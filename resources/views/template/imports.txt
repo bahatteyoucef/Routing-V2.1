@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>GED</title>
+
+	<!-- Vue -->
+	@vite(['resources/css/app.css','resources/scss/app.scss'])
+
+	<!-- Custom CSS -->
+	<link rel="stylesheet" href="{{url('css/login.css')}}">
+	<link rel="stylesheet" href="{{url('css/custom.css')}}">
+	<link rel="stylesheet" href="{{url('css/map.css')}}">
+
+
+	<!-- Vue Template -->
+	<link rel="stylesheet" href="{{url('template/css/app.0625c153.css')}}">
+	<link rel="stylesheet" href="{{url('template/css/chunk-vendors.0d89a5bc.css')}}">
+
+	<!-- Template CSS -->
+
+	<!-- SCSS -->
+	<link rel="stylesheet" href="{{url('template/scss/_animation.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/_background.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/_demo.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/_fonts.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/_footer.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/_functions.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/_layout.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/_misc.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/_navbar.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/_reset.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/_sidebar.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/_typography.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/_utilities.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/_variables.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/landing-screens/_style.scss')}}">
+
+	<!-- Landing -->
+	<link rel="stylesheet" href="{{url('template/scss/landing-screens/_auth.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/landing-screens/_error.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/landing-screens/_landing.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/landing-screens/_profile-page.scss')}}">
+
+	<!-- Components -->
+	<link rel="stylesheet" href="{{url('template/scss/components/_badges.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/components/_bootstrap-progress.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/components/_buttons.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/components/_cards.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/components/_checkbox-radio.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/components/_dashboard.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/components/_dropdown.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/components/_form.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/components/_icons.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/components/_lists.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/components/_nav.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/components/_new-account.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/components/_preview.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/components/_settings-panel.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/components/_tables.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/components/_todo-list.scss')}}">
+
+	<!-- Mixin -->
+	<link rel="stylesheet" href="{{url('template/scss/mixins/_accordions.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/mixins/_animation.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/mixins/_background.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/mixins/_badges.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/mixins/_blockqoute.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/mixins/_breakcrumbs.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/mixins/_buttons.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/mixins/_cards.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/mixins/_misc.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/mixins/_no-ui-slider.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/mixins/_pagination.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/mixins/_popovers.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/mixins/_tabs.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/mixins/_tabs.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/mixins/_text.scss')}}">
+	<link rel="stylesheet" href="{{url('template/scss/mixins/_tooltips.scss')}}">
+
+	<!-- Leaflet -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+
+</head>
+
+<body>
+
+	<div id="app">
+		<main-app></main-app>
+	</div>
+
+	@vite('resources/js/app.js')
+
+</body>
+
+<!-- Vue Routing -->
+<script src="https://unpkg.com/vue@3"></script>
+<script src="https://unpkg.com/vue-router@4"></script>
+
+<!-- Leaflet -->
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+
+</html>

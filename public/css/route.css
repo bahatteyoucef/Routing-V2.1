@@ -1,0 +1,142 @@
+
+/*  */
+
+@media only screen and (min-device-width: 768px) {
+    #sidebar_route
+    {
+        position    :   fixed   ;
+        overflow-x  :   hidden  ;
+    }
+}
+
+/*  */
+
+#map {
+    position    :   absolute    ;
+
+    top         :   73px        ;
+    left        :   0           ;
+
+    width       :   100%        ;
+    height      :   65%         ;
+}
+
+/*  */
+
+#page_route {
+    height      :   100%;
+    width       :   100%;
+}
+
+/*  */
+
+#informations_route_div th, #informations_jour_div th{
+    background-color    : #4281B4;
+    color               : white
+}
+
+#content_route { 
+    position    :   absolute;
+    top         :   0;
+    width       :   83%;
+    height      :   100%;
+}
+
+#tableau_data {
+    position    :   absolute;
+
+    bottom      :   0;
+    left        :   0;
+
+    width       :   100%;
+    height      :   27%;
+
+    overflow-x  :   hidden;
+}
+
+/*  */
+
+.map_top_buttons_div {
+    position        :   fixed;
+    top             :   73px;
+    right           :   55px;
+    z-index         :   999;
+    width           :   15%;
+}
+
+/*  */
+
+path.leaflet-interactive.animate {
+    stroke-dasharray: 1920;
+    stroke-dashoffset: 1920;
+    animation: dash 20s linear 3s forwards;
+}
+
+@keyframes dash {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+/*  */
+
+.leaflet-routing-container {
+    display: none;
+}
+
+/*  */
+
+.canvas-marker:hover {
+    transform: scale(1.2);
+}
+
+/*  */
+
+.marker-cluster-custom-small {
+    opacity : 0.9;
+    background-color: none;
+}
+
+.marker-cluster-custom-small div {
+    opacity : 0.9;
+    background-color: none;
+}
+
+/*  */
+
+.marker-cluster-custom-medium {
+    opacity : 0.9;
+    background-color: none;
+}
+
+.marker-cluster-custom-medium div {
+    opacity : 0.9;
+    background-color: none;
+}
+
+/*  */
+
+.marker-cluster-custom-large {
+    opacity : 0.9;
+    background-color: none;
+}
+
+.marker-cluster-custom-large div {
+    opacity : 0.9;
+    background-color: none;
+}
+
+.marker-cluster div {
+    width           : 45px;
+    height          : 45px;
+    padding         : 15px;
+    margin-left     : 0px;
+    margin-top      : 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius   : 50%;
+    font            : 19px "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+/*  */
