@@ -14,3 +14,10 @@
 }
 
 /*  */
+
+#header_select_route .multiselect-single-label-text {
+
+    color               :   #10B981             ;
+    font-family         :   ubuntu-bold,sans-serif;
+    font-weight         :   700         !important;
+}

@@ -15,7 +15,7 @@ import Login                    from    "./components/login/login.vue"
 //
 
 import RouteImportAdd           from    "./components/routes/imports/RouteImportAdd.vue"
-import mapRoute                 from    "./template/routePartials/mapRoute.vue"
+import ParRouteImportDetails    from    "./components/routes/obs/ParRouteImportDetails.vue"
 
 //  //  //  //  //  //  //  //  //  //  //  //
 
@@ -46,7 +46,7 @@ const routes = [
     // Imports Details
     {
         path        : "/route/obs/route_import/:id_route_import/details",
-        component   : mapRoute
+        component   : ParRouteImportDetails
     },
 ];
 

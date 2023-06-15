@@ -12,12 +12,12 @@
                         <hr />
 
                         <form class="row mt-3 mb-3">
-                            <div class="col-5">
+                            <div class="col-4">
                                 <label for="libelle"        class="form-label">Libelle</label>
                                 <input type="text"          class="form-control"        id="libelle"        v-model="route_import.libelle">
                             </div>
 
-                            <div class="col-5">
+                            <div class="col-4">
                                 <label for="fiile"          class="form-label">File</label>
                                 <input  type="file"         class="form-control"        
                                                             id="file"
@@ -26,42 +26,15 @@
                                                                     application/vnd.ms-excel">
                             </div>
 
-                            <div class="col-2 mt-auto">
-                                <button type="button" class="btn btn-primary"   @click="sendData()">Valider</button>
+                            <div class="col-4 mt-auto">
+                                <button type="button" class="btn btn-primary"   @click="sendData()"                                                                                                         >Importer   </button>
+                                <button type="button" class="btn btn-primary"   @click="showResumeValidate()"   data-bs-toggle="modal" :data-bs-target="'#modalResumeValidate'"     v-if="route_import.file">Valider    </button>
+                                <button type="button" class="btn btn-primary"   @click="showResume()"           data-bs-toggle="modal" :data-bs-target="'#modalResume'"             v-if="route_import.file">Resume     </button>
                             </div>
                         </form>
 
-                        <div v-if="resume_liste_journey_plan    !=  null" class="mt-5">
-
-                            <div v-for="journey_plan in resume_liste_journey_plan" :key="journey_plan.JPlan" class="mt-5">
-
-                                <div>
-                                    <h5 class="modal-title">{{journey_plan.JPlan}} : {{journey_plan.clients.length}}</h5>
-                                </div>
-
-                                <table class="table table-striped mt-3">
-                                    <tr>
-                                        <th>District</th>
-                                        <th>Clients</th>
-                                        <th>City</th>
-                                        <!-- <th>Clients</th> -->
-                                    </tr>
-
-                                    <tr v-for="district in journey_plan.districts" :key="district.DistrictNo">
-                                        <td :rowspan="district.cites.length">{{district.DistrictNameE}}</td>
-                                        <td :rowspan="district.cites.length">{{district.clients.length}}</td>
-                                        <td>
-                                            <tr v-for="cite in district.cites" :key="cite.CityNo" class="p-0">
-                                                <td>{{cite.CityNameE}}</td>
-                                                <td>{{cite.clients.length}}</td>
-                                            </tr>
-                                        </td>
-                                        <!-- <td>Clients</td> -->
-                                    </tr>
-                                </table>
-                            </div>
-
-                        </div>
+                        <modalResume            ref="modalResume"           :key="route_import.file"    :route_import="route_import"  :clients="clients"></modalResume>
+                        <modalResumeValidate    ref="modalResumeValidate"   :key="route_import.file"    :route_import="route_import"  :clients="clients"></modalResumeValidate>
 
                     </div>
                 </div>
@@ -71,6 +44,9 @@
 </template>
 
 <script>
+
+import modalResume       from "./modalResume.vue"
+import modalResumeValidate  from "./modalResumeValidate.vue"
 
 import * as XLSX from "xlsx";
 
@@ -88,18 +64,13 @@ export default {
             },
 
             clients         :   ""  ,
-
-            //
-
-            resume_liste_journey_plan   :   null
-
-            //
         }
     },
 
-    mounted() {
+    components : {
 
-        console.log(1111)
+        modalResume      :   modalResume      ,
+        modalResumeValidate :   modalResumeValidate
     },
 
     methods : {
@@ -113,7 +84,6 @@ export default {
 
             formData.append("libelle"   ,   this.route_import.libelle)
             formData.append("file"      ,   this.route_import.file)
-
             formData.append("data"      ,   JSON.stringify(this.clients))
 
             const res   = await this.$callApi('post' ,   '/route_import/store'    ,   formData)         
@@ -124,6 +94,13 @@ export default {
 
             if(res.status===200){
 
+                // Close Modal
+                this.$hideModal("modalResume")
+
+                // Send Event
+                this.emitter.emit("reSetRouteImport")
+
+                // Add Route Import
                 this.$router.push("/route/obs/route_import/"+res.data.route_import.id+"/details")
 
                 // Send Feedback
@@ -141,6 +118,9 @@ export default {
         getFile(event) {
 
             try {
+
+                // Show Loading Page
+                this.$showLoadingPage()
 
                 const target    =   event.target
 
@@ -177,30 +157,26 @@ export default {
                         this.setLatitudeLongitudeStandard()
                         this.setNecessaryAttributs()
                         this.setCustomerNo()
-
-                        //
-
-                        // this.resume_liste_journey_plan  =   this.$getResumeFileRouting(this.clients)
-
-                        // for (const [key, value] of Object.entries(this.resume_liste_journey_plan)) {
-
-                        //     console.log(this.resume_liste_journey_plan[key])
-                        // }
-
-                        //
-                        
-                    };
-                              
+                    };             
                 }
 
-                else {
-
-                }
+                // Hide Loading Page
+                this.$hideLoadingPage()
 
             }catch(error)
             {
    
             }
+        },
+
+        showResume() {
+
+            this.$refs.modalResume.setResume(this.clients)
+        },
+
+        showResumeValidate() {
+
+            this.$refs.modalResumeValidate.setResumeValidate()
         },
 
         //
@@ -292,46 +268,9 @@ export default {
                     this.clients[i].JPlan           =   ""
                 }
 
-                //
+                if(!this.clients[i].hasOwnProperty("Journee")) {
 
-                if(!this.clients[i].hasOwnProperty("Frequency")) {
-
-                    this.clients[i].Frequency       =   ""
-                }
-
-                if(!this.clients[i].hasOwnProperty("StartWeek")) {
-
-                    this.clients[i].StartWeek       =   ""
-                }
-
-                if(!this.clients[i].hasOwnProperty("sat")) {
-
-                    this.clients[i].sat             =   ""
-                }
-
-                if(!this.clients[i].hasOwnProperty("sun")) {
-
-                    this.clients[i].sun             =   0
-                }
-
-                if(!this.clients[i].hasOwnProperty("mon")) {
-
-                    this.clients[i].mon             =   0
-                }
-
-                if(!this.clients[i].hasOwnProperty("tue")) {
-
-                    this.clients[i].tue             =   ""
-                }
-
-                if(!this.clients[i].hasOwnProperty("wed")) {
-
-                    this.clients[i].wed             =   ""
-                }
-
-                if(!this.clients[i].hasOwnProperty("thu")) {
-
-                    this.clients[i].thu             =   ""
+                    this.clients[i].Journee         =   ""
                 }
             }
         },

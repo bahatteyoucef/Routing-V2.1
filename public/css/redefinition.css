@@ -79,3 +79,10 @@ p {
 }
 
 /*  */
+
+.expanded_modal {
+
+    max-width       :   100%        !important;
+    margin-left     :   1.75rem     !important;
+    margin-right    :   1.75rem     !important;
+}

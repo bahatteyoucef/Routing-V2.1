@@ -214,11 +214,11 @@ export default {
 
                 if(!journey_plan_existe) {
 
-                    liste_journey_plan[clients[i].JPlan]            =   {JPlan  :   ""}
-                    liste_journey_plan[clients[i].JPlan].JPlan      =   clients[i].JPlan   
-                    liste_journey_plan[clients[i].JPlan].clients    =   this.$getJourneyPlanClients(clients, clients[i].JPlan)
-                    liste_journey_plan[clients[i].JPlan].districts  =   this.$getJourneyPlanDistricts(liste_journey_plan[clients[i].JPlan].clients)
-                    // liste_journey_plan[clients[i].JPlan].rowspan    =   this.$getJourneyPlanRowSpan(liste_journey_plan[clients[i].JPlan].districts)
+                    liste_journey_plan[clients[i].JPlan]                =   {JPlan  :   ""}
+                    liste_journey_plan[clients[i].JPlan].JPlan          =   clients[i].JPlan   
+                    liste_journey_plan[clients[i].JPlan].clients        =   this.$getJourneyPlanClients(clients, clients[i].JPlan)
+                    liste_journey_plan[clients[i].JPlan].districts      =   this.$getJourneyPlanDistricts(liste_journey_plan[clients[i].JPlan].clients)
+                    liste_journey_plan[clients[i].JPlan].liste_journee  =   this.$getJourneyPlanJournee(liste_journey_plan[clients[i].JPlan].clients)
                 }
             }
 
@@ -282,7 +282,7 @@ export default {
 
             for (let i = 0; i < journey_plan_clients.length; i++) {
 
-                district_existe         =   this.$checkExistDistrict(districts, journey_plan_clients[i].JPlan) 
+                district_existe         =   this.$checkExistDistrict(districts, journey_plan_clients[i].DistrictNo) 
 
                 if(!district_existe) {
 
@@ -291,6 +291,7 @@ export default {
                     districts[journey_plan_clients[i].DistrictNo].DistrictNameE             =   journey_plan_clients[i].DistrictNameE   
                     districts[journey_plan_clients[i].DistrictNo].clients                   =   this.$getDistrictClients(journey_plan_clients, journey_plan_clients[i].DistrictNo)
                     districts[journey_plan_clients[i].DistrictNo].cites                     =   this.$getDistrictCites(districts[journey_plan_clients[i].DistrictNo].clients)
+                    districts[journey_plan_clients[i].DistrictNo].liste_type_client         =   this.$getDistrictTypeClient(districts[journey_plan_clients[i].DistrictNo].clients)
                 }
             }
 
@@ -334,7 +335,7 @@ export default {
 
             for (let i = 0; i < district_clients.length; i++) {
 
-                cite_existe     =   this.$checkExistCite(cites, district_clients[i].JPlan) 
+                cite_existe     =   this.$checkExistCite(cites, district_clients[i].CityNo) 
 
                 if(!cite_existe) {
 
@@ -342,6 +343,7 @@ export default {
                     cites[district_clients[i].CityNo].CityNo                    =   district_clients[i].CityNo   
                     cites[district_clients[i].CityNo].CityNameE                 =   district_clients[i].CityNameE   
                     cites[district_clients[i].CityNo].clients                   =   this.$getCiteClients(district_clients, district_clients[i].CityNo)
+                    cites[district_clients[i].CityNo].liste_type_client         =   this.$getCiteTypeClient(cites[district_clients[i].CityNo].clients)
                 }
             }
 
@@ -374,9 +376,306 @@ export default {
             }
 
             return cite_clients
-        }
+        },
 
         //
 
+        $getDistrictTypeClient(district_clients) {
+
+            let liste_type_client       =   {}
+            let type_client_existe =   false
+
+            for (let i = 0; i < district_clients.length; i++) {
+
+                type_client_existe     =   this.$checkExistTypeClient(liste_type_client, district_clients[i].CustomerType) 
+
+                if(!type_client_existe) {
+
+                    liste_type_client[district_clients[i].CustomerType]                     =   {CustomerType  :   ""}
+                    liste_type_client[district_clients[i].CustomerType].CustomerType        =   district_clients[i].CustomerType   
+                    liste_type_client[district_clients[i].CustomerType].clients             =   this.$getTypeClientClients(district_clients, district_clients[i].CustomerType)
+                }
+            }
+
+            return liste_type_client
+        },
+
+        $checkExistTypeClient(liste_type_client, CustomerType) {
+
+            for (const [key, value] of Object.entries(liste_type_client)) {
+
+                if(liste_type_client[key].CustomerType  ==  CustomerType) {
+
+                    return true
+                }
+            }
+
+            return false
+        },
+
+        $getTypeClientClients(district_clients, CustomerType) {
+
+            let type_client_clients    =   []
+
+            for (let i = 0; i < district_clients.length; i++) {
+
+                if(district_clients[i].CustomerType ==  CustomerType) {
+
+                    type_client_clients.push(district_clients[i])
+                }
+            }
+
+            return type_client_clients
+        },
+
+        //
+
+        $getCiteTypeClient(cite_clients) {
+
+            let liste_type_client       =   {}
+            let type_client_existe      =   false
+
+            for (let i = 0; i < cite_clients.length; i++) {
+
+                type_client_existe     =   this.$checkExistTypeClient(liste_type_client, cite_clients[i].CustomerType) 
+
+                if(!type_client_existe) {
+
+                    liste_type_client[cite_clients[i].CustomerType]                     =   {CustomerType  :   ""}
+                    liste_type_client[cite_clients[i].CustomerType].CustomerType        =   cite_clients[i].CustomerType   
+                    liste_type_client[cite_clients[i].CustomerType].clients             =   this.$getTypeClientClients(cite_clients, cite_clients[i].CustomerType)
+                }
+            }
+
+            return liste_type_client
+        },
+
+        $getTypeClientClients(cite_clients, CustomerType) {
+
+            let type_client_clients    =   []
+
+            for (let i = 0; i < cite_clients.length; i++) {
+
+                if(cite_clients[i].CustomerType ==  CustomerType) {
+
+                    type_client_clients.push(cite_clients[i])
+                }
+            }
+
+            return type_client_clients
+        },
+
+        //
+
+        $getJourneyPlanJournee(journey_plan_clients) {
+
+            let liste_journee       =   {}
+            let district_existe     =   false
+
+            for (let i = 0; i < journey_plan_clients.length; i++) {
+
+                district_existe         =   this.$checkExistDistrict(liste_journee, journey_plan_clients[i].Journee) 
+
+                if(!district_existe) {
+
+                    liste_journee[journey_plan_clients[i].Journee]                           =   {Journee  :   ""}
+                    liste_journee[journey_plan_clients[i].Journee].Journee                   =   journey_plan_clients[i].Journee   
+                    liste_journee[journey_plan_clients[i].Journee].clients                   =   this.$getJourneeClients(journey_plan_clients, journey_plan_clients[i].Journee)
+                    liste_journee[journey_plan_clients[i].Journee].cites                     =   this.$getJourneeCites(liste_journee[journey_plan_clients[i].Journee].clients)
+                }
+            }
+
+            return liste_journee
+        },
+
+        $checkExistJournee(liste_journee, Journee) {
+
+            for (const [key, value] of Object.entries(liste_journee)) {
+
+                if(liste_journee[key].Journee    ==  Journee) {
+
+                    return true
+                }
+            }
+
+            return false
+        },
+
+        $getJourneeClients(journey_plan_clients, Journee) {
+
+            let journee_clients     =   []
+
+            for (let i = 0; i < journey_plan_clients.length; i++) {
+
+                if(journey_plan_clients[i].Journee   ==  Journee) {
+
+                    journee_clients.push(journey_plan_clients[i])
+                }
+            }
+
+            return journee_clients
+        },
+
+        //
+
+        $getJourneeCites(journee_clients) {
+
+            let cites       =   {}
+            let cite_existe =   false
+
+            for (let i = 0; i < journee_clients.length; i++) {
+
+                cite_existe     =   this.$checkExistCite(cites, journee_clients[i].CityNo) 
+
+                if(!cite_existe) {
+
+                    cites[journee_clients[i].CityNo]                           =   {CityNo  :   "", CityNameE : ""}
+                    cites[journee_clients[i].CityNo].CityNo                    =   journee_clients[i].CityNo   
+                    cites[journee_clients[i].CityNo].CityNameE                 =   journee_clients[i].CityNameE   
+                    cites[journee_clients[i].CityNo].clients                   =   this.$getCiteClients(journee_clients, journee_clients[i].CityNo)
+                }
+            }
+
+            return cites
+        },
+
+        //
+
+        $getDoublantTel(clients) {
+
+            let clients_tempo   =   []
+
+            let double_existe   =   false
+
+            for (let i = 0; i < clients.length - 1; i++) {
+
+                double_existe   =   false
+
+                for (let j = i + 1; j < clients.length; j++) {
+
+                    if(clients[i].Tel   ==  clients[j].Tel) {
+
+                        if(!this.$clientExisteInArray(clients[j], clients_tempo)) {
+
+                            if(double_existe    ==  false) {
+
+                                double_existe   =   true
+                                clients_tempo.push(clients[i])
+                            }
+
+                            clients_tempo.push(clients[j])
+                        }
+                    }
+                }                
+            }
+
+            return clients_tempo
+        },
+
+        $getDoublantLatitudeLongitude(clients) {
+
+            let clients_tempo   =   []
+
+            let double_existe   =   false
+
+            for (let i = 0; i < clients.length - 1; i++) {
+
+                double_existe   =   false
+
+                for (let j = i + 1; j < clients.length; j++) {
+
+                    if((clients[i].Latitude ==  clients[j].Latitude)&&(clients[i].Longitude ==  clients[j].Longitude)) {
+
+                        if(!this.$clientExisteInArray(clients[j], clients_tempo)) {
+
+                            if(double_existe    ==  false) {
+
+                                double_existe   =   true
+                                clients_tempo.push(clients[i])
+                            }
+
+                            clients_tempo.push(clients[j])
+                        }
+                    }
+                }                
+            }
+
+            return clients_tempo
+        },
+
+        $getDoublantCustomerNameE(clients) {
+
+            let clients_tempo   =   []
+
+            let double_existe   =   false
+
+            for (let i = 0; i < clients.length - 1; i++) {
+
+                for (let j = i + 1; j < clients.length; j++) {
+
+                    if(clients[i].CustomerNameE ==  clients[j].CustomerNameE) {
+
+                        if(!this.$clientExisteInArray(clients[j], clients_tempo)) {
+
+                            if(double_existe    ==  false) {
+
+                                double_existe   =   true
+                                clients_tempo.push(clients[i])
+                            }
+
+                            clients_tempo.push(clients[j])
+                        }
+                    }
+                }                
+            }
+
+            return clients_tempo
+        },
+
+        $getDoublantCustomerCode(clients) {
+
+            let clients_tempo   =   []
+
+            let double_existe   =   false
+
+            for (let i = 0; i < clients.length - 1; i++) {
+
+                double_existe   =   false
+
+                for (let j = i + 1; j < clients.length; j++) {
+
+                    if(clients[i].CustomerCode  ==  clients[j].CustomerCode) {
+
+                        if(!this.$clientExisteInArray(clients[j], clients_tempo)) {
+
+                            if(double_existe    ==  false) {
+
+                                double_existe   =   true
+                                clients_tempo.push(clients[i])
+                            }
+
+                            clients_tempo.push(clients[j])
+                        }
+                    }
+                }                
+            }
+
+            return clients_tempo
+        },
+
+        //
+
+        $clientExisteInArray(client, clients) {
+
+            for (let i = 0; i < clients.length; i++) {
+
+                if(clients[i].CustomerNo    ==  client.CustomerNo) {
+
+                    return true
+                }                
+            }
+
+            return false
+        }
     }
 }

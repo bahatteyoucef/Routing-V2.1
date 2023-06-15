@@ -60,6 +60,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/route_import'                                             ,   [RouteImportController::class           , 'index'                                   ]);
     Route::post('/route_import/store'                                       ,   [RouteImportController::class           , 'store'                                   ]);
     Route::post('/route_import/{id_route_import}/update'                    ,   [RouteImportController::class           , 'update'                                  ]);
+    Route::post('/route_import/{id_route_import}/delete'                    ,   [RouteImportController::class           , 'delete'                                  ]);
 
     Route::post('/route/obs/route_import/{id_route_import}/details'         ,   [RouteImportController::class           , 'obsDetailsRouteImport'                   ]);
 });

@@ -85,3 +85,65 @@
 
     cursor      : pointer;
 }
+
+/*  */
+
+/*  */
+
+/* Scroll Bar */
+
+.scrollbar-deep-blue::-webkit-scrollbar-track {
+    -webkit-box-shadow  : inset 0 0 6px rgba(0, 0, 0, 0.1)  ;
+    background-color    : #FFFFFF   ;
+    border-radius       : 10px        ;
+}
+
+.scrollbar-deep-blue::-webkit-scrollbar {
+    width   : 9px  ;
+    height  : 3px   ;
+
+    background-color: #FFFFFF   ;
+}
+
+.scrollbar-deep-blue::-webkit-scrollbar-thumb {
+    border-radius       : 10px                                  ;
+    -webkit-box-shadow  : inset 0 0 6px rgba(0, 0, 0, 0.1)    ;
+    background-image    : -webkit-linear-gradient(330deg, #FFFFFF 0%, #187498 100%) ;
+    background-image    : linear-gradient(120deg, #FFFFFF 0%, #187498 100%)         ;
+}
+
+.scrollbar-deep-blue {
+    scrollbar-color     : #187498 #FFFFFF    ;
+}
+
+/*  */
+
+.popper {
+
+    width               : 355px;
+    height              : 455px;
+
+    overflow            : auto;
+
+    scrollbar-color     : #27374D #000    ;
+}
+
+.popper::-webkit-scrollbar-track {
+    -webkit-box-shadow  : inset 0 0 6px rgba(0, 0, 0, 0.1)  ;
+    background-color    : #FFFFFF   ;
+    border-radius       : 10px        ;
+}
+
+.popper::-webkit-scrollbar {
+    width   : 5px  ;
+    height  : 3px   ;
+
+    background-color: #FFFFFF   ;
+}
+
+.popper::-webkit-scrollbar-thumb {
+    border-radius       : 10px                                  ;
+    -webkit-box-shadow  : inset 0 0 6px rgba(0, 0, 0, 0.1)    ;
+    background-image    : -webkit-linear-gradient(330deg, #000 0%, #27374D 100%) ;
+    background-image    : linear-gradient(120deg, #000 0%, #27374D 100%)         ;
+}

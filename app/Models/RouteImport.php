@@ -75,6 +75,14 @@ class RouteImport extends Model
         $route_import->save();
     }
 
+    public static function deleteRouteImport(int $id_route_import)
+    {
+
+        $route_import       =   RouteImport::find($id_route_import);
+
+        $route_import->delete();
+    }
+
     //
 
     public static function indexRouteImport()

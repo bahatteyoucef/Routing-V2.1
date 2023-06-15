@@ -2,7 +2,7 @@
 
     <!-- Modal -->
     <div class="modal fade" id="clientsChangeRouteModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-dialog modal-xl expanded_modal modal-dialog-scrollable">
             <div class="modal-content">
 
                 <div class="modal-header">
@@ -10,7 +10,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <div class="modal-body mt-3">
+                <div class="modal-body mt-3 table-responsive">
 
                     <form>
 
@@ -42,72 +42,15 @@
                             <div class="col">
                                 <div class="mb-3">
                                     <label for="JPlan"              class="form-label">JPlan</label>
-                                    <select                         class="form-select"         id="JPlan"                  v-model="JPlan">
-                                        <option value=""></option>
-                                        <option v-for="journey_plan in liste_journey_plan"      :key="journey_plan.JPlan"   :value="journey_plan.JPlan">{{journey_plan.JPlan}}</option>
-                                    </select>
+                                    <input type="text"              class="form-control"        id="JPlan"                      v-model="JPlan">
                                 </div>
                             </div>
 
-                            <!-- Frequence de Visite Par Semaine    -->
-                            <div class="col">
-                                <label for="frequence_visite"           class="form-label">Frequence de visite</label>
-                                <select                                 class="form-select"     id="frequence_visite"       v-model="frequence_visite">
-                                    <option value=""></option>
-                                    <option value="1">journalière</option>
-                                    <option value="2">3 fois par semaine</option>
-                                    <option value="3">2 fois par semaine</option>
-                                    <option value="4">1 fois par semaine</option>
-                                    <option value="5">1 fois par 15 jours</option>
-                                    <option value="6">1 fois par mois</option>
-                                </select>
-                            </div>
-
-                            <!-- StartWeek                          -->
-                            <div class="col">
-                                <label for="StartWeek"          class="form-label">StartWeek</label>
-                                <select                         class="form-select"     id="StartWeek"      v-model="StartWeek">
-                                    <option value=""></option>
-                                    <option value="1">Semaine 1</option>
-                                    <option value="2">Semaine 2</option>
-                                    <option value="3">Semaine 3</option>
-                                    <option value="4">Semaine 4</option>
-                                </select>
-                            </div>
-
-                            <!-- Jours                              -->
+                            <!-- Journee                            -->
                             <div class="col">
                                 <div class="mb-3">
-
-                                    <label class="form-label">Jours</label>
-
-                                    <div class="form-check m-0">
-
-                                        <input type="checkbox" class="jours" id="samedi_checkbox"       @change="checkUncheck('samedi_checkbox')"/>
-                                        <label for="checkbox" class="ml-1">Samedi</label>
-                                        <br />
-
-                                        <input type="checkbox" class="jours" id="dimanche_checkbox"     @change="checkUncheck('dimanche_checkbox')"/>
-                                        <label for="checkbox" class="ml-1">Dimanche</label>
-                                        <br />
-
-                                        <input type="checkbox" class="jours" id="lundi_checkbox"        @change="checkUncheck('lundi_checkbox')"/>
-                                        <label for="checkbox" class="ml-1">Lundi</label>
-                                        <br />
-
-                                        <input type="checkbox" class="jours" id="mardi_checkbox"        @change="checkUncheck('mardi_checkbox')"/>
-                                        <label for="checkbox" class="ml-1">Mardi</label>
-                                        <br />
-
-                                        <input type="checkbox" class="jours" id="mercredi_checkbox"     @change="checkUncheck('mercredi_checkbox')"/>
-                                        <label for="checkbox" class="ml-1">Mercredi</label>
-                                        <br />
-
-                                        <input type="checkbox" class="jours" id="jeudi_checkbox"        @change="checkUncheck('jeudi_checkbox')"/>
-                                        <label for="checkbox" class="ml-1">Jeudi</label>
-                                        <br />
-
-                                    </div>
+                                    <label for="Journee"            class="form-label">Journee</label>
+                                    <input type="text"              class="form-control"        id="Journee"                    v-model="Journee">
                                 </div>
                             </div>
 
@@ -115,7 +58,7 @@
 
                     </form>
 
-                    <table class="table table-striped scrollbar scrollbar-deep-blue">
+                    <table class="table table-striped scrollbar scrollbar-deep-blue datatable_client_change_route" id="datatable_client_change_route">
                         <thead>
                             <tr>
                                 <th scope="col">
@@ -123,13 +66,58 @@
                                         <input @change="checkGlobal($event)" type="checkbox" class="form-check-input" id="client_global" checked>
                                     </div>
                                 </th>
-                                <th scope="col">CustomerNo</th>
-                                <th scope="col">CustomerNameE</th>
-                                <th scope="col">CustomerType</th>
-                                <th scope="col">Tel</th>
-                                <th scope="col">Address</th>
-                                <th scope="col">CityNameE</th>
-                                <th scope="col">DistrictNameE</th>
+                                <!-- <th class="col-sm-1">Index</th> -->
+                                <th class="col-sm-1">CustomerCode</th>
+                                <th class="col-sm-1">CustomerNameE</th>
+                                <th class="col-sm-1">CustomerNameA</th>
+
+                                <th class="col-sm-2">Latitude</th>
+                                <th class="col-sm-2">Longitude</th>
+
+                                <th class="col-sm-2">Address</th>
+
+                                <th class="col-sm-1">DistrictNo</th>
+                                <th class="col-sm-2">DistrictNameE</th>
+
+                                <th class="col-sm-1">CityNo</th>
+                                <th class="col-sm-2">CityNameE</th>
+
+                                <th class="col-sm-2">Tel</th>
+
+                                <th class="col-sm-1">CustomerType</th>
+
+                                <th class="col-sm-2">JPlan</th>
+
+                                <th class="col-sm-1">Journee</th>
+                            </tr>
+                        </thead>
+
+                        <thead>
+                            <tr class="datatable_client_change_route_filters">
+
+                                <!-- <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Index"            /></th> -->
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
+
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Latitude"         /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Longitude"        /></th>
+
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Address"          /></th>
+
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="DistrictNo"       /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="DistrictNameE"    /></th>
+
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CityNo"           /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CityNameE"        /></th>
+
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Tel"              /></th>
+
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerType"     /></th>
+
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="JPlan"            /></th>
+
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Journee"          /></th>
                             </tr>
                         </thead>
 
@@ -140,13 +128,30 @@
                                         <input @change="checkClient($event)" class="form-check-input client_checkbox" type="checkbox" :value="client.CustomerNo" :id="'client_'+client.CustomerNo" checked>
                                     </div>
                                 </td>
-                                <td>{{client.CustomerNo}}</td>
+                                <!-- <td>{{index + 1}}</td> -->
+                                <td>{{client.CustomerCode}}</td>
+
                                 <td>{{client.CustomerNameE}}</td>
-                                <td>{{client.CustomerType}}</td>
-                                <td>{{client.Tel}}</td>
+                                <td>{{client.CustomerNameA}}</td>
+
+                                <td>{{client.Latitude}}</td>
+                                <td>{{client.Longitude}}</td>
+
                                 <td>{{client.Address}}</td>
-                                <td>{{client.CityNameE}}</td>
+
+                                <td>{{client.DistrictNo}}</td>
                                 <td>{{client.DistrictNameE}}</td>
+
+                                <td>{{client.CityNo}}</td>
+                                <td>{{client.CityNameE}}</td>
+
+                                <td>{{client.Tel}}</td>
+
+                                <td>{{client.CustomerType}}</td>
+
+                                <td>{{client.JPlan}}</td>
+
+                                <td>{{client.Journee}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -173,30 +178,31 @@ export default {
     data() {
         return {
 
-            DistrictNo              :   '',
-            CityNo                  :   '',
-            JPlan                   :   '',
-            frequence_visite        :   '',
-            StartWeek               :   '',
-
-            all_clients             :   []  ,
-            clients                 :   []  ,
-
-            liste_journey_plan      :   []  ,
-
-            districts               :   []  ,
-            cites                   :   []  ,
+            datatable_client_change_route   :   null,
 
             //
 
-            jour_changed            :   false,
+            DistrictNo                      :   ""  ,
+            CityNo                          :   ""  ,
+            JPlan                           :   ""  ,
 
-            sat                     :   0   ,
-            sun                     :   0   ,
-            mon                     :   0   ,
-            tue                     :   0   ,
-            wed                     :   0   ,
-            thu                     :   0   
+            all_clients                     :   []  ,
+            clients                         :   []  ,
+
+            //
+
+            liste_journey_plan              :   []  ,
+            liste_journee                   :   []  ,
+            liste_type_client               :   []  ,
+
+            //
+
+            districts                       :   []  ,
+            cites                           :   []  ,
+
+            //
+
+            Journee                         :   ""
         }
     },
 
@@ -204,7 +210,9 @@ export default {
 
         ...mapGetters({
             getClientsChangeRoute           :   'client/getClientsChangeRoute'          ,
-            getListeJourneyPlan             :   'journey_plan/getListeJourneyPlan'    
+            getListeJourneyPlan             :   'journey_plan/getListeJourneyPlan'      ,
+            getListeTypeClient              :   'type_client/getListeTypeClient'        ,  
+            getListeJournee                 :   'journee/getListeJournee'    
         }),
     },
 
@@ -219,60 +227,59 @@ export default {
             "setClientsChangeRouteAction"   ,
         ]),
 
-        async sendData() {
+        async setDataTable() {
 
-            this.setJours()
+            try {
+
+                // Destroy DataTable
+                if(this.datatable_client_change_route)  {
+
+                    this.datatable_client_change_route.destroy()
+                }
+
+                this.datatable_client_change_route  =   await this.$DataTableCreate("datatable_client_change_route")
+            }
+
+            catch(e) {
+
+                console.log(e)
+            }
+        },
+
+        async sendData() {
 
             let clients_copy            =   [...this.clients]
 
             for (let i = 0; i < clients_copy.length; i++) {
 
                 // Set District City
-                clients_copy[i].DistrictNo      =   this.DistrictNo 
-                clients_copy[i].CityNo          =   this.CityNo 
+                if(this.DistrictNo      !=  "") {
 
-                clients_copy[i].DistrictNameE   =   this.getDistrictNameE(this.DistrictNo)
-                clients_copy[i].CityNameE       =   this.getCityNameE(this.CityNo)
+                    clients_copy[i].DistrictNo      =   this.DistrictNo 
+                    clients_copy[i].DistrictNameE   =   this.getDistrictNameE(this.DistrictNo)
+                }
+
+                if(this.CityNo          !=  "") {
+
+                    clients_copy[i].CityNo          =   this.CityNo 
+                    clients_copy[i].CityNameE       =   this.getCityNameE(this.CityNo)
+                }
 
                 // Set JPlan
-                clients_copy[i].JPlan           =   this.JPlan 
+                if(this.JPlan           !=  "") {
 
-                // Set Frequency
-                if((this.frequence_visite           ==  1)||(this.frequence_visite  ==  2)||(this.frequence_visite  ==  3)||(this.frequence_visite  ==  4)) {
-
-                    clients_copy[i].Frequency       =   4
+                    clients_copy[i].JPlan           =   this.JPlan 
                 }
-
-                if(this.frequence_visite            ==  5) {
-
-                    clients_copy[i].Frequency       =   2
-                }
-
-                if(this.frequence_visite            ==  6) {
-
-                    clients_copy[i].Frequency       =   1
-                }
-
-                if(this.frequence_visite            ==  "") {
-
-                    clients_copy[i].Frequency       =   ""
-                }
-
-                // Set StartWeek
-                clients_copy[i].StartWeek       =   this.StartWeek
-
+                
                 // Set Journee
-                clients_copy[i].jour_changed    =   this.jour_changed
+                if(this.Journee         !=  "") {
 
-                clients_copy[i].sat             =   this.sat
-                clients_copy[i].sun             =   this.sun
-                clients_copy[i].mon             =   this.mon
-                clients_copy[i].tue             =   this.tue
-                clients_copy[i].wed             =   this.wed
-                clients_copy[i].thu             =   this.thu
+                    clients_copy[i].Journee         =   this.Journee
+                }
             }
 
             // Send Client
+
             this.emitter.emit('reSetChangeRoute' , clients_copy)
 
             // Close Modal
@@ -370,28 +377,31 @@ export default {
                 // 
                 this.setClientsChangeRouteAction(null)
 
-                this.DistrictNo              =   ''
-                this.CityNo                  =   ''
-                this.JPlan                   =   ''
-                this.frequence_visite        =   ''
-                this.StartWeek               =   ''
-
-                this.all_clients             =   []  
-                this.clients                 =   []  
-
-                this.districts               =   []  
-                this.cites                   =   []  
+                this.datatable_client_change_route   =   null
 
                 //
 
-                this.jour_changed            =   false
+                this.DistrictNo                      =   ''
+                this.CityNo                          =   ''
+                this.JPlan                           =   ''
 
-                this.sat                     =   0   
-                this.sun                     =   0   
-                this.mon                     =   0   
-                this.tue                     =   0   
-                this.wed                     =   0   
-                this.thu                     =   0   
+                this.all_clients                     =   []  
+                this.clients                         =   []  
+
+                //
+
+                this.liste_journey_plan              =   []  
+                this.liste_journee                   =   []  
+                this.liste_type_client               =   []  
+
+                //
+
+                this.districts                       =   []  
+                this.cites                           =   []  
+
+                //
+
+                this.Journee                         =   ''
 
                 this.removeDrawings()
             });
@@ -415,11 +425,15 @@ export default {
 
         //
 
-        getData(clients) {
+        async getData(clients) {
+
+            console.log(clients)
 
             // Set Value
             this.all_clients    =   [...clients]
             this.clients        =   [...clients]
+
+            await this.setDataTable()
         },
 
         async getComboData() {
@@ -486,110 +500,6 @@ export default {
             }
         },
 
-        setJours() {
-
-            // Samedi
-
-            const samedi_checkbox   =   document.getElementById("samedi_checkbox")
-            
-            if(samedi_checkbox.checked) {
-
-                this.jour_changed   =   true
-
-                this.sat            =   1
-            }
-            else {
-
-                this.sat    =   0
-            }
-
-            //
-
-            // Dimanche
-
-            const dimanche_checkbox =   document.getElementById("dimanche_checkbox")
-            
-            if(dimanche_checkbox.checked) {
-
-                this.jour_changed   =   true
-
-                this.sun            =   1
-            }
-            else {
-
-                this.sun    =   0
-            }
-
-            //
-
-            // Lundi
-
-            const lundi_checkbox    =   document.getElementById("lundi_checkbox")
-            
-            if(lundi_checkbox.checked) {
-
-                this.jour_changed   =   true
-
-                this.mon            =   1
-            }
-            else {
-
-                this.mon    =   0
-            }
-
-            //
-
-            // Mardi
-
-            const mardi_checkbox    =   document.getElementById("mardi_checkbox")
-            
-            if(mardi_checkbox.checked) {
-
-                this.jour_changed   =   true
-
-                this.tue            =   1
-            }
-            else {
-
-                this.tue    =   0
-            }
-
-            //
-
-            // Mercredi
-
-            const mercredi_checkbox =   document.getElementById("mercredi_checkbox")
-            
-            if(mercredi_checkbox.checked) {
-
-                this.jour_changed   =   true
-
-                this.wed            =   1
-            }
-            else {
-
-                this.wed    =   0
-            }
-
-            //
-
-            // Jeudi
-
-            const jeudi_checkbox    =   document.getElementById("jeudi_checkbox")
-            
-            if(jeudi_checkbox.checked) {
-
-                this.jour_changed   =   true
-
-                this.thu            =   1
-            }
-            else {
-
-                this.thu    =   0
-            }
-
-            //
-        }
     },
 
     watch : {
@@ -602,6 +512,16 @@ export default {
         getListeJourneyPlan(new_liste_journey_plan, old_liste_journey_plan) {
 
             this.liste_journey_plan     =   new_liste_journey_plan
+        },
+
+        getListeJournee(new_liste_journee, old_liste_journee) {
+
+            this.liste_journee          =   new_liste_journee
+        },
+
+        getListeTypeClient(new_liste_type_client, old_liste_type_client) {
+
+            this.liste_type_client      =   new_liste_type_client
         }
     }
 };

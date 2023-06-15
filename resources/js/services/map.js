@@ -71,18 +71,18 @@ export default class Map {
 
     // Show Markers
 
-    $setRouteMarkers(clients, JPID) {
+    $setRouteMarkers(clients, JPID, color) {
 
         // Show Markers
-        this.$showClusters(JPID)        
+        this.$showClusters(JPID, color)        
 
         // Add Markers
-        this.$addRouteMarkers(clients, JPID)
+        this.$addRouteMarkers(clients, JPID, color)
     }
 
-    $addRouteMarkers(clients, JPID) {
+    $addRouteMarkers(clients, JPID, color) {
 
-        var icon                            =   this.$setMarkerIcon(JPID) 
+        var icon                            =   this.$setMarkerIcon(JPID, color) 
 
         // Add Markers
         for (let i = 0; i < clients.length; i++) {
@@ -117,6 +117,7 @@ export default class Map {
             "CustomerNameE  : "     +clients[i].CustomerNameE   +"<br />"+
             "CustomerType   : "     +clients[i].CustomerType    +"<br />"+
             "JPlan          : "     +clients[i].JPlan           +"<br />"+
+            "Journee        : "     +clients[i].Journee         +"<br />"+
             "Tel            : "     +clients[i].Tel             +"<br />"+
             "DistrictName   : "     +clients[i].DistrictNameE   +"<br />"+
             "CityName       : "     +clients[i].CityNameE       +"<br />"+
@@ -135,20 +136,19 @@ export default class Map {
         });
     }
 
-    $setMarkerIcon(JPID) {
+    $setMarkerIcon(JPID, color) {
 
         let icon        =   null
-        let color_index =   JPID % 40
 
         icon    =   new L.Icon({
-            iconUrl  : '/images/'+this.colors[color_index].substring(1)+'.png',
+            iconUrl  : '/images/'+color.substring(1)+'.png',
             shadowUrl: '/images/marker-shadow.png',
         });
 
         return icon
     }
 
-    $showClusters(JPID) {
+    $showClusters(JPID, color) {
 
         this.clusters[JPID]             =   L.markerClusterGroup({
     
@@ -176,7 +176,7 @@ export default class Map {
 
                 let color_index             =   JPID % 40
 
-                div.style.backgroundColor   =   this.colors[color_index]
+                div.style.backgroundColor   =   color
                 div.style.border            =   "3px solid #FFFFFF"
                 div.style.borderRadius      =   "50%"
 
@@ -472,7 +472,7 @@ export default class Map {
 
     $updateModalClientsRoute(clients_change_route) {
 
-        store.commit("client/setClientsChangeRoute"     , clients_change_route)
+        store.commit("client/setClientsChangeRoute" , clients_change_route)
     }
 
     $addModalClient(event) {
@@ -482,7 +482,7 @@ export default class Map {
 
     $updateModalClient(client) {
 
-        store.commit("client/setUpdateClient"   , client)
+        store.commit("client/setUpdateClient"       , client)
     }
 
     // 

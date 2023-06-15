@@ -17,15 +17,11 @@
 
             <div class="container-fluid page-body-wrapper">
 
-                <sidebar-part></sidebar-part>
+                <div class="main-panel w-100" id="main_content">
 
-                <!-- Case Not Route -->
-                <div class="main-panel" id="main_content">
+                    <router-view :key="$route.path"></router-view>
 
-                    <router-view></router-view>
-                    <!-- <footer-part></footer-part> -->
-
-                </div> 
+                </div>
 
             </div>
         </div>
@@ -99,3 +95,20 @@
 
 </script>
 
+
+<style>
+
+:root {
+    --popper-theme-background-color: #333333;
+    --popper-theme-background-color-hover: #333333;
+    --popper-theme-text-color: #ffffff;
+    --popper-theme-border-width: 0px;
+    --popper-theme-border-style: solid;
+    --popper-theme-border-radius: 6px;
+    --popper-theme-padding: 7px;
+    --popper-theme-box-shadow: 0 6px 30px -6px rgba(0, 0, 0, 0.25);
+}
+
+</style>
+
+<style src="@vueform/multiselect/themes/default.css"></style>

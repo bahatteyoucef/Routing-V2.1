@@ -12,13 +12,15 @@
 /*  */
 
 #map {
-    position    :   absolute    ;
+    position    :   fixed   ;
 
-    top         :   73px        ;
-    left        :   0           ;
+    top         :   0       ;
+    left        :   0       ;
 
-    width       :   100%        ;
-    height      :   65%         ;
+    width       :   100%    ;
+    height      :   100%    ;
+
+    transition  :   height 0.3s ease;
 }
 
 /*  */
@@ -30,38 +32,62 @@
 
 /*  */
 
-#informations_route_div th, #informations_jour_div th{
-    background-color    : #4281B4;
-    color               : white
-}
-
 #content_route { 
-    position    :   absolute;
+    position    :   fixed;
     top         :   0;
-    width       :   83%;
-    height      :   100%;
-}
-
-#tableau_data {
-    position    :   absolute;
-
-    bottom      :   0;
     left        :   0;
 
     width       :   100%;
-    height      :   27%;
+    height      :   100%;
+}
 
-    overflow-x  :   hidden;
+#datatable_par_route_import_parent {
+
+    position    :   absolute    ;
+    bottom      :   0           ;
+    left        :   0           ;
+
+    width       :   100%        ;
+    height      :   50%         ;
+
+    overflow    :   auto        ;
+}
+
+#show_route_datatable_icon_div {
+
+    position    :   absolute    ;
+    bottom      :   3%          ;
+    left        :   50%         ;
+}
+
+#hide_route_datatable_icon_div {
+
+    position    :   absolute    ;
+    bottom      :   53%         ;
+    left        :   50%         ;
 }
 
 /*  */
 
 .map_top_buttons_div {
     position        :   fixed;
-    top             :   73px;
-    right           :   55px;
+    top             :   75px;
+    right           :   1cqh;
     z-index         :   999;
-    width           :   15%;
+    width           :   11%;
+}
+
+.map_top_infos_div {
+    position        :   absolute;
+    top             :   175px;
+    left            :   0;
+    z-index         :   999;
+}
+
+.map_top_infos_div td, .map_top_infos_div th {
+
+    font-size       :   13px;
+    color           : #FFFFFF;
 }
 
 /*  */
@@ -82,6 +108,11 @@ path.leaflet-interactive.animate {
 
 .leaflet-routing-container {
     display: none;
+}
+
+.leaflet-top {
+
+    margin-top: 75px;
 }
 
 /*  */

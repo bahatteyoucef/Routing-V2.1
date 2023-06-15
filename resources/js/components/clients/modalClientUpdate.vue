@@ -15,6 +15,11 @@
                     <form>
 
                         <div class="mb-3">
+                            <label for="CustomerCode"       class="form-label">CustomerCode</label>
+                            <input type="text"              class="form-control"        id="CustomerCode"           v-model="client.CustomerCode">
+                        </div>
+
+                        <div class="mb-3">
                             <label for="CustomerNameE"      class="form-label">CustomerNameE</label>
                             <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE">
                         </div>
@@ -68,30 +73,6 @@
                         <!--  -->
 
                         <div class="mb-3">
-                            <label for="Frequency"      class="form-label">Frequence de visite</label>
-                            <select                     class="form-select"     id="Frequency"       v-model="client.Frequency">
-                                <option value="1">journalière</option>
-                                <option value="2">3 fois par semaine</option>
-                                <option value="3">2 fois par semaine</option>
-                                <option value="4">1 fois par semaine</option>
-                                <option value="5">1 fois par 15 jours</option>
-                                <option value="6">1 fois par mois</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="StartWeek"          class="form-label">StartWeek</label>
-                            <select                         class="form-select"     id="StartWeek"      v-model="client.StartWeek">
-                                <option value="1">Semaine 1</option>
-                                <option value="2">Semaine 2</option>
-                                <option value="3">Semaine 3</option>
-                                <option value="4">Semaine 4</option>
-                            </select>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mb-3">
                             <label for="JPlan"              class="form-label">JPlan</label>
                             <input type="text"              class="form-control"        id="JPlan"           v-model="client.JPlan">
                         </div>
@@ -99,45 +80,8 @@
                         <!--  -->
 
                         <div class="mb-3">
-
-                            <label class="form-label">Jours</label>
-
-                            <div class="form-check m-0 p-0">
-
-                                <table class="table table-borderless ml-2">
-    
-                                    <tr class="row w-75">
-                                        <td class="col-sm-1"><input type="checkbox"  class="jours"                              id="samedi_checkbox"        />  </td>
-                                        <td class="col-sm-8"><label for="checkbox"   class="ml-1">Samedi</label>                                                </td>
-                                    </tr>
-
-                                    <tr class="row w-75">
-                                        <td class="col-sm-1"><input type="checkbox"  class="jours"                              id="dimanche_checkbox"      />  </td>
-                                        <td class="col-sm-8"><label for="checkbox"   class="ml-1">Dimanche</label>                                              </td>
-                                    </tr>
-
-                                    <tr class="row w-75">
-                                        <td class="col-sm-1"><input type="checkbox"  class="jours"                              id="lundi_checkbox"         />  </td>
-                                        <td class="col-sm-8"><label for="checkbox"   class="ml-1">Lundi</label>                                                 </td>
-                                    </tr>
-
-                                    <tr class="row w-75">
-                                        <td class="col-sm-1"><input type="checkbox"  class="jours"                              id="mardi_checkbox"         />  </td>
-                                        <td class="col-sm-8"><label for="checkbox"   class="ml-1">Mardi</label>                                                 </td>
-                                    </tr>
-
-                                    <tr class="row w-75">
-                                        <td class="col-sm-1"><input type="checkbox"  class="jours"                              id="mercredi_checkbox"      />  </td>
-                                        <td class="col-sm-8"><label for="checkbox"   class="ml-1">Mercredi</label>                                              </td>
-                                    </tr>
-                                    
-                                    <tr class="row w-75">
-                                        <td class="col-sm-1"><input type="checkbox"  class="jours"                              id="jeudi_checkbox"         />  </td>
-                                        <td class="col-sm-8"><label for="checkbox"   class="ml-1">Jeudi</label>                                                 </td>
-                                    </tr>
-
-                                </table>
-                            </div>
+                            <label for="Journee"            class="form-label">Journee</label>
+                            <input type="text"              class="form-control"        id="Journee"           v-model="client.Journee">
                         </div>
 
                         <!--  -->
@@ -165,7 +109,7 @@
 
 <script>
 
-import { mapActions }  from "vuex";
+import {mapGetters, mapActions} from    "vuex"
 
 export default {
 
@@ -176,6 +120,8 @@ export default {
 
                 // Client
                 CustomerNo      :   '',
+
+                CustomerCode    :   '',
 
                 CustomerNameE   :   '',
                 CustomerNameA   :   '',
@@ -197,23 +143,27 @@ export default {
 
                 // Journey Plan
                 JPlan           :   '',
-
-                // JPCustomer
-                Frequency       :   '',
-                StartWeek       :   '',
-
-                // Journee
-                sat             :   0 ,
-                sun             :   0 ,
-                mon             :   0 ,
-                tue             :   0 ,
-                wed             :   0 ,
-                thu             :   0 
+                Journee         :   ''
             },
 
             willayas                :   [],
-            cites                   :   []
+            cites                   :   [],
+
+            // 
+            liste_journey_plan              :   []  ,
+            liste_journee                   :   []  ,
+            liste_type_client               :   []  ,
+
         }
+    },
+
+    computed : {
+
+        ...mapGetters({
+            getListeJourneyPlan             :   'journey_plan/getListeJourneyPlan'      ,
+            getListeTypeClient              :   'type_client/getListeTypeClient'        ,  
+            getListeJournee                 :   'journee/getListeJournee'    
+        }),
     },
 
     mounted() {
@@ -230,25 +180,6 @@ export default {
         //
 
         async sendData() {
-
-            // Set Frequency
-            if((this.client.Frequency    ==  1)||(this.client.Frequency    ==  2)||(this.client.Frequency    ==  3)||(this.client.Frequency    ==  4)) {
-
-                this.client.Frequency   =   4
-            }
-
-            if(this.client.Frequency    ==  5) {
-
-                this.client.Frequency   =   2
-            }
-
-            if(this.client.Frequency    ==  6) {
-
-                this.client.Frequency   =   1
-            }
-
-            // Set Jours
-            this.setJours()
 
             // Set Client
             this.client.DistrictNameE   =   this.getDistrictNameE(this.client.DistrictNo)
@@ -283,6 +214,8 @@ export default {
                 this.setUpdateClientAction(null)
 
                 // Client
+                this.client.CustomerCode    =   '',
+
                 this.client.CustomerNameE   =   '',
                 this.client.CustomerNameA   =   '',
                 this.client.Tel             =   '',
@@ -303,10 +236,6 @@ export default {
 
                 // Journey Plan
                 this.client.JPlan           =   '',
-
-                // JPCustomer
-                this.client.Frequency       =   '',
-                this.client.StartWeek       =   '',
 
                 this.willayas               =   []
                 this.cites                  =   []
@@ -343,6 +272,8 @@ export default {
 
             this.client.CustomerNo      =   client.CustomerNo
 
+            this.client.CustomerCode    =   client.CustomerCode
+
             this.client.CustomerNameE   =   client.CustomerNameE
             this.client.CustomerNameA   =   client.CustomerNameA
             this.client.Latitude        =   client.Latitude
@@ -359,8 +290,7 @@ export default {
 
             this.client.JPlan           =   client.JPlan
 
-            this.client.Frequency       =   client.Frequency
-            this.client.StartWeek       =   client.StartWeek
+            this.client.Journee         =   client.Journee
 
             this.setJoursGetData(client)
 
@@ -594,6 +524,24 @@ export default {
             }
         }
     },
+
+    watch : {
+
+        getListeJourneyPlan(new_liste_journey_plan, old_liste_journey_plan) {
+
+            this.liste_journey_plan     =   new_liste_journey_plan
+        },
+
+        getListeJournee(new_liste_journee, old_liste_journee) {
+
+            this.liste_journee          =   new_liste_journee
+        },
+
+        getListeTypeClient(new_liste_type_client, old_liste_type_client) {
+
+            this.liste_type_client      =   new_liste_type_client
+        }
+    }
 
 };
 

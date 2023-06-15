@@ -114,6 +114,40 @@ class RouteImportController extends Controller
         }
     }
 
+    public function delete(int $id_route_import)
+    {
+
+        try {
+
+            //
+            DB::beginTransaction();
+            //
+            
+            // store 
+            RouteImport::deleteRouteImport($id_route_import);
+
+            //
+            DB::commit();
+            //
+
+            return response()->json([
+                "header"            =>  "Route Supprimée !"             ,
+                "message"           =>  "une route a été supprimée !"
+            ]);
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
     //
 
     public function obsDetailsRouteImport(string $id_route_import)

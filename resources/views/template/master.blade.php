@@ -40,14 +40,10 @@
 		<link rel="stylesheet" href="{{url('css/custom.css')}}">
 		<link rel="stylesheet" href="{{url('css/route.css')}}">
 
-		<link rel="stylesheet" href="{{url('css/sidebar.css')}}">
 		<link rel="stylesheet" href="{{url('css/header.css')}}">
 
 		<link rel="stylesheet" href="{{url('css/redefinition.css')}}">
 		<link rel="stylesheet" href="{{url('css/datatables.css')}}">
-
-		<link rel="stylesheet" href="{{url('css/z_index.css')}}">
-		<link rl="stylesheet"  href="{{url('css/sidebar_route.css')}}">
 
 	</head>
 

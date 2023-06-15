@@ -4,20 +4,38 @@
         <!-- Logo -->
         <div class="text-center navbar-brand-wrapper d-flex align-items-top justify-content-center">
             <router-link to="/" aria-current="page" class="navbar-brand brand-logo active router-link-active p-0">
-              <img  :src="'/images/header.png'" alt="logo" />
+              <img  :src="'/images/header.png'"     alt="logo" class="mt-2"/>
             </router-link>
 
-            <router-link to="/" aria-current="page" class="navbar-brand brand-logo-mini active router-link-active p-0" id="mini_logo_custom">
-              <img  :src="'/images/mini_header.png'" alt="logo" id="mini_logo_custom_image"/>
+            <router-link to="/" aria-current="page"   class="navbar-brand brand-logo-mini active router-link-active p-0" id="mini_logo_custom">
+              <img  :src="'/images/mini_header.png'"  alt="logo" id="mini_logo_custom_image"/>
             </router-link>
         </div>
 
         <div class="navbar-menu-wrapper d-flex align-items-center ml-auto ml-lg-0" id="header_custom">
 
-            <!-- Toggle Side Bar  -->
-            <button type="button" class="navbar-toggler navbar-toggler align-self-center d-lg-block" @click="toggleSidebar()">
-                <span class="mdi mdi-menu"></span>
-            </button>
+            <!-- Route -->
+            <div class="d-flex align-items-left w-25" id="header_select_route">
+              <Multiselect
+                  v-model             =   "route_link"
+                  :options            =   "liste_route_link"
+                  mode                =   "single" 
+                  placeholder         =   "Select Map"
+                  class               =   "mt-1"
+
+                  :close-on-select    =   "true"
+                  :searchable         =   "true"
+                  :create-option      =   "true"
+
+                  :canDeselect        =   "false"
+                  :canClear           =   "false"
+                  :allowAbsent        =   "false"
+
+                  :groups             =   "true"
+
+              />
+            </div>
+            <!--                -->
 
             <!-- Options -->
             <ul class="navbar-nav navbar-nav-right ml-auto">
@@ -52,16 +70,15 @@
               </li>
 
             </ul>
+            <!--                -->
 
-            <!-- Toggle Side Bar for Mobile -->
-            <button type="button" class="navbar-toggler navbar-toggler-right align-self-center" @click="toggleMobileSidebar()">
-                <span class="mdi mdi-menu"></span>
-            </button>
         </div>
     </nav>
 </template>
 
 <script>
+
+import Multiselect              from '@vueform/multiselect'
 
 import {mapGetters, mapActions} from    "vuex"
 
@@ -69,7 +86,13 @@ export default {
 
     data() {
       return {
-          user        :   {}
+
+          route_link          :   null  ,
+          liste_route_link    :   null  ,
+
+          liste_route_import  :   null  ,
+
+          user                :   {}
       }
     },
 
@@ -82,9 +105,20 @@ export default {
         }),
     },
 
-    mounted() {
+    components: {
+        Multiselect
+    },
+
+    async mounted() {
 
         this.user = this.getUser
+
+        await this.fetchMaps()
+
+        this.emitter.on('reSetRouteImport'          , async ()    =>  {
+
+          await this.fetchMaps()
+        })
     },  
 
     methods: {
@@ -95,24 +129,99 @@ export default {
           "setIsAuthentificatedAction"    
         ]),
 
-        toggleSidebar() {
-
-          document.querySelector("body").classList.toggle("sidebar-icon-only");
-
-          this.$sidebarToggle()
-        },
-
-        toggleMobileSidebar() {
-
-            document.querySelector("#sidebar").classList.toggle("active");
-        },
-
         // 
+
+        async fetchMaps() {
+
+          try {
+
+            this.$callApi("post",    "/route_import", null)
+            .then((res)=> {
+
+                this.liste_route_import = res.data
+
+                this.prepareRouteLink()
+            })
+          }
+          catch(e) {
+
+              console.log(e)
+          }
+        },
+
+        //
+
+        prepareRouteLink() {
+
+          this.liste_route_link = [ {"label" : "Links", "options" : {}, "class" : "mt-5"}, {"label" : "Route Imports", "options" : {}, "class" : "mt-5"} ]
+
+          this.liste_route_link[0]["options"]["/"]                            = "Dashboard"
+          this.liste_route_link[0]["options"]["/route/obs/route_import/add"]  = "Importer une Route"
+
+          for (let i = 0; i < this.liste_route_import.length; i++) {
+
+              this.liste_route_link[1]["options"][this.liste_route_import[i].id]  = this.liste_route_import[i].libelle     
+          }
+        },
+
+        setRouteLink() {
+
+            // Dashboard
+            if(this.$route.path ==  "/") {
+
+              this.route_link = this.$route.path
+            }
+            
+            // Add
+            if(this.$route.path ==  "/route/obs/route_import/add") {
+
+              this.route_link = this.$route.path
+            }
+
+            let map_link_format = /^\/route\/obs\/route_import\/[^\/]+\/details$/
+
+            // Map
+            if(map_link_format.test(this.$route.path)) {
+
+              this.route_link = this.$route.params.id_route_import
+            }
+        },
+
+        goToRoute() {
+
+            // Dashboard
+            if(this.route_link  ==  "/") {
+
+              if(this.$route.path !=  "/") {
+
+                this.$goTo('/')
+              }
+            }
+
+            // Add
+            if(this.route_link  ==  "/route/obs/route_import/add") {
+
+              if(this.$route.path !=  "/route/obs/route_import/add") {
+
+                this.$goTo('/route/obs/route_import/add')
+              }
+            }
+
+            // Map
+            if(!isNaN(this.route_link)) {
+
+              if(this.$route.path !=  '/route/obs/route_import/'+this.route_link+'/details') {
+
+                this.$goTo('/route/obs/route_import/'+this.route_link+'/details')
+              }
+            }
+        },
+
+        //
 
         async logOut() {
 
           const res = await this.$callApi("post", "/logout" , null)
-          console.log(res)
 
           if(res.status ==  200) {
 
@@ -140,6 +249,16 @@ export default {
         getUser(newUser, oldUser) {
 
             this.user   =   newUser
+        },
+
+        route_link(new_route_link, old_route_link) {
+
+          this.goToRoute()
+        },
+
+        $route(to, from) {
+
+          this.setRouteLink()
         }
     }
 };
