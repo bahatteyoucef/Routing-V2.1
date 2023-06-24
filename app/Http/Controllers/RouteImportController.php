@@ -71,7 +71,7 @@ class RouteImportController extends Controller
         }
     }
 
-    public function update(Request $request, int $id_route_import)
+    public function update(Request $request, int $id)
     {
 
         try {
@@ -90,7 +90,7 @@ class RouteImportController extends Controller
             }
 
             // store 
-            RouteImport::updateRouteImport($request, $id_route_import);
+            RouteImport::updateRouteImport($request, $id);
 
             //
             DB::commit();
@@ -114,7 +114,7 @@ class RouteImportController extends Controller
         }
     }
 
-    public function delete(int $id_route_import)
+    public function delete(int $id)
     {
 
         try {
@@ -124,7 +124,7 @@ class RouteImportController extends Controller
             //
             
             // store 
-            RouteImport::deleteRouteImport($id_route_import);
+            RouteImport::deleteRouteImport($id);
 
             //
             DB::commit();
@@ -150,12 +150,109 @@ class RouteImportController extends Controller
 
     //
 
-    public function obsDetailsRouteImport(string $id_route_import)
+    public function journeyPlan(int $id)
     {
 
         try {
 
-            $route_import       =   RouteImport::obsDetailsRouteImport($id_route_import);
+            //
+            DB::beginTransaction();
+            //
+
+            // store 
+            $liste_journey_plan =   RouteImport::journeyPlan($id);
+
+            //
+            DB::commit();
+            //
+
+            return $liste_journey_plan;
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    public function journees(int $id)
+    {
+
+        try {
+
+            //
+            DB::beginTransaction();
+            //
+
+            // store 
+            $journees   =   RouteImport::journees($id);
+
+            //
+            DB::commit();
+            //
+
+            return $journees;
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    //
+
+    public function setWillayasCites(Request $request)
+    {
+
+        try {
+
+            //
+            DB::beginTransaction();
+            //
+
+            // store 
+            $clients    =   RouteImport::setWillayasCites($request);
+
+            //
+            DB::commit();
+            //
+
+            return $clients;
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    //
+
+    public function obsDetailsRouteImport(int $id)
+    {
+
+        try {
+
+            $route_import       =   RouteImport::obsDetailsRouteImport($id);
             return $route_import;
         }
 

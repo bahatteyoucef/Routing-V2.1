@@ -29,12 +29,12 @@
                             <div class="col-4 mt-auto">
                                 <button type="button" class="btn btn-primary"   @click="sendData()"                                                                                                         >Importer   </button>
                                 <button type="button" class="btn btn-primary"   @click="showResumeValidate()"   data-bs-toggle="modal" :data-bs-target="'#modalResumeValidate'"     v-if="route_import.file">Valider    </button>
-                                <button type="button" class="btn btn-primary"   @click="showResume()"           data-bs-toggle="modal" :data-bs-target="'#modalResume'"             v-if="route_import.file">Resume     </button>
+                                <button type="button" class="btn btn-primary"   @click="showResume()"           data-bs-toggle="modal" :data-bs-target="'#modalResume'"             v-if="route_import.file">Resumer    </button>
                             </div>
                         </form>
 
-                        <modalResume            ref="modalResume"           :key="route_import.file"    :route_import="route_import"  :clients="clients"></modalResume>
-                        <modalResumeValidate    ref="modalResumeValidate"   :key="route_import.file"    :route_import="route_import"  :clients="clients"></modalResumeValidate>
+                        <modalResume            ref="modalResume"           :key="clients"                                      :clients="clients"></modalResume>
+                        <modalResumeValidate    ref="modalResumeValidate"   :key="clients"      :route_import="route_import"    :clients="clients"></modalResumeValidate>
 
                     </div>
                 </div>
@@ -73,6 +73,15 @@ export default {
         modalResumeValidate :   modalResumeValidate
     },
 
+    mounted() {
+
+        this.emitter.on('reSetClientsDecoupeByJournee' , (clients)  =>  {
+
+            this.emitter.off('reSetClientsDecoupeByJournee')
+            this.clients    =   clients
+        })
+    },
+
     methods : {
 
         async sendData() {
@@ -89,25 +98,25 @@ export default {
             const res   = await this.$callApi('post' ,   '/route_import/store'    ,   formData)         
             console.log(res.data)
 
-            // Hide Loading Page
-            this.$hideLoadingPage()
-
             if(res.status===200){
-
-                // Close Modal
-                this.$hideModal("modalResume")
 
                 // Send Event
                 this.emitter.emit("reSetRouteImport")
 
-                // Add Route Import
-                this.$router.push("/route/obs/route_import/"+res.data.route_import.id+"/details")
+                // Hide Loading Page
+                this.$hideLoadingPage()
 
                 // Send Feedback
                 this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
+
+                // Add Route Import
+                this.$router.push("/route/obs/route_import/"+res.data.route_import.id+"/details")
 			}
             
             else{
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
 
                 // Send Errors
                 this.$showErrors("Error !", res.data.errors)
@@ -122,46 +131,61 @@ export default {
                 // Show Loading Page
                 this.$showLoadingPage()
 
-                const target    =   event.target
+                setTimeout(() => {
+                    
+                    const target    =   event.target
 
-                if (target && target.files) {
+                    if (target && target.files) {
 
-                    this.route_import.file      =   target.files[0]
+                        this.route_import.file      =   target.files[0]
 
-                    let fileReader              =   new FileReader();
+                        let fileReader              =   new FileReader();
 
-                    fileReader.readAsArrayBuffer(this.route_import.file)
+                        fileReader.readAsArrayBuffer(this.route_import.file)
 
-                    fileReader.onload = async (e) => {
+                        fileReader.onload = async (e) => {
 
-                        let arrayBuffer                         =   fileReader.result
+                            let arrayBuffer                         =   fileReader.result
 
-                        var data                                =   new Uint8Array(arrayBuffer)
-                        var arr                                 =   new Array()
+                            var data                                =   new Uint8Array(arrayBuffer)
+                            var arr                                 =   new Array()
 
-                        for (var i = 0; i != data.length; ++i) {
-                            
-                            arr[i] = String.fromCharCode(data[i])
-                        }
+                            for (var i = 0; i != data.length; ++i) {
+                                
+                                arr[i] = String.fromCharCode(data[i])
+                            }
 
-                        var bstr                    =   arr.join("")
-                        var workbook                =   XLSX.read(bstr, { type: "binary" })
+                            var bstr                    =   arr.join("")
+                            var workbook                =   XLSX.read(bstr, { type: "binary" })
 
-                        var first_sheet_name        =   workbook.SheetNames[0]
-                        var worksheet               =   workbook.Sheets[first_sheet_name]
+                            var first_sheet_name        =   workbook.SheetNames[0]
+                            var worksheet               =   workbook.Sheets[first_sheet_name]
 
-                        this.clients                =   [...XLSX.utils.sheet_to_json(worksheet, { raw: true })]
+                            this.clients                =   [...XLSX.utils.sheet_to_json(worksheet, { raw: true })]
 
-                        //
+                            //
 
-                        this.setLatitudeLongitudeStandard()
-                        this.setNecessaryAttributs()
-                        this.setCustomerNo()
-                    };             
-                }
+                            this.setLatitudeLongitudeStandard()
+                            this.setNecessaryAttributs()
+                            this.setCustomerNo()
 
-                // Hide Loading Page
-                this.$hideLoadingPage()
+                            // 
+
+                            await this.setDistrictNoCityNo()
+
+                            // Hide Loading Page
+                            this.$hideLoadingPage()
+
+                        };             
+                    }
+
+                    else {
+
+                        // Hide Loading Page
+                        this.$hideLoadingPage()
+                    }
+
+                }, 55);
 
             }catch(error)
             {
@@ -235,12 +259,12 @@ export default {
 
                 if(!this.clients[i].hasOwnProperty("DistrictNo")) {
 
-                    this.clients[i].DistrictNo      =   ""
+                    this.clients[i].DistrictNo      =   "UND"
                 }
 
                 if(!this.clients[i].hasOwnProperty("CityNo")) {
 
-                    this.clients[i].CityNo          =   ""
+                    this.clients[i].CityNo          =   "UND"
                 }
 
                 if(!this.clients[i].hasOwnProperty("Tel")) {
@@ -285,6 +309,27 @@ export default {
                 count                       =   count   +   1
             }
         },
+
+        async setDistrictNoCityNo() {
+
+            let formData = new FormData();
+
+            formData.append("clients"       ,   JSON.stringify(this.clients))
+
+            const res   = await this.$callApi('post' ,   '/route_import/set_willayas_cites'    ,   formData)         
+            console.log(res.data)
+
+            if(res.status===200){
+
+                this.clients    =   res.data
+			}
+            
+            else{
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
+			}
+        }
 
         //
 

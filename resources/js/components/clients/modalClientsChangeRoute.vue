@@ -66,7 +66,7 @@
                                         <input @change="checkGlobal($event)" type="checkbox" class="form-check-input" id="client_global" checked>
                                     </div>
                                 </th>
-                                <!-- <th class="col-sm-1">Index</th> -->
+                                <th class="col-sm-1">Index</th>
                                 <th class="col-sm-1">CustomerCode</th>
                                 <th class="col-sm-1">CustomerNameE</th>
                                 <th class="col-sm-1">CustomerNameA</th>
@@ -95,7 +95,8 @@
                         <thead>
                             <tr class="datatable_client_change_route_filters">
 
-                                <!-- <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Index"            /></th> -->
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder=""                 /></th>
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Index"            /></th>
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
@@ -122,13 +123,13 @@
                         </thead>
 
                         <tbody>
-                            <tr v-for="client in all_clients" :key="client.CustomerNo">
+                            <tr v-for="(client, index) in all_clients" :key="client.id">
                                 <td>
                                     <div class="form-check">
-                                        <input @change="checkClient($event)" class="form-check-input client_checkbox" type="checkbox" :value="client.CustomerNo" :id="'client_'+client.CustomerNo" checked>
+                                        <input @change="checkClient($event)" class="form-check-input client_checkbox" type="checkbox" :value="client.id" :id="'client_'+client.id" checked>
                                     </div>
                                 </td>
-                                <!-- <td>{{index + 1}}</td> -->
+                                <td>{{index + 1}}</td>
                                 <td>{{client.CustomerCode}}</td>
 
                                 <td>{{client.CustomerNameE}}</td>
@@ -227,7 +228,9 @@ export default {
             "setClientsChangeRouteAction"   ,
         ]),
 
-        async setDataTable() {
+        //
+
+        async setDataTable(clients) {
 
             try {
 
@@ -237,7 +240,12 @@ export default {
                     this.datatable_client_change_route.destroy()
                 }
 
+                // Set Value
+                this.all_clients    =   [...clients]
+                this.clients        =   [...clients]
+                    
                 this.datatable_client_change_route  =   await this.$DataTableCreate("datatable_client_change_route")
+                console.log(this.datatable_client_change_route)
             }
 
             catch(e) {
@@ -247,6 +255,8 @@ export default {
         },
 
         async sendData() {
+
+            this.$showLoadingPage()
 
             let clients_copy            =   [...this.clients]
 
@@ -278,12 +288,32 @@ export default {
                 }
             }
 
-            // Send Client
+            let formData = new FormData();
 
-            this.emitter.emit('reSetChangeRoute' , clients_copy)
+            formData.append("clients", JSON.stringify(clients_copy))
 
-            // Close Modal
-            this.$hideModal("clientsChangeRouteModal")
+            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/change_route",   formData)
+
+            if(res.status===200){
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Client
+                this.emitter.emit('reSetChangeRoute' , clients_copy)
+
+                // Close Modal
+                this.$hideModal("clientsChangeRouteModal")
+            }
+            
+            else{
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
+			}
         },
 
         //
@@ -346,7 +376,7 @@ export default {
 
             for (let i = 0; i < this.all_clients.length; i++) {
                 
-                if(this.all_clients[i].CustomerNo   ==  id_client) {
+                if(this.all_clients[i].id   ==  id_client) {
 
                     return i
                 }
@@ -359,7 +389,7 @@ export default {
 
             for (let i = 0; i < this.clients.length; i++) {
                 
-                if(this.clients[i].CustomerNo   ==  id_client) {
+                if(this.clients[i].id   ==  id_client) {
 
                     return i
                 }
@@ -377,16 +407,9 @@ export default {
                 // 
                 this.setClientsChangeRouteAction(null)
 
-                this.datatable_client_change_route   =   null
-
-                //
-
                 this.DistrictNo                      =   ''
                 this.CityNo                          =   ''
                 this.JPlan                           =   ''
-
-                this.all_clients                     =   []  
-                this.clients                         =   []  
 
                 //
 
@@ -427,25 +450,21 @@ export default {
 
         async getData(clients) {
 
-            console.log(clients)
+            // Show Loading Page
+            this.$showLoadingPage()
 
-            // Set Value
-            this.all_clients    =   [...clients]
-            this.clients        =   [...clients]
+            await this.setDataTable(clients)
 
-            await this.setDataTable()
+            this.getComboData()
+
+            // Hide Loading Page
+            this.$hideLoadingPage()
         },
 
         async getComboData() {
 
-            // Show Loading Page
-            this.$showLoadingPage()
-
             const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
             this.districts                  =   res_3.data
-
-            // Hide Loading Page
-            this.$hideLoadingPage()
         },
 
         async getCites() {
@@ -503,11 +522,6 @@ export default {
     },
 
     watch : {
-
-        getClientsChangeRoute(new_clients, old_clients) {
-
-            this.getComboData()
-        },
 
         getListeJourneyPlan(new_liste_journey_plan, old_liste_journey_plan) {
 

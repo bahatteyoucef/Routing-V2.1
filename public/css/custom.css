@@ -147,3 +147,16 @@
     background-image    : -webkit-linear-gradient(330deg, #000 0%, #27374D 100%) ;
     background-image    : linear-gradient(120deg, #000 0%, #27374D 100%)         ;
 }
+
+/*  */
+
+.color-square-option {
+    display: flex;
+    align-items: center;
+}
+
+.color-square-box {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}

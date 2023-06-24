@@ -119,7 +119,7 @@ export default {
             client      :   {
 
                 // Client
-                CustomerNo      :   '',
+                id              :   '',
 
                 CustomerCode    :   '',
 
@@ -181,24 +181,79 @@ export default {
 
         async sendData() {
 
+            this.$showLoadingPage()
+
             // Set Client
             this.client.DistrictNameE   =   this.getDistrictNameE(this.client.DistrictNo)
             this.client.CityNameE       =   this.getCityNameE(this.client.CityNo)
 
-            // Send Client
-            this.emitter.emit('reSetUpdate' , this.client)
+            let formData = new FormData();
 
-            // Close Modal
-            this.$hideModal("updateClientModal")
+            formData.append("CustomerCode"  ,   this.client.CustomerCode)
+            formData.append("CustomerNameE" ,   this.client.CustomerNameE)
+            formData.append("CustomerNameA" ,   this.client.CustomerNameA)
+            formData.append("Latitude"      ,   this.client.Latitude)
+            formData.append("Longitude"     ,   this.client.Longitude)
+            formData.append("Address"       ,   this.client.Address)
+            formData.append("DistrictNo"    ,   this.client.DistrictNo)
+            formData.append("DistrictNameE" ,   this.client.DistrictNameE)
+            formData.append("CityNo"        ,   this.client.CityNo)
+            formData.append("CityNameE"     ,   this.client.CityNameE)
+            formData.append("Tel"           ,   this.client.Tel)
+            formData.append("CustomerType"  ,   this.client.CustomerType)
+            formData.append("JPlan"         ,   this.client.JPlan)
+            formData.append("Journee"       ,   this.client.Journee)
+
+            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/update",   formData)
+
+            if(res.status===200){
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Client
+                this.emitter.emit('reSetUpdate' , this.client)
+
+                // Close Modal
+                this.$hideModal("updateClientModal")
+            }
+            
+            else{
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
+			}
         },
 
         async deleteData() {
 
-            // Send Client
-            this.emitter.emit('reSetDelete' , this.client)
+            this.$showLoadingPage()
 
-            // Close Modal
-            this.$hideModal("updateClientModal")
+            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/delete",   null)
+
+            if(res.status===200){
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Client
+                this.emitter.emit('reSetDelete' , this.client)
+
+                // Close Modal
+                this.$hideModal("updateClientModal")
+            }
+            
+            else{
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
+			}
         },
 
         //
@@ -270,7 +325,7 @@ export default {
 
         async getClientData(client) {
 
-            this.client.CustomerNo      =   client.CustomerNo
+            this.client.id              =   client.id
 
             this.client.CustomerCode    =   client.CustomerCode
 

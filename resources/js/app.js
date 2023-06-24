@@ -27,12 +27,12 @@ app.config.globalProperties.$map        =   new Map()
 import mitt from 'mitt'
 
 const emitter       =   mitt()
-app.config.globalProperties.emitter     =   emitter
-app.config.globalProperties.$colors     =   [   '#00CCFF', '#6ECC39', '#F0C20C', '#F1D3B7', '#FF0066', '#FF99CC', '#CC99FF', '#F0C2DC', 
-                                                '#33CCFF', '#6ECCB9', '#F0C200', '#9933FF', '#F1D357', '#FF3399', '#F1D3F7', '#F180B7',
-                                                '#33FFFF', '#66FF99', '#F18E17', '#9900CC', '#FFCC00', '#FF6699', '#F180C7', '#F180E7', 
-                                                '#99CCFF', '#99FF99', '#F18017', '#F1D3D3', '#FFCC99', '#FD9CE3', '#FF9966', '#FF6600', 
-                                                '#99FFFF', '#99FFCC', '#F18417', '#FD9C73', '#CCFF00', '#FF33CC', '#B5E28C', '#B5E2FC'  ];
+app.config.globalProperties.emitter             =   emitter
+app.config.globalProperties.$colors             =   [   '#00CCFF', '#6ECC39', '#F0C20C', '#F1D3B7', '#FF0066', '#FF99CC', '#CC99FF', '#F0C2DC', 
+                                                        '#33CCFF', '#6ECCB9', '#F0C200', '#9933FF', '#F1D357', '#FF3399', '#F1D3F7', '#F180B7',
+                                                        '#33FFFF', '#66FF99', '#F18E17', '#9900CC', '#FFCC00', '#FF6699', '#F180C7', '#F180E7', 
+                                                        '#99CCFF', '#99FF99', '#F18017', '#F1D3D3', '#FFCC99', '#FD9CE3', '#FF9966', '#FF6600', 
+                                                        '#99FFFF', '#99FFCC', '#F18417', '#FD9C73', '#CCFF00', '#FF33CC', '#B5E28C', '#B5E2FC'  ];
 
 // 
 

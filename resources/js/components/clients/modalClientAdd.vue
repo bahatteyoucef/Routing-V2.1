@@ -172,15 +172,53 @@ export default {
 
         async sendData() {
 
+            this.$showLoadingPage()
+
             // Set Client
             this.client.DistrictNameE   =   this.getDistrictNameE(this.client.DistrictNo)
             this.client.CityNameE       =   this.getCityNameE(this.client.CityNo)
 
-            // Send Client
-            this.emitter.emit('reSetAdd' , this.client)
+            let formData = new FormData();
 
-            // Close Modal
-            this.$hideModal("addClientModal")
+            formData.append("CustomerCode"  ,   this.client.CustomerCode)
+            formData.append("CustomerNameE" ,   this.client.CustomerNameE)
+            formData.append("CustomerNameA" ,   this.client.CustomerNameA)
+            formData.append("Latitude"      ,   this.client.Latitude)
+            formData.append("Longitude"     ,   this.client.Longitude)
+            formData.append("Address"       ,   this.client.Address)
+            formData.append("DistrictNo"    ,   this.client.DistrictNo)
+            formData.append("DistrictNameE" ,   this.client.DistrictNameE)
+            formData.append("CityNo"        ,   this.client.CityNo)
+            formData.append("CityNameE"     ,   this.client.CityNameE)
+            formData.append("Tel"           ,   this.client.Tel)
+            formData.append("CustomerType"  ,   this.client.CustomerType)
+            formData.append("JPlan"         ,   this.client.JPlan)
+            formData.append("Journee"       ,   this.client.Journee)
+
+            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/store",   formData)
+            console.log(res.data)
+
+            if(res.status===200){
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Client
+                this.emitter.emit('reSetAdd' , this.client)
+
+                // Close Modal
+                this.$hideModal("addClientModal")
+
+            }
+            
+            else{
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
+			}            
         },
 
         //
@@ -254,6 +292,8 @@ export default {
 
             const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
             this.willayas                   =   res_3.data
+
+            console.log(this.willayas)
         },
 
         async getCites() {
@@ -263,6 +303,8 @@ export default {
 
             const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
             this.cites                      =   res_3.data
+
+            console.log(this.cites)
 
             // Hide Loading Page
             this.$hideLoadingPage()

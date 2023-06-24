@@ -8,32 +8,32 @@
         <login-page></login-page>
     </section>
 
-    <!-- Dashboard + Route -->
-    <section v-if="component_dashboard">
+    <div v-if="isAuthentificated">
+        <!-- Dashboard + Route -->
+        <section v-if="component_dashboard">
 
-        <div class="container-scroller" id="page_route">
+            <div class="container-scroller" id="page_route">
 
-            <header-part></header-part>
+                <header-part></header-part>
 
-            <div class="container-fluid page-body-wrapper">
+                <div class="container-fluid page-body-wrapper">
 
-                <div class="main-panel w-100" id="main_content">
+                    <div class="main-panel w-100" id="main_content">
 
-                    <router-view :key="$route.path"></router-view>
+                        <router-view :key="$route.path"></router-view>
+
+                    </div>
 
                 </div>
-
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
 </template>
 
 <script>
 
     import {mapGetters, mapActions}     from "vuex"
-
-    import axios                        from "axios"
 
     export default {
 
@@ -42,6 +42,8 @@
             return {
 
                 user                    :   {}      ,
+
+                isAuthentificated       :   false   ,
 
                 component_login         :   false   ,
                 component_dashboard     :   false
@@ -57,20 +59,67 @@
             }),
         },
 
-        mounted() {
+        beforeMount() {
 
-            this.user   =   this.getUser
+            this.isAuthentificated  =   false
+        },
 
-            if(this.user.nom) {
+        async mounted() {
 
-                this.component_login     =   false
-                this.component_dashboard =   true
+            this.isAuthentificated      =   await this.checkIfUserIsAuthentificated()
+
+            if(this.isAuthentificated) {
+
+                this.user   =   this.getUser
+
+                if(this.user.nom) {
+
+                    this.component_login        =   false
+                    this.component_dashboard    =   true
+
+                    this.isAuthentificated      =   true
+                }
+
+                else {
+
+                    this.component_login        =   true
+                    this.component_dashboard    =   false
+
+                    this.isAuthentificated      =   false
+                }
             }
 
             else {
 
-                this.component_login     =   true
-                this.component_dashboard =   false
+                // Update State
+                this.setUserAction({})
+                this.setAccessTokenAction("")
+                this.setIsAuthentificatedAction(false)
+
+                // Router
+                this.$goTo("/login")
+            }
+        },
+
+        methods : {
+
+            ...mapActions("authentification" ,  [
+                "setUserAction"                 ,
+                "setAccessTokenAction"          ,
+                "setIsAuthentificatedAction"    
+            ]),
+
+            async checkIfUserIsAuthentificated() {
+
+                const res                   =   await this.$callApi("post"  ,   "/user/isAuthentificated",   null)
+                
+                if(res.data    ==  "") {
+
+                    localStorage.removeItem("vuex")
+                    return false
+                }
+
+                return true
             }
         },
 
@@ -80,14 +129,19 @@
 
                 if(newUser.nom) {
 
-                    this.component_login     =   false
-                    this.component_dashboard =   true
+                    this.component_login        =   false
+                    this.component_dashboard    =   true
+
+                    this.isAuthentificated      =   true
+
                 }
 
                 else {
 
-                    this.component_login     =   true
-                    this.component_dashboard =   false
+                    this.component_login        =   true
+                    this.component_dashboard    =   false
+
+                    this.isAuthentificated      =   false
                 }
             }
         }

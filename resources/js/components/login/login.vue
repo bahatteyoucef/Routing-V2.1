@@ -113,8 +113,6 @@
                         this.setAccessTokenAction(response.data.access_token)
                         this.setIsAuthentificatedAction(true)
 
-                        // 
-
                         // Route To index
                         this.$router.push('/')
                     }

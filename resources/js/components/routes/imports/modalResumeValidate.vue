@@ -419,10 +419,12 @@ export default {
 
             setTimeout(async () => {
                 
-                this.getDoublantTel                  =   this.$getDoublantTel(this.clients)
-                this.getDoublantLatitudeLongitude    =   this.$getDoublantLatitudeLongitude(this.clients)
-                this.getDoublantCustomerNameE        =   this.$getDoublantCustomerNameE(this.clients)
-                this.getDoublantCustomerCode         =   this.$getDoublantCustomerCode(this.clients)
+                let getDoublant                         =   this.$getDoublant(this.clients)
+
+                this.getDoublantTel                     =   getDoublant.$getDoublantTel
+                this.getDoublantLatitudeLongitude       =   getDoublant.$getDoublantLatitudeLongitude
+                this.getDoublantCustomerNameE           =   getDoublant.$getDoublantCustomerNameE
+                this.getDoublantCustomerCode            =   getDoublant.$getDoublantCustomerCode
 
                 await this.setDataTableTel()
                 await this.setDataTableLatitudeLongitude()

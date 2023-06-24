@@ -15,114 +15,146 @@
                 <img  :src="'/images/hide_route_datatable.png'" role="button"   @click="hideRouteDatatable()"/>
             </div>
 
+            <!-- Toggle -->
+            <div id="toggle_div">
+
+                <div class="btn-container" id="marker_cluster_mode_div">
+                    <label class="switch btn-color-mode-switch">
+                        <input type="checkbox" name="marker_cluster_mode" id="marker_cluster_mode" @change="switchMarkerClusterMode()">
+                        <label for="marker_cluster_mode" data-on="Marker" data-off="Cluster" class="btn-color-mode-switch-inner"></label>
+                    </label>
+                </div>
+
+            </div>
+
             <!--  -->
         </div>
 
-        <!-- Modal Add  -->
-        <modalClientAdd             ref="modalClientAdd">   </modalClientAdd>
+        <!-- Modal Add                      -->
+        <modalClientAdd                                                 ref="modalClientAdd">                                                                                       </modalClientAdd>
 
-        <!-- Modal Update  -->
-        <modalClientUpdate          ref="modalClientUpdate"></modalClientUpdate>
+        <!-- Modal Update                   -->
+        <modalClientUpdate                                              ref="modalClientUpdate">                                                                                    </modalClientUpdate>
 
-        <!-- Modal Change Route -->
-        <modalClientsChangeRoute    ref="modalClientsChangeRoute"></modalClientsChangeRoute>
+        <!-- Modal Change Route             -->
+        <modalClientsChangeRoute                                        ref="modalClientsChangeRoute">                                                                              </modalClientsChangeRoute>
 
-        <!--  -->
+        <!-- Modal Decoupe By Journee       -->
+        <modalResume                v-if="route_import"                 ref="modalResume"                   :key="route_import.clients"         :clients="route_import.clients" >   </modalResume>
+
+        <!-- Modal Add New Journey Plan     -->
+        <modalAddJourneyPlan                                            ref="modalAddJourneyPlan"                                                                               >   </modalAddJourneyPlan>
+
+        <!-- Modal Add New Journey Plan     -->
+        <modalUpdateJourneyPlan                                         ref="modalUpdateJourneyPlan"                                                                            >   </modalUpdateJourneyPlan>
+
+        <!--  -->   
 
         <div id="tableau_data">
+
+            <!-- Buttons and Filter -->
             <div class="map_top_buttons_div">
-                <button class="btn primary w-100 m-0 mt-1"  @click="focuseMarkers()">Focus</button>
-                <button class="btn primary w-100 m-0 mt-1"  @click="validerData()">Valider</button>
+                <div class="row">
 
-                <select class="form-select w-100 m-0 mt-1"  @change="reAfficherClientsAndMarkers()"  v-model="column_group">
-                    <option value="1">JPlan</option>
-                    <option value="2">DistrictNo</option>
-                    <option value="3">CityNo</option>
-                    <option value="4">CustomerType</option>
-                    <option value="5">Journee</option>
-                </select>
+                    <div class="col-6">
+                        <button class="btn primary w-100 m-0 mt-1"                                                          @click="focuseMarkers()">Focus</button>
+                        <button class="btn primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#modalResume'" @click="showResume()">Resumer</button>
+                        <button class="btn primary w-100 m-0 mt-1"                                                          @click="showTerritories()">Territoires</button>
+                        <button class="btn primary w-100 m-0 mt-1"                                                          @click="showJPlanBDTerritories()">JPlan BD Territoires</button>
+                        <button class="btn primary w-100 m-0 mt-1"                                                          @click="showJourneeBDTerritories()">Journee BD Territoires</button>
+                    </div>
 
-                <!-- Journey Plan   -->
-                <Multiselect
-                    v-model     =   "journey_plan_filter_value"
-                    :options    =   "liste_journey_plan"
-                    mode        =   "tags"
-                    placeholder =   "Filter By JPlan"
-                    class       =   "mt-1"
+                    <div class="col-6">
 
-                    :close-on-select    =   "false"
-                    :searchable         =   "true"
-                    :create-option      =   "true"
+                        <select class="form-select w-100 m-0 mt-1"                                                          @change="reAfficherClientsAndMarkers()"  v-model="column_group">
+                            <option value="1">JPlan</option>
+                            <option value="2">DistrictNameE</option>
+                            <option value="3">CityNameE</option>
+                            <option value="4">CustomerType</option>
+                            <option value="5">Journee</option>
+                        </select>
 
-                    @change             =   "reAfficherClientsAndMarkers()"
-                />
-                <!--                -->
+                        <!-- Journey Plan   -->
+                        <Multiselect
+                            v-model     =   "journey_plan_filter_value"
+                            :options    =   "liste_journey_plan"
+                            mode        =   "tags"
+                            placeholder =   "Filter By JPlan"
+                            class       =   "mt-1"
 
-                <!-- District       -->
-                <Multiselect
-                    v-model     =   "district_filter_value"
-                    :options    =   "districts"
-                    mode        =   "tags"
-                    placeholder =   "Filter By DistrictNameE"
-                    class       =   "mt-1"
+                            :close-on-select    =   "false"
+                            :searchable         =   "true"
+                            :create-option      =   "true"
 
-                    :close-on-select    =   "false"
-                    :searchable         =   "true"
-                    :create-option      =   "true"
+                            @change             =   "reAfficherClientsAndMarkers()"
+                        />
+                        <!--                -->
 
-                    @change             =   "reAfficherClientsAndMarkers()"
-                />
-                <!--                -->
+                        <!-- District       -->
+                        <Multiselect
+                            v-model     =   "district_filter_value"
+                            :options    =   "districts"
+                            mode        =   "tags"
+                            placeholder =   "Filter By DistrictNameE"
+                            class       =   "mt-1"
 
-                <!-- City           -->
-                <Multiselect
-                    v-model     =   "city_filter_value"
-                    :options    =   "cites"
-                    mode        =   "tags"
-                    placeholder =   "Filter By CityNameE"
-                    class       =   "mt-1"
+                            :close-on-select    =   "false"
+                            :searchable         =   "true"
+                            :create-option      =   "true"
 
-                    :close-on-select    =   "false"
-                    :searchable         =   "true"
-                    :create-option      =   "true"
+                            @change             =   "reAfficherClientsAndMarkers()"
+                        />
+                        <!--                -->
 
-                    @change             =   "reAfficherClientsAndMarkers()"
-                />
-                <!--                -->
+                        <!-- City           -->
+                        <Multiselect
+                            v-model     =   "city_filter_value"
+                            :options    =   "cites"
+                            mode        =   "tags"
+                            placeholder =   "Filter By CityNameE"
+                            class       =   "mt-1"
 
-                <!-- CustomerType   -->
-                <Multiselect
-                    v-model     =   "type_client_filter_value"
-                    :options    =   "liste_type_client"
-                    mode        =   "tags"
-                    placeholder =   "Filter By CustomerType"
-                    class       =   "mt-1"
+                            :close-on-select    =   "false"
+                            :searchable         =   "true"
+                            :create-option      =   "true"
 
-                    :close-on-select    =   "false"
-                    :searchable         =   "true"
-                    :create-option      =   "true"
+                            @change             =   "reAfficherClientsAndMarkers()"
+                        />
+                        <!--                -->
 
-                    @change             =   "reAfficherClientsAndMarkers()"
-                />
-                <!--                -->
+                        <!-- CustomerType   -->
+                        <Multiselect
+                            v-model     =   "type_client_filter_value"
+                            :options    =   "liste_type_client"
+                            mode        =   "tags"
+                            placeholder =   "Filter By CustomerType"
+                            class       =   "mt-1"
 
-                <!-- Journee        -->
-                <Multiselect
-                    v-model     =   "journee_filter_value"
-                    :options    =   "liste_journee"
-                    mode        =   "tags"
-                    placeholder =   "Filter By Journee"
-                    class       =   "mt-1"
+                            :close-on-select    =   "false"
+                            :searchable         =   "true"
+                            :create-option      =   "true"
 
-                    :close-on-select    =   "false"
-                    :searchable         =   "true"
-                    :create-option      =   "true"
+                            @change             =   "reAfficherClientsAndMarkers()"
+                        />
 
-                    @change             =   "reAfficherClientsAndMarkers()"
-                />
-                <!--                -->
+                        <!-- Journee        -->
+                        <Multiselect
+                            v-model     =   "journee_filter_value"
+                            :options    =   "liste_journee"
+                            mode        =   "tags"
+                            placeholder =   "Filter By Journee"
+                            class       =   "mt-1"
+
+                            :close-on-select    =   "false"
+                            :searchable         =   "true"
+                            :create-option      =   "true"
+
+                            @change             =   "reAfficherClientsAndMarkers()"
+                        />
+                        <!--                -->
+                    </div>
+                </div>
             </div>
-
             <div class="map_top_infos_div">
                 <table class="table table-borderless">
 
@@ -156,6 +188,7 @@
                     <thead>
                         <tr>
                             <th class="col-sm-1">Index</th>
+
                             <th class="col-sm-1">CustomerCode</th>
                             <th class="col-sm-1">CustomerNameE</th>
                             <th class="col-sm-1">CustomerNameA</th>
@@ -185,6 +218,7 @@
                         <tr class="datatable_par_route_import_details_filters">
 
                             <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Index"            /></th>
+
                             <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
                             <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
                             <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
@@ -212,7 +246,8 @@
                     
                     <tbody>
                         <tr v-for="(client, index) in clients_table_affiche" :key="client">
-                            <td>{{index + 1}}</td>
+                            <td>{{index +   1}}</td>
+
                             <td>{{client.CustomerCode}}</td>
 
                             <td>{{client.CustomerNameE}}</td>
@@ -253,6 +288,10 @@ import Multiselect              from '@vueform/multiselect'
 import modalClientAdd           from "../../clients/modalClientAdd.vue"
 import modalClientUpdate        from "../../clients/modalClientUpdate.vue"
 import modalClientsChangeRoute  from "../../clients/modalClientsChangeRoute.vue"
+import modalResume              from "../imports/modalResume.vue"
+
+import modalAddJourneyPlan      from "../../territoires/modalAddJourneyPlan.vue"
+import modalUpdateJourneyPlan   from "../../territoires/modalUpdateJourneyPlan.vue"
 
 import {mapGetters, mapActions} from "vuex"
 
@@ -299,26 +338,37 @@ export default {
             // Event
             event_on_process            :   false                       ,
 
-            // Datatable
-            datatable_par_route_import_details  :   null
+            // Datatable                
+            datatable_par_route_import_details  :   null                ,
+
+            // latlngs selected Polygon
+            latlngs                             :   null                ,
+            journey_plan                        :   null
         }
     },  
 
     components: {
+
         Multiselect,
 
-        modalClientAdd           ,
-        modalClientUpdate        ,
-        modalClientsChangeRoute
+        modalClientAdd              ,
+        modalClientUpdate           ,
+        modalClientsChangeRoute     ,
+        modalResume                 ,
+
+        modalAddJourneyPlan         ,
+        modalUpdateJourneyPlan
     },
 
     computed: {
 
         ...mapGetters({
 
-            getAddClient            : 'client/getAddClient',
-            getUpdateClient         : 'client/getUpdateClient',
-            getClientsChangeRoute   : 'client/getClientsChangeRoute'
+            getAddClient            : 'client/getAddClient'                 ,
+            getUpdateClient         : 'client/getUpdateClient'              ,
+            getClientsChangeRoute   : 'client/getClientsChangeRoute'        ,
+
+            getAddJourneyPlan       : 'journey_plan/getAddJourneyPlan'
         })
     },
 
@@ -339,28 +389,47 @@ export default {
 
             this.addClientJSON(client)
 
-            await this.removeDrawings()
+            this.removeDrawings()
         })
 
         this.emitter.on('reSetUpdate'       , async (client)    =>  {
 
             this.updateClientJSON(client)
 
-            await this.removeDrawings()
+            this.removeDrawings()
         })
 
         this.emitter.on('reSetDelete'       , async (client)    =>  {
 
             this.deleteClientJSON(client)
 
-            await this.removeDrawings()
+            this.removeDrawings()
         })
 
         this.emitter.on('reSetChangeRoute'  , async (clients)    =>  {
 
             this.changeRouteClientsJSON(clients)
 
-            await this.removeDrawings()
+            this.removeDrawings()
+        })
+
+        this.emitter.on('reSetClientsDecoupeByJourneeMap' , (clients)  =>  {
+
+            this.route_import.clients   =   clients
+
+            this.reAfficherClientsAndMarkers()
+        })
+
+        //
+
+        this.emitter.on('reSetJPlanBDTerritory' , () =>  {
+
+            this.showJPlanBDTerritories()
+        })
+
+        this.emitter.on('reSetJourneeBDTerritory' , () =>  {
+
+            this.showJourneeBDTerritories()
         })
     },
 
@@ -391,8 +460,10 @@ export default {
             const res                   =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.id_route_import+"/details",   null)
             this.route_import           =   res.data
 
+            console.log(this.route_import)
+
             // Set Clients
-            this.route_import.clients   =   JSON.parse(this.route_import.data)
+            this.route_import.clients   =   this.route_import.data
 
             // Extract JPlan, Cites, District
             this.extractMetaData()
@@ -439,7 +510,6 @@ export default {
             let liste_journee_colors                =   {}
 
             // Colors
-
             for (const [key, value] of Object.entries(this.liste_journey_plan)) {
 
                 if(typeof liste_journey_plan_colors[this.liste_journey_plan[key].color] ==  "undefined") {
@@ -481,7 +551,6 @@ export default {
             }
 
             // Make Groupe
-
             for (let i = 0; i < this.route_import.clients.length; i++) {
 
                 if(typeof journey_plan_util[this.route_import.clients[i].JPlan]         ==  "undefined") {
@@ -489,14 +558,14 @@ export default {
                     journey_plan_util[this.route_import.clients[i].JPlan]                   =   this.route_import.clients[i].JPlan
                 }    
 
-                if(typeof district_util[this.route_import.clients[i].DistrictNameE]        ==  "undefined") {
+                if(typeof district_util[this.route_import.clients[i].DistrictNo]        ==  "undefined") {
 
-                    district_util[this.route_import.clients[i].DistrictNameE]                  =   this.route_import.clients[i].DistrictNameE
+                    district_util[this.route_import.clients[i].DistrictNo]                  =   this.route_import.clients[i].DistrictNameE
                 }
 
-                if(typeof cite_util[this.route_import.clients[i].CityNameE]                ==  "undefined") {
+                if(typeof cite_util[this.route_import.clients[i].CityNo]                ==  "undefined") {
 
-                    cite_util[this.route_import.clients[i].CityNameE]                          =   this.route_import.clients[i].CityNameE
+                    cite_util[this.route_import.clients[i].CityNo]                          =   this.route_import.clients[i].CityNameE
                 }
 
                 if(typeof type_client_util[this.route_import.clients[i].CustomerType]   ==  "undefined") {
@@ -532,12 +601,12 @@ export default {
                 //
 
                 // District
-                district_existe             =   this.checkExistDistrictNameE(this.districts, this.route_import.clients[i].DistrictNameE) 
+                district_existe             =   this.checkExistDistrictNo(this.districts, this.route_import.clients[i].DistrictNo) 
 
                 if(!district_existe) {
 
-                    this.districts[this.route_import.clients[i].DistrictNameE]                          =   {DistrictNameE :   ""}
-                    this.districts[this.route_import.clients[i].DistrictNameE].DistrictNameE            =   this.route_import.clients[i].DistrictNameE 
+                    this.districts[this.route_import.clients[i].DistrictNo]                                 =   {DistrictNameE :   ""}
+                    this.districts[this.route_import.clients[i].DistrictNo].DistrictNameE                   =   this.route_import.clients[i].DistrictNameE 
 
                     if(Object.keys(districts_colors).length    >   0) {
 
@@ -547,19 +616,19 @@ export default {
                         }
                     }
 
-                    this.districts[this.route_import.clients[i].DistrictNameE].color                    =   this.$colors[district_count % this.$colors.length]
-                    district_count                                                                      =   district_count +   1
+                    this.districts[this.route_import.clients[i].DistrictNo].color                           =   this.$colors[district_count % this.$colors.length]
+                    district_count                                                                          =   district_count +   1
                 }
 
                 //
 
                 // Cite
-                cite_existe                 =   this.checkExistCityNameE(this.cites, this.route_import.clients[i].CityNameE) 
+                cite_existe                 =   this.checkExistCityNo(this.cites, this.route_import.clients[i].CityNo) 
 
                 if(!cite_existe) {
 
-                    this.cites[this.route_import.clients[i].CityNameE]                                  =   {CityNameE :   ""}
-                    this.cites[this.route_import.clients[i].CityNameE].CityNameE                        =   this.route_import.clients[i].CityNameE 
+                    this.cites[this.route_import.clients[i].CityNo]                                         =   {CityNameE :   ""}
+                    this.cites[this.route_import.clients[i].CityNo].CityNameE                               =   this.route_import.clients[i].CityNameE 
 
                     if(Object.keys(cites_colors).length    >   0) {
 
@@ -569,8 +638,8 @@ export default {
                         }
                     }
 
-                    this.cites[this.route_import.clients[i].CityNameE].color                            =   this.$colors[cite_count % this.$colors.length]
-                    cite_count                                                                          =   cite_count +   1
+                    this.cites[this.route_import.clients[i].CityNo].color                                   =   this.$colors[cite_count % this.$colors.length]
+                    cite_count                                                                              =   cite_count +   1
 
                 }
 
@@ -618,7 +687,6 @@ export default {
             }
 
             // Remove Elements
-
             for (const [key, value] of Object.entries(this.liste_journey_plan)) {
 
                 if(typeof journey_plan_util[key]   ==  "undefined") {
@@ -679,7 +747,7 @@ export default {
 
             for (const [key, value] of Object.entries(liste_journey_plan)) {
 
-                if(liste_journey_plan[key].JPlan    ==  JPlan) {
+                if(key  ==  JPlan) {
 
                     return true
                 }
@@ -688,11 +756,11 @@ export default {
             return false
         },
 
-        checkExistDistrictNameE(districts, DistrictNameE) {
+        checkExistDistrictNo(districts, DistrictNo) {
 
             for (const [key, value] of Object.entries(districts)) {
             
-                if(districts[key].DistrictNameE    ==  DistrictNameE) {
+                if(key  ==  DistrictNo) {
 
                     return true
                 }
@@ -701,11 +769,11 @@ export default {
             return false
         },
 
-        checkExistCityNameE(cites, CityNameE) {
+        checkExistCityNo(cites, CityNo) {
 
             for (const [key, value] of Object.entries(cites)) {
             
-                if(cites[key].CityNameE    ==  CityNameE) {
+                if(key  ==  CityNo) {
 
                     return true
                 }
@@ -718,7 +786,7 @@ export default {
 
             for (const [key, value] of Object.entries(liste_type_client)) {
             
-                if(liste_type_client[key].CustomerType    ==  CustomerType) {
+                if(key  ==  CustomerType) {
 
                     return true
                 }
@@ -731,7 +799,7 @@ export default {
 
             for (const [key, value] of Object.entries(liste_journee)) {
                 
-                if(liste_journee[key].Journee   ==  Journee) {
+                if(key  ==  Journee) {
 
                     return true
                 }
@@ -741,6 +809,29 @@ export default {
         },
 
         //
+
+        reAfficherClientsAndMarkersSelect() {
+
+            // Show Loading Page
+            this.$showLoadingPage()
+
+            setTimeout(async () => {
+
+                // Prepare Clients
+                this.prepareClients()
+
+                // reAffiche Clients
+                await this.reAfficheClients()
+
+                // reAffiche Markers
+                this.setRouteMarkers()
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+            }, 55);
+
+        },
 
         reAfficherClientsAndMarkers() {
 
@@ -765,6 +856,7 @@ export default {
                 this.$hideLoadingPage()
 
             }, 55);
+        
         },
 
         prepareClients() {
@@ -775,13 +867,13 @@ export default {
 
                 for (const [i, value] of Object.entries(this.route_import.liste_journey_plan)) {
 
-                    this.clients_group[this.route_import.liste_journey_plan[i].JPlan]           =   {column_name : this.route_import.liste_journey_plan[i].JPlan, clients : [], color : this.route_import.liste_journey_plan[i].color}
+                    this.clients_group[i]                                                       =   {column_name : i, clients : [], color : this.route_import.liste_journey_plan[i].color}
 
                     for (let j = 0; j < this.route_import.clients.length; j++) {
 
-                        if(this.route_import.clients[j].JPlan   ==  this.route_import.liste_journey_plan[i].JPlan) {
+                        if(this.route_import.clients[j].JPlan   ==  i) {
 
-                            this.clients_group[this.route_import.liste_journey_plan[i].JPlan].clients.push(this.route_import.clients[j])
+                            this.clients_group[i].clients.push(this.route_import.clients[j])
                         }
                     }
                 }
@@ -791,13 +883,13 @@ export default {
 
                 for (const [i, value] of Object.entries(this.route_import.districts)) {
 
-                    this.clients_group[this.route_import.districts[i].DistrictNameE]            =   {column_name : this.route_import.districts[i].DistrictNameE, clients : [], color : this.route_import.districts[i].color}
+                    this.clients_group[i]                                                       =   {column_name : this.route_import.districts[i].DistrictNameE, clients : [], color : this.route_import.districts[i].color}
                 
                     for (let j = 0; j < this.route_import.clients.length; j++) {
 
-                        if(this.route_import.clients[j].DistrictNameE  ==  this.route_import.districts[i].DistrictNameE) {
+                        if(this.route_import.clients[j].DistrictNo  ==  i) {
 
-                            this.clients_group[this.route_import.districts[i].DistrictNameE].clients.push(this.route_import.clients[j])
+                            this.clients_group[i].clients.push(this.route_import.clients[j])
                         }
                     }
                 }
@@ -807,13 +899,13 @@ export default {
 
                 for (const [i, value] of Object.entries(this.route_import.cites)) {
 
-                    this.clients_group[this.route_import.cites[i].CityNameE]                    =   {column_name : this.route_import.cites[i].CityNameE, clients : [], color : this.route_import.cites[i].color}
+                    this.clients_group[i]                                                       =   {column_name : this.route_import.cites[i].CityNameE, clients : [], color : this.route_import.cites[i].color}
 
                     for (let j = 0; j < this.route_import.clients.length; j++) {
 
-                        if(this.route_import.clients[j].CityNameE  ==  this.route_import.cites[i].CityNameE) {
+                        if(this.route_import.clients[j].CityNo  ==  i) {
 
-                            this.clients_group[this.route_import.cites[i].CityNameE].clients.push(this.route_import.clients[j])
+                            this.clients_group[i].clients.push(this.route_import.clients[j])
                         }
                     }
                 }           
@@ -823,13 +915,13 @@ export default {
 
                 for (const [i, value] of Object.entries(this.route_import.liste_type_client)) {
 
-                    this.clients_group[this.route_import.liste_type_client[i].CustomerType]     =   {column_name : this.route_import.liste_type_client[i].CustomerType, clients : [], color : this.route_import.liste_type_client[i].color}
+                    this.clients_group[i]                                                       =   {column_name : i, clients : [], color : this.route_import.liste_type_client[i].color}
                 
                     for (let j = 0; j < this.route_import.clients.length; j++) {
 
-                        if(this.route_import.clients[j].CustomerType    ==  this.route_import.liste_type_client[i].CustomerType) {
+                        if(this.route_import.clients[j].CustomerType    ==  i) {
 
-                            this.clients_group[this.route_import.liste_type_client[i].CustomerType].clients.push(this.route_import.clients[j])
+                            this.clients_group[i].clients.push(this.route_import.clients[j])
                         }
                     }
                 }           
@@ -839,13 +931,13 @@ export default {
 
                 for (const [i, value] of Object.entries(this.route_import.liste_journee)) {
 
-                    this.clients_group[this.route_import.liste_journee[i].Journee]              =   {column_name : this.route_import.liste_journee[i].Journee, clients : [], color : this.route_import.liste_journee[i].color}
+                    this.clients_group[i]                                                       =   {column_name : i, clients : [], color : this.route_import.liste_journee[i].color}
 
                     for (let j = 0; j < this.route_import.clients.length; j++) {
 
-                        if(this.route_import.clients[j].Journee    ==  this.route_import.liste_journee[i].Journee) {
+                        if(this.route_import.clients[j].Journee    ==  i) {
 
-                            this.clients_group[this.route_import.liste_journee[i].Journee].clients.push(this.route_import.clients[j])
+                            this.clients_group[i].clients.push(this.route_import.clients[j])
                         }
                     }
                 }           
@@ -870,17 +962,11 @@ export default {
 
             let splice                      =   false
 
-            let journee_array               =   []
-            let journee_existe              =   false
-
             for (const [key, value] of Object.entries(this.clients_markers_affiche)) {
  
                 for (let i = this.clients_markers_affiche[key].clients.length - 1;    i >= 0; --i) {
 
                     splice          =   false  
-
-                    journee_array   =   []
-                    journee_existe  =   false
 
                     if(this.journey_plan_filter_value.length    >   0) {
 
@@ -896,7 +982,7 @@ export default {
 
                         if(this.district_filter_value.length    >   0) {
 
-                            if (this.district_filter_value.indexOf(this.clients_markers_affiche[key].clients[i].DistrictNameE.toString())  ==  -1) {
+                            if (this.district_filter_value.indexOf(this.clients_markers_affiche[key].clients[i].DistrictNo.toString())  ==  -1) {
 
                                 // splice
                                 this.clients_markers_affiche[key].clients.splice(i, 1)
@@ -908,7 +994,7 @@ export default {
 
                             if(this.city_filter_value.length    >   0) {
 
-                                if (this.city_filter_value.indexOf(this.clients_markers_affiche[key].clients[i].CityNameE.toString())      ==  -1) {
+                                if (this.city_filter_value.indexOf(this.clients_markers_affiche[key].clients[i].CityNo.toString())      ==  -1) {
 
                                     // splice
                                     this.clients_markers_affiche[key].clients.splice(i, 1)
@@ -988,6 +1074,9 @@ export default {
 
         setRouteMarkers() {
 
+            // Clear Drwaings
+            this.removeDrawings()
+
             // Clear Route Data
             this.clearRouteMarkers()
 
@@ -1009,6 +1098,68 @@ export default {
             this.$map.$clearRouteMarkers()
         },
 
+        //
+
+        async showJPlanBDTerritories() {
+
+            // Show Loading Page
+            this.$showLoadingPage()
+
+            let formData = new FormData();
+
+            const res   = await this.$callApi('post'    ,   '/route_import/'+this.route_import.id+'/journey_plan'   ,   formData)      
+            console.log(res.data)
+
+            if(res.status===200){
+
+                // Show BD Territories
+                this.$map.$showJPlanBDTerritories(res.data)
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+            }
+            
+            else{
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
+			}
+        },
+
+        async showJourneeBDTerritories() {
+
+            // Show Loading Page
+            this.$showLoadingPage()
+
+            let formData = new FormData();
+
+            const res   = await this.$callApi('post'    ,   '/route_import/'+this.route_import.id+'/journees'   ,   formData)      
+            console.log(res.data)
+
+            if(res.status===200){
+
+                // Show BD Territories
+                this.$map.$showJourneeBDTerritories(res.data)
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+            }
+            
+            else{
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
+			}
+        },
+
+        //
+
         clearPath() {
 
             // Clear Path
@@ -1028,7 +1179,7 @@ export default {
             }
         },
 
-        async removeDrawings() {
+        removeDrawings() {
 
             this.$map.$removeDrawings()
         },
@@ -1042,13 +1193,18 @@ export default {
 
         //
 
+        showTerritories() {
+
+            this.$map.$showTerritories()
+        },
+
+        //
+
         addClientJSON(client) {
 
             let new_client      =   {}
 
             // Add Client
-            new_client.CustomerNo       =   this.getMaxCustomerNo() +   1
-
             new_client.CustomerCode     =   client.CustomerCode
 
             new_client.CustomerNameE    =   client.CustomerNameE
@@ -1079,7 +1235,7 @@ export default {
 
             for (let i = 0; i < this.route_import.clients.length; i++) {
                 
-                if(this.route_import.clients[i].CustomerNo  ==  client.CustomerNo) {
+                if(this.route_import.clients[i].id  ==  client.id) {
 
                     // Update Client
 
@@ -1115,7 +1271,7 @@ export default {
 
             for (let i = 0; i < this.route_import.clients.length; i++) {
                 
-                if(this.route_import.clients[i].CustomerNo  ==  client.CustomerNo) {
+                if(this.route_import.clients[i].id  ==  client.id) {
 
                     this.route_import.clients.splice(i, 1)
 
@@ -1133,7 +1289,7 @@ export default {
             for(let i = 0; i < clients.length; i++) {
                 for (let j = 0; j < this.route_import.clients.length; j++) {
                     
-                    if(this.route_import.clients[j].CustomerNo  ==  clients[i].CustomerNo) {
+                    if(this.route_import.clients[j].id  ==  clients[i].id) {
 
                         // Update Client
                         if(clients[i].DistrictNo    !=  "") {
@@ -1167,24 +1323,12 @@ export default {
             this.reAfficherClientsAndMarkers()
         },
 
-        getMaxCustomerNo() {
-
-            let maxCustomerNo   =   0
-
-            for (let i = 0; i < this.route_import.clients.length; i++) {
-
-                if(maxCustomerNo    <   this.route_import.clients[i].CustomerNo) {
-
-                    maxCustomerNo   =   this.route_import.clients[i].CustomerNo
-                }
-            }
-
-            return maxCustomerNo
-        },
-
         //
 
         async validerData() {
+
+            // Show Loading Page
+            this.$showLoadingPage()
 
             let formData = new FormData();
 
@@ -1194,15 +1338,26 @@ export default {
 
             if(res.status===200){
 
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
                 // Send Feedback
                 this.$feedbackSuccess("Modifications Validés"     ,   "les changements effectués ont été valides avec succès !")
             }
             
             else{
 
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
                 // Send Errors
                 this.$showErrors("Error !", res.data.errors)
 			}
+        },
+
+        showResume() {
+
+            this.$refs.modalResume.setResume(this.route_import.clients)
         },
 
         // Map
@@ -1235,12 +1390,40 @@ export default {
             }
         },
 
-        updateClientsRoute(clients) {
+        async updateClientsRoute(clients) {
 
             try {
 
-                this.$refs.modalClientsChangeRoute.getData(clients)
+                await this.$refs.modalClientsChangeRoute.getData(clients)
             }
+            catch(e) {
+
+                console.log(e)
+            }
+        },
+
+        //
+
+        AddJourneyPlan(LatLngs) {
+
+            try {
+
+                this.$refs.modalAddJourneyPlan.getData(LatLngs)
+            }
+
+            catch(e) {
+
+                console.log(e)
+            }
+        },
+
+        UpdateJourneyPlan(journey_plan) {
+
+            try {
+
+                this.$refs.modalUpdateJourneyPlan.getData(journey_plan)
+            }
+
             catch(e) {
 
                 console.log(e)
@@ -1320,10 +1503,32 @@ export default {
 
             let map_element                                             =   document.getElementById("map")
             map_element.style.height                                    =   "100%"
-        }
+        },
 
         //
 
+        switchMarkerClusterMode() {
+
+            const marker_cluster_mode   =   document.getElementById("marker_cluster_mode")
+
+            if(marker_cluster_mode.checked) {
+
+                // Show Markers
+                this.$map.$switchMarkerClusterMode("marker")
+
+                // Show Markers
+                this.reAfficherClientsAndMarkersSelect()
+            }
+
+            else {
+
+                // Show Markers
+                this.$map.$switchMarkerClusterMode("cluster")
+
+                // Show Markers
+                this.reAfficherClientsAndMarkersSelect()
+            }
+        }
     },
 
     watch: {
@@ -1354,18 +1559,60 @@ export default {
             }
         },
 
-        getClientsChangeRoute(newValue, oldValue) {
+        async getClientsChangeRoute(newValue, oldValue) {
 
-            if(newValue != null) {
+            if((newValue != null)&&(newValue != {})) {
                 
                 // ShowModal
                 var clientsChangeRouteModal     =   new Modal(document.getElementById("clientsChangeRouteModal"));
                 clientsChangeRouteModal.show();
 
                 // Send DATA To Modal
-                this.updateClientsRoute(newValue)
+                await this.updateClientsRoute(newValue)
+            }
+        },
+
+        //
+
+        getAddJourneyPlan(newValue, oldValue) {
+
+            if(newValue != null) {
+                
+                if((typeof newValue.journey_plan    ==  "undefined")&&(typeof newValue.journee  ==  "undefined")) {
+
+                    // ShowModal
+                    var addJourneyPlanModal        =   new Modal(document.getElementById("addJourneyPlanModal"));
+                    addJourneyPlanModal.show();
+
+                    // Send DATA To Modal
+                    this.AddJourneyPlan(newValue.latlngs)
+                }
+
+                if(typeof newValue.journey_plan    !=  "undefined") {
+
+                    // ShowModal
+                    var updateJourneyPlanModal      =   new Modal(document.getElementById("updateJourneyPlanModal"));
+                    updateJourneyPlanModal.show();
+
+                    // Send DATA To Modal
+                    this.UpdateJourneyPlan(newValue.journey_plan)
+                }
+
+                if(typeof newValue.journee          !=  "undefined") {
+
+                    // ShowModal
+                    var updateJourneyPlanModal      =   new Modal(document.getElementById("updateJourneyPlanModal"));
+                    updateJourneyPlanModal.show();
+
+                    console.log(newValue.journee)
+
+                    // Send DATA To Modal
+                    this.UpdateJourneyPlan(newValue.journee)
+                }
             }
         }
+
+        //
     },
 }
 </script>

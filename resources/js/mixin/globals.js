@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { entries } from 'lodash';
 
 export default {
 
@@ -197,6 +198,8 @@ export default {
 
             let resume_liste_journey_plan   =   this.$getListeJourneyPlans(clients)
 
+            resume_liste_journey_plan       =   this.$setRowspans(resume_liste_journey_plan)
+
             return resume_liste_journey_plan
         },
 
@@ -251,26 +254,6 @@ export default {
             }
 
             return journey_plan_clients
-        },
-
-        $getJourneyPlanRowSpan(districts) {
-
-            let rowspan     =   0
-
-            for (const [key_1, value_1] of Object.entries(districts)) {
-
-                for (const [key_2, value_2] of Object.entries(districts[key_1].cites)) {
-
-                    rowspan     =   rowspan +   1
-                }
-            }
-
-            if(rowspan  ==  0) {
-
-                rowspan     =   1
-            }
-
-            return rowspan
         },
 
         //
@@ -541,126 +524,102 @@ export default {
 
         //
 
-        $getDoublantTel(clients) {
+        $getDoublant(clients) {
 
-            let clients_tempo   =   []
+            let clients_double                              =   {}
 
-            let double_existe   =   false
+            let clients_tempo_double_tel                    =   []
+            let clients_tempo_double_latitude_longitude     =   []
+            let clients_tempo_double_customer_namee         =   []
+            let clients_tempo_double_customer_code          =   []
+
+            let double_tel_existe                           =   false
+            let double_latitude_longitude_existe            =   false
+            let double_customer_namee_existe                =   false
+            let double_customer_code_existe                 =   false
 
             for (let i = 0; i < clients.length - 1; i++) {
 
-                double_existe   =   false
+                double_tel_existe                               =   false
+                double_latitude_longitude_existe                =   false
+                double_customer_namee_existe                    =   false
+                double_customer_code_existe                     =   false
 
                 for (let j = i + 1; j < clients.length; j++) {
 
+                    // Double Tel
                     if(clients[i].Tel   ==  clients[j].Tel) {
 
-                        if(!this.$clientExisteInArray(clients[j], clients_tempo)) {
+                        if(!this.$clientExisteInArray(clients[j], clients_tempo_double_tel)) {
 
-                            if(double_existe    ==  false) {
+                            if(double_tel_existe    ==  false) {
 
-                                double_existe   =   true
-                                clients_tempo.push(clients[i])
+                                double_tel_existe   =   true
+                                clients_tempo_double_tel.push(clients[i])
                             }
 
-                            clients_tempo.push(clients[j])
+                            clients_tempo_double_tel.push(clients[j])
                         }
                     }
-                }                
-            }
 
-            return clients_tempo
-        },
-
-        $getDoublantLatitudeLongitude(clients) {
-
-            let clients_tempo   =   []
-
-            let double_existe   =   false
-
-            for (let i = 0; i < clients.length - 1; i++) {
-
-                double_existe   =   false
-
-                for (let j = i + 1; j < clients.length; j++) {
-
+                    // Double Latitude Longitude
                     if((clients[i].Latitude ==  clients[j].Latitude)&&(clients[i].Longitude ==  clients[j].Longitude)) {
 
-                        if(!this.$clientExisteInArray(clients[j], clients_tempo)) {
+                        if(!this.$clientExisteInArray(clients[j], clients_tempo_double_latitude_longitude)) {
 
-                            if(double_existe    ==  false) {
+                            if(double_latitude_longitude_existe    ==  false) {
 
-                                double_existe   =   true
-                                clients_tempo.push(clients[i])
+                                double_latitude_longitude_existe   =   true
+                                clients_tempo_double_latitude_longitude.push(clients[i])
                             }
 
-                            clients_tempo.push(clients[j])
+                            clients_tempo_double_latitude_longitude.push(clients[j])
                         }
                     }
-                }                
-            }
 
-            return clients_tempo
-        },
-
-        $getDoublantCustomerNameE(clients) {
-
-            let clients_tempo   =   []
-
-            let double_existe   =   false
-
-            for (let i = 0; i < clients.length - 1; i++) {
-
-                for (let j = i + 1; j < clients.length; j++) {
-
+                    // Double CustomerNameE
                     if(clients[i].CustomerNameE ==  clients[j].CustomerNameE) {
 
-                        if(!this.$clientExisteInArray(clients[j], clients_tempo)) {
+                        if(!this.$clientExisteInArray(clients[j], clients_tempo_double_customer_namee)) {
 
-                            if(double_existe    ==  false) {
+                            if(double_customer_namee_existe    ==  false) {
 
-                                double_existe   =   true
-                                clients_tempo.push(clients[i])
+                                double_customer_namee_existe    =   true
+                                clients_tempo_double_customer_namee.push(clients[i])
                             }
 
-                            clients_tempo.push(clients[j])
+                            clients_tempo_double_customer_namee.push(clients[j])
                         }
                     }
-                }                
-            }
 
-            return clients_tempo
-        },
-
-        $getDoublantCustomerCode(clients) {
-
-            let clients_tempo   =   []
-
-            let double_existe   =   false
-
-            for (let i = 0; i < clients.length - 1; i++) {
-
-                double_existe   =   false
-
-                for (let j = i + 1; j < clients.length; j++) {
-
+                    // Double CustomerCode
                     if(clients[i].CustomerCode  ==  clients[j].CustomerCode) {
 
-                        if(!this.$clientExisteInArray(clients[j], clients_tempo)) {
+                        if(!this.$clientExisteInArray(clients[j], clients_tempo_double_customer_code)) {
 
-                            if(double_existe    ==  false) {
+                            if(double_customer_code_existe      ==  false) {
 
-                                double_existe   =   true
-                                clients_tempo.push(clients[i])
+                                double_customer_code_existe         =   true
+                                clients_tempo_double_customer_code.push(clients[i])
                             }
 
-                            clients_tempo.push(clients[j])
+                            clients_tempo_double_customer_code.push(clients[j])
                         }
                     }
                 }                
             }
 
-            return clients_tempo
+            clients_double.$getDoublantTel                  =   clients_tempo_double_tel
+            clients_double.$getDoublantLatitudeLongitude    =   clients_tempo_double_latitude_longitude
+            clients_double.$getDoublantCustomerNameE        =   clients_tempo_double_customer_namee
+            clients_double.$getDoublantCustomerCode         =   clients_tempo_double_customer_code
+
+            console.log(clients_tempo_double_tel)
+            console.log(clients_tempo_double_latitude_longitude)
+            console.log(clients_tempo_double_customer_namee)
+            console.log(clients_tempo_double_customer_code)
+
+            return clients_double
         },
 
         //
@@ -676,6 +635,79 @@ export default {
             }
 
             return false
-        }
+        },
+
+        //
+
+        $setRowspans(resume_liste_journey_plan) {
+
+            let journey_plan_rowspan_global =   0
+            let district_rowspan_global     =   0
+            let cite_rowspan_global         =   0
+
+            for (const [key, value] of Object.entries(resume_liste_journey_plan)) {
+
+                journey_plan_rowspan_global     =   0
+
+                for (const [key_2, value_2] of Object.entries(resume_liste_journey_plan[key].districts)) {
+
+                    district_rowspan_global         =   0   
+
+                    for (const [key_3, value_3] of Object.entries(resume_liste_journey_plan[key].districts[key_2].cites)) {
+
+                        cite_rowspan_global             =   0
+
+                        for (const [key_4, value_4] of Object.entries(resume_liste_journey_plan[key].districts[key_2].cites[key_3].liste_type_client)) {
+
+                            resume_liste_journey_plan[key].districts[key_2].cites[key_3].liste_type_client[key_4].rowspan   =   1
+
+                            cite_rowspan_global                                                                             =   cite_rowspan_global     +   1
+                        }
+
+                        resume_liste_journey_plan[key].districts[key_2].cites[key_3].rowspan    =   cite_rowspan_global
+
+                        district_rowspan_global                                                 =   district_rowspan_global +   cite_rowspan_global
+                    }
+
+                    resume_liste_journey_plan[key].districts[key_2].rowspan     =   district_rowspan_global
+
+                    journey_plan_rowspan_global                                 =   journey_plan_rowspan_global +   district_rowspan_global
+                }
+
+                resume_liste_journey_plan[key].rowspan      =   journey_plan_rowspan_global
+            }
+
+            //
+
+            let journee_rowspan_journee_global      =   0
+            let cite_rowspan_journee_global         =   0
+
+            for (const [key, value] of Object.entries(resume_liste_journey_plan)) {
+
+                journee_rowspan_journee_global     =   0
+
+                for (const [key_2, value_2] of Object.entries(resume_liste_journey_plan[key].liste_journee)) {
+
+                    cite_rowspan_journee_global      =   0
+
+                    for (const [key_3, value_3] of Object.entries(resume_liste_journey_plan[key].liste_journee[key_2].cites)) {
+
+                        resume_liste_journey_plan[key].liste_journee[key_2].cites[key_3].rowspan_journee    =   1
+
+                        cite_rowspan_journee_global                                                         =   cite_rowspan_journee_global +   1
+                    }
+
+                    resume_liste_journey_plan[key].liste_journee[key_2].rowspan_journee     =   cite_rowspan_journee_global
+
+                    journee_rowspan_journee_global                                          =   journee_rowspan_journee_global  +   cite_rowspan_journee_global
+                }
+
+                resume_liste_journey_plan[key].rowspan_journee  =   journee_rowspan_journee_global
+            }
+
+            return resume_liste_journey_plan
+        },
+
+        //
     }
 }

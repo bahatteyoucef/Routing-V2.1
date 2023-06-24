@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 use Illuminate\Validation\Rule;
@@ -22,6 +24,14 @@ class RouteImport extends Model
     public    $timestamps   =   false;
 
     //
+
+    public static function indexRouteImport()
+    {
+
+        $liste_route_import =   RouteImport::where('owner', Auth::user()->id)->get();
+
+        return $liste_route_import;
+    }
 
     public static function validateStore(Request $request) 
     {
@@ -40,7 +50,7 @@ class RouteImport extends Model
 
         $route_import   =   new RouteImport([
             'libelle'       =>  $request->input('libelle')  ,
-            'data'          =>  $request->get("data")       
+            'owner'         =>  Auth::user()->id
         ]);
 
         $route_import->save();
@@ -51,6 +61,10 @@ class RouteImport extends Model
         $route_import->file     =   $fileName;
 
         $route_import->save();
+
+        // Store Data
+
+        RouteImport::storeData($request, $route_import->id);
 
         return $route_import;
     }
@@ -65,41 +79,134 @@ class RouteImport extends Model
         return $validator;
     }
 
-    public static function updateRouteImport(Request $request, int $id_route_import)
+    public static function updateRouteImport(Request $request, int $id)
     {
 
-        $route_import       =   RouteImport::find($id_route_import);
-
-        $route_import->data =   $request->get("data");
+        $route_import       =   RouteImport::find($id);
 
         $route_import->save();
     }
 
-    public static function deleteRouteImport(int $id_route_import)
+    public static function deleteRouteImport(int $id)
     {
 
-        $route_import       =   RouteImport::find($id_route_import);
+        $route_import       =   RouteImport::find($id);
 
         $route_import->delete();
+
+        // Delete Data
+        RouteImport::deleteData($id);
     }
 
     //
 
-    public static function indexRouteImport()
+    // Journey Plan
+
+    public static function journeyPlan(int $id) 
     {
 
-        $liste_route_import =   RouteImport::all();
+        $liste_journey_plan =   JourneyPlan::where([['id_route_import', $id],['owner', Auth::user()->id]])->get();
 
-        return $liste_route_import;
+        return $liste_journey_plan;
+    }
+
+    public static function journees(int $id) 
+    {
+
+        $journees   =   Journee::where([['id_route_import', $id],['owner', Auth::user()->id]])->get();
+
+        return $journees;
     }
 
     //
 
-    public static function obsDetailsRouteImport(string $id_route_import)
+    // Clients
+
+    public static function storeData(Request $request, int $id)
     {
 
-        $route_import   =   RouteImport::find($id_route_import);
+        //  Clients
 
-        return $route_import;  
+        Client::storeClients($request, $id);
+
+        // 
+
+        // Journey Plan
+
+        JourneyPlan::storeListeJourneyPlan($request, $id);
+
+        //
+
+        // Journee
+
+        Journee::storeJournees($request, $id);
+
+        //
     }
+
+    public static function deleteData(int $id)
+    {
+
+        Client::where("id_route_import", $id)->delete();
+        JourneyPlan::where("id_route_import", $id)->delete();
+        Journee::where("id_route_import", $id)->delete();
+    }
+
+    //
+
+    // Validate City District in Clients
+
+    public static function setWillayasCites(Request $request)
+    {
+
+        $clients    =   json_decode($request->get("clients"));
+
+        foreach ($clients as $client) {
+
+            // District
+            $willaya   =   RTMWillaya::where('DistrictNameE', $client->DistrictNameE)->first();
+
+            if($willaya) {
+
+                $client->DistrictNo     =   $willaya->DistrictNo;
+
+                // Cite
+                $cite   =   RTMCite::where([['CityNameE', $client->CityNameE],['DistrictNo', $client->DistrictNo]])->first();
+
+                if($cite) {
+
+                    $client->CityNo         =   $cite->CITYNO;
+                }
+
+                else {
+
+                    $client->CityNo         =   "UND";
+                }
+            }
+
+            else {
+
+                $client->DistrictNo     =   "UND";
+                $client->CityNo         =   "UND";
+            }
+        }
+
+        return $clients;
+    }
+
+    //
+
+    // Routing
+
+    public static function obsDetailsRouteImport(string $id)
+    {
+
+        $route_import           =   RouteImport::find($id);
+
+        $route_import->data     =   Client::where([["id_route_import", $id],['owner', Auth::user()->id]])->get();   
+
+        return $route_import;
+    }
+
+    //
 }
