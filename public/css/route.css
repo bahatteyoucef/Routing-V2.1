@@ -78,9 +78,6 @@
 }
 
 .map_top_infos_div {
-    position        :   absolute;
-    top             :   175px;
-    left            :   0;
     z-index         :   999;
 }
 
@@ -174,9 +171,11 @@ path.leaflet-interactive.animate {
 
 /* Toggle */
 
-#toggle_div {
+
+
+#map_top_middle_options_div {
     position    : absolute;
-    left        : 47%;
+    left        : 49%;
     top         : 85px;
 }
 

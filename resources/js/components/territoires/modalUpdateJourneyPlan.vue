@@ -108,6 +108,8 @@ export default {
             formData.append("type_territoire"   ,   this.territoire.type_territoire)
             formData.append("latlngs"           ,   JSON.stringify(this.territoire.latlngs))
             formData.append("JPlan"             ,   this.territoire.JPlan)
+            formData.append("old_JPlan"         ,   this.territoire.old_JPlan)
+            formData.append("old_Journee"       ,   this.territoire.old_Journee)
             formData.append("Journee"           ,   this.territoire.Journee)
             formData.append("color"             ,   this.territoire.color)
 
@@ -180,6 +182,8 @@ export default {
             formData.append("latlngs"           ,   JSON.stringify(this.territoire.latlngs))
             formData.append("JPlan"             ,   this.territoire.JPlan)
             formData.append("Journee"           ,   this.territoire.Journee)
+            formData.append("old_Journee"       ,   this.territoire.old_Journee)
+            formData.append("old_JPlan"         ,   this.territoire.old_JPlan)
             formData.append("color"             ,   this.territoire.color)
 
             if(this.territoire.type_territoire    ==  '1') {

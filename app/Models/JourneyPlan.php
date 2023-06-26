@@ -41,6 +41,18 @@ class JourneyPlan extends Model
 
     public static function storeJourneyPlan(Request $request, int $id_route_import) {
 
+        $old_journey_plan   =   JourneyPlan::where([['id_route_import', $id_route_import], ['JPlan', $request->get("old_JPlan")]])->first();
+
+        if($old_journey_plan) {
+
+            $old_journey_plan->latlngs      =   null;
+            $old_journey_plan->color        =   null;
+
+            $old_journey_plan->save();
+        }
+
+        //
+
         $journey_plan   =   JourneyPlan::where([['id_route_import', $id_route_import], ['JPlan', $request->get("JPlan")]])->first();
 
         if($journey_plan) {

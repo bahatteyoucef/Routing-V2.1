@@ -15,17 +15,54 @@
                 <img  :src="'/images/hide_route_datatable.png'" role="button"   @click="hideRouteDatatable()"/>
             </div>
 
-            <!-- Toggle -->
-            <div id="toggle_div">
+            <div id="map_top_middle_options_div">
 
-                <div class="btn-container" id="marker_cluster_mode_div">
-                    <label class="switch btn-color-mode-switch">
-                        <input type="checkbox" name="marker_cluster_mode" id="marker_cluster_mode" @change="switchMarkerClusterMode()">
-                        <label for="marker_cluster_mode" data-on="Marker" data-off="Cluster" class="btn-color-mode-switch-inner"></label>
-                    </label>
+                <div class="row">
+
+                    <!-- Map Info -->
+                    <div class="col p-0">
+                        <div class="map_top_infos_div">
+                            <table class="table table-borderless">
+
+                                <Popper click placement="bottom">
+                                    <img  :src="'/images/map_infos_2.png'" role="button" style="width : 35px; padding : 0;"/>
+
+                                    <template #content>
+                                        <table class="table table-borderless scrollbar scrollbar-deep-blue">
+                                            <tr v-for="groupe in clients_markers_affiche" :key="groupe">
+                                                <th><span>{{ groupe.column_name }} : </span></th>
+                                                <td><span>{{ groupe.clients.length }} clients </span></td>
+                                                
+                                                <td><span :style="  'display: inline-block; '+
+                                                                'width: 15px;           '+
+                                                                'height: 15px;          '+
+                                                                'background-color: '+groupe.color+';'">
+                                                </span></td>
+                                            </tr>
+                                        </table>                            
+                                    </template>
+                                </Popper>
+
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Toggle -->
+                    <div class="col p-0 ml-1">
+                        <div id="toggle_div">
+
+                            <div class="btn-container" id="marker_cluster_mode_div">
+                                <label class="switch btn-color-mode-switch">
+                                    <input type="checkbox" name="marker_cluster_mode" id="marker_cluster_mode" @change="switchMarkerClusterMode()">
+                                    <label for="marker_cluster_mode" data-on="Marker" data-off="Cluster" class="btn-color-mode-switch-inner"></label>
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
 
-            </div>
+            </div>                
 
             <!--  -->
         </div>
@@ -154,31 +191,6 @@
                         <!--                -->
                     </div>
                 </div>
-            </div>
-            <div class="map_top_infos_div">
-                <table class="table table-borderless">
-
-                    <Popper click placement="right-start">
-                        <img  :src="'/images/map_infos_2.png'" role="button"/>
-
-                        <template #content>
-                            <table class="table table-borderless scrollbar scrollbar-deep-blue">
-                                <tr v-for="groupe in clients_markers_affiche" :key="groupe">
-                                    <th><span>{{ groupe.column_name }} : </span></th>
-                                    <td><span>{{ groupe.clients.length }} clients </span></td>
-                                    
-                                    <td><span :style="  'display: inline-block; '+
-                                                    'width: 15px;           '+
-                                                    'height: 15px;          '+
-                                                    'background-color: '+groupe.color+';'">
-                                    </span></td>
-                                </tr>
-                            </table>                            
-                        </template>
-                    </Popper>
-
-
-                </table>
             </div>
 
             <!--  -->

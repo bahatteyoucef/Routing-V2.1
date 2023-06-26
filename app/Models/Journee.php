@@ -43,6 +43,18 @@ class Journee extends Model
 
     public static function storeJournee(Request $request, int $id_route_import) {
 
+        $old_journee                =   Journee::where([['id_route_import', $id_route_import], ['JPlan', $request->get("old_JPlan")], ['Journee', $request->get("old_Journee")]])->first();
+
+        if($old_journee) {
+
+            $old_journee->latlngs   =   null;
+            $old_journee->color     =   null;
+
+            $old_journee->save();
+        }
+
+        //
+
         $journee        =   Journee::where([['id_route_import', $id_route_import], ['JPlan', $request->get("JPlan")], ['Journee', $request->get("Journee")]])->first();
 
         if($journee) {

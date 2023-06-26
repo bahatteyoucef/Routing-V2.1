@@ -136,7 +136,11 @@ export default {
 
             setTimeout(async () => {
                 
+                console.log(this.clients)
+
                 this.resume_liste_journey_plan  =   this.$getResumeFileRouting(this.clients)
+
+                console.log(this.resume_liste_journey_plan)
 
                 // Global
                 this.addGlobalBody()
@@ -150,6 +154,23 @@ export default {
         },
 
         decouperClients() {
+
+            if(this.$route.path.startsWith("/route/obs/route_import/add")) {
+
+                console.log(111)
+
+                this.decouperClientsAdd()
+            }
+
+            else {
+
+                console.log(222)
+
+                this.decouperClientsMap()
+            }
+        },
+
+        decouperClientsAdd() {
 
             if(this.nombre_journee  >   0) {
 
@@ -185,7 +206,7 @@ export default {
                         for (let j = 0; j < clients_par_route.length; j++) {
 
                             clients_par_jour                    =   [...[]]                    
-                            existe_in_finale                    =   this.checkIfClientAddedJourSemaine(clients_ajoutes, clients_par_route[j])    
+                            existe_in_finale                    =   this.checkIfClientAddedJourSemaineAdd(clients_ajoutes, clients_par_route[j])    
 
                             if(!existe_in_finale) {
 
@@ -200,7 +221,7 @@ export default {
 
                                     for (let l = j+1; l < clients_par_route.length; l++) {
                                         
-                                        existe_in_finale                    =   this.checkIfClientAddedJourSemaine(clients_ajoutes, clients_par_route[l])
+                                        existe_in_finale                    =   this.checkIfClientAddedJourSemaineAdd(clients_ajoutes, clients_par_route[l])
 
                                         if(!existe_in_finale) {
 
@@ -238,8 +259,6 @@ export default {
 
                     this.clients.sort((a,b) => b.CustomerNo -   a.CustomerNo)
 
-                    console.log(this.clients)
-
                     for (let i = 0; i < clients_par_tous_les_routes_tempo.length; i++) {
 
                         for (let j = 0; j < clients_par_tous_les_routes_tempo[i].length; j++) {
@@ -270,6 +289,127 @@ export default {
             }
         },
 
+        decouperClientsMap() {
+
+            if(this.nombre_journee  >   0) {
+
+                // Show Loading Page
+                this.$showLoadingPage()
+
+                setTimeout(() => {
+
+                    let nombre_client_visite_par_jour       =   0
+
+                    let clients_par_tous_les_routes_tempo   =   []
+
+                    let clients_par_route_tous_les_jour     =   []
+
+                    let clients_par_route                   =   []
+                    let clients_par_jour                    =   []
+                    let clients_ajoutes                     =   []
+
+                    let existe_in_finale                    =   []
+
+                    let Journee                             =   0
+
+                    for (const [key, value] of Object.entries(this.resume_liste_journey_plan)) {
+
+                        clients_par_route               =   [...value.clients.sort((b, a) => this.getDistance(0, 0, a.Latitude, a.Longitude) - this.getDistance(0, 0, b.Latitude, b.Longitude))]
+
+                        clients_par_route_tous_les_jour =   [...[]]
+
+                        nombre_client_visite_par_jour   =   Math.ceil(clients_par_route.length / this.nombre_journee)
+
+                        Journee                         =   0
+
+                        for (let j = 0; j < clients_par_route.length; j++) {
+
+                            clients_par_jour                    =   [...[]]                    
+                            existe_in_finale                    =   this.checkIfClientAddedJourSemaineMap(clients_ajoutes, clients_par_route[j])    
+
+                            if(!existe_in_finale) {
+
+                                Journee                             =   Journee +   1
+
+                                for (let k = 0; k < (nombre_client_visite_par_jour - 1); k++) {
+
+                                    let min_distance_index      =   -1
+                                    let min_distance            =   -1
+
+                                    let tempo_min_distance      =   -1
+
+                                    for (let l = j+1; l < clients_par_route.length; l++) {
+                                        
+                                        existe_in_finale                    =   this.checkIfClientAddedJourSemaineMap(clients_ajoutes, clients_par_route[l])
+
+                                        if(!existe_in_finale) {
+
+                                            tempo_min_distance              =   this.getDistance(clients_par_route[j].Latitude, clients_par_route[j].Longitude, clients_par_route[l].Latitude, clients_par_route[l].Longitude)
+
+                                            if((min_distance_index == -1)||(min_distance    >   tempo_min_distance)) {
+
+                                                min_distance_index          =   l
+                                                min_distance                =   tempo_min_distance
+                                            }
+                                        }
+                                    }
+
+                                    if(min_distance_index !=    -1) {
+
+                                        clients_par_route[min_distance_index].Journee   =   "Jour "+Journee
+
+                                        clients_par_jour.push(clients_par_route[min_distance_index])
+                                        clients_ajoutes.push(clients_par_route[min_distance_index])
+                                    }
+                                }
+
+                                clients_par_route[j].Journee    =   "Jour "+Journee
+
+                                clients_par_jour.push(clients_par_route[j])
+                                clients_ajoutes.push(clients_par_route[j])
+
+                                clients_par_route_tous_les_jour.push(clients_par_jour)
+                            }
+                        }
+
+                        clients_par_tous_les_routes_tempo.push(clients_par_route_tous_les_jour)
+
+                    }
+
+                    this.clients.sort((a,b) => b.id -   a.id)
+
+                    for (let i = 0; i < clients_par_tous_les_routes_tempo.length; i++) {
+
+                        for (let j = 0; j < clients_par_tous_les_routes_tempo[i].length; j++) {
+
+                            for (let k = 0; k < clients_par_tous_les_routes_tempo[i][j].length; k++) {
+
+                                for (let l = 0; l < this.clients.length; l++) {
+
+                                    if(this.clients[l].id   ==  clients_par_tous_les_routes_tempo[i][j][k].id) {
+
+                                        this.clients[l]     =   clients_par_tous_les_routes_tempo[i][j][k]
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // ReResume
+                    this.setResume()
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+    
+                    // Send Feedback
+                    this.$feedbackSuccess("Decoupage par Journee Realisés"     ,   "le decoupage a été realisés avec succès !")
+
+                }, 55)
+            }
+        },
+
+        //
+
         valider() {
 
             this.emitter.emit('reSetClientsDecoupeByJournee' , this.clients)
@@ -292,8 +432,6 @@ export default {
             let tbody                   =   document.getElementById("datatable_resume_global_body")
 
             tbody.innerHTML             =   ""
-
-            console.log(this.resume_liste_journey_plan)
 
             // Create rows and cells for each data entry
             for (const [key, journey_plan] of Object.entries(this.resume_liste_journey_plan)) {
@@ -529,8 +667,6 @@ export default {
 
             tbody.innerHTML             =   ""
 
-            console.log(this.resume_liste_journey_plan)
-
             // Create rows and cells for each data entry
             for (const [key, journey_plan] of Object.entries(this.resume_liste_journey_plan)) {
 
@@ -681,7 +817,7 @@ export default {
 
         //
 
-        checkIfClientAddedJourSemaine(clients_ajoutes, client) {
+        checkIfClientAddedJourSemaineAdd(clients_ajoutes, client) {
 
             for (let i = 0; i < clients_ajoutes.length; i++) {
                 
@@ -693,6 +829,21 @@ export default {
 
             return false;
         },
+
+        checkIfClientAddedJourSemaineMap(clients_ajoutes, client) {
+
+            for (let i = 0; i < clients_ajoutes.length; i++) {
+                
+                if(client.id    ==  clients_ajoutes[i].id) {
+
+                    return true;
+                }
+            }
+
+            return false;
+        },    
+
+        //
 
         getDistance(latitude_1, longitude_1, latitude_2, longitude_2) {
 

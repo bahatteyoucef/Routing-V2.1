@@ -108,31 +108,34 @@ export default {
 
         async deleteMap(id_route_import) {
 
-            // Show Loading Page
-            this.$showLoadingPage()
+            if(confirm('Are you sure?')) {
 
-            const res   = await this.$callApi('post'    ,   '/route_import/'+id_route_import+'/delete'    ,   null)      
+                // Show Loading Page
+                this.$showLoadingPage()
 
-            if(res.status===200){
+                const res   = await this.$callApi('post'    ,   '/route_import/'+id_route_import+'/delete'    ,   null)      
 
-                // Send Feedback
-                this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
+                if(res.status===200){
 
-                // Get Route Import
-                await this.getRouteImport()
+                    // Send Feedback
+                    this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
 
-                // Hide Loading Page
-                this.$hideLoadingPage()
+                    // Get Route Import
+                    await this.getRouteImport()
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+                }
+                
+                else{
+
+                    // Send Errors
+                    this.$showErrors("Error !", res.data.errors)
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+			    }
             }
-            
-            else{
-
-                // Send Errors
-                this.$showErrors("Error !", res.data.errors)
-
-                // Hide Loading Page
-                this.$hideLoadingPage()
-			}
         }
     }
 }

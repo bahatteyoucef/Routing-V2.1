@@ -181,8 +181,7 @@ export default class Map {
         let icon        =   null
 
         icon    =   new L.Icon({
-            iconUrl  : '/images/'+color.substring(1)+'.png',
-            shadowUrl: '/images/marker-shadow.png',
+            iconUrl  : '/images/'+color.substring(1)+'.png'
         });
 
         return icon
@@ -262,8 +261,7 @@ export default class Map {
         let icon        =   null
 
         icon    =   new L.Icon({
-            iconUrl  : '/images/'+color.substring(1)+'.png',
-            shadowUrl: '/images/marker-shadow.png',
+            iconUrl  : '/images/'+color.substring(1)+'.png'
         });
 
         return icon
