@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class Client extends Model
 {
@@ -71,14 +73,37 @@ class Client extends Model
             $client->save();
 
             // Journey Plan
-            JourneyPlan::storeJourneyPlan($request, $id_route_import);
+            // JourneyPlan::storeJourneyPlan($request, $id_route_import);
 
             // Journee
-            Journee::storeJournee($request, $id_route_import);
+            // Journee::storeJournee($request, $id_route_import);
         }
     }
 
     //
+
+    public static function validateStore(Request $request) 
+    {
+
+        $validator = Validator::make($request->all(), [
+            'CustomerCode'          =>  ["required", "max:255"],
+            'CustomerNameE'         =>  ["required", "max:255"],
+            'CustomerNameA'         =>  ["required", "max:255"],
+            'Latitude'              =>  ["required", "max:255"],
+            'Longitude'             =>  ["required", "max:255"],
+            'Address'               =>  ["required", "max:255"],
+            'DistrictNo'            =>  ["required", "max:255"],
+            'DistrictNameE'         =>  ["required", "max:255"],
+            'CityNo'                =>  ["required", "max:255"],
+            'CityNameE'             =>  ["required", "max:255"],
+            'Tel'                   =>  ["required", "max:255"],
+            'CustomerType'          =>  ["required", "max:255"],
+            // 'JPlan'                 =>  ["required", "max:255"],
+            // 'Journee'               =>  ["required", "max:255"]
+        ]);
+    
+        return $validator;
+    }
 
     public static function storeClient(Request $request, int $id_route_import) {
 
@@ -110,6 +135,31 @@ class Client extends Model
         Journee::storeJournee($request, $id_route_import);
     }
 
+    //
+
+    public static function validateUpdate(Request $request) 
+    {
+
+        $validator = Validator::make($request->all(), [
+            'CustomerCode'          =>  ["required", "max:255"],
+            'CustomerNameE'         =>  ["required", "max:255"],
+            'CustomerNameA'         =>  ["required", "max:255"],
+            'Latitude'              =>  ["required", "max:255"],
+            'Longitude'             =>  ["required", "max:255"],
+            'Address'               =>  ["required", "max:255"],
+            'DistrictNo'            =>  ["required", "max:255"],
+            'DistrictNameE'         =>  ["required", "max:255"],
+            'CityNo'                =>  ["required", "max:255"],
+            'CityNameE'             =>  ["required", "max:255"],
+            'Tel'                   =>  ["required", "max:255"],
+            'CustomerType'          =>  ["required", "max:255"],
+            // 'JPlan'                 =>  ["required", "max:255"],
+            // 'Journee'               =>  ["required", "max:255"]
+        ]);
+    
+        return $validator;
+    }
+
     public static function updateClient(Request $request, int $id_route_import, int $id) {
 
         $client                     =   Client::find($id);
@@ -138,6 +188,8 @@ class Client extends Model
         // Journee
         Journee::storeJournee($request, $id_route_import);
     }
+
+    //
 
     public static function deleteClient(int $id_route_import, int $id) {
 

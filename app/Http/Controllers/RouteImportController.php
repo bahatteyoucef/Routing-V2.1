@@ -53,8 +53,8 @@ class RouteImportController extends Controller
             //
 
             return response()->json([
-                "header"            =>  "Route Ajoutée !"                   ,
-                "message"           =>  "une nouvelle route a été ajouté !" ,
+                "header"            =>  "Route Added !"                             ,
+                "message"           =>  "a new route has been added successfuly!"   ,
                 "route_import"      =>  $route_import
             ]);
         }
@@ -97,8 +97,8 @@ class RouteImportController extends Controller
             //
 
             return response()->json([
-                "header"            =>  "Route Modifiée !"                   ,
-                "message"           =>  "une nouvelle route a été modifié !"
+                "header"            =>  "Route Updated !"                          ,
+                "message"           =>  "a route has been updated successfuly!" 
             ]);
         }
 
@@ -131,8 +131,8 @@ class RouteImportController extends Controller
             //
 
             return response()->json([
-                "header"            =>  "Route Supprimée !"             ,
-                "message"           =>  "une route a été supprimée !"
+                "header"            =>  "Route Deleted !"             ,
+                "message"           =>  "a route has been deleted successfuly!" 
             ]);
         }
 
@@ -181,6 +181,39 @@ class RouteImportController extends Controller
         }
     }
 
+    public function journeyPlanUtil(Request $request, int $id)
+    {
+
+        try {
+
+            //
+            DB::beginTransaction();
+            //
+
+            // store 
+            $liste_journey_plan =   RouteImport::journeyPlanUtil($request, $id);
+
+            //
+            DB::commit();
+            //
+
+            return $liste_journey_plan;
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    //
+
     public function journees(int $id)
     {
 
@@ -192,6 +225,36 @@ class RouteImportController extends Controller
 
             // store 
             $journees   =   RouteImport::journees($id);
+
+            //
+            DB::commit();
+            //
+
+            return $journees;
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+    public function journeesUtil(Request $request, int $id)
+    {
+
+        try {
+
+            //
+            DB::beginTransaction();
+            //
+
+            // store 
+            $journees   =   RouteImport::journeesUtil($request, $id);
 
             //
             DB::commit();

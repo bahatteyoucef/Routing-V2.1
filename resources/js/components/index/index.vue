@@ -11,12 +11,6 @@
                             </span> Dashboard 
                         </h3>
                     </div>
-
-                    <div class="col-1"></div>
-
-                    <div class="col-1 mt-auto">
-                        <button class="float-right btn bg-gradient-primary text-white w-100" @click="AddRouteImport()">+</button>
-                    </div>
                 </div>
 
             </div>
@@ -44,8 +38,8 @@
 
                             </h4>
  
-                            <h6 class="card-text">ID : {{route_import.id}}</h6>
-                            <h6 class="card-text">libelle : {{route_import.libelle}}</h6>
+                            <h6 class="card-text">ID    : {{route_import.id}}</h6>
+                            <h6 class="card-text">label : {{route_import.libelle}}</h6>
 
                         </div>
                     </div>
@@ -93,12 +87,6 @@ export default {
 
                 console.log(e)
             }
-        },
-
-        AddRouteImport() {
-    
-            // Go To Route
-            this.$router.push('/route/obs/route_import/add')
         },
 
         navToMap(id_route_import) {

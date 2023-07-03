@@ -5,15 +5,25 @@
                 <div class="card">
                     <div class="card-body">
 
-                        <div>
-                            <h5 class="modal-title">Importer un nouveau routing</h5>
+                        <div class="row">
+                            <div class="col-10">
+                                <h5 class="modal-title">Import a new Routing</h5>
+                            </div>
+
+                            <div class="col-1 text-right">
+                                <button class="btn btn-primary btn-block" @click="sendDataTempo()">Send Data</button>
+                            </div>
+
+                            <div class="col-1 text-right">
+                                <button class="btn btn-primary btn-block" @click="getDataTempo()">Get Data</button>
+                            </div>
                         </div>
 
                         <hr />
 
                         <form class="row mt-3 mb-3">
                             <div class="col-4">
-                                <label for="libelle"        class="form-label">Libelle</label>
+                                <label for="libelle"        class="form-label">Label</label>
                                 <input type="text"          class="form-control"        id="libelle"        v-model="route_import.libelle">
                             </div>
 
@@ -27,14 +37,14 @@
                             </div>
 
                             <div class="col-4 mt-auto">
-                                <button type="button" class="btn btn-primary"   @click="sendData()"                                                                                                         >Importer   </button>
-                                <button type="button" class="btn btn-primary"   @click="showResumeValidate()"   data-bs-toggle="modal" :data-bs-target="'#modalResumeValidate'"     v-if="route_import.file">Valider    </button>
-                                <button type="button" class="btn btn-primary"   @click="showResume()"           data-bs-toggle="modal" :data-bs-target="'#modalResume'"             v-if="route_import.file">Resumer    </button>
+                                <button type="button" class="btn btn-primary"   @click="sendData()"                                                                                                         >Import     </button>
+                                <button type="button" class="btn btn-primary"   @click="showResumeValidate()"   data-bs-toggle="modal" :data-bs-target="'#modalResumeValidate'"     v-if="route_import.file">Validate   </button>
+                                <button type="button" class="btn btn-primary"   @click="showResume()"           data-bs-toggle="modal" :data-bs-target="'#modalResume'"             v-if="route_import.file">Resume     </button>
                             </div>
                         </form>
 
-                        <modalResume            ref="modalResume"           :key="clients"                                      :clients="clients"></modalResume>
-                        <modalResumeValidate    ref="modalResumeValidate"   :key="clients"      :route_import="route_import"    :clients="clients"></modalResumeValidate>
+                        <!-- <modalResume            ref="modalResume"           :key="clients"                                      :clients="clients"></modalResume> -->
+                        <!-- <modalResumeValidate    ref="modalResumeValidate"   :key="clients"      :route_import="route_import"    :clients="clients"></modalResumeValidate> -->
 
                     </div>
                 </div>
@@ -58,9 +68,9 @@ export default {
 
             route_import    : {
 
-                libelle         :   "",
-                file            :   "",
-                data            :   ""
+                libelle             :   "",
+                file                :   "",
+                file_original_name  :   ""
             },
 
             clients         :   ""  ,
@@ -121,7 +131,6 @@ export default {
                 // Send Errors
                 this.$showErrors("Error !", res.data.errors)
 			}
-
         },
 
         getFile(event) {
@@ -329,10 +338,67 @@ export default {
                 // Send Errors
                 this.$showErrors("Error !", res.data.errors)
 			}
-        }
+        },
 
         //
 
+        async sendDataTempo() {
+
+            this.$showLoadingPage()
+
+            let formData = new FormData();
+
+            formData.append("libelle"   ,   this.route_import.libelle)
+            formData.append("file"      ,   this.route_import.file)
+            formData.append("data"      ,   JSON.stringify(this.clients))
+
+            const res   = await this.$callApi('post' ,   '/route_import_tempo/store'    ,   formData)         
+            console.log(res.data)
+
+            if(res.status===200){
+
+                this.$hideLoadingPage()
+
+                // Send Feedback
+                this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
+			}
+            
+            else{
+
+                this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
+			}
+        },                    
+
+        async getDataTempo() {
+
+            this.$showLoadingPage()
+
+            const res   = await this.$callApi('post' ,   '/route_import_tempo/last'    ,   null)         
+            console.log(res.data)
+
+            if(res.status===200){
+
+                this.$hideLoadingPage()
+
+                this.clients                            =   res.data.clients
+
+                // Route Import
+                this.route_import.libelle               =   res.data.libelle
+                this.route_import.file                  =   res.data.file
+                this.route_import.file_original_name    =   res.data.file_original_name
+            }
+            
+            else{
+
+                this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
+			}
+        }
     }
 }
 

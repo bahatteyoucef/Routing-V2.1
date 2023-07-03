@@ -100,7 +100,7 @@
 
                     if(response.status === 200) {
 
-                        this.$feedbackSuccess("success","vous etes authentifié avec succès")
+                        this.$feedbackSuccess("Logged in !","You have been logged in successfully !")
 
                         // Update l'access token
                         window.$cookies.set('access_token'  , response.data.access_token)
@@ -137,7 +137,7 @@
 
                     if(response.status === 200) {
 
-                        this.$feedbackSuccess("success","test success")
+                        this.$feedbackSuccess("Logged out !","You have been logged out successfully !")
 
                         // Delete l'access token
                         window.$cookies.remove('access_token')

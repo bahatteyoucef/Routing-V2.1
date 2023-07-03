@@ -7,7 +7,7 @@
                 <h4 class="ml-1 card-title"> {{title}} <button class="ml-3 remove_button_style" @click="setDataTable()"><i class="mdi mdi-reload"></i></button></h4>
             </div>
 
-            <div v-if="$canDo(role)"    class="row col-sm-2 justify-content-end">
+            <div    class="row col-sm-2 justify-content-end">
                 <div v-if="update_button.length    >   0"   class="col-sm-6 pr-1 pl-1">
                     <button
                         button type="button" data-bs-toggle="modal" :data-bs-target="'#'+update_modal" class="btn primary w-100"

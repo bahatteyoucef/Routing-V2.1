@@ -6,7 +6,7 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title">Modifier le Client : </h5>
+                    <h5 class="modal-title">Update the Client : {{client.old_CustomerNameE}}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
@@ -15,72 +15,72 @@
                     <form>
 
                         <div class="mb-3">
-                            <label for="CustomerCode"       class="form-label">CustomerCode</label>
+                            <label for="CustomerCode"       class="form-label">CustomerCode (CustomerCode)</label>
                             <input type="text"              class="form-control"        id="CustomerCode"           v-model="client.CustomerCode">
                         </div>
 
                         <div class="mb-3">
-                            <label for="CustomerNameE"      class="form-label">CustomerNameE</label>
+                            <label for="CustomerNameE"      class="form-label">CustomerNameE (CustomerNameE)</label>
                             <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE">
                         </div>
 
                         <div class="mb-3">
-                            <label for="CustomerNameA"      class="form-label">CustomerNameA</label>
+                            <label for="CustomerNameA"      class="form-label">CustomerNameA (CustomerNameA)</label>
                             <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA">
                         </div>
 
                         <div class="mb-3">
-                            <label for="Tel"                class="form-label">Tel</label>
+                            <label for="Tel"                class="form-label">Phone Number (Tel)</label>
                             <input type="text"              class="form-control"        id="Tel"                    v-model="client.Tel">
                         </div>
 
                         <div class="mb-3">
-                            <label for="Address"            class="form-label">Address</label>
+                            <label for="Address"            class="form-label">Address (Address)</label>
                             <input type="text"              class="form-control"        id="Address"                v-model="client.Address">
                         </div>
 
                         <div class="mb-3">
-                            <label for="DistrictNo"         class="form-label">DistrictNo</label>
+                            <label for="DistrictNo"         class="form-label">DistrictNo (DistrictNo)</label>
                             <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()">
-                                <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNameE}}</option>
+                                <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
                             </select>
                         </div>
 
                         <div class="mb-3">
-                            <label for="CityNo"             class="form-label">CityNo</label>
+                            <label for="CityNo"             class="form-label">CityNo (CityNo)</label>
                             <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo">
-                                <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CityNameE}}</option>
+                                <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CITYNO}}- {{cite.CityNameE}}</option>
                             </select>
                         </div>
 
                         <div class="mb-3">
-                            <label for="Latitude"           class="form-label">Latitude</label>
+                            <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
                             <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude">
                         </div>
 
                         <div class="mb-3">
-                            <label for="Longitude"          class="form-label">Longitude</label>
+                            <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
                             <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude">
                         </div>
 
                         <!--  -->
 
                         <div class="mb-3">
-                            <label for="text"               class="form-label">CustomerType</label>
+                            <label for="text"               class="form-label">CustomerType (CustomerType)</label>
                             <input type="text"              class="form-control"        id="CustomerType"           v-model="client.CustomerType">
                         </div>
 
                         <!--  -->
 
                         <div class="mb-3">
-                            <label for="JPlan"              class="form-label">JPlan</label>
+                            <label for="JPlan"              class="form-label">JPlan (JPlan)</label>
                             <input type="text"              class="form-control"        id="JPlan"           v-model="client.JPlan">
                         </div>
 
                         <!--  -->
 
                         <div class="mb-3">
-                            <label for="Journee"            class="form-label">Journee</label>
+                            <label for="Journee"            class="form-label">WorkDay (Journee)</label>
                             <input type="text"              class="form-control"        id="Journee"           v-model="client.Journee">
                         </div>
 
@@ -92,12 +92,12 @@
 
                 <div class="modal-footer"       style="display: flex; justify-content: space-between;">
                     <div class="left-buttons"   style="display: flex;">
-                        <button type="button"   class="btn btn-danger float-left" @click="deleteData()">Supprimer</button>
+                        <button type="button"   class="btn btn-danger float-left" @click="deleteData()">Delete</button>
                     </div>
 
                     <div class="right-buttons"  style="display: flex; margin-left: auto;">
-                        <button type="button"   class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                        <button type="button"   class="btn btn-primary"   @click="sendData()">Valider</button>
+                        <button type="button"   class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button"   class="btn btn-primary"   @click="sendData()">Confirm</button>
                     </div>
                 </div>
 
@@ -116,38 +116,41 @@ export default {
     data() {
         return {
 
+
             client      :   {
 
                 // Client
-                id              :   '',
+                id                  :   '',
 
-                CustomerCode    :   '',
+                CustomerCode        :   '',
 
-                CustomerNameE   :   '',
-                CustomerNameA   :   '',
-                Tel             :   '',
+                old_CustomerNameE   :   '',
 
-                Address         :   '',
+                CustomerNameE       :   '',
+                CustomerNameA       :   '',
+                Tel                 :   '',
 
-                DistrictNo      :   '',
-                DistrictNameE   :   '',
+                Address             :   '',
 
-                CityNo          :   '',
-                CityNameE       :   '',
+                DistrictNo          :   '',
+                DistrictNameE       :   '',
 
-                Latitude        :   '',
-                Longitude       :   '',
+                CityNo              :   '',
+                CityNameE           :   '',
+
+                Latitude            :   '',
+                Longitude           :   '',
 
                 // Type
-                CustomerType    :   '',
+                CustomerType        :   '',
 
                 // Journey Plan
-                JPlan           :   '',
-                Journee         :   ''
+                JPlan               :   '',
+                Journee             :   ''
             },
 
-            willayas                :   [],
-            cites                   :   [],
+            willayas                        :   []  ,
+            cites                           :   []  ,
 
             // 
             liste_journey_plan              :   []  ,
@@ -269,31 +272,33 @@ export default {
                 this.setUpdateClientAction(null)
 
                 // Client
-                this.client.CustomerCode    =   '',
+                this.client.CustomerCode        =   '',
 
-                this.client.CustomerNameE   =   '',
-                this.client.CustomerNameA   =   '',
-                this.client.Tel             =   '',
+                this.client.old_CustomerNameE   =   '',
 
-                this.client.Address         =   '',
+                this.client.CustomerNameE       =   '',
+                this.client.CustomerNameA       =   '',
+                this.client.Tel                 =   '',
 
-                this.client.DistrictNo      =   '',
-                this.client.DistrictNameE    =   '',
+                this.client.Address             =   '',
 
-                this.client.CityNo          =   '',
-                this.client.CityNameE        =   '',
+                this.client.DistrictNo          =   '',
+                this.client.DistrictNameE       =   '',
 
-                this.client.Latitude        =   '',
-                this.client.Longitude       =   '',
+                this.client.CityNo              =   '',
+                this.client.CityNameE           =   '',
+
+                this.client.Latitude            =   '',
+                this.client.Longitude           =   '',
 
                 // Type
-                this.client.CustomerType    =   '',
+                this.client.CustomerType        =   '',
 
                 // Journey Plan
-                this.client.JPlan           =   '',
+                this.client.JPlan               =   '',
 
-                this.willayas               =   []
-                this.cites                  =   []
+                this.willayas                   =   []
+                this.cites                      =   []
 
                 // Remove Drawings
                 this.removeDrawings()
@@ -325,27 +330,29 @@ export default {
 
         async getClientData(client) {
 
-            this.client.id              =   client.id
+            this.client.id                  =   client.id
 
-            this.client.CustomerCode    =   client.CustomerCode
+            this.client.CustomerCode        =   client.CustomerCode
 
-            this.client.CustomerNameE   =   client.CustomerNameE
-            this.client.CustomerNameA   =   client.CustomerNameA
-            this.client.Latitude        =   client.Latitude
-            this.client.Longitude       =   client.Longitude
+            this.client.old_CustomerNameE   =   client.CustomerNameE
 
-            this.client.Address         =   client.Address
-            this.client.DistrictNo      =   client.DistrictNo
+            this.client.CustomerNameE       =   client.CustomerNameE
+            this.client.CustomerNameA       =   client.CustomerNameA
+            this.client.Latitude            =   client.Latitude
+            this.client.Longitude           =   client.Longitude
 
-            this.client.CityNo          =   client.CityNo
+            this.client.Address             =   client.Address
+            this.client.DistrictNo          =   client.DistrictNo
 
-            this.client.Tel             =   client.Tel
+            this.client.CityNo              =   client.CityNo
 
-            this.client.CustomerType    =   client.CustomerType
+            this.client.Tel                 =   client.Tel
 
-            this.client.JPlan           =   client.JPlan
+            this.client.CustomerType        =   client.CustomerType
 
-            this.client.Journee         =   client.Journee
+            this.client.JPlan               =   client.JPlan
+
+            this.client.Journee             =   client.Journee
 
             this.setJoursGetData(client)
 

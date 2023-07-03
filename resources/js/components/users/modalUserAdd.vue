@@ -6,7 +6,7 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title">Ajouter un Utilisateur</h5>
+                    <h5 class="modal-title">Add a New User</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
@@ -34,7 +34,7 @@
                             <input type="password"              class="form-control"        id="password_confirmation"      v-model="user.password_confirmation">
                         </div>
 
-                        <!--  -->
+                        <!--  
 
                         <div class="mb-3">
                             <label for="type_user"              class="form-label">Type User</label>
@@ -45,22 +45,15 @@
                             </select>
                         </div>
 
-                        <!--  -->
-
-                        <div v-if="((user.type_user   ==  'RTM Manager')||(user.type_user   ==  'BU Manager'))"             class="mb-3">
-                            <label for="BUID"                   class="form-label">BUID</label>
-                            <select                             class="form-select"         id="BUID"               v-model="user.BUID">
-                                <option v-for="organisation in organisations" :key="organisation.BUID" :value="organisation.BUID">{{organisation.ShortCode}}</option>
-                            </select>
-                        </div>
+                        -->
 
                     </form>
 
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                    <button type="button" class="btn btn-primary"   @click="sendData()">Valider</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary"   @click="sendData()">Confirm</button>
                 </div>
             </div>
         </div>
@@ -82,11 +75,8 @@ export default {
                 password                :   '',
                 password_confirmation   :   '',
 
-                type_user               :   '',
-                BUID                    :   ''
+                type_user               :   ''
             },
-
-            organisations   :   []
         }
     },
 
@@ -108,8 +98,7 @@ export default {
             formData.append("email"                     , this.user.email)
             formData.append("password"                  , this.user.password)
             formData.append("password_confirmation"     , this.user.password_confirmation)
-            formData.append("type_user"                 , this.user.type_user)
-            formData.append("BUID"                      , this.user.BUID)
+            // formData.append("type_user"                 , this.user.type_user)
 
             const res   = await this.$callApi('post' ,   '/users/store'    ,   formData)         
             console.log(res.data)
@@ -147,9 +136,6 @@ export default {
                 this.user.email                     =   ''
                 this.user.password                  =   ''
                 this.user.password_confirmation     =   ''
-                this.user.BUID                      =   ''
-
-                this.organisations                  =   []
             });
         },
 
@@ -160,8 +146,6 @@ export default {
 
         async getComboData() {
 
-            const res           =   await this.$callApi("post"  ,   "/organisations/combo"       ,   null)
-            this.organisations  =   res.data
         }
     }
 

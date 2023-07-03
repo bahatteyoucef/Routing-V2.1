@@ -16,11 +16,11 @@
                     <div class="row mt-3 text-center">
 
                         <div class="col-10"> 
-                            <input type="number"        class="form-control"        id="nombre_journee"     v-model="nombre_journee"    placeholder="Veuillez saisir le nombre des journees SVP ...">
+                            <input type="number"        class="form-control"        id="nombre_journee"     v-model="nombre_journee"    placeholder="Please enter the number of divisions ...">
                         </div>
 
                         <div class="col-2">
-                            <button type="button" class="btn btn-primary"   @click="decouperClients()">Decouper</button>
+                            <button type="button" class="btn btn-primary"   @click="decouperClients()">Divide</button>
                         </div>
 
                     </div>
@@ -30,7 +30,7 @@
                     <div class="mt-5">
 
                         <div class="col-12 p-0"> 
-                            <h5>Resume Globale :</h5>
+                            <h5>Resume (Global) :</h5>
                         </div>
 
                         <hr />
@@ -66,7 +66,7 @@
                     <div class="mt-5">
 
                         <div class="col-12 p-0"> 
-                            <h5>Resume Par Jour :</h5>
+                            <h5>Resume (Journee) :</h5>
                         </div>
 
                         <hr />
@@ -96,7 +96,7 @@
 
                 <!-- Footer -->
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary"   @click="valider()">Valider</button>
+                    <button type="button" class="btn btn-primary"   @click="valider()">Confirm</button>
                 </div>
 
             </div>

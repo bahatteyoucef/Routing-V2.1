@@ -1,12 +1,12 @@
 <template>
-    <div class="row" v-if="$isRole('Administrateur')||$isRole('RTM Manager')">
+    <div class="row">
         <div class="col-12 grid-margin">
             <div class="card">
                 <div class="card-body">
 
                     <!-- Header -->
-                    <headerComponent    :title="'Liste des Utilisateurs'"           :add_modal="'addUserModal'" :update_modal="'updateUserModal'"   :add_button="'Ajouter un Utilisateur'"    
-                                        :update_button="'Modifier un Utilisateur'"  :role="'RTM Manager'"/>
+                    <headerComponent    :title="'List of Users'"            :add_modal="'addUserModal'" :update_modal="'updateUserModal'"   :add_button="'New User'"    
+                                        :update_button="'Update User'"      :role="'RTM Manager'"/>
 
                     <!-- Table -->
                     <table class="table table-bordered clickable_table" id="user_index">
@@ -15,8 +15,6 @@
                                 <th class="col-sm-1">ID</th>
                                 <th class="col-sm-3">Nom</th>
                                 <th class="col-sm-3">Email</th>
-                                <th class="col-sm-3">Role</th>
-                                <th class="col-sm-3">BUID</th>
                             </tr>
                         </thead>
 
@@ -24,9 +22,7 @@
                             <tr class="user_index_filters">
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="ID"       /></th>
                                 <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Nom"      /></th>
-                                <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Prenom"   /></th>
                                 <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Email"    /></th>
-                                <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="BUID"     /></th>
                             </tr>
                         </thead>
 
@@ -35,8 +31,6 @@
                                 <td>{{index + 1}}</td>
                                 <td>{{user.nom}}</td>
                                 <td>{{user.email}}</td>
-                                <td>{{user.role}}</td>
-                                <td>{{user.BUID}}</td>
                             </tr>
                         </tbody>
                     </table>

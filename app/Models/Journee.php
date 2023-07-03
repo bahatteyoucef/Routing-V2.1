@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class Journee extends Model
 {
@@ -41,21 +43,52 @@ class Journee extends Model
 
     //
 
+    public static function validateStore(Request $request) 
+    {
+
+        $validator = Validator::make($request->all(), [
+            'Journee'       =>  ["required", "max:255"],
+            'JPlan'         =>  ["required", "max:255"],
+            'latlngs'       =>  ["required", "max:255"],
+            'color'         =>  ["required", "max:255"],
+        ]);
+    
+        return $validator;
+    }
+
     public static function storeJournee(Request $request, int $id_route_import) {
 
-        $old_journee                =   Journee::where([['id_route_import', $id_route_import], ['JPlan', $request->get("old_JPlan")], ['Journee', $request->get("old_Journee")]])->first();
+        $journee        =   new Journee([
+            'Journee'           =>  $request->get("Journee")    ,
+            'JPlan'             =>  $request->get("JPlan")      ,
+            'latlngs'           =>  $request->get("latlngs")    ,
+            'color'             =>  $request->get("color")      ,
+            
+            'id_route_import'   =>  $id_route_import            ,
+            'owner'             =>  Auth::user()->id
+        ]);
 
-        if($old_journee) {
+        $journee->save();
+    }
 
-            $old_journee->latlngs   =   null;
-            $old_journee->color     =   null;
+    //
 
-            $old_journee->save();
-        }
+    public static function validateUpdate(Request $request) 
+    {
 
-        //
+        $validator = Validator::make($request->all(), [
+            'Journee'       =>  ["required", "max:255"],
+            'JPlan'         =>  ["required", "max:255"],
+            'latlngs'       =>  ["required", "max:255"],
+            'color'         =>  ["required", "max:255"],
+        ]);
+    
+        return $validator;
+    }
 
-        $journee        =   Journee::where([['id_route_import', $id_route_import], ['JPlan', $request->get("JPlan")], ['Journee', $request->get("Journee")]])->first();
+    public static function updateJournee(Request $request, int $id_route_import, int $id_journee) {
+
+        $journee        =   Journee::find($id_journee);
 
         if($journee) {
 
@@ -67,31 +100,17 @@ class Journee extends Model
 
             $journee->save();
         }
-
-        else {
-
-            $journee        =   new Journee([
-                'Journee'           =>  $request->get("Journee")    ,
-                'JPlan'             =>  $request->get("JPlan")      ,
-                'latlngs'           =>  $request->get("latlngs")    ,
-                'color'             =>  $request->get("color")      ,
-                
-                'id_route_import'   =>  $id_route_import            ,
-                'owner'             =>  Auth::user()->id
-            ]);
-
-            $journee->save();
-        }
     }
 
-    public static function deleteJournee(string $JPlan, string $Journee, int $id_route_import) {
+    //
 
-        $journee        =   Journee::where([['id_route_import', $id_route_import], ['JPlan', $JPlan], ['Journee', $Journee]])->first();
+    public static function deleteJournee(int $id_journee) {
+
+        $journee        =   Journee::find($id_journee);
 
         if($journee) {
 
-            $journee->latlngs   =   null;
-            $journee->save();
+            $journee->delete();
         }
 
         else {

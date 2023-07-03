@@ -33,7 +33,8 @@ class UserController extends Controller
         }
 
         return response()->json([
-            'errors'    =>  "email ou mot de passe erroné !",
+            'header'    =>  "Error !",
+            'errors'    =>  "Wrong email or password !",
         ], Response::HTTP_UNAUTHORIZED);
     }
 
@@ -50,7 +51,7 @@ class UserController extends Controller
         try {
 
             $users          =   User::indexUser();
-            return User::filterUsers($users);
+            return $users;
         }
 
         catch(Throwable $erreur) {
@@ -67,7 +68,7 @@ class UserController extends Controller
         try {
 
             $users          =   User::comboUser();
-            return User::filterUsers($users);
+            return $users;
         }
 
         catch(Throwable $erreur) {
@@ -104,8 +105,8 @@ class UserController extends Controller
             //
 
             return response()->json([
-                "header"        =>  "Utilisateur Ajouté !",
-                "message"       =>  "un utilisateur a été ajouté !"
+                "header"        =>  "User Added !",
+                "message"       =>  "a new user has been added successfully !"
             ]);
         }
 
@@ -147,8 +148,8 @@ class UserController extends Controller
             //
 
             return response()->json([
-                "header"        =>  "Utilisateur Modifié !",
-                "message"       =>  "un utilisateur a été modifié !"
+                "header"        =>  "User Updated !",
+                "message"       =>  "a user has been updated successfully !"
             ]);
 
         }
@@ -172,25 +173,6 @@ class UserController extends Controller
 
             $user  =   User::showUser($id);
             return $user;
-        }
-
-        catch(Throwable $erreur) {
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
-    }
-
-    //
-
-    public function superviseurCombo()
-    {
-
-        try {
-
-            $superviseurs  =   User::superviseurCombo();
-            return $superviseurs;
         }
 
         catch(Throwable $erreur) {

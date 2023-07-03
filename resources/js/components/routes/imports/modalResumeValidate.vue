@@ -16,34 +16,34 @@
                     <div class="mt-3 table-responsive">
 
                         <div>
-                            <h5>Clients double (Tel)</h5>
+                            <h5>Double Clients (Tel)</h5>
                         </div>
 
                         <table class="table table-striped datatable_client_double_tel" id="datatable_client_double_tel">
                             <thead>
                                 <tr>
-                                    <th class="col-sm-1">CustomerCode</th>
-                                    <th class="col-sm-1">CustomerNameE</th>
-                                    <th class="col-sm-1">CustomerNameA</th>
+                                    <th class="col-sm-1">CustomerCode (CustomerCode)</th>
+                                    <th class="col-sm-1">CustomerNameE (CustomerNameE)</th>
+                                    <th class="col-sm-1">CustomerNameA (CustomerNameA)</th>
 
-                                    <th class="col-sm-2">Latitude</th>
-                                    <th class="col-sm-2">Longitude</th>
+                                    <th class="col-sm-2">Latitude (Latitude)</th>
+                                    <th class="col-sm-2">Longitude (Longitude)</th>
 
-                                    <th class="col-sm-2">Address</th>
+                                    <th class="col-sm-2">Address (Address)</th>
 
-                                    <th class="col-sm-1">DistrictNo</th>
-                                    <th class="col-sm-2">DistrictNameE</th>
+                                    <th class="col-sm-1">DistrictNo (DistrictNo)</th>
+                                    <th class="col-sm-2">DistrictNameE (DistrictNameE)</th>
 
-                                    <th class="col-sm-1">CityNo</th>
-                                    <th class="col-sm-2">CityNameE</th>
+                                    <th class="col-sm-1">CityNo (CityNo)</th>
+                                    <th class="col-sm-2">CityNameE (CityNameE)</th>
 
-                                    <th class="col-sm-2">Tel</th>
+                                    <th class="col-sm-2">Phone Number (Tel)</th>
 
-                                    <th class="col-sm-1">CustomerType</th>
+                                    <th class="col-sm-1">CustomerType (CustomerType)</th>
 
-                                    <th class="col-sm-2">JPlan</th>
+                                    <th class="col-sm-2">JPlan (JPlan)</th>
 
-                                    <th class="col-sm-1">Journee</th>
+                                    <th class="col-sm-1">WorkDay (Journee)</th>
                                 </tr>
                             </thead>
 
@@ -108,34 +108,34 @@
                     <div class="mt-3 table-responsive">
 
                         <div>
-                            <h5>Clients double (Latitude/Longitude)</h5>
+                            <h5>Double Clients (Latitude/Longitude)</h5>
                         </div>
 
                         <table class="table table-striped datatable_client_double_latitude_longitude" id="datatable_client_double_latitude_longitude">
                             <thead>
                                 <tr>
-                                    <th class="col-sm-1">CustomerCode</th>
-                                    <th class="col-sm-1">CustomerNameE</th>
-                                    <th class="col-sm-1">CustomerNameA</th>
+                                    <th class="col-sm-1">CustomerCode (CustomerCode)</th>
+                                    <th class="col-sm-1">CustomerNameE (CustomerNameE)</th>
+                                    <th class="col-sm-1">CustomerNameA (CustomerNameA)</th>
 
-                                    <th class="col-sm-2">Latitude</th>
-                                    <th class="col-sm-2">Longitude</th>
+                                    <th class="col-sm-2">Latitude (Latitude)</th>
+                                    <th class="col-sm-2">Longitude (Longitude)</th>
 
-                                    <th class="col-sm-2">Address</th>
+                                    <th class="col-sm-2">Address (Address)</th>
 
-                                    <th class="col-sm-1">DistrictNo</th>
-                                    <th class="col-sm-2">DistrictNameE</th>
+                                    <th class="col-sm-1">DistrictNo (DistrictNo)</th>
+                                    <th class="col-sm-2">DistrictNameE (DistrictNameE)</th>
 
-                                    <th class="col-sm-1">CityNo</th>
-                                    <th class="col-sm-2">CityNameE</th>
+                                    <th class="col-sm-1">CityNo (CityNo)</th>
+                                    <th class="col-sm-2">CityNameE (CityNameE)</th>
 
-                                    <th class="col-sm-2">Tel</th>
+                                    <th class="col-sm-2">Phone Number (Tel)</th>
 
-                                    <th class="col-sm-1">CustomerType</th>
+                                    <th class="col-sm-1">CustomerType (CustomerType)</th>
 
-                                    <th class="col-sm-2">JPlan</th>
+                                    <th class="col-sm-2">JPlan (JPlan)</th>
 
-                                    <th class="col-sm-1">Journee</th>
+                                    <th class="col-sm-1">WorkDay (Journee)</th>
                                 </tr>
                             </thead>
 
@@ -200,34 +200,34 @@
                     <div class="mt-3 table-responsive">
 
                         <div>
-                            <h5>Clients double (CustomerNameE)</h5>
+                            <h5>Double Clients (CustomerNameE)</h5>
                         </div>
 
                         <table class="table table-striped datatable_client_double_namee" id="datatable_client_double_namee">
                             <thead>
                                 <tr>
-                                    <th class="col-sm-1">CustomerCode</th>
-                                    <th class="col-sm-1">CustomerNameE</th>
-                                    <th class="col-sm-1">CustomerNameA</th>
+                                    <th class="col-sm-1">CustomerCode (CustomerCode)</th>
+                                    <th class="col-sm-1">CustomerNameE (CustomerNameE)</th>
+                                    <th class="col-sm-1">CustomerNameA (CustomerNameA)</th>
 
-                                    <th class="col-sm-2">Latitude</th>
-                                    <th class="col-sm-2">Longitude</th>
+                                    <th class="col-sm-2">Latitude (Latitude)</th>
+                                    <th class="col-sm-2">Longitude (Longitude)</th>
 
-                                    <th class="col-sm-2">Address</th>
+                                    <th class="col-sm-2">Address (Address)</th>
 
-                                    <th class="col-sm-1">DistrictNo</th>
-                                    <th class="col-sm-2">DistrictNameE</th>
+                                    <th class="col-sm-1">DistrictNo (DistrictNo)</th>
+                                    <th class="col-sm-2">DistrictNameE (DistrictNameE)</th>
 
-                                    <th class="col-sm-1">CityNo</th>
-                                    <th class="col-sm-2">CityNameE</th>
+                                    <th class="col-sm-1">CityNo (CityNo)</th>
+                                    <th class="col-sm-2">CityNameE (CityNameE)</th>
 
-                                    <th class="col-sm-2">Tel</th>
+                                    <th class="col-sm-2">Phone Number (Tel)</th>
 
-                                    <th class="col-sm-1">CustomerType</th>
+                                    <th class="col-sm-1">CustomerType (CustomerType)</th>
 
-                                    <th class="col-sm-2">JPlan</th>
+                                    <th class="col-sm-2">JPlan (JPlan)</th>
 
-                                    <th class="col-sm-1">Journee</th>
+                                    <th class="col-sm-1">WorkDay (Journee)</th>
                                 </tr>
                             </thead>
 
@@ -292,34 +292,34 @@
                     <div class="mt-3 table-responsive">
 
                         <div>
-                            <h5>Clients double (CustomerCode)</h5>
+                            <h5>Double Clients (CustomerCode)</h5>
                         </div>
 
                         <table class="table table-striped datatable_client_double_customercode" id="datatable_client_double_customercode">
                             <thead>
                                 <tr>
-                                    <th class="col-sm-1">CustomerCode</th>
-                                    <th class="col-sm-1">CustomerNameE</th>
-                                    <th class="col-sm-1">CustomerNameA</th>
+                                    <th class="col-sm-1">CustomerCode (CustomerCode)</th>
+                                    <th class="col-sm-1">CustomerNameE (CustomerNameE)</th>
+                                    <th class="col-sm-1">CustomerNameA (CustomerNameA)</th>
 
-                                    <th class="col-sm-2">Latitude</th>
-                                    <th class="col-sm-2">Longitude</th>
+                                    <th class="col-sm-2">Latitude (Latitude)</th>
+                                    <th class="col-sm-2">Longitude (Longitude)</th>
 
-                                    <th class="col-sm-2">Address</th>
+                                    <th class="col-sm-2">Address (Address)</th>
 
-                                    <th class="col-sm-1">DistrictNo</th>
-                                    <th class="col-sm-2">DistrictNameE</th>
+                                    <th class="col-sm-1">DistrictNo (DistrictNo)</th>
+                                    <th class="col-sm-2">DistrictNameE (DistrictNameE)</th>
 
-                                    <th class="col-sm-1">CityNo</th>
-                                    <th class="col-sm-2">CityNameE</th>
+                                    <th class="col-sm-1">CityNo (CityNo)</th>
+                                    <th class="col-sm-2">CityNameE (CityNameE)</th>
 
-                                    <th class="col-sm-2">Tel</th>
+                                    <th class="col-sm-2">Phone Number (Tel)</th>
 
-                                    <th class="col-sm-1">CustomerType</th>
+                                    <th class="col-sm-1">CustomerType (CustomerType)</th>
 
-                                    <th class="col-sm-2">JPlan</th>
+                                    <th class="col-sm-2">JPlan (JPlan)</th>
 
-                                    <th class="col-sm-1">Journee</th>
+                                    <th class="col-sm-1">WorkDay (Journee)</th>
                                 </tr>
                             </thead>
 

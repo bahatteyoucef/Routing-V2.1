@@ -30,18 +30,29 @@
                   :canDeselect        =   "false"
                   :canClear           =   "false"
                   :allowAbsent        =   "false"
-
-                  :groups             =   "true"
-
               />
             </div>
             <!--                -->
 
-            <!-- Options -->
-            <ul class="navbar-nav navbar-nav-right ml-auto">
+            <!-- Profile -->
+            <ul class="navbar-nav navbar-nav-right ml-5 container justify-content-end">
+
+              <li class="col-6 nav-item p-3">
+
+                <div class="row justify-content-end">
+                  <div class="col-4">
+                    <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToUsers()">Users</button>
+                  </div>
+
+                  <div class="col-4">
+                    <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="AddRouteImport()">New Import</button>
+                  </div>
+                </div>
+
+              </li>
 
               <!-- Profile        -->
-              <li class="nav-item b-nav-dropdown dropdown nav-profile"  id="profile_header_list_parent">
+              <li class="col-2 justify-content-end nav-item b-nav-dropdown dropdown nav-profile"  id="profile_header_list_parent">
 
                 <span id="profileDropdown" role="button" data-bs-toggle="collapse" href="#profile_header_list" aria-haspopup="true" aria-expanded="false" aria-controls="profile_header_list" class="nav-link dropdown-toggle">
 
@@ -149,71 +160,51 @@ export default {
           }
         },
 
-        //
-
         prepareRouteLink() {
 
-          this.liste_route_link = [ {"label" : "Links", "options" : {}, "class" : "mt-5"}, {"label" : "Route Imports", "options" : {}, "class" : "mt-5"} ]
-
-          this.liste_route_link[0]["options"]["/"]                            = "Dashboard"
-          this.liste_route_link[0]["options"]["/route/obs/route_import/add"]  = "Importer une Route"
+          this.liste_route_link = []
 
           for (let i = 0; i < this.liste_route_import.length; i++) {
 
-              this.liste_route_link[1]["options"][this.liste_route_import[i].id]  = this.liste_route_import[i].libelle     
+              this.liste_route_link.push({ value : this.liste_route_import[i].id , label : this.liste_route_import[i].libelle})
           }
         },
 
         setRouteLink() {
 
-            // Dashboard
-            if(this.$route.path ==  "/") {
+          let map_link_format = /^\/route\/obs\/route_import\/[^\/]+\/details$/
 
-              this.route_link = this.$route.path
-            }
-            
-            // Add
-            if(this.$route.path ==  "/route/obs/route_import/add") {
+          // Map
+          if(map_link_format.test(this.$route.path)) {
 
-              this.route_link = this.$route.path
-            }
+            this.route_link = this.$route.params.id_route_import
+          }
 
-            let map_link_format = /^\/route\/obs\/route_import\/[^\/]+\/details$/
+          else {
 
-            // Map
-            if(map_link_format.test(this.$route.path)) {
-
-              this.route_link = this.$route.params.id_route_import
-            }
+            this.route_link = null
+          }
         },
 
-        goToRoute() {
+        //
 
-            // Dashboard
-            if(this.route_link  ==  "/") {
+        AddRouteImport() {
+    
+            // Go To Route
+            this.$router.push('/route/obs/route_import/add')
+        },
 
-              if(this.$route.path !=  "/") {
+        goToUsers() {
 
-                this.$goTo('/')
-              }
-            }
+            // Go To Route
+            this.$router.push('/users')
+        },
 
-            // Add
-            if(this.route_link  ==  "/route/obs/route_import/add") {
+        goToMap() {
 
-              if(this.$route.path !=  "/route/obs/route_import/add") {
+            if(this.route_link  !=  null) {
 
-                this.$goTo('/route/obs/route_import/add')
-              }
-            }
-
-            // Map
-            if(!isNaN(this.route_link)) {
-
-              if(this.$route.path !=  '/route/obs/route_import/'+this.route_link+'/details') {
-
-                this.$goTo('/route/obs/route_import/'+this.route_link+'/details')
-              }
+              this.$goTo('/route/obs/route_import/'+this.route_link+'/details')
             }
         },
 
@@ -251,14 +242,14 @@ export default {
             this.user   =   newUser
         },
 
-        route_link(new_route_link, old_route_link) {
+        route_link(newRouterLink, oldRouterLink) {
 
-          this.goToRoute()
+          this.goToMap()
         },
 
         $route(to, from) {
 
-          this.setRouteLink()
+            this.setRouteLink()
         }
     }
 };

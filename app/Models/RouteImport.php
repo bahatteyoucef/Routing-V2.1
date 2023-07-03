@@ -28,7 +28,7 @@ class RouteImport extends Model
     public static function indexRouteImport()
     {
 
-        $liste_route_import =   RouteImport::where('owner', Auth::user()->id)->get();
+        $liste_route_import =   RouteImport::where('owner', Auth::user()->id)->orderBy("id")->get();
 
         return $liste_route_import;
     }
@@ -105,17 +105,72 @@ class RouteImport extends Model
     public static function journeyPlan(int $id) 
     {
 
-        $liste_journey_plan =   JourneyPlan::where([['id_route_import', $id],['owner', Auth::user()->id]])->get();
+        $liste_journey_plan =   JourneyPlan::where([['id_route_import', $id],['owner', Auth::user()->id]])->orderBy("JPlan")->get();
 
         return $liste_journey_plan;
     }
 
+    public static function journeyPlanUtil(Request $request, int $id) 
+    {
+
+        $liste_journey_plan_array =   json_decode($request->get("liste_journey_plan"));
+
+        if($liste_journey_plan_array  ==  []) {
+
+            $liste_journey_plan =   JourneyPlan::where([['id_route_import', $id],['owner', Auth::user()->id]])->whereNotNull('latlngs')->orderBy("JPlan")->get();
+        }
+
+        else {
+
+            $liste_journey_plan =   JourneyPlan::where([['id_route_import', $id],['owner', Auth::user()->id]])->whereNotNull('latlngs')->whereIn('JPlan', $liste_journey_plan_array)->orderBy("JPlan")->get();
+        }
+
+        return $liste_journey_plan;
+    }
+
+    // Journee
+
     public static function journees(int $id) 
     {
 
-        $journees   =   Journee::where([['id_route_import', $id],['owner', Auth::user()->id]])->get();
+        $journees   =   Journee::where([['id_route_import', $id],['owner', Auth::user()->id]])->orderBy("JPlan")->get();
 
         return $journees;
+    }
+
+    public static function journeesUtil(Request $request, int $id) 
+    {
+
+        $liste_journey_plan_array   =   json_decode($request->get("liste_journey_plan"));
+        $journees_array             =   json_decode($request->get("journees"));
+
+        if($liste_journey_plan_array    ==  []) {
+
+            if($journees_array          ==  []) {
+
+                $liste_journey_plan =   Journee::where([['id_route_import', $id],['owner', Auth::user()->id]])->whereNotNull('latlngs')->orderBy("JPlan")->get();
+            }
+
+            else {
+
+                $liste_journey_plan =   Journee::where([['id_route_import', $id],['owner', Auth::user()->id]])->whereNotNull('latlngs')->whereIn('Journee', $journees_array)->orderBy("JPlan")->get();
+            }
+        }
+
+        else {
+
+            if($journees_array          ==  []) {
+
+                $liste_journey_plan =   Journee::where([['id_route_import', $id],['owner', Auth::user()->id]])->whereNotNull('latlngs')->whereIn('JPlan', $liste_journey_plan_array)->orderBy("JPlan")->get();
+            }
+
+            else {
+
+                $liste_journey_plan =   Journee::where([['id_route_import', $id],['owner', Auth::user()->id]])->whereNotNull('latlngs')->whereIn('JPlan', $liste_journey_plan_array)->whereIn('Journee', $journees_array)->orderBy("JPlan")->get();
+            }
+        }
+
+        return $liste_journey_plan;
     }
 
     //
@@ -133,13 +188,13 @@ class RouteImport extends Model
 
         // Journey Plan
 
-        JourneyPlan::storeListeJourneyPlan($request, $id);
+        // JourneyPlan::storeListeJourneyPlan($request, $id);
 
         //
 
         // Journee
 
-        Journee::storeJournees($request, $id);
+        // Journee::storeJournees($request, $id);
 
         //
     }

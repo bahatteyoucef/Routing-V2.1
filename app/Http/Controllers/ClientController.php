@@ -20,6 +20,15 @@ class ClientController extends Controller
             DB::beginTransaction();
             //
 
+            // validate
+            $validator    =   Client::validateStore($request);
+            
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors'    =>  $validator->errors(),
+                ],422);
+            }
+
             // store 
             Client::storeClient($request, $id_route_import);
 
@@ -27,9 +36,9 @@ class ClientController extends Controller
             DB::commit();
             //
 
-            return response()->json([
-                "header"            =>  "Client Ajouté !"                   ,
-                "message"           =>  "une nouveau client a été ajouté !"
+            return response()->json([   
+                "header"            =>  "Client Added !"                            ,
+                "message"           =>  "a new client has been added successfully !"
             ]);
         }
 
@@ -55,6 +64,15 @@ class ClientController extends Controller
             DB::beginTransaction();
             //
 
+            // validate
+            $validator    =   Client::validateUpdate($request);
+            
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors'    =>  $validator->errors(),
+                ],422);
+            }
+
             // update 
             Client::updateClient($request, $id_route_import, $id);
             
@@ -63,8 +81,8 @@ class ClientController extends Controller
             //
 
             return response()->json([
-                "header"            =>  "Client Modifiée !"                   ,
-                "message"           =>  "une client a été modifié !"
+                "header"            =>  "Client Updated !"                      ,
+                "message"           =>  "a client has been updated successfully !"
             ]);
         }
 
@@ -97,8 +115,8 @@ class ClientController extends Controller
             //
 
             return response()->json([
-                "header"            =>  "Client Supprimé !"                   ,
-                "message"           =>  "une client a été supprimé !"
+                "header"            =>  "Client Deleted !"                   ,
+                "message"           =>  "a client has been deleted successfully !"
             ]);
         }
 
@@ -133,8 +151,8 @@ class ClientController extends Controller
             //
 
             return response()->json([
-                "header"            =>  "Client Supprimé !"                   ,
-                "message"           =>  "une client a été supprimé !"
+                "header"            =>  "Clients Changed Infoes !"                                      ,
+                "message"           =>  "a group of clients informations has been updated successfully !"
             ]);
         }
 

@@ -6,7 +6,8 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title" v-if="clients.length">Change Clients Route {{clients.length}}</h5>
+                    <h5 class="modal-title" v-if="clients">Change Clients Route : {{clients.length}} clients</h5>
+                    <h5 class="modal-title" v-if="!clients">Change Clients Route : 0 clients</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
@@ -19,10 +20,10 @@
                             <!-- DistrictNo                        -->
                             <div class="col">
                                 <div class="mb-3">
-                                    <label for="DistrictNo"         class="form-label">DistrictNo</label>
+                                    <label for="DistrictNo"         class="form-label">DistrictNo (DistrictNo)</label>
                                     <select                         class="form-select"         id="DistrictNo"                 v-model="DistrictNo"    @change="getCites()">
                                         <option value=""></option>
-                                        <option v-for="district in districts"                   :key="district.DistrictNo"      :value="district.DistrictNo">{{district.DistrictNameE}}</option>
+                                        <option v-for="district in districts"                   :key="district.DistrictNo"      :value="district.DistrictNo">{{district.DistrictNo}}- {{district.DistrictNameE}}</option>
                                     </select>
                                 </div>
                             </div>
@@ -30,10 +31,10 @@
                             <!-- CityNo                            -->
                             <div class="col">
                                 <div class="mb-3">
-                                    <label for="CityNo"             class="form-label">CityNo</label>
+                                    <label for="CityNo"             class="form-label">CityNo (CityNo)</label>
                                     <select                         class="form-select"         id="CityNo"                     v-model="CityNo">
                                         <option value=""></option>
-                                        <option v-for="cite in cites"           :key="cite.CITYNO"    :value="cite.CITYNO">{{cite.CityNameE}}</option>
+                                        <option v-for="cite in cites"           :key="cite.CITYNO"    :value="cite.CITYNO">{{cite.CITYNO}}- {{cite.CityNameE}}</option>
                                     </select>
                                 </div>
                             </div>
@@ -41,7 +42,7 @@
                             <!-- JPlan                              -->
                             <div class="col">
                                 <div class="mb-3">
-                                    <label for="JPlan"              class="form-label">JPlan</label>
+                                    <label for="JPlan"              class="form-label">JPlan (JPlan)</label>
                                     <input type="text"              class="form-control"        id="JPlan"                      v-model="JPlan">
                                 </div>
                             </div>
@@ -49,7 +50,7 @@
                             <!-- Journee                            -->
                             <div class="col">
                                 <div class="mb-3">
-                                    <label for="Journee"            class="form-label">Journee</label>
+                                    <label for="Journee"            class="form-label">WorkDay (Journee)</label>
                                     <input type="text"              class="form-control"        id="Journee"                    v-model="Journee">
                                 </div>
                             </div>
@@ -160,8 +161,8 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                    <button type="button" class="btn btn-primary"   @click="sendData()">Valider</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary"   @click="sendData()">Confirm</button>
                 </div>
 
             </div>
@@ -245,7 +246,6 @@ export default {
                 this.clients        =   [...clients]
                     
                 this.datatable_client_change_route  =   await this.$DataTableCreate("datatable_client_change_route")
-                console.log(this.datatable_client_change_route)
             }
 
             catch(e) {
@@ -292,7 +292,10 @@ export default {
 
             formData.append("clients", JSON.stringify(clients_copy))
 
+            console.log(clients_copy)
+
             const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/change_route",   formData)
+            console.log(res)
 
             if(res.status===200){
 
@@ -452,6 +455,8 @@ export default {
 
             // Show Loading Page
             this.$showLoadingPage()
+
+            console.log(clients)
 
             await this.setDataTable(clients)
 

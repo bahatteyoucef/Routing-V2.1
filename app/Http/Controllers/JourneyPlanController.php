@@ -20,6 +20,15 @@ class JourneyPlanController extends Controller
             DB::beginTransaction();
             //
 
+            // validate
+            $validator    =   JourneyPlan::validateStore($request);
+            
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors'    =>  $validator->errors(),
+                ],422);
+            }
+
             // store 
             JourneyPlan::storeJourneyPlan($request, $id_route_import);
 
@@ -28,8 +37,8 @@ class JourneyPlanController extends Controller
             //
 
             return response()->json([
-                "header"            =>  "Journey Plan Ajouté !"             ,
-                "message"           =>  "une journey plan a été ajoutée !"
+                "header"            =>  "Journey Plan Added !"             ,
+                "message"           =>  "a new journey plan has been added successfuly!"
             ]);
         }
 
@@ -46,7 +55,51 @@ class JourneyPlanController extends Controller
 
     }
 
-    public function deleteJourneyPlan(Request $request, int $id_route_import, string $JPlan)
+    public function updateJourneyPlan(Request $request, int $id_route_import, int $id_journey_plan)
+    {
+
+        try {
+
+            //
+            DB::beginTransaction();
+            //
+
+            // validate
+            $validator    =   JourneyPlan::validateUpdate($request);
+            
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors'    =>  $validator->errors(),
+                ],422);
+            }
+
+            // update 
+            JourneyPlan::updateJourneyPlan($request, $id_route_import, $id_journey_plan);
+
+            //
+            DB::commit();
+            //
+
+            return response()->json([
+                "header"            =>  "Journey Plan Updated !"             ,
+                "message"           =>  "a new journey plan has been updated successfuly!"
+            ]);
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+
+    }
+
+    public function deleteJourneyPlan(Request $request, int $id_route_import, int $id_journey_plan)
     {
 
         try {
@@ -56,15 +109,15 @@ class JourneyPlanController extends Controller
             //
 
             // delete 
-            JourneyPlan::deleteJourneyPlan($JPlan, $id_route_import);
+            JourneyPlan::deleteJourneyPlan($id_journey_plan);
 
             //
             DB::commit();
             //
 
             return response()->json([
-                "header"            =>  "Journey Plan Supprimée !"              ,
-                "message"           =>  "une journey plan a été supprimee !"
+                "header"            =>  "Journey Plan Deleted !"              ,
+                "message"           =>  "a journey plan has been deleted successfuly!"
             ]);
         }
 

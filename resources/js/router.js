@@ -12,6 +12,9 @@ import Index                    from    "./components/index/index.vue"
 // login
 import Login                    from    "./components/login/login.vue"
 
+// users
+import Users                    from    "./components/users/index.vue"
+
 //
 
 import RouteImportAdd           from    "./components/routes/imports/RouteImportAdd.vue"
@@ -31,6 +34,12 @@ const routes = [
     {
         path        : "/login",
         component   : Login
+    },
+
+    // Users
+    {
+        path        : "/users",
+        component   : Users
     },
 
     //  //  //  //  //  OBS     //  //  //

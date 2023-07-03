@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class JourneyPlan extends Model
 {
@@ -39,21 +41,48 @@ class JourneyPlan extends Model
 
     //
 
+    public static function validateStore(Request $request) 
+    {
+
+        $validator = Validator::make($request->all(), [
+            'JPlan'         =>  ["required", "max:255"],
+            'latlngs'       =>  ["required", "max:255"],
+            'color'         =>  ["required", "max:255"],
+        ]);
+    
+        return $validator;
+    }
+
     public static function storeJourneyPlan(Request $request, int $id_route_import) {
 
-        $old_journey_plan   =   JourneyPlan::where([['id_route_import', $id_route_import], ['JPlan', $request->get("old_JPlan")]])->first();
+        $journey_plan       =   new JourneyPlan([
+            'JPlan'             =>  $request->get("JPlan")      ,
+            'latlngs'           =>  $request->get("latlngs")    ,
+            'color'             =>  $request->get("color")      ,
+            'id_route_import'   =>  $id_route_import            ,
+            'owner'             =>  Auth::user()->id
+        ]);
 
-        if($old_journey_plan) {
+        $journey_plan->save();
+    }
 
-            $old_journey_plan->latlngs      =   null;
-            $old_journey_plan->color        =   null;
+    //
 
-            $old_journey_plan->save();
-        }
+    public static function validateUpdate(Request $request) 
+    {
 
-        //
+        $validator = Validator::make($request->all(), [
+            'JPlan'         =>  ["required", "max:255"],
+            'latlngs'       =>  ["required", "max:255"],
+            'color'         =>  ["required", "max:255"],
+        ]);
+    
+        return $validator;
+    }
 
-        $journey_plan   =   JourneyPlan::where([['id_route_import', $id_route_import], ['JPlan', $request->get("JPlan")]])->first();
+    public static function updateJourneyPlan(Request $request, int $id_route_import, int $id_journey_plan) {
+
+        $journey_plan   =   JourneyPlan::find($id_journey_plan);
 
         if($journey_plan) {
 
@@ -64,34 +93,18 @@ class JourneyPlan extends Model
 
             $journey_plan->save();
         }
-
-        else {
-
-            $journey_plan       =   new JourneyPlan([
-                'JPlan'             =>  $request->get("JPlan")      ,
-                'latlngs'           =>  $request->get("latlngs")    ,
-                'color'             =>  $request->get("color")      ,
-                'id_route_import'   =>  $id_route_import            ,
-                'owner'             =>  Auth::user()->id
-            ]);
-
-            $journey_plan->save();
-        }
     }
 
-    public static function deleteJourneyPlan(string $JPlan, int $id_route_import) {
+    //
+
+    public static function deleteJourneyPlan(int $id_journey_plan) {
 
         // Delete
-        $journey_plan   =   JourneyPlan::where([['id_route_import', $id_route_import], ['JPlan', $JPlan]])->first();
+        $journey_plan   =   JourneyPlan::find($id_journey_plan);
 
         if($journey_plan) {
 
-            $journey_plan->latlngs   =   null;
-            $journey_plan->save();
-        }
-
-        else {
-
+            $journey_plan->delete();
         }
     }
 

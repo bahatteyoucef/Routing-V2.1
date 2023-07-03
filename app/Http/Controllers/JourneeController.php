@@ -20,6 +20,15 @@ class JourneeController extends Controller
             DB::beginTransaction();
             //
 
+            // validate
+            $validator    =   Journee::validateStore($request);
+            
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors'    =>  $validator->errors(),
+                ],422);
+            }
+
             // store 
             Journee::storeJournee($request, $id_route_import);
 
@@ -28,8 +37,8 @@ class JourneeController extends Controller
             //
 
             return response()->json([
-                "header"            =>  "Journee Ajouté !"              ,
-                "message"           =>  "une journee a été ajoutée !"
+                "header"            =>  "Journee Added !"              ,
+                "message"           =>  "a new journee has been added successfuly!"
             ]);
         }
 
@@ -46,7 +55,51 @@ class JourneeController extends Controller
 
     }
 
-    public function deleteJournee(Request $request, int $id_route_import, string $Journee)
+    public function updateJournee(Request $request, int $id_route_import, int $id_journee)
+    {
+
+        try {
+
+            //
+            DB::beginTransaction();
+            //
+
+            // validate
+            $validator    =   Journee::validateUpdate($request);
+            
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors'    =>  $validator->errors(),
+                ],422);
+            }
+
+            // update 
+            Journee::updateJournee($request, $id_route_import, $id_journee);
+
+            //
+            DB::commit();
+            //
+
+            return response()->json([
+                "header"            =>  "Journee Updated !"                     ,
+                "message"           =>  "a journee has been updated successfuly!"
+            ]);
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+
+    }
+
+    public function deleteJournee(Request $request, int $id_route_import, int $id_journee)
     {
 
         try {
@@ -56,15 +109,15 @@ class JourneeController extends Controller
             //
 
             // delete 
-            Journee::deleteJournee($request->get("JPlan"), $Journee, $id_route_import);
+            Journee::deleteJournee($id_journee);
 
             //
             DB::commit();
             //
 
             return response()->json([
-                "header"            =>  "Journee Supprimée !"              ,
-                "message"           =>  "une journee a été supprimee !"
+                "header"            =>  "Journee Deleted !"                     ,
+                "message"           =>  "a journee has been deleted successfuly!"
             ]);
         }
 

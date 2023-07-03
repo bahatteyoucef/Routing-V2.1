@@ -5,7 +5,7 @@
         <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modifier l' Utilisateur : {{ user.nom_original }}</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Update The User : {{ user.nom_original }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
@@ -23,7 +23,7 @@
                             <input type="text"                  class="form-control"        id="email"                      v-model="user.email">
                         </div>
 
-                        <!--  -->
+                        <!--  
 
                         <div class="mb-3">
                             <label for="type_user"              class="form-label">Type User</label>
@@ -34,22 +34,15 @@
                             </select>
                         </div>
 
-                        <!--  -->
-
-                        <div v-if="((user.type_user   ==  'RTM Manager')||(user.type_user   ==  'BU Manager'))"  class="mb-3">
-                            <label for="BUID"                   class="form-label">BUID</label>
-                            <select                             class="form-select"         id="BUID"               v-model="user.BUID">
-                                <option v-for="organisation in organisations" :key="organisation.BUID" :value="organisation.BUID">{{organisation.ShortCode}}</option>
-                            </select>
-                        </div>
+                        -->
 
                     </form>
 
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                    <button type="button" class="btn btn-primary"   @click="sendData()">Valider</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary"   @click="sendData()">Confirm</button>
                 </div>
             </div>
         </div>
@@ -71,8 +64,7 @@ export default {
                 nom                 :   '',
                 email               :   '',
 
-                type_user           :   '',
-                BUID                :   ''
+                type_user           :   ''
             },
 
             organisations   :   []
@@ -95,11 +87,9 @@ export default {
 
             formData.append("nom"                       , this.user.nom)
             formData.append("email"                     , this.user.email)
-
             formData.append("type_user"                 , this.user.type_user)
-            formData.append("BUID"                      , this.user.BUID)
 
-            const res   = await this.$callApi('post' ,   '/users/'+this.user.id+'/update'    ,   formData)         
+            const res   =   await this.$callApi('post' ,   '/users/'+this.user.id+'/update'    ,   formData)         
 
             // Hide Loading Page
             this.$hideLoadingPage()
@@ -135,9 +125,6 @@ export default {
                 this.user.email                     =   ''
 
                 this.user.type_user                 =   ''
-                this.user.BUID                      =   ''
-
-                this.organisations                  =   []
             });
         },
 
@@ -149,7 +136,7 @@ export default {
 
         async getUserData(user) {
 
-            const res               =   await this.$callApi("post"  ,   "/users/"+user.id+"/show"    ,   null)
+            const res                   =   await this.$callApi("post"  ,   "/users/"+user.id+"/show"    ,   null)
 
             this.user.nom_original      =   res.data.nom
 
@@ -158,13 +145,10 @@ export default {
             this.user.email             =   res.data.email   
 
             this.user.type_user         =   res.data.role
-            this.user.BUID              =   res.data.BUID
         },
 
         async getComboData() {
 
-            const res           =   await this.$callApi("post"  ,   "/organisations/combo"       ,   null)
-            this.organisations  =   res.data
         }
     }
 

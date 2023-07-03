@@ -30,14 +30,16 @@
                                     <template #content>
                                         <table class="table table-borderless scrollbar scrollbar-deep-blue">
                                             <tr v-for="groupe in clients_markers_affiche" :key="groupe">
-                                                <th><span>{{ groupe.column_name }} : </span></th>
-                                                <td><span>{{ groupe.clients.length }} clients </span></td>
-                                                
-                                                <td><span :style="  'display: inline-block; '+
-                                                                'width: 15px;           '+
-                                                                'height: 15px;          '+
-                                                                'background-color: '+groupe.color+';'">
-                                                </span></td>
+                                                <th class="p-1 col-7"><span @click="reAfficherClientsAndMarkersByColor(groupe.column_name)" role="button">{{ groupe.column_name }} : </span></th>
+                                                <td class="p-1 col-3"><span>{{ groupe.clients.length }} Clients </span></td>
+                                                <td class="p-1 col-1">
+                                                    <span   :style="    'display: inline-block;'+
+                                                                        'width: 15px;          '+
+                                                                        'height: 15px;         '+
+                                                                        'float: right;         '+
+                                                                        'background-color: '    +groupe.color+';'">
+                                                    </span>
+                                                </td>
                                             </tr>
                                         </table>                            
                                     </template>
@@ -85,7 +87,7 @@
         <!-- Modal Add New Journey Plan     -->
         <modalUpdateJourneyPlan                                         ref="modalUpdateJourneyPlan"                                                                            >   </modalUpdateJourneyPlan>
 
-        <!--  -->   
+        <!--                                -->   
 
         <div id="tableau_data">
 
@@ -93,15 +95,15 @@
             <div class="map_top_buttons_div">
                 <div class="row">
 
-                    <div class="col-6">
+                    <div class="col-5">
                         <button class="btn primary w-100 m-0 mt-1"                                                          @click="focuseMarkers()">Focus</button>
-                        <button class="btn primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#modalResume'" @click="showResume()">Resumer</button>
-                        <button class="btn primary w-100 m-0 mt-1"                                                          @click="showTerritories()">Territoires</button>
-                        <button class="btn primary w-100 m-0 mt-1"                                                          @click="showJPlanBDTerritories()">JPlan BD Territoires</button>
-                        <button class="btn primary w-100 m-0 mt-1"                                                          @click="showJourneeBDTerritories()">Journee BD Territoires</button>
+                        <button class="btn primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#modalResume'" @click="showResume()">Resume</button>
+                        <button class="btn primary w-100 m-0 mt-1"                                                          @click="showTerritories()">Auto Territories</button>
+                        <button class="btn primary w-100 m-0 mt-1"                                                          @click="showJPlanBDTerritories()">JPlan Territories</button>
+                        <button class="btn primary w-100 m-0 mt-1"                                                          @click="showJourneeBDTerritories()">Journee Territories</button>
                     </div>
 
-                    <div class="col-6">
+                    <div class="col-7">
 
                         <select class="form-select w-100 m-0 mt-1"                                                          @change="reAfficherClientsAndMarkers()"  v-model="column_group">
                             <option value="1">JPlan</option>
@@ -288,6 +290,8 @@
                 </table>
             </div>
         </div>
+ 
+        <!--                                -->
 
     </div>
 
@@ -521,6 +525,9 @@ export default {
             let liste_type_client_colors            =   {}
             let liste_journee_colors                =   {}
 
+            let sortedArray                         =   null
+            let sortedObject                        =   null
+
             // Colors
             for (const [key, value] of Object.entries(this.liste_journey_plan)) {
 
@@ -617,8 +624,10 @@ export default {
 
                 if(!district_existe) {
 
-                    this.districts[this.route_import.clients[i].DistrictNo]                                 =   {DistrictNameE :   ""}
+                    this.districts[this.route_import.clients[i].DistrictNo]                                 =   {DistrictNameComplete : "", DistrictNameE : "", DistrictNo : ""}
+                    this.districts[this.route_import.clients[i].DistrictNo].DistrictNo                      =   this.route_import.clients[i].DistrictNo 
                     this.districts[this.route_import.clients[i].DistrictNo].DistrictNameE                   =   this.route_import.clients[i].DistrictNameE 
+                    this.districts[this.route_import.clients[i].DistrictNo].DistrictNameComplete            =   this.route_import.clients[i].DistrictNo +   "- "    +   this.route_import.clients[i].DistrictNameE 
 
                     if(Object.keys(districts_colors).length    >   0) {
 
@@ -639,8 +648,10 @@ export default {
 
                 if(!cite_existe) {
 
-                    this.cites[this.route_import.clients[i].CityNo]                                         =   {CityNameE :   ""}
+                    this.cites[this.route_import.clients[i].CityNo]                                         =   {CityNameComplete : "", CityNameE : "", CityNo : ""}
+                    this.cites[this.route_import.clients[i].CityNo].CityNo                                  =   this.route_import.clients[i].CityNo 
                     this.cites[this.route_import.clients[i].CityNo].CityNameE                               =   this.route_import.clients[i].CityNameE 
+                    this.cites[this.route_import.clients[i].CityNo].CityNameComplete                        =   this.route_import.clients[i].CityNo +   "- " +   this.route_import.clients[i].CityNameE 
 
                     if(Object.keys(cites_colors).length    >   0) {
 
@@ -741,13 +752,73 @@ export default {
 
             //
 
+            sortedArray                 =   Object.values(this.liste_journey_plan);
+            sortedArray.sort((a, b)     =>  a.JPlan.localeCompare(b.JPlan));
+            sortedObject                =   sortedArray.reduce((acc, journey_plan, index) => {
+                
+                acc[journey_plan.JPlan]             =   journey_plan;
+                return acc;
+            }, {});
+
+            this.liste_journey_plan                 =   sortedObject
             this.route_import.liste_journey_plan    =   this.liste_journey_plan
+
+            //
+
+            sortedArray                 =   Object.values(this.districts);
+            sortedArray.sort((a, b)     =>  a.DistrictNameComplete.localeCompare(b.DistrictNameComplete));
+
+            sortedObject                =   sortedArray.reduce((acc, district, index) => {
+                
+                acc[district.DistrictNo]            =   district;
+                return acc;
+            }, {});
+
+            this.districts                          =   sortedObject
             this.route_import.districts             =   this.districts
+
+            //
+
+            sortedArray                 =   Object.values(this.cites);
+            sortedArray.sort((a, b)     =>  a.CityNameComplete.localeCompare(b.CityNameComplete));
+
+            sortedObject                =   sortedArray.reduce((acc, cite, index) => {
+
+                acc[cite.CityNo]                    =   cite;
+                return acc;
+            }, {});
+
+            this.cites                              =   sortedObject
             this.route_import.cites                 =   this.cites
+
+            //
+
+            sortedArray                 =   Object.values(this.liste_type_client);
+            sortedArray.sort((a, b)     =>  a.CustomerType.localeCompare(b.CustomerType));
+            sortedObject                =   sortedArray.reduce((acc, type_client, index) => {
+
+                acc[type_client.CustomerType]       =   type_client;
+                return acc;
+            }, {});
+
+            this.liste_type_client                  =   sortedObject
             this.route_import.liste_type_client     =   this.liste_type_client
+
+            //
+
+            sortedArray                 =   Object.values(this.liste_journee);
+            sortedArray.sort((a, b)     =>  a.Journee.localeCompare(b.Journee));
+            sortedObject                =   sortedArray.reduce((acc, journee, index) => {
+
+                acc[journee.Journee]                =   journee;
+                return acc;
+            }, {});
+
+            this.liste_journee                      =   sortedObject
             this.route_import.liste_journee         =   this.liste_journee
 
             // 
+
             this.setListeJourneyPlanAction(this.liste_journey_plan)
             this.setListeTypeClientAction(this.liste_type_client)
             this.setListeJourneeAction(this.liste_journee)
@@ -868,8 +939,68 @@ export default {
                 this.$hideLoadingPage()
 
             }, 55);
-        
         },
+
+        reAfficherClientsAndMarkersByColor(column_name) {
+
+            // JPlan
+            if(this.column_group    ==  1) {
+
+                this.journey_plan_filter_value      =   [column_name]
+            }
+
+            // District
+            if(this.column_group    ==  2) {
+
+                let DistrictNo                      =   this.getDistrictNo(column_name)
+                this.district_filter_value          =   [DistrictNo]
+            }
+
+            // City
+            if(this.column_group    ==  3) {
+
+                let CityNo                          =   this.getCityNo(column_name)
+                this.city_filter_value              =   [CityNo]
+            }
+
+            // CustomerType
+            if(this.column_group    ==  4) {
+
+                this.type_client_filter_value       =   [column_name]
+            }
+
+            // Journee
+            if(this.column_group    ==  5) {
+
+                this.journee_filter_value           =   [column_name]
+            }
+        },
+
+        //
+
+        getDistrictNo(DistrictNameE) {
+
+            for (const [key, value] of Object.entries(this.districts)) {
+
+                if(this.districts[key].DistrictNameE    ==  DistrictNameE) {
+
+                    return key
+                }
+            }
+        },
+
+        getCityNo(CityNameE) {
+
+            for (const [key, value] of Object.entries(this.cites)) {
+
+                if(this.cites[key].CityNameE            ==  CityNameE) {
+
+                    return key
+                }
+            }
+        },
+
+        //
 
         prepareClients() {
 
@@ -954,6 +1085,25 @@ export default {
                     }
                 }           
             }
+
+            // 
+
+            // Step 1: Convert the object into an array of values
+            const clientsGroupsArray = Object.values(this.clients_group);
+
+            // Step 2: Sort the array based on the 'year' property of the sub-objects
+            clientsGroupsArray.sort((a, b) => b.clients.length - a.clients.length);
+
+            // Step 3: Convert the sorted array back into an object
+            const sortedClientsGroups   =   clientsGroupsArray.reduce((acc, client_group, index) => {
+                
+                acc[client_group.column_name] = client_group;
+                return acc;
+            }, {});
+
+            //
+
+            this.clients_group  =   sortedClientsGroups
         },
 
         async reAfficheClients() {
@@ -970,9 +1120,9 @@ export default {
 
         reAfficheClientsMarkers() {
 
-            this.clients_markers_affiche    =   this.clients_group
+            this.clients_markers_affiche        =   this.clients_group
 
-            let splice                      =   false
+            let splice                          =   false
 
             for (const [key, value] of Object.entries(this.clients_markers_affiche)) {
  
@@ -1048,6 +1198,23 @@ export default {
                     this.clients_markers_affiche[key]
                 }
             }
+
+            // Step 1: Convert the object into an array of values
+            const clientsMarkersAfficheArray    =   Object.values(this.clients_markers_affiche);
+
+            // Step 2: Sort the array based on the 'year' property of the sub-objects
+            clientsMarkersAfficheArray.sort((a, b) => b.clients.length - a.clients.length);
+
+            // Step 3: Convert the sorted array back into an object
+            const sortedClientsMarkersAffiche   =   clientsMarkersAfficheArray.reduce((acc, client_marker, index) => {
+                
+                acc[client_marker.column_name]   =   client_marker;
+                return acc;
+            }, {});
+
+            //
+
+            this.clients_markers_affiche        =   sortedClientsMarkersAffiche
         },
 
         reAfficheClientsTable() {
@@ -1119,7 +1286,9 @@ export default {
 
             let formData = new FormData();
 
-            const res   = await this.$callApi('post'    ,   '/route_import/'+this.route_import.id+'/journey_plan'   ,   formData)      
+            formData.append("liste_journey_plan", JSON.stringify(this.journey_plan_filter_value)) 
+
+            const res   = await this.$callApi('post'    ,   '/route_import/'+this.route_import.id+'/journey_plan/util'   ,   formData)      
             console.log(res.data)
 
             if(res.status===200){
@@ -1148,7 +1317,10 @@ export default {
 
             let formData = new FormData();
 
-            const res   = await this.$callApi('post'    ,   '/route_import/'+this.route_import.id+'/journees'   ,   formData)      
+            formData.append("liste_journey_plan"    , JSON.stringify(this.journey_plan_filter_value)) 
+            formData.append("journees"              , JSON.stringify(this.journee_filter_value)) 
+
+            const res   = await this.$callApi('post'    ,   '/route_import/'+this.route_import.id+'/journees/util'   ,   formData)      
             console.log(res.data)
 
             if(res.status===200){
@@ -1615,8 +1787,6 @@ export default {
                     // ShowModal
                     var updateJourneyPlanModal      =   new Modal(document.getElementById("updateJourneyPlanModal"));
                     updateJourneyPlanModal.show();
-
-                    console.log(newValue.journee)
 
                     // Send DATA To Modal
                     this.UpdateJourneyPlan(newValue.journee)

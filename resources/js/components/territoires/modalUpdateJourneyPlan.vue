@@ -6,21 +6,13 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title">Modifier le Territoire </h5>
+                    <h5 class="modal-title">Update The Territory</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body mt-3">
 
                     <form>
-
-                        <div class="mb-3">
-                            <label for="JPlan"              class="form-label">Type Territoire</label>
-                            <select class="form-select"     v-model="territoire.type_territoire">
-                                <option value='1'>Journey Plan</option>
-                                <option value='2'>Journee</option>
-                            </select>
-                        </div>
 
                         <div class="mb-3">
                             <label for="JPlan"              class="form-label">JPlan</label>
@@ -44,12 +36,12 @@
 
                 <div class="modal-footer"       style="display: flex; justify-content: space-between;">
                     <div class="left-buttons"   style="display: flex;">
-                        <button type="button"   class="btn btn-danger float-left" @click="deleteData()">Supprimer</button>
+                        <button type="button"   class="btn btn-danger float-left" @click="deleteData()">Delete</button>
                     </div>
 
                     <div class="right-buttons"  style="display: flex; margin-left: auto;">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                        <button type="button"   class="btn btn-primary"   @click="sendData()">Valider</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button"   class="btn btn-primary"   @click="sendData()">Confirm</button>
                     </div>
                 </div>
 
@@ -70,13 +62,11 @@ export default {
 
             territoire      :   {
 
-                type_territoire     :   '1',
+                id                  :   null ,
 
+                type_territoire     :   '1'  ,
 
-                old_JPlan           :   '',
                 JPlan               :   '',
-
-                old_Journee         :   '',
                 Journee             :   '',
 
                 color               :   '',
@@ -105,11 +95,8 @@ export default {
 
             let formData = new FormData();
 
-            formData.append("type_territoire"   ,   this.territoire.type_territoire)
             formData.append("latlngs"           ,   JSON.stringify(this.territoire.latlngs))
             formData.append("JPlan"             ,   this.territoire.JPlan)
-            formData.append("old_JPlan"         ,   this.territoire.old_JPlan)
-            formData.append("old_Journee"       ,   this.territoire.old_Journee)
             formData.append("Journee"           ,   this.territoire.Journee)
             formData.append("color"             ,   this.territoire.color)
 
@@ -117,7 +104,7 @@ export default {
 
             if(this.territoire.type_territoire    ==  '1') {
 
-                const res                       =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/journey_plan/store"   ,   formData)
+                const res                       =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/journey_plan/"+this.territoire.id+"/update"   ,   formData)
                 console.log(res.data)
 
                 if(res.status===200){
@@ -145,7 +132,7 @@ export default {
 
             if(this.territoire.type_territoire    ==  '2') {
 
-                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/journees/store"       ,   formData)
+                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/journees/"+this.territoire.id+"/update"       ,   formData)
                 console.log(res.data)
 
                 if(res.status===200){
@@ -178,17 +165,14 @@ export default {
 
             let formData = new FormData();
 
-            formData.append("type_territoire"   ,   this.territoire.type_territoire)
             formData.append("latlngs"           ,   JSON.stringify(this.territoire.latlngs))
             formData.append("JPlan"             ,   this.territoire.JPlan)
             formData.append("Journee"           ,   this.territoire.Journee)
-            formData.append("old_Journee"       ,   this.territoire.old_Journee)
-            formData.append("old_JPlan"         ,   this.territoire.old_JPlan)
             formData.append("color"             ,   this.territoire.color)
 
             if(this.territoire.type_territoire    ==  '1') {
 
-                const res                       =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/journey_plan/"+this.territoire.old_JPlan+"/delete"    ,   formData)
+                const res                       =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/journey_plan/"+this.territoire.id+"/delete"    ,   formData)
                 console.log(res.data)
 
                 if(res.status===200){
@@ -215,9 +199,7 @@ export default {
 
             if(this.territoire.type_territoire    ==  '2') {
 
-                console.log(this.territoire.old_Journee)
-
-                const res                       =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/journees/"+this.territoire.old_Journee+"/delete"      ,   formData)
+                const res                       =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/journees/"+this.territoire.id+"/delete"      ,   formData)
                 console.log(res.data)
 
                 if(res.status===200){
@@ -256,13 +238,12 @@ export default {
                 // Client
                 this.territoire.type_territoire     =   '1',
 
-                this.territoire.old_JPlan           =   '',
                 this.territoire.JPlan               =   '',
-
-                this.territoire.old_Journee         =   '',
                 this.territoire.Journee             =   '',
 
                 this.territoire.color               =   '',
+
+                this.territoire.id                  =   null
 
                 // Remove Drawings
                 this.removeDrawings()
@@ -279,8 +260,6 @@ export default {
 
         getData(journey_plan) {
 
-            console.log(journey_plan.Journee)
-
             this.territoire.latlngs =   journey_plan.latlngs
 
             if(journey_plan.Journee) {
@@ -293,11 +272,9 @@ export default {
                 this.territoire.type_territoire   =   '1'
             }
 
-            this.territoire.old_JPlan       =   journey_plan.JPlan
-            this.territoire.JPlan           =   journey_plan.JPlan
+            this.territoire.id              =   journey_plan.id
 
-            
-            this.territoire.old_Journee     =   journey_plan.Journee
+            this.territoire.JPlan           =   journey_plan.JPlan  
             this.territoire.Journee         =   journey_plan.Journee
 
             this.territoire.color           =   journey_plan.color

@@ -1,10 +1,13 @@
 <?php
 
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ClientTempoController;
 use App\Http\Controllers\JourneeController;
 use App\Http\Controllers\JourneyPlanController;
 use App\Http\Controllers\RouteImportController;
+use App\Http\Controllers\RouteImportTempoController;
 use App\Http\Controllers\UserController;
+use App\Models\ClientTempo;
 use App\Models\JourneyPlan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -46,24 +49,57 @@ Route::post('/user/isAuthentificated', [UserController::class, 'isAuthentificate
 // Dashboard
 Route::middleware('auth:api')->group(function () {
     
-    //
+    // RTM WIllaya Cite
 
     Route::post('/rtm_willayas'         ,   function()  { 
 
-        return DB::table("RTM_Willaya")->get();
+        return DB::table("RTM_Willaya")->orderBy("DistrictNo")->get();
     });
 
     Route::post('/rtm_willayas/{DistrictNo}/rtm_cites'         ,   function($DistrictNo)  { 
 
-        return DB::table("RTM_City")->where('DistrictNo', $DistrictNo)->get();
+        return DB::table("RTM_City")->where('DistrictNo', $DistrictNo)->orderBy("DistrictNo")->get();
     });
 
     Route::post('/rtm_cites'            ,   function()  { 
 
-        return DB::table("RTM_City")->get();
+        return DB::table("RTM_City")->orderBy("CityNo")->get();
     });
 
     //
+
+    // Users
+
+    Route::post('/users'                                                    ,   [UserController::class                  , 'index'                                   ]);
+    Route::post('/users/combo'                                              ,   [UserController::class                  , 'combo'                                   ]);
+    Route::post('/users/{id}/show'                                          ,   [UserController::class                  , 'show'                                    ]);
+
+    Route::post('/users/store'                                              ,   [UserController::class                  , 'store'                                   ]);
+    Route::post('/users/{id}/update'                                        ,   [UserController::class                  , 'update'                                  ]);
+
+    //
+
+    // Route Import Tempo
+
+    Route::post('/route_import_tempo/last'                                  ,   [RouteImportTempoController::class      , 'lastTempo'                               ]);
+    Route::post('/route_import_tempo/store'                                 ,   [RouteImportTempoController::class      , 'store'                                   ]);
+    Route::post('/route_import_tempo/file'                                  ,   [RouteImportTempoController::class      , 'getFile'                                 ]);
+
+    //
+
+    // Clients Tempo
+
+    Route::post('/clients_tempo'                                            ,   [ClientTempoController::class           , 'index'                                    ]);
+    Route::post('/clients_tempo/update'                                     ,   [ClientTempoController::class           , 'store'                                    ]);
+
+    Route::post('/clients_tempo/doubles/Tel'                                ,   [ClientTempoController::class           , 'getDoublesTel'                            ]);
+    Route::post('/clients_tempo/doubles/CustomerCode'                       ,   [ClientTempoController::class           , 'getDoublesCustomerCode'                   ]);
+    Route::post('/clients_tempo/doubles/CustomerNameE'                      ,   [ClientTempoController::class           , 'getDoublesCustomerNameE'                  ]);
+    Route::post('/clients_tempo/doubles/GPS'                                ,   [ClientTempoController::class           , 'getDoublesGPS'                            ]);
+
+    //
+
+    // Route Import
 
     Route::post('/route_import/set_willayas_cites'                          ,   [RouteImportController::class           , 'setWillayasCites'                        ]);    
 
@@ -73,13 +109,18 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/route_import/{id}/delete'                                 ,   [RouteImportController::class           , 'delete'                                  ]);
 
     Route::post('/route_import/{id}/journey_plan'                           ,   [RouteImportController::class           , 'journeyPlan'                             ]);
+    Route::post('/route_import/{id}/journey_plan/util'                      ,   [RouteImportController::class           , 'journeyPlanUtil'                         ]);
+
     Route::post('/route_import/{id}/journees'                               ,   [RouteImportController::class           , 'journees'                                ]);
+    Route::post('/route_import/{id}/journees/util'                          ,   [RouteImportController::class           , 'journeesUtil'                            ]);
 
     Route::post('/route_import/{id}/journey_plan/store'                     ,   [JourneyPlanController::class           , 'storeJourneyPlan'                        ]);
-    Route::post('/route_import/{id}/journey_plan/{JPlan}/delete'            ,   [JourneyPlanController::class           , 'deleteJourneyPlan'                       ]);
+    Route::post('/route_import/{id}/journey_plan/{id_journey_plan}/update'  ,   [JourneyPlanController::class           , 'updateJourneyPlan'                       ]);
+    Route::post('/route_import/{id}/journey_plan/{id_journey_plan}/delete'  ,   [JourneyPlanController::class           , 'deleteJourneyPlan'                       ]);
 
     Route::post('/route_import/{id}/journees/store'                         ,   [JourneeController::class               , 'storeJournee'                            ]);
-    Route::post('/route_import/{id}/journees/{Journee}/delete'              ,   [JourneeController::class               , 'deleteJournee'                           ]);
+    Route::post('/route_import/{id}/journees/{id_journee}/update'           ,   [JourneeController::class               , 'updateJournee'                           ]);
+    Route::post('/route_import/{id}/journees/{id_journee}/delete'           ,   [JourneeController::class               , 'deleteJournee'                           ]);
 
     Route::post('/route_import/{id_route_import}/clients/store'             ,   [ClientController::class                , 'storeClient'                             ]);
     Route::post('/route_import/{id_route_import}/clients/{id}/update'       ,   [ClientController::class                , 'updateClient'                            ]);
@@ -87,4 +128,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/route_import/{id_route_import}/clients/change_route'      ,   [ClientController::class                , 'changeRouteClients'                      ]);
 
     Route::post('/route/obs/route_import/{id}/details'                      ,   [RouteImportController::class           , 'obsDetailsRouteImport'                   ]);
+
+    //
+
 });

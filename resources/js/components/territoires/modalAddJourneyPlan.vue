@@ -6,7 +6,7 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title">Ajouter une Territoire</h5>
+                    <h5 class="modal-title">Add a New Territoire</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
@@ -15,7 +15,7 @@
                     <form>
 
                         <div class="mb-3">
-                            <label for="JPlan"              class="form-label">Type Territoire</label>
+                            <label for="JPlan"              class="form-label">Territory Type</label>
                             <select class="form-select"     v-model="territoire.type_territoire">
                                 <option value='1'>Journey Plan</option>
                                 <option value='2'>Journee</option>
@@ -44,8 +44,8 @@
 
                 <div class="modal-footer"       style="display: flex; justify-content: space-between;">
                     <div class="right-buttons"  style="display: flex; margin-left: auto;">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                        <button type="button"   class="btn btn-primary"   @click="sendData()">Valider</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button"   class="btn btn-primary"   @click="sendData()">Confirm</button>
                     </div>
                 </div>
 
