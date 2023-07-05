@@ -200,6 +200,38 @@ export default {
 
             resume_liste_journey_plan       =   this.$setRowspans(resume_liste_journey_plan)
 
+            // Sorting By Number of Clients
+
+            let sortedArray                     =   Object.values(resume_liste_journey_plan);
+            // sortedArray.sort((a, b)             =>  b.clients.length - a.clients.length);
+            sortedArray.sort((a, b)             =>  a.JPlan.localeCompare(b.JPlan));
+            let sortedObject                    =   sortedArray.reduce((acc, journey_plan, index) => {
+                
+                acc[journey_plan.JPlan]         =   journey_plan;
+                return acc;
+            }, {});
+
+            resume_liste_journey_plan           =   sortedObject
+
+            //
+
+            // Sorting By Journees
+
+            for (const [key, value] of Object.entries(resume_liste_journey_plan)) {
+
+                sortedArray                         =   Object.values(resume_liste_journey_plan[key].liste_journee);
+                sortedArray.sort((a, b)             =>  a.Journee.localeCompare(b.Journee));
+                sortedObject                        =   sortedArray.reduce((acc, Journee, index) => {
+                    
+                    acc[Journee.Journee]            =   Journee;
+                    return acc;
+                }, {});
+
+                resume_liste_journey_plan[key].liste_journee      =   sortedObject 
+            }
+
+            //
+
             return resume_liste_journey_plan
         },
 

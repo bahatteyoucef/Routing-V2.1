@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 
 class RouteImportTempo extends Model
@@ -65,7 +66,7 @@ class RouteImportTempo extends Model
         $route_import_tempo->save();
 
         $fileName                   =   uniqid().'.'.$request->file->getClientOriginalExtension();
-        $request->file->move(public_path('uploads/route_import_tempo/'.$route_import_tempo->id), $fileName);
+        $request->file->move(public_path('uploads/route_import_tempo/'.Auth::user()->id), $fileName);
 
         $route_import_tempo->file                   =   $fileName;
         $route_import_tempo->file_original_name     =   $request->file->getClientOriginalName();
@@ -79,6 +80,9 @@ class RouteImportTempo extends Model
     public static function deleteRouteImportTempo() {
 
         RouteImportTempo::where('owner', Auth::user()->id)->delete();
+        ClientTempo::where('owner', Auth::user()->id)->delete();
+
+        File::deleteDirectory(public_path('uploads/route_import_tempo/'.Auth::user()->id));
     }
 
     //

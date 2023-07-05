@@ -12,21 +12,6 @@
 
                 <div class="modal-body mt-3 table-responsive">
                         
-                    <!-- Inputs -->
-                    <div class="row mt-3 text-center">
-
-                        <div class="col-10"> 
-                            <input type="number"        class="form-control"        id="nombre_journee"     v-model="nombre_journee"    placeholder="Please enter the number of divisions ...">
-                        </div>
-
-                        <div class="col-2">
-                            <button type="button" class="btn btn-primary"   @click="decouperClients()">Divide</button>
-                        </div>
-
-                    </div>
-
-                    <hr />
-
                     <div class="mt-5">
 
                         <div class="col-12 p-0"> 
@@ -39,17 +24,19 @@
 
                             <thead>
                                 <tr>
-                                    <th>JPlan</th>
-                                    <th>JPlan Clients</th>
+                                    <th class="col-2">JPlan</th>
+                                    <th class="col-1">JPlan Clients</th>
 
-                                    <th>District</th>
-                                    <th>District Clients</th>
+                                    <th class="col-1">District</th>
+                                    <th class="col-1">District Clients</th>
 
-                                    <th>City</th>
-                                    <th>City Clients</th>
+                                    <th class="col-1">City</th>
+                                    <th class="col-1">City Clients</th>
 
-                                    <th>CustomerType</th>
-                                    <th>CustomerType Clients</th>
+                                    <th class="col-1">CustomerType</th>
+                                    <th class="col-1">CustomerType Clients</th>
+
+                                    <th class="col-2">Options</th>
                                 </tr>
                             </thead>
 
@@ -75,11 +62,11 @@
 
                             <thead>
                                 <tr>
-                                    <th>JPlan</th>
-                                    <th>Journee</th>
-                                    <th>Journee Clients</th>
-                                    <th>City</th>
-                                    <th>City Clients</th>
+                                    <th class="col-2">JPlan</th>
+                                    <th class="col-2">Journee</th>
+                                    <th class="col-2">Journee Clients</th>
+                                    <th class="col-2">City</th>
+                                    <th class="col-2">City Clients</th>
                                 </tr>
                             </thead>
 
@@ -108,19 +95,22 @@
 <script>
 
 export default {
+
     data() {
         return { 
 
-            datatable_resume_global     :   null,
+            datatable_resume_global     :   null    ,
 
-            nombre_journee              :   ""  ,
-            liste_jourey_plan           :   []  ,
+            nombre_journee              :   ""      ,
+            liste_jourey_plan           :   []      ,
 
-            resume_liste_journey_plan   :   null
+            resume_liste_journey_plan   :   null    ,
+
+            clients                     :   []
         }
     },
 
-    props : ["clients"],
+    props   : ["type", "id_route_import_tempo"],
 
     mounted() {
 
@@ -129,6 +119,63 @@ export default {
 
     methods : {
 
+        async getClients() {
+
+            if(this.type    ==  "temporary") {
+
+                await this.getClientsTemporary()
+                this.setResume()
+            }
+
+            if(this.type    ==  "permanent") {
+
+                await this.getClientsPermanent()
+                this.setResume()
+            }
+        },
+
+        async getClientsTemporary() {
+
+            this.$showLoadingPage()
+
+            // Set Data
+
+            const res   =   await this.$callApi('post'  ,   '/route_import_tempo/last'  ,   null)         
+            console.log(res)
+
+            if(res.status===200){
+
+                if(typeof res.data.clients              !=  "undefined") {
+
+                    this.clients                        =   res.data.clients
+                }
+
+                this.$hideLoadingPage()
+            }
+            
+            else{
+
+                this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
+			}
+        },
+
+        async getClientsPermanent() {
+
+            this.$showLoadingPage()
+
+            const res                   =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.$route.params.id_route_import+"/details",   null)
+
+            // Set Clients
+            this.clients                =   res.data.data
+
+            this.$hideLoadingPage()
+        },
+
+        //
+
         setResume() {
 
             // Show Loading Page
@@ -136,11 +183,7 @@ export default {
 
             setTimeout(async () => {
                 
-                console.log(this.clients)
-
                 this.resume_liste_journey_plan  =   this.$getResumeFileRouting(this.clients)
-
-                console.log(this.resume_liste_journey_plan)
 
                 // Global
                 this.addGlobalBody()
@@ -153,26 +196,15 @@ export default {
             }, 55);
         },
 
-        decouperClients() {
+        //
 
-            if(this.$route.path.startsWith("/route/obs/route_import/add")) {
+        decouperClients(key) {
 
-                console.log(111)
+            let nombre_journee  =   document.getElementById("route_"+key).value
 
-                this.decouperClientsAdd()
-            }
+            //
 
-            else {
-
-                console.log(222)
-
-                this.decouperClientsMap()
-            }
-        },
-
-        decouperClientsAdd() {
-
-            if(this.nombre_journee  >   0) {
+            if(nombre_journee  >   0) {
 
                 // Show Loading Page
                 this.$showLoadingPage()
@@ -193,71 +225,91 @@ export default {
 
                     let Journee                             =   0
 
-                    for (const [key, value] of Object.entries(this.resume_liste_journey_plan)) {
+                    //
 
-                        clients_par_route               =   [...value.clients.sort((b, a) => this.getDistance(0, 0, a.Latitude, a.Longitude) - this.getDistance(0, 0, b.Latitude, b.Longitude))]
+                    clients_par_route               =   [...this.resume_liste_journey_plan[key].clients.sort((b, a) => this.getDistance(0, 0, a.Latitude, a.Longitude) - this.getDistance(0, 0, b.Latitude, b.Longitude))]
 
-                        clients_par_route_tous_les_jour =   [...[]]
+                    clients_par_route_tous_les_jour =   [...[]]
 
-                        nombre_client_visite_par_jour   =   Math.ceil(clients_par_route.length / this.nombre_journee)
+                    nombre_client_visite_par_jour   =   Math.floor(clients_par_route.length / nombre_journee)
 
-                        Journee                         =   0
+                    Journee                         =   0
 
-                        for (let j = 0; j < clients_par_route.length; j++) {
+                    for (let j = 0; j < nombre_client_visite_par_jour*nombre_journee; j++) {
 
-                            clients_par_jour                    =   [...[]]                    
-                            existe_in_finale                    =   this.checkIfClientAddedJourSemaineAdd(clients_ajoutes, clients_par_route[j])    
+                        clients_par_jour                    =   [...[]]                    
+                        existe_in_finale                    =   this.checkIfClientAddedJourSemaineMap(clients_ajoutes, clients_par_route[j])    
 
-                            if(!existe_in_finale) {
+                        if(!existe_in_finale) {
 
-                                Journee                             =   Journee +   1
+                            Journee                             =   Journee +   1
 
-                                for (let k = 0; k < (nombre_client_visite_par_jour - 1); k++) {
+                            for (let k = 0; k < (nombre_client_visite_par_jour - 1); k++) {
 
-                                    let min_distance_index      =   -1
-                                    let min_distance            =   -1
+                                let min_distance_index      =   -1
+                                let min_distance            =   -1
 
-                                    let tempo_min_distance      =   -1
+                                let tempo_min_distance      =   -1
 
-                                    for (let l = j+1; l < clients_par_route.length; l++) {
-                                        
-                                        existe_in_finale                    =   this.checkIfClientAddedJourSemaineAdd(clients_ajoutes, clients_par_route[l])
+                                for (let l = j+1; l < nombre_client_visite_par_jour*nombre_journee; l++) {
+                                    
+                                    existe_in_finale                    =   this.checkIfClientAddedJourSemaineMap(clients_ajoutes, clients_par_route[l])
 
-                                        if(!existe_in_finale) {
+                                    if(!existe_in_finale) {
 
-                                            tempo_min_distance              =   this.getDistance(clients_par_route[j].Latitude, clients_par_route[j].Longitude, clients_par_route[l].Latitude, clients_par_route[l].Longitude)
+                                        tempo_min_distance              =   this.getDistance(clients_par_route[j].Latitude, clients_par_route[j].Longitude, clients_par_route[l].Latitude, clients_par_route[l].Longitude)
 
-                                            if((min_distance_index == -1)||(min_distance    >   tempo_min_distance)) {
+                                        if((min_distance_index == -1)||(min_distance    >   tempo_min_distance)) {
 
-                                                min_distance_index          =   l
-                                                min_distance                =   tempo_min_distance
-                                            }
+                                            min_distance_index          =   l
+                                            min_distance                =   tempo_min_distance
                                         }
-                                    }
-
-                                    if(min_distance_index !=    -1) {
-
-                                        clients_par_route[min_distance_index].Journee   =   "Jour "+Journee
-
-                                        clients_par_jour.push(clients_par_route[min_distance_index])
-                                        clients_ajoutes.push(clients_par_route[min_distance_index])
                                     }
                                 }
 
-                                clients_par_route[j].Journee    =   "Jour "+Journee
+                                if(min_distance_index !=    -1) {
 
-                                clients_par_jour.push(clients_par_route[j])
-                                clients_ajoutes.push(clients_par_route[j])
+                                    clients_par_route[min_distance_index].Journee   =   "Jour "+Journee
 
-                                clients_par_route_tous_les_jour.push(clients_par_jour)
+                                    clients_par_jour.push(clients_par_route[min_distance_index])
+                                    clients_ajoutes.push(clients_par_route[min_distance_index])
+                                }
                             }
+
+                            clients_par_route[j].Journee    =   "Jour "+Journee
+
+                            clients_par_jour.push(clients_par_route[j])
+                            clients_ajoutes.push(clients_par_route[j])
+
+                            clients_par_route_tous_les_jour.push(clients_par_jour)
                         }
-
-                        clients_par_tous_les_routes_tempo.push(clients_par_route_tous_les_jour)
-
                     }
 
-                    this.clients.sort((a,b) => b.CustomerNo -   a.CustomerNo)
+                    //
+
+                    let journee_util_array  =   []
+                    let journee             =   null
+
+                    for(let i = nombre_client_visite_par_jour*nombre_journee; i < clients_par_route.length; i++) {
+
+                        journee =   this.getMinDistanceJournee(clients_par_route_tous_les_jour, clients_par_route[i], journee_util_array)
+
+                        clients_par_route[i].Journee                =   "Jour "+(journee + 1)
+                        clients_par_route_tous_les_jour[journee].push(clients_par_route[i])
+
+                        journee_util_array.push(journee)
+
+                        if(journee_util_array.length    >=  clients_par_route_tous_les_jour.length) {
+
+                            journee_util_array  =   []
+                        }
+                    }
+
+                    clients_par_tous_les_routes_tempo.push(clients_par_route_tous_les_jour)
+
+                    //
+
+                    this.clients.sort((a,b) => b.id -   a.id)
 
                     for (let i = 0; i < clients_par_tous_les_routes_tempo.length; i++) {
 
@@ -267,7 +319,7 @@ export default {
 
                                 for (let l = 0; l < this.clients.length; l++) {
 
-                                    if(this.clients[l].CustomerNo   ==  clients_par_tous_les_routes_tempo[i][j][k].CustomerNo) {
+                                    if(this.clients[l].id   ==  clients_par_tous_les_routes_tempo[i][j][k].id) {
 
                                         this.clients[l]     =   clients_par_tous_les_routes_tempo[i][j][k]
                                     }
@@ -275,6 +327,7 @@ export default {
                             }
                         }
                     }
+                    
 
                     // ReResume
                     this.setResume()
@@ -282,12 +335,32 @@ export default {
                     // Hide Loading Page
                     this.$hideLoadingPage()
     
-                    // Send Feedback
-                    this.$feedbackSuccess("Decoupage par Journee Realisés"     ,   "le decoupage a été realisés avec succès !")
-
                 }, 55)
             }
         },
+
+        getMinDistanceJournee(clients_par_route_tous_les_jour, client, journee_util_array) {
+
+            let min_distance_index      =   -1
+            let min_distance            =   -1
+
+            let tempo_min_distance      =   -1
+
+            for (let i = 0; i < clients_par_route_tous_les_jour.length; i++) {
+
+                tempo_min_distance              =   this.getDistance(clients_par_route_tous_les_jour[i][0].Latitude, clients_par_route_tous_les_jour[i][0].Longitude, client.Latitude, client.Longitude)
+
+                if(((min_distance_index == -1)||(min_distance    >   tempo_min_distance))&&(!journee_util_array.includes(i))) {
+
+                    min_distance_index          =   i
+                    min_distance                =   tempo_min_distance
+                }
+            }
+
+            return min_distance_index
+        },
+
+        //
 
         decouperClientsMap() {
 
@@ -401,24 +474,83 @@ export default {
                     // Hide Loading Page
                     this.$hideLoadingPage()
     
-                    // Send Feedback
-                    this.$feedbackSuccess("Decoupage par Journee Realisés"     ,   "le decoupage a été realisés avec succès !")
-
                 }, 55)
             }
         },
 
         //
 
-        valider() {
+        async valider() {
 
-            this.emitter.emit('reSetClientsDecoupeByJournee' , this.clients)
+            if(this.type    ==  "temporary") {
 
-            // Send Feedback
-            this.$feedbackSuccess("Decoupage par Journee Validés"     ,   "le decoupage a été validés avec succès !")
+                this.$showLoadingPage()
 
-            // Close Modal
-            this.$hideModal("modalResume")
+                let formData    =   new FormData();
+
+                formData.append("data"  ,   JSON.stringify(this.clients))
+
+                const res                   =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.id_route_import_tempo+"/clients_tempo/update", formData)
+                console.log(res.data)
+
+                if(res.status===200){
+
+                    this.emitter.emit('reSetClientsDecoupeByJourneeAdd' , this.clients)
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    // Send Feedback
+                    this.$feedbackSuccess(res.data.header     ,   res.data.message)
+
+                    // Close Modal
+                    this.$hideModal("modalResume")
+                }
+                
+                else{
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    // Send Errors
+                    this.$showErrors("Error !", res.data.errors)
+                }            
+            }
+
+            else {
+
+                this.$showLoadingPage()
+
+                let formData    =   new FormData();
+
+                formData.append("data"  ,   JSON.stringify(this.clients))
+
+                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/update",  formData)
+                console.log(res.data)
+
+                if(res.status===200){
+
+                    this.emitter.emit('reSetClientsDecoupeByJourneeMap' , this.clients)
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    // Send Feedback
+                    this.$feedbackSuccess(res.data.header     ,   res.data.message)
+
+                    // Close Modal
+                    this.$hideModal("modalResume")
+                }
+                
+                else{
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    // Send Errors
+                    this.$showErrors("Error !", res.data.errors)
+                }
+            }
         },
 
         //
@@ -653,6 +785,43 @@ export default {
 
                     district_index                                  =   district_index      +   1
                 }
+
+                //
+
+                var OptionsCell                                 =   document.createElement("td")
+                OptionsCell.setAttribute("rowspan"              ,   journey_plan.rowspan)
+
+                var OptionsDiv                                  =   document.createElement("div")
+                OptionsDiv.classList.add("row")
+                OptionsDiv.classList.add("justify-content-center")
+
+                var OptionsInput                                =   document.createElement("input")
+                OptionsInput.setAttribute("type", "number")
+                OptionsInput.setAttribute("id"  , "route_"+key)
+                OptionsInput.setAttribute("placeholder" ,   "number of workdays ...")
+
+                OptionsInput.classList.add("form-control")
+                OptionsInput.classList.add("w-75")
+
+                var OptionsButton                               =   document.createElement("button")
+                OptionsButton.setAttribute("type", "button")
+                OptionsButton.classList.add("btn-primary")
+                OptionsButton.classList.add("btn")
+                OptionsButton.classList.add("mt-1")
+                OptionsButton.classList.add("w-75")
+
+                OptionsButton.textContent                       =   "Divide"
+
+                //
+
+                OptionsButton.addEventListener("click", ()  =>  {this.decouperClients(key)})
+
+                OptionsDiv.appendChild(OptionsInput)
+                OptionsDiv.appendChild(OptionsButton)
+                OptionsCell.appendChild(OptionsDiv)
+                customerJourneyPlanRow.appendChild(OptionsCell)
+
+                //
 
                 district_index          =   1
             }

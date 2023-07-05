@@ -91,6 +91,9 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
 
+	<!-- Excel     -->
+	<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+
 	@vite('resources/js/app.js')
 
 </html>

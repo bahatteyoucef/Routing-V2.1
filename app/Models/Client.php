@@ -129,13 +129,13 @@ class Client extends Model
         $client->save();
 
         // Journey Plan
-        JourneyPlan::storeJourneyPlan($request, $id_route_import);
+        // JourneyPlan::storeJourneyPlan($request, $id_route_import);
 
         // Journee
-        Journee::storeJournee($request, $id_route_import);
+        // Journee::storeJournee($request, $id_route_import);
     }
 
-    //
+    //          
 
     public static function validateUpdate(Request $request) 
     {
@@ -183,10 +183,41 @@ class Client extends Model
         $client->save();
 
         // Journey Plan
-        JourneyPlan::storeJourneyPlan($request, $id_route_import);
+        // JourneyPlan::storeJourneyPlan($request, $id_route_import);
 
         // Journee
-        Journee::storeJournee($request, $id_route_import);
+        // Journee::storeJournee($request, $id_route_import);
+    }
+
+    //
+
+    public static function updateClients(Request $request, int $id_route_import) {
+
+        $clients    =   json_decode($request->get("data"));
+
+        foreach ($clients as $client_tempo) {
+
+            // Client
+
+            $client                             =   Client::find($client_tempo->id);
+
+            $client->CustomerCode               =   $client_tempo->CustomerCode;
+            $client->CustomerNameE              =   $client_tempo->CustomerNameE;
+            $client->CustomerNameA              =   $client_tempo->CustomerNameA;
+            $client->Latitude                   =   $client_tempo->Latitude;
+            $client->Longitude                  =   $client_tempo->Longitude;
+            $client->Address                    =   $client_tempo->Address;
+            $client->DistrictNo                 =   $client_tempo->DistrictNo;
+            $client->DistrictNameE              =   $client_tempo->DistrictNameE;
+            $client->CityNo                     =   $client_tempo->CityNo;
+            $client->CityNameE                  =   $client_tempo->CityNameE;
+            $client->Tel                        =   $client_tempo->Tel;
+            $client->CustomerType               =   $client_tempo->CustomerType;
+            $client->JPlan                      =   $client_tempo->JPlan;
+            $client->Journee                    =   $client_tempo->Journee;
+
+            $client->save();
+        }
     }
 
     //

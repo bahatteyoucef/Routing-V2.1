@@ -8,8 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Fluent;
 use Illuminate\Validation\Rule;
 
 class RouteImport extends Model
@@ -37,10 +38,20 @@ class RouteImport extends Model
     {
 
         $validator = Validator::make($request->all(), [
-            'libelle'           =>  ["required", "max:255"      ],
-            'data'              =>  ["required", "json"         ],
-            'file'              =>  ["required", "mimes:xlsx"   ]
+            'libelle'                   =>  ["required", "max:255"                  ],
+            'new_upload'                =>  ["required"                             ],
+            'data'                      =>  ["required", "json"                     ]
         ]);
+
+        //
+
+        $validator->sometimes(['file']                                              , 'required|file:xlsx'      , function (Fluent $input) {
+            return $input->new_upload   ==  "true";
+        });
+
+        $validator->sometimes(['id_route_import_tempo', 'file_route_import_tempo']  , 'required'                , function (Fluent $input) {
+            return $input->new_upload   ==  "false";
+        });
 
         return $validator;
     }
@@ -55,16 +66,50 @@ class RouteImport extends Model
 
         $route_import->save();
 
-        $fileName               =   uniqid().'.'.$request->file->getClientOriginalExtension();
-        // $request->file->move(public_path('uploads/route_import/'.$route_import->id), $fileName);
+        if($request->get("new_upload")  ==  "true") {
 
-        $route_import->file     =   $fileName;
+            $fileName               =   uniqid().'.'.$request->file->getClientOriginalExtension();
+            $request->file->move(public_path('uploads/route_import/'.Auth::user()->id), $fileName);
+
+            $route_import->file     =   $fileName;
+        }
+
+        else {
+
+            $fileName               =   $request->get("file_route_import_tempo");
+
+            if(!File::exists(public_path().'/uploads')) {
+
+                $path = public_path().'/uploads';
+                File::makeDirectory($path, $mode = 0777, true, true);
+            }
+
+            if(!File::exists(public_path().'/uploads'.'/route_import')) {
+
+                $path = public_path().'/uploads'.'/route_import';
+                File::makeDirectory($path, $mode = 0777, true, true);
+            }
+
+            if(!File::exists(public_path().'/uploads'.'/route_import/'.Auth::user()->id)) {
+
+                $path = public_path().'/uploads'.'/route_import/'.Auth::user()->id;
+                File::makeDirectory($path, $mode = 0777, true, true);
+            }
+
+            //
+
+            File::move(public_path('uploads/'.'route_import_tempo/'.Auth::user()->id.'/'.$fileName), public_path('uploads/'.'route_import/'.Auth::user()->id.'/'.$fileName));
+
+            $route_import->file     =   $fileName;
+        }
 
         $route_import->save();
 
         // Store Data
-
         RouteImport::storeData($request, $route_import->id);
+
+        // Delete Tempo
+        RouteImportTempo::deleteRouteImportTempo();
 
         return $route_import;
     }

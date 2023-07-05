@@ -70,22 +70,22 @@
         </div>
 
         <!-- Modal Add                      -->
-        <modalClientAdd                                                 ref="modalClientAdd">                                                                                       </modalClientAdd>
+        <modalClientAdd                                                 ref="modalClientAdd"                                                                                        >   </modalClientAdd>
 
         <!-- Modal Update                   -->
-        <modalClientUpdate                                              ref="modalClientUpdate">                                                                                    </modalClientUpdate>
+        <modalClientUpdate                                              ref="modalClientUpdate"                                                                                     >   </modalClientUpdate>
 
         <!-- Modal Change Route             -->
-        <modalClientsChangeRoute                                        ref="modalClientsChangeRoute">                                                                              </modalClientsChangeRoute>
+        <modalClientsChangeRoute                                        ref="modalClientsChangeRoute"                                                                               >   </modalClientsChangeRoute>
 
         <!-- Modal Decoupe By Journee       -->
-        <modalResume                v-if="route_import"                 ref="modalResume"                   :key="route_import.clients"         :clients="route_import.clients" >   </modalResume>
+        <modalResume                                                    ref="modalResume"               :key="Date.now()"                                       :type="'permanent'" >   </modalResume>
 
         <!-- Modal Add New Journey Plan     -->
-        <modalAddJourneyPlan                                            ref="modalAddJourneyPlan"                                                                               >   </modalAddJourneyPlan>
+        <modalAddJourneyPlan                                            ref="modalAddJourneyPlan"                                                                                   >   </modalAddJourneyPlan>
 
         <!-- Modal Add New Journey Plan     -->
-        <modalUpdateJourneyPlan                                         ref="modalUpdateJourneyPlan"                                                                            >   </modalUpdateJourneyPlan>
+        <modalUpdateJourneyPlan                                         ref="modalUpdateJourneyPlan"                                                                                >   </modalUpdateJourneyPlan>
 
         <!--                                -->   
 
@@ -432,6 +432,8 @@ export default {
         this.emitter.on('reSetClientsDecoupeByJourneeMap' , (clients)  =>  {
 
             this.route_import.clients   =   clients
+
+            console.log(1111)
 
             this.reAfficherClientsAndMarkers()
         })
@@ -1539,9 +1541,9 @@ export default {
 			}
         },
 
-        showResume() {
+        async showResume() {
 
-            this.$refs.modalResume.setResume(this.route_import.clients)
+            await this.$refs.modalResume.getClients()
         },
 
         // Map

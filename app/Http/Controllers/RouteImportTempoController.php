@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ClientTempo;
 use App\Models\RouteImportTempo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -84,15 +85,15 @@ class RouteImportTempoController extends Controller
             if($route_import_tempo) {
 
                 // Get the file path or generate it dynamically
-                $filePath = public_path('uploads/route_import_tempo/'.$route_import_tempo->file);
+                $filePath = public_path('uploads/route_import_tempo/'.$route_import_tempo->id.'/'.$route_import_tempo->file);
                 
                 // Check if the file exists
                 if (file_exists($filePath)) {
 
                     // Set the appropriate headers for the file
                     $headers = [
-                        'Content-Type'          =>  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                        'Content-Disposition'   =>  'attachment; filename="'+$route_import_tempo->file+'"',
+                        'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        'Content-Disposition' => 'attachment; filename="file.xlsx"',
                     ];
 
                     // Return the file as a response

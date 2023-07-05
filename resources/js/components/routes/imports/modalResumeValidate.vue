@@ -6,7 +6,7 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title" v-if="clients.length">Validate Data : </h5>
+                    <h5 class="modal-title">Validate Data : </h5>
                     <button type="button"   class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
@@ -76,7 +76,7 @@
                             </thead>
 
                             <tbody>
-                                <tr v-for="client in getDoublantTel" :key="client.CustomerNo">
+                                <tr v-for="client in getDoublantTel" :key="client.id" @click="updateElementTempo(client)" >
                                     <td>{{client.CustomerCode}}</td>
                                     <td>{{client.CustomerNameE}}</td>
                                     <td>{{client.CustomerNameA}}</td>
@@ -168,7 +168,7 @@
                             </thead>
 
                             <tbody>
-                                <tr v-for="client in getDoublantLatitudeLongitude" :key="client.CustomerNo">
+                                <tr v-for="client in getDoublantLatitudeLongitude" :key="client.id" @click="updateElementTempo(client)" >
                                     <td>{{client.CustomerCode}}</td>
                                     <td>{{client.CustomerNameE}}</td>
                                     <td>{{client.CustomerNameA}}</td>
@@ -260,7 +260,7 @@
                             </thead>
 
                             <tbody>
-                                <tr v-for="client in getDoublantCustomerNameE" :key="client.CustomerNo">
+                                <tr v-for="client in getDoublantCustomerNameE" :key="client.id" @click="updateElementTempo(client)" >
                                     <td>{{client.CustomerCode}}</td>
                                     <td>{{client.CustomerNameE}}</td>
                                     <td>{{client.CustomerNameA}}</td>
@@ -352,7 +352,7 @@
                             </thead>
 
                             <tbody>
-                                <tr v-for="client in getDoublantCustomerCode" :key="client.CustomerNo">
+                                <tr v-for="client in getDoublantCustomerCode" :key="client.id" @click="updateElementTempo(client)" >
                                     <td>{{client.CustomerCode}}</td>
                                     <td>{{client.CustomerNameE}}</td>
                                     <td>{{client.CustomerNameA}}</td>
@@ -384,31 +384,47 @@
 
             </div>
         </div>
+
+        <!-- Modal Add  -->
+        <modalClientUpdateTempo ref="modalClientUpdateTempo" :id_route_import_tempo="id_route_import_tempo">   </modalClientUpdateTempo>
+
     </div>
 
 </template>
 
 <script>
 
+import modalClientUpdateTempo from "../../clients/modalClientUpdateTempo.vue"
+
 export default {
 
     data() {
         return {
 
-            getDoublantTel                  :   null,
-            getDoublantLatitudeLongitude    :   null,
-            getDoublantCustomerNameE        :   null,
-            getDoublantCustomerCode         :   null,
+            getDoublantTel                                  :   null,
+            getDoublantLatitudeLongitude                    :   null,
+            getDoublantCustomerNameE                        :   null,
+            getDoublantCustomerCode                         :   null,
 
             datatable_client_double_tel                     :   null,
             datatable_client_double_latitude_longitude      :   null,
             datatable_client_double_namee                   :   null,
-            datatable_client_double_customercode            :   null
+            datatable_client_double_customercode            :   null,
 
+            clients                                         :   null
         }
     },
 
-    props : ["clients", "route_import"],
+    props : ["id_route_import_tempo"],
+
+    mounted(){
+
+    },
+
+    components : {
+
+        modalClientUpdateTempo  :   modalClientUpdateTempo
+    },
 
     methods : {
 
@@ -419,22 +435,37 @@ export default {
 
             setTimeout(async () => {
                 
-                let getDoublant                         =   this.$getDoublant(this.clients)
+                this.$showLoadingPage()
 
-                this.getDoublantTel                     =   getDoublant.$getDoublantTel
-                this.getDoublantLatitudeLongitude       =   getDoublant.$getDoublantLatitudeLongitude
-                this.getDoublantCustomerNameE           =   getDoublant.$getDoublantCustomerNameE
-                this.getDoublantCustomerCode            =   getDoublant.$getDoublantCustomerCode
+                const res                   =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.id_route_import_tempo+"/clients_tempo/doubles", null)
+                console.log(res.data)
 
-                await this.setDataTableTel()
-                await this.setDataTableLatitudeLongitude()
-                await this.setDataTableNameE()
-                await this.setDataTableCustomerCode()
+                if(res.status===200){
 
-                // Hide Loading Page
-                this.$hideLoadingPage()
+                    this.getDoublantTel                     =   res.data.getDoublantTel
+                    this.getDoublantLatitudeLongitude       =   res.data.getDoublantLatitudeLongitude
+                    this.getDoublantCustomerNameE           =   res.data.getDoublantCustomerNameE
+                    this.getDoublantCustomerCode            =   res.data.getDoublantCustomerCode
+
+                    await this.setDataTableTel()
+                    await this.setDataTableLatitudeLongitude()
+                    await this.setDataTableNameE()
+                    await this.setDataTableCustomerCode()
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+                }
+                
+                else{
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    // Send Errors
+                    this.$showErrors("Error !", res.data.errors)
+                }            
+
             }, 55);
-
         },
 
         async setDataTableTel() {
@@ -511,8 +542,204 @@ export default {
 
                 console.log(e)
             }
+        },
+
+        //
+
+        updateElementTempo(client_tempo) {
+
+            try {
+
+                // ShowModal
+                var updateModal     =   new Modal(document.getElementById("modalClientUpdateTempo"));
+                updateModal.show();
+
+                // Send DATA To Modal
+                this.$refs.modalClientUpdateTempo.getData(client_tempo)
+            }
+            catch(e) {
+
+                console.log(e)
+            }
+        },
+
+        //
+
+        async updateClientDoubleTel(client) {
+
+            for (let i = 0; i < this.getDoublantTel.length; i++) {
+
+                if(this.getDoublantTel[i].id    ==  client.id) {
+
+                    this.getDoublantTel[i].CustomerCode     =   client.CustomerCode
+                    this.getDoublantTel[i].CustomerNameE    =   client.CustomerNameE
+                    this.getDoublantTel[i].CustomerNameA    =   client.CustomerNameA
+                    this.getDoublantTel[i].Latitude         =   client.Latitude
+                    this.getDoublantTel[i].Longitude        =   client.Longitude
+                    this.getDoublantTel[i].Address          =   client.Address
+                    this.getDoublantTel[i].DistrictNo       =   client.DistrictNo
+                    this.getDoublantTel[i].DistrictNameE    =   client.DistrictNameE
+                    this.getDoublantTel[i].CityNo           =   client.CityNo
+                    this.getDoublantTel[i].CityNameE        =   client.CityNameE
+                    this.getDoublantTel[i].Tel              =   client.Tel
+                    this.getDoublantTel[i].CustomerType     =   client.CustomerType
+                    this.getDoublantTel[i].JPlan            =   client.JPlan
+                    this.getDoublantTel[i].Journee          =   client.Journee
+                }                
+            }
+
+            //
+
+            await this.setDataTableTel()
+        },
+
+        async updateClientDoubleLatitudeLongitude(client) {
+
+            for (let i = 0; i < this.getDoublantLatitudeLongitude.length; i++) {
+
+                if(this.getDoublantLatitudeLongitude[i].id    ==  client.id) {
+
+                    this.getDoublantLatitudeLongitude[i].CustomerCode       =   client.CustomerCode
+                    this.getDoublantLatitudeLongitude[i].CustomerNameE      =   client.CustomerNameE
+                    this.getDoublantLatitudeLongitude[i].CustomerNameA      =   client.CustomerNameA
+                    this.getDoublantLatitudeLongitude[i].Latitude           =   client.Latitude
+                    this.getDoublantLatitudeLongitude[i].Longitude          =   client.Longitude
+                    this.getDoublantLatitudeLongitude[i].Address            =   client.Address
+                    this.getDoublantLatitudeLongitude[i].DistrictNo         =   client.DistrictNo
+                    this.getDoublantLatitudeLongitude[i].DistrictNameE      =   client.DistrictNameE
+                    this.getDoublantLatitudeLongitude[i].CityNo             =   client.CityNo
+                    this.getDoublantLatitudeLongitude[i].CityNameE          =   client.CityNameE
+                    this.getDoublantLatitudeLongitude[i].Tel                =   client.Tel
+                    this.getDoublantLatitudeLongitude[i].CustomerType       =   client.CustomerType
+                    this.getDoublantLatitudeLongitude[i].JPlan              =   client.JPlan
+                    this.getDoublantLatitudeLongitude[i].Journee            =   client.Journee
+                }                
+            }
+
+            //
+
+            await this.setDataTableLatitudeLongitude()
+        },
+
+        async updateClientDoubleCustomerNameE(client) {
+
+            for (let i = 0; i < this.getDoublantCustomerNameE.length; i++) {
+
+                if(this.getDoublantCustomerNameE[i].id    ==  client.id) {
+
+                    this.getDoublantCustomerNameE[i].CustomerCode       =   client.CustomerCode
+                    this.getDoublantCustomerNameE[i].CustomerNameE      =   client.CustomerNameE
+                    this.getDoublantCustomerNameE[i].CustomerNameA      =   client.CustomerNameA
+                    this.getDoublantCustomerNameE[i].Latitude           =   client.Latitude
+                    this.getDoublantCustomerNameE[i].Longitude          =   client.Longitude
+                    this.getDoublantCustomerNameE[i].Address            =   client.Address
+                    this.getDoublantCustomerNameE[i].DistrictNo         =   client.DistrictNo
+                    this.getDoublantCustomerNameE[i].DistrictNameE      =   client.DistrictNameE
+                    this.getDoublantCustomerNameE[i].CityNo             =   client.CityNo
+                    this.getDoublantCustomerNameE[i].CityNameE          =   client.CityNameE
+                    this.getDoublantCustomerNameE[i].Tel                =   client.Tel
+                    this.getDoublantCustomerNameE[i].CustomerType       =   client.CustomerType
+                    this.getDoublantCustomerNameE[i].JPlan              =   client.JPlan
+                    this.getDoublantCustomerNameE[i].Journee            =   client.Journee
+                }                
+            }
+
+            //
+
+            await this.setDataTableNameE()
+        },
+
+        async updateClientDoubleCustomerCode(client) {
+
+            for (let i = 0; i < this.getDoublantCustomerCode.length; i++) {
+
+                if(this.getDoublantCustomerCode[i].id    ==  client.id) {
+
+                    this.getDoublantCustomerCode[i].CustomerCode        =   client.CustomerCode
+                    this.getDoublantCustomerCode[i].CustomerNameE       =   client.CustomerNameE
+                    this.getDoublantCustomerCode[i].CustomerNameA       =   client.CustomerNameA
+                    this.getDoublantCustomerCode[i].Latitude            =   client.Latitude
+                    this.getDoublantCustomerCode[i].Longitude           =   client.Longitude
+                    this.getDoublantCustomerCode[i].Address             =   client.Address
+                    this.getDoublantCustomerCode[i].DistrictNo          =   client.DistrictNo
+                    this.getDoublantCustomerCode[i].DistrictNameE       =   client.DistrictNameE
+                    this.getDoublantCustomerCode[i].CityNo              =   client.CityNo
+                    this.getDoublantCustomerCode[i].CityNameE           =   client.CityNameE
+                    this.getDoublantCustomerCode[i].Tel                 =   client.Tel
+                    this.getDoublantCustomerCode[i].CustomerType        =   client.CustomerType
+                    this.getDoublantCustomerCode[i].JPlan               =   client.JPlan
+                    this.getDoublantCustomerCode[i].Journee             =   client.Journee
+                }                
+            }
+
+            //
+
+            await this.setDataTableCustomerCode()
+        },
+
+        //
+
+        async deleteClientDoubleTel(client) {
+
+            for (let i = 0; i < this.getDoublantTel.length; i++) {
+
+                if(this.getDoublantTel[i].id    ==  client.id) {
+
+                    this.getDoublantTel.splice(i, 1)
+                }                
+            }
+
+            //
+
+            await this.setDataTableTel()
+        },
+
+        async deleteClientDoubleLatitudeLongitude(client) {
+
+            for (let i = 0; i < this.getDoublantLatitudeLongitude.length; i++) {
+
+                if(this.getDoublantLatitudeLongitude[i].id    ==  client.id) {
+
+                    this.getDoublantLatitudeLongitude.splice(i, 1)
+                }                
+            }
+
+            //
+
+            await this.setDataTableLatitudeLongitude()
+        },
+
+        async deleteClientDoubleCustomerNameE(client) {
+
+            for (let i = 0; i < this.getDoublantCustomerNameE.length; i++) {
+
+                if(this.getDoublantCustomerNameE[i].id    ==  client.id) {
+
+                    this.getDoublantCustomerNameE.splice(i, 1)
+                }                
+            }
+
+            //
+
+            await this.setDataTableNameE()
+        },
+
+        async deleteClientDoubleCustomerCode(client) {
+
+            for (let i = 0; i < this.getDoublantCustomerCode.length; i++) {
+
+                if(this.getDoublantCustomerCode[i].id    ==  client.id) {
+
+                    this.getDoublantCustomerCode.splice(i, 1)
+                }                
+            }
+
+            //
+
+            await this.setDataTableCustomerCode()
         }
 
+        //
     }
 }
 </script>

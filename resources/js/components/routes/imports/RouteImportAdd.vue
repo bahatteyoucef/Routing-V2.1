@@ -28,23 +28,23 @@
                             </div>
 
                             <div class="col-4">
-                                <label for="fiile"          class="form-label">File</label>
+                                <label for="file"           class="form-label">File</label>
                                 <input  type="file"         class="form-control"        
                                                             id="file"
-                                                            @input="getFile($event)"   
+                                                            @input="getFile($event)"
                                                             accept=".csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, 
                                                                     application/vnd.ms-excel">
                             </div>
 
                             <div class="col-4 mt-auto">
-                                <button type="button" class="btn btn-primary"   @click="sendData()"                                                                                                         >Import     </button>
-                                <button type="button" class="btn btn-primary"   @click="showResumeValidate()"   data-bs-toggle="modal" :data-bs-target="'#modalResumeValidate'"     v-if="route_import.file">Validate   </button>
-                                <button type="button" class="btn btn-primary"   @click="showResume()"           data-bs-toggle="modal" :data-bs-target="'#modalResume'"             v-if="route_import.file">Resume     </button>
+                                <button type="button" class="btn btn-primary"   @click="sendData()"                                                                                                                 >Import     </button>
+                                <button type="button" class="btn btn-primary"   @click="showResumeValidate()"   data-bs-toggle="modal" :data-bs-target="'#modalResumeValidate'"     v-if="route_import.sent_tempo"  >Validate   </button>
+                                <button type="button" class="btn btn-primary"   @click="showResume()"           data-bs-toggle="modal" :data-bs-target="'#modalResume'"             v-if="route_import.sent_tempo"  >Resume     </button>
                             </div>
                         </form>
 
-                        <!-- <modalResume            ref="modalResume"           :key="clients"                                      :clients="clients"></modalResume> -->
-                        <!-- <modalResumeValidate    ref="modalResumeValidate"   :key="clients"      :route_import="route_import"    :clients="clients"></modalResumeValidate> -->
+                        <modalResume            ref="modalResume"           :key="Date.now()"   :type="'temporary'"     :id_route_import_tempo="route_import.id_route_import_tempo"     ></modalResume>
+                        <modalResumeValidate    ref="modalResumeValidate"   :key="Date.now()"                           :id_route_import_tempo="route_import.id_route_import_tempo"     ></modalResumeValidate>
 
                     </div>
                 </div>
@@ -68,12 +68,18 @@ export default {
 
             route_import    : {
 
-                libelle             :   "",
-                file                :   "",
-                file_original_name  :   ""
+                libelle                     :   "",
+                file                        :   "",
+                file_original_name          :   "",
+
+                id_route_import_tempo       :   null,
+                file_route_import_tempo     :   null,
+
+                new_upload                  :   true,
+                sent_tempo                  :   false
             },
 
-            clients         :   ""  ,
+            clients         :   ""      
         }
     },
 
@@ -85,9 +91,8 @@ export default {
 
     mounted() {
 
-        this.emitter.on('reSetClientsDecoupeByJournee' , (clients)  =>  {
+        this.emitter.on('reSetClientsDecoupeByJourneeAdd' , (clients)  =>  {
 
-            this.emitter.off('reSetClientsDecoupeByJournee')
             this.clients    =   clients
         })
     },
@@ -101,11 +106,26 @@ export default {
 
             let formData = new FormData();
 
-            formData.append("libelle"   ,   this.route_import.libelle)
-            formData.append("file"      ,   this.route_import.file)
-            formData.append("data"      ,   JSON.stringify(this.clients))
+            formData.append("libelle"                   ,   this.route_import.libelle)
 
-            const res   = await this.$callApi('post' ,   '/route_import/store'    ,   formData)         
+            if(this.route_import.new_upload ==  true) {
+
+                formData.append("new_upload"                ,   this.route_import.new_upload)
+                formData.append("data"                      ,   JSON.stringify(this.clients))
+
+                formData.append("file"                      ,   this.route_import.file)
+            }
+
+            else {
+
+                formData.append("new_upload"                ,   this.route_import.new_upload)
+                formData.append("data"                      ,   JSON.stringify(this.clients))
+
+                formData.append("id_route_import_tempo"     ,   this.route_import.id_route_import_tempo)
+                formData.append("file_route_import_tempo"   ,   this.route_import.file_route_import_tempo)
+            }
+
+            const res   = await this.$callApi('post'    ,   '/route_import/store'   ,   formData)         
             console.log(res.data)
 
             if(res.status===200){
@@ -182,10 +202,12 @@ export default {
 
                             await this.setDistrictNoCityNo()
 
+                            this.route_import.new_upload    =   true
+                            this.route_import.sent_tempo    =   false
+
                             // Hide Loading Page
                             this.$hideLoadingPage()
-
-                        };             
+                        };           
                     }
 
                     else {
@@ -202,14 +224,16 @@ export default {
             }
         },
 
-        showResume() {
+        //
 
-            this.$refs.modalResume.setResume(this.clients)
+        async showResume() {
+
+            await this.$refs.modalResume.getClients()
         },
 
-        showResumeValidate() {
+        async showResumeValidate() {
 
-            this.$refs.modalResumeValidate.setResumeValidate()
+            await this.$refs.modalResumeValidate.setResumeValidate()
         },
 
         //
@@ -357,6 +381,10 @@ export default {
 
             if(res.status===200){
 
+                await this.getDataTempo()
+
+                //
+
                 this.$hideLoadingPage()
 
                 // Send Feedback
@@ -376,19 +404,49 @@ export default {
 
             this.$showLoadingPage()
 
+            // Set Data
+
             const res   = await this.$callApi('post' ,   '/route_import_tempo/last'    ,   null)         
-            console.log(res.data)
 
             if(res.status===200){
 
+                if(res.data    ==  "")  {
+
+                }
+
+                else {
+
+                    this.route_import.sent_tempo     =   true
+
+                    if(typeof res.data.clients              !=  "undefined") {
+
+                        this.clients                                                =   res.data.clients
+                    }
+
+                    if(typeof res.data.id                   !=  "undefined") {
+
+                        this.route_import.id_route_import_tempo                     =   res.data.id
+                    }
+
+                    if(typeof res.data.libelle              !=  "undefined") {
+
+                        this.route_import.libelle                                   =   res.data.libelle
+                    }
+
+                    if(typeof res.data.file                 !=  "undefined") {
+
+                        this.route_import.file_route_import_tempo                   =   res.data.file
+                        this.route_import.new_upload                                =   false
+                    }
+
+                    if(typeof res.data.file_original_name   !=  "undefined") {
+
+                        this.route_import.file_original_name                        =   res.data.file_original_name
+                        this.createFile(res.data.file_original_name)
+                    }
+                }
+
                 this.$hideLoadingPage()
-
-                this.clients                            =   res.data.clients
-
-                // Route Import
-                this.route_import.libelle               =   res.data.libelle
-                this.route_import.file                  =   res.data.file
-                this.route_import.file_original_name    =   res.data.file_original_name
             }
             
             else{
@@ -398,6 +456,54 @@ export default {
                 // Send Errors
                 this.$showErrors("Error !", res.data.errors)
 			}
+        },
+
+        //
+
+        createFile(original_name) {
+
+            // Create a new workbook
+            const workbook = XLSX.utils.book_new();
+
+            // Create a new worksheet
+            const worksheet = XLSX.utils.aoa_to_sheet([["Hello", "World"]]);
+
+            // Add the worksheet to the workbook
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+            // Generate the Excel file binary data
+            const excelBinaryData = XLSX.write(workbook, { type: "binary", bookType: "xlsx" });
+
+            // Convert the binary data to a Blob
+            const fileData = new Blob([this.s2ab(excelBinaryData)], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+
+            // Create a new file object
+            const file = new File([fileData], original_name, { type: fileData.type });
+
+            // Get the file input element
+            const fileInput = document.getElementById("file");
+
+            // Create a new file list
+            const fileList = new DataTransfer();
+
+            // Add the file to the file list
+            fileList.items.add(file);
+
+            // Set the file list to the file input
+            fileInput.files = fileList.files;
+        },
+
+        // Utility function to convert a string to ArrayBuffer
+        s2ab(s) {
+
+            const buf = new ArrayBuffer(s.length);
+            const view = new Uint8Array(buf);
+
+            for (let i = 0; i < s.length; i++) {
+                view[i] = s.charCodeAt(i) & 0xFF;
+            }
+
+            return buf;
         }
     }
 }
