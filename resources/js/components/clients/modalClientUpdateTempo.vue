@@ -160,7 +160,7 @@ export default {
         }
     },
 
-    props : ["id_route_import_tempo"],
+    props : ["id_route_import_tempo", "modal_source"],
 
     mounted() {
 
@@ -204,11 +204,26 @@ export default {
                 // Hide Loading Page
                 this.$hideLoadingPage()
 
-                await this.$parent.updateClientDoubleTel(this.client)
-                await this.$parent.updateClientDoubleLatitudeLongitude(this.client)
-                await this.$parent.updateClientDoubleCustomerNameE(this.client)
-                await this.$parent.updateClientDoubleCustomerCode(this.client)
+                if(this.modal_source    ==  "CustomerCode") {
 
+                    this.emitter.emit("updateDoublesCustomerCode"   , this.client)
+                }
+
+                if(this.modal_source    ==  "CustomerNameE") {
+
+                    this.emitter.emit("updateDoublesCustomerNameE"  , this.client)
+                }
+
+                if(this.modal_source    ==  "Tel") {
+
+                    this.emitter.emit("updateDoublesTel"            , this.client)
+                }
+
+                if(this.modal_source    ==  "GPS") {
+
+                    this.emitter.emit("updateDoublesGPS"            , this.client)
+                }
+            
                 // Close Modal
                 this.$hideModal("modalClientUpdateTempo")
             }
@@ -236,10 +251,25 @@ export default {
                 // Hide Loading Page
                 this.$hideLoadingPage()
 
-                await this.$parent.deleteClientDoubleTel(this.client)
-                await this.$parent.deleteClientDoubleLatitudeLongitude(this.client)
-                await this.$parent.deleteClientDoubleCustomerNameE(this.client)
-                await this.$parent.deleteClientDoubleCustomerCode(this.client)
+                if(this.modal_source    ==  "CustomerCode") {
+
+                    this.emitter.emit("deleteDoublesCustomerCode"   , this.client)
+                }
+
+                if(this.modal_source    ==  "CustomerNameE") {
+
+                    this.emitter.emit("deleteDoublesCustomerNameE"  , this.client)
+                }
+
+                if(this.modal_source    ==  "Tel") {
+
+                    this.emitter.emit("deleteDoublesTel"            , this.client)
+                }
+
+                if(this.modal_source    ==  "GPS") {
+
+                    this.emitter.emit("deleteDoublesGPS"            , this.client)
+                }
 
                 // Close Modal
                 this.$hideModal("modalClientUpdateTempo")
@@ -293,6 +323,8 @@ export default {
         },
 
         getData(client) {
+
+            console.log(client)
 
             this.getClientData(client)  
             this.getComboData()  

@@ -44,28 +44,47 @@ class ClientTempo extends Model
 
         $clients    =   json_decode($request->get("data"));
 
-        foreach ($clients as $client) {
+        foreach ($clients as $client_elem) {
 
             // Client
 
             $client         =   new ClientTempo([
-                'CustomerCode'              =>  $client->CustomerCode   ,
-                'CustomerNameE'             =>  $client->CustomerNameE  ,
-                'CustomerNameA'             =>  $client->CustomerNameA  ,
-                'Latitude'                  =>  $client->Latitude       ,
-                'Longitude'                 =>  $client->Longitude      ,
-                'Address'                   =>  $client->Address        ,
-                'DistrictNo'                =>  $client->DistrictNo     ,
-                'DistrictNameE'             =>  $client->DistrictNameE  ,
-                'CityNo'                    =>  $client->CityNo         ,
-                'CityNameE'                 =>  $client->CityNameE      ,
-                'Tel'                       =>  $client->Tel            ,
-                'CustomerType'              =>  $client->CustomerType   ,
-                'JPlan'                     =>  $client->JPlan          ,
-                'Journee'                   =>  $client->Journee        ,
+                'CustomerCode'              =>  $client_elem->CustomerCode   ,
+                'CustomerNameE'             =>  $client_elem->CustomerNameE  ,
+                'CustomerNameA'             =>  $client_elem->CustomerNameA  ,
+                'Latitude'                  =>  $client_elem->Latitude       ,
+                'Longitude'                 =>  $client_elem->Longitude      ,
+                'Address'                   =>  $client_elem->Address        ,
+                'DistrictNo'                =>  $client_elem->DistrictNo     ,
+                'DistrictNameE'             =>  $client_elem->DistrictNameE  ,
+                'CityNo'                    =>  $client_elem->CityNo         ,
+                'CityNameE'                 =>  $client_elem->CityNameE      ,
+                'Tel'                       =>  $client_elem->Tel            ,
+                'CustomerType'              =>  $client_elem->CustomerType   ,
                 'id_route_import_tempo'     =>  $id_route_import_tempo  ,
                 'owner'                     =>  Auth::user()->id
             ]);
+
+            if($client_elem->JPlan      !=  null) {
+
+                $client->JPlan                  =   $client_elem->JPlan;
+            }
+
+            else {
+
+                $client->JPlan                  =   "";
+            }
+
+            if($client_elem->Journee    !=  null) {
+
+                $client->Journee                =   $client_elem->Journee;
+            }
+
+            else {
+
+                $client->Journee                =   "";
+            }
+
 
             $client->save();
         }
@@ -87,8 +106,26 @@ class ClientTempo extends Model
         $client->CityNameE                  =   $request->get("CityNameE");
         $client->Tel                        =   $request->get("Tel");
         $client->CustomerType               =   $request->get("CustomerType");
-        $client->JPlan                      =   $request->get("JPlan");
-        $client->Journee                    =   $request->get("Journee");
+
+        if($request->get("JPlan")   !=  null) {
+
+            $client->JPlan              =   $request->get("JPlan");
+        }
+
+        else {
+
+            $client->JPlan              =   "";
+        }
+
+        if($request->get("Journee") !=  null) {
+
+            $client->Journee            =   $request->get("Journee");
+        }
+
+        else {
+
+            $client->Journee            =   "";
+        }
 
         $client->save();
 
@@ -128,10 +165,27 @@ class ClientTempo extends Model
             $client->CityNameE                  =   $client_tempo->CityNameE;
             $client->Tel                        =   $client_tempo->Tel;
             $client->CustomerType               =   $client_tempo->CustomerType;
-            $client->JPlan                      =   $client_tempo->JPlan;
-            $client->Journee                    =   $client_tempo->Journee;
             $client->id_route_import_tempo      =   $client_tempo->id_route_import_tempo;
-            $client->owner                      =   $client_tempo->owner;
+
+            if($client_tempo->JPlan     !=  null) {
+
+                $client->JPlan                  =   $client_tempo->JPlan;
+            }
+
+            else {
+
+                $client->JPlan                  =   "";
+            }
+
+            if($client_tempo->Journee   !=  null) {
+
+                $client->Journee                =   $client_tempo->Journee;
+            }
+
+            else {
+
+                $client->Journee                =   "";
+            }
 
             $client->save();
         }
@@ -150,96 +204,67 @@ class ClientTempo extends Model
 
         $getDoublant    =   new stdClass();
 
-
-        $getDoublant->getDoublantTel                    =   DB::table('clients_tempo')
-                                                            ->where('id_route_import_tempo', $id_route_import_tempo)
-                                                            ->whereIn('Tel', function ($query) {
-                                                                $query->select('Tel')
-                                                                    ->from('clients_tempo')
-                                                                    ->groupBy('Tel')
-                                                                    ->havingRaw('COUNT(*) > 1');
-                                                            })
-                                                            ->get();
-
-
-        $getDoublant->getDoublantLatitudeLongitude      =   DB::table('clients_tempo')
-                                                            ->where('id_route_import_tempo', $id_route_import_tempo)
-                                                            ->whereIn(DB::raw('(Latitude, Longitude)'), function ($query) {
-                                                                $query->select('Latitude', 'Longitude')
-                                                                    ->from('clients_tempo')
-                                                                    ->groupBy('Latitude', 'Longitude')
-                                                                    ->havingRaw('COUNT(*) > 1');
-                                                            })
-                                                            ->get();
-
-        $getDoublant->getDoublantCustomerNameE          =   DB::table('clients_tempo')
-                                                            ->where('id_route_import_tempo', $id_route_import_tempo)
-                                                            ->whereIn('CustomerNameE', function ($query) {
-                                                                $query->select('CustomerNameE')
-                                                                    ->from('clients_tempo')
-                                                                    ->groupBy('CustomerNameE')
-                                                                    ->havingRaw('COUNT(*) > 1');
-                                                            })
-                                                            ->get();
-
-        $getDoublant->getDoublantCustomerCode           =   DB::table('clients_tempo')
-                                                            ->where('id_route_import_tempo', $id_route_import_tempo)
-                                                            ->whereIn('CustomerCode', function ($query) {
-                                                                $query->select('CustomerCode')
-                                                                    ->from('clients_tempo')
-                                                                    ->groupBy('CustomerCode')
-                                                                    ->havingRaw('COUNT(*) > 1');
-                                                            })
-                                                            ->get();
-
-        /*
-
-        $getDoublantTel                 =   "   SELECT *
-                                                FROM clients_tempo
-                                                WHERE clients_tempo.Tel IN (
-                                                    SELECT clients_tempo.Tel
-                                                    FROM clients_tempo
-                                                    GROUP BY clients_tempo.Tel
-                                                    HAVING COUNT(*) > 1
-                                            )";
-
-        $getDoublantLatitudeLongitude   =   "   SELECT *
-                                                FROM clients_tempo
-                                                WHERE (Latitude, Longitude) IN (
-                                                    SELECT Latitude, Longitude
-                                                    FROM clients_tempo
-                                                    GROUP BY Latitude, Longitude
-                                                    HAVING COUNT(*) > 1
-                                            )";
-
-        $getDoublantCustomerNameE       =   "   SELECT *
-                                                FROM clients_tempo
-                                                WHERE CustomerNameE IN (
-                                                    SELECT CustomerNameE
-                                                    FROM clients_tempo
-                                                    GROUP BY CustomerNameE
-                                                    HAVING COUNT(*) > 1
-                                            )";
-
-        $getDoublantCustomerCode        =   "   SELECT *
-                                                FROM clients_tempo
-                                                WHERE CustomerCode IN (
-                                                    SELECT CustomerCode
-                                                    FROM clients_tempo
-                                                    GROUP BY CustomerCode
-                                                    HAVING COUNT(*) > 1
-                                            )";
-
-        $getDoublant->getDoublantTel                    =   DB::select($getDoublantTel);
-
-        $getDoublant->getDoublantLatitudeLongitude      =   DB::select($getDoublantLatitudeLongitude);
-
-        $getDoublant->getDoublantCustomerNameE          =   DB::select($getDoublantCustomerNameE);
-
-        $getDoublant->getDoublantCustomerCode           =   DB::select($getDoublantCustomerCode);
-
-        */
+        $getDoublant->getDoublantCustomerCode           =   ClientTempo::getDoublesCustomerCodeClients($id_route_import_tempo);
+        $getDoublant->getDoublantCustomerNameE          =   ClientTempo::getDoublesCustomerNameEClients($id_route_import_tempo);
+        $getDoublant->getDoublantTel                    =   ClientTempo::getDoublesTelClients($id_route_import_tempo);
+        $getDoublant->getDoublantLatitudeLongitude      =   ClientTempo::getDoublesGPSClients($id_route_import_tempo);
 
         return $getDoublant;
+    }
+
+    public static function getDoublesTelClients(int $id_route_import_tempo) {
+
+        return  DB::table('clients_tempo')
+                    ->where('id_route_import_tempo', $id_route_import_tempo)
+                    ->whereIn('Tel', function ($query) use ($id_route_import_tempo) {
+                        $query->select('Tel')
+                            ->from('clients_tempo')
+                            ->where('id_route_import_tempo', $id_route_import_tempo)
+                            ->groupBy('Tel')
+                            ->havingRaw('COUNT(*) > 1');
+                    })
+                    ->get();
+    } 
+
+    public static function getDoublesCustomerCodeClients(int $id_route_import_tempo) {
+
+        return  DB::table('clients_tempo')
+                    ->where('id_route_import_tempo', $id_route_import_tempo)
+                    ->whereIn('CustomerCode', function ($query) use ($id_route_import_tempo) {
+                        $query->select('CustomerCode')
+                            ->from('clients_tempo')
+                            ->where('id_route_import_tempo', $id_route_import_tempo)
+                            ->groupBy('CustomerCode')
+                            ->havingRaw('COUNT(*) > 1');
+                    })
+                    ->get();
+    }
+
+    public static function getDoublesCustomerNameEClients(int $id_route_import_tempo) {
+
+        return  DB::table('clients_tempo')
+                    ->where('id_route_import_tempo', $id_route_import_tempo)
+                    ->whereIn('CustomerNameE', function ($query) use ($id_route_import_tempo) {
+                        $query->select('CustomerNameE')
+                            ->from('clients_tempo')
+                            ->where('id_route_import_tempo', $id_route_import_tempo)
+                            ->groupBy('CustomerNameE')
+                            ->havingRaw('COUNT(*) > 1');
+                    })
+                    ->get();
+    }
+
+    public static function getDoublesGPSClients(int $id_route_import_tempo) {
+
+        return  DB::table('clients_tempo')
+                    ->where('id_route_import_tempo', $id_route_import_tempo)
+                    ->whereIn(DB::raw('(Latitude, Longitude)'), function ($query) use ($id_route_import_tempo) {
+                        $query->select('Latitude', 'Longitude')
+                            ->from('clients_tempo')
+                            ->where('id_route_import_tempo', $id_route_import_tempo)
+                            ->groupBy('Latitude', 'Longitude')
+                            ->havingRaw('COUNT(*) > 1');
+                    })
+                    ->get();
     }
 }

@@ -49,7 +49,7 @@ class Journee extends Model
         $validator = Validator::make($request->all(), [
             'Journee'       =>  ["required", "max:255"],
             'JPlan'         =>  ["required", "max:255"],
-            'latlngs'       =>  ["required", "max:255"],
+            'latlngs'       =>  ["required"],
             'color'         =>  ["required", "max:255"],
         ]);
     
@@ -79,7 +79,7 @@ class Journee extends Model
         $validator = Validator::make($request->all(), [
             'Journee'       =>  ["required", "max:255"],
             'JPlan'         =>  ["required", "max:255"],
-            'latlngs'       =>  ["required", "max:255"],
+            'latlngs'       =>  ["required"],
             'color'         =>  ["required", "max:255"],
         ]);
     

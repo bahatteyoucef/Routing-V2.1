@@ -1,0 +1,86 @@
+@media screen and (max-width:650px) {
+
+    #main_content {
+
+        margin-top  : 5px;
+        transition  : margin 0.3s ease-in-out;
+    }
+
+    #mini_logo_custom {
+        
+        padding-left: 0px   !important;
+    }
+
+    #logo_div_parent {
+
+        width       : 100%  !important;
+    }
+
+    #mini_logo_custom_image {
+
+        width       : 175px !important;
+        height      : 35px  !important;
+    }
+
+    #header_menu_buttons_div {
+
+        display     : block !important;
+        margin-top  : 21px  !important;
+    }
+
+    #header_menu {
+
+        width       : 100%; 
+        display     : none
+    }
+
+    .modal {
+
+        height      : 90%   !important;
+    }
+
+    /* Map */
+
+    #show_route_datatable_icon_div {
+
+        left        :   45% ;
+        /* bottom      :   15% ; */
+    }
+
+    #hide_route_datatable_icon_div {
+
+        bottom      :   53% ;
+        /* left        :   46% ; */
+    }
+
+    #map_top_middle_options_div {
+
+        left        :   31%     ;
+        top         :   85px    ;
+    }
+
+    .map_top_buttons_parent_div {
+
+        display             :   none    ;
+        width               :   100%    ;
+        left                :   0px     ;
+        top                 :   155px   ;
+        background-color    : white   ;
+        padding-top         :   15px    ;
+        padding-bottom      :   15px    ;
+    }
+
+    .map_top_buttons_div {
+
+        width       :   95%     ;
+        margin      :   auto    ;
+    }
+
+    #map_options_buttons_div {
+
+        display     : block !important;
+    }
+
+    /*  */
+
+}

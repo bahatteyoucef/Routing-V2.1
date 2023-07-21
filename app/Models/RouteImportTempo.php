@@ -56,6 +56,16 @@ class RouteImportTempo extends Model
     public static function storeRouteImportTempo(Request $request) 
     {
 
+        if(Auth::user()->hasRole("Admin")) {
+
+            $liste_route_import    =   RouteImport::where("owner", Auth::user()->id)->get();
+
+            if(count($liste_route_import)   >=  Auth::user()->max_route_import) {
+
+                throw new Exception("You have achieved the maximum nombre of route imports !");
+            }
+        }
+
         RouteImportTempo::deleteRouteImportTempo();
 
         $route_import_tempo =   new RouteImportTempo([

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -30,7 +31,7 @@ class ClientController extends Controller
             }
 
             // store 
-            Client::storeClient($request, $id_route_import);
+            $client =   Client::storeClient($request, $id_route_import);
 
             //
             DB::commit();
@@ -38,7 +39,8 @@ class ClientController extends Controller
 
             return response()->json([   
                 "header"            =>  "Client Added !"                            ,
-                "message"           =>  "a new client has been added successfully !"
+                "message"           =>  "a new client has been added successfully !",
+                "client"            =>  $client
             ]);
         }
 
@@ -205,4 +207,112 @@ class ClientController extends Controller
     }
 
     //
+
+    public function getDoublesClients(int $id_route_import) {
+
+        try {
+
+            $getDoublant    =   Client::getDoublesClients($id_route_import);
+
+            return $getDoublant;
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    public function getDoublesTelClients(int $id_route_import) {
+
+        try {
+
+            $getDoublant    =   Client::getDoublesTelClients($id_route_import);
+
+            return $getDoublant;
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    public function getDoublesCustomerCodeClients(int $id_route_import) {
+
+        try {
+
+            $getDoublant    =   Client::getDoublesCustomerCodeClients($id_route_import);
+
+            return $getDoublant;
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    public function getDoublesCustomerNameEClients(int $id_route_import) {
+
+        try {
+
+            $getDoublant    =   Client::getDoublesCustomerNameEClients($id_route_import);
+
+            return $getDoublant;
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    public function getDoublesGPSClients(int $id_route_import) {
+
+        try {
+
+            $getDoublant    =   Client::getDoublesGPSClients($id_route_import);
+
+            return $getDoublant;
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    //
+
 }

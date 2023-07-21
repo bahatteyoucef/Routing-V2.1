@@ -26,8 +26,12 @@ class UserController extends Controller
 
         if (Auth::attempt($request->all())) {
 
+            $user           =   Auth::user();
+
+            $user->roles    =   $user->getRoleNames();
+
             return response([
-                'user'          => Auth::user(),
+                'user'          => $user                                                ,
                 'access_token'  => Auth::user()->createToken('authToken')->accessToken
             ], Response::HTTP_OK);
         }
@@ -51,7 +55,7 @@ class UserController extends Controller
         try {
 
             $users          =   User::indexUser();
-            return $users;
+            return User::filterUsers($users);
         }
 
         catch(Throwable $erreur) {

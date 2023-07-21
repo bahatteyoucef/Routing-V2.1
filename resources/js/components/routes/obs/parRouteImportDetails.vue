@@ -62,9 +62,26 @@
 
                         </div>
                     </div>
+
+                    <!--  -->
+
+                    <div class="col p-0 ml-1" id="map_options_buttons_div"  style="display:none">
+                        <div id="show_map_options_div"  @click="$showMapOptions()">
+                            <span class="page-title-icon bg-gradient-primary text-white mr-2" id="show_map_options_button">
+                            <i class="mdi mdi-chevron-double-left"></i>
+                            </span> 
+                        </div>
+
+                        <div id="hide_map_options_div"  style="display:none" @click="$hideMapOptions()">
+                            <span class="page-title-icon bg-gradient-primary text-white mr-2" id="hide_map_options_button">
+                            <i class="mdi mdi-chevron-double-right"></i>
+                            </span> 
+                        </div>
+                    </div>
+
                 </div>
 
-            </div>                
+            </div>
 
             <!--  -->
         </div>
@@ -79,7 +96,7 @@
         <modalClientsChangeRoute                                        ref="modalClientsChangeRoute"                                                                               >   </modalClientsChangeRoute>
 
         <!-- Modal Decoupe By Journee       -->
-        <modalResume                                                    ref="modalResume"               :key="Date.now()"                                       :type="'permanent'" >   </modalResume>
+        <modalResume                                                    ref="modalResume"               :key="id_route_import"      :type="'permanent'"                             >   </modalResume>
 
         <!-- Modal Add New Journey Plan     -->
         <modalAddJourneyPlan                                            ref="modalAddJourneyPlan"                                                                                   >   </modalAddJourneyPlan>
@@ -87,110 +104,122 @@
         <!-- Modal Add New Journey Plan     -->
         <modalUpdateJourneyPlan                                         ref="modalUpdateJourneyPlan"                                                                                >   </modalUpdateJourneyPlan>
 
+        <!-- Modal Update Map               -->
+        <modalUpdateMap                                                 ref="modalUpdateMap"           :key="id_route_import"       :id_route_import="id_route_import"              >   </modalUpdateMap>
+
+        <!-- Modal Update Map               -->
+        <modalValidateMap                                               ref="modalValidateMap"         :key="id_route_import"       :id_route_import="id_route_import"              >   </modalValidateMap>
+
         <!--                                -->   
 
         <div id="tableau_data">
 
             <!-- Buttons and Filter -->
-            <div class="map_top_buttons_div">
-                <div class="row">
+            <div class="map_top_buttons_parent_div animate__animated" id="map_top_buttons_parent_div">
+                <div class="map_top_buttons_div" id="map_top_buttons_div">
+                    <div class="row">
 
-                    <div class="col-5">
-                        <button class="btn primary w-100 m-0 mt-1"                                                          @click="focuseMarkers()">Focus</button>
-                        <button class="btn primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#modalResume'" @click="showResume()">Resume</button>
-                        <button class="btn primary w-100 m-0 mt-1"                                                          @click="showTerritories()">Auto Territories</button>
-                        <button class="btn primary w-100 m-0 mt-1"                                                          @click="showJPlanBDTerritories()">JPlan Territories</button>
-                        <button class="btn primary w-100 m-0 mt-1"                                                          @click="showJourneeBDTerritories()">Journee Territories</button>
-                    </div>
+                        <div class="col-5">
+                            <button class="btn primary w-100 m-0 mt-1"                                                                  @click="focuseMarkers()">Focus</button>
+                            <button class="btn primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#modalResume'"         @click="showResume()">Resume</button>
+                            <button class="btn primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#modalUpdateMap'"      >Update</button>
+                            <button class="btn primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#modalValidateMap'"    @click="getDoubles()">Validate</button>
+                            <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showTerritories()">Auto Territories</button>
+                            <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showJPlanBDTerritories()">JPlan Territories</button>
+                            <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showJourneeBDTerritories()">Journee Territories</button>
+                        </div>
 
-                    <div class="col-7">
+                        <!--  -->
 
-                        <select class="form-select w-100 m-0 mt-1"                                                          @change="reAfficherClientsAndMarkers()"  v-model="column_group">
-                            <option value="1">JPlan</option>
-                            <option value="2">DistrictNameE</option>
-                            <option value="3">CityNameE</option>
-                            <option value="4">CustomerType</option>
-                            <option value="5">Journee</option>
-                        </select>
+                        <div class="col-7">
 
-                        <!-- Journey Plan   -->
-                        <Multiselect
-                            v-model     =   "journey_plan_filter_value"
-                            :options    =   "liste_journey_plan"
-                            mode        =   "tags"
-                            placeholder =   "Filter By JPlan"
-                            class       =   "mt-1"
+                            <select class="form-select w-100 m-0 mt-1"                                                          @change="reAfficherClientsAndMarkers()"  v-model="column_group">
+                                <option value="1">JPlan</option>
+                                <option value="2">DistrictNameE</option>
+                                <option value="3">CityNameE</option>
+                                <option value="4">CustomerType</option>
+                                <option value="5">Journee</option>
+                            </select>
 
-                            :close-on-select    =   "false"
-                            :searchable         =   "true"
-                            :create-option      =   "true"
+                            <!-- Journey Plan   -->
+                            <Multiselect
+                                v-model     =   "journey_plan_filter_value"
+                                :options    =   "liste_journey_plan"
+                                mode        =   "tags"
+                                placeholder =   "Filter By JPlan"
+                                class       =   "mt-1"
 
-                            @change             =   "reAfficherClientsAndMarkers()"
-                        />
-                        <!--                -->
+                                :close-on-select    =   "false"
+                                :searchable         =   "true"
+                                :create-option      =   "true"
 
-                        <!-- District       -->
-                        <Multiselect
-                            v-model     =   "district_filter_value"
-                            :options    =   "districts"
-                            mode        =   "tags"
-                            placeholder =   "Filter By DistrictNameE"
-                            class       =   "mt-1"
+                                @change             =   "reAfficherClientsAndMarkers()"
+                            />
+                            <!--                -->
 
-                            :close-on-select    =   "false"
-                            :searchable         =   "true"
-                            :create-option      =   "true"
+                            <!-- District       -->
+                            <Multiselect
+                                v-model     =   "district_filter_value"
+                                :options    =   "districts"
+                                mode        =   "tags"
+                                placeholder =   "Filter By DistrictNameE"
+                                class       =   "mt-1"
 
-                            @change             =   "reAfficherClientsAndMarkers()"
-                        />
-                        <!--                -->
+                                :close-on-select    =   "false"
+                                :searchable         =   "true"
+                                :create-option      =   "true"
 
-                        <!-- City           -->
-                        <Multiselect
-                            v-model     =   "city_filter_value"
-                            :options    =   "cites"
-                            mode        =   "tags"
-                            placeholder =   "Filter By CityNameE"
-                            class       =   "mt-1"
+                                @change             =   "reAfficherClientsAndMarkers()"
+                            />
+                            <!--                -->
 
-                            :close-on-select    =   "false"
-                            :searchable         =   "true"
-                            :create-option      =   "true"
+                            <!-- City           -->
+                            <Multiselect
+                                v-model     =   "city_filter_value"
+                                :options    =   "cites"
+                                mode        =   "tags"
+                                placeholder =   "Filter By CityNameE"
+                                class       =   "mt-1"
 
-                            @change             =   "reAfficherClientsAndMarkers()"
-                        />
-                        <!--                -->
+                                :close-on-select    =   "false"
+                                :searchable         =   "true"
+                                :create-option      =   "true"
 
-                        <!-- CustomerType   -->
-                        <Multiselect
-                            v-model     =   "type_client_filter_value"
-                            :options    =   "liste_type_client"
-                            mode        =   "tags"
-                            placeholder =   "Filter By CustomerType"
-                            class       =   "mt-1"
+                                @change             =   "reAfficherClientsAndMarkers()"
+                            />
+                            <!--                -->
 
-                            :close-on-select    =   "false"
-                            :searchable         =   "true"
-                            :create-option      =   "true"
+                            <!-- CustomerType   -->
+                            <Multiselect
+                                v-model     =   "type_client_filter_value"
+                                :options    =   "liste_type_client"
+                                mode        =   "tags"
+                                placeholder =   "Filter By CustomerType"
+                                class       =   "mt-1"
 
-                            @change             =   "reAfficherClientsAndMarkers()"
-                        />
+                                :close-on-select    =   "false"
+                                :searchable         =   "true"
+                                :create-option      =   "true"
 
-                        <!-- Journee        -->
-                        <Multiselect
-                            v-model     =   "journee_filter_value"
-                            :options    =   "liste_journee"
-                            mode        =   "tags"
-                            placeholder =   "Filter By Journee"
-                            class       =   "mt-1"
+                                @change             =   "reAfficherClientsAndMarkers()"
+                            />
 
-                            :close-on-select    =   "false"
-                            :searchable         =   "true"
-                            :create-option      =   "true"
+                            <!-- Journee        -->
+                            <Multiselect
+                                v-model     =   "journee_filter_value"
+                                :options    =   "liste_journee"
+                                mode        =   "tags"
+                                placeholder =   "Filter By Journee"
+                                class       =   "mt-1"
 
-                            @change             =   "reAfficherClientsAndMarkers()"
-                        />
-                        <!--                -->
+                                :close-on-select    =   "false"
+                                :searchable         =   "true"
+                                :create-option      =   "true"
+
+                                @change             =   "reAfficherClientsAndMarkers()"
+                            />
+                            <!--                -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -259,7 +288,7 @@
                     </thead>
                     
                     <tbody>
-                        <tr v-for="(client, index) in clients_table_affiche" :key="client">
+                        <tr v-for="(client, index) in clients_table_affiche" :key="client" role="button" @click="showModalupdateClient(client)">
                             <td>{{index +   1}}</td>
 
                             <td>{{client.CustomerCode}}</td>
@@ -289,6 +318,7 @@
                     </tbody>
                 </table>
             </div>
+
         </div>
  
         <!--                                -->
@@ -308,6 +338,9 @@ import modalResume              from "../imports/modalResume.vue"
 
 import modalAddJourneyPlan      from "../../territoires/modalAddJourneyPlan.vue"
 import modalUpdateJourneyPlan   from "../../territoires/modalUpdateJourneyPlan.vue"
+
+import modalUpdateMap           from "../imports/Map/modalUpdateMap.vue"
+import modalValidateMap         from "../imports/Map/modalValidateMap.vue"
 
 import {mapGetters, mapActions} from "vuex"
 
@@ -373,7 +406,10 @@ export default {
         modalResume                 ,
 
         modalAddJourneyPlan         ,
-        modalUpdateJourneyPlan
+        modalUpdateJourneyPlan      ,
+
+        modalUpdateMap              ,
+        modalValidateMap         
     },
 
     computed: {
@@ -433,9 +469,12 @@ export default {
 
             this.route_import.clients   =   clients
 
-            console.log(1111)
-
             this.reAfficherClientsAndMarkers()
+        })
+
+        this.emitter.on('reSetClientsUpdateMap'             , async ()  =>  {
+
+            await this.getData()
         })
 
         //
@@ -570,6 +609,8 @@ export default {
                     liste_journee_colors[this.liste_journee[key].color]                     =   this.liste_journee[key].color
                 }
             }
+
+            console.log(liste_journey_plan_colors)
 
             // Make Groupe
             for (let i = 0; i < this.route_import.clients.length; i++) {
@@ -1391,6 +1432,7 @@ export default {
             let new_client      =   {}
 
             // Add Client
+            new_client.id               =   client.id
             new_client.CustomerCode     =   client.CustomerCode
 
             new_client.CustomerNameE    =   client.CustomerNameE
@@ -1546,6 +1588,11 @@ export default {
             await this.$refs.modalResume.getClients()
         },
 
+        async getDoubles() {
+
+            await this.$refs.modalValidateMap.getDoubles()
+        },
+
         // Map
 
         addMap() {
@@ -1574,6 +1621,16 @@ export default {
 
                 console.log(e)
             }
+        },
+
+        showModalupdateClient(client) {
+
+            // ShowModal
+            var updateModal     =   new Modal(document.getElementById("updateClientModal"));
+            updateModal.show();
+
+            // Send DATA To Modal
+            this.updateClient(client)
         },
 
         async updateClientsRoute(clients) {

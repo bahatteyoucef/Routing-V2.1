@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Fluent;
@@ -29,7 +30,12 @@ class RouteImport extends Model
     public static function indexRouteImport()
     {
 
-        $liste_route_import =   RouteImport::where('owner', Auth::user()->id)->orderBy("id")->get();
+        $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
+
+        foreach ($liste_route_import as $route_import) {
+
+            $route_import->clients          =   Client::where("id_route_import", $route_import->id)->get();
+        }
 
         return $liste_route_import;
     }
@@ -71,7 +77,14 @@ class RouteImport extends Model
             $fileName               =   uniqid().'.'.$request->file->getClientOriginalExtension();
             $request->file->move(public_path('uploads/route_import/'.Auth::user()->id), $fileName);
 
-            $route_import->file     =   $fileName;
+            // 
+
+            $route_import_filename  =   new RouteImportFile();
+
+            $route_import_filename->id_route_import     =   $route_import->id;
+            $route_import_filename->file                =   $fileName;
+
+            $route_import_filename->save();
         }
 
         else {
@@ -100,7 +113,14 @@ class RouteImport extends Model
 
             File::move(public_path('uploads/'.'route_import_tempo/'.Auth::user()->id.'/'.$fileName), public_path('uploads/'.'route_import/'.Auth::user()->id.'/'.$fileName));
 
-            $route_import->file     =   $fileName;
+            // 
+
+            $route_import_filename                      =   new RouteImportFile();
+
+            $route_import_filename->id_route_import     =   $route_import->id;
+            $route_import_filename->file                =   $fileName;
+
+            $route_import_filename->save();
         }
 
         $route_import->save();
@@ -111,6 +131,16 @@ class RouteImport extends Model
         // Delete Tempo
         RouteImportTempo::deleteRouteImportTempo();
 
+        // Store Relation with User
+        $user_route_import  =   new UserRouteImport([
+
+            'id_user'           =>  Auth::user()->id        ,
+            'id_route_import'   =>  $route_import->id
+        ]);
+
+        $user_route_import->save();
+
+        // 
         return $route_import;
     }
 
@@ -118,7 +148,8 @@ class RouteImport extends Model
     {
 
         $validator = Validator::make($request->all(), [
-            'data'              =>  ["required", "json"]
+            'data'              =>  ["required", "json"]    ,
+            'file'              =>  ["required", "file:xlsx"]
         ]);
 
         return $validator;
@@ -127,9 +158,34 @@ class RouteImport extends Model
     public static function updateRouteImport(Request $request, int $id)
     {
 
-        $route_import       =   RouteImport::find($id);
+        $fileName               =   uniqid().'.'.$request->file->getClientOriginalExtension();
+        $request->file->move(public_path('uploads/route_import/'.Auth::user()->id), $fileName);
 
-        $route_import->save();
+        // 
+
+        $route_import_filename  =   new RouteImportFile();
+
+        $route_import_filename->id_route_import     =   $id;
+        $route_import_filename->file                =   $fileName;
+
+        $route_import_filename->save();
+
+        // 
+
+        // Store Data
+        RouteImport::storeData($request, $id);
+    }
+
+    public static function showRouteImport(int $id)
+    {
+
+        $route_import                       =   RouteImport::find($id);
+
+        $route_import->clients              =   Client::where("id_route_import", $id)->get();
+        $route_import->liste_journey_plan   =   JourneyPlan::where("id_route_import", $id)->get();
+        $route_import->liste_journee        =   Journee::where("id_route_import", $id)->get();
+
+        return $route_import;
     }
 
     public static function deleteRouteImport(int $id)
@@ -150,7 +206,7 @@ class RouteImport extends Model
     public static function journeyPlan(int $id) 
     {
 
-        $liste_journey_plan =   JourneyPlan::where([['id_route_import', $id],['owner', Auth::user()->id]])->orderBy("JPlan")->get();
+        $liste_journey_plan =   JourneyPlan::where('id_route_import', $id)->orderBy("JPlan")->get();
 
         return $liste_journey_plan;
     }
@@ -162,12 +218,12 @@ class RouteImport extends Model
 
         if($liste_journey_plan_array  ==  []) {
 
-            $liste_journey_plan =   JourneyPlan::where([['id_route_import', $id],['owner', Auth::user()->id]])->whereNotNull('latlngs')->orderBy("JPlan")->get();
+            $liste_journey_plan =   JourneyPlan::where('id_route_import', $id)->whereNotNull('latlngs')->orderBy("JPlan")->get();
         }
 
         else {
 
-            $liste_journey_plan =   JourneyPlan::where([['id_route_import', $id],['owner', Auth::user()->id]])->whereNotNull('latlngs')->whereIn('JPlan', $liste_journey_plan_array)->orderBy("JPlan")->get();
+            $liste_journey_plan =   JourneyPlan::where('id_route_import', $id)->whereNotNull('latlngs')->whereIn('JPlan', $liste_journey_plan_array)->orderBy("JPlan")->get();
         }
 
         return $liste_journey_plan;
@@ -178,7 +234,7 @@ class RouteImport extends Model
     public static function journees(int $id) 
     {
 
-        $journees   =   Journee::where([['id_route_import', $id],['owner', Auth::user()->id]])->orderBy("JPlan")->get();
+        $journees   =   Journee::where('id_route_import', $id)->orderBy("JPlan")->get();
 
         return $journees;
     }
@@ -193,12 +249,12 @@ class RouteImport extends Model
 
             if($journees_array          ==  []) {
 
-                $liste_journey_plan =   Journee::where([['id_route_import', $id],['owner', Auth::user()->id]])->whereNotNull('latlngs')->orderBy("JPlan")->get();
+                $liste_journey_plan =   Journee::where('id_route_import', $id)->whereNotNull('latlngs')->orderBy("JPlan")->get();
             }
 
             else {
 
-                $liste_journey_plan =   Journee::where([['id_route_import', $id],['owner', Auth::user()->id]])->whereNotNull('latlngs')->whereIn('Journee', $journees_array)->orderBy("JPlan")->get();
+                $liste_journey_plan =   Journee::where('id_route_import', $id)->whereNotNull('latlngs')->whereIn('Journee', $journees_array)->orderBy("JPlan")->get();
             }
         }
 
@@ -206,12 +262,12 @@ class RouteImport extends Model
 
             if($journees_array          ==  []) {
 
-                $liste_journey_plan =   Journee::where([['id_route_import', $id],['owner', Auth::user()->id]])->whereNotNull('latlngs')->whereIn('JPlan', $liste_journey_plan_array)->orderBy("JPlan")->get();
+                $liste_journey_plan =   Journee::where('id_route_import', $id)->whereNotNull('latlngs')->whereIn('JPlan', $liste_journey_plan_array)->orderBy("JPlan")->get();
             }
 
             else {
 
-                $liste_journey_plan =   Journee::where([['id_route_import', $id],['owner', Auth::user()->id]])->whereNotNull('latlngs')->whereIn('JPlan', $liste_journey_plan_array)->whereIn('Journee', $journees_array)->orderBy("JPlan")->get();
+                $liste_journey_plan =   Journee::where('id_route_import', $id)->whereNotNull('latlngs')->whereIn('JPlan', $liste_journey_plan_array)->whereIn('Journee', $journees_array)->orderBy("JPlan")->get();
             }
         }
 
@@ -250,6 +306,7 @@ class RouteImport extends Model
         Client::where("id_route_import", $id)->delete();
         JourneyPlan::where("id_route_import", $id)->delete();
         Journee::where("id_route_import", $id)->delete();
+        RouteImportFile::where("id_route_import", $id)->delete();
     }
 
     //
@@ -303,10 +360,21 @@ class RouteImport extends Model
 
         $route_import           =   RouteImport::find($id);
 
-        $route_import->data     =   Client::where([["id_route_import", $id],['owner', Auth::user()->id]])->get();   
+        $route_import->data     =   Client::where("id_route_import", $id)->get();   
 
         return $route_import;
     }
+
+    //
+
+    // Clients
+
+    public static function clients(int $id)
+    {
+
+        return Client::where("id_route_import", $id)->get();
+    }
+
 
     //
 }

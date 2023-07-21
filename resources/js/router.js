@@ -15,6 +15,12 @@ import Login                    from    "./components/login/login.vue"
 // users
 import Users                    from    "./components/users/index.vue"
 
+// RouteImportTempo
+import RouteImportTempo         from    "./components/routes/imports/routeImportTempo.vue"
+
+// RouteImportClients
+import RouteImportClients       from    "./components/routes/routeImportClients.vue"
+
 //
 
 import RouteImportAdd           from    "./components/routes/imports/RouteImportAdd.vue"
@@ -42,9 +48,21 @@ const routes = [
         component   : Users
     },
 
+    // Route Import Clients
+    {
+        path        : "/route_import/:id_route_import/clients",
+        component   : RouteImportClients
+    },
+
     //  //  //  //  //  OBS     //  //  //
 
     //
+
+    // Imports Tempo
+    {
+        path        : "/route/obs/route_import_tempo",
+        component   : RouteImportTempo
+    },
 
     // Imports Add
     {

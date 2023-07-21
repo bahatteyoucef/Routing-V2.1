@@ -37,7 +37,7 @@
 
     export default {
 
-        props : ["title" , "add_button", "update_button", "add_modal",  "update_modal", "role"],
+        props : ["title" , "add_button", "update_button", "add_modal",  "update_modal"],
 
         data() {
 

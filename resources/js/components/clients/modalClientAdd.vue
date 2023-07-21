@@ -113,6 +113,8 @@ export default {
             client      :   {
 
                 // Client
+                id              :   '',
+
                 CustomerCode    :   '',
 
                 CustomerNameE   :   '',
@@ -196,7 +198,6 @@ export default {
             formData.append("Journee"       ,   this.client.Journee)
 
             const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/store",   formData)
-            console.log(res.data)
 
             if(res.status===200){
 
@@ -204,6 +205,11 @@ export default {
                 this.$hideLoadingPage()
 
                 // Send Client
+
+                this.client.id  =   res.data.client.id
+
+                console.log(this.client)
+
                 this.emitter.emit('reSetAdd' , this.client)
 
                 // Close Modal

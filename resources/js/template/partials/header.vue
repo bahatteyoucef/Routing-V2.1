@@ -1,67 +1,89 @@
 <template>
-    <nav v-if="user.nom" class="navbar navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row navbar-light navbar-expand-lg" id="template-header">
+    <nav v-if="user.nom" class="navbar navbar default-layout-navbar col-sm-lg-12 col-sm-12 p-0 fixed-top d-flex flex-row navbar-light navbar-expand-lg" id="template-header">
         
         <!-- Logo -->
-        <div class="text-center navbar-brand-wrapper d-flex align-items-top justify-content-center">
+        <div class="text-center navbar-brand-wrapper d-flex align-items-top justify-content-center" id="logo_div_parent">
             <router-link to="/" aria-current="page" class="navbar-brand brand-logo active router-link-active p-0">
               <img  :src="'/images/header.png'"     alt="logo" class="mt-2"/>
             </router-link>
 
             <router-link to="/" aria-current="page"   class="navbar-brand brand-logo-mini active router-link-active p-0" id="mini_logo_custom">
-              <img  :src="'/images/mini_header.png'"  alt="logo" id="mini_logo_custom_image"/>
+              <img  :src="'/images/header.png'"     alt="logo" id="mini_logo_custom_image" class="mt-2"/>
             </router-link>
+
+            <div id="header_menu_buttons_div" style="display:none">
+              <div id="show_header_menu_div" @click="$showHeaderMenu()">
+                <span class="page-title-icon bg-gradient-primary text-white mr-2" id="show_header_menu_button">
+                  <i class="mdi mdi-menu-left"></i>
+                </span> 
+              </div>
+
+              <div id="hide_header_menu_div" style="display:none" @click="$hideHeaderMenu()">
+                <span class="page-title-icon bg-gradient-primary text-white mr-2" id="hide_header_menu_button">
+                  <i class="mdi mdi-menu-right"></i>
+                </span> 
+              </div>
+            </div>
+
         </div>
 
-        <div class="navbar-menu-wrapper d-flex align-items-center ml-auto ml-lg-0" id="header_custom">
+        <div class="navbar-menu-wrapper d-flex align-items-end row h-100 w-100 pr-0 pl-4">
 
-            <!-- Route -->
-            <div class="d-flex align-items-left w-25" id="header_select_route">
-              <Multiselect
-                  v-model             =   "route_link"
-                  :options            =   "liste_route_link"
-                  mode                =   "single" 
-                  placeholder         =   "Select Map"
-                  class               =   "mt-1"
+            <!-- Options -->
+            <ul class="navbar-nav navbar-nav-right ml-5 container m-0 mt-1 animate__animated pr-0" id="header_menu">
 
-                  :close-on-select    =   "true"
-                  :searchable         =   "true"
-                  :create-option      =   "true"
+              <!-- Route -->
+              <li class="col-sm-3 nav-item" >
+                <Multiselect
+                    v-if="$isRole('Super Admin')||$isRole('BackOffice')"
 
-                  :canDeselect        =   "false"
-                  :canClear           =   "false"
-                  :allowAbsent        =   "false"
-              />
-            </div>
-            <!--                -->
+                    v-model             =   "route_link"
+                    :options            =   "liste_route_link"
+                    mode                =   "single" 
+                    placeholder         =   "Select Map"
+                    class               =   "mt-1"
 
-            <!-- Profile -->
-            <ul class="navbar-nav navbar-nav-right ml-5 container justify-content-end">
+                    :close-on-select    =   "true"
+                    :searchable         =   "true"
+                    :create-option      =   "true"
 
-              <li class="col-6 nav-item p-3">
+                    :canDeselect        =   "false"
+                    :canClear           =   "false"
+                    :allowAbsent        =   "false"
+                />
+              </li>
+              <!--                -->
+
+              <!-- Buttons        -->
+              <li class="col-sm-7 nav-item">
 
                 <div class="row justify-content-end">
-                  <div class="col-4">
+                  <div class="col-sm-4 mt-1"  v-if="$isRole('Super Admin')">
                     <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToUsers()">Users</button>
                   </div>
 
-                  <div class="col-4">
+                  <div class="col-sm-4 mt-1"  v-if="$isRole('Super Admin')||$isRole('BackOffice')">
                     <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="AddRouteImport()">New Import</button>
+                  </div>
+
+                  <div class="col-sm-4 mt-1"  v-if="($isRole('Super Admin')||$isRole('BackOffice'))&&(route_import_existe)">
+                    <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToRouteTempo()">Suspended Import</button>
                   </div>
                 </div>
 
               </li>
 
               <!-- Profile        -->
-              <li class="col-2 justify-content-end nav-item b-nav-dropdown dropdown nav-profile"  id="profile_header_list_parent">
+              <li class="col-sm-2 nav-item b-nav-dropdown dropdown nav-profile d-flex justify-content-center">
 
                 <span id="profileDropdown" role="button" data-bs-toggle="collapse" href="#profile_header_list" aria-haspopup="true" aria-expanded="false" aria-controls="profile_header_list" class="nav-link dropdown-toggle">
 
-                    <div class="nav-profile-img">
+                    <div class="nav-profile-img mt-1">
                       <img :src="'/images/profile.jpg'" alt="image"/>
                       <span class="availability-status online"></span>
                     </div>
 
-                    <div class="nav-profile-text">
+                    <div class="nav-profile-text mt-1">
                         <p class="mb-1 text-black">
                             {{user.nom}} {{user.prenom}}
                         </p>
@@ -70,7 +92,7 @@
                 </span>
 
                 <ul tabindex="-1" class="dropdown-menu dropdown-menu-right" id="profile_header_list">
-                    <li role="presentation" class="preview-item" @click="logOut()">
+                    <li role="presentation" class="preview-item mt-1" @click="logOut()">
                         <span  role="button" class="dropdown-item">
                           <i class="mdi mdi-logout mr-2 text_light_purple"></i>
                           Log Out
@@ -103,6 +125,8 @@ export default {
 
           liste_route_import  :   null  ,
 
+          route_import_existe :   false ,
+
           user                :   {}
       }
     },
@@ -122,8 +146,11 @@ export default {
 
     async mounted() {
 
+        console.log(this.$isRole('Super Admin'))
+
         this.user = this.getUser
 
+        await this.getRouteTempo()
         await this.fetchMaps()
 
         this.emitter.on('reSetRouteImport'          , async ()    =>  {
@@ -141,6 +168,27 @@ export default {
         ]),
 
         // 
+
+        async getRouteTempo() {
+
+          try {
+
+            this.$callApi("post",    "/route_import_tempo/last", null)
+            .then((res)=> {
+
+              console.log(res.data)
+
+              if(res.data) {
+
+                this.route_import_existe  = true
+              }
+            })
+          }
+          catch(e) {
+
+              console.log(e)
+          }
+        }, 
 
         async fetchMaps() {
 
@@ -194,6 +242,8 @@ export default {
             this.$router.push('/route/obs/route_import/add')
         },
 
+        //
+
         goToUsers() {
 
             // Go To Route
@@ -206,6 +256,11 @@ export default {
 
               this.$goTo('/route/obs/route_import/'+this.route_link+'/details')
             }
+        },
+
+        goToRouteTempo() {
+
+            this.$goTo('/route/obs/route_import_tempo')
         },
 
         //

@@ -7,8 +7,11 @@ import authentification from    './mixin/authentification'
 import feedbacks        from    './mixin/feedbacks'
 import globals          from    './mixin/globals'
 import datatables       from    './mixin/datatables'
+import responsive       from    './mixin/responsive'
 
 import Map              from    './services/map'
+import IndexedDB        from    './services/indexedDB'
+
 // 
 
 // Creating the app
@@ -20,6 +23,18 @@ const app           =   createApp(App)
 
 app.config.globalProperties.$map        =   new Map()
 
+// IndexedDB
+app.config.globalProperties.$indexedDB  =   new IndexedDB()
+app.config.globalProperties.$indexedDB.$indexedDB_intialiazeSetDATA()
+
+// 
+
+if (window.navigator.onLine) {
+    app.config.globalProperties.$connectedToInternet  =   true
+} else {
+    app.config.globalProperties.$connectedToInternet  =   false
+}
+
 // 
 
 // Event Bus
@@ -28,11 +43,13 @@ import mitt from 'mitt'
 
 const emitter       =   mitt()
 app.config.globalProperties.emitter             =   emitter
-app.config.globalProperties.$colors             =   [   '#00CCFF', '#6ECC39', '#F0C20C', '#F1D3B7', '#FF0066', '#FF99CC', '#CC99FF', '#F0C2DC', 
-                                                        '#33CCFF', '#6ECCB9', '#F0C200', '#9933FF', '#F1D357', '#FF3399', '#F1D3F7', '#F180B7',
-                                                        '#33FFFF', '#66FF99', '#F18E17', '#9900CC', '#FFCC00', '#FF6699', '#F180C7', '#F180E7', 
-                                                        '#99CCFF', '#99FF99', '#F18017', '#F1D3D3', '#FFCC99', '#FD9CE3', '#FF9966', '#FF6600', 
-                                                        '#99FFFF', '#99FFCC', '#F18417', '#FD9C73', '#CCFF00', '#FF33CC', '#B5E28C', '#B5E2FC'  ];
+
+app.config.globalProperties.$colors             =   [   '#A52714'       , '#F9A825'     , '#3949AB'     , '#817717'     , '#558B2F'     , 
+                                                        '#097138'       , '#006064'     , '#01579B'     , '#1A237E'     , '#673AB7'     ,
+                                                        '#4E342E'       , '#C2185B'     , '#FF5252'     , '#F57C00'     , '#000000'     ,
+                                                        '#FFEA00'       , '#AFB42B'     , '#7CB342'     , '#0F9D58'     , '#0097A7'     ,
+                                                        '#0288D1'       , '#FFD600'     , '#9C27B0'     , '#E65100'     , '#880E4F'     ,
+                                                        '#795548'       , '#BDBDBD'     , '#757575'     , '#424243'     , '#FBC02D'     ]
 
 // 
 
@@ -112,11 +129,26 @@ if(JSON.parse(localStorage.getItem('vuex')) !=  null) {
 
 // 
 
+// Check if Mobile
+
+if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+
+    app.config.globalProperties.device  =   "mobile"
+}
+
+else {
+
+    app.config.globalProperties.device  =   "laptop"
+}
+
+// 
+
 // Mixin
 app.mixin(authentification)
 app.mixin(feedbacks)
 app.mixin(globals)
 app.mixin(datatables)
+app.mixin(responsive)
 // 
 
 //Sweet Alert

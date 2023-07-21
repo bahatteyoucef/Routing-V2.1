@@ -80,12 +80,12 @@ export default {
 
             let role_principale    =   this.$rolePrincipale()
 
-            if(role_principale ==  "Administrateur") {
+            if(role_principale ==  "Super Admin") {
 
                 return true
             }
 
-            if(role_principale ==  "RTM Manager") {
+            if(role_principale ==  "Admin") {
 
                 if((role ==  "RTM Manager")||(role ==  "BU Manager")||(role ==  "Salesman")) {
 

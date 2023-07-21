@@ -9,14 +9,6 @@
                             <div class="col-10">
                                 <h5 class="modal-title">Import a new Routing</h5>
                             </div>
-
-                            <div class="col-1 text-right">
-                                <button class="btn btn-primary btn-block" @click="sendDataTempo()">Send Data</button>
-                            </div>
-
-                            <div class="col-1 text-right">
-                                <button class="btn btn-primary btn-block" @click="getDataTempo()">Get Data</button>
-                            </div>
                         </div>
 
                         <hr />
@@ -37,14 +29,9 @@
                             </div>
 
                             <div class="col-4 mt-auto">
-                                <button type="button" class="btn btn-primary"   @click="sendData()"                                                                                                                 >Import     </button>
-                                <button type="button" class="btn btn-primary"   @click="showResumeValidate()"   data-bs-toggle="modal" :data-bs-target="'#modalResumeValidate'"     v-if="route_import.sent_tempo"  >Validate   </button>
-                                <button type="button" class="btn btn-primary"   @click="showResume()"           data-bs-toggle="modal" :data-bs-target="'#modalResume'"             v-if="route_import.sent_tempo"  >Resume     </button>
+                                <button type="button" class="btn btn-primary"   @click="sendDataTempo()"    >Import     </button>
                             </div>
                         </form>
-
-                        <modalResume            ref="modalResume"           :key="Date.now()"   :type="'temporary'"     :id_route_import_tempo="route_import.id_route_import_tempo"     ></modalResume>
-                        <modalResumeValidate    ref="modalResumeValidate"   :key="Date.now()"                           :id_route_import_tempo="route_import.id_route_import_tempo"     ></modalResumeValidate>
 
                     </div>
                 </div>
@@ -54,9 +41,6 @@
 </template>
 
 <script>
-
-import modalResume       from "./modalResume.vue"
-import modalResumeValidate  from "./modalResumeValidate.vue"
 
 import * as XLSX from "xlsx";
 
@@ -81,77 +65,14 @@ export default {
 
             clients         :   ""      
         }
-    },
 
-    components : {
-
-        modalResume      :   modalResume      ,
-        modalResumeValidate :   modalResumeValidate
     },
 
     mounted() {
 
-        this.emitter.on('reSetClientsDecoupeByJourneeAdd' , (clients)  =>  {
-
-            this.clients    =   clients
-        })
     },
 
     methods : {
-
-        async sendData() {
-
-            // Show Loading Page
-            this.$showLoadingPage()
-
-            let formData = new FormData();
-
-            formData.append("libelle"                   ,   this.route_import.libelle)
-
-            if(this.route_import.new_upload ==  true) {
-
-                formData.append("new_upload"                ,   this.route_import.new_upload)
-                formData.append("data"                      ,   JSON.stringify(this.clients))
-
-                formData.append("file"                      ,   this.route_import.file)
-            }
-
-            else {
-
-                formData.append("new_upload"                ,   this.route_import.new_upload)
-                formData.append("data"                      ,   JSON.stringify(this.clients))
-
-                formData.append("id_route_import_tempo"     ,   this.route_import.id_route_import_tempo)
-                formData.append("file_route_import_tempo"   ,   this.route_import.file_route_import_tempo)
-            }
-
-            const res   = await this.$callApi('post'    ,   '/route_import/store'   ,   formData)         
-            console.log(res.data)
-
-            if(res.status===200){
-
-                // Send Event
-                this.emitter.emit("reSetRouteImport")
-
-                // Hide Loading Page
-                this.$hideLoadingPage()
-
-                // Send Feedback
-                this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
-
-                // Add Route Import
-                this.$router.push("/route/obs/route_import/"+res.data.route_import.id+"/details")
-			}
-            
-            else{
-
-                // Hide Loading Page
-                this.$hideLoadingPage()
-
-                // Send Errors
-                this.$showErrors("Error !", res.data.errors)
-			}
-        },
 
         getFile(event) {
 
@@ -222,18 +143,6 @@ export default {
             {
    
             }
-        },
-
-        //
-
-        async showResume() {
-
-            await this.$refs.modalResume.getClients()
-        },
-
-        async showResumeValidate() {
-
-            await this.$refs.modalResumeValidate.setResumeValidate()
         },
 
         //
@@ -381,7 +290,9 @@ export default {
 
             if(res.status===200){
 
-                await this.getDataTempo()
+                //
+
+                this.$goTo('/route/obs/route_import_tempo')
 
                 //
 
@@ -399,64 +310,6 @@ export default {
                 this.$showErrors("Error !", res.data.errors)
 			}
         },                    
-
-        async getDataTempo() {
-
-            this.$showLoadingPage()
-
-            // Set Data
-
-            const res   = await this.$callApi('post' ,   '/route_import_tempo/last'    ,   null)         
-
-            if(res.status===200){
-
-                if(res.data    ==  "")  {
-
-                }
-
-                else {
-
-                    this.route_import.sent_tempo     =   true
-
-                    if(typeof res.data.clients              !=  "undefined") {
-
-                        this.clients                                                =   res.data.clients
-                    }
-
-                    if(typeof res.data.id                   !=  "undefined") {
-
-                        this.route_import.id_route_import_tempo                     =   res.data.id
-                    }
-
-                    if(typeof res.data.libelle              !=  "undefined") {
-
-                        this.route_import.libelle                                   =   res.data.libelle
-                    }
-
-                    if(typeof res.data.file                 !=  "undefined") {
-
-                        this.route_import.file_route_import_tempo                   =   res.data.file
-                        this.route_import.new_upload                                =   false
-                    }
-
-                    if(typeof res.data.file_original_name   !=  "undefined") {
-
-                        this.route_import.file_original_name                        =   res.data.file_original_name
-                        this.createFile(res.data.file_original_name)
-                    }
-                }
-
-                this.$hideLoadingPage()
-            }
-            
-            else{
-
-                this.$hideLoadingPage()
-
-                // Send Errors
-                this.$showErrors("Error !", res.data.errors)
-			}
-        },
 
         //
 

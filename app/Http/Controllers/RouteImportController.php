@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\RouteImport;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -16,7 +17,7 @@ class RouteImportController extends Controller
         try {
 
             $liste_route_import     =   RouteImport::indexRouteImport();
-            return $liste_route_import;
+            return User::filterRouteImport($liste_route_import);
         }
 
         catch(Throwable $erreur) {
@@ -90,15 +91,15 @@ class RouteImportController extends Controller
             }
 
             // store 
-            RouteImport::updateRouteImport($request, $id);
+            $clients    =   RouteImport::updateRouteImport($request, $id);
 
             //
             DB::commit();
             //
 
             return response()->json([
-                "header"            =>  "Route Updated !"                          ,
-                "message"           =>  "a route has been updated successfuly!" 
+                "header"            =>  "Route Updated !"                           ,
+                "message"           =>  "a route has been updated successfuly!"     
             ]);
         }
 
@@ -107,6 +108,23 @@ class RouteImportController extends Controller
             //
             DB::rollBack();
             //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    public function show(int $id)
+    {
+
+        try {
+
+            $route_import   =   RouteImport::showRouteImport($id);
+            return $route_import;
+        }
+
+        catch(Throwable $erreur) {
 
             return response()->json([
                 'errors'    =>  [$erreur->getMessage()],
@@ -326,4 +344,30 @@ class RouteImportController extends Controller
             ],422);
         }
     }
+
+    //
+
+    public function clients(int $id)
+    {
+
+        try {
+
+            $clients        =   RouteImport::clients($id);
+            $route_import   =   RouteImport::find($id);
+
+            return response()->json([
+                'clients'           =>  $clients,
+                'route_import'      =>  $route_import
+            ],422);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    //
 }

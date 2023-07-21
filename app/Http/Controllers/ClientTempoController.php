@@ -190,82 +190,86 @@ class ClientTempoController extends Controller
 
     public function getDoublesTelClients(int $id_route_import_tempo) {
 
-        // try {
+        try {
 
-        //     $last_route_import     =   ClientTempo::index();
-        //     return $last_route_import;
-        // }
+            $getDoublant    =   ClientTempo::getDoublesTelClients($id_route_import_tempo);
 
-        // catch(Throwable $erreur) {
+            return $getDoublant;
+        }
 
-        //     //
-        //     DB::rollBack();
-        //     //
+        catch(Throwable $erreur) {
 
-        //     return response()->json([
-        //         'errors'    =>  [$erreur->getMessage()],
-        //     ],422);
-        // }
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
     }
 
     public function getDoublesCustomerCodeClients(int $id_route_import_tempo) {
 
-        // try {
+        try {
 
-        //     $last_route_import     =   ClientTempo::index();
-        //     return $last_route_import;
-        // }
+            $getDoublant    =   ClientTempo::getDoublesCustomerCodeClients($id_route_import_tempo);
 
-        // catch(Throwable $erreur) {
+            return $getDoublant;
+        }
 
-        //     //
-        //     DB::rollBack();
-        //     //
+        catch(Throwable $erreur) {
 
-        //     return response()->json([
-        //         'errors'    =>  [$erreur->getMessage()],
-        //     ],422);
-        // }
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
     }
 
     public function getDoublesCustomerNameEClients(int $id_route_import_tempo) {
 
-        // try {
+        try {
 
-        //     $last_route_import     =   ClientTempo::index();
-        //     return $last_route_import;
-        // }
+            $getDoublant    =   ClientTempo::getDoublesCustomerNameEClients($id_route_import_tempo);
 
-        // catch(Throwable $erreur) {
+            return $getDoublant;
+        }
 
-        //     //
-        //     DB::rollBack();
-        //     //
+        catch(Throwable $erreur) {
 
-        //     return response()->json([
-        //         'errors'    =>  [$erreur->getMessage()],
-        //     ],422);
-        // }
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
     }
 
     public function getDoublesGPSClients(int $id_route_import_tempo) {
 
-        // try {
+        try {
 
-        //     $last_route_import     =   ClientTempo::index();
-        //     return $last_route_import;
-        // }
+            $getDoublant    =   ClientTempo::getDoublesGPSClients($id_route_import_tempo);
 
-        // catch(Throwable $erreur) {
+            return $getDoublant;
+        }
 
-        //     //
-        //     DB::rollBack();
-        //     //
+        catch(Throwable $erreur) {
 
-        //     return response()->json([
-        //         'errors'    =>  [$erreur->getMessage()],
-        //     ],422);
-        // }
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
     }
 
     //

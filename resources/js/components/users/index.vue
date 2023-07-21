@@ -6,23 +6,29 @@
 
                     <!-- Header -->
                     <headerComponent    :title="'List of Users'"            :add_modal="'addUserModal'" :update_modal="'updateUserModal'"   :add_button="'New User'"    
-                                        :update_button="'Update User'"      :role="'RTM Manager'"/>
+                                        :update_button="'Update User'"      />
 
                     <!-- Table -->
                     <table class="table table-bordered clickable_table" id="user_index">
                         <thead>
                             <tr>
                                 <th class="col-sm-1">ID</th>
-                                <th class="col-sm-3">Nom</th>
+                                <th class="col-sm-3">Name</th>
                                 <th class="col-sm-3">Email</th>
+                                <th class="col-sm-3">Tel</th>
+                                <th class="col-sm-3">Company</th>
+                                <th class="col-sm-3">Type User</th>
                             </tr>
                         </thead>
 
                         <thead>
                             <tr class="user_index_filters">
-                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="ID"       /></th>
-                                <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Nom"      /></th>
-                                <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Email"    /></th>
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="ID"           /></th>
+                                <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Name"         /></th>
+                                <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Email"        /></th>
+                                <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Tel"          /></th>
+                                <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Company"      /></th>
+                                <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Type User"    /></th>
                             </tr>
                         </thead>
 
@@ -31,6 +37,9 @@
                                 <td>{{index + 1}}</td>
                                 <td>{{user.nom}}</td>
                                 <td>{{user.email}}</td>
+                                <td>{{user.tel}}</td>
+                                <td>{{user.company}}</td>
+                                <td>{{user.type_user}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -112,11 +121,11 @@ export default {
             }
         },
 
-        addElement() {
+        async addElement() {
 
             try {
 
-                this.$refs.modalUserAdd.getData()
+                await this.$refs.modalUserAdd.getData()
             }
             catch(e) {
 
@@ -124,11 +133,11 @@ export default {
             }
         },
 
-        updateElement() {
+        async updateElement() {
 
             try {
 
-                this.$refs.modalUserUpdate.getData(this.selected_row)
+                await this.$refs.modalUserUpdate.getData(this.selected_row)
             }
             catch(e) {
 

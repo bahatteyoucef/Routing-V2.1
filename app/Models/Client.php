@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use stdClass;
 
 class Client extends Model
 {
@@ -28,28 +30,47 @@ class Client extends Model
 
         $clients    =   json_decode($request->get("data"));
 
-        foreach ($clients as $client) {
+        foreach ($clients as $client_elem) {
 
             // Client
 
             $client         =   new Client([
-                'CustomerCode'      =>  $client->CustomerCode   ,
-                'CustomerNameE'     =>  $client->CustomerNameE  ,
-                'CustomerNameA'     =>  $client->CustomerNameA  ,
-                'Latitude'          =>  $client->Latitude       ,
-                'Longitude'         =>  $client->Longitude      ,
-                'Address'           =>  $client->Address        ,
-                'DistrictNo'        =>  $client->DistrictNo     ,
-                'DistrictNameE'     =>  $client->DistrictNameE  ,
-                'CityNo'            =>  $client->CityNo         ,
-                'CityNameE'         =>  $client->CityNameE      ,
-                'Tel'               =>  $client->Tel            ,
-                'CustomerType'      =>  $client->CustomerType   ,
-                'JPlan'             =>  $client->JPlan          ,
-                'Journee'           =>  $client->Journee        ,
+                'CustomerCode'      =>  $client_elem->CustomerCode   ,
+                'CustomerNameE'     =>  $client_elem->CustomerNameE  ,
+                'CustomerNameA'     =>  $client_elem->CustomerNameA  ,
+                'Latitude'          =>  $client_elem->Latitude       ,
+                'Longitude'         =>  $client_elem->Longitude      ,
+                'Address'           =>  $client_elem->Address        ,
+                'DistrictNo'        =>  $client_elem->DistrictNo     ,
+                'DistrictNameE'     =>  $client_elem->DistrictNameE  ,
+                'CityNo'            =>  $client_elem->CityNo         ,
+                'CityNameE'         =>  $client_elem->CityNameE      ,
+                'Tel'               =>  $client_elem->Tel            ,
+                'CustomerType'      =>  $client_elem->CustomerType   ,
                 'id_route_import'   =>  $id_route_import        ,
                 'owner'             =>  Auth::user()->id
             ]);
+
+            if($client_elem->JPlan      !=  null) {
+    
+                $client->JPlan              =   $client_elem->JPlan;
+            }
+
+            else {
+
+                $client->JPlan              =   "";
+            }
+
+            if($client_elem->Journee    !=  null) {
+
+                $client->Journee            =   $client_elem->Journee;
+            }
+
+            else {
+
+                $client->Journee            =   "";
+            }
+
 
             $client->save();
         }
@@ -71,12 +92,6 @@ class Client extends Model
             $client->Journee        =   $client_elem->Journee;
 
             $client->save();
-
-            // Journey Plan
-            // JourneyPlan::storeJourneyPlan($request, $id_route_import);
-
-            // Journee
-            // Journee::storeJournee($request, $id_route_import);
         }
     }
 
@@ -98,8 +113,6 @@ class Client extends Model
             'CityNameE'             =>  ["required", "max:255"],
             'Tel'                   =>  ["required", "max:255"],
             'CustomerType'          =>  ["required", "max:255"],
-            // 'JPlan'                 =>  ["required", "max:255"],
-            // 'Journee'               =>  ["required", "max:255"]
         ]);
     
         return $validator;
@@ -120,22 +133,26 @@ class Client extends Model
             'CityNameE'         =>  $request->input("CityNameE")        ,
             'Tel'               =>  $request->input("Tel")              ,
             'CustomerType'      =>  $request->input("CustomerType")     ,
-            'JPlan'             =>  $request->input("JPlan")            ,
-            'Journee'           =>  $request->input("Journee")          ,
             'id_route_import'   =>  $id_route_import                    ,  
             'owner'             =>  Auth::user()->id
         ]);
 
+        if($request->input("JPlan")     !=  null) {
+
+            $client->JPlan          =   $request->input("JPlan");
+        }
+
+        if($request->input("Journee")   !=  null) {
+
+            $client->Journee        =   $request->input("Journee");
+        }
+
         $client->save();
 
-        // Journey Plan
-        // JourneyPlan::storeJourneyPlan($request, $id_route_import);
-
-        // Journee
-        // Journee::storeJournee($request, $id_route_import);
+        return $client;
     }
 
-    //          
+    //
 
     public static function validateUpdate(Request $request) 
     {
@@ -152,9 +169,7 @@ class Client extends Model
             'CityNo'                =>  ["required", "max:255"],
             'CityNameE'             =>  ["required", "max:255"],
             'Tel'                   =>  ["required", "max:255"],
-            'CustomerType'          =>  ["required", "max:255"],
-            // 'JPlan'                 =>  ["required", "max:255"],
-            // 'Journee'               =>  ["required", "max:255"]
+            'CustomerType'          =>  ["required", "max:255"]
         ]);
     
         return $validator;
@@ -164,29 +179,46 @@ class Client extends Model
 
         $client                     =   Client::find($id);
 
-        $client->CustomerCode       =   $request->get("CustomerCode")       ;
-        $client->CustomerNameE      =   $request->get("CustomerNameE")      ;
-        $client->CustomerNameA      =   $request->get("CustomerNameA")      ;
-        $client->Latitude           =   $request->get("Latitude")           ;
-        $client->Longitude          =   $request->get("Longitude")          ;
-        $client->Address            =   $request->get("Address")            ;
-        $client->DistrictNo         =   $request->get("DistrictNo")         ;
-        $client->DistrictNameE      =   $request->get("DistrictNameE")      ;
-        $client->CityNo             =   $request->get("CityNo")             ;
-        $client->CityNameE          =   $request->get("CityNameE")          ;
-        $client->Tel                =   $request->get("Tel")                ;
-        $client->CustomerType       =   $request->get("CustomerType")       ;
-        $client->JPlan              =   $request->get("JPlan")              ;
-        $client->Journee            =   $request->get("Journee")            ;
-        $client->id_route_import    =   $id_route_import                    ;
+        if($client) {
 
-        $client->save();
+            $client->CustomerCode       =   $request->get("CustomerCode")       ;
+            $client->CustomerNameE      =   $request->get("CustomerNameE")      ;
+            $client->CustomerNameA      =   $request->get("CustomerNameA")      ;
+            $client->Latitude           =   $request->get("Latitude")           ;
+            $client->Longitude          =   $request->get("Longitude")          ;
+            $client->Address            =   $request->get("Address")            ;
+            $client->DistrictNo         =   $request->get("DistrictNo")         ;
+            $client->DistrictNameE      =   $request->get("DistrictNameE")      ;
+            $client->CityNo             =   $request->get("CityNo")             ;
+            $client->CityNameE          =   $request->get("CityNameE")          ;
+            $client->Tel                =   $request->get("Tel")                ;
+            $client->CustomerType       =   $request->get("CustomerType")       ;
+            $client->id_route_import    =   $id_route_import                    ;
 
-        // Journey Plan
-        // JourneyPlan::storeJourneyPlan($request, $id_route_import);
+            if($request->input("JPlan")     !=  null) {
 
-        // Journee
-        // Journee::storeJournee($request, $id_route_import);
+                $client->JPlan          =   $request->input("JPlan");
+            }
+
+            else {
+
+                $client->JPlan          =   "";
+            }
+
+            //
+
+            if($request->input("Journee")   !=  null) {
+
+                $client->Journee        =   $request->input("Journee");
+            }
+
+            else {
+
+                $client->Journee        =   "";
+            }
+
+            $client->save();
+        }
     }
 
     //
@@ -213,8 +245,26 @@ class Client extends Model
             $client->CityNameE                  =   $client_tempo->CityNameE;
             $client->Tel                        =   $client_tempo->Tel;
             $client->CustomerType               =   $client_tempo->CustomerType;
-            $client->JPlan                      =   $client_tempo->JPlan;
-            $client->Journee                    =   $client_tempo->Journee;
+
+            if($client_tempo->JPlan     !=  null) {
+    
+                $client->JPlan                      =   $client_tempo->JPlan;
+            }
+
+            else {
+
+                $client->JPlan                      =   "";
+            }
+
+            if($client_tempo->Journee   !=  null) {
+
+                $client->Journee                    =   $client_tempo->Journee;
+            }
+
+            else {
+
+                $client->Journee                    =   "";
+            }
 
             $client->save();
         }
@@ -226,17 +276,79 @@ class Client extends Model
 
         $client     =   Client::find($id);
 
-        // $Journee    =   $client->Journee; 
-        // $JPlan      =   $client->JPlan;
-
         $client->delete();
-
-        // Journey Plan
-        // JourneyPlan::deleteJourneyPlan($JPlan, $id_route_import);
-
-        // Journee
-        // Journee::deleteJournee($JPlan, $Journee, $id_route_import);
     }
 
     //
+
+    public static function getDoublesClients(int $id_route_import) {
+
+        $getDoublant    =   new stdClass();
+
+        $getDoublant->getDoublantCustomerCode           =   Client::getDoublesCustomerCodeClients($id_route_import);
+        $getDoublant->getDoublantCustomerNameE          =   Client::getDoublesCustomerNameEClients($id_route_import);
+        $getDoublant->getDoublantTel                    =   Client::getDoublesTelClients($id_route_import);
+        $getDoublant->getDoublantLatitudeLongitude      =   Client::getDoublesGPSClients($id_route_import);
+
+        return $getDoublant;
+    }
+
+    public static function getDoublesTelClients(int $id_route_import) {
+
+        return  DB::table('clients')
+                    ->where('id_route_import', $id_route_import)
+                    ->whereIn('Tel', function ($query) use ($id_route_import) {
+                        $query->select('Tel')
+                            ->from('clients')
+                            ->where('id_route_import', $id_route_import)
+                            ->groupBy('Tel')
+                            ->havingRaw('COUNT(*) > 1');
+                    })
+                    ->get();
+    } 
+
+    public static function getDoublesCustomerCodeClients(int $id_route_import) {
+
+        return  DB::table('clients')
+                    ->where('id_route_import', $id_route_import)
+                    ->whereIn('CustomerCode', function ($query) use ($id_route_import) {
+                        $query->select('CustomerCode')
+                            ->from('clients')
+                            ->where('id_route_import', $id_route_import)
+                            ->groupBy('CustomerCode')
+                            ->havingRaw('COUNT(*) > 1');
+                    })
+                    ->get();
+    }
+
+    public static function getDoublesCustomerNameEClients(int $id_route_import) {
+
+        return  DB::table('clients')
+                    ->where('id_route_import', $id_route_import)
+                    ->whereIn('CustomerNameE', function ($query) use ($id_route_import) {
+                        $query->select('CustomerNameE')
+                            ->from('clients')
+                            ->where('id_route_import', $id_route_import)
+                            ->groupBy('CustomerNameE')
+                            ->havingRaw('COUNT(*) > 1');
+                    })
+                    ->get();
+    }
+
+    public static function getDoublesGPSClients(int $id_route_import) {
+
+        return  DB::table('clients')
+                    ->where('id_route_import', $id_route_import)
+                    ->whereIn(DB::raw('(Latitude, Longitude)'), function ($query) use ($id_route_import) {
+                        $query->select('Latitude', 'Longitude')
+                            ->from('clients')
+                            ->where('id_route_import', $id_route_import)
+                            ->groupBy('Latitude', 'Longitude')
+                            ->havingRaw('COUNT(*) > 1');
+                    })
+                    ->get();
+    }
+
+    //
+
 }

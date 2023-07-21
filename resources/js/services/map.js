@@ -36,11 +36,12 @@ export default class Map {
 
         this.path                                           =   null
 
-        this.colors                                         =   [   '#00CCFF', '#6ECC39', '#F0C20C', '#F1D3B7', '#FF0066', '#FF99CC', '#CC99FF', '#F0C2DC', 
-                                                                    '#33CCFF', '#6ECCB9', '#F0C200', '#9933FF', '#F1D357', '#FF3399', '#F1D3F7', '#F180B7',
-                                                                    '#33FFFF', '#66FF99', '#F18E17', '#9900CC', '#FFCC00', '#FF6699', '#F180C7', '#F180E7', 
-                                                                    '#99CCFF', '#99FF99', '#F18017', '#F1D3D3', '#FFCC99', '#FD9CE3', '#FF9966', '#FF6600', 
-                                                                    '#99FFFF', '#99FFCC', '#F18417', '#FD9C73', '#CCFF00', '#FF33CC', '#B5E28C', '#B5E2FC'  ];
+        this.colors                                         =   [   '#A52714'       , '#F9A825'     , '#3949AB'     , '#817717'     , '#558B2F'     , 
+                                                                    '#097138'       , '#006064'     , '#01579B'     , '#1A237E'     , '#673AB7'     ,
+                                                                    '#4E342E'       , '#C2185B'     , '#FF5252'     , '#F57C00'     , '#000000'     ,
+                                                                    '#FFEA00'       , '#AFB42B'     , '#7CB342'     , '#0F9D58'     , '#0097A7'     ,
+                                                                    '#0288D1'       , '#FFD600'     , '#9C27B0'     , '#E65100'     , '#880E4F'     ,
+                                                                    '#795548'       , '#BDBDBD'     , '#757575'     , '#424243'     , '#FBC02D'     ]
 
     }
 
@@ -181,7 +182,8 @@ export default class Map {
         let icon        =   null
 
         icon    =   new L.Icon({
-            iconUrl  : '/images/'+color.substring(1)+'.png'
+            iconUrl  : '/images/'+color.substring(1)+'.png',
+            iconSize: [15, 15] // Replace 'width' and 'height' with your desired values
         });
 
         return icon
@@ -261,7 +263,8 @@ export default class Map {
         let icon        =   null
 
         icon    =   new L.Icon({
-            iconUrl  : '/images/'+color.substring(1)+'.png'
+            iconUrl  : '/images/'+color.substring(1)+'.png',
+            iconSize: [15, 15] // Replace 'width' and 'height' with your desired values
         });
 
         return icon
@@ -293,10 +296,9 @@ export default class Map {
 
                 var div                     =   document.createElement("div");
 
-                let color_index             =   JPID % 40
-
                 div.style.backgroundColor   =   color
                 div.style.border            =   "3px solid #FFFFFF"
+                div.style.color             =   "white"
                 div.style.borderRadius      =   "50%"
 
                 div.innerHTML               =   "<span>" + childCount + "</span>"
@@ -404,11 +406,15 @@ export default class Map {
         // Add the marker group to the map
         this.map.addLayer(markers);
 
-        // Get the bounds of all the markers
-        var groupBounds = markers.getBounds();
+        if(markerArray.length > 0) {
 
-        // Zoom the map to fit the bounds of the markers
-        this.map.fitBounds(groupBounds);
+            // Get the bounds of all the markers
+            var groupBounds = markers.getBounds();
+
+            // Zoom the map to fit the bounds of the markers
+            this.map.fitBounds(groupBounds);
+
+        }
     }
 
     // Remove Markers

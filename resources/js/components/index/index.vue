@@ -24,19 +24,26 @@
                         <div class="card-body p-3">
                             <img :src="'/template/images/dashboard/circle.svg'"    class="card-img-absolute"   alt="circle-image" />
 
-                            <h4 class="font-weight-normal mb-3">{{route_import.libelle}}
+                            <div class="row">
+                                <div class="col-9">
+                                    <h4 class="font-weight-normal mb-3">{{route_import.libelle}}</h4>
+                                </div>
 
-                                <span role="button" class="p-1" @click="deleteMap(route_import.id)">
-                                    <i class="mdi mdi-delete mdi-24px float-right">
-                                    </i>                                    
-                                </span>
+                                <div class="col-1 p-0"  v-if="$isRole('Super Admin')||$isRole('BackOffice')">
+                                    <i class="mdi mdi-delete mdi-24px p-1" role="button" data-bs-toggle="modal" :data-bs-target="'#modalRouteImportDelete'"     @click="setRouteImportDelete(route_import.id)">
+                                    </i> 
+                                </div>
 
-                                <span role="button" class="p-1" @click="navToMap(route_import.id)">
-                                    <i class="mdi mdi-google-maps mdi-24px float-right">
+                                <div class="col-1 p-0"  v-if="$isRole('Super Admin')||$isRole('BackOffice')">
+                                    <i class="mdi mdi-google-maps mdi-24px p-1" role="button"                                                                   @click="navToMap(route_import.id)">
                                     </i>
-                                </span>
+                                </div>
 
-                            </h4>
+                                <div class="col-1 p-0"  v-if="$isRole('Super Admin')||$isRole('BackOffice')||$isRole('FrontOffice')">
+                                    <i class="mdi mdi-account-multiple mdi-24px p-1" role="button"                                                                   @click="getClients(route_import.id)">
+                                    </i>
+                                </div>
+                            </div>                       
  
                             <h6 class="card-text">ID    : {{route_import.id}}</h6>
                             <h6 class="card-text">label : {{route_import.libelle}}</h6>
@@ -48,12 +55,16 @@
             
             </div>
 
+            <modalRouteImportDelete  ref="modalRouteImportDelete"></modalRouteImportDelete>
+
         </section>
 
     </div>
 </template>
 
 <script>
+
+import modalRouteImportDelete from "../routes/imports/modalRouteImportDelete.vue"
 
 export default {
 
@@ -63,9 +74,19 @@ export default {
         }
     },
 
+    components : {
+
+        modalRouteImportDelete
+    },
+
     async mounted() {
 
         await this.getRouteImport()
+
+        this.emitter.on("reSetRouteImport" , async () =>  {
+
+            await this.getRouteImport()
+        })
     },
 
     methods : {
@@ -74,13 +95,22 @@ export default {
 
             try {
 
-                this.$callApi("post",    "/route_import", null)
-                .then((res)=> {
+                if(this.$connectedToInternet) {
 
-                    console.log(res.data)
+                    this.$callApi("post",    "/route_import", null)
+                    .then((res)=> {
 
-                    this.liste_route_import = res.data
-                })
+                        this.liste_route_import     =   res.data
+
+                        // Add to indexedDB
+                        this.$indexedDB.$setListeRouteImport(this.liste_route_import)
+                    })
+                }
+
+                else {
+
+                    this.liste_route_import         =   await this.$indexedDB.$getRouteImport()
+                }
             }
 
             catch(e) {
@@ -94,36 +124,16 @@ export default {
             this.$router.push('/route/obs/route_import/'+id_route_import+'/details')
         },
 
-        async deleteMap(id_route_import) {
+        async setRouteImportDelete(id_route_import) {
 
-            if(confirm('Are you sure?')) {
+            await this.$refs.modalRouteImportDelete.setRouteImportDelete(id_route_import)
+        },
 
-                // Show Loading Page
-                this.$showLoadingPage()
+        //
 
-                const res   = await this.$callApi('post'    ,   '/route_import/'+id_route_import+'/delete'    ,   null)      
+        getClients(id_route_import) {
 
-                if(res.status===200){
-
-                    // Send Feedback
-                    this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
-
-                    // Get Route Import
-                    await this.getRouteImport()
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-                }
-                
-                else{
-
-                    // Send Errors
-                    this.$showErrors("Error !", res.data.errors)
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-			    }
-            }
+            this.$router.push('/route_import/'+id_route_import+'/clients')
         }
     }
 }

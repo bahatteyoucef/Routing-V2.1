@@ -45,6 +45,8 @@
 		<link rel="stylesheet" href="{{url('css/redefinition.css')}}">
 		<link rel="stylesheet" href="{{url('css/datatables.css')}}">
 
+		<link rel="stylesheet" href="{{url('css/responsiveness.css')}}">
+
 	</head>
 
 	<body>
@@ -93,6 +95,9 @@
 
 	<!-- Excel     -->
 	<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+
+	<!-- Customer -->
+	<script src="{{url('js/responsive.js')}}"></script>
 
 	@vite('resources/js/app.js')
 
