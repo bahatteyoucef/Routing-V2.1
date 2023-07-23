@@ -196,6 +196,7 @@ export default {
             formData.append("CustomerType"  ,   this.client.CustomerType)
             formData.append("JPlan"         ,   this.client.JPlan)
             formData.append("Journee"       ,   this.client.Journee)
+            formData.append("status"        ,   "validated")
 
             const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/store",   formData)
 
@@ -206,7 +207,8 @@ export default {
 
                 // Send Client
 
-                this.client.id  =   res.data.client.id
+                this.client.id      =   res.data.client.id
+                this.client.status  =   "validated"
 
                 console.log(this.client)
 

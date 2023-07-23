@@ -370,4 +370,39 @@ class RouteImportController extends Controller
     }
 
     //
+
+    public function sync(Request $request)
+    {
+    
+        try {
+
+            //
+            DB::beginTransaction();
+            //
+
+            // store 
+            RouteImport::sync($request);
+
+            //
+            DB::commit();
+            //
+
+            return response()->json([
+                "header"            =>  "Synchronisation Perfomed !"                        ,
+                "message"           =>  "a synchronisation has been performed successfuly!"     
+            ]);
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+
+    }
 }

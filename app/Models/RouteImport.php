@@ -2,17 +2,14 @@
 
 namespace App\Models;
 
-use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Fluent;
-use Illuminate\Validation\Rule;
 
 class RouteImport extends Model
 {
@@ -34,7 +31,10 @@ class RouteImport extends Model
 
         foreach ($liste_route_import as $route_import) {
 
-            $route_import->clients          =   Client::where("id_route_import", $route_import->id)->get();
+            $route_import->clients      =   Client::where("id_route_import", $route_import->id)
+                                            ->join('users', 'clients.owner', '=', 'users.id')
+                                            ->select('clients.*', 'users.nom as owner_name')
+                                            ->get();
         }
 
         return $liste_route_import;
@@ -181,7 +181,7 @@ class RouteImport extends Model
 
         $route_import                       =   RouteImport::find($id);
 
-        $route_import->clients              =   Client::where("id_route_import", $id)->get();
+        $route_import->clients              =   Client::where("id_route_import", $id)->join('users', 'clients.owner', '=', 'users.id')->select('clients.*', 'users.nom as owner_name')->get();
         $route_import->liste_journey_plan   =   JourneyPlan::where("id_route_import", $id)->get();
         $route_import->liste_journee        =   Journee::where("id_route_import", $id)->get();
 
@@ -360,7 +360,7 @@ class RouteImport extends Model
 
         $route_import           =   RouteImport::find($id);
 
-        $route_import->data     =   Client::where("id_route_import", $id)->get();   
+        $route_import->data     =   Client::where("id_route_import", $id)->join('users', 'clients.owner', '=', 'users.id')->select('clients.*', 'users.nom as owner_name')->get();   
 
         return $route_import;
     }
@@ -372,9 +372,135 @@ class RouteImport extends Model
     public static function clients(int $id)
     {
 
-        return Client::where("id_route_import", $id)->get();
+        return  Client::where("id_route_import", $id)
+                ->join('users', 'clients.owner', '=', 'users.id')
+                ->select('clients.*', 'users.nom as owner_name')
+                ->get();
     }
 
-
     //
+
+    public static function sync(Request $request)
+    {
+
+        //
+
+        $updated_clients    =   json_decode($request->get("updated_clients"));
+
+        foreach ($updated_clients as $client_elem) {
+
+            $client             =   Client::find($client_elem->id);
+
+            if($client) {
+
+                $client->CustomerCode       =   $client_elem->CustomerCode;
+                $client->CustomerNameE      =   $client_elem->CustomerNameE;
+                $client->CustomerNameA      =   $client_elem->CustomerNameA;
+                $client->Latitude           =   $client_elem->Latitude;
+                $client->Longitude          =   $client_elem->Longitude;
+                $client->Address            =   $client_elem->Address;
+                $client->DistrictNo         =   $client_elem->DistrictNo;
+                $client->DistrictNameE      =   $client_elem->DistrictNameE;
+                $client->CityNo             =   $client_elem->CityNo;
+                $client->CityNameE          =   $client_elem->CityNameE;
+                $client->Tel                =   $client_elem->Tel;
+                $client->CustomerType       =   $client_elem->CustomerType;
+                $client->id_route_import    =   $client_elem->id_route_import;
+
+                if($client_elem->JPlan      !=  null) {
+
+                    $client->JPlan          =   $client_elem->JPlan;
+                }
+
+                else {
+
+                    $client->JPlan          =   "";
+                }
+
+                //
+
+                if($client_elem->Journee    !=  null) {
+
+                    $client->Journee        =   $client_elem->Journee;
+                }
+
+                else {
+
+                    $client->Journee        =   "";
+                }
+
+                $client->save();
+            }
+        }
+
+        // 
+
+        $added_clients      =   json_decode($request->get("added_clients"));
+
+        foreach ($added_clients as $client_elem) {
+
+            $client         =   new Client([
+                'CustomerCode'      =>  $client_elem->CustomerCode      ,    
+                'CustomerNameE'     =>  $client_elem->CustomerNameE     ,
+                'CustomerNameA'     =>  $client_elem->CustomerNameA     ,
+                'Latitude'          =>  $client_elem->Latitude          ,
+                'Longitude'         =>  $client_elem->Longitude         ,
+                'Address'           =>  $client_elem->Address           ,
+                'DistrictNo'        =>  $client_elem->DistrictNo        ,
+                'DistrictNameE'     =>  $client_elem->DistrictNameE     ,
+                'CityNo'            =>  $client_elem->CityNo            ,
+                'CityNameE'         =>  $client_elem->CityNameE         ,
+                'Tel'               =>  $client_elem->Tel               ,
+                'CustomerType'      =>  $client_elem->CustomerType      ,
+                'id_route_import'   =>  $client_elem->id_route_import   ,  
+                'status'            =>  $client_elem->status            ,
+                'owner'             =>  Auth::user()->id
+            ]);
+
+            if($client_elem->JPlan      !=  null) {
+
+                $client->JPlan          =   $client_elem->JPlan;
+            }
+
+            if($client_elem->Journee    !=  null) {
+
+                $client->Journee        =   $client_elem->Journee;
+            }
+
+            $client->save();
+
+
+        }
+
+        //
+
+        $validated_clients    =   json_decode($request->get("validated_clients"));
+
+        foreach ($validated_clients as $client_elem) {
+
+            $client         =   Client::find($client_elem->id);
+
+            if($client) {
+
+                $client->status     =   "validated";
+                $client->save();
+            }
+        }
+
+        //
+
+        $deleted_clients    =   json_decode($request->get("deleted_clients"));
+
+        foreach ($deleted_clients as $client_elem) {
+
+            $client         =   Client::find($client_elem->id);
+
+            if($client) {
+
+                $client->delete();
+            }
+        }
+
+        //
+    }
 }

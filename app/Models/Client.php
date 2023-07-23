@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -26,6 +26,18 @@ class Client extends Model
 
     //
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Event hook to set the date before storing a new object in the database
+        static::creating(function ($client) {
+            $client->created_at = Carbon::now()->format('d F Y');;
+        });
+    }
+
+    //
+
     public static function storeClients(Request $request, int $id_route_import) {
 
         $clients    =   json_decode($request->get("data"));
@@ -35,19 +47,21 @@ class Client extends Model
             // Client
 
             $client         =   new Client([
-                'CustomerCode'      =>  $client_elem->CustomerCode   ,
-                'CustomerNameE'     =>  $client_elem->CustomerNameE  ,
-                'CustomerNameA'     =>  $client_elem->CustomerNameA  ,
-                'Latitude'          =>  $client_elem->Latitude       ,
-                'Longitude'         =>  $client_elem->Longitude      ,
-                'Address'           =>  $client_elem->Address        ,
-                'DistrictNo'        =>  $client_elem->DistrictNo     ,
-                'DistrictNameE'     =>  $client_elem->DistrictNameE  ,
-                'CityNo'            =>  $client_elem->CityNo         ,
-                'CityNameE'         =>  $client_elem->CityNameE      ,
-                'Tel'               =>  $client_elem->Tel            ,
-                'CustomerType'      =>  $client_elem->CustomerType   ,
-                'id_route_import'   =>  $id_route_import        ,
+                'CustomerCode'      =>  $client_elem->CustomerCode      ,
+                'CustomerNameE'     =>  $client_elem->CustomerNameE     ,
+                'CustomerNameA'     =>  $client_elem->CustomerNameA     ,
+                'Latitude'          =>  $client_elem->Latitude          ,
+                'Longitude'         =>  $client_elem->Longitude         ,
+                'Address'           =>  $client_elem->Address           ,
+                'DistrictNo'        =>  $client_elem->DistrictNo        ,
+                'DistrictNameE'     =>  $client_elem->DistrictNameE     ,
+                'CityNo'            =>  $client_elem->CityNo            ,
+                'CityNameE'         =>  $client_elem->CityNameE         ,
+                'Tel'               =>  $client_elem->Tel               ,
+                'CustomerType'      =>  $client_elem->CustomerType      ,
+                'id_route_import'   =>  $id_route_import                ,
+                'status'            =>  "validated"                     ,
+                'created_at'        =>  1,
                 'owner'             =>  Auth::user()->id
             ]);
 
@@ -107,10 +121,10 @@ class Client extends Model
             'Latitude'              =>  ["required", "max:255"],
             'Longitude'             =>  ["required", "max:255"],
             'Address'               =>  ["required", "max:255"],
-            'DistrictNo'            =>  ["required", "max:255"],
-            'DistrictNameE'         =>  ["required", "max:255"],
-            'CityNo'                =>  ["required", "max:255"],
-            'CityNameE'             =>  ["required", "max:255"],
+            // 'DistrictNo'            =>  ["required", "max:255"],
+            // 'DistrictNameE'         =>  ["required", "max:255"],
+            // 'CityNo'                =>  ["required", "max:255"],
+            // 'CityNameE'             =>  ["required", "max:255"],
             'Tel'                   =>  ["required", "max:255"],
             'CustomerType'          =>  ["required", "max:255"],
         ]);
@@ -134,6 +148,7 @@ class Client extends Model
             'Tel'               =>  $request->input("Tel")              ,
             'CustomerType'      =>  $request->input("CustomerType")     ,
             'id_route_import'   =>  $id_route_import                    ,  
+            'status'            =>  $request->input("status")           ,
             'owner'             =>  Auth::user()->id
         ]);
 
@@ -164,10 +179,10 @@ class Client extends Model
             'Latitude'              =>  ["required", "max:255"],
             'Longitude'             =>  ["required", "max:255"],
             'Address'               =>  ["required", "max:255"],
-            'DistrictNo'            =>  ["required", "max:255"],
-            'DistrictNameE'         =>  ["required", "max:255"],
-            'CityNo'                =>  ["required", "max:255"],
-            'CityNameE'             =>  ["required", "max:255"],
+            // 'DistrictNo'            =>  ["required", "max:255"],
+            // 'DistrictNameE'         =>  ["required", "max:255"],
+            // 'CityNo'                =>  ["required", "max:255"],
+            // 'CityNameE'             =>  ["required", "max:255"],
             'Tel'                   =>  ["required", "max:255"],
             'CustomerType'          =>  ["required", "max:255"]
         ]);
@@ -217,6 +232,19 @@ class Client extends Model
                 $client->Journee        =   "";
             }
 
+            $client->save();
+        }
+    }
+
+    //
+
+    public static function validateClient(int $id_route_import, int $id) {
+
+        $client                     =   Client::find($id);
+
+        if($client) {
+
+            $client->status         =   "validated";
             $client->save();
         }
     }

@@ -85,7 +85,7 @@
 
                     <div class="nav-profile-text mt-1">
                         <p class="mb-1 text-black">
-                            {{user.nom}} {{user.prenom}}
+                            {{user.nom}}
                         </p>
                     </div>
 

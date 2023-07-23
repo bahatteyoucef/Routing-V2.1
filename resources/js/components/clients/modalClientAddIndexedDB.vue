@@ -182,49 +182,74 @@ export default {
 
             let formData = new FormData();
 
-            formData.append("CustomerCode"  ,   this.client.CustomerCode)
-            formData.append("CustomerNameE" ,   this.client.CustomerNameE)
-            formData.append("CustomerNameA" ,   this.client.CustomerNameA)
-            formData.append("Latitude"      ,   this.client.Latitude)
-            formData.append("Longitude"     ,   this.client.Longitude)
-            formData.append("Address"       ,   this.client.Address)
-            formData.append("DistrictNo"    ,   this.client.DistrictNo)
-            formData.append("DistrictNameE" ,   this.client.DistrictNameE)
-            formData.append("CityNo"        ,   this.client.CityNo)
-            formData.append("CityNameE"     ,   this.client.CityNameE)
-            formData.append("Tel"           ,   this.client.Tel)
-            formData.append("CustomerType"  ,   this.client.CustomerType)
-            formData.append("JPlan"         ,   this.client.JPlan)
-            formData.append("Journee"       ,   this.client.Journee)
+            formData.append("CustomerCode"      ,   this.client.CustomerCode)
+            formData.append("CustomerNameE"     ,   this.client.CustomerNameE)
+            formData.append("CustomerNameA"     ,   this.client.CustomerNameA)
+            formData.append("Latitude"          ,   this.client.Latitude)
+            formData.append("Longitude"         ,   this.client.Longitude)
+            formData.append("Address"           ,   this.client.Address)
+            formData.append("DistrictNo"        ,   this.client.DistrictNo)
+            formData.append("DistrictNameE"     ,   this.client.DistrictNameE)
+            formData.append("CityNo"            ,   this.client.CityNo)
+            formData.append("CityNameE"         ,   this.client.CityNameE)
+            formData.append("Tel"               ,   this.client.Tel)
+            formData.append("CustomerType"      ,   this.client.CustomerType)
+            formData.append("JPlan"             ,   this.client.JPlan)
+            formData.append("Journee"           ,   this.client.Journee)
+            formData.append("id_route_import"   ,   this.$route.params.id_route_import)
+            formData.append("status"            ,   "unvalidated")
 
-            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/store",   formData)
+            if(this.$connectedToInternet) {
 
-            if(res.status===200){
+                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/store",   formData)
+
+                if(res.status===200){
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    // Send Client
+
+                    this.client.id                  =   res.data.client.id
+                    this.client.status              =   "unvalidated"
+                    this.client.id_route_import     =   this.$route.params.id_route_import
+
+                    this.emitter.emit('reSetAdd' , this.client)
+
+                    // Close Modal
+                    this.$hideModal("modalClientAddIndexedDB")
+                }
+                
+                else{
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    // Send Errors
+                    this.$showErrors("Error !", res.data.errors)
+                }       
+            }
+
+            else {
+
+                let max_local_id                =   await this.$indexedDB.$getMaxAddedClients()
+
+                this.client.id                  =   "local_id_"+(max_local_id   +   1) 
+                this.client.status              =   "unvalidated"
+                this.client.id_route_import     =   this.$route.params.id_route_import
+
+                // Add in indexedDB
+                await this.$indexedDB.$setAddedClients(this.client, this.$route.params.id_route_import)
 
                 // Hide Loading Page
                 this.$hideLoadingPage()
 
                 // Send Client
-
-                this.client.id  =   res.data.client.id
-
-                console.log(this.client)
-
                 this.emitter.emit('reSetAdd' , this.client)
 
                 // Close Modal
                 this.$hideModal("modalClientAddIndexedDB")
-
             }
-            
-            else{
-
-                // Hide Loading Page
-                this.$hideLoadingPage()
-
-                // Send Errors
-                this.$showErrors("Error !", res.data.errors)
-			}            
         },
 
         //
@@ -265,16 +290,7 @@ export default {
 
                 this.willayas               =   []
                 this.cites                  =   []
-
-                // Remove Drawings
-                this.removeDrawings()
             });
-        },
-
-        removeDrawings() {
-
-            // Remove Drawings
-            this.$map.$removeDrawings()
         },
 
         //
@@ -296,24 +312,45 @@ export default {
 
         async getComboData() {
 
-            const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
-            this.willayas                   =   res_3.data
+            if(this.$connectedToInternet) {
 
-            console.log(this.willayas)
+                const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
+                this.willayas                   =   res_3.data
+            }
+
+            else {
+
+                this.willayas                   =   await this.$indexedDB.$getWillayas()
+            }
         },
 
         async getCites() {
 
-            // Show Loading Page
-            this.$showLoadingPage()
+            if(this.$connectedToInternet) {
 
-            const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
-            this.cites                      =   res_3.data
+                // Show Loading Page
+                this.$showLoadingPage()
 
-            console.log(this.cites)
+                const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
+                this.cites                      =   res_3.data
 
-            // Hide Loading Page
-            this.$hideLoadingPage()
+                // Hide Loading Page
+                this.$hideLoadingPage()
+            }
+
+            else {
+
+                // Show Loading Page
+                this.$showLoadingPage()
+
+                let willaya                     =   await this.$indexedDB.$getWillaya(this.client.DistrictNo)
+                console.log(willaya)
+
+                this.cites                      =   willaya.cites
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+            }
         },
 
         //

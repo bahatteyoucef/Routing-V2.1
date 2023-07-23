@@ -97,7 +97,8 @@
 
                     <div class="right-buttons"  style="display: flex; margin-left: auto;">
                         <button type="button"   class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button"   class="btn btn-primary"   @click="sendData()">Confirm</button>
+                        <button type="button"   class="btn btn-success"                             @click="validateData()"   v-if="client.status   !=  'validated'"      >Validate</button>
+                        <button type="button"   class="btn btn-primary"                             @click="sendData()"                                                 >Confirm</button>
                     </div>
                 </div>
 
@@ -146,7 +147,9 @@ export default {
 
                 // Journey Plan
                 JPlan               :   '',
-                Journee             :   ''
+                Journee             :   '',
+
+                status                :   ''
             },
 
             willayas                        :   []  ,
@@ -259,6 +262,34 @@ export default {
 			}
         },
 
+        async validateData() {
+
+            this.$showLoadingPage()
+
+            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/validate",   null)
+
+            if(res.status===200){
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Client
+                this.emitter.emit('reSetValidate' , this.client)
+
+                // Close Modal
+                this.$hideModal("updateClientModal")
+            }
+            
+            else{
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
+            }
+        },
+
         //
 
         clearData(id_modal) {
@@ -296,6 +327,8 @@ export default {
 
                 // Journey Plan
                 this.client.JPlan               =   '',
+
+                this.client.status              =   '',
 
                 this.willayas                   =   []
                 this.cites                      =   []
@@ -353,6 +386,8 @@ export default {
             this.client.JPlan               =   client.JPlan
 
             this.client.Journee             =   client.Journee
+
+            this.client.status                =   client.status
 
             this.setJoursGetData(client)
 

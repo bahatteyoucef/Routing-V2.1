@@ -97,7 +97,8 @@
 
                     <div class="right-buttons"  style="display: flex; margin-left: auto;">
                         <button type="button"   class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button"   class="btn btn-primary"   @click="sendData()">Confirm</button>
+                        <button type="button"   class="btn btn-success"                             v-if="client.status   !=  'validated'"  @click="validateData()">Validate</button>
+                        <button type="button"   class="btn btn-primary"                                                                     @click="sendData()">Confirm</button>
                     </div>
                 </div>
 
@@ -146,7 +147,9 @@ export default {
 
                 // Journey Plan
                 JPlan               :   '',
-                Journee             :   ''
+                Journee             :   '',
+
+                status                :   ''
             },
 
             willayas                        :   []  ,
@@ -192,24 +195,56 @@ export default {
 
             let formData = new FormData();
 
-            formData.append("CustomerCode"  ,   this.client.CustomerCode)
-            formData.append("CustomerNameE" ,   this.client.CustomerNameE)
-            formData.append("CustomerNameA" ,   this.client.CustomerNameA)
-            formData.append("Latitude"      ,   this.client.Latitude)
-            formData.append("Longitude"     ,   this.client.Longitude)
-            formData.append("Address"       ,   this.client.Address)
-            formData.append("DistrictNo"    ,   this.client.DistrictNo)
-            formData.append("DistrictNameE" ,   this.client.DistrictNameE)
-            formData.append("CityNo"        ,   this.client.CityNo)
-            formData.append("CityNameE"     ,   this.client.CityNameE)
-            formData.append("Tel"           ,   this.client.Tel)
-            formData.append("CustomerType"  ,   this.client.CustomerType)
-            formData.append("JPlan"         ,   this.client.JPlan)
-            formData.append("Journee"       ,   this.client.Journee)
+            formData.append("CustomerCode"      ,   this.client.CustomerCode)
+            formData.append("CustomerNameE"     ,   this.client.CustomerNameE)
+            formData.append("CustomerNameA"     ,   this.client.CustomerNameA)
+            formData.append("Latitude"          ,   this.client.Latitude)
+            formData.append("Longitude"         ,   this.client.Longitude)
+            formData.append("Address"           ,   this.client.Address)
+            formData.append("DistrictNo"        ,   this.client.DistrictNo)
+            formData.append("DistrictNameE"     ,   this.client.DistrictNameE)
+            formData.append("CityNo"            ,   this.client.CityNo)
+            formData.append("CityNameE"         ,   this.client.CityNameE)
+            formData.append("Tel"               ,   this.client.Tel)
+            formData.append("CustomerType"      ,   this.client.CustomerType)
+            formData.append("JPlan"             ,   this.client.JPlan)
+            formData.append("Journee"           ,   this.client.Journee)
+            formData.append("id_route_import"   ,   this.$route.params.id_route_import)
 
-            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/update",   formData)
+            if(this.$connectedToInternet) {
 
-            if(res.status===200){
+                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/update",   formData)
+
+                if(res.status===200){
+
+                    this.client.id_route_import     =   this.$route.params.id_route_import
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    // Send Client
+                    this.emitter.emit('reSetUpdate' , this.client)
+
+                    // Close Modal
+                    this.$hideModal("modalClientUpdateIndexedDB")
+                }
+                
+                else{
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    // Send Errors
+                    this.$showErrors("Error !", res.data.errors)
+                }
+            }
+
+            else {
+
+                this.client.id_route_import     =   this.$route.params.id_route_import
+
+                // Add in indexedDB
+                await this.$indexedDB.$setUpdatedClients(this.client, this.$route.params.id_route_import)
 
                 // Hide Loading Page
                 this.$hideLoadingPage()
@@ -220,24 +255,46 @@ export default {
                 // Close Modal
                 this.$hideModal("modalClientUpdateIndexedDB")
             }
-            
-            else{
-
-                // Hide Loading Page
-                this.$hideLoadingPage()
-
-                // Send Errors
-                this.$showErrors("Error !", res.data.errors)
-			}
         },
 
         async deleteData() {
 
             this.$showLoadingPage()
 
-            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/delete",   null)
+            if(this.$connectedToInternet) {
 
-            if(res.status===200){
+                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/delete",   null)
+
+                if(res.status===200){
+
+                    this.client.id_route_import     =   this.$route.params.id_route_import
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    // Send Client
+                    this.emitter.emit('reSetDelete' , this.client)
+
+                    // Close Modal
+                    this.$hideModal("modalClientUpdateIndexedDB")
+                }
+                
+                else{
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    // Send Errors
+                    this.$showErrors("Error !", res.data.errors)
+                }
+            }
+
+            else {
+
+                this.client.id_route_import     =   this.$route.params.id_route_import
+
+                // Add in indexedDB
+                await this.$indexedDB.$setDeletedClients(this.client, this.$route.params.id_route_import)
 
                 // Hide Loading Page
                 this.$hideLoadingPage()
@@ -248,15 +305,58 @@ export default {
                 // Close Modal
                 this.$hideModal("modalClientUpdateIndexedDB")
             }
-            
-            else{
+        },
+
+        async validateData() {
+
+            this.$showLoadingPage()
+
+            if(this.$connectedToInternet) {
+
+                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/validate",   null)
+
+                if(res.status===200){
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    this.client.status              =   "validated"
+                    this.client.id_route_import     =   this.$route.params.id_route_import
+
+                    // Send Client
+                    this.emitter.emit('reSetValidate' , this.client)
+
+                    // Close Modal
+                    this.$hideModal("modalClientUpdateIndexedDB")
+                }
+                
+                else{
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    // Send Errors
+                    this.$showErrors("Error !", res.data.errors)
+                }
+            }
+
+            else {
+
+                this.client.status              =   "validated"
+                this.client.id_route_import     =   this.$route.params.id_route_import
+
+                // Add in indexedDB
+                await this.$indexedDB.$setValidatedClients(this.client, this.$route.params.id_route_import)
 
                 // Hide Loading Page
                 this.$hideLoadingPage()
 
-                // Send Errors
-                this.$showErrors("Error !", res.data.errors)
-			}
+                // Send Client
+                this.emitter.emit('reSetValidate' , this.client)
+
+                // Close Modal
+                this.$hideModal("modalClientUpdateIndexedDB")
+            }
         },
 
         //
@@ -297,29 +397,11 @@ export default {
                 // Journey Plan
                 this.client.JPlan               =   '',
 
+                this.client.status                =   '',
+
                 this.willayas                   =   []
                 this.cites                      =   []
-
-                // Remove Drawings
-                this.removeDrawings()
-
             });
-        },
-
-        removeDrawings() {
-
-            // Not Map
-            if(!this.$route.path.startsWith("/route/obs/")) {
-
-                // Do Nothing 
-            }
-
-            // Map
-            else {
-
-                // Remove Drawings
-                this.$map.$removeDrawings()
-            }   
         },
 
         getData(client) {
@@ -354,6 +436,8 @@ export default {
 
             this.client.Journee             =   client.Journee
 
+            this.client.status                =   client.status
+
             this.setJoursGetData(client)
 
             await this.getCites()
@@ -361,20 +445,45 @@ export default {
 
         async getComboData() {
 
-            const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
-            this.willayas                   =   res_3.data
+            if(this.$connectedToInternet) {
+
+                const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
+                this.willayas                   =   res_3.data
+            }
+
+            else {
+
+                this.willayas                   =   await this.$indexedDB.$getWillayas()
+            }
         },
 
         async getCites() {
 
-            // Show Loading Page
-            this.$showLoadingPage()
+            if(this.$connectedToInternet) {
 
-            const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
-            this.cites                      =   res_3.data
+                // Show Loading Page
+                this.$showLoadingPage()
 
-            // Hide Loading Page
-            this.$hideLoadingPage()
+                const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
+                this.cites                      =   res_3.data
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+            }
+
+            else {
+
+                // Show Loading Page
+                this.$showLoadingPage()
+
+                let willaya                     =   await this.$indexedDB.$getWillaya(this.client.DistrictNo)
+                console.log(willaya)
+
+                this.cites                      =   willaya.cites
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+            }
         },
 
         //

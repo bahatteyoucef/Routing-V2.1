@@ -9,6 +9,7 @@ use App\Http\Controllers\RouteImportTempoController;
 use App\Http\Controllers\UserController;
 use App\Models\ClientTempo;
 use App\Models\JourneyPlan;
+use App\Models\RouteImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -51,22 +52,36 @@ Route::middleware('auth:api')->group(function () {
     
     // RTM WIllaya Cite
 
-    Route::post('/rtm_willayas'         ,   function()  { 
+    Route::post('/rtm_willayas/rtm_cites/details'           ,   function()  { 
+
+        $willayas   =   DB::table("RTM_Willaya")->orderBy("DistrictNo")->get();
+
+        foreach ($willayas as $willaya) {
+
+            $willaya->cites =   DB::table("RTM_City")->where('DistrictNo', $willaya->DistrictNo)->orderBy("CityNo")->get();
+        }
+
+        return $willayas;
+    });
+
+    Route::post('/rtm_willayas'                             ,   function()  { 
 
         return DB::table("RTM_Willaya")->orderBy("DistrictNo")->get();
     });
 
-    Route::post('/rtm_willayas/{DistrictNo}/rtm_cites'         ,   function($DistrictNo)  { 
+    Route::post('/rtm_willayas/{DistrictNo}/rtm_cites'      ,   function($DistrictNo)  { 
 
-        return DB::table("RTM_City")->where('DistrictNo', $DistrictNo)->orderBy("DistrictNo")->get();
+        return DB::table("RTM_City")->where('DistrictNo', $DistrictNo)->orderBy("CityNo")->get();
     });
 
-    Route::post('/rtm_cites'            ,   function()  { 
+    Route::post('/rtm_cites'                                ,   function()  { 
 
         return DB::table("RTM_City")->orderBy("CityNo")->get();
     });
 
     //
+
+    Route::post('/indexedDB/sync'                                                                       ,   [RouteImportController::class           , 'sync'                                    ]);
 
     // Users
 
@@ -137,6 +152,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/route_import/{id}/journees/store'                                                     ,   [JourneeController::class               , 'storeJournee'                            ]);
     Route::post('/route_import/{id}/journees/{id_journee}/update'                                       ,   [JourneeController::class               , 'updateJournee'                           ]);
     Route::post('/route_import/{id}/journees/{id_journee}/delete'                                       ,   [JourneeController::class               , 'deleteJournee'                           ]);
+
+    Route::post('/route_import/{id_route_import}/clients/{id}/validate'                                 ,   [ClientController::class                , 'validateClient'                          ]);
 
     Route::post('/route_import/{id_route_import}/clients/store'                                         ,   [ClientController::class                , 'storeClient'                             ]);
     Route::post('/route_import/{id_route_import}/clients/{id}/update'                                   ,   [ClientController::class                , 'updateClient'                            ]);

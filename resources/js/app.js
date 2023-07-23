@@ -19,24 +19,6 @@ const app           =   createApp(App)
 
 // 
 
-// Singleton
-
-app.config.globalProperties.$map        =   new Map()
-
-// IndexedDB
-app.config.globalProperties.$indexedDB  =   new IndexedDB()
-app.config.globalProperties.$indexedDB.$indexedDB_intialiazeSetDATA()
-
-// 
-
-if (window.navigator.onLine) {
-    app.config.globalProperties.$connectedToInternet  =   true
-} else {
-    app.config.globalProperties.$connectedToInternet  =   false
-}
-
-// 
-
 // Event Bus
 
 import mitt from 'mitt'
@@ -177,6 +159,25 @@ import "bootstrap"
 
 import  {Modal}   from    'bootstrap';
 window.Modal = Modal;
+
+// 
+
+// Singleton
+if (window.navigator.onLine) {
+    app.config.globalProperties.$map                    =   new Map()
+}
+
+// IndexedDB
+app.config.globalProperties.$indexedDB                  =   new IndexedDB()
+
+await app.config.globalProperties.$indexedDB.$indexedDB_intialiazeSetDATA()
+
+//
+
+// Internet
+app.config.globalProperties.$connectedToInternet        =   window.navigator.onLine
+window.addEventListener('online'    , ()    =>  {app.config.globalProperties.$connectedToInternet   =   true});
+window.addEventListener('offline'   , ()    =>  {app.config.globalProperties.$connectedToInternet   =   false});
 
 // 
 

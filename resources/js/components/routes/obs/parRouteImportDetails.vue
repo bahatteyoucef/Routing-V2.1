@@ -232,9 +232,9 @@
                         <tr>
                             <th class="col-sm-1">Index</th>
 
-                            <th class="col-sm-1">CustomerCode</th>
-                            <th class="col-sm-1">CustomerNameE</th>
-                            <th class="col-sm-1">CustomerNameA</th>
+                            <th class="col-sm-2">CustomerCode</th>
+                            <th class="col-sm-2">CustomerNameE</th>
+                            <th class="col-sm-2">CustomerNameA</th>
 
                             <th class="col-sm-2">Latitude</th>
                             <th class="col-sm-2">Longitude</th>
@@ -253,7 +253,14 @@
 
                             <th class="col-sm-2">JPlan</th>
 
-                            <th class="col-sm-1">Journee</th>
+                            <th class="col-sm-2">Journee</th>
+
+                            <!--  -->
+
+                            <th class="col-sm-2">Owner</th>
+                            <th class="col-sm-2">Created At</th>
+                            <th class="col-sm-2">Status</th>
+
                         </tr>
                     </thead>
 
@@ -262,9 +269,9 @@
 
                             <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Index"            /></th>
 
-                            <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
-                            <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
-                            <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
 
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Latitude"         /></th>
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Longitude"        /></th>
@@ -284,6 +291,12 @@
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="JPlan"            /></th>
 
                             <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Journee"          /></th>
+
+                            <!--  -->
+
+                            <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Owner"            /></th>
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Created_At"       /></th>
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Status"           /></th>
                         </tr>
                     </thead>
                     
@@ -292,7 +305,6 @@
                             <td>{{index +   1}}</td>
 
                             <td>{{client.CustomerCode}}</td>
-
                             <td>{{client.CustomerNameE}}</td>
                             <td>{{client.CustomerNameA}}</td>
 
@@ -314,6 +326,17 @@
                             <td>{{client.JPlan}}</td>
 
                             <td>{{client.Journee}}</td>
+
+                            <!--  -->
+
+                            <td>{{client.owner_name}}</td>
+                            <td>{{client.created_at}}</td>
+
+                            <td>
+                                <span v-if="client.status=='unvalidated'"   href="#" class="badge badge-warning">{{client.status}}</span>
+                                <span v-if="client.status=='validated'"     href="#" class="badge badge-success">{{client.status}}</span>
+                            </td>
+
                         </tr>
                     </tbody>
                 </table>
@@ -420,8 +443,15 @@ export default {
             getUpdateClient         : 'client/getUpdateClient'              ,
             getClientsChangeRoute   : 'client/getClientsChangeRoute'        ,
 
-            getAddJourneyPlan       : 'journey_plan/getAddJourneyPlan'
+            getAddJourneyPlan       : 'journey_plan/getAddJourneyPlan'      ,
+
+            //
+
+            getUser                 :   'authentification/getUser'              ,
+            getAccessToken          :   'authentification/getAccessToken'       ,
+            getIsAuthentificated    :   'authentification/getIsAuthentificated'
         })
+
     },
 
     async mounted() {
@@ -454,6 +484,13 @@ export default {
         this.emitter.on('reSetDelete'       , async (client)    =>  {
 
             this.deleteClientJSON(client)
+
+            this.removeDrawings()
+        })
+
+        this.emitter.on('reSetValidate'     , async (client)    =>  {
+
+            this.validateClientJSON(client)
 
             this.removeDrawings()
         })
@@ -503,6 +540,8 @@ export default {
         ...mapActions("journee" ,  [
             "setListeJourneeAction"     ,
         ]),
+
+        //
 
         setValues() {
 
@@ -1453,6 +1492,10 @@ export default {
             new_client.JPlan            =   client.JPlan            
             new_client.Journee          =   client.Journee        
 
+            new_client.status           =   client.status            
+            new_client.owner_name       =   this.getUser.nom
+            new_client.created_at       =   this.$formatDate(new Date())
+
             this.route_import.clients.push(new_client)
 
             // ReAffiche
@@ -1486,6 +1529,24 @@ export default {
 
                     this.route_import.clients[i].JPlan          =   client.JPlan            
                     this.route_import.clients[i].Journee            =   client.Journee        
+
+                    break
+                }
+            }
+
+            // ReAffiche
+            this.reAfficherClientsAndMarkers()
+        },
+
+        validateClientJSON(client) {
+
+            for (let i = 0; i < this.route_import.clients.length; i++) {
+                
+                if(this.route_import.clients[i].id  ==  client.id) {
+
+                    // Update Client
+
+                    this.route_import.clients[i].status     =   "validated"
 
                     break
                 }

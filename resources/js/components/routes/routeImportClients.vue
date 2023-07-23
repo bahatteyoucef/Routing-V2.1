@@ -23,10 +23,10 @@
 
                                 <th class="col-sm-2">Address</th>
 
-                                <th class="col-sm-1">DistrictNo</th>
+                                <!-- <th class="col-sm-1">DistrictNo</th> -->
                                 <th class="col-sm-2">DistrictNameE</th>
 
-                                <th class="col-sm-1">CityNo</th>
+                                <!-- <th class="col-sm-1">CityNo</th> -->
                                 <th class="col-sm-2">CityNameE</th>
 
                                 <th class="col-sm-2">Tel</th>
@@ -36,6 +36,12 @@
                                 <th class="col-sm-2">JPlan</th>
 
                                 <th class="col-sm-1">Journee</th>
+
+                                <!--  -->
+
+                                <th class="col-sm-2">Owner</th>
+                                <th class="col-sm-2">Created At</th>
+                                <th class="col-sm-2">Status</th>
                             </tr>
                         </thead>
 
@@ -53,10 +59,10 @@
 
                                 <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Address"          /></th>
 
-                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="DistrictNo"       /></th>
+                                <!-- <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="DistrictNo"       /></th> -->
                                 <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="DistrictNameE"    /></th>
 
-                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CityNo"           /></th>
+                                <!-- <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CityNo"           /></th> -->
                                 <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CityNameE"        /></th>
 
                                 <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Tel"              /></th>
@@ -66,6 +72,12 @@
                                 <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="JPlan"            /></th>
 
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Journee"          /></th>
+
+                                <!--  -->
+
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Owner"            /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Created_At"       /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Status"           /></th>
                             </tr>
                         </thead>
                         
@@ -83,10 +95,10 @@
 
                                 <td>{{client.Address}}</td>
 
-                                <td>{{client.DistrictNo}}</td>
+                                <!-- <td>{{client.DistrictNo}}</td> -->
                                 <td>{{client.DistrictNameE}}</td>
 
-                                <td>{{client.CityNo}}</td>
+                                <!-- <td>{{client.CityNo}}</td> -->
                                 <td>{{client.CityNameE}}</td>
 
                                 <td>{{client.Tel}}</td>
@@ -96,6 +108,17 @@
                                 <td>{{client.JPlan}}</td>
 
                                 <td>{{client.Journee}}</td>
+
+                                <!--  -->
+
+                                <td>{{client.owner_name}}</td>
+                                <td>{{client.created_at}}</td>
+
+                                <td>
+                                    <span v-if="client.status=='unvalidated'"   href="#" class="badge badge-warning">{{client.status}}</span>
+                                    <span v-if="client.status=='validated'"     href="#" class="badge badge-success">{{client.status}}</span>
+                                </td>
+
                             </tr>
                         </tbody>
                     </table>
@@ -115,10 +138,12 @@
  
 <script>
 
-import headerComponent      from "../../template/components/headerComponent.vue"
+import headerComponent              from "../../template/components/headerComponent.vue"
 
-import modalClientAddIndexedDB       from "../clients/modalClientAddIndexedDB.vue"
-import modalClientUpdateIndexedDB    from "../clients/modalClientUpdateIndexedDB.vue"
+import modalClientAddIndexedDB      from "../clients/modalClientAddIndexedDB.vue"
+import modalClientUpdateIndexedDB   from "../clients/modalClientUpdateIndexedDB.vue"
+
+import {mapGetters, mapActions}     from "vuex"
 
 export default {
 
@@ -143,6 +168,16 @@ export default {
         modalClientUpdateIndexedDB
     },
 
+    computed : {
+
+        ...mapGetters({
+
+            getUser                 :   'authentification/getUser'              ,
+            getAccessToken          :   'authentification/getAccessToken'       ,
+            getIsAuthentificated    :   'authentification/getIsAuthentificated'
+        })
+    },
+
     async mounted() {
 
         this.emitter.on('reSetAdd'          , async (client)    =>  {
@@ -160,6 +195,11 @@ export default {
             await this.deleteClientToDatatable(client)
         })
 
+        this.emitter.on('reSetValidate'     , async (client)    =>  {
+
+            await this.validateClientToDatatable(client)
+        })
+
         await this.setDataTable()
     },
 
@@ -169,23 +209,45 @@ export default {
 
             try {
 
-                // Destroy DataTable
-                if(this.datatable_route_import_client_index)  {
+                if(this.$connectedToInternet) {
 
-                    this.datatable_route_import_client_index.destroy()
+                    // Destroy DataTable
+                    if(this.datatable_route_import_client_index)  {
+
+                        this.datatable_route_import_client_index.destroy()
+                    }
+                
+                    // Initialisation 
+                    this.clients    =   [];
+
+                    this.$callApi("post",    "/route_import/"+this.$route.params.id_route_import+"/clients", null)
+                    .then(async (res)=> {
+
+                        this.route_import   =   res.data.route_import
+                        this.clients        =   res.data.clients
+
+                        this.datatable_route_import_client_index    =   await this.$DataTableCreate("route_import_client_index")
+                    })
                 }
 
-                // Initialisation 
-                this.clients    =   [];
+                else {
 
-                this.$callApi("post",    "/route_import/"+this.$route.params.id_route_import+"/clients", null)
-                .then(async (res)=> {
+                    // Destroy DataTable
+                    if(this.datatable_route_import_client_index)  {
 
-                    this.route_import   =   res.data.route_import
-                    this.clients        =   res.data.clients
+                        this.datatable_route_import_client_index.destroy()
+                    }
+                
+                    // Initialisation 
+                    this.clients    =   [];
+
+                    await this.$indexedDB.$indexedDB_intialiazeSetDATA()
+
+                    this.route_import                           =   await this.$indexedDB.$getRouteImport(this.$route.params.id_route_import)
+                    this.clients                                =   this.route_import.clients
 
                     this.datatable_route_import_client_index    =   await this.$DataTableCreate("route_import_client_index")
-                })
+                }
             }
 
             catch(e) {
@@ -193,6 +255,8 @@ export default {
                 console.log(e)
             }
         },
+
+        //
 
         async addElement() {
 
@@ -245,6 +309,10 @@ export default {
 
             new_client.JPlan            =   client.JPlan            
             new_client.Journee          =   client.Journee        
+
+            new_client.status           =   client.status            
+            new_client.owner_name       =   this.getUser.nom
+            new_client.created_at       =   this.$formatDate(new Date())
 
             this.clients.push(new_client)
 
@@ -310,6 +378,29 @@ export default {
                 if(this.clients[i].id  ==  client.id) {
 
                     this.clients.splice(i, 1)
+
+                    break
+                }
+            }
+
+            //
+
+            // Destroy DataTable
+            if(this.datatable_route_import_client_index)  {
+
+                this.datatable_route_import_client_index.destroy()
+            }
+
+            this.datatable_route_import_client_index    =   await this.$DataTableCreate("route_import_client_index")
+        },
+
+        async validateClientToDatatable(client) {
+
+            for (let i = 0; i < this.clients.length; i++) {
+                
+                if(this.clients[i].id  ==  client.id) {
+
+                    this.clients[i].status  =   client.status
 
                     break
                 }
