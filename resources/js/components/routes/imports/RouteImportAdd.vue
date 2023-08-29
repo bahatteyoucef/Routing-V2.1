@@ -63,6 +63,8 @@ export default {
                 sent_tempo                  :   false
             },
 
+            rdy_send        :   false       ,
+
             clients         :   ""      
         }
 
@@ -80,6 +82,8 @@ export default {
 
                 // Show Loading Page
                 this.$showLoadingPage()
+
+                this.rdy_send   =   false
 
                 setTimeout(() => {
                     
@@ -115,16 +119,21 @@ export default {
 
                             //
 
-                            this.setLatitudeLongitudeStandard()
-                            this.setNecessaryAttributs()
-                            this.setCustomerNo()
+                            this.checkFileFormat()
 
-                            // 
+                            if(this.rdy_send) {
 
-                            await this.setDistrictNoCityNo()
+                                this.setLatitudeLongitudeStandard()
+                                this.setNecessaryAttributs()
+                                this.setCustomerNo()
 
-                            this.route_import.new_upload    =   true
-                            this.route_import.sent_tempo    =   false
+                                // 
+
+                                await this.setDistrictNoCityNo()
+
+                                this.route_import.new_upload    =   true
+                                this.route_import.sent_tempo    =   false
+                            }
 
                             // Hide Loading Page
                             this.$hideLoadingPage()
@@ -146,6 +155,94 @@ export default {
         },
 
         //
+
+        checkFileFormat() {
+
+            let errors  =   []
+
+            if(this.clients.length  >   0) {
+
+                let columns =   Object.keys(this.clients[0])
+
+                let CustomerCode_existe     =   columns.includes("CustomerCode")
+                let CustomerNameE_existe    =   columns.includes("CustomerNameE")
+                let CustomerNameA_existe    =   columns.includes("CustomerNameA")
+                let Latitude_existe         =   columns.includes("Latitude")
+                let Longitude_existe        =   columns.includes("Longitude")
+                let Address_existe          =   columns.includes("Address")
+                let DistrictNameE_existe    =   columns.includes("DistrictNameE")
+                let CityNameE_existe        =   columns.includes("CityNameE")
+                let Tel_existe              =   columns.includes("Tel")
+                let CustomerType_existe     =   columns.includes("CustomerType")
+
+                if(!CustomerCode_existe) {
+
+                    errors.push("Your file doesn't contain the column 'CustomerCode'")
+                }
+
+                if(!CustomerNameE_existe) {
+
+                    errors.push("Your file doesn't contain the column 'CustomerNameE'")
+                }
+
+                if(!CustomerNameA_existe) {
+
+                    errors.push("Your file doesn't contain the column 'CustomerNameA'")
+                }
+
+                if(!Latitude_existe) {
+
+                    errors.push("Your file doesn't contain the column 'Latitude'")
+                }
+
+                if(!Longitude_existe) {
+
+                    errors.push("Your file doesn't contain the column 'Longitude'")
+                }
+
+                if(!Address_existe) {
+
+                    errors.push("Your file doesn't contain the column 'Address'")
+                }
+
+                if(!DistrictNameE_existe) {
+
+                    errors.push("Your file doesn't contain the column 'DistrictNameE'")
+                }
+
+                if(!CityNameE_existe) {
+
+                    errors.push("Your file doesn't contain the column 'CityNameE'")
+                }
+
+                if(!Tel_existe) {
+
+                    errors.push("Your file doesn't contain the column 'Tel'")
+                }
+
+                if(!CustomerType_existe) {
+
+                    errors.push("Your file doesn't contain the column 'CustomerType'")
+                }
+
+                //
+
+                if(errors.length    >   0) {
+
+                    this.$showErrors("Error !", errors)
+                }
+
+                else {
+
+                    this.rdy_send   =   true
+                }
+            }
+
+            else {
+
+                this.$showErrors("Error !", "Your file is empty !")
+            }
+        },
 
         setLatitudeLongitudeStandard() {
 
@@ -277,38 +374,41 @@ export default {
 
         async sendDataTempo() {
 
-            this.$showLoadingPage()
+            if(this.rdy_send) {
 
-            let formData = new FormData();
+                this.$showLoadingPage()
 
-            formData.append("libelle"   ,   this.route_import.libelle)
-            formData.append("file"      ,   this.route_import.file)
-            formData.append("data"      ,   JSON.stringify(this.clients))
+                let formData = new FormData();
 
-            const res   = await this.$callApi('post' ,   '/route_import_tempo/store'    ,   formData)         
-            console.log(res.data)
+                formData.append("libelle"   ,   this.route_import.libelle)
+                formData.append("file"      ,   this.route_import.file)
+                formData.append("data"      ,   JSON.stringify(this.clients))
 
-            if(res.status===200){
+                const res   = await this.$callApi('post' ,   '/route_import_tempo/store'    ,   formData)         
+                console.log(res.data)
 
-                //
+                if(res.status===200){
 
-                this.$goTo('/route/obs/route_import_tempo')
+                    //
 
-                //
+                    this.$goTo('/route/obs/route_import_tempo')
 
-                this.$hideLoadingPage()
+                    //
 
-                // Send Feedback
-                this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
-			}
-            
-            else{
+                    this.$hideLoadingPage()
 
-                this.$hideLoadingPage()
+                    // Send Feedback
+                    this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
+                }
+                
+                else{
 
-                // Send Errors
-                this.$showErrors("Error !", res.data.errors)
-			}
+                    this.$hideLoadingPage()
+
+                    // Send Errors
+                    this.$showErrors("Error !", res.data.errors)
+                }
+            }
         },                    
 
         //

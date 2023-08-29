@@ -15,6 +15,20 @@
                     <form>
 
                         <div class="mb-3">
+                            <label for="facade_image_update"    class="form-label">Facade Image (Facade Image)</label>
+                            <input type="file"                  class="form-control"    id="facade_image_update"               accept="image/*"    @change="facadeImage()">
+                            <img                                                        id="facade_image_display_update"       src=""              class="w-100">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="in_store_image_update"  class="form-label">In-Store Image (In-Store Image)</label>
+                            <input type="file"                  class="form-control"    id="in_store_image_update"             accept="image/*"    @change="inStoreImage()">
+                            <img                                                        id="in_store_image_display_update"     src=""              class="w-100">
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mb-3">
                             <label for="CustomerCode"       class="form-label">CustomerCode (CustomerCode)</label>
                             <input type="text"              class="form-control"        id="CustomerCode"           v-model="client.CustomerCode">
                         </div>
@@ -117,8 +131,13 @@ export default {
     data() {
         return {
 
-
             client      :   {
+
+                // Images   
+                facade_image                     :   '',
+                in_store_image                   :   '',
+                facade_image_original_name       :   '',
+                in_store_image_original_name     :   '',
 
                 // Client
                 id                  :   '',
@@ -195,25 +214,32 @@ export default {
 
             let formData = new FormData();
 
-            formData.append("CustomerCode"      ,   this.client.CustomerCode)
-            formData.append("CustomerNameE"     ,   this.client.CustomerNameE)
-            formData.append("CustomerNameA"     ,   this.client.CustomerNameA)
-            formData.append("Latitude"          ,   this.client.Latitude)
-            formData.append("Longitude"         ,   this.client.Longitude)
-            formData.append("Address"           ,   this.client.Address)
-            formData.append("DistrictNo"        ,   this.client.DistrictNo)
-            formData.append("DistrictNameE"     ,   this.client.DistrictNameE)
-            formData.append("CityNo"            ,   this.client.CityNo)
-            formData.append("CityNameE"         ,   this.client.CityNameE)
-            formData.append("Tel"               ,   this.client.Tel)
-            formData.append("CustomerType"      ,   this.client.CustomerType)
-            formData.append("JPlan"             ,   this.client.JPlan)
-            formData.append("Journee"           ,   this.client.Journee)
-            formData.append("id_route_import"   ,   this.$route.params.id_route_import)
+            formData.append("CustomerCode"                  ,   this.client.CustomerCode)
+            formData.append("CustomerNameE"                 ,   this.client.CustomerNameE)
+            formData.append("CustomerNameA"                 ,   this.client.CustomerNameA)
+            formData.append("Latitude"                      ,   this.client.Latitude)
+            formData.append("Longitude"                     ,   this.client.Longitude)
+            formData.append("Address"                       ,   this.client.Address)
+            formData.append("DistrictNo"                    ,   this.client.DistrictNo)
+            formData.append("DistrictNameE"                 ,   this.client.DistrictNameE)
+            formData.append("CityNo"                        ,   this.client.CityNo)
+            formData.append("CityNameE"                     ,   this.client.CityNameE)
+            formData.append("Tel"                           ,   this.client.Tel)
+            formData.append("CustomerType"                  ,   this.client.CustomerType)
+            formData.append("JPlan"                         ,   this.client.JPlan)
+            formData.append("Journee"                       ,   this.client.Journee)
+
+            formData.append("facade_image"                  ,   this.client.facade_image)
+            formData.append("in_store_image"                ,   this.client.in_store_image)
+            formData.append("facade_image_original_name"    ,   this.client.facade_image_original_name)
+            formData.append("in_store_image_original_name"  ,   this.client.in_store_image_original_name)
+
+            formData.append("id_route_import"               ,   this.$route.params.id_route_import)
 
             if(this.$connectedToInternet) {
 
                 const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/update",   formData)
+                console.log(res.data)
 
                 if(res.status===200){
 
@@ -365,6 +391,29 @@ export default {
 
             $(id_modal).on("hidden.bs.modal",   ()  => {
 
+                //
+
+                let facade_image_update             =   document.getElementById("facade_image_update")
+                facade_image_update.value           =   ""
+
+                let facade_image_display_update     =   document.getElementById("facade_image_display_update")
+                facade_image_display_update.src     =   ""
+
+                //
+
+                let in_store_image_update           =   document.getElementById("in_store_image_update")
+                in_store_image_update.value         =   ""
+
+                let in_store_image_display_update   =   document.getElementById("in_store_image_display_update")
+                in_store_image_display_update.src   =   ""
+
+                //
+
+                this.client.facade_image                    =   '',
+                this.client.in_store_image                  =   '',
+                this.client.facade_image_original_name      =   '',
+                this.client.in_store_image_original_name    =   '',
+
                 // 
                 this.unsetJoursGetData()
 
@@ -436,7 +485,23 @@ export default {
 
             this.client.Journee             =   client.Journee
 
-            this.client.status                =   client.status
+            this.client.status              =   client.status
+
+            this.client.facade_image                        =   client.facade_image
+            this.client.in_store_image                      =   client.in_store_image
+            this.client.facade_image_original_name          =   client.facade_image_original_name
+            this.client.in_store_image_original_name        =   client.in_store_image_original_name
+
+            // 
+            this.$createFile(client.facade_image_original_name      ,   "facade_image_update")
+            this.$createFile(client.in_store_image_original_name    ,   "in_store_image_update")
+
+            // 
+            let facade_image_display_update     =   document.getElementById("facade_image_display_update")
+            let in_store_image_display_update   =   document.getElementById("in_store_image_display_update")
+
+            this.base64ToImage(this.client.facade_image             ,   facade_image_display_update)            
+            this.base64ToImage(this.client.in_store_image           ,   in_store_image_display_update)            
 
             this.setJoursGetData(client)
 
@@ -693,7 +758,56 @@ export default {
                     return this.cites[i].CityNameE
                 }                
             }
-        }
+        },
+
+        //
+
+        async facadeImage() {
+
+            const facade_image  =   document.getElementById("facade_image_update").files[0];
+
+            console.log(facade_image)
+
+            if(facade_image) {
+
+                console.log(222)
+
+                this.client.facade_image_original_name      =   facade_image.name
+                this.client.facade_image                    =   await this.$imageToBase64(facade_image)
+
+                //
+
+                let facade_image_display                    =   document.getElementById("facade_image_display_update")
+                this.base64ToImage(this.client.facade_image, facade_image_display)
+            }
+        },
+
+        //
+
+        async inStoreImage() {
+
+            const in_store_image  =   document.getElementById("in_store_image_update").files[0];
+
+            if(in_store_image) {
+
+                this.client.in_store_image_original_name    =   in_store_image.name
+                this.client.in_store_image                  =   await this.$imageToBase64(in_store_image)
+                
+                //
+
+                let in_store_image_display                  =   document.getElementById("in_store_image_display_update")
+                this.base64ToImage(this.client.in_store_image, in_store_image_display)
+            }
+        },
+
+        //     
+
+        base64ToImage(image_base64, image_display_div) {
+
+            this.$base64ToImage(image_base64, image_display_div)
+        },
+
+        //
     },
 
     watch : {

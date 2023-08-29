@@ -210,6 +210,82 @@ export default {
 
         //
 
+        // Function to convert an image to Base64
+        $imageToBase64(imageFile) {
+
+            return new Promise((resolve, reject) => {
+
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(",")[1]);
+                reader.onerror = (error) => reject(error);
+                reader.readAsDataURL(imageFile);
+            });
+        },
+
+        // Function to convert Base64 back to an image and display it
+        $base64ToImage(base64String, outputElement) {
+
+            const image = new Image();
+            image.src = "data:image/jpeg;base64," + base64String;
+            
+            image.onload = () => {
+                outputElement.src   =   image.src;
+            };
+        },
+
+        //
+
+        $createFile(original_name, file_input_id) {
+
+            if(original_name   !=  null) {
+
+                // Create a new workbook
+                const workbook = XLSX.utils.book_new();
+
+                // Create a new worksheet
+                const worksheet = XLSX.utils.aoa_to_sheet([["Hello", "World"]]);
+
+                // Add the worksheet to the workbook
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+                // Generate the Excel file binary data
+                const excelBinaryData = XLSX.write(workbook, { type: "binary", bookType: "xlsx" });
+
+                // Convert the binary data to a Blob
+                const fileData = new Blob([this.$s2ab(excelBinaryData)], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+
+                // Create a new file object
+                const file = new File([fileData], original_name, { type: fileData.type });
+
+                // Get the file input element
+                const fileInput = document.getElementById(file_input_id);
+
+                // Create a new file list
+                const fileList = new DataTransfer();
+
+                // Add the file to the file list
+                fileList.items.add(file);
+
+                // Set the file list to the file input
+                fileInput.files = fileList.files;
+            }
+        },
+
+        // Utility function to convert a string to ArrayBuffer
+        $s2ab(s) {
+
+            const buf = new ArrayBuffer(s.length);
+            const view = new Uint8Array(buf);
+
+            for (let i = 0; i < s.length; i++) {
+                view[i] = s.charCodeAt(i) & 0xFF;
+            }
+
+            return buf;
+        },
+
+        //
+
         $getResumeFileRouting(clients) {
 
             let resume_liste_journey_plan   =   this.$getListeJourneyPlans(clients)

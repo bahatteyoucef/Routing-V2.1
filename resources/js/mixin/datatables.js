@@ -39,6 +39,7 @@ export default {
                             { extend  : "excelHtml5"    , text    : "<i class='mdi mdi-microsoft-excel'></i>"   },
                             { extend  : "copyHtml5"     , text    : "<i class='mdi mdi-content-copy'></i>"      },
                             { extend  : "pdfHtml5"      , text    : "<i class='mdi mdi-file-outline'></i>"      },
+                            { extend  : "print"         , text    : "<i class='mdi mdi-printer'></i>"      },
                         ],
 
                         language    : {

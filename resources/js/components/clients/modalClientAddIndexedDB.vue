@@ -15,6 +15,20 @@
                     <form>
 
                         <div class="mb-3">
+                            <label for="facade_image"       class="form-label">Facade Image (Facade Image)</label>
+                            <input type="file"              class="form-control"        id="facade_image"               accept="image/*"    @change="facadeImage()">
+                            <img                                                        id="facade_image_display"       src=""              class="w-100">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="in_store_image"     class="form-label">In-Store Image (In-Store Image)</label>
+                            <input type="file"              class="form-control"        id="in_store_image"             accept="image/*"    @change="inStoreImage()">
+                            <img                                                        id="in_store_image_display"     src=""              class="w-100">
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mb-3">
                             <label for="CustomerCode"       class="form-label">CustomerCode (CustomerCode)</label>
                             <input type="text"              class="form-control"        id="CustomerCode"           v-model="client.CustomerCode">
                         </div>
@@ -112,43 +126,49 @@ export default {
 
             client      :   {
 
+                // Images   
+                facade_image                    :   '',
+                in_store_image                  :   '',
+                facade_image_original_name      :   '',
+                in_store_image_original_name    :   '',
+
                 // Client
-                id              :   '',
+                id                              :   '',
 
-                CustomerCode    :   '',
+                CustomerCode                    :   '',
 
-                CustomerNameE   :   '',
-                CustomerNameA   :   '',
-                Tel             :   '',
+                CustomerNameE                   :   '',
+                CustomerNameA                   :   '',
+                Tel                             :   '',
 
-                Address         :   '',
+                Address                         :   '',
 
-                DistrictNo      :   '',
-                DistrictNameE   :   '',
+                DistrictNo                      :   '',
+                DistrictNameE                   :   '',
 
-                CityNo          :   '',
-                CityNameE       :   '',
+                CityNo                          :   '',
+                CityNameE                       :   '',
 
-                Latitude        :   '',
-                Longitude       :   '',
+                Latitude                        :   '',
+                Longitude                       :   '',
 
                 // Type
-                CustomerType    :   '',
+                CustomerType                    :   '',
 
                 // Journey Plan
-                JPlan           :   '',
+                JPlan                           :   '',
 
                 // Journee
-                Journee         :   '' 
+                Journee                         :   '' 
             },
 
-            willayas                :   [],
-            cites                   :   [],
+            willayas                            :   [],
+            cites                               :   [],
 
             // 
-            liste_journey_plan              :   []  ,
-            liste_journee                   :   []  ,
-            liste_type_client               :   []  
+            liste_journey_plan                  :   []  ,
+            liste_journee                       :   []  ,
+            liste_type_client                   :   []  
         }
     },
 
@@ -182,22 +202,28 @@ export default {
 
             let formData = new FormData();
 
-            formData.append("CustomerCode"      ,   this.client.CustomerCode)
-            formData.append("CustomerNameE"     ,   this.client.CustomerNameE)
-            formData.append("CustomerNameA"     ,   this.client.CustomerNameA)
-            formData.append("Latitude"          ,   this.client.Latitude)
-            formData.append("Longitude"         ,   this.client.Longitude)
-            formData.append("Address"           ,   this.client.Address)
-            formData.append("DistrictNo"        ,   this.client.DistrictNo)
-            formData.append("DistrictNameE"     ,   this.client.DistrictNameE)
-            formData.append("CityNo"            ,   this.client.CityNo)
-            formData.append("CityNameE"         ,   this.client.CityNameE)
-            formData.append("Tel"               ,   this.client.Tel)
-            formData.append("CustomerType"      ,   this.client.CustomerType)
-            formData.append("JPlan"             ,   this.client.JPlan)
-            formData.append("Journee"           ,   this.client.Journee)
-            formData.append("id_route_import"   ,   this.$route.params.id_route_import)
-            formData.append("status"            ,   "unvalidated")
+            formData.append("CustomerCode"                  ,   this.client.CustomerCode)
+            formData.append("CustomerNameE"                 ,   this.client.CustomerNameE)
+            formData.append("CustomerNameA"                 ,   this.client.CustomerNameA)
+            formData.append("Latitude"                      ,   this.client.Latitude)
+            formData.append("Longitude"                     ,   this.client.Longitude)
+            formData.append("Address"                       ,   this.client.Address)
+            formData.append("DistrictNo"                    ,   this.client.DistrictNo)
+            formData.append("DistrictNameE"                 ,   this.client.DistrictNameE)
+            formData.append("CityNo"                        ,   this.client.CityNo)
+            formData.append("CityNameE"                     ,   this.client.CityNameE)
+            formData.append("Tel"                           ,   this.client.Tel)
+            formData.append("CustomerType"                  ,   this.client.CustomerType)
+            formData.append("JPlan"                         ,   this.client.JPlan)
+            formData.append("Journee"                       ,   this.client.Journee)
+            formData.append("id_route_import"               ,   this.$route.params.id_route_import)
+
+            formData.append("facade_image"                  ,   this.client.facade_image)
+            formData.append("in_store_image"                ,   this.client.in_store_image)
+            formData.append("facade_image_original_name"    ,   this.client.facade_image_original_name)
+            formData.append("in_store_image_original_name"  ,   this.client.in_store_image_original_name)
+
+            formData.append("status"                        ,   "unvalidated")
 
             if(this.$connectedToInternet) {
 
@@ -258,8 +284,29 @@ export default {
 
             $(id_modal).on("hidden.bs.modal",   ()  => {
 
+                let facade_image            =   document.getElementById("facade_image")
+                facade_image.value          =   ""
+
+                let facade_image_display    =   document.getElementById("facade_image_display")
+                facade_image_display.src    =   ""
+
                 // 
+
+                let in_store_image          =   document.getElementById("in_store_image")
+                in_store_image.value        =   ""
+
+                let in_store_image_display  =   document.getElementById("in_store_image_display")
+                in_store_image_display.src  =   ""
+
+                //
+
                 this.setAddClientAction(null)
+
+                // 
+                this.client.facade_image                    =   '',
+                this.client.in_store_image                  =   '',
+                this.client.facade_image_original_name      =   '',
+                this.client.in_store_image_original_name    =   '',
 
                 // Client
                 this.client.CustomerCode    =   '',
@@ -375,7 +422,51 @@ export default {
                     return this.cites[i].CityNameE
                 }                
             }
+        },
+
+        //
+
+        async facadeImage() {
+
+            const facade_image  =   document.getElementById("facade_image").files[0];
+
+            if(facade_image) {
+
+                this.client.facade_image_original_name      =   facade_image.name
+                this.client.facade_image                    =   await this.$imageToBase64(facade_image)
+
+                //
+
+                let facade_image_display                    =   document.getElementById("facade_image_display")
+                this.base64ToImage(this.client.facade_image, facade_image_display)
+            }
+        },
+
+        //
+
+        async inStoreImage() {
+
+            const in_store_image  =   document.getElementById("in_store_image").files[0];
+
+            if(in_store_image) {
+
+                this.client.in_store_image_original_name    =   in_store_image.name
+                this.client.in_store_image                  =   await this.$imageToBase64(in_store_image)
+                
+                //
+
+                let in_store_image_display                  =   document.getElementById("in_store_image_display")
+                this.base64ToImage(this.client.in_store_image, in_store_image_display)
+            }
+        },
+
+        //     
+
+        base64ToImage(image_base64, image_display_div) {
+
+            this.$base64ToImage(image_base64, image_display_div)
         }
+
     },
 
     watch : {

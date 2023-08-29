@@ -235,6 +235,12 @@ export default {
 
                     let Route                               =   0
 
+                    let clients_neighbours                  =   []
+                    let clients_neighbours_index            =   0
+                    let nombre_neighbours                   =   0
+
+                    let nombre_clients_sans_route           =   0
+
                     //
 
                     clients                         =   [...this.clients.sort((b, a) => this.getDistance(0, 0, a.Latitude, a.Longitude) - this.getDistance(0, 0, b.Latitude, b.Longitude))]
@@ -245,7 +251,9 @@ export default {
 
                     Route                           =   0
 
-                    for (let j = 0; j < nombre_client_visite_par_route*this.nomber_routes; j++) {
+                    nombre_clients_sans_route       =   clients.length  -   nombre_client_visite_par_route*this.nomber_routes
+
+                    for (let j = 0; j < clients.length; j++) {
 
                         clients_par_route                   =   [...[]]                    
                         existe_in_finale                    =   this.checkIfClientAddedRouteMap(clients_ajoutes, clients[j])    
@@ -254,28 +262,72 @@ export default {
 
                             Route                           =   Route   +   1
 
-                            let clients_neighbours          =   [...clients.slice(j+1, this.nomber_routes*nombre_client_visite_par_route)]
-                            let clients_neighbours_index    =   0
-                            let nombre_neighbours           =   0
+                            clients_neighbours              =   [...clients.slice(j+1, clients.length)]
+                            clients_neighbours_index        =   0
+                            nombre_neighbours               =   0
                             
                             clients_neighbours.sort((a, b) => this.getDistance(clients[j].Latitude, clients[j].Longitude, a.Latitude, a.Longitude) - this.getDistance(clients[j].Latitude, clients[j].Longitude, b.Latitude, b.Longitude));
 
                             while(nombre_neighbours  <  nombre_client_visite_par_route - 1) {                      
                             
-                                existe_in_finale                    =   this.checkIfClientAddedRouteMap(clients_ajoutes, clients_neighbours[clients_neighbours_index])
+                                if(clients_neighbours[clients_neighbours_index]) {
 
-                                if(!existe_in_finale) {
+                                    existe_in_finale                    =   this.checkIfClientAddedRouteMap(clients_ajoutes, clients_neighbours[clients_neighbours_index])
 
-                                    clients_neighbours[clients_neighbours_index].JPlan  =   "Route "    +   Route
+                                    if(!existe_in_finale) {
 
-                                    clients_par_route.push(clients_neighbours[clients_neighbours_index])
-                                    clients_ajoutes.push(clients_neighbours[clients_neighbours_index])
+                                        clients_neighbours[clients_neighbours_index].JPlan  =   "Route "    +   Route
 
-                                    nombre_neighbours       =   nombre_neighbours           +   1
+                                        clients_par_route.push(clients_neighbours[clients_neighbours_index])
+                                        clients_ajoutes.push(clients_neighbours[clients_neighbours_index])
+
+                                        nombre_neighbours       =   nombre_neighbours           +   1
+                                    }
+
+                                    clients_neighbours_index    =   clients_neighbours_index    +   1
                                 }
 
-                                clients_neighbours_index    =   clients_neighbours_index    +   1
+                                else {
+
+                                    break
+                                }
                             }
+
+                            //
+
+                            if(nombre_clients_sans_route  >   0) {
+
+                                while(true) {                      
+                                
+                                    if(clients_neighbours[clients_neighbours_index]) {
+
+                                        existe_in_finale                    =   this.checkIfClientAddedRouteMap(clients_ajoutes, clients_neighbours[clients_neighbours_index])
+
+                                        if(!existe_in_finale) {
+
+                                            clients_neighbours[clients_neighbours_index].JPlan  =   "Route "    +   Route
+
+                                            clients_par_route.push(clients_neighbours[clients_neighbours_index])
+                                            clients_ajoutes.push(clients_neighbours[clients_neighbours_index])
+
+                                            nombre_neighbours               =   nombre_neighbours           +   1
+
+                                            nombre_clients_sans_route     =   nombre_clients_sans_route -   1
+
+                                            break
+                                        }
+
+                                        clients_neighbours_index    =   clients_neighbours_index    +   1
+                                    }
+
+                                    else {
+
+                                        break
+                                    }
+                                }
+                            }
+
+                            //
 
                             clients[j].JPlan    =   "Route "    +   Route
 
@@ -283,19 +335,6 @@ export default {
                             clients_ajoutes.push(clients[j])
                             clients_par_tous_les_route.push(clients_par_route)
                         }
-                    }
-
-                    //
-
-                    for(let i = this.nomber_routes*nombre_client_visite_par_route; i < clients.length; i++) {
-
-                        if(typeof clients_par_tous_les_route["N/A"] == "undefined") {
-
-                            clients_par_tous_les_route["N/A"]   =   []
-                        }
-
-                        this.clients[i].JPlan                =   "N/A"
-                        clients_par_tous_les_route["N/A"].push(clients[i])
                     }
 
                     //
@@ -353,6 +392,12 @@ export default {
 
                     let Journee                             =   0
 
+                    let clients_neighbours                  =   []
+                    let clients_neighbours_index            =   0
+                    let nombre_neighbours                   =   0
+
+                    let nombre_clients_sans_journee         =   0
+
                     //
 
                     clients_par_route               =   [...this.resume_liste_journey_plan[key].clients.sort((b, a) => this.getDistance(0, 0, a.Latitude, a.Longitude) - this.getDistance(0, 0, b.Latitude, b.Longitude))]
@@ -363,7 +408,11 @@ export default {
 
                     Journee                         =   0
 
-                    for (let j = 0; j < nombre_client_visite_par_jour*nombre_journee; j++) {
+                    nombre_clients_sans_journee     =   clients_par_route.length    -   nombre_client_visite_par_jour*nombre_journee
+
+                    //
+
+                    for (let j = 0; j < clients_par_route.length; j++) {
 
                         clients_par_jour                    =   [...[]]                    
                         existe_in_finale                    =   this.checkIfClientAddedJourSemaineMap(clients_ajoutes, clients_par_route[j])    
@@ -372,28 +421,72 @@ export default {
 
                             Journee                         =   Journee   +   1
 
-                            let clients_neighbours          =   [...clients_par_route.slice(j+1, nombre_journee*nombre_client_visite_par_jour)]
-                            let clients_neighbours_index    =   0
-                            let nombre_neighbours           =   0
+                            clients_neighbours          =   [...clients_par_route.slice(j+1, clients_par_route.length)]
+                            clients_neighbours_index    =   0
+                            nombre_neighbours           =   0
                             
                             clients_neighbours.sort((a, b) => this.getDistance(clients_par_route[j].Latitude, clients_par_route[j].Longitude, a.Latitude, a.Longitude) - this.getDistance(clients_par_route[j].Latitude, clients_par_route[j].Longitude, b.Latitude, b.Longitude));
 
                             while(nombre_neighbours  <  nombre_client_visite_par_jour - 1) {                      
                             
-                                existe_in_finale                    =   this.checkIfClientAddedRouteMap(clients_ajoutes, clients_neighbours[clients_neighbours_index])
+                                if(clients_neighbours[clients_neighbours_index]) {
 
-                                if(!existe_in_finale) {
+                                    existe_in_finale                    =   this.checkIfClientAddedRouteMap(clients_ajoutes, clients_neighbours[clients_neighbours_index])
 
-                                    clients_neighbours[clients_neighbours_index].Journee    =   "Jour " +   Journee
+                                    if(!existe_in_finale) {
 
-                                    clients_par_jour.push(clients_neighbours[clients_neighbours_index])
-                                    clients_ajoutes.push(clients_neighbours[clients_neighbours_index])
+                                        clients_neighbours[clients_neighbours_index].Journee    =   "Jour " +   Journee
 
-                                    nombre_neighbours       =   nombre_neighbours           +   1
+                                        clients_par_jour.push(clients_neighbours[clients_neighbours_index])
+                                        clients_ajoutes.push(clients_neighbours[clients_neighbours_index])
+
+                                        nombre_neighbours       =   nombre_neighbours           +   1
+                                    }
+                                    
+                                    clients_neighbours_index    =   clients_neighbours_index    +   1
                                 }
 
-                                clients_neighbours_index    =   clients_neighbours_index    +   1
+                                else {
+
+                                    break
+                                }
                             }
+
+                            //
+
+                            if(nombre_clients_sans_journee  >   0) {
+
+                                while(true) {                      
+                                
+                                    if(clients_neighbours[clients_neighbours_index]) {
+
+                                        existe_in_finale                    =   this.checkIfClientAddedRouteMap(clients_ajoutes, clients_neighbours[clients_neighbours_index])
+
+                                        if(!existe_in_finale) {
+
+                                            clients_neighbours[clients_neighbours_index].Journee    =   "Jour " +   Journee
+
+                                            clients_par_jour.push(clients_neighbours[clients_neighbours_index])
+                                            clients_ajoutes.push(clients_neighbours[clients_neighbours_index])
+
+                                            nombre_neighbours               =   nombre_neighbours           +   1
+
+                                            nombre_clients_sans_journee     =   nombre_clients_sans_journee -   1
+
+                                            break
+                                        }
+
+                                        clients_neighbours_index    =   clients_neighbours_index    +   1
+                                    }
+
+                                    else {
+
+                                        break
+                                    }
+                                }
+                            }
+
+                            //
 
                             clients_par_route[j].Journee    =   "Jour " +   Journee
 
@@ -401,19 +494,6 @@ export default {
                             clients_ajoutes.push(clients_par_route[j])
                             clients_par_route_tous_les_jour.push(clients_par_jour)
                         }
-                    }
-
-                    //
-
-                    for(let i = nombre_client_visite_par_jour*nombre_journee; i < clients_par_route.length; i++) {
-
-                        if(typeof clients_par_route_tous_les_jour["N/A"]    ==  "undefined") {
-
-                            clients_par_route_tous_les_jour["N/A"]  =   []
-                        }
-
-                        clients_par_route[i].Journee                =   "N/A"
-                        clients_par_route_tous_les_jour["N/A"].push(clients_par_route[i])
                     }
 
                     //

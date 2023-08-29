@@ -60,6 +60,7 @@ import 'datatables.net-buttons/js/buttons.colVis.min';
 import 'datatables.net-buttons/js/dataTables.buttons.min';
 import 'datatables.net-buttons/js/buttons.flash.min';
 import 'datatables.net-buttons/js/buttons.html5.min';
+import 'datatables.net-buttons/js/buttons.print.min';
 
 import 'datatables.net-select-bs5'
 

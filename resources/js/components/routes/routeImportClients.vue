@@ -150,6 +150,11 @@ export default {
     data() {
         return {
 
+            updated_user                            :   ''      ,
+            added_user                              :   ''      ,
+
+            //
+
             route_import                            :   null    ,
 
             clients                                 :   []      ,

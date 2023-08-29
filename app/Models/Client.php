@@ -135,21 +135,27 @@ class Client extends Model
     public static function storeClient(Request $request, int $id_route_import) {
 
         $client     =   new Client([
-            'CustomerCode'      =>  $request->input("CustomerCode")     ,
-            'CustomerNameE'     =>  $request->input("CustomerNameE")    ,
-            'CustomerNameA'     =>  $request->input("CustomerNameA")    ,
-            'Latitude'          =>  $request->input("Latitude")         ,
-            'Longitude'         =>  $request->input("Longitude")        ,
-            'Address'           =>  $request->input("Address")          ,
-            'DistrictNo'        =>  $request->input("DistrictNo")       ,
-            'DistrictNameE'     =>  $request->input("DistrictNameE")    ,
-            'CityNo'            =>  $request->input("CityNo")           ,
-            'CityNameE'         =>  $request->input("CityNameE")        ,
-            'Tel'               =>  $request->input("Tel")              ,
-            'CustomerType'      =>  $request->input("CustomerType")     ,
-            'id_route_import'   =>  $id_route_import                    ,  
-            'status'            =>  $request->input("status")           ,
-            'owner'             =>  Auth::user()->id
+            'CustomerCode'                  =>  $request->input("CustomerCode")                 ,
+            'CustomerNameE'                 =>  $request->input("CustomerNameE")                ,
+            'CustomerNameA'                 =>  $request->input("CustomerNameA")                ,
+            'Latitude'                      =>  $request->input("Latitude")                     ,
+            'Longitude'                     =>  $request->input("Longitude")                    ,
+            'Address'                       =>  $request->input("Address")                      ,
+            'DistrictNo'                    =>  $request->input("DistrictNo")                   ,
+            'DistrictNameE'                 =>  $request->input("DistrictNameE")                ,
+            'CityNo'                        =>  $request->input("CityNo")                       ,
+            'CityNameE'                     =>  $request->input("CityNameE")                    ,
+            'Tel'                           =>  $request->input("Tel")                          ,
+            'CustomerType'                  =>  $request->input("CustomerType")                 ,
+            'id_route_import'               =>  $id_route_import                                ,  
+
+            'facade_image'                  =>  $request->input("facade_image")                 ,
+            'in_store_image'                =>  $request->input("in_store_image")               ,
+            'facade_image_original_name'    =>  $request->input("facade_image_original_name")   ,
+            'in_store_image_original_name'  =>  $request->input("in_store_image_original_name")   ,
+
+            'status'                        =>  $request->input("status")                       ,
+            'owner'                         =>  Auth::user()->id
         ]);
 
         if($request->input("JPlan")     !=  null) {
@@ -196,19 +202,24 @@ class Client extends Model
 
         if($client) {
 
-            $client->CustomerCode       =   $request->get("CustomerCode")       ;
-            $client->CustomerNameE      =   $request->get("CustomerNameE")      ;
-            $client->CustomerNameA      =   $request->get("CustomerNameA")      ;
-            $client->Latitude           =   $request->get("Latitude")           ;
-            $client->Longitude          =   $request->get("Longitude")          ;
-            $client->Address            =   $request->get("Address")            ;
-            $client->DistrictNo         =   $request->get("DistrictNo")         ;
-            $client->DistrictNameE      =   $request->get("DistrictNameE")      ;
-            $client->CityNo             =   $request->get("CityNo")             ;
-            $client->CityNameE          =   $request->get("CityNameE")          ;
-            $client->Tel                =   $request->get("Tel")                ;
-            $client->CustomerType       =   $request->get("CustomerType")       ;
-            $client->id_route_import    =   $id_route_import                    ;
+            $client->CustomerCode                   =   $request->get("CustomerCode")       ;
+            $client->CustomerNameE                  =   $request->get("CustomerNameE")      ;
+            $client->CustomerNameA                  =   $request->get("CustomerNameA")      ;
+            $client->Latitude                       =   $request->get("Latitude")           ;
+            $client->Longitude                      =   $request->get("Longitude")          ;
+            $client->Address                        =   $request->get("Address")            ;
+            $client->DistrictNo                     =   $request->get("DistrictNo")         ;
+            $client->DistrictNameE                  =   $request->get("DistrictNameE")      ;
+            $client->CityNo                         =   $request->get("CityNo")             ;
+            $client->CityNameE                      =   $request->get("CityNameE")          ;
+            $client->Tel                            =   $request->get("Tel")                ;
+            $client->CustomerType                   =   $request->get("CustomerType")       ;
+            $client->id_route_import                =   $id_route_import                    ;
+
+            $client->facade_image                   =   $request->get("facade_image")                   ;
+            $client->in_store_image                 =   $request->get("in_store_image")                 ;
+            $client->facade_image_original_name     =   $request->get("facade_image_original_name")     ;
+            $client->in_store_image_original_name   =   $request->get("in_store_image_original_name")   ;
 
             if($request->input("JPlan")     !=  null) {
 

@@ -45,9 +45,11 @@ export default {
     data() {
         return { 
 
+            rdy_send        :   false   ,
+
             route_import    : {
 
-                file            :   "",
+                file            :   ""  ,
             },
 
             clients         :   ""   
@@ -110,6 +112,8 @@ export default {
                 // Show Loading Page
                 this.$showLoadingPage()
 
+                this.rdy_send   =   false
+
                 setTimeout(() => {
                     
                     const target    =   event.target
@@ -144,9 +148,14 @@ export default {
 
                             //
 
-                            this.setLatitudeLongitudeStandard()
-                            this.setNecessaryAttributs()
-                            this.setCustomerNo()
+                            this.checkFileFormat()
+
+                            if(this.rdy_send) {
+
+                                this.setLatitudeLongitudeStandard()
+                                this.setNecessaryAttributs()
+                                this.setCustomerNo()
+                            }
 
                             // 
 
@@ -175,6 +184,94 @@ export default {
         },
 
         //
+
+        checkFileFormat() {
+
+            let errors  =   []
+
+            if(this.clients.length  >   0) {
+
+                let columns =   Object.keys(this.clients[0])
+
+                let CustomerCode_existe     =   columns.includes("CustomerCode")
+                let CustomerNameE_existe    =   columns.includes("CustomerNameE")
+                let CustomerNameA_existe    =   columns.includes("CustomerNameA")
+                let Latitude_existe         =   columns.includes("Latitude")
+                let Longitude_existe        =   columns.includes("Longitude")
+                let Address_existe          =   columns.includes("Address")
+                let DistrictNameE_existe    =   columns.includes("DistrictNameE")
+                let CityNameE_existe        =   columns.includes("CityNameE")
+                let Tel_existe              =   columns.includes("Tel")
+                let CustomerType_existe     =   columns.includes("CustomerType")
+
+                if(!CustomerCode_existe) {
+
+                    errors.push("Your file doesn't contain the column 'CustomerCode'")
+                }
+
+                if(!CustomerNameE_existe) {
+
+                    errors.push("Your file doesn't contain the column 'CustomerNameE'")
+                }
+
+                if(!CustomerNameA_existe) {
+
+                    errors.push("Your file doesn't contain the column 'CustomerNameA'")
+                }
+
+                if(!Latitude_existe) {
+
+                    errors.push("Your file doesn't contain the column 'Latitude'")
+                }
+
+                if(!Longitude_existe) {
+
+                    errors.push("Your file doesn't contain the column 'Longitude'")
+                }
+
+                if(!Address_existe) {
+
+                    errors.push("Your file doesn't contain the column 'Address'")
+                }
+
+                if(!DistrictNameE_existe) {
+
+                    errors.push("Your file doesn't contain the column 'DistrictNameE'")
+                }
+
+                if(!CityNameE_existe) {
+
+                    errors.push("Your file doesn't contain the column 'CityNameE'")
+                }
+
+                if(!Tel_existe) {
+
+                    errors.push("Your file doesn't contain the column 'Tel'")
+                }
+
+                if(!CustomerType_existe) {
+
+                    errors.push("Your file doesn't contain the column 'CustomerType'")
+                }
+
+                //
+
+                if(errors.length    >   0) {
+
+                    this.$showErrors("Error !", errors)
+                }
+
+                else {
+
+                    this.rdy_send   =   true
+                }
+            }
+
+            else {
+
+                this.$showErrors("Error !", "Your file is empty !")
+            }
+        },
 
         setLatitudeLongitudeStandard() {
 

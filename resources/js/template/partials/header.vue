@@ -58,16 +58,20 @@
               <li class="col-sm-7 nav-item">
 
                 <div class="row justify-content-end">
-                  <div class="col-sm-4 mt-1"  v-if="$isRole('Super Admin')">
+                  <div class="col-sm-3 mt-1"  v-if="$isRole('Super Admin')">
                     <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToUsers()">Users</button>
                   </div>
 
-                  <div class="col-sm-4 mt-1"  v-if="$isRole('Super Admin')||$isRole('BackOffice')">
+                  <div class="col-sm-3 mt-1"  v-if="$isRole('Super Admin')||$isRole('BackOffice')">
                     <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="AddRouteImport()">New Import</button>
                   </div>
 
-                  <div class="col-sm-4 mt-1"  v-if="($isRole('Super Admin')||$isRole('BackOffice'))&&(route_import_existe)">
+                  <div class="col-sm-3 mt-1"  v-if="($isRole('Super Admin')||$isRole('BackOffice'))&&(route_import_existe)">
                     <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToRouteTempo()">Suspended Import</button>
+                  </div>
+
+                  <div class="col-sm-3 mt-1">
+                    <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="sync()">Synchronize</button>
                   </div>
                 </div>
 
@@ -261,6 +265,17 @@ export default {
         goToRouteTempo() {
 
             this.$goTo('/route/obs/route_import_tempo')
+        },
+
+        //
+
+        async sync() {
+
+          this.$showLoadingPage()
+
+          await this.$indexedDB.$sync()
+
+          this.$hideLoadingPage()
         },
 
         //

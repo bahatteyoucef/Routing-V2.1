@@ -86,3 +86,9 @@ p {
     margin-left     :   1.75rem     !important;
     margin-right    :   1.75rem     !important;
 }
+
+
+.swal2-container {
+
+    z-index         :   99999999    !important;
+}

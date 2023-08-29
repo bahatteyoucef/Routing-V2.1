@@ -110,11 +110,6 @@ export default class MobileClientIndexedDB {
             this.openRequestPlanRTM.onsuccess           =   async (event)  =>  {
 
                 this.route_import_db            =   event.target.result
-
-                await this.$sync()
-
-                await this.$getListeRouteImportFromDB()
-                await this.$getWillayasFromDB()
           
                 resolve(true)
             };
@@ -153,6 +148,9 @@ export default class MobileClientIndexedDB {
             this.$clearAddedClients()
             this.$clearValidatedClients()
             this.$clearDeletedClients()
+
+            await this.$getListeRouteImportFromDB()
+            await this.$getWillayasFromDB()
         }
     }
 
