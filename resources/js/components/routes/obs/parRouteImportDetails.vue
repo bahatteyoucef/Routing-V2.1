@@ -985,11 +985,18 @@ export default {
                 // Prepare Clients
                 this.prepareClients()
 
+                console.log(this.clients_group)
+
                 // reAffiche Clients
                 await this.reAfficheClients()
 
+                console.log(this.clients_markers_affiche)
+                console.log(this.clients_table_affiche)
+
                 // reAffiche Markers
                 this.setRouteMarkers()
+
+                console.log(4)
 
                 // Hide Loading Page
                 this.$hideLoadingPage()
@@ -1008,14 +1015,23 @@ export default {
                 // Extract JPlan, Cites, District
                 this.extractMetaData()
 
+                console.log(1)
+
                 // Prepare Clients
                 this.prepareClients()
+
+                console.log(this.clients_group)
 
                 // reAffiche Clients
                 await this.reAfficheClients()
 
+                console.log(this.clients_markers_affiche)
+                console.log(this.clients_table_affiche)
+
                 // reAffiche Markers
                 this.setRouteMarkers()
+
+                console.log(4)
 
                 // Hide Loading Page
                 this.$hideLoadingPage()
