@@ -43,28 +43,55 @@ export default class Map {
                                                                     '#0288D1'       , '#FFD600'     , '#9C27B0'     , '#E65100'     , '#880E4F'     ,
                                                                     '#795548'       , '#BDBDBD'     , '#757575'     , '#424243'     , '#FBC02D'     ]
 
+        //
+
+        this.user_latitude                                  =   0
+        this.user_longitude                                 =   0
+        this.user_marker                                    =   null
+
+        this.user_role                                      =   null
     }
 
     // Map
 
-    $createMap() {
+    $createMap(role) {
 
         // Create Map
-        this.map        =   L.map('map').setView(["31.26456666666666", "2.7863816666666663"], 5);
+        this.map            =   L.map('map').setView(["31.26456666666666", "2.7863816666666663"], 5);
 
         // TitleLayer
-        this.titleLayer =   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        this.titleLayer     =   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(this.map);
 
-        // Add Journey Plan Territory
-        this.$drawJourneyPlanTerritory()
+        console.log(role)
 
-        // Add Draw Function
-        this.$drawFonction()
+        // User Role
+        this.user_role      =   role
 
-        // Add Events
-        this.$drawSelection()
+        if((this.user_role == "Super Admin")||(this.user_role == "BackOffice")) {
+
+            // Add Journey Plan Territory
+            this.$drawJourneyPlanTerritory()
+
+            // Add Draw Function
+            this.$drawFonction()
+
+            // Add Events
+            this.$drawSelection()
+        }
+
+        if((this.user_role == "FrontOffice")) {
+
+            // Add Draw Function
+            this.$drawFonction()
+
+            // Add Events
+            this.$drawSelection()
+        }
+
+        // setCurrentPosition
+        this.$setCurrentPosition()
     }
 
     $destroyMap() {
@@ -1069,5 +1096,68 @@ export default class Map {
         store.commit("journey_plan/setAddJourneyPlan" ,  {"latlngs" : latlngs})
     }
 
-    // 
+    // Audit Modifs
+
+    $setCurrentPosition() {
+
+        if(this.user_role   ==  "FrontOffice") {
+
+            // Define a custom icon for the user's position marker
+            var customIcon = L.icon({
+                iconUrl         : '/images/user_marker.png'     ,
+                iconSize        : [25, 35]                      , // Set the size of the icon
+                iconAnchor      : [12, 35]                      , // Set the anchor point of the icon (centered at the bottom)
+            });
+
+            // Create a marker with the custom icon
+            this.user_marker = L.marker([0, 0], { icon: customIcon }).addTo(this.map);
+
+            // 
+            navigator.geolocation.watchPosition(()  =>  {
+                this.$updateUserPosition();
+            });
+        }
+    }
+
+    $updateUserPosition() {
+
+        navigator.geolocation.getCurrentPosition((position) =>  {
+
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+
+            this.user_latitude   =   lat
+            this.user_longitude  =   lng
+
+            console.log(lat)
+            console.log(lng)
+
+            // Update the marker's position
+            this.user_marker.setLatLng([this.user_latitude, this.user_longitude]);
+        },
+
+            (error) => {
+            
+                console.error('Error getting geolocation:', error);
+            },
+        
+            { 
+                enableHighAccuracy  : true      ,
+                maximumAge          : 100000    ,   // Maximum age of cached position in milliseconds
+                timeout             : 95000         // Maximum time to wait for a new position in milliseconds
+            }
+        );
+    }
+
+    $showCurrentPosition() {
+
+        // Get the bounds of all the markers
+        // var groupBounds = this.user_marker.getBounds();
+
+        // Zoom the map to fit the bounds of the markers
+        this.map.setView([this.user_marker.getLatLng().lat, this.user_marker.getLatLng().lng], this.map.getZoom());
+    }
+
+    //
+
 }

@@ -1,7 +1,8 @@
 <template>
     <div class="content-wrapper">
         <section class="dashboard">
-            <div class="page-header">
+
+            <div v-if="$isRole('Super Admin')||$isRole('BackOffice')" class="page-header">
 
                 <div class="row w-100">
                     <div class="col-10">
@@ -34,13 +35,13 @@
                                     </i> 
                                 </div>
 
-                                <div class="col-1 p-0"  v-if="$isRole('Super Admin')||$isRole('BackOffice')">
+                                <div class="col-1 p-0">
                                     <i class="mdi mdi-google-maps mdi-24px p-1" role="button"                                                                   @click="navToMap(route_import.id)">
                                     </i>
                                 </div>
 
-                                <div class="col-1 p-0"  v-if="$isRole('Super Admin')||$isRole('BackOffice')||$isRole('FrontOffice')">
-                                    <i class="mdi mdi-account-multiple mdi-24px p-1" role="button"                                                                   @click="getClients(route_import.id)">
+                                <div class="col-1 p-0">
+                                    <i class="mdi mdi-account-multiple mdi-24px p-1" role="button"                                                              @click="getClients(route_import.id)">
                                     </i>
                                 </div>
                             </div>                       

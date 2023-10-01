@@ -833,5 +833,31 @@ export default {
         },
 
         //
+
+        $currentPosition() {
+
+            return new Promise((resolve, reject) => {
+
+                navigator.geolocation.getCurrentPosition(
+
+                    (position) => {
+                        resolve(position); // Resolve the promise with the position
+                    },
+
+                    (error) => {
+            
+                        reject(error)                        
+                        console.error('Error getting geolocation:', error);
+                    },
+                
+                    { 
+                        enableHighAccuracy  : true      ,
+                        maximumAge          : 100000    ,   // Maximum age of cached position in milliseconds
+                        timeout             : 95000         // Maximum time to wait for a new position in milliseconds
+                    }
+                );
+            });
+
+        }
     }
 }

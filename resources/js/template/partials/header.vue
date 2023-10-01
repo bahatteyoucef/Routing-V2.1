@@ -35,8 +35,6 @@
               <!-- Route -->
               <li class="col-sm-3 nav-item" >
                 <Multiselect
-                    v-if="$isRole('Super Admin')||$isRole('BackOffice')"
-
                     v-model             =   "route_link"
                     :options            =   "liste_route_link"
                     mode                =   "single" 
@@ -68,10 +66,6 @@
 
                   <div class="col-sm-3 mt-1"  v-if="($isRole('Super Admin')||$isRole('BackOffice'))&&(route_import_existe)">
                     <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToRouteTempo()">Suspended Import</button>
-                  </div>
-
-                  <div class="col-sm-3 mt-1">
-                    <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="sync()">Synchronize</button>
                   </div>
                 </div>
 
@@ -265,17 +259,6 @@ export default {
         goToRouteTempo() {
 
             this.$goTo('/route/obs/route_import_tempo')
-        },
-
-        //
-
-        async sync() {
-
-          this.$showLoadingPage()
-
-          await this.$indexedDB.$sync()
-
-          this.$hideLoadingPage()
         },
 
         //

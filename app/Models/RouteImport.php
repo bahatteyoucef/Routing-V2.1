@@ -406,6 +406,7 @@ class RouteImport extends Model
                 $client->Tel                =   $client_elem->Tel;
                 $client->CustomerType       =   $client_elem->CustomerType;
                 $client->id_route_import    =   $client_elem->id_route_import;
+                $client->owner              =   Auth::user()->id;
 
                 if($client_elem->JPlan      !=  null) {
 

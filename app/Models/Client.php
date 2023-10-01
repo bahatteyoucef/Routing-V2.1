@@ -47,22 +47,23 @@ class Client extends Model
             // Client
 
             $client         =   new Client([
-                'CustomerCode'      =>  $client_elem->CustomerCode      ,
-                'CustomerNameE'     =>  $client_elem->CustomerNameE     ,
-                'CustomerNameA'     =>  $client_elem->CustomerNameA     ,
-                'Latitude'          =>  $client_elem->Latitude          ,
-                'Longitude'         =>  $client_elem->Longitude         ,
-                'Address'           =>  $client_elem->Address           ,
-                'DistrictNo'        =>  $client_elem->DistrictNo        ,
-                'DistrictNameE'     =>  $client_elem->DistrictNameE     ,
-                'CityNo'            =>  $client_elem->CityNo            ,
-                'CityNameE'         =>  $client_elem->CityNameE         ,
-                'Tel'               =>  $client_elem->Tel               ,
-                'CustomerType'      =>  $client_elem->CustomerType      ,
-                'id_route_import'   =>  $id_route_import                ,
-                'status'            =>  "validated"                     ,
-                'created_at'        =>  1,
-                'owner'             =>  Auth::user()->id
+                'CustomerCode'          =>  $client_elem->CustomerCode      ,
+                'CustomerNameE'         =>  $client_elem->CustomerNameE     ,
+                'CustomerNameA'         =>  $client_elem->CustomerNameA     ,
+                'Latitude'              =>  $client_elem->Latitude          ,
+                'Longitude'             =>  $client_elem->Longitude         ,
+                'Address'               =>  $client_elem->Address           ,
+                'DistrictNo'            =>  $client_elem->DistrictNo        ,
+                'DistrictNameE'         =>  $client_elem->DistrictNameE     ,
+                'CityNo'                =>  $client_elem->CityNo            ,
+                'CityNameE'             =>  $client_elem->CityNameE         ,
+                'Tel'                   =>  $client_elem->Tel               ,
+                'CustomerType'          =>  $client_elem->CustomerType      ,
+                'id_route_import'       =>  $id_route_import                ,
+                'status'                =>  "pending"                       ,
+                'nonvalidated_details'  =>  ""                              ,
+                'created_at'            =>  1,
+                'owner'                 =>  Auth::user()->id
             ]);
 
             if($client_elem->JPlan      !=  null) {
@@ -152,9 +153,11 @@ class Client extends Model
             'facade_image'                  =>  $request->input("facade_image")                 ,
             'in_store_image'                =>  $request->input("in_store_image")               ,
             'facade_image_original_name'    =>  $request->input("facade_image_original_name")   ,
-            'in_store_image_original_name'  =>  $request->input("in_store_image_original_name")   ,
+            'in_store_image_original_name'  =>  $request->input("in_store_image_original_name") ,
 
             'status'                        =>  $request->input("status")                       ,
+            'nonvalidated_details'          =>  $request->input("nonvalidated_details")         ,
+
             'owner'                         =>  Auth::user()->id
         ]);
 
@@ -221,6 +224,11 @@ class Client extends Model
             $client->facade_image_original_name     =   $request->get("facade_image_original_name")     ;
             $client->in_store_image_original_name   =   $request->get("in_store_image_original_name")   ;
 
+            $client->status                         =   $request->get("status")                         ;
+            $client->nonvalidated_details           =   $request->get("nonvalidated_details")           ;
+
+            $client->owner                          =   Auth::user()->id;
+
             if($request->input("JPlan")     !=  null) {
 
                 $client->JPlan          =   $request->input("JPlan");
@@ -284,6 +292,7 @@ class Client extends Model
             $client->CityNameE                  =   $client_tempo->CityNameE;
             $client->Tel                        =   $client_tempo->Tel;
             $client->CustomerType               =   $client_tempo->CustomerType;
+            $client->owner                      =   Auth::user()->id;
 
             if($client_tempo->JPlan     !=  null) {
     

@@ -2,7 +2,7 @@
 
     <!-- Modal -->
     <div class="modal fade" id="updateClientModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
 
                 <div class="modal-header">
@@ -53,14 +53,16 @@
                             </select>
                         </div>
 
-                        <div class="mb-3">
+                         <!--  -->
+
+                        <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
-                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude">
+                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @changed="checkClients()">
                         </div>
 
-                        <div class="mb-3">
+                        <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
-                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude">
+                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @changed="checkClients()">
                         </div>
 
                         <!--  -->
@@ -86,6 +88,111 @@
 
                         <!--  -->
 
+                        <div v-if="client.status_original   ==  'validated'">
+                            <div v-if="$isRole('Super Admin')||$isRole('BackOffice')" class="mb-3">
+                                <label for="status"             class="form-label">Status</label>
+                                <select                         class="form-select"         id="status"                 v-model="client.status">
+                                    <option value="validated" selected>validated</option>
+                                    <option value="nonvalidated" selected>nonvalidated</option>
+                                </select>
+
+                                <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
+                                    <div class="form-group">
+                                        <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
+                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div v-if="$isRole('FrontOffice')" class="mb-3">
+                                <label for="status"             class="form-label">Status</label>
+                                <select                         class="form-select"         id="status"                 v-model="client.status">
+                                    <option value="validated" selected>validated</option>
+                                    <option value="nonvalidated">nonvalidated</option>
+                                </select>
+
+                                <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
+                                    <div class="form-group">
+                                        <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
+                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="((client.status_original   ==  'nonvalidated') || (client.status_original   ==  'pending'))">
+                            <div v-if="$isRole('Super Admin')||$isRole('BackOffice')" class="mb-3">
+                                <label for="status"             class="form-label">Status</label>
+                                <select                         class="form-select"         id="status"                 v-model="client.status">
+                                    <option value="validated" selected>validated</option>
+                                    <option value="pending">pending</option>
+                                    <option value="nonvalidated" selected>nonvalidated</option>
+                                </select>
+
+                                <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
+                                    <div class="form-group">
+                                        <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
+                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div v-if="$isRole('FrontOffice')" class="mb-3">
+                                <label for="status"             class="form-label">Status</label>
+                                <select                         class="form-select"         id="status"                 v-model="client.status">
+                                    <option value="pending" selected>pending</option>
+                                    <option value="nonvalidated">nonvalidated</option>
+                                </select>
+
+                                <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
+                                    <div class="form-group">
+                                        <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
+                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mb-3">
+                            <label for="facade_image_update"    class="form-label">Facade Image (Facade Image)</label>
+                            <input type="file"                  class="form-control"    id="facade_image_update"               accept="image/*"    @change="facadeImage()">
+                            <img                                                        id="facade_image_display_update"       src=""              class="w-100">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="in_store_image_update"  class="form-label">In-Store Image (In-Store Image)</label>
+                            <input type="file"                  class="form-control"    id="in_store_image_update"             accept="image/*"    @change="inStoreImage()">
+                            <img                                                        id="in_store_image_display_update"     src=""              class="w-100">
+                        </div>
+
+                        <!--  -->
+
+                        <hr />
+
+                        <h5>Nearby Clients</h5>
+
+                        <hr />
+
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="col-sm-1">CustomerNameE</th>
+                                    <th class="col-sm-2">Tel</th>
+                                    <th class="col-sm-1">CustomerType</th>
+                                </tr>
+                            </thead>
+                            
+                            <tbody>
+                                <tr v-for="client in close_clients" :key="client">
+                                    <td>{{client.CustomerNameE}}</td>
+                                    <td>{{client.Tel}}</td>
+                                    <td>{{client.CustomerType}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
                     </form>
 
                 </div>
@@ -97,7 +204,7 @@
 
                     <div class="right-buttons"  style="display: flex; margin-left: auto;">
                         <button type="button"   class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button"   class="btn btn-success"                             @click="validateData()"   v-if="client.status   !=  'validated'"      >Validate</button>
+                        <!-- <button type="button"   class="btn btn-success"                             @click="validateData()"   v-if="client.status   !=  'validated'"      >Validate</button> -->
                         <button type="button"   class="btn btn-primary"                             @click="sendData()"                                                 >Confirm</button>
                     </div>
                 </div>
@@ -119,6 +226,12 @@ export default {
 
 
             client      :   {
+
+                // Images   
+                facade_image                     :   '',
+                in_store_image                   :   '',
+                facade_image_original_name       :   '',
+                in_store_image_original_name     :   '',
 
                 // Client
                 id                  :   '',
@@ -149,7 +262,10 @@ export default {
                 JPlan               :   '',
                 Journee             :   '',
 
-                status                :   ''
+                // 
+                status                  :   '',
+                status_original         :   '',
+                nonvalidated_details    :   ''
             },
 
             willayas                        :   []  ,
@@ -160,6 +276,11 @@ export default {
             liste_journee                   :   []  ,
             liste_type_client               :   []  ,
 
+            //
+
+            all_clients                     :   []  ,
+            close_clients                   :   []  ,
+            min_distance                    :   0.02
         }
     },
 
@@ -209,6 +330,9 @@ export default {
             formData.append("CustomerType"  ,   this.client.CustomerType)
             formData.append("JPlan"         ,   this.client.JPlan)
             formData.append("Journee"       ,   this.client.Journee)
+
+            formData.append("status"                    ,   this.client.status)
+            formData.append("nonvalidated_details"      ,   this.client.nonvalidated_details)
 
             const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/update",   formData)
 
@@ -355,10 +479,17 @@ export default {
             }   
         },
 
-        getData(client) {
+        getData(client, all_clients) {
+
+            this.all_clients    =   all_clients
 
             this.getClientData(client)  
             this.getComboData()  
+
+            if(this.$isRole("FrontOffice")) {
+
+                this.checkClients()
+            }
         },
 
         async getClientData(client) {
@@ -387,7 +518,25 @@ export default {
 
             this.client.Journee             =   client.Journee
 
-            this.client.status                =   client.status
+            this.client.status                  =   client.status
+            this.client.status_original         =   client.status
+            this.client.nonvalidated_details    =   client.nonvalidated_details
+
+            this.client.facade_image                        =   client.facade_image
+            this.client.in_store_image                      =   client.in_store_image
+            this.client.facade_image_original_name          =   client.facade_image_original_name
+            this.client.in_store_image_original_name        =   client.in_store_image_original_name
+
+            // 
+            this.$createFile(client.facade_image_original_name      ,   "facade_image_update")
+            this.$createFile(client.in_store_image_original_name    ,   "in_store_image_update")
+
+            // 
+            let facade_image_display_update     =   document.getElementById("facade_image_display_update")
+            let in_store_image_display_update   =   document.getElementById("in_store_image_display_update")
+
+            this.base64ToImage(this.client.facade_image             ,   facade_image_display_update)            
+            this.base64ToImage(this.client.in_store_image           ,   in_store_image_display_update)            
 
             this.setJoursGetData(client)
 
@@ -619,7 +768,83 @@ export default {
                     return this.cites[i].CityNameE
                 }                
             }
-        }
+        },
+
+        //
+
+        checkClients() {
+
+            this.close_clients  =   []
+
+            let distance        =   0
+
+            for (let i = 0; i < this.all_clients.length; i++) {
+
+                distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
+
+                if(this.all_clients[i].CustomerNameE == "test") {
+
+                    console.log(distance)
+                }
+
+                if(distance <=  this.min_distance) {
+                
+                    this.close_clients.push(this.all_clients[i])
+                }
+            }
+        },
+
+        getDistance(latitude_1, longitude_1, latitude_2, longitude_2) {
+
+            return this.$map.$setDistanceStraight(latitude_1, longitude_1, latitude_2, longitude_2)
+        },
+
+        //
+
+        async facadeImage() {
+
+            const facade_image  =   document.getElementById("facade_image_update").files[0];
+
+            console.log(facade_image)
+
+            if(facade_image) {
+
+                console.log(222)
+
+                this.client.facade_image_original_name      =   facade_image.name
+                this.client.facade_image                    =   await this.$imageToBase64(facade_image)
+
+                //
+
+                let facade_image_display                    =   document.getElementById("facade_image_display_update")
+                this.base64ToImage(this.client.facade_image, facade_image_display)
+            }
+        },
+
+        //
+
+        async inStoreImage() {
+
+            const in_store_image  =   document.getElementById("in_store_image_update").files[0];
+
+            if(in_store_image) {
+
+                this.client.in_store_image_original_name    =   in_store_image.name
+                this.client.in_store_image                  =   await this.$imageToBase64(in_store_image)
+                
+                //
+
+                let in_store_image_display                  =   document.getElementById("in_store_image_display_update")
+                this.base64ToImage(this.client.in_store_image, in_store_image_display)
+            }
+        },
+
+        //     
+
+        base64ToImage(image_base64, image_display_div) {
+
+            this.$base64ToImage(image_base64, image_display_div)
+        },
     },
 
     watch : {

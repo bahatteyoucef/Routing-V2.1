@@ -34,6 +34,13 @@ export default {
 
         //
 
+        $role() {
+
+            if(this.$findRoleIndex("Super Admin")   !== -1)     return "Super Admin"
+            if(this.$findRoleIndex("BackOffice")    !== -1)     return "BackOffice"
+            if(this.$findRoleIndex("FrontOffice")   !== -1)     return "FrontOffice"
+        },
+
         $rolePrincipale() {
 
             if(this.$findRoleIndex("Administrateur")          !== -1)     return "Administrateur"

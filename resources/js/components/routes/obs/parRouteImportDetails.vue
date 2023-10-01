@@ -20,7 +20,7 @@
                 <div class="row">
 
                     <!-- Map Info -->
-                    <div class="col p-0">
+                    <div v-if="(($isRole('Super Admin'))||($isRole('BackOffice')))" class="col p-0">
                         <div class="map_top_infos_div">
                             <table class="table table-borderless">
 
@@ -50,7 +50,7 @@
                     </div>
 
                     <!-- Toggle -->
-                    <div class="col p-0 ml-1">
+                    <div v-if="(($isRole('Super Admin'))||($isRole('BackOffice')))" class="col p-0 ml-1">
                         <div id="toggle_div">
 
                             <div class="btn-container" id="marker_cluster_mode_div">
@@ -63,7 +63,18 @@
                         </div>
                     </div>
 
-                    <!--  -->
+                    <div v-if="$isRole('FrontOffice')" class="col p-0 ml-1">
+                        <div id="toggle_div">
+
+                            <div class="btn-container" id="marker_cluster_mode_div">
+                                <label class="switch btn-color-mode-switch">
+                                    <input type="checkbox" name="marker_cluster_mode" id="marker_cluster_mode" @change="switchMarkerClusterMode()">
+                                    <label for="marker_cluster_mode" data-on="Marker" data-off="Cluster" class="btn-color-mode-switch-inner"></label>
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
 
                     <div class="col p-0 ml-1" id="map_options_buttons_div"  style="display:none">
                         <div id="show_map_options_div"  @click="$showMapOptions()">
@@ -119,7 +130,7 @@
                 <div class="map_top_buttons_div" id="map_top_buttons_div">
                     <div class="row">
 
-                        <div class="col-5">
+                        <div v-if="(($isRole('Super Admin'))||($isRole('BackOffice')))" class="col-5">
                             <button class="btn primary w-100 m-0 mt-1"                                                                  @click="focuseMarkers()">Focus</button>
                             <button class="btn primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#modalResume'"         @click="showResume()">Resume</button>
                             <button class="btn primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#modalUpdateMap'"      >Update</button>
@@ -127,6 +138,11 @@
                             <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showTerritories()">Auto Territories</button>
                             <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showJPlanBDTerritories()">JPlan Territories</button>
                             <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showJourneeBDTerritories()">Journee Territories</button>
+                        </div>
+
+                        <div v-if="$isRole('FrontOffice')" class="col-5">
+                            <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showCurrentPosition()">Position</button>
+                            <button class="btn primary w-100 m-0 mt-1"                                                                  @click="addClientFront()">Add Client</button>
                         </div>
 
                         <!--  -->
@@ -139,6 +155,8 @@
                                 <option value="3">CityNameE</option>
                                 <option value="4">CustomerType</option>
                                 <option value="5">Journee</option>
+                                <option value="6">Owner</option>
+                                <option value="7">Status</option>
                             </select>
 
                             <!-- Journey Plan   -->
@@ -210,6 +228,38 @@
                                 :options    =   "liste_journee"
                                 mode        =   "tags"
                                 placeholder =   "Filter By Journee"
+                                class       =   "mt-1"
+
+                                :close-on-select    =   "false"
+                                :searchable         =   "true"
+                                :create-option      =   "true"
+
+                                @change             =   "reAfficherClientsAndMarkers()"
+                            />
+                            <!--                -->
+
+                            <!-- Owners        -->
+                            <Multiselect
+                                v-model     =   "owner_filter_value"
+                                :options    =   "owners"
+                                mode        =   "tags"
+                                placeholder =   "Filter By Owner"
+                                class       =   "mt-1"
+
+                                :close-on-select    =   "false"
+                                :searchable         =   "true"
+                                :create-option      =   "true"
+
+                                @change             =   "reAfficherClientsAndMarkers()"
+                            />
+                            <!--                -->
+
+                            <!-- Status        -->
+                            <Multiselect
+                                v-model     =   "status_filter_value"
+                                :options    =   "liste_status"
+                                mode        =   "tags"
+                                placeholder =   "Filter By Status"
                                 class       =   "mt-1"
 
                                 :close-on-select    =   "false"
@@ -333,7 +383,8 @@
                             <td>{{client.created_at}}</td>
 
                             <td>
-                                <span v-if="client.status=='unvalidated'"   href="#" class="badge badge-warning">{{client.status}}</span>
+                                <span v-if="client.status=='nonvalidated'"  href="#" class="badge badge-danger">{{client.status}}</span>
+                                <span v-if="client.status=='pending'"       href="#" class="badge badge-warning">{{client.status}}</span>
                                 <span v-if="client.status=='validated'"     href="#" class="badge badge-success">{{client.status}}</span>
                             </td>
 
@@ -402,6 +453,16 @@ export default {
             journee_filter_value        :   []                          ,
             liste_journee               :   {}                          ,
 
+            // Ownwer
+
+            owner_filter_value          :   []                          ,
+            owners                      :   {}                          ,
+
+            // Status
+
+            status_filter_value         :   []                          ,
+            liste_status                :   {}                          ,
+
             // Clients
             clients_group               :   {}                          ,
             clients_markers_affiche     :   {}                          ,
@@ -415,7 +476,13 @@ export default {
 
             // latlngs selected Polygon
             latlngs                             :   null                ,
-            journey_plan                        :   null
+            journey_plan                        :   null                ,
+
+            client : {
+
+                lat :   0,
+                lng :   0
+            }
         }
     },  
 
@@ -556,8 +623,6 @@ export default {
             const res                   =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.id_route_import+"/details",   null)
             this.route_import           =   res.data
 
-            console.log(this.route_import)
-
             // Set Clients
             this.route_import.clients   =   this.route_import.data
 
@@ -586,24 +651,32 @@ export default {
             let cite_count                          =   0
             let type_client_count                   =   0
             let journee_count                       =   0
+            let owner_count                         =   0
+            let status_count                        =   0
 
             let journey_plan_existe                 =   false
             let district_existe                     =   false
             let cite_existe                         =   false
             let type_client_existe                  =   false
             let journee_existe                      =   false
+            let owner_existe                        =   false
+            let status_existe                       =   false
 
             let journey_plan_util                   =   {}
             let district_util                       =   {}
             let cite_util                           =   {}
             let type_client_util                    =   {}
             let journee_util                        =   {}
+            let owner_util                          =   {}
+            let status_util                          =   {}
 
             let liste_journey_plan_colors           =   {}
             let districts_colors                    =   {}
             let cites_colors                        =   {}
             let liste_type_client_colors            =   {}
             let liste_journee_colors                =   {}
+            let owners_colors                       =   {}
+            let liste_status_colors                 =   {}
 
             let sortedArray                         =   null
             let sortedObject                        =   null
@@ -649,7 +722,21 @@ export default {
                 }
             }
 
-            console.log(liste_journey_plan_colors)
+            for (const [key, value] of Object.entries(this.owners)) {
+
+                if(typeof owner_util[this.owners[key].color]  ==  "undefined") {
+
+                    owners_colors[this.owners[key].color]           =   this.owners[key].color
+                }
+            }
+
+            for (const [key, value] of Object.entries(this.liste_status)) {
+
+                if(typeof status_util[this.liste_status[key].color]  ==  "undefined") {
+
+                    liste_status_colors[this.liste_status[key].color]           =   this.liste_status[key].color
+                }
+            }
 
             // Make Groupe
             for (let i = 0; i < this.route_import.clients.length; i++) {
@@ -677,6 +764,16 @@ export default {
                 if(typeof journee_util[this.route_import.clients[i].Journee]            ==  "undefined") {
 
                     journee_util[this.route_import.clients[i].Journee]                      =   this.route_import.clients[i].Journee
+                }
+
+                if(typeof owner_util[this.route_import.clients[i].owner_name]                ==  "undefined") {
+
+                    owner_util[this.route_import.clients[i].owner_name]                     =   this.route_import.clients[i].owner_name
+                }
+
+                if(typeof status_util[this.route_import.clients[i].status]              ==  "undefined") {
+
+                    status_util[this.route_import.clients[i].status]                        =   this.route_import.clients[i].status
                 }
 
                 // JPlan
@@ -771,7 +868,7 @@ export default {
                 }
 
                 // Journee
-                journee_existe              =   this.checkExistJournee(this.liste_type_client, this.route_import.clients[i].Journee) 
+                journee_existe              =   this.checkExistJournee(this.liste_journee, this.route_import.clients[i].Journee) 
 
                 if(!journee_existe) {
 
@@ -788,6 +885,46 @@ export default {
 
                     this.liste_journee[this.route_import.clients[i].Journee].color                      =   this.$colors[journee_count % this.$colors.length]
                     journee_count                                                                       =   journee_count +   1
+                }
+
+                // Owner
+                owner_existe              =   this.checkExistOwner(this.owners, this.route_import.clients[i].owner_name) 
+
+                if(!owner_existe) {
+
+                    this.owners[this.route_import.clients[i].owner_name]             =   {owner_name :   ""}
+                    this.owners[this.route_import.clients[i].owner_name].owner_name  =   this.route_import.clients[i].owner_name 
+
+                    if(Object.keys(owners_colors).length    >   0) {
+
+                        while(typeof owners_colors[this.$colors[owner_count % this.$colors.length]] !=  "undefined") {
+
+                            owner_count                                                                 =   owner_count +   1
+                        }
+                    }
+
+                    this.owners[this.route_import.clients[i].owner_name].color      =   this.$colors[owner_count % this.$colors.length]
+                    owner_count                                                     =   owner_count +   1
+                }
+
+                // Status
+                status_existe              =   this.checkExistStatus(this.liste_status, this.route_import.clients[i].status) 
+
+                if(!status_existe) {
+
+                    this.liste_status[this.route_import.clients[i].status]             =   {status :   ""}
+                    this.liste_status[this.route_import.clients[i].status].status  =   this.route_import.clients[i].status 
+
+                    if(Object.keys(liste_status_colors).length    >   0) {
+
+                        while(typeof liste_status_colors[this.$colors[status_count % this.$colors.length]] !=  "undefined") {
+
+                            status_count                                                                        =   status_count +   1
+                        }
+                    }
+
+                    this.liste_status[this.route_import.clients[i].status].color        =   this.$colors[status_count % this.$colors.length]
+                    status_count                                                        =   status_count +   1
                 }
             }
 
@@ -829,6 +966,22 @@ export default {
                 if(typeof journee_util[key]   ==  "undefined") {
 
                     delete this.liste_journee[key]
+                }
+            }
+
+            for (const [key, value] of Object.entries(this.owners)) {
+
+                if(typeof owner_util[key]   ==  "undefined") {
+
+                    delete this.owners[key]
+                }
+            }
+
+            for (const [key, value] of Object.entries(this.liste_status)) {
+
+                if(typeof status_util[key]   ==  "undefined") {
+
+                    delete this.liste_status[key]
                 }
             }
 
@@ -899,11 +1052,38 @@ export default {
             this.liste_journee                      =   sortedObject
             this.route_import.liste_journee         =   this.liste_journee
 
+            //
+
+            sortedArray                 =   Object.values(this.owners);
+            sortedArray.sort((a, b)     =>  a.owner_name.localeCompare(b.owner_name));
+            sortedObject                =   sortedArray.reduce((acc, owner, index) => {
+
+                acc[owner.owner_name]        =   owner;
+                return acc;
+            }, {});
+
+            this.owners                      =   sortedObject
+            this.route_import.owners         =   this.owners
+
             // 
+
+            sortedArray                 =   Object.values(this.liste_status);
+            sortedArray.sort((a, b)     =>  a.status.localeCompare(b.status));
+            sortedObject                =   sortedArray.reduce((acc, status, index) => {
+
+                acc[status.status]   =   status;
+                return acc;
+            }, {});
+
+            this.liste_status                      =   sortedObject
+            this.route_import.liste_status         =   this.liste_status
+
+            //
 
             this.setListeJourneyPlanAction(this.liste_journey_plan)
             this.setListeTypeClientAction(this.liste_type_client)
             this.setListeJourneeAction(this.liste_journee)
+            // this.setOwnersAction(this.owners)
         },
 
         // 
@@ -973,6 +1153,32 @@ export default {
             return false
         },
 
+        checkExistOwner(owners, owner_name) {
+
+            for (const [key, value] of Object.entries(owners)) {
+                
+                if(key  ==  owner_name) {
+
+                    return true
+                }
+            }
+
+            return false
+        },
+
+        checkExistStatus(liste_status, status) {
+
+            for (const [key, value] of Object.entries(liste_status)) {
+                
+                if(key  ==  status) {
+
+                    return true
+                }
+            }
+
+            return false
+        },
+
         //
 
         reAfficherClientsAndMarkersSelect() {
@@ -985,18 +1191,11 @@ export default {
                 // Prepare Clients
                 this.prepareClients()
 
-                console.log(this.clients_group)
-
                 // reAffiche Clients
                 await this.reAfficheClients()
 
-                console.log(this.clients_markers_affiche)
-                console.log(this.clients_table_affiche)
-
                 // reAffiche Markers
                 this.setRouteMarkers()
-
-                console.log(4)
 
                 // Hide Loading Page
                 this.$hideLoadingPage()
@@ -1015,23 +1214,14 @@ export default {
                 // Extract JPlan, Cites, District
                 this.extractMetaData()
 
-                console.log(1)
-
                 // Prepare Clients
                 this.prepareClients()
-
-                console.log(this.clients_group)
 
                 // reAffiche Clients
                 await this.reAfficheClients()
 
-                console.log(this.clients_markers_affiche)
-                console.log(this.clients_table_affiche)
-
                 // reAffiche Markers
                 this.setRouteMarkers()
-
-                console.log(4)
 
                 // Hide Loading Page
                 this.$hideLoadingPage()
@@ -1072,6 +1262,18 @@ export default {
 
                 this.journee_filter_value           =   [column_name]
             }
+
+            // Owner
+            if(this.column_group    ==  6) {
+
+                this.owner_filter_value             =   [column_name]
+            }
+
+            // Staus
+            if(this.column_group    ==  7) {
+
+                this.status_filter_value           =   [column_name]
+            }
         },
 
         //
@@ -1092,6 +1294,17 @@ export default {
             for (const [key, value] of Object.entries(this.cites)) {
 
                 if(this.cites[key].CityNameE            ==  CityNameE) {
+
+                    return key
+                }
+            }
+        },
+
+        getOwner(owner_name) {
+
+            for (const [key, value] of Object.entries(this.owners)) {
+
+                if(this.owners[key].owner_name            ==  owner_name) {
 
                     return key
                 }
@@ -1177,6 +1390,38 @@ export default {
                     for (let j = 0; j < this.route_import.clients.length; j++) {
 
                         if(this.route_import.clients[j].Journee    ==  i) {
+
+                            this.clients_group[i].clients.push(this.route_import.clients[j])
+                        }
+                    }
+                }           
+            }
+
+            if(this.column_group    ==  6) {
+
+                for (const [i, value] of Object.entries(this.route_import.owners)) {
+
+                    this.clients_group[i]                                                       =   {column_name : i, clients : [], color : this.route_import.owners[i].color}
+
+                    for (let j = 0; j < this.route_import.clients.length; j++) {
+
+                        if(this.route_import.clients[j].owner_name  ==  i) {
+
+                            this.clients_group[i].clients.push(this.route_import.clients[j])
+                        }
+                    }
+                }           
+            }
+
+            if(this.column_group    ==  7) {
+
+                for (const [i, value] of Object.entries(this.route_import.liste_status)) {
+
+                    this.clients_group[i]                                                       =   {column_name : i, clients : [], color : this.route_import.liste_status[i].color}
+
+                    for (let j = 0; j < this.route_import.clients.length; j++) {
+
+                        if(this.route_import.clients[j].status    ==  i) {
 
                             this.clients_group[i].clients.push(this.route_import.clients[j])
                         }
@@ -1283,6 +1528,32 @@ export default {
                                             // splice
                                             this.clients_markers_affiche[key].clients.splice(i, 1)
                                             splice  =   true
+                                        }
+                                    }
+
+                                    if(splice   ==  false) {
+
+                                        if(this.owner_filter_value.length    >   0) {
+
+                                            if (this.owner_filter_value.indexOf(this.clients_markers_affiche[key].clients[i].owner_name.toString())          ==  -1) {
+
+                                                // splice
+                                                this.clients_markers_affiche[key].clients.splice(i, 1)
+                                                splice  =   true
+                                            }
+                                        }
+
+                                        if(splice   ==  false) {
+
+                                            if(this.status_filter_value.length    >   0) {
+
+                                                if (this.status_filter_value.indexOf(this.clients_markers_affiche[key].clients[i].status.toString())          ==  -1) {
+
+                                                    // splice
+                                                    this.clients_markers_affiche[key].clients.splice(i, 1)
+                                                    splice  =   true
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -1442,6 +1713,14 @@ export default {
 
         //
 
+        showCurrentPosition() {
+
+            // Clear Route Data
+            this.$map.$showCurrentPosition()
+        },
+
+        //
+
         clearPath() {
 
             // Clear Path
@@ -1508,9 +1787,11 @@ export default {
             new_client.JPlan            =   client.JPlan            
             new_client.Journee          =   client.Journee        
 
-            new_client.status           =   client.status            
             new_client.owner_name       =   this.getUser.nom
             new_client.created_at       =   this.$formatDate(new Date())
+
+            new_client.status                  =   client.status            
+            new_client.nonvalidated_details    =   client.nonvalidated_details        
 
             this.route_import.clients.push(new_client)
 
@@ -1543,8 +1824,11 @@ export default {
 
                     this.route_import.clients[i].CustomerType   =   client.CustomerType     
 
-                    this.route_import.clients[i].JPlan          =   client.JPlan            
+                    this.route_import.clients[i].JPlan              =   client.JPlan            
                     this.route_import.clients[i].Journee            =   client.Journee        
+
+                    this.route_import.clients[i].status                 =   client.status            
+                    this.route_import.clients[i].nonvalidated_details   =   client.nonvalidated_details        
 
                     break
                 }
@@ -1562,7 +1846,8 @@ export default {
 
                     // Update Client
 
-                    this.route_import.clients[i].status     =   "validated"
+                    this.route_import.clients[i].status                 =   client.status            
+                    this.route_import.clients[i].nonvalidated_details   =   client.nonvalidated_details        
 
                     break
                 }
@@ -1674,14 +1959,14 @@ export default {
 
         addMap() {
 
-            this.$map.$createMap()
+            this.$map.$createMap(this.$role())
         },
 
         addClient(client) {
 
             try {
             
-                this.$refs.modalClientAdd.getData(client)
+                this.$refs.modalClientAdd.getData(client, this.clients_table_affiche)
             }
             catch(e) {
 
@@ -1692,7 +1977,7 @@ export default {
         updateClient(client) {
 
             try {
-                this.$refs.modalClientUpdate.getData(client)
+                this.$refs.modalClientUpdate.getData(client, this.clients_table_affiche)
             }
             catch(e) {
 
@@ -1716,6 +2001,33 @@ export default {
 
                 await this.$refs.modalClientsChangeRoute.getData(clients)
             }
+            catch(e) {
+
+                console.log(e)
+            }
+        },
+
+        //
+
+        async addClientFront() {
+
+            try {
+            
+
+                let position     =   await this.$currentPosition()
+
+                let client      =   { lat : 0, lng : 0 }
+
+                client.lat      =   position.coords.latitude
+                client.lng      =   position.coords.longitude
+
+                // ShowModal
+                var addModal    =   new Modal(document.getElementById("addClientModal"));
+                addModal.show();
+
+                this.addClient(client)
+            }
+
             catch(e) {
 
                 console.log(e)

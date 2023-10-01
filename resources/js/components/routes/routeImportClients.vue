@@ -6,7 +6,7 @@
 
                     <!-- Header -->
                     <headerComponent    :title="'List of clients du route import : '+route_import.libelle"      :add_modal="'modalClientAddIndexedDB'"  :update_modal="'modalClientUpdateIndexedDB'"    :add_button="'New Client'"  v-if="route_import"   
-                                        :update_button="'Update Client'"                                        />
+                                        :update_button="'Update Client'"                                        :sync_button="'sync'"               />
 
                     <!-- Table -->
                     <table class="table table-bordered clickable_table" id="route_import_client_index">
@@ -14,12 +14,12 @@
                             <tr>
                                 <th class="col-sm-1">Index</th>
 
-                                <th class="col-sm-1">CustomerCode</th>
+                                <!-- <th class="col-sm-1">CustomerCode</th> -->
                                 <th class="col-sm-1">CustomerNameE</th>
-                                <th class="col-sm-1">CustomerNameA</th>
+                                <!-- <th class="col-sm-1">CustomerNameA</th> -->
 
-                                <th class="col-sm-2">Latitude</th>
-                                <th class="col-sm-2">Longitude</th>
+                                <!-- <th class="col-sm-2">Latitude</th> -->
+                                <!-- <th class="col-sm-2">Longitude</th> -->
 
                                 <th class="col-sm-2">Address</th>
 
@@ -33,9 +33,8 @@
 
                                 <th class="col-sm-1">CustomerType</th>
 
-                                <th class="col-sm-2">JPlan</th>
-
-                                <th class="col-sm-1">Journee</th>
+                                <!-- <th class="col-sm-2">JPlan</th> -->
+                                <!-- <th class="col-sm-1">Journee</th> -->
 
                                 <!--  -->
 
@@ -50,12 +49,12 @@
 
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Index"            /></th>
 
-                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
+                                <!-- <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th> -->
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
-                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
+                                <!-- <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th> -->
 
-                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Latitude"         /></th>
-                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Longitude"        /></th>
+                                <!-- <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Latitude"         /></th> -->
+                                <!-- <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Longitude"        /></th> -->
 
                                 <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Address"          /></th>
 
@@ -69,9 +68,9 @@
 
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerType"     /></th>
 
-                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="JPlan"            /></th>
+                                <!-- <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="JPlan"            /></th> -->
 
-                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Journee"          /></th>
+                                <!-- <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Journee"          /></th> -->
 
                                 <!--  -->
 
@@ -85,13 +84,13 @@
                             <tr v-for="(client, index) in clients" :key="client" @click="selectRow(client)" role="button"   :id="'route_import_client_index_'+client.id">
                                 <td>{{index +   1}}</td>
 
-                                <td>{{client.CustomerCode}}</td>
+                                <!-- <td>{{client.CustomerCode}}</td> -->
 
                                 <td>{{client.CustomerNameE}}</td>
-                                <td>{{client.CustomerNameA}}</td>
+                                <!-- <td>{{client.CustomerNameA}}</td> -->
 
-                                <td>{{client.Latitude}}</td>
-                                <td>{{client.Longitude}}</td>
+                                <!-- <td>{{client.Latitude}}</td> -->
+                                <!-- <td>{{client.Longitude}}</td> -->
 
                                 <td>{{client.Address}}</td>
 
@@ -105,9 +104,9 @@
 
                                 <td>{{client.CustomerType}}</td>
 
-                                <td>{{client.JPlan}}</td>
+                                <!-- <td>{{client.JPlan}}</td> -->
 
-                                <td>{{client.Journee}}</td>
+                                <!-- <td>{{client.Journee}}</td> -->
 
                                 <!--  -->
 
@@ -115,7 +114,8 @@
                                 <td>{{client.created_at}}</td>
 
                                 <td>
-                                    <span v-if="client.status=='unvalidated'"   href="#" class="badge badge-warning">{{client.status}}</span>
+                                    <span v-if="client.status=='nonvalidated'"  href="#" class="badge badge-danger">{{client.status}}</span>
+                                    <span v-if="client.status=='pending'"       href="#" class="badge badge-warning">{{client.status}}</span>
                                     <span v-if="client.status=='validated'"     href="#" class="badge badge-success">{{client.status}}</span>
                                 </td>
 
@@ -267,7 +267,18 @@ export default {
 
             try {
 
-                await this.$refs.modalClientAddIndexedDB.getData()
+
+                let client      =   { lat : 0, lng : 0 }
+
+                if(this.$isRole("FrontOffice")) {
+
+                    let position     =   await this.$currentPosition()
+
+                    client.lat      =   position.coords.latitude
+                    client.lng      =   position.coords.longitude
+                }
+
+                await this.$refs.modalClientAddIndexedDB.getData(client, this.clients)
             }
             catch(e) {
 
@@ -279,12 +290,21 @@ export default {
 
             try {
 
-                await this.$refs.modalClientUpdateIndexedDB.getData(this.selected_row)
+                await this.$refs.modalClientUpdateIndexedDB.getData(this.selected_row, this.clients)
             }
             catch(e) {
 
                 console.log(e)
             }
+        },
+
+        async sync() {
+
+          this.$showLoadingPage()
+
+          await this.$indexedDB.$sync()
+
+          this.$hideLoadingPage()
         },
 
         //
@@ -318,6 +338,9 @@ export default {
             new_client.status           =   client.status            
             new_client.owner_name       =   this.getUser.nom
             new_client.created_at       =   this.$formatDate(new Date())
+
+            new_client[i].status                  =   client.status            
+            new_client[i].nonvalidated_details    =   client.nonvalidated_details        
 
             this.clients.push(new_client)
 
@@ -360,6 +383,9 @@ export default {
 
                     this.clients[i].JPlan               =   client.JPlan            
                     this.clients[i].Journee             =   client.Journee        
+
+                    this.clients[i].status                  =   client.status            
+                    this.clients[i].nonvalidated_details    =   client.nonvalidated_details        
 
                     break
                 }
@@ -405,7 +431,8 @@ export default {
                 
                 if(this.clients[i].id  ==  client.id) {
 
-                    this.clients[i].status  =   client.status
+                    this.clients[i].status                  =   client.status            
+                    this.clients[i].nonvalidated_details    =   client.nonvalidated_details        
 
                     break
                 }

@@ -2,7 +2,7 @@
 
     <!-- Modal -->
     <div class="modal fade" id="modalClientAddIndexedDB" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
 
                 <div class="modal-header">
@@ -13,20 +13,6 @@
                 <div class="modal-body mt-3">
 
                     <form>
-
-                        <div class="mb-3">
-                            <label for="facade_image"       class="form-label">Facade Image (Facade Image)</label>
-                            <input type="file"              class="form-control"        id="facade_image"               accept="image/*"    @change="facadeImage()">
-                            <img                                                        id="facade_image_display"       src=""              class="w-100">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="in_store_image"     class="form-label">In-Store Image (In-Store Image)</label>
-                            <input type="file"              class="form-control"        id="in_store_image"             accept="image/*"    @change="inStoreImage()">
-                            <img                                                        id="in_store_image_display"     src=""              class="w-100">
-                        </div>
-
-                        <!--  -->
 
                         <div class="mb-3">
                             <label for="CustomerCode"       class="form-label">CustomerCode (CustomerCode)</label>
@@ -67,14 +53,14 @@
                             </select>
                         </div>
 
-                        <div class="mb-3">
+                        <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
-                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude">
+                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @changed="checkClients()">
                         </div>
 
-                        <div class="mb-3">
+                        <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
-                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude">
+                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @changed="checkClients()">
                         </div>
 
                         <!--  -->
@@ -99,6 +85,77 @@
                         </div>
 
                         <!--  -->
+
+                        <div v-if="$isRole('Super Admin')||$isRole('BackOffice')" class="mb-3">
+                            <label for="status"             class="form-label">Status</label>
+                            <select                         class="form-select"         id="status"                 v-model="client.status">
+                                <option value="validated" selected>validated</option>
+                                <option value="pending">pending</option>
+                                <option value="nonvalidated">nonvalidated</option>
+                            </select>
+
+                            <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
+                                <div class="form-group">
+                                    <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
+                                    <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="$isRole('FrontOffice')" class="mb-3">
+                            <label for="status"             class="form-label">Status</label>
+                            <select                         class="form-select"         id="status"                 v-model="client.status">
+                                <option value="pending" selected>pending</option>
+                                <option value="nonvalidated">nonvalidated</option>
+                            </select>
+
+                            <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
+                                <div class="form-group">
+                                    <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
+                                    <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mb-3">
+                            <label for="facade_image"       class="form-label">Facade Image (Facade Image)</label>
+                            <input type="file"              class="form-control"        id="facade_image"               accept="image/*"    @change="facadeImage()">
+                            <img                                                        id="facade_image_display"       src=""              class="w-100">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="in_store_image"     class="form-label">In-Store Image (In-Store Image)</label>
+                            <input type="file"              class="form-control"        id="in_store_image"             accept="image/*"    @change="inStoreImage()">
+                            <img                                                        id="in_store_image_display"     src=""              class="w-100">
+                        </div>
+
+                        <!--  -->
+
+                        <hr />
+
+                        <h5>Nearby Clients</h5>
+
+                        <hr />
+
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="col-sm-1">CustomerNameE</th>
+                                    <th class="col-sm-2">Tel</th>
+                                    <th class="col-sm-1">CustomerType</th>
+                                </tr>
+                            </thead>
+                            
+                            <tbody>
+                                <tr v-for="client in close_clients" :key="client">
+                                    <td>{{client.CustomerNameE}}</td>
+                                    <td>{{client.Tel}}</td>
+                                    <td>{{client.CustomerType}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
 
                     </form>
 
@@ -159,7 +216,11 @@ export default {
                 JPlan                           :   '',
 
                 // Journee
-                Journee                         :   '' 
+                Journee                         :   '',
+
+                // Status
+                status                          :   '',
+                nonvalidated_details            :   ''
             },
 
             willayas                            :   [],
@@ -168,7 +229,13 @@ export default {
             // 
             liste_journey_plan                  :   []  ,
             liste_journee                       :   []  ,
-            liste_type_client                   :   []  
+            liste_type_client                   :   []  ,
+
+            //
+
+            all_clients                     :   []  ,
+            close_clients                   :   []  ,
+            min_distance                    :   0.02
         }
     },
 
@@ -182,6 +249,16 @@ export default {
     },
 
     mounted() {
+
+        if(this.$isRole("Super Admin")||this.$isRole("BackOffice")) {
+
+            this.client.status  =   "validated"
+        }
+
+        if(this.$isRole("FrontOffice")) {
+
+            this.client.status  =   "pending"
+        }
 
         this.clearData("#modalClientAddIndexedDB")
     },  
@@ -223,7 +300,8 @@ export default {
             formData.append("facade_image_original_name"    ,   this.client.facade_image_original_name)
             formData.append("in_store_image_original_name"  ,   this.client.in_store_image_original_name)
 
-            formData.append("status"                        ,   "unvalidated")
+            formData.append("status"                        ,   this.client.status)
+            formData.append("nonvalidated_details"          ,   this.client.nonvalidated_details)
 
             if(this.$connectedToInternet) {
 
@@ -235,10 +313,10 @@ export default {
                     this.$hideLoadingPage()
 
                     // Send Client
-
-                    this.client.id                  =   res.data.client.id
-                    this.client.status              =   "unvalidated"
-                    this.client.id_route_import     =   this.$route.params.id_route_import
+                    this.client.id                      =   res.data.client.id
+                    this.client.status                  =   this.client.status
+                    this.client.nonvalidated_details    =   this.client.nonvalidated_details
+                    this.client.id_route_import         =   this.$route.params.id_route_import
 
                     this.emitter.emit('reSetAdd' , this.client)
 
@@ -260,9 +338,10 @@ export default {
 
                 let max_local_id                =   await this.$indexedDB.$getMaxAddedClients()
 
-                this.client.id                  =   "local_id_"+(max_local_id   +   1) 
-                this.client.status              =   "unvalidated"
-                this.client.id_route_import     =   this.$route.params.id_route_import
+                this.client.id                      =   "local_id_"+(max_local_id   +   1) 
+                this.client.status                  =   this.client.status
+                this.client.nonvalidated_details    =   this.client.nonvalidated_details
+                this.client.id_route_import         =   this.$route.params.id_route_import
 
                 // Add in indexedDB
                 await this.$indexedDB.$setAddedClients(this.client, this.$route.params.id_route_import)
@@ -342,10 +421,17 @@ export default {
 
         //
 
-        getData(client) {
+        getData(client, all_clients) {
+
+            this.all_clients    =   all_clients
 
             this.setCoords(client)
             this.getComboData()  
+
+            if(this.$isRole("FrontOffice")) {
+
+                this.checkClients()
+            }
         },
 
         setCoords(client) {
@@ -465,7 +551,38 @@ export default {
         base64ToImage(image_base64, image_display_div) {
 
             this.$base64ToImage(image_base64, image_display_div)
+        },
+
+        //
+
+        checkClients() {
+
+            this.close_clients  =   []
+
+            let distance        =   0
+
+            for (let i = 0; i < this.all_clients.length; i++) {
+
+                distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
+
+                if(this.all_clients[i].CustomerNameE == "test") {
+
+                    console.log(distance)
+                }
+
+                if(distance <=  this.min_distance) {
+                
+                    this.close_clients.push(this.all_clients[i])
+                }
+            }
+        },
+
+        getDistance(latitude_1, longitude_1, latitude_2, longitude_2) {
+
+            return this.$map.$setDistanceStraight(latitude_1, longitude_1, latitude_2, longitude_2)
         }
+
+        //
 
     },
 

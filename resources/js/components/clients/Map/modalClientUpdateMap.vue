@@ -53,6 +53,8 @@
                             </select>
                         </div>
 
+                        <!--  
+
                         <div class="mb-3">
                             <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
                             <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude">
@@ -62,6 +64,8 @@
                             <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
                             <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude">
                         </div>
+
+                        -->
 
                         <!--  -->
 
