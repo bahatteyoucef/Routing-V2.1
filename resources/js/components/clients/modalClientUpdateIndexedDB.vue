@@ -275,6 +275,11 @@ export default {
             liste_journee                   :   []  ,
             liste_type_client               :   []  ,
 
+            //
+            all_clients                     :   []  ,
+            close_clients                   :   []  ,
+            min_distance                    :   0.03
+
         }
     },
 

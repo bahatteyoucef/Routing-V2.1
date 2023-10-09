@@ -235,7 +235,7 @@ export default {
 
             all_clients                     :   []  ,
             close_clients                   :   []  ,
-            min_distance                    :   0.02
+            min_distance                    :   0.03
         }
     },
 

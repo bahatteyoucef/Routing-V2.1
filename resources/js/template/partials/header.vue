@@ -33,7 +33,7 @@
             <ul class="navbar-nav navbar-nav-right ml-5 container m-0 mt-1 animate__animated pr-0" id="header_menu">
 
               <!-- Route -->
-              <li class="col-sm-3 nav-item" >
+              <li v-if="$isRole('Super Admin')||$isRole('BackOffice')" class="col-sm-3 nav-item" >
                 <Multiselect
                     v-model             =   "route_link"
                     :options            =   "liste_route_link"

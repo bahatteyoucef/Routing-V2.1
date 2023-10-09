@@ -122,7 +122,15 @@ export default {
 
         navToMap(id_route_import) {
             
-            this.$router.push('/route/obs/route_import/'+id_route_import+'/details')
+            if(this.$isRole("Super Admin")||this.$isRole("BackOffice")) {
+
+                this.$router.push('/route/obs/route_import/'+id_route_import+'/details')
+            }
+
+            if(this.$isRole("FrontOffice")) {
+
+                this.$router.push('/route/frontoffice/obs/route_import/'+id_route_import+'/details')
+            }
         },
 
         async setRouteImportDelete(id_route_import) {

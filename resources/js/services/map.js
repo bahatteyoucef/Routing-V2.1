@@ -1105,8 +1105,8 @@ export default class Map {
             // Define a custom icon for the user's position marker
             var customIcon = L.icon({
                 iconUrl         : '/images/user_marker.png'     ,
-                iconSize        : [25, 35]                      , // Set the size of the icon
-                iconAnchor      : [12, 35]                      , // Set the anchor point of the icon (centered at the bottom)
+                iconSize        : [35, 35]                      , // Set the size of the icon
+                iconAnchor      : [17, 17]                      , // Set the anchor point of the icon (centered at the bottom)
             });
 
             // Create a marker with the custom icon

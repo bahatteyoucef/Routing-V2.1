@@ -23,8 +23,9 @@ import RouteImportClients       from    "./components/routes/routeImportClients.
 
 //
 
-import RouteImportAdd           from    "./components/routes/imports/RouteImportAdd.vue"
-import ParRouteImportDetails    from    "./components/routes/obs/ParRouteImportDetails.vue"
+import RouteImportAdd                       from    "./components/routes/imports/RouteImportAdd.vue"
+import ParRouteImportDetails                from    "./components/routes/obs/ParRouteImportDetails.vue"
+import ParRouteImportFrontOfficeDetails     from    "./components/routes/obs/ParRouteImportFrontOfficeDetails.vue"
 
 //  //  //  //  //  //  //  //  //  //  //  //
 
@@ -75,6 +76,12 @@ const routes = [
         path        : "/route/obs/route_import/:id_route_import/details",
         component   : ParRouteImportDetails
     },
+
+    // Imports ParRouteImportFrontOfficeDetails Details
+    {
+        path        : "/route/frontoffice/obs/route_import/:id_route_import/details",
+        component   : ParRouteImportFrontOfficeDetails
+    },
 ];
 
 const router = createRouter({
@@ -96,7 +103,27 @@ router.beforeEach((to, from, next) => {
 
         if((to.path != "/login")&&(store.getters[`authentification/getIsAuthentificated`]   ==  true)) {
 
-            next()
+            if((to.path != "/login")&&(Authentification.methods.$isRole("FrontOffice"))) {
+
+                const pattern = /^\/route\/obs\/route_import\/\d+\/details$/;
+                
+                let route_obs_frontOffice   =   pattern.test(to.path);
+
+                if(route_obs_frontOffice) {
+
+                    next("/")
+                }
+
+                else {
+
+                    next()
+                }
+            }
+
+            else {
+
+                next()
+            }
         }
 
         else {
