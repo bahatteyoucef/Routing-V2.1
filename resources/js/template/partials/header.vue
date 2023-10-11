@@ -4,12 +4,30 @@
         <!-- Logo -->
         <div class="text-center navbar-brand-wrapper d-flex align-items-top justify-content-center" id="logo_div_parent">
             <router-link to="/" aria-current="page" class="navbar-brand brand-logo active router-link-active p-0">
-              <img  :src="'/images/header.png'"     alt="logo" class="mt-2"/>
+              <img  :src="'/images/profile.jpg'"     alt="logo" class="mt-3 ml-3"/>
             </router-link>
 
             <router-link to="/" aria-current="page"   class="navbar-brand brand-logo-mini active router-link-active p-0" id="mini_logo_custom">
-              <img  :src="'/images/header.png'"     alt="logo" id="mini_logo_custom_image" class="mt-2"/>
+              <img  :src="'/images/profile.jpg'"     alt="logo" id="mini_logo_custom_image" class="mt-3 ml-3"/>
             </router-link>
+
+            <!--  -->
+
+            <div class="mr-5 row w-100">
+              <div v-if="show_frontoffice_buttons" class="p-1 pt-0 mt-3 col">
+                  <button class="btn primary w-100 m-0 pr-4 pl-4"                                                                  @click="addClient()"><i class="mdi mdi-plus"></i></button>
+              </div>
+
+              <div v-if="show_frontoffice_buttons" class="p-1 pt-0 mt-3 col">
+                  <button class="btn primary w-100 m-0 pr-4 pl-4"                                                                  @click="getClients()"><i class="mdi mdi-account-multiple"></i></button>
+              </div>
+
+              <div v-if="show_frontoffice_buttons" class="p-1 pt-0 mt-3 col">
+                  <button class="btn primary w-100 m-0 pr-4 pl-4"                                                                  @click="sync()"><i class="mdi mdi-repeat"></i></button>
+              </div>
+            </div>
+
+            <!--  -->
 
             <div id="header_menu_buttons_div" style="display:none">
               <div id="show_header_menu_div" @click="$showHeaderMenu()">
@@ -24,7 +42,6 @@
                 </span> 
               </div>
             </div>
-
         </div>
 
         <div class="navbar-menu-wrapper d-flex align-items-end row h-100 w-100 pr-0 pl-4">
@@ -90,10 +107,17 @@
                 </span>
 
                 <ul tabindex="-1" class="dropdown-menu dropdown-menu-right" id="profile_header_list">
+
                     <li role="presentation" class="preview-item mt-1" @click="logOut()">
                         <span  role="button" class="dropdown-item">
                           <i class="mdi mdi-logout mr-2 text_light_purple"></i>
                           Log Out
+                        </span>
+                    </li>
+
+                    <li class="m-3 text-secondary">
+                        <span  role="button">
+                          software version : 2.0
                         </span>
                     </li>
                 </ul>
@@ -118,14 +142,16 @@ export default {
     data() {
       return {
 
-          route_link          :   null  ,
-          liste_route_link    :   null  ,
+          route_link                :   null  ,
+          liste_route_link          :   null  ,
 
-          liste_route_import  :   null  ,
+          liste_route_import        :   null  ,
 
-          route_import_existe :   false ,
+          route_import_existe       :   false ,
 
-          user                :   {}
+          user                      :   {}    ,
+
+          show_frontoffice_buttons  : false
       }
     },
 
@@ -144,7 +170,9 @@ export default {
 
     async mounted() {
 
-        console.log(this.$isRole('Super Admin'))
+        this.showFrontofficeButtons(this.$route)
+
+        // 
 
         this.user = this.getUser
 
@@ -285,6 +313,53 @@ export default {
 
             this.$showErrors("Error !" , res.errors)
           }
+        },
+
+        // 
+
+        showFrontofficeButtons(route) {
+
+          console.log(route)
+
+          if(this.$isRole("FrontOffice")) {
+
+              const pattern = /^\/route\/frontoffice\/obs\/route_import\/\d+\/details$/;
+                
+              let route_obs_frontOffice   =   pattern.test(route.path);
+
+              if(route_obs_frontOffice) {
+
+                this.show_frontoffice_buttons   = true
+              }
+
+              else {
+
+                this.show_frontoffice_buttons   = false
+              }
+          }
+        },
+
+        // 
+
+        async addClient() {
+
+          let position     =   await this.$currentPosition()
+
+          this.$router.push('/route_import/'+this.$route.params.id_route_import+'/clients/add/'+position.coords.latitude+'/'+position.coords.longitude)
+        },
+
+        getClients() {
+
+          this.$router.push('/route_import/'+this.$route.params.id_route_import+'/clients')
+        },
+
+        async sync() {
+
+          this.$showLoadingPage()
+
+          await this.$indexedDB.$sync()
+
+          this.$hideLoadingPage()
         }
     },
 
@@ -303,6 +378,7 @@ export default {
         $route(to, from) {
 
             this.setRouteLink()
+            this.showFrontofficeButtons(to)
         }
     }
 };

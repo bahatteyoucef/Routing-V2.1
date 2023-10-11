@@ -49,6 +49,11 @@ export default {
             this.$router.push(route)
         },
 
+        $goBack() {
+
+            this.$router.go(-1); 
+        },
+
         //
 
         $hideModal(id) {

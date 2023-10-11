@@ -27,6 +27,16 @@ import RouteImportAdd                       from    "./components/routes/imports
 import ParRouteImportDetails                from    "./components/routes/obs/ParRouteImportDetails.vue"
 import ParRouteImportFrontOfficeDetails     from    "./components/routes/obs/ParRouteImportFrontOfficeDetails.vue"
 
+// 
+
+import ClientsAdd                           from    "./components/clients/ClientAdd.vue"
+import ClientsUpdate                        from    "./components/clients/ClientUpdate.vue"
+
+//
+
+// Declare a variable at the top of your router file
+let initialRoute  =   true
+
 //  //  //  //  //  //  //  //  //  //  //  //
 
 const routes = [
@@ -53,6 +63,20 @@ const routes = [
     {
         path        : "/route_import/:id_route_import/clients",
         component   : RouteImportClients
+    },
+
+    // 
+
+    // ClientsAdd
+    {
+        path        : "/route_import/:id_route_import/clients/add/:latitude/:longitude",
+        component   : ClientsAdd
+    },
+
+    // ClientsUpdate
+    {
+        path        : "/route_import/:id_route_import/clients/:id_client/update",
+        component   : ClientsUpdate
     },
 
     //  //  //  //  //  OBS     //  //  //
@@ -116,13 +140,31 @@ router.beforeEach((to, from, next) => {
 
                 else {
 
-                    next()
+                    if(initialRoute) {
+
+                        initialRoute    =   false
+                        next("/")
+                    }
+
+                    else {
+                    
+                        next()
+                    }
                 }
             }
 
             else {
 
-                next()
+                if(initialRoute) {
+
+                    initialRoute    =   false
+                    next("/")
+                }
+
+                else {
+
+                    next()    
+                }
             }
         }
 

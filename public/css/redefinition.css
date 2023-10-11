@@ -92,3 +92,14 @@ p {
 
     z-index         :   99999999    !important;
 }
+
+.navbar.default-layout-navbar .navbar-brand-wrapper .navbar-brand {
+
+    width           :   43%;
+}
+
+.navbar.default-layout-navbar .navbar-brand-wrapper .navbar-brand img {
+
+    width           :   35px;
+    height          :   35px;
+}

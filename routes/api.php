@@ -154,6 +154,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/route_import/{id}/journees/{id_journee}/delete'                                       ,   [JourneeController::class               , 'deleteJournee'                           ]);
 
     Route::post('/route_import/{id_route_import}/clients/{id}/validate'                                 ,   [ClientController::class                , 'validateClient'                          ]);
+    Route::post('/route_import/{id_route_import}/clients/{id}/show'                                     ,   [ClientController::class                , 'showClient'                              ]);
 
     Route::post('/route_import/{id_route_import}/clients/store'                                         ,   [ClientController::class                , 'storeClient'                             ]);
     Route::post('/route_import/{id_route_import}/clients/{id}/update'                                   ,   [ClientController::class                , 'updateClient'                            ]);

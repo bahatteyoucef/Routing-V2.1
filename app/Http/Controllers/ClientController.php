@@ -12,6 +12,31 @@ class ClientController extends Controller
 {
     //
 
+    public function showClient(Request $request, int $id_route_import, int $id)
+    {
+
+        try {
+
+            // update 
+            $client =   Client::showClient($request, $id_route_import, $id);
+
+            return $client;
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    //
+
     public function storeClient(Request $request, int $id_route_import)
     {
 

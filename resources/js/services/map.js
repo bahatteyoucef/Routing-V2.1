@@ -64,8 +64,6 @@ export default class Map {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(this.map);
 
-        console.log(role)
-
         // User Role
         this.user_role      =   role
 
@@ -84,7 +82,7 @@ export default class Map {
         if((this.user_role == "FrontOffice")) {
 
             // Add Draw Function
-            this.$drawFonction()
+            this.$drawFonctionFrontOffice()
 
             // Add Events
             this.$drawSelection()
@@ -465,10 +463,6 @@ export default class Map {
 
         //
 
-        console.log(this.markers_mode_array)
-
-        //
-
         // Clear Markers
         this.markers_mode_array.forEach(marker => {
             
@@ -547,7 +541,6 @@ export default class Map {
 
                 // Territory Latitude Longitude
                 let territoryLatLngs    =   this.$getTerritoryLatLngs(this.markers[key])
-                console.log(territoryLatLngs)
 
                 // Territory
                 var territory           =   L.polygon(territoryLatLngs, { color: 'black' }).addTo(this.map)
@@ -580,7 +573,6 @@ export default class Map {
 
                 // Territory Latitude Longitude
                 let territoryLatLngs    =   this.$getTerritoryLatLngs(this.markers_mode_array_markers[key])
-                console.log(territoryLatLngs)
 
                 // Territory
                 var territory           =   L.polygon(territoryLatLngs, { color: 'black' }).addTo(this.map)
@@ -613,9 +605,6 @@ export default class Map {
             var latlngs =   JSON.parse(territories[i].latlngs)
 
             if(Array.isArray(latlngs) && (latlngs.length > 0)) {
-
-                console.log(latlngs)
-                console.log(territories[i].color)
 
                 // Territory
                 var territory           =   L.polygon(latlngs, { color: territories[i].color }).addTo(this.map)
@@ -652,8 +641,6 @@ export default class Map {
     }
 
     $getTerritoryLatLngs(markers) {
-
-        console.log(markers)
 
         // 
         let territoryLatLngs    =   []
@@ -725,9 +712,6 @@ export default class Map {
             var latlngs =   JSON.parse(territories[i].latlngs)
 
             if(Array.isArray(latlngs) && (latlngs.length > 0)) {
-
-                console.log(latlngs)
-                console.log(territories[i].color)
 
                 // Territory
                 var territory           =   L.polygon(latlngs, { color: territories[i].color }).addTo(this.map)
@@ -839,6 +823,45 @@ export default class Map {
 
     // Draw Functions
 
+    $drawFonctionFrontOffice() {
+
+        // Set Draw Options
+        this.$drawOptionsFrontOffice()
+    }
+
+    $drawOptionsFrontOffice() {
+
+        // Initialise the FeatureGroup to store editable layers
+        this.map.addLayer(this.editable_layers);
+
+        this.draw_plugin_options = {
+
+            position: 'bottomleft',
+
+            draw: {
+
+                polyline        : false ,
+                circle          : false , 
+                rectangle       : false ,
+                marker          : true  ,
+                circlemarker    : false ,
+                polygon         : false
+            },
+
+            edit: {
+                featureGroup    : this.editable_layers, // REQUIRED!!
+                edit            : false,                // Exclude the edit option
+                remove          : true
+            }
+        };
+
+        // Initialise the Draw Control 
+        this.draw_control   =   new L.Control.Draw(this.draw_plugin_options);
+        this.map.addControl(this.draw_control);
+    }
+
+    // Draw Functions
+
     $drawFonction() {
 
         // Set Draw Options
@@ -909,7 +932,7 @@ export default class Map {
         this.map.on("draw:created", (event)   =>  {
 
             var layer   =   event.layer;
-    
+
             if (layer instanceof L.Polygon) {
 
                 // Change Route
@@ -920,13 +943,13 @@ export default class Map {
 
                     if(this.marker_cluster_mode     ==  "cluster") {
 
-                        // Get Clients (Polygon)                    
+                        // Get Clients (Polygon)
                         clients_change_route    =   this.$getClientsFromSelection(event)
                     }
 
                     if(this.marker_cluster_mode     ==  "marker") {
 
-                        // Get Clients (Polygon)                    
+                        // Get Clients (Polygon)
                         clients_change_route    =   this.$getClientsFromSelectionMarkersMode(event)
                     }
 
@@ -1128,9 +1151,6 @@ export default class Map {
 
             this.user_latitude   =   lat
             this.user_longitude  =   lng
-
-            console.log(lat)
-            console.log(lng)
 
             // Update the marker's position
             this.user_marker.setLatLng([this.user_latitude, this.user_longitude]);

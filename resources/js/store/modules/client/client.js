@@ -12,7 +12,10 @@ export default {
 
             update_client           :   null,
             add_client              :   null,
-            clients_change_route    :   null
+            clients_change_route    :   null,
+
+            all_clients             :   null,
+            client                  :   null
         }
     },
 

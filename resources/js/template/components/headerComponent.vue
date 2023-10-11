@@ -24,15 +24,6 @@
                     >
                         <i class="mdi mdi-plus-box-outline"></i>
                     </button>
-                </div> 
-
-                <div v-if="((sync_button) && (sync_button.length    >   0))"     class="col-sm-4 pr-1 pl-1">
-                    <button
-                        button type="button" class="btn primary w-100"
-                        v-on:click="syncElement()"
-                    >
-                        <i class="mdi mdi-repeat"></i>
-                    </button>
                 </div>
             </div>
         </div>
@@ -46,7 +37,7 @@
 
     export default {
 
-        props : ["title" , "add_button", "update_button", "add_modal",  "update_modal", "sync_button"],
+        props : ["title" , "add_button", "update_button", "add_modal",  "update_modal"],
 
         data() {
 
@@ -69,11 +60,6 @@
             },
 
             async setDataTable() {
-
-                await this.$parent.setDataTable()
-            },
-
-            async syncElement() {
 
                 await this.$parent.setDataTable()
             },

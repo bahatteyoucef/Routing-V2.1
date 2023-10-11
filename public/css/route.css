@@ -327,4 +327,11 @@ path.leaflet-interactive.animate {
     color           : #000;
 }
 
+#show_position_button {
+
+    position        : fixed;
+    top             : 75px;
+    right           : 7px;
+}
+
 /* 

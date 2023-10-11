@@ -18,7 +18,8 @@
 
     #mini_logo_custom_image {
 
-        width       : 175px !important;
+        float       : left;
+        width       : 35px !important;
         height      : 35px  !important;
     }
 
@@ -61,11 +62,10 @@
 
     .map_top_buttons_parent_div {
 
-        display             :   none    ;
+        display             :   block    ;
         width               :   100%    ;
         left                :   0px     ;
-        top                 :   155px   ;
-        background-color    : white   ;
+        top                 :   64px   ;
         padding-top         :   15px    ;
         padding-bottom      :   15px    ;
     }

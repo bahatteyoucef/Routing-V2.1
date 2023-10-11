@@ -6,7 +6,7 @@
 
                     <!-- Header -->
                     <headerComponent    :title="'List of clients du route import : '+route_import.libelle"      :add_modal="'modalClientAddIndexedDB'"  :update_modal="'modalClientUpdateIndexedDB'"    :add_button="'New Client'"  v-if="route_import"   
-                                        :update_button="'Update Client'"                                        :sync_button="'sync'"               />
+                                        :update_button="'Update Client'"                                        />
 
                     <!-- Table -->
                     <table class="table table-bordered clickable_table" id="route_import_client_index">
@@ -296,15 +296,6 @@ export default {
 
                 console.log(e)
             }
-        },
-
-        async sync() {
-
-          this.$showLoadingPage()
-
-          await this.$indexedDB.$sync()
-
-          this.$hideLoadingPage()
         },
 
         //

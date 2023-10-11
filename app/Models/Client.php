@@ -227,7 +227,7 @@ class Client extends Model
             $client->status                         =   $request->get("status")                         ;
             $client->nonvalidated_details           =   $request->get("nonvalidated_details")           ;
 
-            $client->owner                          =   Auth::user()->id;
+            // $client->owner                          =   Auth::user()->id;
 
             if($request->input("JPlan")     !=  null) {
 
@@ -253,6 +253,17 @@ class Client extends Model
 
             $client->save();
         }
+    }
+
+    //
+
+    public static function showClient(Request $request, int $id_route_import, int $id) {
+
+        return  Client::where("clients.id_route_import", $id_route_import)
+                ->where("clients.id", $id)
+                ->join('users', 'clients.owner', '=', 'users.id')
+                ->select('clients.*', 'users.nom as owner_name')
+                ->first();
     }
 
     //
@@ -292,7 +303,7 @@ class Client extends Model
             $client->CityNameE                  =   $client_tempo->CityNameE;
             $client->Tel                        =   $client_tempo->Tel;
             $client->CustomerType               =   $client_tempo->CustomerType;
-            $client->owner                      =   Auth::user()->id;
+            // $client->owner                      =   Auth::user()->id;
 
             if($client_tempo->JPlan     !=  null) {
     

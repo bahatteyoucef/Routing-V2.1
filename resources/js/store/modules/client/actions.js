@@ -13,5 +13,18 @@ export default {
     setClientsChangeRouteAction(context, value) {
 
         context.commit("client/setClientsChangeRoute"       , value, {root: true})
+    },
+
+    // 
+
+    setAllClientsAction(context, value) {
+
+        context.commit("client/setAllClients"               , value, {root: true})
+    },
+
+    setClientAction(context, value) {
+
+        context.commit("client/setClient"                   , value, {root: true})
     }
+
 }

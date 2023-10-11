@@ -7,50 +7,12 @@
 
             <!--  -->
 
-            <div id="show_route_datatable_icon_div" class="animate__animated"   >
-                <img  :src="'/images/show_route_datatable.png'" role="button"   @click="showRouteDatatable()"/>
-            </div>
-
-            <div id="hide_route_datatable_icon_div" class="animate__animated"   style="display : none">
-                <img  :src="'/images/hide_route_datatable.png'" role="button"   @click="hideRouteDatatable()"/>
-            </div>
-
             <div id="map_top_middle_options_div">
 
                 <div class="row">
 
-                    <!-- Map Info -->
-                    <div v-if="(($isRole('Super Admin'))||($isRole('BackOffice')))" class="col p-0">
-                        <div class="map_top_infos_div">
-                            <table class="table table-borderless">
-
-                                <Popper click placement="bottom">
-                                    <img  :src="'/images/map_infos_2.png'" role="button" style="width : 35px; padding : 0;"/>
-
-                                    <template #content>
-                                        <table class="table table-borderless scrollbar scrollbar-deep-blue">
-                                            <tr v-for="groupe in clients_markers_affiche" :key="groupe">
-                                                <th class="p-1 col-7"><span @click="reAfficherClientsAndMarkersByColor(groupe.column_name)" role="button">{{ groupe.column_name }} : </span></th>
-                                                <td class="p-1 col-3"><span>{{ groupe.clients.length }} Clients </span></td>
-                                                <td class="p-1 col-1">
-                                                    <span   :style="    'display: inline-block;'+
-                                                                        'width: 15px;          '+
-                                                                        'height: 15px;         '+
-                                                                        'float: right;         '+
-                                                                        'background-color: '    +groupe.color+';'">
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        </table>                            
-                                    </template>
-                                </Popper>
-
-                            </table>
-                        </div>
-                    </div>
-
                     <!-- Toggle -->
-                    <div v-if="(($isRole('Super Admin'))||($isRole('BackOffice')))" class="col p-0 ml-1">
+                    <div class="col p-0 ml-4">
                         <div id="toggle_div">
 
                             <div class="btn-container" id="marker_cluster_mode_div">
@@ -60,33 +22,6 @@
                                 </label>
                             </div>
 
-                        </div>
-                    </div>
-
-                    <div v-if="$isRole('FrontOffice')" class="col p-0 ml-1">
-                        <div id="toggle_div">
-
-                            <div class="btn-container" id="marker_cluster_mode_div">
-                                <label class="switch btn-color-mode-switch">
-                                    <input type="checkbox" name="marker_cluster_mode" id="marker_cluster_mode" @change="switchMarkerClusterMode()">
-                                    <label for="marker_cluster_mode" data-on="Marker" data-off="Cluster" class="btn-color-mode-switch-inner"></label>
-                                </label>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div class="col p-0 ml-1" id="map_options_buttons_div"  style="display:none">
-                        <div id="show_map_options_div"  @click="$showMapOptions()">
-                            <span class="page-title-icon bg-gradient-primary text-white mr-2" id="show_map_options_button">
-                            <i class="mdi mdi-chevron-double-left"></i>
-                            </span> 
-                        </div>
-
-                        <div id="hide_map_options_div"  style="display:none" @click="$hideMapOptions()">
-                            <span class="page-title-icon bg-gradient-primary text-white mr-2" id="hide_map_options_button">
-                            <i class="mdi mdi-chevron-double-right"></i>
-                            </span> 
                         </div>
                     </div>
 
@@ -125,153 +60,8 @@
 
         <div id="tableau_data">
 
-            <!-- Buttons and Filter -->
-            <div class="map_top_buttons_parent_div animate__animated" id="map_top_buttons_parent_div">
-                <div class="map_top_buttons_div" id="map_top_buttons_div">
-                    <div class="row">
-
-                        <div v-if="(($isRole('Super Admin'))||($isRole('BackOffice')))" class="col-5">
-                            <button class="btn primary w-100 m-0 mt-1"                                                                  @click="focuseMarkers()">Focus</button>
-                            <button class="btn primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#modalResume'"         @click="showResume()">Resume</button>
-                            <button class="btn primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#modalUpdateMap'"      >Update</button>
-                            <button class="btn primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#modalValidateMap'"    @click="getDoubles()">Validate</button>
-                            <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showTerritories()">Auto Territories</button>
-                            <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showJPlanBDTerritories()">JPlan Territories</button>
-                            <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showJourneeBDTerritories()">Journee Territories</button>
-                        </div>
-
-                        <div v-if="$isRole('FrontOffice')" class="col-5">
-                            <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showCurrentPosition()"><i class="mdi mdi-crosshairs-gps"></i></button>
-                            <button class="btn primary w-100 m-0 mt-1"                                                                  @click="addClientFront()"><i class="mdi mdi-plus"></i></button>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="col-7">
-
-                            <select class="form-select w-100 m-0 mt-1"                                                          @change="reAfficherClientsAndMarkers()"  v-model="column_group">
-                                <option value="1">JPlan</option>
-                                <option value="2">DistrictNameE</option>
-                                <option value="3">CityNameE</option>
-                                <option value="4">CustomerType</option>
-                                <option value="5">Journee</option>
-                                <option value="6">Owner</option>
-                                <option value="7">Status</option>
-                            </select>
-
-                            <!-- Journey Plan   -->
-                            <Multiselect
-                                v-model     =   "journey_plan_filter_value"
-                                :options    =   "liste_journey_plan"
-                                mode        =   "tags"
-                                placeholder =   "Filter By JPlan"
-                                class       =   "mt-1"
-
-                                :close-on-select    =   "false"
-                                :searchable         =   "true"
-                                :create-option      =   "true"
-
-                                @change             =   "reAfficherClientsAndMarkers()"
-                            />
-                            <!--                -->
-
-                            <!-- District       -->
-                            <Multiselect
-                                v-model     =   "district_filter_value"
-                                :options    =   "districts"
-                                mode        =   "tags"
-                                placeholder =   "Filter By DistrictNameE"
-                                class       =   "mt-1"
-
-                                :close-on-select    =   "false"
-                                :searchable         =   "true"
-                                :create-option      =   "true"
-
-                                @change             =   "reAfficherClientsAndMarkers()"
-                            />
-                            <!--                -->
-
-                            <!-- City           -->
-                            <Multiselect
-                                v-model     =   "city_filter_value"
-                                :options    =   "cites"
-                                mode        =   "tags"
-                                placeholder =   "Filter By CityNameE"
-                                class       =   "mt-1"
-
-                                :close-on-select    =   "false"
-                                :searchable         =   "true"
-                                :create-option      =   "true"
-
-                                @change             =   "reAfficherClientsAndMarkers()"
-                            />
-                            <!--                -->
-
-                            <!-- CustomerType   -->
-                            <Multiselect
-                                v-model     =   "type_client_filter_value"
-                                :options    =   "liste_type_client"
-                                mode        =   "tags"
-                                placeholder =   "Filter By CustomerType"
-                                class       =   "mt-1"
-
-                                :close-on-select    =   "false"
-                                :searchable         =   "true"
-                                :create-option      =   "true"
-
-                                @change             =   "reAfficherClientsAndMarkers()"
-                            />
-
-                            <!-- Journee        -->
-                            <Multiselect
-                                v-model     =   "journee_filter_value"
-                                :options    =   "liste_journee"
-                                mode        =   "tags"
-                                placeholder =   "Filter By Journee"
-                                class       =   "mt-1"
-
-                                :close-on-select    =   "false"
-                                :searchable         =   "true"
-                                :create-option      =   "true"
-
-                                @change             =   "reAfficherClientsAndMarkers()"
-                            />
-                            <!--                -->
-
-                            <!-- Owners        -->
-                            <Multiselect
-                                v-model     =   "owner_filter_value"
-                                :options    =   "owners"
-                                mode        =   "tags"
-                                placeholder =   "Filter By Owner"
-                                class       =   "mt-1"
-
-                                :close-on-select    =   "false"
-                                :searchable         =   "true"
-                                :create-option      =   "true"
-
-                                @change             =   "reAfficherClientsAndMarkers()"
-                            />
-                            <!--                -->
-
-                            <!-- Status        -->
-                            <Multiselect
-                                v-model     =   "status_filter_value"
-                                :options    =   "liste_status"
-                                mode        =   "tags"
-                                placeholder =   "Filter By Status"
-                                class       =   "mt-1"
-
-                                :close-on-select    =   "false"
-                                :searchable         =   "true"
-                                :create-option      =   "true"
-
-                                @change             =   "reAfficherClientsAndMarkers()"
-                            />
-                            <!--                -->
-                        </div>
-                    </div>
-                </div>
+            <div v-if="$isRole('FrontOffice')" class="col-2 float-right mt-1 p-0" id="show_position_button">
+                <button class="btn primary w-100 m-0 mt-1 pr-0 pl-0"                                                        @click="showCurrentPosition()"><i class="mdi mdi-crosshairs-gps"></i></button>
             </div>
 
             <!--  -->
@@ -482,7 +272,12 @@ export default {
 
                 lat :   0,
                 lng :   0
-            }
+            },
+
+            clients_non_owner               :   [],
+            clients_owner_validated         :   [],
+            clients_owner_pending           :   [],
+            clients_owner_non_validated     :   []
         }
     },  
 
@@ -608,6 +403,10 @@ export default {
             "setListeJourneeAction"     ,
         ]),
 
+        ...mapActions("client" ,  [
+            "setAllClientsAction"     ,
+        ]),
+
         //
 
         setValues() {
@@ -626,14 +425,8 @@ export default {
             // Set Clients
             this.route_import.clients   =   this.route_import.data
 
-            // Extract JPlan, Cites, District
-            this.extractMetaData()
-
-            // Prepare Clients
-            this.prepareClients()
-
-            // Prepare Affiche Clients
-            await this.reAfficheClients()
+            // Set Data in Vuex
+            this.setAllClientsAction(this.route_import.clients)
 
             // Set Markers
             this.setRouteMarkers()
@@ -1188,12 +981,6 @@ export default {
 
             setTimeout(async () => {
 
-                // Prepare Clients
-                this.prepareClients()
-
-                // reAffiche Clients
-                await this.reAfficheClients()
-
                 // reAffiche Markers
                 this.setRouteMarkers()
 
@@ -1210,15 +997,6 @@ export default {
             this.$showLoadingPage()
 
             setTimeout(async () => {
-
-                // Extract JPlan, Cites, District
-                this.extractMetaData()
-
-                // Prepare Clients
-                this.prepareClients()
-
-                // reAffiche Clients
-                await this.reAfficheClients()
 
                 // reAffiche Markers
                 this.setRouteMarkers()
@@ -1729,16 +1507,69 @@ export default {
 
         setMarkers() {
 
-            let i = 0
+            this.setClientsArrays()
 
-            // Set Markers
-            for (const [key, value] of Object.entries(this.clients_markers_affiche)) {
+            console.log(1)
 
-                this.$map.$setRouteMarkers(this.clients_markers_affiche[key].clients, i, this.clients_markers_affiche[key].color)
+            this.$map.$setRouteMarkers(this.clients_non_owner               , 1, "#000000")
 
-                i   =   i + 1
-            }
+            console.log(2)
+
+            this.$map.$setRouteMarkers(this.clients_owner_validated         , 2, "#0F9D58")
+
+            console.log(3)
+
+            this.$map.$setRouteMarkers(this.clients_owner_pending           , 3, "#F57C00")
+
+            console.log(4)
+
+            this.$map.$setRouteMarkers(this.clients_owner_non_validated     , 4, "#F70000")
+
+            console.log(5)
         },
+
+        setClientsArrays() {
+
+            this.clients_non_owner               =   []
+            this.clients_owner_validated         =   []
+            this.clients_owner_pending           =   []
+            this.clients_owner_non_validated     =   []
+
+            for (let i = 0; i < this.route_import.clients.length; i++) {
+
+                // Black
+                if(this.route_import.clients[i].owner   !=  this.getUser.id) {
+
+                    this.clients_non_owner.push(this.route_import.clients[i])
+                }
+
+                else {
+
+                    if(this.route_import.clients[i].status == "validated") {
+
+                        this.clients_owner_validated.push(this.route_import.clients[i])
+                    }
+
+                    else {
+
+                        if(this.route_import.clients[i].status == "pending") {
+
+                            this.clients_owner_pending.push(this.route_import.clients[i])
+                        }
+
+                        else {
+
+                            if(this.route_import.clients[i].status == "nonvalidated") {
+
+                                this.clients_owner_non_validated.push(this.route_import.clients[i])
+                            }
+                        }
+                    }
+                }
+            }
+        },        
+
+        //
 
         removeDrawings() {
 
@@ -2013,7 +1844,6 @@ export default {
 
             try {
             
-
                 let position     =   await this.$currentPosition()
 
                 let client      =   { lat : 0, lng : 0 }
@@ -2141,6 +1971,8 @@ export default {
 
         switchMarkerClusterMode() {
 
+            console.log(22222222222)
+
             const marker_cluster_mode   =   document.getElementById("marker_cluster_mode")
 
             if(marker_cluster_mode.checked) {
@@ -2165,29 +1997,25 @@ export default {
 
     watch: {
 
-        getAddClient(newValue, oldValue) {
+        async getAddClient(newValue, oldValue) {
 
             if(newValue != null) {
                 
-                // ShowModal
-                var addModal    =   new Modal(document.getElementById("addClientModal"));
-                addModal.show();
+                this.$router.push('/route_import/'+this.$route.params.id_route_import+'/clients/add/'+newValue.lat+'/'+newValue.lng)
 
                 // Send DATA To Modal
-                this.addClient(newValue)
+                // this.addClient(newValue)
             }
         },
 
-        getUpdateClient(newValue, oldValue) {
+        async getUpdateClient(newValue, oldValue) {
 
             if(newValue != null) {
                 
-                // ShowModal
-                var updateModal     =   new Modal(document.getElementById("updateClientModal"));
-                updateModal.show();
+                this.$router.push('/route_import/'+this.$route.params.id_route_import+'/clients/'+newValue.id+'/update')
 
                 // Send DATA To Modal
-                this.updateClient(newValue)
+                // this.updateClient(newValue)
             }
         },
 

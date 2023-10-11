@@ -13,5 +13,17 @@ export default {
     getClientsChangeRoute(state) {
 
         return state.clients_change_route
-    }
+    },
+
+    //
+
+    getAllClients(state) {
+
+        return state.all_clients
+    },
+
+    getClient(state) {
+
+        return state.client
+    }    
 }

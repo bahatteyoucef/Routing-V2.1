@@ -13,5 +13,17 @@ export default {
     setClientsChangeRoute(state, value) {
 
         state.clients_change_route  =   value
+    },
+
+    //
+
+    setAllClients(state, value) {
+
+        state.all_clients           =   value
+    },
+
+    setClient(state, value) {
+
+        state.client                =   value
     }
 }
