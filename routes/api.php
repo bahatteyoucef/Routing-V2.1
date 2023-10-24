@@ -54,11 +54,11 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/rtm_willayas/rtm_cites/details'           ,   function()  { 
 
-        $willayas   =   DB::table("RTM_Willaya")->orderBy("DistrictNo")->get();
+        $willayas   =   DB::table("RTM_Willaya")->orderByRaw('CAST(DistrictNo AS SIGNED INTEGER)')->get();
 
         foreach ($willayas as $willaya) {
 
-            $willaya->cites =   DB::table("RTM_City")->where('DistrictNo', $willaya->DistrictNo)->orderBy("CityNo")->get();
+            $willaya->cites =   DB::table("RTM_City")->where('DistrictNo', $willaya->DistrictNo)->orderByRaw('CAST(CityNo AS SIGNED INTEGER)')->get();
         }
 
         return $willayas;
@@ -66,17 +66,17 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/rtm_willayas'                             ,   function()  { 
 
-        return DB::table("RTM_Willaya")->orderBy("DistrictNo")->get();
+        return DB::table("RTM_Willaya")->orderByRaw('CAST(DistrictNo AS SIGNED INTEGER)')->get();
     });
 
     Route::post('/rtm_willayas/{DistrictNo}/rtm_cites'      ,   function($DistrictNo)  { 
 
-        return DB::table("RTM_City")->where('DistrictNo', $DistrictNo)->orderBy("CityNo")->get();
+        return DB::table("RTM_City")->where('DistrictNo', $DistrictNo)->orderByRaw('CAST(CityNo AS SIGNED INTEGER)')->get();
     });
 
     Route::post('/rtm_cites'                                ,   function()  { 
 
-        return DB::table("RTM_City")->orderBy("CityNo")->get();
+        return DB::table("RTM_City")->orderByRaw('CAST(CityNo AS SIGNED INTEGER)')->get();
     });
 
     //
@@ -91,6 +91,8 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/users/store'                                                                          ,   [UserController::class                  , 'store'                                   ]);
     Route::post('/users/{id}/update'                                                                    ,   [UserController::class                  , 'update'                                  ]);
+
+    Route::post('/users/{id}/update/password'                                                           ,   [UserController::class                  , 'changePassword'                          ]);
 
     //
 

@@ -352,6 +352,9 @@ export default {
                     // Hide Loading Page
                     this.$hideLoadingPage()
 
+                    // Send Feedback
+                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
+
                     // Send Client
                     this.emitter.emit('reSetUpdate' , this.client)
 
@@ -401,6 +404,9 @@ export default {
 
                     // Hide Loading Page
                     this.$hideLoadingPage()
+
+                    // Send Feedback
+                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
                     // Send Client
                     this.emitter.emit('reSetDelete' , this.client)
@@ -453,6 +459,9 @@ export default {
                     this.client.status                  =   this.client.status
                     this.client.nonvalidated_details    =   this.client.nonvalidated_details
                     this.client.id_route_import         =   this.$route.params.id_route_import
+
+                    // Send Feedback
+                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
                     // Send Client
                     this.emitter.emit('reSetValidate' , this.client)
@@ -554,8 +563,11 @@ export default {
 
                 this.client.status                =   '',
 
-                this.willayas                   =   []
-                this.cites                      =   []
+                this.willayas                   =   []  ,
+                this.cites                      =   []  ,
+
+                this.all_clients                =   []  ,
+                this.close_clients              =   []
             });
         },
 
@@ -566,10 +578,10 @@ export default {
             this.getClientData(client)  
             this.getComboData()  
 
-            if(this.$isRole("FrontOffice")) {
+            // if(this.$isRole("FrontOffice")) {
 
                 this.checkClients()
-            }
+            // }
         },
 
         async getClientData(client) {

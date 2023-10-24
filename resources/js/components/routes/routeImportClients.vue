@@ -2,24 +2,26 @@
     <div class="row">
         <div class="col-12 grid-margin">
             <div class="card">
-                <div class="card-body">
+                <div class="card-body p-0 pt-5">
 
                     <!-- Header -->
-                    <headerComponent    :title="'List of clients du route import : '+route_import.libelle"      :add_modal="'modalClientAddIndexedDB'"  :update_modal="'modalClientUpdateIndexedDB'"    :add_button="'New Client'"  v-if="route_import"   
-                                        :update_button="'Update Client'"                                        />
+                    <headerComponent    v-if="route_import&&($isRole('FrontOffice'))"                           :title="'List of clients du route import : '+route_import.libelle"      />
+
+                    <headerComponent    v-if="route_import&&($isRole('Super Admin')||$isRole('BackOffice'))"    :title="'List of clients du route import : '+route_import.libelle"      :add_modal="'addClientModal'"  :update_modal="'updateClientModal'"    :add_button="'New Client'"   
+                                                                                                                :update_button="'Update Client'"                                        />
 
                     <!-- Table -->
-                    <table class="table table-bordered clickable_table" id="route_import_client_index">
+                    <table  v-if="$isRole('Super Admin')||$isRole('BackOffice')" class="table table-bordered clickable_table" id="route_import_client_index">
                         <thead>
                             <tr>
                                 <th class="col-sm-1">Index</th>
 
-                                <!-- <th class="col-sm-1">CustomerCode</th> -->
-                                <th class="col-sm-1">CustomerNameE</th>
-                                <!-- <th class="col-sm-1">CustomerNameA</th> -->
+                                <th class="col-sm-2">CustomerCode</th>
+                                <th class="col-sm-2">CustomerNameE</th>
+                                <th class="col-sm-2">CustomerNameA</th>
 
-                                <!-- <th class="col-sm-2">Latitude</th> -->
-                                <!-- <th class="col-sm-2">Longitude</th> -->
+                                <th class="col-sm-2">Latitude</th>
+                                <th class="col-sm-2">Longitude</th>
 
                                 <th class="col-sm-2">Address</th>
 
@@ -33,14 +35,16 @@
 
                                 <th class="col-sm-1">CustomerType</th>
 
-                                <!-- <th class="col-sm-2">JPlan</th> -->
-                                <!-- <th class="col-sm-1">Journee</th> -->
+                                <th class="col-sm-2">JPlan</th>
+
+                                <th class="col-sm-2">Journee</th>
 
                                 <!--  -->
 
                                 <th class="col-sm-2">Owner</th>
                                 <th class="col-sm-2">Created At</th>
                                 <th class="col-sm-2">Status</th>
+
                             </tr>
                         </thead>
 
@@ -49,12 +53,12 @@
 
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Index"            /></th>
 
-                                <!-- <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th> -->
-                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
-                                <!-- <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th> -->
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
 
-                                <!-- <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Latitude"         /></th> -->
-                                <!-- <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Longitude"        /></th> -->
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Latitude"         /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Longitude"        /></th>
 
                                 <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Address"          /></th>
 
@@ -68,9 +72,9 @@
 
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerType"     /></th>
 
-                                <!-- <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="JPlan"            /></th> -->
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="JPlan"            /></th>
 
-                                <!-- <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Journee"          /></th> -->
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Journee"          /></th>
 
                                 <!--  -->
 
@@ -81,16 +85,15 @@
                         </thead>
                         
                         <tbody>
-                            <tr v-for="(client, index) in clients" :key="client" @click="selectRow(client)" role="button"   :id="'route_import_client_index_'+client.id">
+                            <tr v-for="client, index in clients" :key="client" @click="selectRow(client)" role="button"   :id="'route_import_client_index_'+client.id">
                                 <td>{{index +   1}}</td>
 
-                                <!-- <td>{{client.CustomerCode}}</td> -->
-
+                                <td>{{client.CustomerCode}}</td>
                                 <td>{{client.CustomerNameE}}</td>
-                                <!-- <td>{{client.CustomerNameA}}</td> -->
+                                <td>{{client.CustomerNameA}}</td>
 
-                                <!-- <td>{{client.Latitude}}</td> -->
-                                <!-- <td>{{client.Longitude}}</td> -->
+                                <td>{{client.Latitude}}</td>
+                                <td>{{client.Longitude}}</td>
 
                                 <td>{{client.Address}}</td>
 
@@ -104,9 +107,9 @@
 
                                 <td>{{client.CustomerType}}</td>
 
-                                <!-- <td>{{client.JPlan}}</td> -->
+                                <td>{{client.JPlan}}</td>
 
-                                <!-- <td>{{client.Journee}}</td> -->
+                                <td>{{client.Journee}}</td>
 
                                 <!--  -->
 
@@ -123,27 +126,66 @@
                         </tbody>
                     </table>
 
+                    <!--  -->
+
+                    <!-- Table -->
+                    <table v-if="$isRole('FrontOffice')" class="table table-bordered clickable_table" id="route_import_client_index" style="table-layout : fixed">
+                        <thead>
+                            <tr>
+                                <th class="col">Customer</th>
+                                <th class="col">City</th>
+                                <th class="col">Tel</th>
+                            </tr>
+                        </thead>
+
+                        <thead>
+                            <tr class="route_import_client_index_filters">
+
+                                <th><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder="CityNameE"        /></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder="Tel"              /></th>
+                            </tr>
+                        </thead>
+                        
+                        <tbody>
+                            <tr v-for="client in clients" :key="client" @click="selectRow(client)" role="button"   :id="'route_import_client_index_'+client.id">
+                                <td style="white-space: break-spaces;">{{client.CustomerNameE}}</td>
+                                <td style="white-space: break-spaces;">{{client.CityNameE}}</td>
+                                <td style="white-space: break-spaces;">{{client.Tel}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
                 </div>
             </div>
         </div>
 
         <!-- Modal Add  -->
-        <modalClientAddIndexedDB    ref="modalClientAddIndexedDB">   </modalClientAddIndexedDB>
+        <!-- <modalClientAddIndexedDB    ref="modalClientAddIndexedDB">   </modalClientAddIndexedDB> -->
 
         <!-- Modal Update  -->
-        <modalClientUpdateIndexedDB ref="modalClientUpdateIndexedDB"></modalClientUpdateIndexedDB>
+        <!-- <modalClientUpdateIndexedDB ref="modalClientUpdateIndexedDB"></modalClientUpdateIndexedDB> -->
+
+        <!-- Modal Add                      -->
+        <modalClientAdd             ref="modalClientAdd"            ></modalClientAdd>
+
+        <!-- Modal Update                   -->
+        <modalClientUpdate          ref="modalClientUpdate"         ></modalClientUpdate>
 
     </div>
 </template>
  
 <script>
 
-import headerComponent              from "../../template/components/headerComponent.vue"
+import headerComponent              from    "../../template/components/headerComponent.vue"
 
-import modalClientAddIndexedDB      from "../clients/modalClientAddIndexedDB.vue"
-import modalClientUpdateIndexedDB   from "../clients/modalClientUpdateIndexedDB.vue"
+import modalClientAddIndexedDB      from    "../clients/modalClientAddIndexedDB.vue"
+import modalClientUpdateIndexedDB   from    "../clients/modalClientUpdateIndexedDB.vue"
 
-import {mapGetters, mapActions}     from "vuex"
+import modalClientAdd               from    "../clients/modalClientAdd.vue"
+import modalClientUpdate            from    "../clients/modalClientUpdate.vue"
+
+import {mapGetters, mapActions}     from    "vuex"
 
 export default {
 
@@ -170,7 +212,10 @@ export default {
     components : {
         headerComponent ,
         modalClientAddIndexedDB,
-        modalClientUpdateIndexedDB
+        modalClientUpdateIndexedDB,
+
+        modalClientAdd              ,
+        modalClientUpdate           ,
     },
 
     computed : {
@@ -179,7 +224,10 @@ export default {
 
             getUser                 :   'authentification/getUser'              ,
             getAccessToken          :   'authentification/getAccessToken'       ,
-            getIsAuthentificated    :   'authentification/getIsAuthentificated'
+            getIsAuthentificated    :   'authentification/getIsAuthentificated' ,
+
+            getAddClient            :   'client/getAddClient'                   ,
+            getUpdateClient         :   'client/getUpdateClient'                
         })
     },
 
@@ -210,6 +258,12 @@ export default {
 
     methods : {
 
+        ...mapActions("client" ,  [
+            "setUpdateClientAction"   ,
+        ]),
+
+        //
+
         async setDataTable() {
 
             try {
@@ -221,17 +275,25 @@ export default {
 
                         this.datatable_route_import_client_index.destroy()
                     }
-                
+
                     // Initialisation 
                     this.clients    =   [];
 
-                    this.$callApi("post",    "/route_import/"+this.$route.params.id_route_import+"/clients", null)
+                    this.$callApi("post",   "/route_import/"+this.$route.params.id_route_import+"/clients",     null)
                     .then(async (res)=> {
 
                         this.route_import   =   res.data.route_import
                         this.clients        =   res.data.clients
 
-                        this.datatable_route_import_client_index    =   await this.$DataTableCreate("route_import_client_index")
+                        if(this.$isRole("FrontOffice")) {
+
+                            this.datatable_route_import_client_index    =   await this.$DataTableCreateFrontOffice("route_import_client_index")
+                        }
+
+                        else {
+
+                            this.datatable_route_import_client_index    =   await this.$DataTableCreate("route_import_client_index")
+                        }
                     })
                 }
 
@@ -246,12 +308,20 @@ export default {
                     // Initialisation 
                     this.clients    =   [];
 
-                    await this.$indexedDB.$indexedDB_intialiazeSetDATA()
+                    // await this.$indexedDB.$indexedDB_intialiazeSetDATA()
 
                     this.route_import                           =   await this.$indexedDB.$getRouteImport(this.$route.params.id_route_import)
                     this.clients                                =   this.route_import.clients
 
-                    this.datatable_route_import_client_index    =   await this.$DataTableCreate("route_import_client_index")
+                    if(this.$isRole("FrontOffice")) {
+
+                        this.datatable_route_import_client_index    =   await this.$DataTableCreateFrontOffice("route_import_client_index")
+                    }
+
+                    else {
+
+                        this.datatable_route_import_client_index    =   await this.$DataTableCreate("route_import_client_index")
+                    }
                 }
             }
 
@@ -267,18 +337,26 @@ export default {
 
             try {
 
-
-                let client      =   { lat : 0, lng : 0 }
-
                 if(this.$isRole("FrontOffice")) {
+
+                    let client      =   { lat : 0, lng : 0 }
 
                     let position     =   await this.$currentPosition()
 
                     client.lat      =   position.coords.latitude
                     client.lng      =   position.coords.longitude
+
+                    await this.$refs.modalClientAddIndexedDB.getData(client, this.clients)
                 }
 
-                await this.$refs.modalClientAddIndexedDB.getData(client, this.clients)
+                //
+
+                if(this.$isRole("Super Admin")||this.$isRole("BackOffice")) {
+
+                    let client      =   { lat : 0, lng : 0 }
+
+                    this.$refs.modalClientAdd.getData(client, this.clients)
+                }
             }
             catch(e) {
 
@@ -290,7 +368,17 @@ export default {
 
             try {
 
-                await this.$refs.modalClientUpdateIndexedDB.getData(this.selected_row, this.clients)
+                if(this.$isRole("FrontOffice")) {
+
+                    await this.$refs.modalClientUpdateIndexedDB.getData(this.selected_row, this.clients)
+                }
+
+                if(this.$isRole("Super Admin")||this.$isRole("BackOffice")) {
+
+                    console.log(this.selected_row)
+
+                    this.$refs.modalClientUpdate.getData(this.selected_row, this.clients)
+                }
             }
             catch(e) {
 
@@ -326,12 +414,17 @@ export default {
             new_client.JPlan            =   client.JPlan            
             new_client.Journee          =   client.Journee        
 
+            new_client.facade_image                     =   client.facade_image
+            new_client.in_store_image                   =   client.in_store_image
+            new_client.facade_image_original_name       =   client.facade_image_original_name
+            new_client.in_store_image_original_name     =   client.in_store_image_original_name
+
             new_client.status           =   client.status            
             new_client.owner_name       =   this.getUser.nom
             new_client.created_at       =   this.$formatDate(new Date())
 
-            new_client[i].status                  =   client.status            
-            new_client[i].nonvalidated_details    =   client.nonvalidated_details        
+            new_client.status                  =   client.status            
+            new_client.nonvalidated_details    =   client.nonvalidated_details        
 
             this.clients.push(new_client)
 
@@ -374,6 +467,11 @@ export default {
 
                     this.clients[i].JPlan               =   client.JPlan            
                     this.clients[i].Journee             =   client.Journee        
+
+                    this.clients[i].facade_image                     =   client.facade_image
+                    this.clients[i].in_store_image                   =   client.in_store_image
+                    this.clients[i].facade_image_original_name       =   client.facade_image_original_name
+                    this.clients[i].in_store_image_original_name     =   client.in_store_image_original_name
 
                     this.clients[i].status                  =   client.status            
                     this.clients[i].nonvalidated_details    =   client.nonvalidated_details        
@@ -462,6 +560,10 @@ export default {
 
                 // Selected Row
                 this.selected_row   =   client
+
+                this.setUpdateClientAction(client)      
+
+                console.log(this.getUpdateClient)
             }
 
             else {

@@ -55,12 +55,12 @@
 
                         <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
-                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @changed="checkClients()">
+                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @change="checkClients()">
                         </div>
 
                         <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
-                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @changed="checkClients()">
+                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @change="checkClients()">
                         </div>
 
                         <!--  -->
@@ -318,6 +318,9 @@ export default {
                     this.client.nonvalidated_details    =   this.client.nonvalidated_details
                     this.client.id_route_import         =   this.$route.params.id_route_import
 
+                    // Send Feedback
+                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
+
                     this.emitter.emit('reSetAdd' , this.client)
 
                     // Close Modal
@@ -428,10 +431,10 @@ export default {
             this.setCoords(client)
             this.getComboData()  
 
-            if(this.$isRole("FrontOffice")) {
+            // if(this.$isRole("FrontOffice")) {
 
                 this.checkClients()
-            }
+            // }
         },
 
         setCoords(client) {

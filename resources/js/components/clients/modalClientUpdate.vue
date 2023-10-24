@@ -57,12 +57,12 @@
 
                         <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
-                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @changed="checkClients()">
+                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @change="checkClients()">
                         </div>
 
                         <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
-                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @changed="checkClients()">
+                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @change="checkClients()">
                         </div>
 
                         <!--  -->
@@ -331,8 +331,13 @@ export default {
             formData.append("JPlan"         ,   this.client.JPlan)
             formData.append("Journee"       ,   this.client.Journee)
 
-            formData.append("status"                    ,   this.client.status)
-            formData.append("nonvalidated_details"      ,   this.client.nonvalidated_details)
+            formData.append("facade_image"                  ,   this.client.facade_image)
+            formData.append("in_store_image"                ,   this.client.in_store_image)
+            formData.append("facade_image_original_name"    ,   this.client.facade_image_original_name)
+            formData.append("in_store_image_original_name"  ,   this.client.in_store_image_original_name)
+
+            formData.append("status"                ,   this.client.status)
+            formData.append("nonvalidated_details"  ,   this.client.nonvalidated_details)
 
             const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/update",   formData)
 
@@ -340,6 +345,9 @@ export default {
 
                 // Hide Loading Page
                 this.$hideLoadingPage()
+
+                // Send Feedback
+                this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
                 // Send Client
                 this.emitter.emit('reSetUpdate' , this.client)
@@ -369,6 +377,9 @@ export default {
                 // Hide Loading Page
                 this.$hideLoadingPage()
 
+                // Send Feedback
+                this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
+
                 // Send Client
                 this.emitter.emit('reSetDelete' , this.client)
 
@@ -397,6 +408,9 @@ export default {
                 // Hide Loading Page
                 this.$hideLoadingPage()
 
+                // Send Feedback
+                this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
+
                 // Send Client
                 this.emitter.emit('reSetValidate' , this.client)
 
@@ -419,6 +433,31 @@ export default {
         clearData(id_modal) {
 
             $(id_modal).on("hidden.bs.modal",   ()  => {
+
+                //
+
+                let facade_image_update             =   document.getElementById("facade_image_update")
+                facade_image_update.value           =   ""
+
+                let facade_image_display_update     =   document.getElementById("facade_image_display_update")
+                facade_image_display_update.src     =   ""
+
+                //
+
+                let in_store_image_update           =   document.getElementById("in_store_image_update")
+                in_store_image_update.value         =   ""
+
+                let in_store_image_display_update   =   document.getElementById("in_store_image_display_update")
+                in_store_image_display_update.src   =   ""
+
+                //
+
+                this.client.facade_image                    =   '',
+                this.client.in_store_image                  =   '',
+                this.client.facade_image_original_name      =   '',
+                this.client.in_store_image_original_name    =   '',
+
+                //
 
                 // 
                 this.unsetJoursGetData()
@@ -454,8 +493,11 @@ export default {
 
                 this.client.status              =   '',
 
-                this.willayas                   =   []
-                this.cites                      =   []
+                this.willayas                   =   []  ,
+                this.cites                      =   []  ,
+
+                this.all_clients                =   []  ,
+                this.close_clients              =   []
 
                 // Remove Drawings
                 this.removeDrawings()
@@ -486,13 +528,15 @@ export default {
             this.getClientData(client)  
             this.getComboData()  
 
-            if(this.$isRole("FrontOffice")) {
+            // if(this.$isRole("FrontOffice")) {
 
                 this.checkClients()
-            }
+            // }
         },
 
         async getClientData(client) {
+
+            console.log(client)
 
             this.client.id                  =   client.id
 
@@ -780,16 +824,14 @@ export default {
 
             for (let i = 0; i < this.all_clients.length; i++) {
 
-                distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
+                if(this.all_clients[i].id   !=  this.client.id) {
 
-                if(this.all_clients[i].CustomerNameE == "test") {
+                    distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
 
-                    console.log(distance)
-                }
-
-                if(distance <=  this.min_distance) {
-                
-                    this.close_clients.push(this.all_clients[i])
+                    if(distance <=  this.min_distance) {
+                    
+                        this.close_clients.push(this.all_clients[i])
+                    }
                 }
             }
         },
@@ -805,11 +847,7 @@ export default {
 
             const facade_image  =   document.getElementById("facade_image_update").files[0];
 
-            console.log(facade_image)
-
             if(facade_image) {
-
-                console.log(222)
 
                 this.client.facade_image_original_name      =   facade_image.name
                 this.client.facade_image                    =   await this.$imageToBase64(facade_image)

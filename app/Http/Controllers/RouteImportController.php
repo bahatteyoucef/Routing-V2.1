@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\RouteImport;
+use App\Models\RTMWillaya;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -334,6 +335,13 @@ class RouteImportController extends Controller
         try {
 
             $route_import       =   RouteImport::obsDetailsRouteImport($id);
+            $willayas           =   RTMWillaya::index();
+
+            return response()->json([
+                "route_import"  =>  $route_import,
+                "willayas"      =>  $willayas
+            ]);
+
             return $route_import;
         }
 

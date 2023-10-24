@@ -343,8 +343,29 @@ class User extends Authenticatable
                 }
             }
         }
+
+        //
     }
 
     //
 
+    public static function validatechangePassword(Request $request) 
+    {
+
+        $validator = Validator::make($request->all(), [
+            'old_password'          =>  ["required", "current_password:api"             ],
+            'new_password'          =>  ["required", "confirmed"    , "min:6", "max:255"]
+        ]);
+    
+        return $validator;
+    }
+
+    public static function changePassword(Request $request, int $id) {
+
+        $user                   =   User::find($id);
+
+        $user->password         =   Hash::make($request->input('new_password'));
+
+        $user->save();
+    }
 }

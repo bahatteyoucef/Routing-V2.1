@@ -14,6 +14,9 @@ import Login                    from    "./components/login/login.vue"
 
 // users
 import Users                    from    "./components/users/index.vue"
+import ShowUsers                from    "./components/users/show.vue"
+import UserUpdate               from    "./components/users/UserUpdate.vue"
+import changePassword           from    "./components/users/changePassword.vue"
 
 // RouteImportTempo
 import RouteImportTempo         from    "./components/routes/imports/routeImportTempo.vue"
@@ -57,6 +60,24 @@ const routes = [
     {
         path        : "/users",
         component   : Users
+    },
+
+    // ShowUsers
+    {
+        path        : "/users/:id_user/show",
+        component   : ShowUsers
+    },
+
+    // UserUpdate
+    {
+        path        : "/users/:id_user/update",
+        component   : UserUpdate        
+    },
+
+    // UserUpdate Password
+    {
+        path        : "/users/:id_user/update/password",
+        component   : changePassword        
     },
 
     // Route Import Clients

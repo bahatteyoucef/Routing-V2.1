@@ -57,12 +57,12 @@
 
                         <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
-                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @changed="checkClients()">
+                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @input="checkClients()">
                         </div>
 
                         <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
-                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @changed="checkClients()">
+                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @input="checkClients()">
                         </div>
                     
                         <!--  -->
@@ -332,6 +332,7 @@ export default {
 
             formData.append("facade_image"                  ,   this.client.facade_image)
             formData.append("in_store_image"                ,   this.client.in_store_image)
+
             formData.append("facade_image_original_name"    ,   this.client.facade_image_original_name)
             formData.append("in_store_image_original_name"  ,   this.client.in_store_image_original_name)
 
@@ -351,6 +352,9 @@ export default {
 
                     // Hide Loading Page
                     this.$hideLoadingPage()
+
+                    // Send Feedback
+                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
                     // Send Client
                     this.emitter.emit('reSetUpdate' , this.client)
@@ -401,6 +405,9 @@ export default {
 
                     // Hide Loading Page
                     this.$hideLoadingPage()
+
+                    // Send Feedback
+                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
                     // Send Client
                     this.emitter.emit('reSetDelete' , this.client)
@@ -453,6 +460,9 @@ export default {
                     this.client.status                  =   this.client.status
                     this.client.nonvalidated_details    =   this.client.nonvalidated_details
                     this.client.id_route_import         =   this.$route.params.id_route_import
+
+                    // Send Feedback
+                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
                     // Send Client
                     this.emitter.emit('reSetValidate' , this.client)
@@ -552,24 +562,30 @@ export default {
                 // Journey Plan
                 this.client.JPlan               =   '',
 
-                this.client.status                =   '',
+                this.client.status              =   '',
 
-                this.willayas                   =   []
-                this.cites                      =   []
+                this.willayas                   =   []  ,
+                this.cites                      =   []  ,
+
+                this.all_clients                =   []  ,
+                this.close_clients              =   []
+
             });
         },
 
         getData(client, all_clients) {
+
+            console.log(client)
 
             this.all_clients    =   all_clients
 
             this.getClientData(client)  
             this.getComboData()  
 
-            if(this.$isRole("FrontOffice")) {
+            // if(this.$isRole("FrontOffice")) {
 
                 this.checkClients()
-            }
+            // }
         },
 
         async getClientData(client) {
@@ -930,18 +946,18 @@ export default {
 
             let distance        =   0
 
+            console.log(this.all_clients)
+
             for (let i = 0; i < this.all_clients.length; i++) {
 
-                distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
+                if(this.all_clients[i].id   !=  this.client.id) {
 
-                if(this.all_clients[i].CustomerNameE == "test") {
+                    distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
 
-                    console.log(distance)
-                }
-
-                if(distance <=  this.min_distance) {
-                
-                    this.close_clients.push(this.all_clients[i])
+                    if(distance <=  this.min_distance) {
+                    
+                        this.close_clients.push(this.all_clients[i])
+                    }
                 }
             }
         },

@@ -14,7 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\Rules;
 
 use App\Models\Role;
-
+use App\Models\UserRouteImport;
+use Exception;
 use Throwable;
 
 class UserController extends Controller
@@ -29,6 +30,25 @@ class UserController extends Controller
             $user           =   Auth::user();
 
             $user->roles    =   $user->getRoleNames();
+
+            // 
+
+            if($user->type_user ==  "FrontOffice") {
+
+                $route_import   =   UserRouteImport::where('id_user', $user->id)->first();  
+
+                if($route_import) {
+
+                    $user->id_route_import  =   $route_import->id_route_import;
+                }
+
+                else {
+
+                    $user->id_route_import  =   null;
+                }
+            }
+
+            // 
 
             return response([
                 'user'          => $user                                                ,
@@ -180,6 +200,52 @@ class UserController extends Controller
         }
 
         catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    //
+
+    public function changePassword(Request $request, int $id) 
+    {
+
+        try {
+
+            //
+            DB::beginTransaction();
+            //
+
+            // validate
+            $validator    =   User::validateChangePassword($request, $id);
+            
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors'    =>  $validator->errors(),
+                ],422);
+            }
+
+            // update
+            User::changePassword($request, $id);
+
+            //
+            DB::commit();
+            //
+
+            return response()->json([
+                "header"        =>  "Password Updated !",
+                "message"       =>  "You need to login again !"
+            ]);
+
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
 
             return response()->json([
                 'errors'    =>  [$erreur->getMessage()],

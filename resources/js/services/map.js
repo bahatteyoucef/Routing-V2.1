@@ -45,6 +45,11 @@ export default class Map {
 
         //
 
+        this.kml_willayas                                   =   []
+        this.kml_layers                                     =   []
+
+        //
+
         this.user_latitude                                  =   0
         this.user_longitude                                 =   0
         this.user_marker                                    =   null
@@ -1180,4 +1185,19 @@ export default class Map {
 
     //
 
+    $setKMLLayers(kml_layers) {
+
+        // Delete all kml layers
+        this.kml_layers.forEach(kml_layer => {
+
+            this.map.removeLayer(kml_layer);            
+        })
+
+        // Add all kml layers
+        kml_layers.forEach(kml_layer => {
+            
+            // Add new layers
+            this.kml_layers[kml_layer]   =   omnivore.kml('/kml/'+kml_layer+'.kml').addTo(this.map);
+        });
+    }
 }

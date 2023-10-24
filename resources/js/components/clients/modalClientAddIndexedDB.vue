@@ -55,12 +55,12 @@
 
                         <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
-                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @changed="checkClients()">
+                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @input="checkClients()">
                         </div>
 
                         <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
-                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @changed="checkClients()">
+                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @input="checkClients()">
                         </div>
 
                         <!--  -->
@@ -318,6 +318,9 @@ export default {
                     this.client.nonvalidated_details    =   this.client.nonvalidated_details
                     this.client.id_route_import         =   this.$route.params.id_route_import
 
+                    // Send Feedback
+                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
+
                     this.emitter.emit('reSetAdd' , this.client)
 
                     // Close Modal
@@ -414,8 +417,11 @@ export default {
                 // Journee
                 this.client.Journee         =   '',
 
-                this.willayas               =   []
-                this.cites                  =   []
+                this.willayas               =   []  ,
+                this.cites                  =   []  ,
+
+                this.all_clients            =   []  ,
+                this.close_clients          =   []
             });
         },
 
@@ -428,10 +434,10 @@ export default {
             this.setCoords(client)
             this.getComboData()  
 
-            if(this.$isRole("FrontOffice")) {
+            // if(this.$isRole("FrontOffice")) {
 
                 this.checkClients()
-            }
+            // }
         },
 
         setCoords(client) {
@@ -561,14 +567,13 @@ export default {
 
             let distance        =   0
 
+            console.log(this.all_clients)
+
             for (let i = 0; i < this.all_clients.length; i++) {
 
                 distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
 
-                if(this.all_clients[i].CustomerNameE == "test") {
-
-                    console.log(distance)
-                }
+                console.log(distance)
 
                 if(distance <=  this.min_distance) {
                 
@@ -603,6 +608,5 @@ export default {
             this.liste_type_client      =   new_liste_type_client
         }
     }
-
 };
 </script>

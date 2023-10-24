@@ -122,10 +122,10 @@ class Client extends Model
             'Latitude'              =>  ["required", "max:255"],
             'Longitude'             =>  ["required", "max:255"],
             'Address'               =>  ["required", "max:255"],
-            // 'DistrictNo'            =>  ["required", "max:255"],
-            // 'DistrictNameE'         =>  ["required", "max:255"],
-            // 'CityNo'                =>  ["required", "max:255"],
-            // 'CityNameE'             =>  ["required", "max:255"],
+            'DistrictNo'            =>  ["required", "max:255"],
+            'DistrictNameE'         =>  ["required", "max:255"],
+            'CityNo'                =>  ["required", "max:255"],
+            'CityNameE'             =>  ["required", "max:255"],
             'Tel'                   =>  ["required", "max:255"],
             'CustomerType'          =>  ["required", "max:255"],
         ]);
@@ -148,28 +148,109 @@ class Client extends Model
             'CityNameE'                     =>  $request->input("CityNameE")                    ,
             'Tel'                           =>  $request->input("Tel")                          ,
             'CustomerType'                  =>  $request->input("CustomerType")                 ,
+
             'id_route_import'               =>  $id_route_import                                ,  
-
-            'facade_image'                  =>  $request->input("facade_image")                 ,
-            'in_store_image'                =>  $request->input("in_store_image")               ,
-            'facade_image_original_name'    =>  $request->input("facade_image_original_name")   ,
-            'in_store_image_original_name'  =>  $request->input("in_store_image_original_name") ,
-
-            'status'                        =>  $request->input("status")                       ,
-            'nonvalidated_details'          =>  $request->input("nonvalidated_details")         ,
 
             'owner'                         =>  Auth::user()->id
         ]);
 
-        if($request->input("JPlan")     !=  null) {
+        //
 
-            $client->JPlan          =   $request->input("JPlan");
+        if($request->input("JPlan") !=  null) {
+
+            $client->JPlan      =   $request->input("JPlan");
         }
 
-        if($request->input("Journee")   !=  null) {
+        else {
 
-            $client->Journee        =   $request->input("Journee");
+            $client->JPlan      =   "";
         }
+
+        //
+
+        if($request->input("Journee") !=  null) {
+
+            $client->Journee      =   $request->input("Journee");
+        }
+
+        else {
+
+            $client->Journee      =   "";
+        }
+
+        //
+
+        if($request->input("facade_image") !=  null) {
+
+            $client->facade_image      =   $request->input("facade_image");
+        }
+
+        else {
+
+            $client->facade_image      =   "";
+        }
+
+        //
+
+        if($request->input("in_store_image") !=  null) {
+
+            $client->in_store_image      =   $request->input("in_store_image");
+        }
+
+        else {
+
+            $client->in_store_image      =   "";
+        }
+
+        //
+
+        if($request->input("facade_image_original_name") !=  null) {
+
+            $client->facade_image_original_name      =   $request->input("facade_image_original_name");
+        }
+
+        else {
+
+            $client->facade_image_original_name      =   "";
+        }
+
+        //
+
+        if($request->input("in_store_image_original_name") !=  null) {
+
+            $client->in_store_image_original_name      =   $request->input("in_store_image_original_name");
+        }
+
+        else {
+
+            $client->in_store_image_original_name      =   "";
+        }
+
+        //
+
+        if($request->input("status") !=  null) {
+
+            $client->status      =   $request->input("status");
+        }
+
+        else {
+
+            $client->status      =   "";
+        }
+
+        //
+
+        if($request->input("nonvalidated_details") !=  null) {
+
+            $client->nonvalidated_details      =   $request->input("nonvalidated_details");
+        }
+
+        else {
+
+            $client->nonvalidated_details      =   "";
+        }
+
+        //
 
         $client->save();
 
@@ -188,10 +269,10 @@ class Client extends Model
             'Latitude'              =>  ["required", "max:255"],
             'Longitude'             =>  ["required", "max:255"],
             'Address'               =>  ["required", "max:255"],
-            // 'DistrictNo'            =>  ["required", "max:255"],
-            // 'DistrictNameE'         =>  ["required", "max:255"],
-            // 'CityNo'                =>  ["required", "max:255"],
-            // 'CityNameE'             =>  ["required", "max:255"],
+            'DistrictNo'            =>  ["required", "max:255"],
+            'DistrictNameE'         =>  ["required", "max:255"],
+            'CityNo'                =>  ["required", "max:255"],
+            'CityNameE'             =>  ["required", "max:255"],
             'Tel'                   =>  ["required", "max:255"],
             'CustomerType'          =>  ["required", "max:255"]
         ]);
@@ -217,38 +298,101 @@ class Client extends Model
             $client->CityNameE                      =   $request->get("CityNameE")          ;
             $client->Tel                            =   $request->get("Tel")                ;
             $client->CustomerType                   =   $request->get("CustomerType")       ;
+
             $client->id_route_import                =   $id_route_import                    ;
 
-            $client->facade_image                   =   $request->get("facade_image")                   ;
-            $client->in_store_image                 =   $request->get("in_store_image")                 ;
-            $client->facade_image_original_name     =   $request->get("facade_image_original_name")     ;
-            $client->in_store_image_original_name   =   $request->get("in_store_image_original_name")   ;
+            if($request->input("JPlan") !=  null) {
 
-            $client->status                         =   $request->get("status")                         ;
-            $client->nonvalidated_details           =   $request->get("nonvalidated_details")           ;
-
-            // $client->owner                          =   Auth::user()->id;
-
-            if($request->input("JPlan")     !=  null) {
-
-                $client->JPlan          =   $request->input("JPlan");
+                $client->JPlan      =   $request->input("JPlan");
             }
 
             else {
 
-                $client->JPlan          =   "";
+                $client->JPlan      =   "";
             }
 
             //
 
-            if($request->input("Journee")   !=  null) {
+            if($request->input("Journee") !=  null) {
 
-                $client->Journee        =   $request->input("Journee");
+                $client->Journee      =   $request->input("Journee");
             }
 
             else {
 
-                $client->Journee        =   "";
+                $client->Journee      =   "";
+            }
+
+            //
+
+            if($request->input("facade_image") !=  null) {
+
+                $client->facade_image      =   $request->input("facade_image");
+            }
+
+            else {
+
+                $client->facade_image      =   "";
+            }
+
+            //
+
+            if($request->input("in_store_image") !=  null) {
+
+                $client->in_store_image      =   $request->input("in_store_image");
+            }
+
+            else {
+
+                $client->in_store_image      =   "";
+            }
+
+            //
+
+            if($request->input("facade_image_original_name") !=  null) {
+
+                $client->facade_image_original_name      =   $request->input("facade_image_original_name");
+            }
+
+            else {
+
+                $client->facade_image_original_name      =   "";
+            }
+
+            //
+
+            if($request->input("in_store_image_original_name") !=  null) {
+
+                $client->in_store_image_original_name      =   $request->input("in_store_image_original_name");
+            }
+
+            else {
+
+                $client->in_store_image_original_name      =   "";
+            }
+
+            //
+
+            if($request->input("status") !=  null) {
+
+                $client->status      =   $request->input("status");
+            }
+
+            else {
+
+                $client->status      =   "";
+            }
+
+            //
+
+            if($request->input("nonvalidated_details") !=  null) {
+
+                $client->nonvalidated_details      =   $request->input("nonvalidated_details");
+            }
+
+            else {
+
+                $client->nonvalidated_details      =   "";
             }
 
             $client->save();
@@ -303,7 +447,6 @@ class Client extends Model
             $client->CityNameE                  =   $client_tempo->CityNameE;
             $client->Tel                        =   $client_tempo->Tel;
             $client->CustomerType               =   $client_tempo->CustomerType;
-            // $client->owner                      =   Auth::user()->id;
 
             if($client_tempo->JPlan     !=  null) {
     

@@ -56,6 +56,8 @@
                             <Multiselect
                                 @select             =   "setListeRouteImport()"
                                 @deselect           =   "setListeRouteImport()"
+                                @clear              =   "setListeRouteImport()"
+
                                 v-model             =   "user.liste_route_import"
                                 :options            =   "liste_route_import"
                                 mode                =   "tags" 

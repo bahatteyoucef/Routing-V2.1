@@ -120,53 +120,62 @@ export default {
 
                     if (target && target.files) {
 
-                        this.route_import.file      =   target.files[0]
+                        if(typeof target.files[0]   !=  "undefined") {
 
-                        let fileReader              =   new FileReader();
+                            this.route_import.file      =   target.files[0]
 
-                        fileReader.readAsArrayBuffer(this.route_import.file)
+                            let fileReader              =   new FileReader();
 
-                        fileReader.onload = async (e) => {
+                            fileReader.readAsArrayBuffer(this.route_import.file)
 
-                            let arrayBuffer                         =   fileReader.result
+                            fileReader.onload = async (e) => {
 
-                            var data                                =   new Uint8Array(arrayBuffer)
-                            var arr                                 =   new Array()
+                                let arrayBuffer                         =   fileReader.result
 
-                            for (var i = 0; i != data.length; ++i) {
-                                
-                                arr[i] = String.fromCharCode(data[i])
-                            }
+                                var data                                =   new Uint8Array(arrayBuffer)
+                                var arr                                 =   new Array()
 
-                            var bstr                    =   arr.join("")
-                            var workbook                =   XLSX.read(bstr, { type: "binary" })
+                                for (var i = 0; i != data.length; ++i) {
+                                    
+                                    arr[i] = String.fromCharCode(data[i])
+                                }
 
-                            var first_sheet_name        =   workbook.SheetNames[0]
-                            var worksheet               =   workbook.Sheets[first_sheet_name]
+                                var bstr                    =   arr.join("")
+                                var workbook                =   XLSX.read(bstr, { type: "binary" })
 
-                            this.clients                =   [...XLSX.utils.sheet_to_json(worksheet, { raw: true })]
+                                var first_sheet_name        =   workbook.SheetNames[0]
+                                var worksheet               =   workbook.Sheets[first_sheet_name]
 
-                            //
+                                this.clients                =   [...XLSX.utils.sheet_to_json(worksheet, { raw: true })]
 
-                            this.checkFileFormat()
+                                //
 
-                            if(this.rdy_send) {
+                                this.checkFileFormat()
 
-                                this.setLatitudeLongitudeStandard()
-                                this.setNecessaryAttributs()
-                                this.setCustomerNo()
-                            }
+                                if(this.rdy_send) {
 
-                            // 
+                                    this.setLatitudeLongitudeStandard()
+                                    this.setNecessaryAttributs()
+                                    this.setCustomerNo()
+                                }
 
-                            await this.setDistrictNoCityNo()
+                                // 
 
-                            this.route_import.new_upload    =   true
-                            this.route_import.sent_tempo    =   false
+                                await this.setDistrictNoCityNo()
+
+                                this.route_import.new_upload    =   true
+                                this.route_import.sent_tempo    =   false
+
+                                // Hide Loading Page
+                                this.$hideLoadingPage()
+                            };      
+                        }
+
+                        else {
 
                             // Hide Loading Page
                             this.$hideLoadingPage()
-                        };           
+                        }
                     }
 
                     else {

@@ -420,7 +420,7 @@ export default {
             this.$showLoadingPage()
 
             const res                   =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.id_route_import+"/details",   null)
-            this.route_import           =   res.data
+            this.route_import           =   res.data.route_import
 
             // Set Clients
             this.route_import.clients   =   this.route_import.data
@@ -1624,6 +1624,11 @@ export default {
             new_client.status                  =   client.status            
             new_client.nonvalidated_details    =   client.nonvalidated_details        
 
+            new_client.facade_image                     =   client.facade_image            
+            new_client.in_store_image                   =   client.in_store_image        
+            new_client.facade_image_original_name       =   client.facade_image_original_name            
+            new_client.in_store_image_original_name     =   client.in_store_image_original_name        
+
             this.route_import.clients.push(new_client)
 
             // ReAffiche
@@ -1660,6 +1665,11 @@ export default {
 
                     this.route_import.clients[i].status                 =   client.status            
                     this.route_import.clients[i].nonvalidated_details   =   client.nonvalidated_details        
+
+                    this.route_import.clients[i].facade_image                   =   client.facade_image            
+                    this.route_import.clients[i].in_store_image                 =   client.in_store_image        
+                    this.route_import.clients[i].facade_image_original_name     =   client.facade_image_original_name            
+                    this.route_import.clients[i].in_store_image_original_name   =   client.in_store_image_original_name        
 
                     break
                 }

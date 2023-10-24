@@ -103,14 +103,23 @@ export default {
 
                         this.liste_route_import     =   res.data
 
-                        // Add to indexedDB
-                        this.$indexedDB.$setListeRouteImport(this.liste_route_import)
+                        if(this.$isRole("FrontOffice")) {
+
+                            // Add to indexedDB
+                            this.$indexedDB.$setListeRouteImport(this.liste_route_import)
+                        }
                     })
                 }
 
                 else {
 
-                    this.liste_route_import         =   await this.$indexedDB.$getListeRouteImport()
+                    setTimeout(async () => {
+                        
+                        if(this.$isRole("FrontOffice")) {
+
+                            this.liste_route_import         =   await this.$indexedDB.$getListeRouteImport()
+                        }
+                    }, 555);
                 }
             }
 

@@ -1,4 +1,4 @@
-import axios    from 'axios'
+import axios        from 'axios'
 
 export default class MobileClientIndexedDB {
     
@@ -111,6 +111,8 @@ export default class MobileClientIndexedDB {
 
                 this.route_import_db            =   event.target.result
           
+                await this.$sync()
+
                 resolve(true)
             };
 
@@ -128,44 +130,54 @@ export default class MobileClientIndexedDB {
 
     async $sync() {
 
-        let updated_clients                     =   await this.$getUpdatedClients()
-        let added_clients                       =   await this.$getAddedClients()
-        let validated_clients                   =   await this.$getValidatedClients()
-        let deleted_clients                     =   await this.$getDeletedClients()
+        if(window.navigator.onLine) {
 
-        let formData = new FormData();
+            let updated_clients                     =   await this.$getUpdatedClients()
+            let added_clients                       =   await this.$getAddedClients()
+            let validated_clients                   =   await this.$getValidatedClients()
+            let deleted_clients                     =   await this.$getDeletedClients()
 
-        formData.append("updated_clients"       ,   JSON.stringify(updated_clients))
-        formData.append("added_clients"         ,   JSON.stringify(added_clients))
-        formData.append("validated_clients"     ,   JSON.stringify(validated_clients))
-        formData.append("deleted_clients"       ,   JSON.stringify(deleted_clients))
+            let formData = new FormData();
 
-        const res   = await this.$callApi('post' ,   '/indexedDB/sync'  ,   formData)         
-        
-        if(res.status  ===  200) {
+            formData.append("updated_clients"       ,   JSON.stringify(updated_clients))
+            formData.append("added_clients"         ,   JSON.stringify(added_clients))
+            formData.append("validated_clients"     ,   JSON.stringify(validated_clients))
+            formData.append("deleted_clients"       ,   JSON.stringify(deleted_clients))
 
-            this.$clearUpdatedClients()
-            this.$clearAddedClients()
-            this.$clearValidatedClients()
-            this.$clearDeletedClients()
+            const res   = await this.$callApi('post' ,   '/indexedDB/sync'  ,   formData)         
+            console.log(res)        
 
-            await this.$getListeRouteImportFromDB()
-            await this.$getWillayasFromDB()
+            if(res.status  ==  200) {
+
+                //
+                this.$clearListeRouteImport()
+                this.$clearWillayas()
+
+                //
+                this.$clearUpdatedClients()
+                this.$clearAddedClients()
+                this.$clearValidatedClients()
+                this.$clearDeletedClients()
+
+                await this.$getListeRouteImportFromDB()
+                await this.$getWillayasFromDB()
+
+                return 200
+            }
         }
     }
 
     async $getListeRouteImportFromDB() {
 
-        if(window.navigator.onLine) {
+        // Fill Liste Route Import
+        axios.post("/route_import", null)
+        .then((res)=> {
 
-            // Fill Liste Route Import
-            axios.post("/route_import", null)
-            .then((res)=> {
+            console.log(res)
 
-                // Add to indexedDB
-                this.$setListeRouteImport(res.data)
-            })
-        }
+            // Add to indexedDB
+            this.$setListeRouteImport(res.data)
+        })
     }
 
     async $getWillayasFromDB() {
@@ -174,15 +186,11 @@ export default class MobileClientIndexedDB {
 
             let willayas    =   await this.$getWillayas()
 
-            console.log(willayas.length)
-
             if(willayas.length  ==  0) {
 
                 // Fill Liste Willayas
                 axios.post("/rtm_willayas/rtm_cites/details", null)
                 .then((res)=> {
-
-                    console.log(res.data)
 
                     // Add to indexedDB
                     this.$setWillayas(res.data)
@@ -212,17 +220,20 @@ export default class MobileClientIndexedDB {
 
     async $getListeRouteImport()  {
 
-        let results                                 =   []
+        return new Promise(async (resolve, error) => {
 
-        this.transaction_route_import               =   this.route_import_db.transaction("route_import", "readwrite")
-        this.store_route_import                     =   this.transaction_route_import.objectStore("route_import")
+            let results                                 =   []
 
-        let liste_route_import                      =   this.store_route_import.openCursor()
+            this.transaction_route_import               =   this.route_import_db.transaction("route_import", "readwrite")
+            this.store_route_import                     =   this.transaction_route_import.objectStore("route_import")
 
-        results                                     =   await this.$fillListeRouteImport(liste_route_import)
+            let liste_route_import                      =   this.store_route_import.openCursor()
 
-        return new Promise((resolve, error) => {
-            this.data_route_import                  =   results
+            results                                     =   await this.$fillListeRouteImport(liste_route_import)
+
+            console.log(results)
+
+            this.data_route_import                      =   results
             resolve(results)
         })     
     }
@@ -251,31 +262,32 @@ export default class MobileClientIndexedDB {
 
     $clearListeRouteImport() {
 
-        this.transaction_route_import               =   this.route_import_db.transaction("nouveaux_questionnaires", "readwrite")
-        this.store_route_import                     =   this.transaction_route_import.objectStore("nouveaux_questionnaires")
+        this.transaction_route_import               =   this.route_import_db.transaction("route_import", "readwrite")
+        this.store_route_import                     =   this.transaction_route_import.objectStore("route_import")
 
         this.store_route_import.clear()
     }
 
     async $getRouteImport(id_route_import) {
 
-        let result                                  =   []
+        return new Promise(async (resolve, error) => {
 
-        this.transaction_route_import               =   this.route_import_db.transaction("route_import", "readwrite")
-        this.store_route_import                     =   this.transaction_route_import.objectStore("route_import")
+            let result                                  =   []
 
-        let id_route_import_number                  =   parseInt(id_route_import, 10)
+            this.transaction_route_import               =   this.route_import_db.transaction("route_import", "readwrite")
+            this.store_route_import                     =   this.transaction_route_import.objectStore("route_import")
 
-        if(isNaN(id_route_import_number)) {
+            let id_route_import_number                  =   parseInt(id_route_import, 10)
 
-            resolve([])
-        }
+            if(isNaN(id_route_import_number)) {
 
-        let route_import                            =   this.store_route_import.get(id_route_import_number)
+                resolve([])
+            }
 
-        result                                      =   await this.$findRouteImport(route_import)
+            let route_import                            =   this.store_route_import.get(id_route_import_number)
 
-        return new Promise((resolve, error) => {
+            result                                      =   await this.$findRouteImport(route_import)
+
             resolve(result)
         })     
     }
@@ -305,23 +317,24 @@ export default class MobileClientIndexedDB {
 
     async $getClients(id_route_import)  {
 
-        let result                                  =   []
+        return new Promise(async (resolve, error) => {
 
-        this.transaction_route_import               =   this.route_import_db.transaction("route_import", "readwrite")
-        this.store_route_import                     =   this.transaction_route_import.objectStore("route_import")
+            let result                                  =   []
 
-        let id_route_import_number                  =   parseInt(id_route_import, 10)
+            this.transaction_route_import               =   this.route_import_db.transaction("route_import", "readwrite")
+            this.store_route_import                     =   this.transaction_route_import.objectStore("route_import")
 
-        if(isNaN(id_route_import_number)) {
+            let id_route_import_number                  =   parseInt(id_route_import, 10)
 
-            resolve([])
-        }
+            if(isNaN(id_route_import_number)) {
 
-        let route_import                            =   this.store_route_import.get(id_route_import_number)
+                resolve([])
+            }
 
-        result                                      =   await this.$findRouteImport(route_import)
+            let route_import                            =   this.store_route_import.get(id_route_import_number)
 
-        return new Promise((resolve, error) => {
+            result                                      =   await this.$findRouteImport(route_import)
+
 
             if(result   !=  {}) {
 
@@ -347,13 +360,12 @@ export default class MobileClientIndexedDB {
 
         this.store_added_clients.put({...client})
 
-        console.log(client)
-
         // Set Client in Route Import
         this.transaction_route_import               =   this.route_import_db.transaction("route_import", "readwrite")
         this.store_route_import                     =   this.transaction_route_import.objectStore("route_import")
 
         let route_import                            =   await this.$getRouteImport(id_route_import)
+
         route_import.clients.push({...client})
 
         this.store_route_import.put(route_import)
@@ -361,26 +373,29 @@ export default class MobileClientIndexedDB {
 
     async $getAddedClients()  {
 
-        let results                                 =   []
+        return new Promise(async (resolve, error) => {
 
-        this.transaction_added_clients              =   this.route_import_db.transaction("added_clients", "readwrite")
-        this.store_added_clients                    =   this.transaction_added_clients.objectStore("added_clients")
+            let results                                 =   []
 
-        let liste_added_clients                     =   this.store_added_clients.openCursor()
+            this.transaction_added_clients              =   this.route_import_db.transaction("added_clients", "readwrite")
+            this.store_added_clients                    =   this.transaction_added_clients.objectStore("added_clients")
 
-        results                                     =   await this.$fillListeAddedClients(liste_added_clients)
+            let liste_added_clients                     =   this.store_added_clients.openCursor()
 
-        return new Promise((resolve, error) => {
-            this.data_added_clients                 =   results
+            results                                     =   await this.$fillListeAddedClients(liste_added_clients)
+
+            console.log(results)
+
+            this.data_added_clients                     =   results
             resolve(results)
         })     
     }
 
     async $fillListeAddedClients(liste_added_clients) {
 
-        let results =   []
-
         return new Promise((resolve, error) => {
+
+            let results =   []
 
             liste_added_clients.onsuccess =    function (e)    {
                 var cursor = e.target.result;
@@ -388,6 +403,8 @@ export default class MobileClientIndexedDB {
                 if (cursor) {
                     results.push(cursor.value) 
                     cursor.continue();
+
+                    console.log(cursor.value)
                 }
 
                 else {
@@ -408,16 +425,17 @@ export default class MobileClientIndexedDB {
 
     async $getAddedClient(id_client) {
 
-        let result                                  =   []
+        return new Promise(async (resolve, error) => {
 
-        this.transaction_added_client               =   this.route_import_db.transaction("added_client", "readwrite")
-        this.store_added_client                     =   this.transaction_added_client.objectStore("added_client")
+            let result                                  =   []
 
-        let added_client                            =   this.store_added_client.get(id_client)
+            this.transaction_added_client               =   this.route_import_db.transaction("added_client", "readwrite")
+            this.store_added_client                     =   this.transaction_added_client.objectStore("added_client")
 
-        result                                      =   await this.$findAddedClient(added_client)
+            let added_client                            =   this.store_added_client.get(id_client)
 
-        return new Promise((resolve, error) => {
+            result                                      =   await this.$findAddedClient(added_client)
+
             resolve(result)
         })     
     }
@@ -447,30 +465,26 @@ export default class MobileClientIndexedDB {
 
     async $getMaxAddedClients() {
 
-        let result                                  =   null
+        return new Promise(async (resolve, error) => {
 
-        this.transaction_added_clients              =   this.route_import_db.transaction("added_clients", "readwrite")
-        this.store_added_clients                    =   this.transaction_added_clients.objectStore("added_clients")
+            let results     =   await this.$getAddedClients()
+            console.log(results)
 
-        let liste_added_clients                     =   this.store_added_clients.openCursor()
-
-        result                                      =   await this.$fillMaxAddedClients(liste_added_clients)
-
-        return new Promise((resolve, error) => {
-
-            resolve(result)
+            resolve(parseInt(results[results.length - 1].id.match(/(\d+)$/)[1]))
         })
     }
 
     async $fillMaxAddedClients(liste_added_clients) {
 
         let maxRecord   =   null;
-        let maxValue    =   -Infinity;
+        let maxValue    =   -1000;
 
         return new Promise((resolve, error) => {
 
             liste_added_clients.onsuccess =    function (e)    {
                 var cursor = e.target.result;
+
+                console.log(e.target)
 
                 if (cursor) {
 
@@ -490,6 +504,8 @@ export default class MobileClientIndexedDB {
 
                         const regex = /(\d+)$/; // Match one or more digits at the end of the string
                         const matches = maxRecord.id.match(regex);
+
+                        console.log(matches)
 
                         if (matches && matches.length > 1) {
 
@@ -559,16 +575,17 @@ export default class MobileClientIndexedDB {
 
     async $getUpdatedClients()  {
 
-        let results                                 =   []
+        return new Promise(async (resolve, error) => {
 
-        this.transaction_updated_clients            =   this.route_import_db.transaction("updated_clients", "readwrite")
-        this.store_updated_clients                  =   this.transaction_updated_clients.objectStore("updated_clients")
+            let results                                 =   []
 
-        let liste_updated_clients                   =   this.store_updated_clients.openCursor()
+            this.transaction_updated_clients            =   this.route_import_db.transaction("updated_clients", "readwrite")
+            this.store_updated_clients                  =   this.transaction_updated_clients.objectStore("updated_clients")
 
-        results                                     =   await this.$fillListeUpdatedClients(liste_updated_clients)
+            let liste_updated_clients                   =   this.store_updated_clients.openCursor()
 
-        return new Promise((resolve, error) => {
+            results                                     =   await this.$fillListeUpdatedClients(liste_updated_clients)
+
             this.data_updated_clients                   =   results
             resolve(results)
         })     
@@ -641,9 +658,14 @@ export default class MobileClientIndexedDB {
 
         let route_import                                =   await this.$getRouteImport(id_route_import)
 
+        console.log(route_import)
+
         for (let i = 0; i < route_import.clients.length; i++) {
 
             if(route_import.clients[i].id   ==  client.id) {
+
+                console.log(route_import.clients[i])
+                console.log(client)
 
                 route_import.clients.splice(1, i)
                 break;
@@ -655,16 +677,17 @@ export default class MobileClientIndexedDB {
 
     async $getDeletedClients()  {
 
-        let results                                 =   []
+        return new Promise(async (resolve, error) => {
 
-        this.transaction_deleted_clients            =   this.route_import_db.transaction("deleted_clients", "readwrite")
-        this.store_deleted_clients                  =   this.transaction_deleted_clients.objectStore("deleted_clients")
+            let results                                 =   []
 
-        let liste_deleted_clients                   =   this.store_deleted_clients.openCursor()
+            this.transaction_deleted_clients            =   this.route_import_db.transaction("deleted_clients", "readwrite")
+            this.store_deleted_clients                  =   this.transaction_deleted_clients.objectStore("deleted_clients")
 
-        results                                     =   await this.$fillListeDeletedClients(liste_deleted_clients)
+            let liste_deleted_clients                   =   this.store_deleted_clients.openCursor()
 
-        return new Promise((resolve, error) => {
+            results                                     =   await this.$fillListeDeletedClients(liste_deleted_clients)
+
             this.data_deleted_clients                   =   results
             resolve(results)
         })     
@@ -754,16 +777,17 @@ export default class MobileClientIndexedDB {
 
     async $getValidatedClients()  {
 
-        let results                                 =   []
+        return new Promise(async (resolve, error) => {
 
-        this.transaction_validated_clients          =   this.route_import_db.transaction("validated_clients", "readwrite")
-        this.store_validated_clients                =   this.transaction_validated_clients.objectStore("validated_clients")
+            let results                                 =   []
 
-        let liste_validated_clients                 =   this.store_validated_clients.openCursor()
+            this.transaction_validated_clients          =   this.route_import_db.transaction("validated_clients", "readwrite")
+            this.store_validated_clients                =   this.transaction_validated_clients.objectStore("validated_clients")
 
-        results                                     =   await this.$fillListeValidatedClients(liste_validated_clients)
+            let liste_validated_clients                 =   this.store_validated_clients.openCursor()
 
-        return new Promise((resolve, error) => {
+            results                                     =   await this.$fillListeValidatedClients(liste_validated_clients)
+
             this.data_validated_clients                   =   results
             resolve(results)
         })     
@@ -817,17 +841,18 @@ export default class MobileClientIndexedDB {
 
     async $getWillayas()  {
 
-        let results                                 =   []
+        return new Promise(async (resolve, error) => {
 
-        this.transaction_willayas                   =   this.route_import_db.transaction("willayas", "readwrite")
-        this.store_willayas                         =   this.transaction_willayas.objectStore("willayas")
+            let results                                 =   []
 
-        let wilayas                                 =   this.store_willayas.openCursor()
+            this.transaction_willayas                   =   this.route_import_db.transaction("willayas", "readwrite")
+            this.store_willayas                         =   this.transaction_willayas.objectStore("willayas")
 
-        results                                     =   await this.$fillWillayas(wilayas)
+            let wilayas                                 =   this.store_willayas.openCursor()
 
-        return new Promise((resolve, error) => {
-            this.data_willayas                  =   results
+            results                                     =   await this.$fillWillayas(wilayas)
+
+            this.data_willayas                          =   results
             resolve(results)
         })
     }
@@ -856,24 +881,25 @@ export default class MobileClientIndexedDB {
 
     $clearWillayas() {
 
-        this.transaction_willayas               =   this.route_import_db.transaction("nouveaux_questionnaires", "readwrite")
-        this.store_willayas                     =   this.transaction_willayas.objectStore("nouveaux_questionnaires")
+        this.transaction_willayas                   =   this.route_import_db.transaction("willayas", "readwrite")
+        this.store_willayas                         =   this.transaction_willayas.objectStore("willayas")
 
         this.store_willayas.clear()
     }
 
     async $getWillaya(DistrictNo) {
 
-        let result                                  =   []
+        return new Promise(async (resolve, error) => {
 
-        this.transaction_willayas                   =   this.route_import_db.transaction("willayas", "readwrite")
-        this.store_willayas                         =   this.transaction_willayas.objectStore("willayas")
+            let result                                  =   []
 
-        let willayas                                =   this.store_willayas.get(DistrictNo)
+            this.transaction_willayas                   =   this.route_import_db.transaction("willayas", "readwrite")
+            this.store_willayas                         =   this.transaction_willayas.objectStore("willayas")
 
-        result                                      =   await this.$findWillaya(willayas)
+            let willayas                                =   this.store_willayas.get(DistrictNo)
 
-        return new Promise((resolve, error) => {
+            result                                      =   await this.$findWillaya(willayas)
+
             resolve(result)
         })     
     }

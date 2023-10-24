@@ -3,27 +3,47 @@
         
         <!-- Logo -->
         <div class="text-center navbar-brand-wrapper d-flex align-items-top justify-content-center" id="logo_div_parent">
-            <router-link to="/" aria-current="page" class="navbar-brand brand-logo active router-link-active p-0">
-              <img  :src="'/images/profile.jpg'"     alt="logo" class="mt-3 ml-3"/>
-            </router-link>
+            <div v-if="$isRole('FrontOffice')">
+              <router-link to="/" aria-current="page" class="navbar-brand brand-logo active router-link-active p-0 w-100">
+                <img  :src="'/images/profile.jpg'"     alt="logo" class="mt-3 ml-3 w-100"/>
+              </router-link>
 
-            <router-link to="/" aria-current="page"   class="navbar-brand brand-logo-mini active router-link-active p-0" id="mini_logo_custom">
-              <img  :src="'/images/profile.jpg'"     alt="logo" id="mini_logo_custom_image" class="mt-3 ml-3"/>
-            </router-link>
+              <router-link to="/" aria-current="page"   class="navbar-brand brand-logo-mini active router-link-active p-0 w-100" id="mini_logo_custom">
+                <img  :src="'/images/profile.jpg'"     alt="logo" id="mini_logo_custom_image" class="mt-3 ml-3 w-100"/>
+              </router-link>
+            </div>
+
+            <div v-if="$isRole('Super Admin')||$isRole('BackOffice')">
+              <router-link to="/" aria-current="page" class="navbar-brand brand-logo active router-link-active p-0">
+                <img  :src="'/images/header.png'"     alt="logo" class="mt-2"/>
+              </router-link>
+
+              <router-link to="/" aria-current="page"   class="navbar-brand brand-logo-mini active router-link-active p-0" id="mini_logo_custom">
+                <img  :src="'/images/header.png'"     alt="logo" id="mini_logo_custom_image" class="mt-2"/>
+              </router-link>
+            </div>
 
             <!--  -->
 
-            <div class="mr-5 row w-100">
-              <div v-if="show_frontoffice_buttons" class="p-1 pt-0 mt-3 col">
-                  <button class="btn primary w-100 m-0 pr-4 pl-4"                                                                  @click="addClient()"><i class="mdi mdi-plus"></i></button>
+            <div class="mr-3 ml-3 row w-100" v-if="$isRole('FrontOffice')">
+              <div class="p-1 pt-0 mt-3 col">
+                  <button v-if="/^\/route_import\/[^\/]+\/clients$/.test($route.path)" class="btn primary w-100 m-0"     @click="updateClient()"><i class="mdi mdi-pencil"></i></button>
               </div>
 
-              <div v-if="show_frontoffice_buttons" class="p-1 pt-0 mt-3 col">
-                  <button class="btn primary w-100 m-0 pr-4 pl-4"                                                                  @click="getClients()"><i class="mdi mdi-account-multiple"></i></button>
+              <div class="p-1 pt-0 mt-3 col">
+                  <button class="btn primary w-100 m-0"                                                                  @click="addClient()"><i class="mdi mdi-plus"></i></button>
               </div>
 
-              <div v-if="show_frontoffice_buttons" class="p-1 pt-0 mt-3 col">
-                  <button class="btn primary w-100 m-0 pr-4 pl-4"                                                                  @click="sync()"><i class="mdi mdi-repeat"></i></button>
+              <div class="p-1 pt-0 mt-3 col">
+                  <button class="btn primary w-100 m-0"                                                                  @click="getClients()"><i class="mdi mdi-account-multiple"></i></button>
+              </div>
+
+              <div class="p-1 pt-0 mt-3 col">
+                  <button class="btn primary w-100 m-0"                                                                  @click="sync()"><i class="mdi mdi-repeat"></i></button>
+              </div>
+
+              <div class="p-1 pt-0 mt-3 col">
+                  <button v-if="$route.path  != '/'" class="btn primary w-100 m-0"                                      @click="$goBack()"><i class="mdi mdi-arrow-left"></i></button>
               </div>
             </div>
 
@@ -108,6 +128,20 @@
 
                 <ul tabindex="-1" class="dropdown-menu dropdown-menu-right" id="profile_header_list">
 
+                    <li role="presentation" class="preview-item mt-1" id="installButton">
+                        <span  role="button" class="dropdown-item">
+                          <i class="mdi mdi-download mr-2 text_light_purple"></i>
+                          Install Application
+                        </span>
+                    </li>
+
+                    <li role="presentation" class="preview-item mt-1" @click="showProfile()">
+                        <span  role="button" class="dropdown-item">
+                          <i class="mdi mdi-account mr-2 text_light_purple"></i>
+                          Profile
+                        </span>
+                    </li>
+
                     <li role="presentation" class="preview-item mt-1" @click="logOut()">
                         <span  role="button" class="dropdown-item">
                           <i class="mdi mdi-logout mr-2 text_light_purple"></i>
@@ -149,9 +183,7 @@ export default {
 
           route_import_existe       :   false ,
 
-          user                      :   {}    ,
-
-          show_frontoffice_buttons  : false
+          user                      :   {}    
       }
     },
 
@@ -160,7 +192,10 @@ export default {
         ...mapGetters({
             getUser                     :   'authentification/getUser'              ,
             getAccessToken              :   'authentification/getAccessToken'       ,
-            getIsAuthentificated        :   'authentification/getIsAuthentificated'
+            getIsAuthentificated        :   'authentification/getIsAuthentificated' ,
+
+            getAddClient                :   'client/getAddClient'                   ,
+            getUpdateClient             :   'client/getUpdateClient'                
         }),
     },
 
@@ -183,6 +218,8 @@ export default {
 
           await this.fetchMaps()
         })
+
+        this.pwaFunction()
     },  
 
     methods: {
@@ -193,7 +230,70 @@ export default {
           "setIsAuthentificatedAction"    
         ]),
 
-        // 
+        //
+
+        pwaFunction() {
+
+          let deferredPrompt;
+
+          window.addEventListener('beforeinstallprompt', (e) => {
+              deferredPrompt = e;
+          });
+
+          const installButton = document.getElementById('installButton');
+
+          if(installButton) {
+
+            installButton.addEventListener('click', async () => {
+
+                if (deferredPrompt !== null) {
+
+                    deferredPrompt.prompt();
+
+                    const { outcome } = await deferredPrompt.userChoice;
+
+                    if (outcome === 'accepted') {
+                        deferredPrompt = null;
+                    }
+                }
+            });
+          }
+        },
+
+        downloadPWA() {
+
+          console.log(111)
+
+          window.addEventListener('beforeinstallprompt', (event) => {
+
+            console.log(2222)
+
+            event.preventDefault();
+            this.showInstallPrompt(event);
+          });
+        },
+
+        showInstallPrompt(event) {
+
+          console.log(3333)
+
+          event.prompt();
+
+          event.userChoice.then((choiceResult) => {
+
+            if (choiceResult.outcome === 'accepted') {
+
+              console.log('User accepted the PWA installation');
+            } 
+
+            else {
+
+              console.log('User declined the PWA installation');
+            }
+          });
+        },
+
+        //
 
         async getRouteTempo() {
 
@@ -291,6 +391,13 @@ export default {
 
         //
 
+        async showProfile() {
+
+          this.$router.push('/users/'+this.getUser.id+'/show')
+        },
+
+        //
+
         async logOut() {
 
           const res = await this.$callApi("post", "/logout" , null)
@@ -323,19 +430,9 @@ export default {
 
           if(this.$isRole("FrontOffice")) {
 
-              const pattern = /^\/route\/frontoffice\/obs\/route_import\/\d+\/details$/;
-                
-              let route_obs_frontOffice   =   pattern.test(route.path);
-
-              if(route_obs_frontOffice) {
-
-                this.show_frontoffice_buttons   = true
-              }
-
-              else {
-
-                this.show_frontoffice_buttons   = false
-              }
+            const pattern = /^\/route\/frontoffice\/obs\/route_import\/\d+\/details$/;
+              
+            let route_obs_frontOffice   =   pattern.test(route.path);
           }
         },
 
@@ -345,19 +442,32 @@ export default {
 
           let position     =   await this.$currentPosition()
 
-          this.$router.push('/route_import/'+this.$route.params.id_route_import+'/clients/add/'+position.coords.latitude+'/'+position.coords.longitude)
+          this.$router.push('/route_import/'+this.getUser.id_route_import+'/clients/add/'+position.coords.latitude+'/'+position.coords.longitude)
+        },
+
+        async updateClient() {
+
+          if(this.getUpdateClient) {
+
+            this.$router.push('/route_import/'+this.getUser.id_route_import+'/clients/'+this.getUpdateClient.id+'/update')
+          }
         },
 
         getClients() {
 
-          this.$router.push('/route_import/'+this.$route.params.id_route_import+'/clients')
+          this.$router.push('/route_import/'+this.getUser.id_route_import+'/clients')
         },
 
         async sync() {
 
           this.$showLoadingPage()
 
-          await this.$indexedDB.$sync()
+          let res = await this.$indexedDB.$sync()
+
+          if(res  ==  200) {
+
+            this.$feedbackSuccess("Synchronisation Perfomed !" , "a synchronisation has been performed successfuly!")
+          }
 
           this.$hideLoadingPage()
         }

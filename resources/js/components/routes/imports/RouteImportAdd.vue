@@ -93,7 +93,9 @@ export default {
 
                         this.route_import.file      =   target.files[0]
 
-                        let fileReader              =   new FileReader();
+                        if(typeof target.files[0] != "undefined") {
+
+                            let fileReader              =   new FileReader();
 
                         fileReader.readAsArrayBuffer(this.route_import.file)
 
@@ -129,7 +131,7 @@ export default {
 
                                 // 
 
-                                await this.setDistrictNoCityNo()
+                                // await this.setDistrictNoCityNo()
 
                                 this.route_import.new_upload    =   true
                                 this.route_import.sent_tempo    =   false
@@ -137,7 +139,14 @@ export default {
 
                             // Hide Loading Page
                             this.$hideLoadingPage()
-                        };           
+                        };   
+                        }  
+
+                        else {
+
+                            // Hide Loading Page
+                            this.$hideLoadingPage()
+                        }
                     }
 
                     else {
@@ -170,7 +179,9 @@ export default {
                 let Latitude_existe         =   columns.includes("Latitude")
                 let Longitude_existe        =   columns.includes("Longitude")
                 let Address_existe          =   columns.includes("Address")
+                let DistrictNo_existe       =   columns.includes("DistrictNo")
                 let DistrictNameE_existe    =   columns.includes("DistrictNameE")
+                let CityNo_existe           =   columns.includes("CityNo")
                 let CityNameE_existe        =   columns.includes("CityNameE")
                 let Tel_existe              =   columns.includes("Tel")
                 let CustomerType_existe     =   columns.includes("CustomerType")
@@ -205,9 +216,19 @@ export default {
                     errors.push("Your file doesn't contain the column 'Address'")
                 }
 
+                if(!DistrictNo_existe) {
+
+                    errors.push("Your file doesn't contain the column 'DistrictNo'")
+                }
+
                 if(!DistrictNameE_existe) {
 
                     errors.push("Your file doesn't contain the column 'DistrictNameE'")
+                }
+
+                if(!CityNo_existe) {
+
+                    errors.push("Your file doesn't contain the column 'CityNo'")
                 }
 
                 if(!CityNameE_existe) {

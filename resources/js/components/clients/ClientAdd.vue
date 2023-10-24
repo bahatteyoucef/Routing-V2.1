@@ -264,6 +264,7 @@ export default {
 
     async mounted() {
 
+        // 
         if(this.$isRole("Super Admin")||this.$isRole("BackOffice")) {
 
             this.client.status  =   "validated"
@@ -275,6 +276,16 @@ export default {
         }
 
         //
+
+        let res_1   =   await this.$indexedDB.$getListeRouteImport()
+        let res_2   =   await this.$indexedDB.$getAddedClients()
+        let res_3   =   await this.$indexedDB.$getUpdatedClients()
+        let res_4   =   await this.$indexedDB.$getDeletedClients()
+
+        console.log(res_1)
+        console.log(res_2)
+        console.log(res_3)
+        console.log(res_4)
 
         await this.getData()
     },  
@@ -318,34 +329,71 @@ export default {
             formData.append("status"                ,   this.client.status)
             formData.append("nonvalidated_details"  ,   this.client.nonvalidated_details)
 
-            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/store",   formData)
+            if(this.$connectedToInternet) {
 
-            if(res.status===200){
+                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/store",   formData)
+
+                if(res.status===200){
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    // Send Client
+                    this.client.id                      =   res.data.client.id
+                    this.client.status                  =   this.client.status
+                    this.client.nonvalidated_details    =   this.client.nonvalidated_details
+
+                    // Send Feedback
+                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
+
+                    // this.emitter.emit('reSetAdd' , this.client)
+
+                    // 
+                    this.$goBack()
+                }
+                
+                else{
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    // Send Errors
+                    this.$showErrors("Error !", res.data.errors)
+                }      
+            }
+
+            else {
+
+                let clients    =   await this.$indexedDB.$getAddedClients()
+
+                console.log(clients)
+
+                let max_local_id    =   0
+
+                if(clients.length > 0) {
+
+                    max_local_id    =   parseInt(clients[clients.length - 1].id.match(/(\d+)$/)[1]) + 1
+
+                    console.log(max_local_id)
+                }
+
+                this.client.id                      =   "local_id_"+max_local_id
+                this.client.status                  =   this.client.status
+                this.client.nonvalidated_details    =   this.client.nonvalidated_details
+                this.client.id_route_import         =   this.$route.params.id_route_import
+
+                // Add in indexedDB
+                await this.$indexedDB.$setAddedClients(this.client, this.$route.params.id_route_import)
 
                 // Hide Loading Page
                 this.$hideLoadingPage()
 
                 // Send Client
+                // this.emitter.emit('reSetAdd' , this.client)
 
-                this.client.id                      =   res.data.client.id
-                this.client.status                  =   this.client.status
-                this.client.nonvalidated_details    =   this.client.nonvalidated_details
-
-                this.emitter.emit('reSetAdd' , this.client)
-
-                // 
+                // Go Back
                 this.$goBack()
-
             }
-            
-            else{
-
-                // Hide Loading Page
-                this.$hideLoadingPage()
-
-                // Send Errors
-                this.$showErrors("Error !", res.data.errors)
-			}            
         },
 
         //
@@ -367,20 +415,31 @@ export default {
 
             //
 
-            const res           =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.$route.params.id_route_import+"/details",   null)
-            this.all_clients    =   res.data.data
+            if(this.$connectedToInternet) {
 
-            console.log(res)
+                const res           =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.$route.params.id_route_import+"/details",   null)
+                this.all_clients    =   res.data.route_import.data
+            }
+
+            else {
+
+                this.route_import   =   await this.$indexedDB.$getRouteImport(this.$route.params.id_route_import)
+                this.all_clients    =   this.route_import.clients
+            }
 
             //
 
             this.setCoords(client)
             this.getComboData()  
 
-            if(this.$isRole("FrontOffice")) {
+            // if(this.$isRole("FrontOffice")) {
+
+            if(this.$connectedToInternet) {
 
                 this.checkClients()
             }
+
+            // }
         },
 
         setCoords(client) {
@@ -394,20 +453,45 @@ export default {
 
         async getComboData() {
 
-            const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
-            this.willayas                   =   res_3.data
+            if(this.$connectedToInternet) {
+
+                const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
+                this.willayas                   =   res_3.data
+            }
+
+            else {
+
+                this.willayas                   =   await this.$indexedDB.$getWillayas()
+            }
         },
 
         async getCites() {
 
-            // Show Loading Page
-            this.$showLoadingPage()
+            if(this.$connectedToInternet) {
 
-            const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
-            this.cites                      =   res_3.data
+                // Show Loading Page
+                this.$showLoadingPage()
 
-            // Hide Loading Page
-            this.$hideLoadingPage()
+                const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
+                this.cites                      =   res_3.data
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+            }
+
+            else {
+
+                // Show Loading Page
+                this.$showLoadingPage()
+
+                let willaya                     =   await this.$indexedDB.$getWillaya(this.client.DistrictNo)
+                console.log(willaya)
+
+                this.cites                      =   willaya.cites
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+            }
         },
 
         //

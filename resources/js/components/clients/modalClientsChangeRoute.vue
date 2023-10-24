@@ -302,6 +302,9 @@ export default {
                 // Hide Loading Page
                 this.$hideLoadingPage()
 
+                // Send Feedback
+                this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
+
                 // Send Client
                 this.emitter.emit('reSetChangeRoute' , clients_copy)
 

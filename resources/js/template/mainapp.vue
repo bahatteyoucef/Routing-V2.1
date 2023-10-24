@@ -66,6 +66,10 @@
 
         async mounted() {
 
+            // Set lOCAL DB
+            await this.$indexedDB.$indexedDB_intialiazeSetDATA()
+
+            // 
             this.isAuthentificated      =   await this.checkIfUserIsAuthentificated()
 
             if(this.isAuthentificated) {

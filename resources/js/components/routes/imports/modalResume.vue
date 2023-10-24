@@ -183,7 +183,7 @@ export default {
             const res                   =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.$route.params.id_route_import+"/details",   null)
 
             // Set Clients
-            this.clients                =   res.data.data
+            this.clients                =   res.data.route_import.data
 
             this.$hideLoadingPage()
         },

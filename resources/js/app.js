@@ -171,8 +171,6 @@ if (window.navigator.onLine) {
 // IndexedDB
 app.config.globalProperties.$indexedDB                  =   new IndexedDB()
 
-await app.config.globalProperties.$indexedDB.$indexedDB_intialiazeSetDATA()
-
 //
 
 // Internet

@@ -1,5 +1,7 @@
 import axios from 'axios'
-import { entries } from 'lodash';
+import { entries, sortedIndex } from 'lodash';
+
+import * as XLSX from "xlsx";
 
 export default {
 
@@ -51,7 +53,10 @@ export default {
 
         $goBack() {
 
-            this.$router.go(-1); 
+            if(window.history.length    >   0) {
+
+                this.$router.go(-1); 
+            }
         },
 
         //
@@ -297,39 +302,122 @@ export default {
 
             resume_liste_journey_plan       =   this.$setRowspans(resume_liste_journey_plan)
 
-            // Sorting By Number of Clients
+            // Sorting By Route Name
+            resume_liste_journey_plan           =   this.$sortResumeByRouteName(resume_liste_journey_plan)
+
+            // Sorting By Journees
+
+            for (const [key, value] of Object.entries(resume_liste_journey_plan)) {
+
+                resume_liste_journey_plan[key].liste_journee      =   this.$sortResumeByJourneeName(value) 
+            }
+
+            //
+
+            return resume_liste_journey_plan
+        },
+
+        $sortResumeByRouteName(resume_liste_journey_plan) {
 
             let sortedArray                     =   Object.values(resume_liste_journey_plan);
             // sortedArray.sort((a, b)             =>  b.clients.length - a.clients.length);
-            sortedArray.sort((a, b)             =>  a.JPlan.localeCompare(b.JPlan));
+
+            sortedArray.sort((a, b)             =>  {
+
+                // Use a regular expression to match numbers at the end of the string
+                let regex = /\d+$/;
+                
+                // Use the match method to find the matched numbers
+                let a_last_number   =   a.JPlan.match(regex);
+                let b_last_number   =   b.JPlan.match(regex);
+
+                // Check if there is a match and return the result, or return null if there's no match
+                if(a_last_number    ==  null) {
+
+                    if(b_last_number    ==  null) {
+
+                        console.log(b.JPlan)
+
+                        return a.JPlan.localeCompare(b.JPlan)
+                    }
+
+                    else {
+
+                        return -1
+                    }
+                }
+
+                else {
+
+                    if(b_last_number    ==  null) {
+
+                        return 1
+                    }
+
+                    else {
+
+                        return a_last_number - b_last_number
+                    }
+                }
+            })
+
             let sortedObject                    =   sortedArray.reduce((acc, journey_plan, index) => {
                 
                 acc[journey_plan.JPlan]         =   journey_plan;
                 return acc;
             }, {});
 
-            resume_liste_journey_plan           =   sortedObject
+            return sortedObject
+        },
 
-            //
+        $sortResumeByJourneeName(value, key) {
 
-            // Sorting By Journees
+            let sortedArray                         =   Object.values(value.liste_journee);
 
-            for (const [key, value] of Object.entries(resume_liste_journey_plan)) {
+            sortedArray.sort((a, b)             =>  {
 
-                sortedArray                         =   Object.values(resume_liste_journey_plan[key].liste_journee);
-                sortedArray.sort((a, b)             =>  a.Journee.localeCompare(b.Journee));
-                sortedObject                        =   sortedArray.reduce((acc, Journee, index) => {
-                    
-                    acc[Journee.Journee]            =   Journee;
-                    return acc;
-                }, {});
+                // Use a regular expression to match numbers at the end of the string
+                let regex = /\d+$/;
+                
+                // Use the match method to find the matched numbers
+                let a_last_number   =   a.Journee.match(regex);
+                let b_last_number   =   b.Journee.match(regex);
 
-                resume_liste_journey_plan[key].liste_journee      =   sortedObject 
-            }
+                // Check if there is a match and return the result, or return null if there's no match
+                if(a_last_number    ==  null) {
 
-            //
+                    if(b_last_number    ==  null) {
 
-            return resume_liste_journey_plan
+                        return a.Journee.localeCompare(b.Journee)
+                    }
+
+                    else {
+
+                        return -1
+                    }
+                }
+
+                else {
+
+                    if(b_last_number    ==  null) {
+
+                        return 1
+                    }
+
+                    else {
+
+                        return a_last_number - b_last_number
+                    }
+                }
+            })
+
+            let sortedObject                        =   sortedArray.reduce((acc, Journee, index) => {
+                
+                acc[Journee.Journee]            =   Journee;
+                return acc;
+            }, {});
+
+            return sortedObject
         },
 
         //
@@ -851,8 +939,9 @@ export default {
 
                     (error) => {
             
-                        reject(error)                        
-                        console.error('Error getting geolocation:', error);
+                        let position    =   { coords : { latitude : 0, longitude : 0}}
+
+                        resolve(position)
                     },
                 
                     { 

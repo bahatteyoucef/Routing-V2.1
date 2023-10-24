@@ -57,12 +57,12 @@
                          
                         <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
-                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @changed="checkClients()">
+                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @change="checkClients()">
                         </div>
 
                         <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
-                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @changed="checkClients()">
+                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @change="checkClients()">
                         </div>
 
                         <!--  -->
@@ -122,15 +122,15 @@
                         <!--  -->
 
                         <div class="mb-3">
-                            <label for="facade_image"       class="form-label">Facade Image (Facade Image)</label>
-                            <input type="file"              class="form-control"        id="facade_image"               accept="image/*"    @change="facadeImage()">
-                            <img                                                        id="facade_image_display"       src=""              class="w-100">
+                            <label for="facade_image_add"   class="form-label">Facade Image (Facade Image)</label>
+                            <input type="file"              class="form-control"        id="facade_image_add"           accept="image/*"    @change="facadeImage()">
+                            <img                                                        id="facade_image_display_add"       src=""              class="w-100">
                         </div>
 
                         <div class="mb-3">
-                            <label for="in_store_image"     class="form-label">In-Store Image (In-Store Image)</label>
-                            <input type="file"              class="form-control"        id="in_store_image"             accept="image/*"    @change="inStoreImage()">
-                            <img                                                        id="in_store_image_display"     src=""              class="w-100">
+                            <label for="in_store_image_add" class="form-label">In-Store Image (In-Store Image)</label>
+                            <input type="file"              class="form-control"        id="in_store_image_add"             accept="image/*"    @change="inStoreImage()">
+                            <img                                                        id="in_store_image_display_add"     src=""              class="w-100">
                         </div>
 
                         <!--  -->
@@ -312,6 +312,7 @@ export default {
             formData.append("nonvalidated_details"  ,   this.client.nonvalidated_details)
 
             const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/store",   formData)
+            console.log(res)
 
             if(res.status===200){
 
@@ -323,6 +324,9 @@ export default {
                 this.client.id                      =   res.data.client.id
                 this.client.status                  =   this.client.status
                 this.client.nonvalidated_details    =   this.client.nonvalidated_details
+
+                // Send Feedback
+                this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
                 this.emitter.emit('reSetAdd' , this.client)
 
@@ -346,6 +350,29 @@ export default {
         clearData(id_modal) {
 
             $(id_modal).on("hidden.bs.modal",   ()  => {
+
+                //
+
+                let facade_image_add             =   document.getElementById("facade_image_add")
+                facade_image_add.value           =   ""
+
+                let facade_image_display_add     =   document.getElementById("facade_image_display_add")
+                facade_image_display_add.src     =   ""
+
+                //
+
+                let in_store_image_add           =   document.getElementById("in_store_image_add")
+                in_store_image_add.value         =   ""
+
+                let in_store_image_display_add   =   document.getElementById("in_store_image_display_add")
+                in_store_image_display_add.src   =   ""
+
+                //
+
+                this.client.facade_image                    =   '',
+                this.client.in_store_image                  =   '',
+                this.client.facade_image_original_name      =   '',
+                this.client.in_store_image_original_name    =   '',
 
                 // 
                 this.setAddClientAction(null)
@@ -394,6 +421,8 @@ export default {
         //
 
         getData(client, all_clients) {
+
+            console.log(client)
 
             this.all_clients    =   all_clients
 
@@ -461,7 +490,7 @@ export default {
 
         async facadeImage() {
 
-            const facade_image  =   document.getElementById("facade_image").files[0];
+            const facade_image  =   document.getElementById("facade_image_add").files[0];
 
             if(facade_image) {
 
@@ -470,7 +499,7 @@ export default {
 
                 //
 
-                let facade_image_display                    =   document.getElementById("facade_image_display")
+                let facade_image_display                    =   document.getElementById("facade_image_display_add")
                 this.base64ToImage(this.client.facade_image, facade_image_display)
             }
         },
@@ -479,7 +508,7 @@ export default {
 
         async inStoreImage() {
 
-            const in_store_image  =   document.getElementById("in_store_image").files[0];
+            const in_store_image  =   document.getElementById("in_store_image_add").files[0];
 
             if(in_store_image) {
 
@@ -488,7 +517,7 @@ export default {
                 
                 //
 
-                let in_store_image_display                  =   document.getElementById("in_store_image_display")
+                let in_store_image_display                  =   document.getElementById("in_store_image_display_add")
                 this.base64ToImage(this.client.in_store_image, in_store_image_display)
             }
         },
@@ -511,11 +540,6 @@ export default {
             for (let i = 0; i < this.all_clients.length; i++) {
 
                 distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
-
-                if(this.all_clients[i].CustomerNameE == "test") {
-
-                    console.log(distance)
-                }
 
                 if(distance <=  this.min_distance) {
                 

@@ -269,6 +269,24 @@
                                 @change             =   "reAfficherClientsAndMarkers()"
                             />
                             <!--                -->
+
+                            <!-- Status        -->
+                            <Multiselect
+                                v-model     =   "kml_layers"
+                                :options    =   "kml_willayas"
+                                mode        =   "tags"
+                                placeholder =   "Select Willaya KML"
+                                class       =   "mt-1"
+
+                                :close-on-select    =   "false"
+                                :searchable         =   "true"
+                                :create-option      =   "true"
+
+                                @select             =   "setKMLLayers()"
+                                @deselect           =   "setKMLLayers()"
+                                @clear              =   "setKMLLayers()"
+                            />
+                            <!--                -->
                         </div>
                     </div>
                 </div>
@@ -482,7 +500,12 @@ export default {
 
                 lat :   0,
                 lng :   0
-            }
+            },
+
+            //
+
+            kml_willayas                :   [],
+            kml_layers                  :   null,
         }
     },  
 
@@ -621,10 +644,13 @@ export default {
             this.$showLoadingPage()
 
             const res                   =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.id_route_import+"/details",   null)
-            this.route_import           =   res.data
+            this.route_import           =   res.data.route_import
 
             // Set Clients
             this.route_import.clients   =   this.route_import.data
+
+            // 
+            this.setKMLWillayas(res.data.willayas)
 
             // Extract JPlan, Cites, District
             this.extractMetaData()
@@ -668,7 +694,7 @@ export default {
             let type_client_util                    =   {}
             let journee_util                        =   {}
             let owner_util                          =   {}
-            let status_util                          =   {}
+            let status_util                         =   {}
 
             let liste_journey_plan_colors           =   {}
             let districts_colors                    =   {}
@@ -985,98 +1011,33 @@ export default {
                 }
             }
 
-            //
-
-            sortedArray                 =   Object.values(this.liste_journey_plan);
-            sortedArray.sort((a, b)     =>  a.JPlan.localeCompare(b.JPlan));
-            sortedObject                =   sortedArray.reduce((acc, journey_plan, index) => {
-                
-                acc[journey_plan.JPlan]             =   journey_plan;
-                return acc;
-            }, {});
-
-            this.liste_journey_plan                 =   sortedObject
+            // Sort JPlan
+            this.liste_journey_plan                 =   this.sortFilterJPlan()
             this.route_import.liste_journey_plan    =   this.liste_journey_plan
 
-            //
-
-            sortedArray                 =   Object.values(this.districts);
-            sortedArray.sort((a, b)     =>  a.DistrictNameComplete.localeCompare(b.DistrictNameComplete));
-
-            sortedObject                =   sortedArray.reduce((acc, district, index) => {
-                
-                acc[district.DistrictNo]            =   district;
-                return acc;
-            }, {});
-
-            this.districts                          =   sortedObject
+            // Sort DistrictNo
+            this.districts                          =   this.sortFilterDistrictNo()
             this.route_import.districts             =   this.districts
 
-            //
-
-            sortedArray                 =   Object.values(this.cites);
-            sortedArray.sort((a, b)     =>  a.CityNameComplete.localeCompare(b.CityNameComplete));
-
-            sortedObject                =   sortedArray.reduce((acc, cite, index) => {
-
-                acc[cite.CityNo]                    =   cite;
-                return acc;
-            }, {});
-
-            this.cites                              =   sortedObject
+            // Sort CityNo
+            this.cites                              =   this.sortFilterCityNo()
             this.route_import.cites                 =   this.cites
 
-            //
-
-            sortedArray                 =   Object.values(this.liste_type_client);
-            sortedArray.sort((a, b)     =>  a.CustomerType.localeCompare(b.CustomerType));
-            sortedObject                =   sortedArray.reduce((acc, type_client, index) => {
-
-                acc[type_client.CustomerType]       =   type_client;
-                return acc;
-            }, {});
-
-            this.liste_type_client                  =   sortedObject
+            // Sort CustomerType
+            this.liste_type_client                  =   this.sortFilterCustomerType()
             this.route_import.liste_type_client     =   this.liste_type_client
 
-            //
-
-            sortedArray                 =   Object.values(this.liste_journee);
-            sortedArray.sort((a, b)     =>  a.Journee.localeCompare(b.Journee));
-            sortedObject                =   sortedArray.reduce((acc, journee, index) => {
-
-                acc[journee.Journee]                =   journee;
-                return acc;
-            }, {});
-
-            this.liste_journee                      =   sortedObject
+            // Sort Journee
+            this.liste_journee                      =   this.sortFilterJournee()
             this.route_import.liste_journee         =   this.liste_journee
 
-            //
+            // Sort Owner
+            this.owners                             =   this.sortFilterOwner()
+            this.route_import.owners                =   this.owners
 
-            sortedArray                 =   Object.values(this.owners);
-            sortedArray.sort((a, b)     =>  a.owner_name.localeCompare(b.owner_name));
-            sortedObject                =   sortedArray.reduce((acc, owner, index) => {
-
-                acc[owner.owner_name]        =   owner;
-                return acc;
-            }, {});
-
-            this.owners                      =   sortedObject
-            this.route_import.owners         =   this.owners
-
-            // 
-
-            sortedArray                 =   Object.values(this.liste_status);
-            sortedArray.sort((a, b)     =>  a.status.localeCompare(b.status));
-            sortedObject                =   sortedArray.reduce((acc, status, index) => {
-
-                acc[status.status]   =   status;
-                return acc;
-            }, {});
-
-            this.liste_status                      =   sortedObject
-            this.route_import.liste_status         =   this.liste_status
+            // Sort Status
+            this.liste_status                       =   this.sortFilterStatus()
+            this.route_import.liste_status          =   this.liste_status
 
             //
 
@@ -1793,6 +1754,11 @@ export default {
             new_client.status                  =   client.status            
             new_client.nonvalidated_details    =   client.nonvalidated_details        
 
+            new_client.facade_image                     =   client.facade_image            
+            new_client.in_store_image                   =   client.in_store_image        
+            new_client.facade_image_original_name       =   client.facade_image_original_name            
+            new_client.in_store_image_original_name     =   client.in_store_image_original_name        
+
             this.route_import.clients.push(new_client)
 
             // ReAffiche
@@ -1829,6 +1795,11 @@ export default {
 
                     this.route_import.clients[i].status                 =   client.status            
                     this.route_import.clients[i].nonvalidated_details   =   client.nonvalidated_details        
+
+                    this.route_import.clients[i].facade_image                   =   client.facade_image            
+                    this.route_import.clients[i].in_store_image                 =   client.in_store_image        
+                    this.route_import.clients[i].facade_image_original_name     =   client.facade_image_original_name            
+                    this.route_import.clients[i].in_store_image_original_name   =   client.in_store_image_original_name        
 
                     break
                 }
@@ -2160,6 +2131,258 @@ export default {
                 // Show Markers
                 this.reAfficherClientsAndMarkersSelect()
             }
+        },
+
+        //
+
+        setKMLWillayas(kml_willayas) {
+
+            this.kml_willayas   =   []
+
+            for (let i = 0; i < kml_willayas.length; i++) {
+
+                this.kml_willayas.push({ value : kml_willayas[i].DistrictNo , label : kml_willayas[i].DistrictNo + "- " + kml_willayas[i].DistrictNameE})
+            }
+        },
+
+        setKMLLayers() {
+
+            setTimeout(() => {
+
+                console.log(this.kml_layers)
+                this.$map.$setKMLLayers(this.kml_layers)
+            }, 555);
+        },
+
+        // SORT FILTERS
+
+        sortFilterJPlan() {
+
+            let sortedArray                 =   Object.values(this.liste_journey_plan);
+
+            sortedArray.sort((a, b)             =>  {
+
+                // Use a regular expression to match numbers at the end of the string
+                let regex = /\d+$/;
+                
+                // Use the match method to find the matched numbers
+                let a_last_number   =   a.JPlan.match(regex);
+                let b_last_number   =   b.JPlan.match(regex);
+
+                // Check if there is a match and return the result, or return null if there's no match
+                if(a_last_number    ==  null) {
+
+                    if(b_last_number    ==  null) {
+
+                        return a.JPlan.localeCompare(b.JPlan)
+                    }
+
+                    else {
+
+                        return -1
+                    }
+                }
+
+                else {
+
+                    if(b_last_number    ==  null) {
+
+                        return 1
+                    }
+
+                    else {
+
+                        return a_last_number - b_last_number
+                    }
+                }
+            })
+
+            let sortedObject                =   sortedArray.reduce((acc, journey_plan, index) => {
+                
+                acc[journey_plan.JPlan]     =   journey_plan;
+                return acc;
+            }, {});
+
+            return sortedObject
+        },
+
+        sortFilterDistrictNo() {
+
+            let sortedArray                 =   Object.values(this.districts);
+
+            sortedArray.sort((a, b)             =>  {
+
+                // Use a regular expression to match numbers at the end of the string
+                let regex = /\d+$/;
+                
+                // Use the match method to find the matched numbers
+                let a_last_number   =   a.DistrictNo.match(regex);
+                let b_last_number   =   b.DistrictNo.match(regex);
+
+                // Check if there is a match and return the result, or return null if there's no match
+                if(a_last_number    ==  null) {
+
+                    return -1
+                }
+
+                else {
+
+                    if(b_last_number    ==  null) {
+
+                        return 1
+                    }
+
+                    else {
+
+                        return a_last_number - b_last_number
+                    }
+                }
+            })
+
+            let sortedObject                =   sortedArray.reduce((acc, district, index) => {
+                
+                acc[district.DistrictNo]            =   district;
+                return acc;
+            }, {});
+
+            return sortedObject
+        },
+
+        sortFilterCityNo() {
+
+            let sortedArray                 =   Object.values(this.cites);
+
+            sortedArray.sort((a, b)             =>  {
+
+                // Use a regular expression to match numbers at the end of the string
+                let regex = /\d+$/;
+                
+                // Use the match method to find the matched numbers
+                let a_last_number   =   a.CityNo.match(regex);
+                let b_last_number   =   b.CityNo.match(regex);
+
+                // Check if there is a match and return the result, or return null if there's no match
+                if(a_last_number    ==  null) {
+
+                    return -1
+                }
+
+                else {
+
+                    if(b_last_number    ==  null) {
+
+                        return 1
+                    }
+
+                    else {
+
+                        return a_last_number - b_last_number
+                    }
+                }
+            })
+
+            let sortedObject                =   sortedArray.reduce((acc, cite, index) => {
+
+                acc[cite.CityNo]                    =   cite;
+                return acc;
+            }, {});
+
+            return sortedObject
+        },
+
+        sortFilterCustomerType() {
+
+            let sortedArray                 =   Object.values(this.liste_type_client);
+            
+            sortedArray.sort((a, b)     =>  a.CustomerType.localeCompare(b.CustomerType));
+            
+            let sortedObject                =   sortedArray.reduce((acc, type_client, index) => {
+
+                acc[type_client.CustomerType]       =   type_client;
+                return acc;
+            }, {});
+
+            return sortedObject
+        },
+
+        sortFilterJournee() {
+
+            let sortedArray                 =   Object.values(this.liste_journee);
+
+            sortedArray.sort((a, b)             =>  {
+
+                // Use a regular expression to match numbers at the end of the string
+                let regex = /\d+$/;
+                
+                // Use the match method to find the matched numbers
+                let a_last_number   =   a.Journee.match(regex);
+                let b_last_number   =   b.Journee.match(regex);
+
+                // Check if there is a match and return the result, or return null if there's no match
+                if(a_last_number    ==  null) {
+
+                    if(b_last_number    ==  null) {
+
+                        return a.Journee.localeCompare(b.Journee)
+                    }
+
+                    else {
+
+                        return -1
+                    }
+                }
+
+                else {
+
+                    if(b_last_number    ==  null) {
+
+                        return 1
+                    }
+
+                    else {
+
+                        return a_last_number - b_last_number
+                    }
+                }
+            })
+
+            let sortedObject                =   sortedArray.reduce((acc, journee, index) => {
+
+                acc[journee.Journee]                =   journee;
+                return acc;
+            }, {});
+
+            return sortedObject
+        },
+
+        sortFilterOwner() {
+
+            let sortedArray                 =   Object.values(this.owners);
+            
+            sortedArray.sort((a, b)         =>  a.owner_name.localeCompare(b.owner_name));
+            
+            let sortedObject                =   sortedArray.reduce((acc, owner, index) => {
+
+                acc[owner.owner_name]       =   owner;
+                return acc;
+            }, {});
+
+            return sortedObject
+        },
+
+        sortFilterStatus() {
+
+            let sortedArray                 =   Object.values(this.liste_status);
+            
+            sortedArray.sort((a, b)     =>  a.status.localeCompare(b.status));
+            
+            let sortedObject                =   sortedArray.reduce((acc, status, index) => {
+
+                acc[status.status]   =   status;
+                return acc;
+            }, {});
+
+            return sortedObject
         }
     },
 

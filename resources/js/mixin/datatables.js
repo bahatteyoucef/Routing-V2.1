@@ -11,6 +11,58 @@ export default {
 
     methods: {
 
+        // FrontOffice
+
+        async $DataTableCreateFrontOffice(table) {
+
+            await this.$setDataTableFrontOffice(table)
+
+            this.$setSearchColumn(table)
+
+            return this.datatable
+        },
+
+        $setDataTableFrontOffice(table) {
+
+            return new Promise((resolve, reject) => {
+
+                setTimeout(()   =>  {
+
+                    this.datatable   =   $('#'+table).DataTable(
+                    {
+                        destroy     : true,
+                        responsive  : true,
+
+                        language    : {
+
+                            lengthMenu      :   "_MENU_",
+                            search          :   "<div class='search_input_text mt-1 pr-0'>Search : </div>",
+
+                            zeroRecords     :   "No records ...",
+                            emptyTable      :   "No records ...",
+
+                            paginate    :   {
+                                "first"     :   "F",
+                                "last"      :   "L",
+                                "next"      :   "N",
+                                "previous"  :   "P"
+                            },
+                        },
+
+                        pagingType      : "full",
+
+                        initComplete: () => {
+
+                            this.$movePaginationCombo(table)
+
+                            resolve(this.datatable);
+                        }
+                    });
+
+                });
+            });
+        },
+
         // Non Excel
 
         async $DataTableCreate(table) {
@@ -47,14 +99,14 @@ export default {
                             lengthMenu      :   "_MENU_",
                             search          :   "<div class='search_input_text mt-1 pr-0'>Search : </div>",
 
-                            zeroRecords     :   "Pas de resultats ...",
-                            emptyTable      :   "Pas de resultats ...",
+                            zeroRecords     :   "No records ...",
+                            emptyTable      :   "No records ...",
 
                             paginate    :   {
-                                "first"     :   "Premier",
-                                "last"      :   "Dernier",
-                                "next"      :   "Suivant",
-                                "previous"  :   "Precedent"
+                                "first"     :   "First",
+                                "last"      :   "Last",
+                                "next"      :   "Next",
+                                "previous"  :   "Previous"
                             },
                         },
 
@@ -69,6 +121,8 @@ export default {
                 });
             });
         },
+
+        //
 
         $movePaginationCombo(table) {
 

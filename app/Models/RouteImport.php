@@ -399,14 +399,76 @@ class RouteImport extends Model
                 $client->Latitude           =   $client_elem->Latitude;
                 $client->Longitude          =   $client_elem->Longitude;
                 $client->Address            =   $client_elem->Address;
-                $client->DistrictNo         =   $client_elem->DistrictNo;
-                $client->DistrictNameE      =   $client_elem->DistrictNameE;
                 $client->CityNo             =   $client_elem->CityNo;
+                $client->DistrictNo         =   $client_elem->DistrictNo;
                 $client->CityNameE          =   $client_elem->CityNameE;
+                $client->DistrictNameE      =   $client_elem->DistrictNameE;
                 $client->Tel                =   $client_elem->Tel;
                 $client->CustomerType       =   $client_elem->CustomerType;
                 $client->id_route_import    =   $client_elem->id_route_import;
                 $client->owner              =   Auth::user()->id;
+
+                //
+
+                if($client_elem->facade_image_original_name    !=  null) {
+
+                    $client->facade_image_original_name           =   $client_elem->facade_image_original_name;
+                }
+
+                else {
+
+                    $client->facade_image_original_name           =   "";
+                }
+
+                //
+
+                if($client_elem->in_store_image_original_name    !=  null) {
+
+                    $client->in_store_image_original_name           =   $client_elem->in_store_image_original_name;
+                }
+
+                else {
+
+                    $client->in_store_image_original_name           =   "";
+                }
+
+                //
+
+                if($client_elem->facade_image    !=  null) {
+
+                    $client->facade_image           =   $client_elem->facade_image;
+                }
+
+                else {
+
+                    $client->facade_image           =   "";
+                }
+
+                //
+
+                if($client_elem->in_store_image    !=  null) {
+
+                    $client->in_store_image           =   $client_elem->in_store_image;
+                }
+
+                else {
+
+                    $client->in_store_image           =   "";
+                }
+
+                //
+
+                if($client_elem->nonvalidated_details    !=  null) {
+
+                    $client->nonvalidated_details           =   $client_elem->nonvalidated_details;
+                }
+
+                else {
+
+                    $client->nonvalidated_details           =   "";
+                }
+
+                //
 
                 if($client_elem->JPlan      !=  null) {
 
@@ -447,20 +509,87 @@ class RouteImport extends Model
                 'Latitude'          =>  $client_elem->Latitude          ,
                 'Longitude'         =>  $client_elem->Longitude         ,
                 'Address'           =>  $client_elem->Address           ,
-                'DistrictNo'        =>  $client_elem->DistrictNo        ,
-                'DistrictNameE'     =>  $client_elem->DistrictNameE     ,
-                'CityNo'            =>  $client_elem->CityNo            ,
-                'CityNameE'         =>  $client_elem->CityNameE         ,
+                'CityNo'            =>  $client_elem->CityNo           ,
+                'DistrictNo'        =>  $client_elem->DistrictNo           ,
+                'CityNameE'         =>  $client_elem->CityNameE           ,
+                'DistrictNameE'     =>  $client_elem->DistrictNameE           ,
                 'Tel'               =>  $client_elem->Tel               ,
                 'CustomerType'      =>  $client_elem->CustomerType      ,
                 'id_route_import'   =>  $client_elem->id_route_import   ,  
                 'status'            =>  $client_elem->status            ,
-                'owner'             =>  Auth::user()->id
+                'owner'             =>  Auth::user()->id                ,
             ]);
+
+            //
+
+            if($client_elem->facade_image_original_name    !=  null) {
+
+                $client->facade_image_original_name           =   $client_elem->facade_image_original_name;
+            }
+
+            else {
+
+                $client->facade_image_original_name           =   "";
+            }
+
+            //
+
+            if($client_elem->in_store_image_original_name    !=  null) {
+
+                $client->in_store_image_original_name           =   $client_elem->in_store_image_original_name;
+            }
+
+            else {
+
+                $client->in_store_image_original_name           =   "";
+            }
+
+            //
+
+            if($client_elem->facade_image    !=  null) {
+
+                $client->facade_image           =   $client_elem->facade_image;
+            }
+
+            else {
+
+                $client->facade_image           =   "";
+            }
+
+            //
+
+            if($client_elem->in_store_image    !=  null) {
+
+                $client->in_store_image           =   $client_elem->in_store_image;
+            }
+
+            else {
+
+                $client->in_store_image           =   "";
+            }
+
+            //
+
+            if($client_elem->nonvalidated_details    !=  null) {
+
+                $client->nonvalidated_details           =   $client_elem->nonvalidated_details;
+            }
+
+            else {
+
+                $client->nonvalidated_details           =   "";
+            }
+
+            //
 
             if($client_elem->JPlan      !=  null) {
 
                 $client->JPlan          =   $client_elem->JPlan;
+            }
+
+            else {
+
+                $client->JPlan          =   "";
             }
 
             if($client_elem->Journee    !=  null) {
@@ -468,9 +597,14 @@ class RouteImport extends Model
                 $client->Journee        =   $client_elem->Journee;
             }
 
+            else {
+
+                $client->Journee        =   "";
+            }
+
+            //
+
             $client->save();
-
-
         }
 
         //

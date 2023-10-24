@@ -90,6 +90,87 @@
 
                         <!--  -->
 
+                        <div v-if="client.status_original   ==  'validated'">
+                            <div v-if="$isRole('Super Admin')||$isRole('BackOffice')" class="mb-3">
+                                <label for="status"             class="form-label">Status</label>
+                                <select                         class="form-select"         id="status"                 v-model="client.status">
+                                    <option value="validated" selected>validated</option>
+                                    <option value="nonvalidated" selected>nonvalidated</option>
+                                </select>
+
+                                <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
+                                    <div class="form-group">
+                                        <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
+                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div v-if="$isRole('FrontOffice')" class="mb-3">
+                                <label for="status"             class="form-label">Status</label>
+                                <select                         class="form-select"         id="status"                 v-model="client.status">
+                                    <option value="validated" selected>validated</option>
+                                    <option value="nonvalidated">nonvalidated</option>
+                                </select>
+
+                                <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
+                                    <div class="form-group">
+                                        <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
+                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="((client.status_original   ==  'nonvalidated') || (client.status_original   ==  'pending'))">
+                            <div v-if="$isRole('Super Admin')||$isRole('BackOffice')" class="mb-3">
+                                <label for="status"             class="form-label">Status</label>
+                                <select                         class="form-select"         id="status"                 v-model="client.status">
+                                    <option value="validated" selected>validated</option>
+                                    <option value="pending">pending</option>
+                                    <option value="nonvalidated" selected>nonvalidated</option>
+                                </select>
+
+                                <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
+                                    <div class="form-group">
+                                        <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
+                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div v-if="$isRole('FrontOffice')" class="mb-3">
+                                <label for="status"             class="form-label">Status</label>
+                                <select                         class="form-select"         id="status"                 v-model="client.status">
+                                    <option value="pending" selected>pending</option>
+                                    <option value="nonvalidated">nonvalidated</option>
+                                </select>
+
+                                <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
+                                    <div class="form-group">
+                                        <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
+                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mb-3">
+                            <label for="facade_image_update_map"    class="form-label">Facade Image (Facade Image)</label>
+                            <input type="file"                  class="form-control"    id="facade_image_update_map"               accept="image/*"    @change="facadeImage()">
+                            <img                                                        id="facade_image_display_update_map"       src=""              class="w-100">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="in_store_image_update_map"  class="form-label">In-Store Image (In-Store Image)</label>
+                            <input type="file"                  class="form-control"    id="in_store_image_update_map"             accept="image/*"    @change="inStoreImage()">
+                            <img                                                        id="in_store_image_display_update_map"     src=""              class="w-100">
+                        </div>
+
+                        <!--  -->
+
                     </form>
 
                 </div>
@@ -123,6 +204,12 @@ export default {
 
             client      :   {
 
+                // Images   
+                facade_image                    :   '',
+                in_store_image                  :   '',
+                facade_image_original_name      :   '',
+                in_store_image_original_name    :   '',
+
                 // Client
                 id                  :   '',
 
@@ -150,7 +237,12 @@ export default {
 
                 // Journey Plan
                 JPlan               :   '',
-                Journee             :   ''
+                Journee             :   '',
+
+                                // 
+                status                  :   '',
+                status_original         :   '',
+                nonvalidated_details    :   ''
             },
 
             willayas                        :   []  ,
@@ -200,12 +292,23 @@ export default {
             formData.append("JPlan"         ,   this.client.JPlan)
             formData.append("Journee"       ,   this.client.Journee)
 
+            formData.append("facade_image"                  ,   this.client.facade_image)
+            formData.append("in_store_image"                ,   this.client.in_store_image)
+            formData.append("facade_image_original_name"    ,   this.client.facade_image_original_name)
+            formData.append("in_store_image_original_name"  ,   this.client.in_store_image_original_name)
+
+            formData.append("status"                ,   this.client.status)
+            formData.append("nonvalidated_details"  ,   this.client.nonvalidated_details)
+
             const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/update",   formData)
 
             if(res.status===200){
 
                 // Hide Loading Page
                 this.$hideLoadingPage()
+
+                // Send Feedback
+                this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
                 if(this.modal_source    ==  "CustomerCode") {
 
@@ -254,6 +357,9 @@ export default {
                 // Hide Loading Page
                 this.$hideLoadingPage()
 
+                // Send Feedback
+                this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
+
                 if(this.modal_source    ==  "CustomerCode") {
 
                     this.emitter.emit("deleteDoublesCustomerCodeMap"   , this.client)
@@ -293,6 +399,31 @@ export default {
         clearData(id_modal) {
 
             $(id_modal).on("hidden.bs.modal",   ()  => {
+
+                //
+
+                let facade_image_update_map             =   document.getElementById("facade_image_update_map")
+                facade_image_update_map.value           =   ""
+
+                let facade_image_display_update_map     =   document.getElementById("facade_image_display_update_map")
+                facade_image_display_update_map.src     =   ""
+
+                //
+
+                let in_store_image_update_map           =   document.getElementById("in_store_image_update_map")
+                in_store_image_update_map.value         =   ""
+
+                let in_store_image_display_update_map   =   document.getElementById("in_store_image_display_update_map")
+                in_store_image_display_update_map.src   =   ""
+
+                //
+
+                this.client.facade_image                    =   '',
+                this.client.in_store_image                  =   '',
+                this.client.facade_image_original_name      =   '',
+                this.client.in_store_image_original_name    =   '',
+
+                //
 
                 // Client
                 this.client.CustomerCode        =   '',
@@ -356,6 +487,26 @@ export default {
             this.client.JPlan               =   client.JPlan
 
             this.client.Journee             =   client.Journee
+
+            this.client.status                  =   client.status
+            this.client.status_original         =   client.status
+            this.client.nonvalidated_details    =   client.nonvalidated_details
+
+            this.client.facade_image                        =   client.facade_image
+            this.client.in_store_image                      =   client.in_store_image
+            this.client.facade_image_original_name          =   client.facade_image_original_name
+            this.client.in_store_image_original_name        =   client.in_store_image_original_name
+
+            // 
+            this.$createFile(client.facade_image_original_name      ,   "facade_image_update_map")
+            this.$createFile(client.in_store_image_original_name    ,   "in_store_image_update_map")
+
+            // 
+            let facade_image_display_update_map     =   document.getElementById("facade_image_display_update_map")
+            let in_store_image_display_update_map   =   document.getElementById("in_store_image_display_update_map")
+
+            this.base64ToImage(this.client.facade_image             ,   facade_image_display_update_map)            
+            this.base64ToImage(this.client.in_store_image           ,   in_store_image_display_update_map)            
 
             this.setJoursGetData(client)
 
@@ -572,6 +723,55 @@ export default {
                     return this.cites[i].CityNameE
                 }                
             }
+        },
+
+        //
+
+        //
+
+        async facadeImage() {
+
+            const facade_image  =   document.getElementById("facade_image_update_map").files[0];
+
+            console.log(facade_image)
+
+            if(facade_image) {
+
+                console.log(222)
+
+                this.client.facade_image_original_name      =   facade_image.name
+                this.client.facade_image                    =   await this.$imageToBase64(facade_image)
+
+                //
+
+                let facade_image_display                    =   document.getElementById("facade_image_display_update_map")
+                this.base64ToImage(this.client.facade_image, facade_image_display)
+            }
+        },
+
+        //
+
+        async inStoreImage() {
+
+            const in_store_image  =   document.getElementById("in_store_image_update_map").files[0];
+
+            if(in_store_image) {
+
+                this.client.in_store_image_original_name    =   in_store_image.name
+                this.client.in_store_image                  =   await this.$imageToBase64(in_store_image)
+                
+                //
+
+                let in_store_image_display                  =   document.getElementById("in_store_image_display_update_map")
+                this.base64ToImage(this.client.in_store_image, in_store_image_display)
+            }
+        },
+
+        //     
+
+        base64ToImage(image_base64, image_display_div) {
+
+            this.$base64ToImage(image_base64, image_display_div)
         }
     },
 };
