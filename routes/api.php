@@ -1,11 +1,19 @@
 <?php
 
+use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ClientTempoController;
+use App\Http\Controllers\CompetitorAnalysisController;
+use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\JourneeController;
 use App\Http\Controllers\JourneyPlanController;
+use App\Http\Controllers\MarqueController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\RouteImportController;
 use App\Http\Controllers\RouteImportTempoController;
+use App\Http\Controllers\StockCheckController;
+use App\Http\Controllers\TypeController;
 use App\Http\Controllers\UserController;
 use App\Models\ClientTempo;
 use App\Models\JourneyPlan;
@@ -96,6 +104,70 @@ Route::middleware('auth:api')->group(function () {
 
     //
 
+    // Produits
+
+    Route::post('/produits'                                                                             ,   [ProduitController::class               , 'index'                                   ]);
+    Route::post('/produits/combo'                                                                       ,   [ProduitController::class               , 'combo'                                   ]);
+    Route::post('/produits/{id}/show'                                                                   ,   [ProduitController::class               , 'show'                                    ]);
+
+    Route::post('/produits/store'                                                                       ,   [ProduitController::class               , 'store'                                   ]);
+    Route::post('/produits/{id}/update'                                                                 ,   [ProduitController::class               , 'update'                                  ]);
+
+    Route::post('/route_import/{id_route_import}/products/stock'                                        ,   [ProduitController::class               , 'stockProducts'                           ]);
+    Route::post('/route_import/{id_route_import}/products/competitors'                                  ,   [ProduitController::class               , 'competitorsProducts'                     ]);
+
+    Route::post('/route_import/{id_route_import}/products/{id_produit}/prices'                          ,   [ProduitController::class               , 'produitPrices'                           ]);
+
+    //
+
+    // Categorie
+
+    Route::post('/categories'                                                                           ,   [CategorieController::class             , 'index'                                   ]);
+    Route::post('/categories/combo'                                                                     ,   [CategorieController::class             , 'combo'                                   ]);
+    Route::post('/categories/{id}/show'                                                                 ,   [CategorieController::class             , 'show'                                    ]);
+
+    Route::post('/categories/store'                                                                     ,   [CategorieController::class             , 'store'                                   ]);
+    Route::post('/categories/{id}/update'                                                               ,   [CategorieController::class             , 'update'                                  ]);
+
+    //
+
+    // Type
+
+    Route::post('/types'                                                                                ,   [TypeController::class                  , 'index'                                   ]);
+    Route::post('/types/combo'                                                                          ,   [TypeController::class                  , 'combo'                                   ]);
+    Route::post('/types/{id}/show'                                                                      ,   [TypeController::class                  , 'show'                                    ]);
+
+    Route::post('/types/store'                                                                          ,   [TypeController::class                  , 'store'                                   ]);
+    Route::post('/types/{id}/update'                                                                    ,   [TypeController::class                  , 'update'                                  ]);
+
+    //
+
+    // Marque
+
+    Route::post('/marques'                                                                              ,   [MarqueController::class                , 'index'                                   ]);
+    Route::post('/marques/combo'                                                                        ,   [MarqueController::class                , 'combo'                                   ]);
+    Route::post('/marques/{id}/show'                                                                    ,   [MarqueController::class                , 'show'                                    ]);
+
+    Route::post('/marques/store'                                                                        ,   [MarqueController::class                , 'store'                                   ]);
+    Route::post('/marques/{id}/update'                                                                  ,   [MarqueController::class                , 'update'                                  ]);
+
+    //
+
+    Route::post('/route_import/{id}/categories'                                                         ,   [RouteImportController::class           , 'routeImportCategories'                   ]);
+    Route::post('/categories/{id}/types'                                                                ,   [CategorieController::class             , 'categorieTypes'                          ]);
+
+
+    //
+
+    Route::post('/complaints'                                                                           ,   [ComplaintController::class             , 'index'                                   ]);
+    Route::post('/complaints/combo'                                                                     ,   [ComplaintController::class             , 'combo'                                   ]);
+    Route::post('/complaints/{id}/show'                                                                 ,   [ComplaintController::class             , 'show'                                    ]);
+
+    Route::post('/complaints/store'                                                                     ,   [ComplaintController::class             , 'store'                                   ]);
+    Route::post('/complaints/{id}/update'                                                               ,   [ComplaintController::class             , 'update'                                  ]);
+
+    //
+
     // Route Import Tempo
 
     Route::post('/route_import_tempo/last'                                                              ,   [RouteImportTempoController::class      , 'lastTempo'                               ]);
@@ -116,6 +188,14 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/route_import_tempo/{id_route_import_tempo}/clients_tempo/doubles/CustomerCode'        ,   [ClientTempoController::class           , 'getDoublesCustomerCodeClients'           ]);
     Route::post('/route_import_tempo/{id_route_import_tempo}/clients_tempo/doubles/CustomerNameE'       ,   [ClientTempoController::class           , 'getDoublesCustomerNameEClients'          ]);
     Route::post('/route_import_tempo/{id_route_import_tempo}/clients_tempo/doubles/GPS'                 ,   [ClientTempoController::class           , 'getDoublesGPSClients'                    ]);
+
+    //
+
+    // Competitor Analysis
+
+    Route::post('/competitors_analysis/all/store'                                                       ,   [CompetitorAnalysisController::class    , 'storeListeCompetitorAnalysis'            ]);
+    Route::post('/stock_check/all/store'                                                                ,   [StockCheckController::class            , 'storeListeStockCheck'                    ]);
+    Route::post('/orders/all/store'                                                                     ,   [OrderController::class                 , 'storeListeOrders'                        ]);
 
     //
 

@@ -93,6 +93,11 @@
               <li class="col-sm-7 nav-item">
 
                 <div class="row justify-content-end">
+
+                  <div class="col-sm-3 mt-1"  v-if="$isRole('BackOffice')">
+                    <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToProduits()">Products</button>
+                  </div>
+
                   <div class="col-sm-3 mt-1"  v-if="$isRole('Super Admin')">
                     <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToUsers()">Users</button>
                   </div>
@@ -128,7 +133,7 @@
 
                 <ul tabindex="-1" class="dropdown-menu dropdown-menu-right" id="profile_header_list">
 
-                    <li role="presentation" class="preview-item mt-1" id="installButton">
+                    <li v-show="show_install_button"  role="presentation" class="preview-item mt-1" id="installButton">
                         <span  role="button" class="dropdown-item">
                           <i class="mdi mdi-download mr-2 text_light_purple"></i>
                           Install Application
@@ -183,7 +188,9 @@ export default {
 
           route_import_existe       :   false ,
 
-          user                      :   {}    
+          user                      :   {}    ,
+
+          show_install_button       :   false
       }
     },
 
@@ -237,7 +244,16 @@ export default {
           let deferredPrompt;
 
           window.addEventListener('beforeinstallprompt', (e) => {
+
+              // Prevent the browser's default prompt from showing
+              e.preventDefault();
+
+              // 
               deferredPrompt = e;
+
+              console.log(e)
+
+              this.show_install_button  = true
           });
 
           const installButton = document.getElementById('installButton');
@@ -246,7 +262,11 @@ export default {
 
             installButton.addEventListener('click', async () => {
 
+                this.$showLoadingPage()
+
                 if (deferredPrompt !== null) {
+
+                    console.log(deferredPrompt)
 
                     deferredPrompt.prompt();
 
@@ -256,41 +276,10 @@ export default {
                         deferredPrompt = null;
                     }
                 }
+
+                this.$hideLoadingPage()
             });
           }
-        },
-
-        downloadPWA() {
-
-          console.log(111)
-
-          window.addEventListener('beforeinstallprompt', (event) => {
-
-            console.log(2222)
-
-            event.preventDefault();
-            this.showInstallPrompt(event);
-          });
-        },
-
-        showInstallPrompt(event) {
-
-          console.log(3333)
-
-          event.prompt();
-
-          event.userChoice.then((choiceResult) => {
-
-            if (choiceResult.outcome === 'accepted') {
-
-              console.log('User accepted the PWA installation');
-            } 
-
-            else {
-
-              console.log('User declined the PWA installation');
-            }
-          });
         },
 
         //
@@ -470,6 +459,12 @@ export default {
           }
 
           this.$hideLoadingPage()
+        },
+
+        //
+        goToProduits() {
+
+          this.$router.push("/produits")
         }
     },
 

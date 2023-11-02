@@ -347,6 +347,222 @@ class User extends Authenticatable
         //
     }
 
+    public static function filterProduits($produits) {
+
+        $produits_final   =   [];
+
+        if(Auth::user()->hasRole("Super Admin")) {
+
+            return $produits;
+        }
+
+        else {
+
+            if(Auth::user()->hasRole("BackOffice")) {
+
+                foreach ($produits as $produit) {
+
+                    # code...
+                    $liste_user_route_import            =   UserRouteImport::where('id_user', Auth::user()->id)->get();
+
+                    foreach ($liste_user_route_import as $user_route_import) {
+
+                        if($user_route_import->id_route_import  ==  $produit->id_route_import) {
+
+                            array_push($produits_final, $produit);
+                        }
+                    }
+                }
+
+                return $produits_final;
+            }
+
+            else {
+
+                if(Auth::user()->hasRole("FrontOffice")) {
+
+                    foreach ($produits as $produit) {
+
+                        # code...
+                        $liste_user_route_import            =   UserRouteImport::where('id_user', Auth::user()->id)->get();
+
+                        foreach ($liste_user_route_import as $user_route_import) {
+
+                            if($user_route_import->id_route_import  ==  $produit->id_route_import) {
+
+                                array_push($produits_final, $produit);
+                            }
+                        }
+                    }
+
+                    return $produits_final;
+                }
+            }
+        }
+    }
+
+    public static function filterTypes($types) {
+
+        $types_final   =   [];
+
+        if(Auth::user()->hasRole("Super Admin")) {
+
+            return $types;
+        }
+
+        else {
+
+            if(Auth::user()->hasRole("BackOffice")) {
+
+                foreach ($types as $type) {
+
+                    # code...
+                    $liste_user_route_import            =   UserRouteImport::where('id_user', Auth::user()->id)->get();
+
+                    foreach ($liste_user_route_import as $user_route_import) {
+
+                        if($user_route_import->id_route_import  ==  $type->id_route_import) {
+
+                            array_push($types_final, $type);
+                        }
+                    }
+                }
+
+                return $types_final;
+            }
+
+            else {
+
+                if(Auth::user()->hasRole("FrontOffice")) {
+
+                    foreach ($types as $type) {
+
+                        # code...
+                        $liste_user_route_import            =   UserRouteImport::where('id_user', Auth::user()->id)->get();
+
+                        foreach ($liste_user_route_import as $user_route_import) {
+
+                            if($user_route_import->id_route_import  ==  $type->id_route_import) {
+
+                                array_push($types_final, $type);
+                            }
+                        }
+                    }
+
+                    return $types_final;
+                }
+            }
+        }
+    }
+
+    public static function filterCategories($categories) {
+
+        $categories_final   =   [];
+
+        if(Auth::user()->hasRole("Super Admin")) {
+
+            return $categories;
+        }
+
+        else {
+
+            if(Auth::user()->hasRole("BackOffice")) {
+
+                foreach ($categories as $categorie) {
+
+                    # code...
+                    $liste_user_route_import            =   UserRouteImport::where('id_user', Auth::user()->id)->get();
+
+                    foreach ($liste_user_route_import as $user_route_import) {
+
+                        if($user_route_import->id_route_import  ==  $categorie->id_route_import) {
+
+                            array_push($categories_final, $categorie);
+                        }
+                    }
+                }
+
+                return $categories_final;
+            }
+
+            else {
+
+                if(Auth::user()->hasRole("FrontOffice")) {
+
+                    foreach ($categories as $categorie) {
+
+                        # code...
+                        $liste_user_route_import            =   UserRouteImport::where('id_user', Auth::user()->id)->get();
+
+                        foreach ($liste_user_route_import as $user_route_import) {
+
+                            if($user_route_import->id_route_import  ==  $categorie->id_route_import) {
+
+                                array_push($categories_final, $categorie);
+                            }
+                        }
+                    }
+
+                    return $categories_final;
+                }
+            }
+        }
+    }
+
+    public static function filterMarques($marques) {
+
+        $marques_final   =   [];
+
+        if(Auth::user()->hasRole("Super Admin")) {
+
+            return $marques;
+        }
+
+        else {
+
+            if(Auth::user()->hasRole("BackOffice")) {
+
+                foreach ($marques as $marque) {
+
+                    # code...
+                    $liste_user_route_import            =   UserRouteImport::where('id_user', Auth::user()->id)->get();
+
+                    foreach ($liste_user_route_import as $user_route_import) {
+
+                        if($user_route_import->id_route_import  ==  $marque->id_route_import) {
+
+                            array_push($marques_final, $marque);
+                        }
+                    }
+                }
+
+                return $marques_final;
+            }
+
+            else {
+
+                if(Auth::user()->hasRole("FrontOffice")) {
+
+                    foreach ($marques as $marque) {
+
+                        # code...
+                        $liste_user_route_import            =   UserRouteImport::where('id_user', Auth::user()->id)->get();
+
+                        foreach ($liste_user_route_import as $user_route_import) {
+
+                            if($user_route_import->id_route_import  ==  $marque->id_route_import) {
+
+                                array_push($marques_final, $marque);
+                            }
+                        }
+                    }
+
+                    return $marques_final;
+                }
+            }
+        }
+    }
+
     //
 
     public static function validatechangePassword(Request $request) 
