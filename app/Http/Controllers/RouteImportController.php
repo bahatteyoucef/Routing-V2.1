@@ -30,6 +30,23 @@ class RouteImportController extends Controller
         }
     }
 
+    public function combo()
+    {
+
+        try {
+
+            $liste_route_import     =   RouteImport::comboRouteImport();
+            return User::filterRouteImport($liste_route_import);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
     public function store(Request $request)
     {
 

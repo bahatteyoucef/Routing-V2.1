@@ -122,6 +122,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/route_import/set_willayas_cites'                                                      ,   [RouteImportController::class           , 'setWillayasCites'                        ]);    
 
     Route::post('/route_import'                                                                         ,   [RouteImportController::class           , 'index'                                   ]);
+    Route::post('/route_import/combo'                                                                   ,   [RouteImportController::class           , 'combo'                                   ]);
     Route::post('/route_import/store'                                                                   ,   [RouteImportController::class           , 'store'                                   ]);
     Route::post('/route_import/{id}/update'                                                             ,   [RouteImportController::class           , 'update'                                  ]);
     Route::post('/route_import/{id}/delete'                                                             ,   [RouteImportController::class           , 'delete'                                  ]);

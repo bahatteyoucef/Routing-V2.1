@@ -408,6 +408,8 @@ export default {
 
             this.setCoords(client)
             this.getComboData()  
+
+            this.checkClients()
         },
 
         setCoords(client) {

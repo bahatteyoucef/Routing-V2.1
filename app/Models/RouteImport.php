@@ -58,6 +58,16 @@ class RouteImport extends Model
 
     //
 
+    public static function comboRouteImport()
+    {
+
+        $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
+
+        return $liste_route_import;
+    }
+
+    //
+
     public static function validateStore(Request $request) 
     {
 

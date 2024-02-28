@@ -401,13 +401,27 @@ class Client extends Model
 
     //
 
-    public static function showClient(Request $request, int $id_route_import, int $id) {
+     public static function showClient(Request $request, int $id_route_import, int $id) {
 
-        return  Client::where("clients.id_route_import", $id_route_import)
-                ->where("clients.id", $id)
-                ->join('users', 'clients.owner', '=', 'users.id')
-                ->select('clients.*', 'users.nom as owner_name')
-                ->first();
+        // return  Client::where("clients.id_route_import", $id_route_import)
+        //         ->where("clients.id", $id)
+        //         ->join('users', 'clients.owner', '=', 'users.id')
+        //         ->select('clients.*', 'users.nom as owner_name')
+        //         ->first();
+        
+        $client =   Client::find($id);
+        
+        if($client) {
+            
+            $user   =   User::find($client->id);
+            
+            if($user) {
+                
+                $client->owner_name     =   $user->nom;
+            }            
+        }
+        
+        return $client;
     }
 
     //
