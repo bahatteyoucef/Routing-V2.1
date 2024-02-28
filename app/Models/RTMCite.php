@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class RTMCite extends Model
+{
+    use HasFactory;
+
+    protected $guarded      =   [];
+
+    protected $table        =   'RTM_City';
+    protected $primaryKey   =   'CITYNO';
+
+    public    $timestamps   =   false;
+}

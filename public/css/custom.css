@@ -1,0 +1,162 @@
+/*  */
+
+.remove_button_style,    .remove_button_style:hover,  .remove_button_style:active,  .remove_button_style:focus 
+{
+    background  :   none        !important;
+    color       :   inherit     !important;
+    border      :   none        !important;
+    padding     :   0           !important;
+    font        :   inherit     !important;
+    cursor      :   pointer     !important;
+    outline     :   inherit     !important;
+}
+
+/*  */
+
+.primary {
+    color               :   white       !important;
+    background-color    :   #A25CFF     !important;
+}
+
+.border_primary {
+    border              :   none        !important;
+    outline             :   none        !important;
+}
+
+/*  */
+
+/* Loading */
+
+.center_screen {
+    position        :   fixed   ;
+    top             :   45%     ;
+
+    width           :   100%    ;
+
+    margin          :   auto    ;
+}
+
+#loading_screen {
+    position        :   fixed;
+
+    width           :   100%;
+    height          :   100%;
+
+    z-index         :   99999;
+
+    background      : rgba(255, 255, 255, 0.1);
+    backdrop-filter :   blur(5px);
+}
+
+/*  */
+
+.page-item.active .page-link {
+    background-color    : #A25CFF   !important;
+    border-color        : #A25CFF   !important;
+}
+
+/*  */
+
+@media (min-width: 1200px)
+{
+    .modal-xl {
+
+        --bs-modal-width    : 91%         !important;
+    }
+}
+
+/*  */
+
+.mdi_upload_client::before {
+    font-size   : 55px          !important; /* Set the desired icon size */
+    color       : #A25CFF     !important; /* Set the desired icon color */
+}
+
+/*  */
+
+.display_none {
+
+    display     : none;
+}
+
+/*  */
+
+.clickable_table tr {
+
+    cursor      : pointer;
+}
+
+/*  */
+
+/*  */
+
+/* Scroll Bar */
+
+.scrollbar-deep-blue::-webkit-scrollbar-track {
+    -webkit-box-shadow  : inset 0 0 6px rgba(0, 0, 0, 0.1)  ;
+    background-color    : #FFFFFF   ;
+    border-radius       : 10px        ;
+}
+
+.scrollbar-deep-blue::-webkit-scrollbar {
+    width   : 9px  ;
+    height  : 3px   ;
+
+    background-color: #FFFFFF   ;
+}
+
+.scrollbar-deep-blue::-webkit-scrollbar-thumb {
+    border-radius       : 10px                                  ;
+    -webkit-box-shadow  : inset 0 0 6px rgba(0, 0, 0, 0.1)    ;
+    background-image    : -webkit-linear-gradient(330deg, #FFFFFF 0%, #187498 100%) ;
+    background-image    : linear-gradient(120deg, #FFFFFF 0%, #187498 100%)         ;
+}
+
+.scrollbar-deep-blue {
+    scrollbar-color     : #187498 #FFFFFF    ;
+}
+
+/*  */
+
+.popper {
+
+    width               : 295px;
+    height              : 455px;
+
+    overflow            : auto;
+
+    scrollbar-color     : #27374D #000    ;
+}
+
+.popper::-webkit-scrollbar-track {
+    -webkit-box-shadow  : inset 0 0 6px rgba(0, 0, 0, 0.1)  ;
+    background-color    : #FFFFFF   ;
+    border-radius       : 10px        ;
+}
+
+.popper::-webkit-scrollbar {
+    width   : 5px  ;
+    height  : 3px   ;
+
+    background-color: #FFFFFF   ;
+}
+
+.popper::-webkit-scrollbar-thumb {
+    border-radius       : 10px                                  ;
+    -webkit-box-shadow  : inset 0 0 6px rgba(0, 0, 0, 0.1)    ;
+    background-image    : -webkit-linear-gradient(330deg, #000 0%, #27374D 100%) ;
+    background-image    : linear-gradient(120deg, #000 0%, #27374D 100%)         ;
+}
+
+/*  */
+
+.color-square-option {
+    display: flex;
+    align-items: center;
+}
+
+.color-square-box {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
