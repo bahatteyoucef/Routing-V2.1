@@ -93,11 +93,6 @@
               <li class="col-sm-7 nav-item">
 
                 <div class="row justify-content-end">
-
-                  <div class="col-sm-3 mt-1"  v-if="$isRole('BackOffice')">
-                    <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToProduits()">Products</button>
-                  </div>
-
                   <div class="col-sm-3 mt-1"  v-if="$isRole('Super Admin')">
                     <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToUsers()">Users</button>
                   </div>
@@ -459,12 +454,6 @@ export default {
           }
 
           this.$hideLoadingPage()
-        },
-
-        //
-        goToProduits() {
-
-          this.$router.push("/produits")
         }
     },
 

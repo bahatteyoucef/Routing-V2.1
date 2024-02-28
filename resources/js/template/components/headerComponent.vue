@@ -8,46 +8,19 @@
             </div>
 
             <div    class="row col-sm-2 justify-content-end">
-                <div v-if="((prices_button_page) && (prices_button_page.length    >   0))"              class="col-sm-4 pr-1 pl-1">
+                <div v-if="((update_button) && (update_button.length    >   0))"   class="col-sm-4 pr-1 pl-1">
                     <button
-                        button type="button"                                                            class="btn primary w-100"
-                        v-on:click="pricesElementPage()"
-                    >
-                        <i class="mdi mdi-cash"></i>
-                    </button>
-                </div>
-
-                <div v-if="((update_button) && (update_button.length    >   0))"                        class="col-sm-4 pr-1 pl-1">
-                    <button
-                        button type="button" data-bs-toggle="modal" :data-bs-target="'#'+update_modal"  class="btn primary w-100"
+                        button type="button" data-bs-toggle="modal" :data-bs-target="'#'+update_modal" class="btn primary w-100"
                         v-on:click="updateElement()"
                     >
                         <i class="mdi mdi-pencil-box-outline"></i>
                     </button>
                 </div>
 
-                <div v-if="((add_button) && (add_button.length    >   0))"                              class="col-sm-4 pr-1 pl-1">
+                <div v-if="((add_button) && (add_button.length    >   0))"      class="col-sm-4 pr-1 pl-1">
                     <button
-                        button type="button" data-bs-toggle="modal" :data-bs-target="'#'+add_modal"     class="btn primary w-100"
+                        button type="button" data-bs-toggle="modal" :data-bs-target="'#'+add_modal" class="btn primary w-100"
                         v-on:click="addElement()"
-                    >
-                        <i class="mdi mdi-plus-box-outline"></i>
-                    </button>
-                </div>
-
-                <div v-if="((update_button_page) && (update_button_page.length    >   0))"              class="col-sm-4 pr-1 pl-1">
-                    <button
-                        button type="button"                                                            class="btn primary w-100"
-                        v-on:click="updateElementPage()"
-                    >
-                        <i class="mdi mdi-pencil-box-outline"></i>
-                    </button>
-                </div>
-
-                <div v-if="((add_button_page) && (add_button_page.length    >   0))"                    class="col-sm-4 pr-1 pl-1">
-                    <button
-                        button type="button"                                                            class="btn primary w-100"
-                        v-on:click="addElementPage()"
                     >
                         <i class="mdi mdi-plus-box-outline"></i>
                     </button>
@@ -64,7 +37,7 @@
 
     export default {
 
-        props : ["title" , "add_button", "update_button", "add_modal",  "update_modal", "add_button_page", "update_button_page", "prices_button_page"],
+        props : ["title" , "add_button", "update_button", "add_modal",  "update_modal"],
 
         data() {
 
@@ -85,25 +58,6 @@
 
                 this.$parent.updateElement()
             },
-
-            addElementPage() {
-
-                this.$parent.addElementPage()
-            },
-
-            updateElementPage() {
-
-                this.$parent.updateElementPage()
-            },
-
-            //
-
-            pricesElementPage() {
-
-                this.$parent.pricesElementPage()
-            },
-
-            //
 
             async setDataTable() {
 

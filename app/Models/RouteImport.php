@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Fluent;
@@ -638,27 +637,5 @@ class RouteImport extends Model
         }
 
         //
-    }
-
-    //
-
-    public static function routeImportCategories(int $id) 
-    {
-
-        $categories      =   DB::table('categories')
-                            ->where('categories.id_route_import', $id)
-
-                            ->select([ 
-                                'categories.id                  as  id'                     , 
-
-                                'categories.nom                 as  nom'                    ,
-                                'categories.description         as  description'            ,
-
-                                'categories.id_route_import     as  nom_type'               ,
-                            ])
-
-                            ->get();
-
-        return $categories;
     }
 }

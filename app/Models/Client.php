@@ -32,7 +32,7 @@ class Client extends Model
 
         // Event hook to set the date before storing a new object in the database
         static::creating(function ($client) {
-            $client->created_at =   Carbon::now()->format('d F Y');
+            $client->created_at = Carbon::now()->format('d F Y');;
         });
     }
 
