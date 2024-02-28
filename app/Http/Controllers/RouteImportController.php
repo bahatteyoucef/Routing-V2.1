@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
 use App\Models\RouteImport;
 use App\Models\RTMWillaya;
 use App\Models\User;
@@ -412,5 +413,41 @@ class RouteImportController extends Controller
             ],422);
         }
 
+    }
+
+    //
+
+    public function headerRouteImports()
+    {
+
+        try {
+
+            $liste_route_import     =   RouteImport::headerRouteImports();
+            return User::filterRouteImport($liste_route_import);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    public function indexRouteImports()
+    {
+
+        try {
+
+            $liste_route_import     =   RouteImport::indexRouteImports();
+            return User::filterRouteImport($liste_route_import);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
     }
 }

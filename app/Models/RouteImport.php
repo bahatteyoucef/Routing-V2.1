@@ -40,6 +40,24 @@ class RouteImport extends Model
         return $liste_route_import;
     }
 
+    public static function headerRouteImports()
+    {
+
+        $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
+
+        return $liste_route_import;
+    }
+
+    public static function indexRouteImports()
+    {
+
+        $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
+
+        return $liste_route_import;
+    }
+
+    //
+
     public static function validateStore(Request $request) 
     {
 

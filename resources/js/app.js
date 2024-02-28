@@ -10,7 +10,6 @@ import datatables       from    './mixin/datatables'
 import responsive       from    './mixin/responsive'
 
 import Map              from    './services/map'
-import IndexedDB        from    './services/indexedDB'
 
 // 
 
@@ -167,9 +166,6 @@ window.Modal = Modal;
 if (window.navigator.onLine) {
     app.config.globalProperties.$map                    =   new Map()
 }
-
-// IndexedDB
-app.config.globalProperties.$indexedDB                  =   new IndexedDB()
 
 //
 

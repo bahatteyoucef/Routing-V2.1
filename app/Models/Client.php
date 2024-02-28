@@ -425,7 +425,7 @@ class Client extends Model
 
     //
 
-    public static function updateClients(Request $request, int $id_route_import) {
+    public static function updateResumeClients(Request $request) {
 
         $clients    =   json_decode($request->get("data"));
 
@@ -434,19 +434,6 @@ class Client extends Model
             // Client
 
             $client                             =   Client::find($client_tempo->id);
-
-            $client->CustomerCode               =   $client_tempo->CustomerCode;
-            $client->CustomerNameE              =   $client_tempo->CustomerNameE;
-            $client->CustomerNameA              =   $client_tempo->CustomerNameA;
-            $client->Latitude                   =   $client_tempo->Latitude;
-            $client->Longitude                  =   $client_tempo->Longitude;
-            $client->Address                    =   $client_tempo->Address;
-            $client->DistrictNo                 =   $client_tempo->DistrictNo;
-            $client->DistrictNameE              =   $client_tempo->DistrictNameE;
-            $client->CityNo                     =   $client_tempo->CityNo;
-            $client->CityNameE                  =   $client_tempo->CityNameE;
-            $client->Tel                        =   $client_tempo->Tel;
-            $client->CustomerType               =   $client_tempo->CustomerType;
 
             if($client_tempo->JPlan     !=  null) {
     

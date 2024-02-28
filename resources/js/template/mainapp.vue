@@ -66,9 +66,6 @@
 
         async mounted() {
 
-            // Set Local DB
-            await this.$indexedDB.$indexedDB_intialiazeSetDATA()
-
             // 
             this.isAuthentificated      =   await this.checkIfUserIsAuthentificated()
 

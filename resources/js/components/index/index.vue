@@ -93,28 +93,11 @@ export default {
 
                 if(this.$connectedToInternet) {
 
-                    this.$callApi("post",    "/route_import", null)
+                    this.$callApi("post",    "/route_import/index", null)
                     .then((res)=> {
 
                         this.liste_route_import     =   res.data
-
-                        if(this.$isRole("FrontOffice")) {
-
-                            // Add to indexedDB
-                            this.$indexedDB.$setListeRouteImport(this.liste_route_import)
-                        }
                     })
-                }
-
-                else {
-
-                    setTimeout(async () => {
-                        
-                        if(this.$isRole("FrontOffice")) {
-
-                            this.liste_route_import         =   await this.$indexedDB.$getListeRouteImport()
-                        }
-                    }, 555);
                 }
             }
 
@@ -129,11 +112,6 @@ export default {
             if(this.$isRole("Super Admin")||this.$isRole("BackOffice")) {
 
                 this.$router.push('/route/obs/route_import/'+id_route_import+'/details')
-            }
-
-            if(this.$isRole("FrontOffice")) {
-
-                this.$router.push('/route/frontoffice/obs/route_import/'+id_route_import+'/details')
             }
         },
 

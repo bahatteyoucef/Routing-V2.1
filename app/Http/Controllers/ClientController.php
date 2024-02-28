@@ -195,6 +195,44 @@ class ClientController extends Controller
         }
     }
 
+    //
+
+    public function updateResumeClients(Request $request)
+    {
+
+        try {
+
+            //
+            DB::beginTransaction();
+            //
+
+            // update 
+            Client::updateResumeClients($request);
+            
+            //
+            DB::commit();
+            //
+
+            return response()->json([
+                "header"            =>  "Clients Updated !"                      ,
+                "message"           =>  "the clients have been updated successfully !"
+            ]);
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    //
+
     public function validateClient(int $id_route_import, int $id)
     {
 
