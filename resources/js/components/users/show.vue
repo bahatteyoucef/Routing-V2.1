@@ -127,7 +127,10 @@ export default {
 
         async getUserData() {
 
+            console.log(111)
+
             const res                   =   await this.$callApi("post"  ,   "/users/"+this.$route.params.id_user+"/show"    ,   null)
+            console.log(res)
 
             this.user.nom_original          =   res.data.nom
 
@@ -145,7 +148,10 @@ export default {
 
         async getComboData() {
 
+            console.log(222)
+
             const res               =   await this.$callApi("post",     "/route_import/combo",      null)
+            console.log(res)
 
             let liste_route_import  =   res.data
 
