@@ -134,12 +134,12 @@
 
 <script>
 
-import modalValidateCustomerCodeMap     from "./modalValidateCustomerCodeMap.vue"
-import modalValidateCustomerNameEMap    from "./modalValidateCustomerNameEMap.vue"
-import modalValidateTelMap              from "./modalValidateTelMap.vue"
-import modalValidateGPSMap              from "./modalValidateGPSMap.vue"
+import modalValidateCustomerCodeMap     from "./ValidateData/modalValidateCustomerCodeMap.vue"
+import modalValidateCustomerNameEMap    from "./ValidateData/modalValidateCustomerNameEMap.vue"
+import modalValidateTelMap              from "./ValidateData/modalValidateTelMap.vue"
+import modalValidateGPSMap              from "./ValidateData/modalValidateGPSMap.vue"
 
-import modalClientUpdateMap             from "../../../clients/Map/modalClientUpdateMap.vue"
+import modalClientUpdateMap             from "../../clients/Permanent/modalClientUpdateMap.vue"
 
 export default {
 

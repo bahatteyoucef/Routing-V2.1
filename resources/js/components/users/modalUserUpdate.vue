@@ -33,14 +33,6 @@
                             <input type="text"                  class="form-control"        id="company"                    v-model="user.company">
                         </div>
 
-                        <div class="mb-3">
-                            <label for="type_user"              class="form-label">Type User</label>
-                            <select                             class="form-select"         id="type_user"                  v-model="user.type_user">
-                                <option value="BackOffice">BackOffice</option>
-                                <option value="FrontOffice">FrontOffice</option>
-                            </select>
-                        </div>
-
                         <div class="mb-3" v-if="user.type_user  ==  'BackOffice'">
                             <label for="max_route_import"       class="form-label">Max Route Imports</label>
                             <input type="number"                class="form-control"        id="max_route_import"           v-model="user.max_route_import">
@@ -102,7 +94,7 @@ export default {
                 email                   :   '',
                 tel                     :   '',
                 company                 :   '',
-                type_user               :   '',
+                type_user               :   'BackOffice',
 
                 max_route_import        :   0 ,
 

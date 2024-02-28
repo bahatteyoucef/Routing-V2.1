@@ -133,7 +133,7 @@
 
                         <!--  -->
 
-                        <modalResume                    ref="modalResume"                       :key="Date.now()"       :type="'temporary'"                                                 :id_route_import_tempo="route_import.id_route_import_tempo"     ></modalResume>
+                        <modalResume                    ref="modalResume"                       :key="route_import"     :type="'temporary'"                                                 :id_route_import_tempo="route_import.id_route_import_tempo"     ></modalResume>
                         <modalValidate                  ref="modalValidate"                                                                                                                 :id_route_import_tempo="route_import.id_route_import_tempo"     ></modalValidate>
 
                         <!--  -->
@@ -156,15 +156,16 @@
 
 <script>
 
-import modalResume                  from "./modalResume.vue"
-import modalValidate                from "./modalValidate.vue"
+import modalResume                  from "../modalResume.vue"
 
-import modalValidateCustomerCode    from "./modalValidateCustomerCode.vue"
-import modalValidateCustomerNameE   from "./modalValidateCustomerNameE.vue"
-import modalValidateTel             from "./modalValidateTel.vue"
-import modalValidateGPS             from "./modalValidateGPS.vue"
+import modalClientUpdateTempo       from "../../clients/Temporary/modalClientUpdateTempo.vue"
 
-import modalClientUpdateTempo       from "../../clients/modalClientUpdateTempo.vue"
+import modalValidate                from "./modalSubmit.vue"
+
+import modalValidateCustomerCode    from "./ValidateDataTempo/modalValidateCustomerCode.vue"
+import modalValidateCustomerNameE   from "./ValidateDataTempo/modalValidateCustomerNameE.vue"
+import modalValidateTel             from "./ValidateDataTempo/modalValidateTel.vue"
+import modalValidateGPS             from "./ValidateDataTempo/modalValidateGPS.vue"
 
 import * as XLSX from "xlsx";
 

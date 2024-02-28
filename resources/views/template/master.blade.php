@@ -10,9 +10,6 @@
 		
 		<title>Routing</title>
 
-		<!-- PWA -->
-		@laravelPWA
-
 		<!-- Vue -->
 		@vite(['resources/css/app.css','resources/scss/app.scss'])
 
@@ -30,7 +27,7 @@
 		<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
 		<link rel="stylesheet" href="{{url('Leaflet.markercluster-1.4.1/dist/MarkerCluster.css')}}" />
 		<link rel="stylesheet" href="{{url('Leaflet.markercluster-1.4.1/dist/MarkerCluster.Default.css')}}" />
-		<link rel="stylesheet" href="https://unpkg.com/leaflet-editable@1.2.0/dist/leaflet.editable.css" />
+		<!-- <link rel="stylesheet" href="https://unpkg.com/leaflet-editable@1.2.0/dist/leaflet.editable.css" /> -->
 
 		<!-- Font Awesome -->
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.css"></link>
@@ -52,39 +49,6 @@
 
 		<!--  -->
 
-		<!-- PWA Test -->
-		<link rel="manifest" href="/manifest.json">
-
-		<!-- Chrome for Android theme color -->
-		<meta name="theme-color" content="#000000">
-
-		<!-- Add to homescreen for Chrome on Android -->
-		<meta name="mobile-web-app-capable" content="yes">
-		<meta name="application-name" content="PWA">
-		<link rel="icon" sizes="512x512" href="/images/icons/icon-512x512.png">
-
-		<!-- Add to homescreen for Safari on iOS -->
-		<meta name="apple-mobile-web-app-capable" content="yes">
-		<meta name="apple-mobile-web-app-status-bar-style" content="black">
-		<meta name="apple-mobile-web-app-title" content="PWA">
-		<link rel="apple-touch-icon" href="/images/icons/icon-512x512.png">
-
-		<link href="/images/icons/splash-640x1136.png" 		media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" 	rel="apple-touch-startup-image" />
-		<link href="/images/icons/splash-750x1334.png" 		media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" 	rel="apple-touch-startup-image" />
-		<link href="/images/icons/splash-1242x2208.png" 	media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)" 	rel="apple-touch-startup-image" />
-		<link href="/images/icons/splash-1125x2436.png" 	media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" 	rel="apple-touch-startup-image" />
-		<link href="/images/icons/splash-828x1792.png" 		media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" 	rel="apple-touch-startup-image" />
-		<link href="/images/icons/splash-1242x2688.png" 	media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" 	rel="apple-touch-startup-image" />
-		<link href="/images/icons/splash-1536x2048.png" 	media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)" 	rel="apple-touch-startup-image" />
-		<link href="/images/icons/splash-1668x2224.png" 	media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)" 	rel="apple-touch-startup-image" />
-		<link href="/images/icons/splash-1668x2388.png" 	media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)" 	rel="apple-touch-startup-image" />
-		<link href="/images/icons/splash-2048x2732.png" 	media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" 	rel="apple-touch-startup-image" />
-
-		<!--  -->
-
-		<!-- Tile for Win8 -->
-		<meta name="msapplication-TileColor" content="#ffffff">
-		<meta name="msapplication-TileImage" content="/images/icons/icon-512x512.png">
 	</head>
 
 	<body>
@@ -105,8 +69,6 @@
 	<script src="https://rawgit.com/hayeswise/Leaflet.PointInPolygon/master/wise-leaflet-pip.js">	</script>
 
 	<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js">	</script>
-	<!-- <script src="https://unpkg.com/leaflet-editable@1.2.0/dist/leaflet.editable.js"></script> -->
-
 	<script src='//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js'></script>
 
 	<script src="{{url('Leaflet.markercluster-1.4.1/dist/leaflet.markercluster-src.js')}}">			</script>
@@ -114,30 +76,8 @@
 
 	<!--  -->
 
-	<!-- Template -->
-	<!-- <script src="{{url('template/js/chunk-2d0b9062.97448cc8.js')}}">	</script>
-	<script src="{{url('template/js/chunk-2d0ba2e9.eafd91ad.js')}}">	</script>
-	<script src="{{url('template/js/chunk-2d0c18ec.6a1ea22e.js')}}">	</script>
-	<script src="{{url('template/js/chunk-2d0ccf69.8e9fb9e3.js')}}">	</script>
-	<script src="{{url('template/js/chunk-2d0e2534.696069ec.js')}}">	</script>
-	<script src="{{url('template/js/chunk-2d20febb.edbe74cd.js')}}">	</script>
-	<script src="{{url('template/js/chunk-2d217b0a.1c1d01ec.js')}}">	</script>
-	<script src="{{url('template/js/chunk-2d21e985.34450ac3.js')}}">	</script>
-	<script src="{{url('template/js/chunk-2d22db47.8944bbc1.js')}}">	</script>
-	<script src="{{url('template/js/chunk-355d107d.c505912a.js')}}">	</script>
-	<script src="{{url('template/js/chunk-4218871c.b9ca3326.js') }}">	</script>
-	<script src="{{url('template/js/chunk-4c8b6c66.fc58459b.js')}}">	</script>
-	<script src="{{url('template/js/app.3c7ebefc.js') }}">				</script> -->
-
-	<!-- Datatable -->
-	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script> -->
-	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script> -->
-
 	<!-- Excel     -->
 	<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
-
-	<!-- Customer -->
-	<!-- <script src="{{url('js/responsive.js')}}"></script> -->
 
 	@vite('resources/js/app.js')
 

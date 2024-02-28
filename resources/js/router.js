@@ -49,25 +49,7 @@ const routes = [
         component   : () => import('./components/users/changePassword.vue')
     },
 
-    // Route Import Clients
-    {
-        path        : "/route_import/:id_route_import/clients",
-        component   : () => import('./components/routes/routeImportClients.vue')
-    },
-
-    // 
-
-    // ClientsAdd
-    {
-        path        : "/route_import/:id_route_import/clients/add/:latitude/:longitude",
-        component   : () => import('./components/clients/ClientAdd.vue')
-    },
-
-    // ClientsUpdate
-    {
-        path        : "/route_import/:id_route_import/clients/:id_client/update",
-        component   : () => import('./components/clients/ClientUpdate.vue')
-    },
+    //
 
     //  //  //  //  //  OBS     //  //  //
 
@@ -76,25 +58,19 @@ const routes = [
     // Imports Tempo
     {
         path        : "/route/obs/route_import_tempo",
-        component   : () => import('./components/routes/imports/routeImportTempo.vue')
+        component   : () => import('./components/routes/Temporary/routeImportTempo.vue')
     },
 
     // Imports Add
     {
         path        : "/route/obs/route_import/add",
-        component   : () => import('./components/routes/imports/RouteImportAdd.vue')
+        component   : () => import('./components/routes/RouteImportAdd.vue')
     },
 
     // Imports Details
     {
         path        : "/route/obs/route_import/:id_route_import/details",
-        component   : () => import('./components/routes/obs/ParRouteImportDetails.vue')
-    },
-
-    // Imports ParRouteImportFrontOfficeDetails Details
-    {
-        path        : "/route/frontoffice/obs/route_import/:id_route_import/details",
-        component   : () => import('./components/routes/obs/ParRouteImportFrontOfficeDetails.vue')
+        component   : () => import('./components/routes/Permanent/ParRouteImportDetails.vue')
     },
 ];
 
@@ -117,44 +93,15 @@ router.beforeEach((to, from, next) => {
 
         if((to.path != "/login")&&(store.getters[`authentification/getIsAuthentificated`]   ==  true)) {
 
-            if((to.path != "/login")&&(Authentification.methods.$isRole("FrontOffice"))) {
+            if(initialRoute) {
 
-                const pattern = /^\/route\/obs\/route_import\/\d+\/details$/;
-                
-                let route_obs_frontOffice   =   pattern.test(to.path);
-
-                if(route_obs_frontOffice) {
-
-                    next("/")
-                }
-
-                else {
-
-                    if(initialRoute) {
-
-                        initialRoute    =   false
-                        next("/")
-                    }
-
-                    else {
-                    
-                        next()
-                    }
-                }
+                initialRoute    =   false
+                next("/")
             }
 
             else {
 
-                if(initialRoute) {
-
-                    initialRoute    =   false
-                    next("/")
-                }
-
-                else {
-
-                    next()    
-                }
+                next()    
             }
         }
 

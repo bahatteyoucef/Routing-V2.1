@@ -63,19 +63,6 @@
                         </div>
                     </div>
 
-                    <div v-if="$isRole('FrontOffice')" class="col p-0 ml-1">
-                        <div id="toggle_div">
-
-                            <div class="btn-container" id="marker_cluster_mode_div">
-                                <label class="switch btn-color-mode-switch">
-                                    <input type="checkbox" name="marker_cluster_mode" id="marker_cluster_mode" @change="switchMarkerClusterMode()">
-                                    <label for="marker_cluster_mode" data-on="Marker" data-off="Cluster" class="btn-color-mode-switch-inner"></label>
-                                </label>
-                            </div>
-
-                        </div>
-                    </div>
-
                     <div class="col p-0 ml-1" id="map_options_buttons_div"  style="display:none">
                         <div id="show_map_options_div"  @click="$showMapOptions()">
                             <span class="page-title-icon bg-gradient-primary text-white mr-2" id="show_map_options_button">
@@ -138,11 +125,6 @@
                             <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showTerritories()">Auto Territories</button>
                             <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showJPlanBDTerritories()">JPlan Territories</button>
                             <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showJourneeBDTerritories()">Journee Territories</button>
-                        </div>
-
-                        <div v-if="$isRole('FrontOffice')" class="col-5">
-                            <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showCurrentPosition()">Position</button>
-                            <button class="btn primary w-100 m-0 mt-1"                                                                  @click="addClientFront()">Add Client</button>
                         </div>
 
                         <!--  -->
@@ -421,20 +403,33 @@
 
 <script>
 
-import Multiselect              from '@vueform/multiselect'
+import Multiselect                  from    "@vueform/multiselect"
 
-import modalClientAdd           from "../../clients/modalClientAdd.vue"
-import modalClientUpdate        from "../../clients/modalClientUpdate.vue"
-import modalClientsChangeRoute  from "../../clients/modalClientsChangeRoute.vue"
-import modalResume              from "../imports/modalResume.vue"
+// Clients
 
-import modalAddJourneyPlan      from "../../territoires/modalAddJourneyPlan.vue"
-import modalUpdateJourneyPlan   from "../../territoires/modalUpdateJourneyPlan.vue"
+import modalClientAdd               from    "../../clients/Permanent/modalClientAdd.vue"
+import modalClientUpdate            from    "../../clients/Permanent/modalClientUpdate.vue"
+import modalClientsChangeRoute      from    "../../clients/Permanent/modalClientsChangeRoute.vue"
 
-import modalUpdateMap           from "../imports/Map/modalUpdateMap.vue"
-import modalValidateMap         from "../imports/Map/modalValidateMap.vue"
+//
 
-import {mapGetters, mapActions} from "vuex"
+// Territories
+
+import modalAddJourneyPlan          from    "../../territoires/modalAddJourneyPlan.vue"
+import modalUpdateJourneyPlan       from    "../../territoires/modalUpdateJourneyPlan.vue"
+
+//
+
+// Map
+
+import modalUpdateMap               from    "./modalUpdateMap.vue"
+import modalValidateMap             from    "./modalValidateMap.vue"
+
+import modalResume                  from    "../modalResume.vue"
+
+//
+
+import {mapGetters, mapActions}     from    "vuex"
 
 export default {
     
@@ -1972,33 +1967,6 @@ export default {
 
                 await this.$refs.modalClientsChangeRoute.getData(clients)
             }
-            catch(e) {
-
-                console.log(e)
-            }
-        },
-
-        //
-
-        async addClientFront() {
-
-            try {
-            
-
-                let position     =   await this.$currentPosition()
-
-                let client      =   { lat : 0, lng : 0 }
-
-                client.lat      =   position.coords.latitude
-                client.lng      =   position.coords.longitude
-
-                // ShowModal
-                var addModal    =   new Modal(document.getElementById("addClientModal"));
-                addModal.show();
-
-                this.addClient(client)
-            }
-
             catch(e) {
 
                 console.log(e)

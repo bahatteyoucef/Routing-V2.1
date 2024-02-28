@@ -1,7 +1,7 @@
 <template>
 
     <!-- Modal -->
-    <div class="modal fade" id="modalClientUpdateIndexedDB" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="updateClientModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
 
@@ -53,18 +53,18 @@
                             </select>
                         </div>
 
-                        <!--  -->
+                         <!--  -->
 
                         <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
-                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @changed="checkClients()">
+                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @change="checkClients()">
                         </div>
 
                         <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
-                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @changed="checkClients()">
+                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @change="checkClients()">
                         </div>
-                    
+
                         <!--  -->
 
                         <div class="mb-3">
@@ -103,21 +103,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div v-if="$isRole('FrontOffice')" class="mb-3">
-                                <label for="status"             class="form-label">Status</label>
-                                <select                         class="form-select"         id="status"                 v-model="client.status">
-                                    <option value="validated" selected>validated</option>
-                                    <option value="nonvalidated">nonvalidated</option>
-                                </select>
-
-                                <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
-                                    <div class="form-group">
-                                        <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
-                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                         <div v-if="((client.status_original   ==  'nonvalidated') || (client.status_original   ==  'pending'))">
@@ -127,21 +112,6 @@
                                     <option value="validated" selected>validated</option>
                                     <option value="pending">pending</option>
                                     <option value="nonvalidated" selected>nonvalidated</option>
-                                </select>
-
-                                <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
-                                    <div class="form-group">
-                                        <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
-                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div v-if="$isRole('FrontOffice')" class="mb-3">
-                                <label for="status"             class="form-label">Status</label>
-                                <select                         class="form-select"         id="status"                 v-model="client.status">
-                                    <option value="pending" selected>pending</option>
-                                    <option value="nonvalidated">nonvalidated</option>
                                 </select>
 
                                 <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
@@ -204,8 +174,8 @@
 
                     <div class="right-buttons"  style="display: flex; margin-left: auto;">
                         <button type="button"   class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <!-- <button type="button"   class="btn btn-success"                             v-if="client.status   !=  'validated'"  @click="validateData()">Validate</button> -->
-                        <button type="button"   class="btn btn-primary"                                                                     @click="sendData()">Confirm</button>
+                        <!-- <button type="button"   class="btn btn-success"                             @click="validateData()"   v-if="client.status   !=  'validated'"      >Validate</button> -->
+                        <button type="button"   class="btn btn-primary"                             @click="sendData()"                                                 >Confirm</button>
                     </div>
                 </div>
 
@@ -223,6 +193,7 @@ export default {
 
     data() {
         return {
+
 
             client      :   {
 
@@ -261,7 +232,7 @@ export default {
                 JPlan               :   '',
                 Journee             :   '',
 
-                // Status
+                // 
                 status                  :   '',
                 status_original         :   '',
                 nonvalidated_details    :   ''
@@ -276,10 +247,10 @@ export default {
             liste_type_client               :   []  ,
 
             //
+
             all_clients                     :   []  ,
             close_clients                   :   []  ,
             min_distance                    :   0.03
-
         }
     },
 
@@ -294,7 +265,7 @@ export default {
 
     mounted() {
 
-        this.clearData("#modalClientUpdateIndexedDB")
+        this.clearData("#updateClientModal")
     },  
 
     methods : {
@@ -315,188 +286,115 @@ export default {
 
             let formData = new FormData();
 
-            formData.append("CustomerCode"                  ,   this.client.CustomerCode)
-            formData.append("CustomerNameE"                 ,   this.client.CustomerNameE)
-            formData.append("CustomerNameA"                 ,   this.client.CustomerNameA)
-            formData.append("Latitude"                      ,   this.client.Latitude)
-            formData.append("Longitude"                     ,   this.client.Longitude)
-            formData.append("Address"                       ,   this.client.Address)
-            formData.append("DistrictNo"                    ,   this.client.DistrictNo)
-            formData.append("DistrictNameE"                 ,   this.client.DistrictNameE)
-            formData.append("CityNo"                        ,   this.client.CityNo)
-            formData.append("CityNameE"                     ,   this.client.CityNameE)
-            formData.append("Tel"                           ,   this.client.Tel)
-            formData.append("CustomerType"                  ,   this.client.CustomerType)
-            formData.append("JPlan"                         ,   this.client.JPlan)
-            formData.append("Journee"                       ,   this.client.Journee)
+            formData.append("CustomerCode"  ,   this.client.CustomerCode)
+            formData.append("CustomerNameE" ,   this.client.CustomerNameE)
+            formData.append("CustomerNameA" ,   this.client.CustomerNameA)
+            formData.append("Latitude"      ,   this.client.Latitude)
+            formData.append("Longitude"     ,   this.client.Longitude)
+            formData.append("Address"       ,   this.client.Address)
+            formData.append("DistrictNo"    ,   this.client.DistrictNo)
+            formData.append("DistrictNameE" ,   this.client.DistrictNameE)
+            formData.append("CityNo"        ,   this.client.CityNo)
+            formData.append("CityNameE"     ,   this.client.CityNameE)
+            formData.append("Tel"           ,   this.client.Tel)
+            formData.append("CustomerType"  ,   this.client.CustomerType)
+            formData.append("JPlan"         ,   this.client.JPlan)
+            formData.append("Journee"       ,   this.client.Journee)
 
             formData.append("facade_image"                  ,   this.client.facade_image)
             formData.append("in_store_image"                ,   this.client.in_store_image)
             formData.append("facade_image_original_name"    ,   this.client.facade_image_original_name)
             formData.append("in_store_image_original_name"  ,   this.client.in_store_image_original_name)
 
-            formData.append("id_route_import"               ,   this.$route.params.id_route_import)
+            formData.append("status"                ,   this.client.status)
+            formData.append("nonvalidated_details"  ,   this.client.nonvalidated_details)
 
-            formData.append("status"                        ,   this.client.status)
-            formData.append("nonvalidated_details"          ,   this.client.nonvalidated_details)
+            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/update",   formData)
 
-            if(this.$connectedToInternet) {
-
-                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/update",   formData)
-                console.log(res.data)
-
-                if(res.status===200){
-
-                    this.client.id_route_import     =   this.$route.params.id_route_import
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
-                    // Send Feedback
-                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
-
-                    // Send Client
-                    this.emitter.emit('reSetUpdate' , this.client)
-
-                    // Close Modal
-                    this.$hideModal("modalClientUpdateIndexedDB")
-                }
-                
-                else{
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
-                    // Send Errors
-                    this.$showErrors("Error !", res.data.errors)
-                }
-            }
-
-            else {
-
-                this.client.id_route_import     =   this.$route.params.id_route_import
-
-                // Add in indexedDB
-                await this.$indexedDB.$setUpdatedClients(this.client, this.$route.params.id_route_import)
+            if(res.status===200){
 
                 // Hide Loading Page
                 this.$hideLoadingPage()
+
+                // Send Feedback
+                this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
                 // Send Client
                 this.emitter.emit('reSetUpdate' , this.client)
 
                 // Close Modal
-                this.$hideModal("modalClientUpdateIndexedDB")
+                this.$hideModal("updateClientModal")
             }
+            
+            else{
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
+			}
         },
 
         async deleteData() {
 
             this.$showLoadingPage()
 
-            if(this.$connectedToInternet) {
+            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/delete",   null)
 
-                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/delete",   null)
-
-                if(res.status===200){
-
-                    this.client.id_route_import     =   this.$route.params.id_route_import
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
-                    // Send Feedback
-                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
-
-                    // Send Client
-                    this.emitter.emit('reSetDelete' , this.client)
-
-                    // Close Modal
-                    this.$hideModal("modalClientUpdateIndexedDB")
-                }
-                
-                else{
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
-                    // Send Errors
-                    this.$showErrors("Error !", res.data.errors)
-                }
-            }
-
-            else {
-
-                this.client.id_route_import     =   this.$route.params.id_route_import
-
-                // Add in indexedDB
-                await this.$indexedDB.$setDeletedClients(this.client, this.$route.params.id_route_import)
+            if(res.status===200){
 
                 // Hide Loading Page
                 this.$hideLoadingPage()
+
+                // Send Feedback
+                this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
                 // Send Client
                 this.emitter.emit('reSetDelete' , this.client)
 
                 // Close Modal
-                this.$hideModal("modalClientUpdateIndexedDB")
+                this.$hideModal("updateClientModal")
             }
+            
+            else{
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
+			}
         },
 
         async validateData() {
 
             this.$showLoadingPage()
 
-            if(this.$connectedToInternet) {
+            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/validate",   null)
 
-                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/validate",   null)
-
-                if(res.status===200){
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
-                    this.client.status                  =   this.client.status
-                    this.client.nonvalidated_details    =   this.client.nonvalidated_details
-                    this.client.id_route_import         =   this.$route.params.id_route_import
-
-                    // Send Feedback
-                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
-
-                    // Send Client
-                    this.emitter.emit('reSetValidate' , this.client)
-
-                    // Close Modal
-                    this.$hideModal("modalClientUpdateIndexedDB")
-                }
-                
-                else{
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
-                    // Send Errors
-                    this.$showErrors("Error !", res.data.errors)
-                }
-            }
-
-            else {
-
-                this.client.status                  =   this.client.status
-                this.client.nonvalidated_details    =   this.client.nonvalidated_details
-                this.client.id_route_import         =   this.$route.params.id_route_import
-
-                // Add in indexedDB
-                await this.$indexedDB.$setValidatedClients(this.client, this.$route.params.id_route_import)
+            if(res.status===200){
 
                 // Hide Loading Page
                 this.$hideLoadingPage()
+
+                // Send Feedback
+                this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
                 // Send Client
                 this.emitter.emit('reSetValidate' , this.client)
 
                 // Close Modal
-                this.$hideModal("modalClientUpdateIndexedDB")
+                this.$hideModal("updateClientModal")
+            }
+            
+            else{
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
             }
         },
 
@@ -528,6 +426,8 @@ export default {
                 this.client.in_store_image                  =   '',
                 this.client.facade_image_original_name      =   '',
                 this.client.in_store_image_original_name    =   '',
+
+                //
 
                 // 
                 this.unsetJoursGetData()
@@ -561,14 +461,34 @@ export default {
                 // Journey Plan
                 this.client.JPlan               =   '',
 
-                this.client.status                =   '',
+                this.client.status              =   '',
 
                 this.willayas                   =   []  ,
                 this.cites                      =   []  ,
 
                 this.all_clients                =   []  ,
                 this.close_clients              =   []
+
+                // Remove Drawings
+                this.removeDrawings()
+
             });
+        },
+
+        removeDrawings() {
+
+            // Not Map
+            if(!this.$route.path.startsWith("/route/obs/")) {
+
+                // Do Nothing 
+            }
+
+            // Map
+            else {
+
+                // Remove Drawings
+                this.$map.$removeDrawings()
+            }   
         },
 
         getData(client, all_clients) {
@@ -578,13 +498,12 @@ export default {
             this.getClientData(client)  
             this.getComboData()  
 
-            // if(this.$isRole("FrontOffice")) {
-
-                this.checkClients()
-            // }
+            this.checkClients()
         },
 
         async getClientData(client) {
+
+            console.log(client)
 
             this.client.id                  =   client.id
 
@@ -637,45 +556,20 @@ export default {
 
         async getComboData() {
 
-            if(this.$connectedToInternet) {
-
-                const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
-                this.willayas                   =   res_3.data
-            }
-
-            else {
-
-                this.willayas                   =   await this.$indexedDB.$getWillayas()
-            }
+            const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
+            this.willayas                   =   res_3.data
         },
 
         async getCites() {
 
-            if(this.$connectedToInternet) {
+            // Show Loading Page
+            this.$showLoadingPage()
 
-                // Show Loading Page
-                this.$showLoadingPage()
+            const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
+            this.cites                      =   res_3.data
 
-                const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
-                this.cites                      =   res_3.data
-
-                // Hide Loading Page
-                this.$hideLoadingPage()
-            }
-
-            else {
-
-                // Show Loading Page
-                this.$showLoadingPage()
-
-                let willaya                     =   await this.$indexedDB.$getWillaya(this.client.DistrictNo)
-                console.log(willaya)
-
-                this.cites                      =   willaya.cites
-
-                // Hide Loading Page
-                this.$hideLoadingPage()
-            }
+            // Hide Loading Page
+            this.$hideLoadingPage()
         },
 
         //
@@ -889,15 +783,38 @@ export default {
 
         //
 
+        checkClients() {
+
+            this.close_clients  =   []
+
+            let distance        =   0
+
+            for (let i = 0; i < this.all_clients.length; i++) {
+
+                if(this.all_clients[i].id   !=  this.client.id) {
+
+                    distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
+
+                    if(distance <=  this.min_distance) {
+                    
+                        this.close_clients.push(this.all_clients[i])
+                    }
+                }
+            }
+        },
+
+        getDistance(latitude_1, longitude_1, latitude_2, longitude_2) {
+
+            return this.$map.$setDistanceStraight(latitude_1, longitude_1, latitude_2, longitude_2)
+        },
+
+        //
+
         async facadeImage() {
 
             const facade_image  =   document.getElementById("facade_image_update").files[0];
 
-            console.log(facade_image)
-
             if(facade_image) {
-
-                console.log(222)
 
                 this.client.facade_image_original_name      =   facade_image.name
                 this.client.facade_image                    =   await this.$imageToBase64(facade_image)
@@ -933,37 +850,6 @@ export default {
 
             this.$base64ToImage(image_base64, image_display_div)
         },
-
-        //
-
-        checkClients() {
-
-            this.close_clients  =   []
-
-            let distance        =   0
-
-            for (let i = 0; i < this.all_clients.length; i++) {
-
-                distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
-
-                if(this.all_clients[i].CustomerNameE == "test") {
-
-                    console.log(distance)
-                }
-
-                if(distance <=  this.min_distance) {
-                
-                    this.close_clients.push(this.all_clients[i])
-                }
-            }
-        },
-
-        getDistance(latitude_1, longitude_1, latitude_2, longitude_2) {
-
-            return this.$map.$setDistanceStraight(latitude_1, longitude_1, latitude_2, longitude_2)
-        }
-
-        //
     },
 
     watch : {

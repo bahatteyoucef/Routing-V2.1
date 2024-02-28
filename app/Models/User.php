@@ -157,12 +157,6 @@ class User extends Authenticatable
             $user->assignRole($BackOfficeRole);
         }
 
-        if($request->get("type_user")   ==  "FrontOffice") {
-
-            $FrontOfficeRole = Role::findByName('FrontOffice');
-            $user->assignRole($FrontOfficeRole);
-        }
-
         //
     }
 
@@ -227,13 +221,6 @@ class User extends Authenticatable
 
             $user->syncRoles(['BackOffice']);
         }
-
-        if($request->get("type_user")   ==  "FrontOffice") {
-
-            $user->syncRoles(['FrontOffice']);
-        }
-
-        //
     }       
 
     public static function showUser(int $id) 
@@ -280,14 +267,6 @@ class User extends Authenticatable
 
                 return [];
             }
-
-            else {
-
-                if(Auth::user()->hasRole("FrontOffice")) {
-
-                    return [];
-                }
-            }
         }
     }
 
@@ -319,28 +298,6 @@ class User extends Authenticatable
                 }
 
                 return $liste_route_import_final;
-            }
-
-            else {
-
-                if(Auth::user()->hasRole("FrontOffice")) {
-
-                    foreach ($liste_route_import as $route_import) {
-
-                        # code...
-                        $liste_user_route_import            =   UserRouteImport::where('id_user', Auth::user()->id)->get();
-
-                        foreach ($liste_user_route_import as $user_route_import) {
-
-                            if($user_route_import->id_route_import  ==  $route_import->id) {
-
-                                array_push($liste_route_import_final, $route_import);
-                            }
-                        }
-                    }
-
-                    return $liste_route_import_final;
-                }
             }
         }
 

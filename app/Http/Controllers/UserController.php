@@ -33,23 +33,6 @@ class UserController extends Controller
 
             // 
 
-            if($user->type_user ==  "FrontOffice") {
-
-                $route_import   =   UserRouteImport::where('id_user', $user->id)->first();  
-
-                if($route_import) {
-
-                    $user->id_route_import  =   $route_import->id_route_import;
-                }
-
-                else {
-
-                    $user->id_route_import  =   null;
-                }
-            }
-
-            // 
-
             return response([
                 'user'          => $user                                                ,
                 'access_token'  => Auth::user()->createToken('authToken')->accessToken

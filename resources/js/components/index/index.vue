@@ -39,11 +39,6 @@
                                     <i class="mdi mdi-google-maps mdi-24px p-1" role="button"                                                                   @click="navToMap(route_import.id)">
                                     </i>
                                 </div>
-
-                                <div class="col-1 p-0">
-                                    <i class="mdi mdi-account-multiple mdi-24px p-1" role="button"                                                              @click="getClients(route_import.id)">
-                                    </i>
-                                </div>
                             </div>                       
  
                             <h6 class="card-text">ID    : {{route_import.id}}</h6>
@@ -65,7 +60,7 @@
 
 <script>
 
-import modalRouteImportDelete from "../routes/imports/modalRouteImportDelete.vue"
+import modalRouteImportDelete from "../routes/Permanent/modalRouteImportDelete.vue"
 
 export default {
 
@@ -145,13 +140,6 @@ export default {
         async setRouteImportDelete(id_route_import) {
 
             await this.$refs.modalRouteImportDelete.setRouteImportDelete(id_route_import)
-        },
-
-        //
-
-        getClients(id_route_import) {
-
-            this.$router.push('/route_import/'+id_route_import+'/clients')
         }
     }
 }

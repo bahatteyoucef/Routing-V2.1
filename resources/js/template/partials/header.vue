@@ -95,13 +95,6 @@
 
                 <ul tabindex="-1" class="dropdown-menu dropdown-menu-right" id="profile_header_list">
 
-                    <li v-show="show_install_button"  role="presentation" class="preview-item mt-1" id="installButton">
-                        <span  role="button" class="dropdown-item">
-                          <i class="mdi mdi-download mr-2 text_light_purple"></i>
-                          Install Application
-                        </span>
-                    </li>
-
                     <li role="presentation" class="preview-item mt-1" @click="showProfile()">
                         <span  role="button" class="dropdown-item">
                           <i class="mdi mdi-account mr-2 text_light_purple"></i>
@@ -150,9 +143,7 @@ export default {
 
           route_import_existe       :   false ,
 
-          user                      :   {}    ,
-
-          show_install_button       :   false
+          user                      :   {}
       }
     },
 
@@ -183,8 +174,6 @@ export default {
 
           await this.fetchMaps()
         })
-
-        this.pwaFunction()
     },  
 
     methods: {
@@ -194,51 +183,6 @@ export default {
           "setAccessTokenAction"          ,
           "setIsAuthentificatedAction"    
         ]),
-
-        //
-
-        pwaFunction() {
-
-          let deferredPrompt;
-
-          window.addEventListener('beforeinstallprompt', (e) => {
-
-              // Prevent the browser's default prompt from showing
-              e.preventDefault();
-
-              // 
-              deferredPrompt = e;
-
-              console.log(e)
-
-              this.show_install_button  = true
-          });
-
-          const installButton = document.getElementById('installButton');
-
-          if(installButton) {
-
-            installButton.addEventListener('click', async () => {
-
-                this.$showLoadingPage()
-
-                if (deferredPrompt !== null) {
-
-                    console.log(deferredPrompt)
-
-                    deferredPrompt.prompt();
-
-                    const { outcome } = await deferredPrompt.userChoice;
-
-                    if (outcome === 'accepted') {
-                        deferredPrompt = null;
-                    }
-                }
-
-                this.$hideLoadingPage()
-            });
-          }
-        },
 
         //
 

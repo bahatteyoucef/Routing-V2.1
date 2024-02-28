@@ -104,21 +104,6 @@
                             </div>
                         </div>
 
-                        <div v-if="$isRole('FrontOffice')" class="mb-3">
-                            <label for="status"             class="form-label">Status</label>
-                            <select                         class="form-select"         id="status"                 v-model="client.status">
-                                <option value="pending" selected>pending</option>
-                                <option value="nonvalidated">nonvalidated</option>
-                            </select>
-
-                            <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
-                                <div class="form-group">
-                                    <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
-                                    <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
-                                </div>
-                            </div>
-                        </div>
-
                         <!--  -->
 
                         <div class="mb-3">
@@ -262,11 +247,6 @@ export default {
         if(this.$isRole("Super Admin")||this.$isRole("BackOffice")) {
 
             this.client.status  =   "validated"
-        }
-
-        if(this.$isRole("FrontOffice")) {
-
-            this.client.status  =   "pending"
         }
 
         this.clearData("#addClientModal")
@@ -428,11 +408,6 @@ export default {
 
             this.setCoords(client)
             this.getComboData()  
-
-            if(this.$isRole("FrontOffice")) {
-
-                this.checkClients()
-            }
         },
 
         setCoords(client) {
