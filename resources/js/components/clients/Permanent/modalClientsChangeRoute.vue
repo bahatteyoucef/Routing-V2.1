@@ -288,11 +288,19 @@ export default {
                 }
             }
 
+            //
+
             let formData = new FormData();
 
-            formData.append("clients", JSON.stringify(clients_copy))
+            let clients     =   clients_copy.map(obj => { 
+                return {    id          :   obj.id      ,   
+                            DistrictNo  :   obj.DistrictNo  ,   DistrictNameE   :   obj.DistrictNameE   ,   
+                            CityNo      :   obj.CityNo      ,   CityNameE       :   obj.CityNameE       ,   
+                            JPlan       :   obj.JPlan       ,   Journee         :   obj.Journee         };});
 
-            console.log(clients_copy)
+            //
+
+            formData.append("clients", JSON.stringify(clients))
 
             const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/change_route",   formData)
             console.log(res)

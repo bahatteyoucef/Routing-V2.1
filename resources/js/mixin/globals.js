@@ -952,6 +952,22 @@ export default {
                 );
             });
 
+        },
+
+        //
+
+        $variableSize(formData) {
+
+            // Serialize the FormData object
+            let serializedFormData = JSON.stringify(Object.fromEntries(formData));
+
+            // Calculate the size of the serialized string in bytes
+            let byteSize = new Blob([serializedFormData]).size;
+
+            // Convert bytes to kilobytes
+            let kilobyteSize = byteSize / 1024;
+
+            console.log('Size of FormData in KB:', kilobyteSize.toFixed(2), 'KB');
         }
     }
 }

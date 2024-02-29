@@ -742,7 +742,11 @@ export default {
 
                 let formData    =   new FormData();
 
-                formData.append("data"  ,   JSON.stringify(this.clients))
+                let clients     =   this.clients.map(obj => { return { id   :   obj.id  ,   JPlan   :   obj.JPlan   ,   Journee :   obj.Journee };});
+
+                //
+
+                formData.append("data"  ,   JSON.stringify(clients))
 
                 const res                   =   await this.$callApi("post"  ,   "/clients_tempo/resume/update", formData)
                 console.log(res.data)
@@ -777,7 +781,11 @@ export default {
 
                 let formData    =   new FormData();
 
-                formData.append("data"      ,   JSON.stringify(this.clients))
+                let clients     =   this.clients.map(obj => { return { id   :   obj.id  ,   JPlan   :   obj.JPlan   ,   Journee :   obj.Journee };});
+
+                //
+
+                formData.append("data"      ,   JSON.stringify(clients))
 
                 const res                   =   await this.$callApi("post"  ,   "/clients/resume/update",  formData)
                 console.log(res.data)
