@@ -120,7 +120,9 @@ export default {
 
             resume_liste_journey_plan   :   null    ,
 
-            clients                     :   []
+            clients                     :   []      ,
+
+            clients_changed_routes             :   []
         }
     },
 
@@ -740,9 +742,13 @@ export default {
 
                 let formData    =   new FormData();
 
-                formData.append("data"  ,   JSON.stringify(this.clients))
+                let clients     =   this.clients.map(obj => { return { id   :   obj.id  ,   JPlan   :   obj.JPlan   ,   Journee :   obj.Journee };});
 
-                const res                   =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.id_route_import_tempo+"/clients_tempo/update", formData)
+                //
+
+                formData.append("data"  ,   JSON.stringify(clients))
+
+                const res                   =   await this.$callApi("post"  ,   "/clients_tempo/resume/update", formData)
                 console.log(res.data)
 
                 if(res.status===200){
@@ -775,9 +781,13 @@ export default {
 
                 let formData    =   new FormData();
 
-                formData.append("data"  ,   JSON.stringify(this.clients))
+                let clients     =   this.clients.map(obj => { return { id   :   obj.id  ,   JPlan   :   obj.JPlan   ,   Journee :   obj.Journee };});
 
-                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/update",  formData)
+                //
+
+                formData.append("data"      ,   JSON.stringify(clients))
+
+                const res                   =   await this.$callApi("post"  ,   "/clients/resume/update",  formData)
                 console.log(res.data)
 
                 if(res.status===200){

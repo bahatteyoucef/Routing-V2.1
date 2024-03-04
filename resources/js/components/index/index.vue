@@ -98,17 +98,29 @@ export default {
 
                 if(this.$connectedToInternet) {
 
-                    this.$callApi("post",    "/route_import", null)
-                    .then((res)=> {
+                    if(this.$isRole("FrontOffice")) {
 
-                        this.liste_route_import     =   res.data
+                        this.$callApi("post",   "/route_import/index",      null)
+                        .then((res)=> {
 
-                        if(this.$isRole("FrontOffice")) {
+                            this.liste_route_import     =   res.data
+                        })
+                    }
 
-                            // Add to indexedDB
-                            this.$indexedDB.$setListeRouteImport(this.liste_route_import)
-                        }
-                    })
+                    if((this.$isRole("BackOffice"))||(this.$isRole("Super Admin"))) {
+
+                        this.$callApi("post",    "/route_import/index",     null)
+                        .then((res)=> {
+
+                            this.liste_route_import     =   res.data
+
+                            if(this.$isRole("FrontOffice")) {
+
+                                // Add to indexedDB
+                                this.$indexedDB.$setListeRouteImport(this.liste_route_import)
+                            }
+                        })
+                    }
                 }
 
                 else {

@@ -239,29 +239,14 @@ class User extends Authenticatable
     public static function showUser(int $id) 
     {
     
-        $user       =   DB::table('users')
-                            ->where('users.id',$id)
+        //
+        $user                       =   User::find($id);
 
-                            ->select([ 
-                                'users.id                   as  id'                 , 
-
-                                'users.nom                  as  nom'                ,
-                                'users.email                as  email'              ,
-
-                                'users.tel                  as  tel'                ,
-                                'users.company              as  company'            ,
-
-                                'users.type_user            as  type_user'          ,
-
-                                'users.max_route_import     as  max_route_import'
-                            ])
-
-                            ->first();
-
+        //
         $user->liste_route_import   =   DB::table('users_route_import')
-                                            ->where('users_route_import.id_user', $user->id) 
-                                            ->pluck('users_route_import.id_route_import') 
-                                            ->toArray();
+                                        ->where('users_route_import.id_user', $user->id) 
+                                        ->pluck('users_route_import.id_route_import') 
+                                        ->toArray();
 
         return $user;
     }

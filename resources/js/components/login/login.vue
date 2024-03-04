@@ -113,6 +113,12 @@
                         this.setAccessTokenAction(response.data.access_token)
                         this.setIsAuthentificatedAction(true)
 
+                        if(this.$isRole("FrontOffice")) {
+
+                            // Set Local DB
+                            await this.$indexedDB.$indexedDB_intialiazeSetDATA()
+                        }
+
                         // Route To index
                         this.$router.push('/')
                     }

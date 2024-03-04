@@ -193,6 +193,42 @@ class ClientTempo extends Model
 
     //
 
+    public static function updateResumeClients(Request $request) {
+
+        $clients    =   json_decode($request->get("data"));
+
+        foreach ($clients as $client_tempo) {
+
+            // Client
+
+            $client                             =   ClientTempo::find($client_tempo->id);
+
+            if($client_tempo->JPlan     !=  null) {
+
+                $client->JPlan                  =   $client_tempo->JPlan;
+            }
+
+            else {
+
+                $client->JPlan                  =   "";
+            }
+
+            if($client_tempo->Journee   !=  null) {
+
+                $client->Journee                =   $client_tempo->Journee;
+            }
+
+            else {
+
+                $client->Journee                =   "";
+            }
+
+            $client->save();
+        }
+    }
+
+    //
+
     public static function deleteClients() {
 
         ClientTempo::where('owner', Auth::user()->id)->delete();

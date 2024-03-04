@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
 use App\Models\RouteImport;
 use App\Models\RTMWillaya;
 use App\Models\User;
@@ -18,6 +19,23 @@ class RouteImportController extends Controller
         try {
 
             $liste_route_import     =   RouteImport::indexRouteImport();
+            return User::filterRouteImport($liste_route_import);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    public function combo()
+    {
+
+        try {
+
+            $liste_route_import     =   RouteImport::comboRouteImport();
             return User::filterRouteImport($liste_route_import);
         }
 
@@ -122,6 +140,23 @@ class RouteImportController extends Controller
         try {
 
             $route_import   =   RouteImport::showRouteImport($id);
+            return $route_import;
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    public function indexedDBShow(int $id)
+    {
+
+        try {
+
+            $route_import   =   RouteImport::indexedDBShowRouteImport($id);
             return $route_import;
         }
 
@@ -412,5 +447,41 @@ class RouteImportController extends Controller
             ],422);
         }
 
+    }
+
+    //
+
+    public function headerRouteImports()
+    {
+
+        try {
+
+            $liste_route_import     =   RouteImport::headerRouteImports();
+            return User::filterRouteImport($liste_route_import);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    public function indexRouteImports()
+    {
+
+        try {
+
+            $liste_route_import     =   RouteImport::indexRouteImports();
+            return User::filterRouteImport($liste_route_import);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
     }
 }

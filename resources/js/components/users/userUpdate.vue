@@ -15,22 +15,22 @@
 
                         <div class="mb-3">
                             <label for="nom"                class="form-label">Name : </label>
-                            <input type="text"              class="form-control"        id="nom"           v-model="user.nom">
+                            <input type="text"              class="form-control"        id="nom"            v-model="user.nom">
                         </div>
 
                         <div class="mb-3">
                             <label for="email"              class="form-label">Email : </label>
-                            <input type="text"              class="form-control"        id="email"           v-model="user.email">
+                            <input type="text"              class="form-control"        id="email"          v-model="user.email">
                         </div>
 
                         <div class="mb-3">
                             <label for="tel"                class="form-label">Tel : </label>
-                            <input type="text"              class="form-control"        id="tel"           v-model="user.tel">
+                            <input type="text"              class="form-control"        id="tel"            v-model="user.tel">
                         </div>
 
                         <div class="mb-3">
                             <label for="company"            class="form-label">Company : </label>
-                            <input type="text"              class="form-control"        id="company"           v-model="user.company">
+                            <input type="text"              class="form-control"        id="company"        v-model="user.company">
                         </div>
 
                         <!--  -->
@@ -172,7 +172,7 @@ export default {
 
         async getComboData() {
 
-            const res               =   await this.$callApi("post",       "/route_import",        null)
+            const res               =   await this.$callApi("post",       "/route_import/combo",        null)
             console.log(res.data)
 
             let liste_route_import  =   res.data

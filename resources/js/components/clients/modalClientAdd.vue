@@ -429,10 +429,10 @@ export default {
             this.setCoords(client)
             this.getComboData()  
 
-            if(this.$isRole("FrontOffice")) {
+            // if(this.$isRole("FrontOffice")) {
 
                 this.checkClients()
-            }
+            // }
         },
 
         setCoords(client) {

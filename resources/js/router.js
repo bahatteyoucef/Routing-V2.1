@@ -1,41 +1,10 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHistory }   from    "vue-router";
 
 // mixin
-import Authentification         from    "./mixin/authentification"
+import Authentification                     from    "./mixin/authentification"
 
 // store
-import store                    from    "./store/store"
-
-// index
-import Index                    from    "./components/index/index.vue"
-
-// login
-import Login                    from    "./components/login/login.vue"
-
-// users
-import Users                    from    "./components/users/index.vue"
-import ShowUsers                from    "./components/users/show.vue"
-import UserUpdate               from    "./components/users/UserUpdate.vue"
-import changePassword           from    "./components/users/changePassword.vue"
-
-// RouteImportTempo
-import RouteImportTempo         from    "./components/routes/imports/routeImportTempo.vue"
-
-// RouteImportClients
-import RouteImportClients       from    "./components/routes/routeImportClients.vue"
-
-//
-
-import RouteImportAdd                       from    "./components/routes/imports/RouteImportAdd.vue"
-import ParRouteImportDetails                from    "./components/routes/obs/ParRouteImportDetails.vue"
-import ParRouteImportFrontOfficeDetails     from    "./components/routes/obs/ParRouteImportFrontOfficeDetails.vue"
-
-// 
-
-import ClientsAdd                           from    "./components/clients/ClientAdd.vue"
-import ClientsUpdate                        from    "./components/clients/ClientUpdate.vue"
-
-//
+import store                                from    "./store/store"
 
 // Declare a variable at the top of your router file
 let initialRoute  =   true
@@ -47,43 +16,43 @@ const routes = [
     // Index
     {
         path        : "/",
-        component   : Index
+        component   : () => import('./components/index/index.vue')
     },
 
     // Login
     {
         path        : "/login",
-        component   : Login
+        component   : () => import('./components/login/login.vue')
     },
 
     // Users
     {
         path        : "/users",
-        component   : Users
+        component   : () => import('./components/users/index.vue')
     },
 
     // ShowUsers
     {
         path        : "/users/:id_user/show",
-        component   : ShowUsers
+        component   : () => import('./components/users/show.vue')
     },
 
     // UserUpdate
     {
         path        : "/users/:id_user/update",
-        component   : UserUpdate        
+        component   : () => import('./components/users/UserUpdate.vue')
     },
 
     // UserUpdate Password
     {
         path        : "/users/:id_user/update/password",
-        component   : changePassword        
+        component   : () => import('./components/users/changePassword.vue')
     },
 
     // Route Import Clients
     {
         path        : "/route_import/:id_route_import/clients",
-        component   : RouteImportClients
+        component   : () => import('./components/routes/routeImportClients.vue')
     },
 
     // 
@@ -91,13 +60,13 @@ const routes = [
     // ClientsAdd
     {
         path        : "/route_import/:id_route_import/clients/add/:latitude/:longitude",
-        component   : ClientsAdd
+        component   : () => import('./components/clients/ClientAdd.vue')
     },
 
     // ClientsUpdate
     {
         path        : "/route_import/:id_route_import/clients/:id_client/update",
-        component   : ClientsUpdate
+        component   : () => import('./components/clients/ClientUpdate.vue')
     },
 
     //  //  //  //  //  OBS     //  //  //
@@ -107,25 +76,25 @@ const routes = [
     // Imports Tempo
     {
         path        : "/route/obs/route_import_tempo",
-        component   : RouteImportTempo
+        component   : () => import('./components/routes/imports/routeImportTempo.vue')
     },
 
     // Imports Add
     {
         path        : "/route/obs/route_import/add",
-        component   : RouteImportAdd
+        component   : () => import('./components/routes/imports/RouteImportAdd.vue')
     },
 
     // Imports Details
     {
         path        : "/route/obs/route_import/:id_route_import/details",
-        component   : ParRouteImportDetails
+        component   : () => import('./components/routes/obs/ParRouteImportDetails.vue')
     },
 
     // Imports ParRouteImportFrontOfficeDetails Details
     {
         path        : "/route/frontoffice/obs/route_import/:id_route_import/details",
-        component   : ParRouteImportFrontOfficeDetails
+        component   : () => import('./components/routes/obs/ParRouteImportFrontOfficeDetails.vue')
     },
 ];
 

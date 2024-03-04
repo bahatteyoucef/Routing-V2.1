@@ -29,6 +29,24 @@
         </section>
     </div>
 
+    <!-- Install Banner -->
+    <div v-if="$isRole('FrontOffice')" v-show="show_install_button" id="BlockInstall" class="w-100 p-3">
+        <div class="row">
+            <div @click="closeInstallBanner()"  class="col-2 p-0 d-flex justify-content-center align-items-center">
+                <i class="mdi mdi-close font-weight-bold text-light" style="font-size: 30px;"></i>
+            </div>
+
+            <div class="col-7 text-light p-0">
+                <div><h5>Swalis Survey</h5></div>
+                <div><span>Get our app for better experience.</span></div>
+            </div>
+
+            <div class="col-3 p-0 d-flex justify-content-center align-items-center">
+                <button id="BlockInstallButton" class="btn btn-light"><b>Install</b></button>
+            </div>
+        </div>
+    </div>
+
 </template>
 
 <script>
@@ -46,7 +64,11 @@
                 isAuthentificated       :   false   ,
 
                 component_login         :   false   ,
-                component_dashboard     :   false
+                component_dashboard     :   false   ,
+
+                //
+
+                show_install_button     :   false
             }
         },
 
@@ -66,9 +88,6 @@
 
         async mounted() {
 
-            // Set lOCAL DB
-            await this.$indexedDB.$indexedDB_intialiazeSetDATA()
-
             // 
             this.isAuthentificated      =   await this.checkIfUserIsAuthentificated()
 
@@ -77,6 +96,17 @@
                 this.user   =   this.getUser
 
                 if(this.user.nom) {
+
+                    console.log(this.user.nom)
+                    console.log(this.$isRole("FrontOffice"))
+
+                    if(this.$isRole("FrontOffice")) {
+
+                        // Set Local DB
+                        await this.$indexedDB.$indexedDB_intialiazeSetDATA()
+                    }
+
+                    //
 
                     this.component_login        =   false
                     this.component_dashboard    =   true
@@ -103,6 +133,8 @@
                 // Router
                 this.$goTo("/login")
             }
+
+            this.pwaFunction()
         },
 
         methods : {
@@ -112,6 +144,8 @@
                 "setAccessTokenAction"          ,
                 "setIsAuthentificatedAction"    
             ]),
+
+            //
 
             async checkIfUserIsAuthentificated() {
 
@@ -124,6 +158,66 @@
                 }
 
                 return true
+            },
+
+            pwaFunction() {
+
+                setTimeout(() => {
+
+                    let deferredPrompt;
+
+                    window.addEventListener('beforeinstallprompt', async (e) => {
+
+                        // Prevent the browser's default prompt from showing
+                        e.preventDefault();
+
+                        // 
+                        deferredPrompt = e;
+
+                        this.show_install_button  = true
+                
+                        await this.$nextTick()
+
+                        //
+                        console.log("test_1")
+                    });
+
+                    console.log("test_2")
+
+                    const BlockInstallButton = document.getElementById('BlockInstallButton');
+                    console.log(BlockInstallButton)
+
+                    if(BlockInstallButton) {
+
+                        BlockInstallButton.addEventListener('click', async () => {
+
+                            this.$showLoadingPage()
+
+                            console.log(22222)
+
+                            if (deferredPrompt !== null) {
+
+                                deferredPrompt.prompt();
+
+                                const { outcome } = await deferredPrompt.userChoice;
+
+                                if (outcome === 'accepted') {
+                                    deferredPrompt = null;
+                                }
+                            }
+
+                            this.$hideLoadingPage()
+                        });
+                    }
+
+                }, 555)
+            },
+
+            closeInstallBanner() {
+
+                const BlockInstall  =   document.getElementById("BlockInstall")
+
+                BlockInstall.remove()
             }
         },
 

@@ -110,6 +110,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/route_import_tempo/{id_route_import_tempo}/clients_tempo/{id}/delete'                 ,   [ClientTempoController::class           , 'deleteClient'                            ]);
 
     Route::post('/route_import_tempo/{id_route_import_tempo}/clients_tempo/update'                      ,   [ClientTempoController::class           , 'updateClients'                           ]);
+    Route::post('/clients_tempo/resume/update'                                                          ,   [ClientTempoController::class           , 'updateResumeClients'                     ]);
 
     Route::post('/route_import_tempo/{id_route_import_tempo}/clients_tempo/doubles'                     ,   [ClientTempoController::class           , 'getDoublesClients'                       ]);
     Route::post('/route_import_tempo/{id_route_import_tempo}/clients_tempo/doubles/Tel'                 ,   [ClientTempoController::class           , 'getDoublesTelClients'                    ]);
@@ -124,12 +125,18 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/route_import/set_willayas_cites'                                                      ,   [RouteImportController::class           , 'setWillayasCites'                        ]);    
 
     Route::post('/route_import'                                                                         ,   [RouteImportController::class           , 'index'                                   ]);
+    Route::post('/route_import/combo'                                                                   ,   [RouteImportController::class           , 'combo'                                   ]);
     Route::post('/route_import/store'                                                                   ,   [RouteImportController::class           , 'store'                                   ]);
     Route::post('/route_import/{id}/update'                                                             ,   [RouteImportController::class           , 'update'                                  ]);
     Route::post('/route_import/{id}/delete'                                                             ,   [RouteImportController::class           , 'delete'                                  ]);
+    
     Route::post('/route_import/{id}/show'                                                               ,   [RouteImportController::class           , 'show'                                    ]);
+    Route::post('/route_import/{id}/indexedDB/show'                                                     ,   [RouteImportController::class           , 'indexedDBShow'                           ]);
 
     Route::post('/route_import/{id}/clients'                                                            ,   [RouteImportController::class           , 'clients'                                 ]);
+
+    Route::post('/route_import/header'                                                                  ,   [RouteImportController::class           , 'headerRouteImports'                      ]);
+    Route::post('/route_import/index'                                                                   ,   [RouteImportController::class           , 'indexRouteImports'                       ]);
 
     //
 
@@ -164,6 +171,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/route_import/{id_route_import}/clients/change_route'                                  ,   [ClientController::class                , 'changeRouteClients'                      ]);
     Route::post('/route_import/{id_route_import}/clients/update'                                        ,   [ClientController::class                , 'updateClients'                           ]);
+    Route::post('/clients/resume/update'                                                                ,   [ClientController::class                , 'updateResumeClients'                     ]);
 
     Route::post('/route/obs/route_import/{id}/details'                                                  ,   [RouteImportController::class           , 'obsDetailsRouteImport'                   ]);
 

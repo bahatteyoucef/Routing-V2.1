@@ -40,6 +40,34 @@ class RouteImport extends Model
         return $liste_route_import;
     }
 
+    public static function headerRouteImports()
+    {
+
+        $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
+
+        return $liste_route_import;
+    }
+
+    public static function indexRouteImports()
+    {
+
+        $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
+
+        return $liste_route_import;
+    }
+
+    //
+
+    public static function comboRouteImport()
+    {
+
+        $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
+
+        return $liste_route_import;
+    }
+
+    //
+
     public static function validateStore(Request $request) 
     {
 
@@ -184,6 +212,16 @@ class RouteImport extends Model
         $route_import->clients              =   Client::where("id_route_import", $id)->join('users', 'clients.owner', '=', 'users.id')->select('clients.*', 'users.nom as owner_name')->get();
         $route_import->liste_journey_plan   =   JourneyPlan::where("id_route_import", $id)->get();
         $route_import->liste_journee        =   Journee::where("id_route_import", $id)->get();
+
+        return $route_import;
+    }
+
+    public static function indexedDBShowRouteImport(int $id)
+    {
+
+        $route_import                       =   RouteImport::find($id);
+
+        $route_import->clients              =   Client::where("id_route_import", $id)->join('users', 'clients.owner', '=', 'users.id')->select('clients.*', 'users.nom as owner_name')->get();
 
         return $route_import;
     }
@@ -605,21 +643,6 @@ class RouteImport extends Model
             //
 
             $client->save();
-        }
-
-        //
-
-        $validated_clients    =   json_decode($request->get("validated_clients"));
-
-        foreach ($validated_clients as $client_elem) {
-
-            $client         =   Client::find($client_elem->id);
-
-            if($client) {
-
-                $client->status     =   "validated";
-                $client->save();
-            }
         }
 
         //

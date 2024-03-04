@@ -217,7 +217,7 @@ export default {
 
         async getComboData() {
 
-            const res               =   await this.$callApi("post",       "/route_import",        null)
+            const res               =   await this.$callApi("post",       "/route_import/combo",        null)
 
             let liste_route_import  =   res.data
 

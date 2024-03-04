@@ -1,4 +1,8 @@
-import axios        from 'axios'
+// axios
+import axios        from    "axios"
+
+// store
+import store        from    "../store/store"
 
 export default class MobileClientIndexedDB {
     
@@ -39,15 +43,6 @@ export default class MobileClientIndexedDB {
 
         //
 
-        this.object_validated_clients       =   []
-
-        this.transaction_validated_clients  =   null
-        this.store_validated_clients        =   null
-
-        this.data_validated_clients         =   null
-
-        //
-
         this.object_deleted_clients         =   []
 
         this.transaction_deleted_clients    =   null
@@ -72,7 +67,9 @@ export default class MobileClientIndexedDB {
 
     async $indexedDB_intialiazeSetDATA() {
 
-        this.indexedDB =   window.indexedDB    ||  window.mozIndexedDB ||  window.webkitIndexedDB  ||  window.msIndexedDB  ||  window.shimIndexedDB
+        console.log(123)
+
+        this.indexedDB      =   window.indexedDB    ||  window.mozIndexedDB ||  window.webkitIndexedDB  ||  window.msIndexedDB  ||  window.shimIndexedDB
 
         if (!this.indexedDB) {
 
@@ -86,10 +83,12 @@ export default class MobileClientIndexedDB {
     async $indexedDB_setDATA() {
         this.openRequestPlanRTM    =   this.indexedDB.open("route_import_db"   , 1);
 
+        console.log(456)
+
         return new Promise((resolve, reject) => {
 
             // CASE 1 : DB New (not existe)
-            this.openRequestPlanRTM.onupgradeneeded     =   (event)  =>  {
+            this.openRequestPlanRTM.onupgradeneeded     =   async (event)   =>  {
 
                 // DB Config
                 this.route_import_db            =   event.target.result
@@ -98,7 +97,6 @@ export default class MobileClientIndexedDB {
                 this.object_route_import        =   this.route_import_db.createObjectStore("route_import"       ,   { keyPath: "id"         })
                 this.object_updated_clients     =   this.route_import_db.createObjectStore("updated_clients"    ,   { keyPath: "id"         })
                 this.object_added_clients       =   this.route_import_db.createObjectStore("added_clients"      ,   { keyPath: "id"         })
-                this.object_validated_clients   =   this.route_import_db.createObjectStore("validated_clients"  ,   { keyPath: "id"         })
                 this.object_deleted_clients     =   this.route_import_db.createObjectStore("deleted_clients"    ,   { keyPath: "id"         })
 
                 this.object_willayas            =   this.route_import_db.createObjectStore("willayas"           ,   { keyPath: "DistrictNo" })
@@ -107,7 +105,7 @@ export default class MobileClientIndexedDB {
             };
 
             // CASE 2 : DB EXISTE 
-            this.openRequestPlanRTM.onsuccess           =   async (event)  =>  {
+            this.openRequestPlanRTM.onsuccess           =   async (event)   =>  {
 
                 this.route_import_db            =   event.target.result
           
@@ -134,31 +132,29 @@ export default class MobileClientIndexedDB {
 
             let updated_clients                     =   await this.$getUpdatedClients()
             let added_clients                       =   await this.$getAddedClients()
-            let validated_clients                   =   await this.$getValidatedClients()
             let deleted_clients                     =   await this.$getDeletedClients()
 
             let formData = new FormData();
 
             formData.append("updated_clients"       ,   JSON.stringify(updated_clients))
             formData.append("added_clients"         ,   JSON.stringify(added_clients))
-            formData.append("validated_clients"     ,   JSON.stringify(validated_clients))
             formData.append("deleted_clients"       ,   JSON.stringify(deleted_clients))
 
-            const res   = await this.$callApi('post' ,   '/indexedDB/sync'  ,   formData)         
-            console.log(res)        
+            const res   = await this.$callApi('post'    ,   '/indexedDB/sync'   ,   formData)         
+            console.log(res)
 
             if(res.status  ==  200) {
 
                 //
                 this.$clearListeRouteImport()
-                this.$clearWillayas()
+                // this.$clearWillayas()
 
                 //
                 this.$clearUpdatedClients()
                 this.$clearAddedClients()
-                this.$clearValidatedClients()
                 this.$clearDeletedClients()
 
+                //
                 await this.$getListeRouteImportFromDB()
                 await this.$getWillayasFromDB()
 
@@ -169,14 +165,14 @@ export default class MobileClientIndexedDB {
 
     async $getListeRouteImportFromDB() {
 
+        console.log(store.getters[`authentification/getUser`].id_route_import)
+
         // Fill Liste Route Import
-        axios.post("/route_import", null)
+        axios.post("/route_import/"+store.getters[`authentification/getUser`].id_route_import+"/indexedDB/show",    null)
         .then((res)=> {
 
-            console.log(res)
-
             // Add to indexedDB
-            this.$setListeRouteImport(res.data)
+            this.$setListeRouteImport([res.data])
         })
     }
 
@@ -191,6 +187,8 @@ export default class MobileClientIndexedDB {
                 // Fill Liste Willayas
                 axios.post("/rtm_willayas/rtm_cites/details", null)
                 .then((res)=> {
+
+                    console.log(res)
 
                     // Add to indexedDB
                     this.$setWillayas(res.data)
@@ -721,105 +719,6 @@ export default class MobileClientIndexedDB {
         this.store_deleted_clients                  =   this.transaction_deleted_clients.objectStore("deleted_clients")
 
         this.store_deleted_clients.clear()
-    }
-
-    //
-
-    // Validated Clients
-
-    async $setValidatedClients(client, id_route_import) {
-
-        // this is an old Client
-        if(!isNaN(client.id)) {
-
-            // Set Reponse
-            this.transaction_validated_clients          =   this.route_import_db.transaction("validated_clients", "readwrite")
-            this.store_validated_clients                =   this.transaction_validated_clients.objectStore("validated_clients")
-
-            this.store_validated_clients.put({...client})
-
-            // Verify if he exists in updated clients table
-            this.transaction_updated_clients            =   this.route_import_db.transaction("updated_clients", "readwrite")
-            this.store_updated_clients                  =   this.transaction_updated_clients.objectStore("updated_clients")
-
-            this.store_updated_clients.delete(client.id)
-        }
-
-        // this is Added Client
-        else {
-
-            // Set Reponse
-            this.transaction_added_clients              =   this.route_import_db.transaction("added_clients", "readwrite")
-            this.store_added_clients                    =   this.transaction_added_clients.objectStore("added_clients")
-
-            client.status                                 =   "validated"
-
-            this.store_added_clients.put({...client})
-        }
-
-        // Set Client in Route Import
-        this.transaction_route_import                   =   this.route_import_db.transaction("route_import", "readwrite")
-        this.store_route_import                         =   this.transaction_route_import.objectStore("route_import")
-
-        let route_import                                =   await this.$getRouteImport(id_route_import)
-
-        for (let i = 0; i < route_import.clients.length; i++) {
-
-            if(route_import.clients[i].id   ==  client.id) {
-
-                route_import.clients[i].status    =   "validated"
-                break;
-            }
-        }
-
-        this.store_route_import.put(route_import)
-    }
-
-    async $getValidatedClients()  {
-
-        return new Promise(async (resolve, error) => {
-
-            let results                                 =   []
-
-            this.transaction_validated_clients          =   this.route_import_db.transaction("validated_clients", "readwrite")
-            this.store_validated_clients                =   this.transaction_validated_clients.objectStore("validated_clients")
-
-            let liste_validated_clients                 =   this.store_validated_clients.openCursor()
-
-            results                                     =   await this.$fillListeValidatedClients(liste_validated_clients)
-
-            this.data_validated_clients                   =   results
-            resolve(results)
-        })     
-    }
-
-    async $fillListeValidatedClients(liste_validated_clients) {
-
-        let results =   []
-
-        return new Promise((resolve, error) => {
-
-            liste_validated_clients.onsuccess =    function (e)    {
-                var cursor = e.target.result;
-
-                if (cursor) {
-                    results.push(cursor.value) 
-                    cursor.continue();
-                }
-
-                else {
-                    resolve(results)
-                }
-            };
-
-        })
-    }
-
-    $clearValidatedClients() {    
-        this.transaction_validated_clients          =   this.route_import_db.transaction("validated_clients", "readwrite")
-        this.store_validated_clients                =   this.transaction_validated_clients.objectStore("validated_clients")
-
-        this.store_validated_clients.clear()
     }
 
     //

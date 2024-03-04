@@ -403,11 +403,25 @@ class Client extends Model
 
     public static function showClient(Request $request, int $id_route_import, int $id) {
 
-        return  Client::where("clients.id_route_import", $id_route_import)
-                ->where("clients.id", $id)
-                ->join('users', 'clients.owner', '=', 'users.id')
-                ->select('clients.*', 'users.nom as owner_name')
-                ->first();
+        // return  Client::where("clients.id_route_import", $id_route_import)
+        //         ->where("clients.id", $id)
+        //         ->join('users', 'clients.owner', '=', 'users.id')
+        //         ->select('clients.*', 'users.nom as owner_name')
+        //         ->first();
+        
+        $client =   Client::find($id);
+        
+        if($client) {
+            
+            $user   =   User::find($client->id);
+            
+            if($user) {
+                
+                $client->owner_name     =   $user->nom;
+            }            
+        }
+        
+        return $client;
     }
 
     //
@@ -419,6 +433,42 @@ class Client extends Model
         if($client) {
 
             $client->status         =   "validated";
+            $client->save();
+        }
+    }
+
+    //
+
+    public static function updateResumeClients(Request $request) {
+
+        $clients    =   json_decode($request->get("data"));
+
+        foreach ($clients as $client_tempo) {
+
+            // Client
+
+            $client                             =   Client::find($client_tempo->id);
+
+            if($client_tempo->JPlan     !=  null) {
+    
+                $client->JPlan                      =   $client_tempo->JPlan;
+            }
+
+            else {
+
+                $client->JPlan                      =   "";
+            }
+
+            if($client_tempo->Journee   !=  null) {
+
+                $client->Journee                    =   $client_tempo->Journee;
+            }
+
+            else {
+
+                $client->Journee                    =   "";
+            }
+
             $client->save();
         }
     }

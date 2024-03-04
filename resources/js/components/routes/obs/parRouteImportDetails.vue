@@ -63,6 +63,7 @@
                         </div>
                     </div>
 
+                    <!--  -->
                     <div v-if="$isRole('FrontOffice')" class="col p-0 ml-1">
                         <div id="toggle_div">
 

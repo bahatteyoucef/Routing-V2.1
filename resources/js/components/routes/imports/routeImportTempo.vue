@@ -133,7 +133,7 @@
 
                         <!--  -->
 
-                        <modalResume                    ref="modalResume"                       :key="Date.now()"       :type="'temporary'"                                                 :id_route_import_tempo="route_import.id_route_import_tempo"     ></modalResume>
+                        <modalResume                    ref="modalResume"                       :key="route_import"     :type="'temporary'"                                                 :id_route_import_tempo="route_import.id_route_import_tempo"     ></modalResume>
                         <modalValidate                  ref="modalValidate"                                                                                                                 :id_route_import_tempo="route_import.id_route_import_tempo"     ></modalValidate>
 
                         <!--  -->
