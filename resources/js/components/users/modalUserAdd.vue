@@ -49,7 +49,7 @@
 
                         <!--  -->
 
-                        <div class="mb-3">
+                        <div class="mb-3"   v-if="user.type_user    ==  'BackOffice'">
 
                             <label for="Route Imports"               class="form-label">Route Imports</label>
 
@@ -62,6 +62,34 @@
                                 :options            =   "liste_route_import"
                                 mode                =   "tags" 
                                 placeholder         =   "Select Maps"
+                                class               =   "mt-1"
+
+                                :close-on-select    =   "false"
+                                :searchable         =   "true"
+                                :create-option      =   "true"
+
+                                :canDeselect        =   "true"
+                                :canClear           =   "true"
+                                :allowAbsent        =   "false"
+                            />
+
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mb-3"   v-if="user.type_user    ==  'FrontOffice'">
+
+                            <label for="Route Imports"               class="form-label">Route Imports</label>
+
+                            <Multiselect
+                                @select             =   "setListeRouteImport()"
+                                @deselect           =   "setListeRouteImport()"
+                                @clear              =   "setListeRouteImport()"
+
+                                v-model             =   "user.selected_route_import"
+                                :options            =   "liste_route_import"
+                                mode                =   "single" 
+                                placeholder         =   "Select Map"
                                 class               =   "mt-1"
 
                                 :close-on-select    =   "false"
@@ -111,18 +139,20 @@ export default {
         return {
 
             user            :   {
-                nom                     :   '',
-                email                   :   '',
-                tel                     :   '',
-                company                 :   '',
 
-                type_user               :   '',
+                nom                     :   ''      ,
+                email                   :   ''      ,
+                tel                     :   ''      ,
+                company                 :   ''      ,
 
-                max_route_import        :   0 ,
+                type_user               :   ''      ,
 
-                liste_route_import      :   null,
+                max_route_import        :   0       ,
 
-                password                :   '',
+                selected_route_import   :   null    ,
+                liste_route_import      :   null    ,
+
+                password                :   ''      ,
                 password_confirmation   :   ''
             },
 
@@ -157,6 +187,7 @@ export default {
 
             formData.append("max_route_import"          , this.user.max_route_import)
 
+            formData.append("selected_route_import"     , this.user.selected_route_import)
             formData.append("liste_route_import"        , JSON.stringify(this.user.liste_route_import))
 
             formData.append("password"                  , this.user.password)
@@ -201,6 +232,7 @@ export default {
 
                 this.user.max_route_import          =   0
 
+                this.user.selected_route_import     =   null
                 this.user.liste_route_import        =   null
 
                 this.user.password                  =   ''

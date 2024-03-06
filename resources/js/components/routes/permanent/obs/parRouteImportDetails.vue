@@ -139,6 +139,7 @@
                             <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showTerritories()">Auto Territories</button>
                             <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showJPlanBDTerritories()">JPlan Territories</button>
                             <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showJourneeBDTerritories()">Journee Territories</button>
+                            <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showUserBDTerritories()">User Territories</button>
                         </div>
 
                         <div v-if="$isRole('FrontOffice')" class="col-5">
@@ -424,16 +425,16 @@
 
 import Multiselect              from '@vueform/multiselect'
 
-import modalClientAdd           from "../../clients/modalClientAdd.vue"
-import modalClientUpdate        from "../../clients/modalClientUpdate.vue"
-import modalClientsChangeRoute  from "../../clients/modalClientsChangeRoute.vue"
-import modalResume              from "../imports/modalResume.vue"
+import modalClientAdd           from "../../../clients/permanent/modalClientAdd.vue"
+import modalClientUpdate        from "../../../clients/permanent/modalClientUpdate.vue"
+import modalClientsChangeRoute  from "../../../clients/permanent/modalClientsChangeRoute.vue"
+import modalResume              from "../../modalResume.vue"
 
-import modalAddJourneyPlan      from "../../territoires/modalAddJourneyPlan.vue"
-import modalUpdateJourneyPlan   from "../../territoires/modalUpdateJourneyPlan.vue"
+import modalAddJourneyPlan      from "../../../territoires/modalAddJourneyPlan.vue"
+import modalUpdateJourneyPlan   from "../../../territoires/modalUpdateJourneyPlan.vue"
 
-import modalUpdateMap           from "../imports/Map/modalUpdateMap.vue"
-import modalValidateMap         from "../imports/Map/modalValidateMap.vue"
+import modalUpdateMap           from "../../../routes/permanent/modalUpdateMap.vue"
+import modalValidateMap         from "../../../routes/permanent/modalValidateMap.vue"
 
 import {mapGetters, mapActions} from "vuex"
 
@@ -530,11 +531,11 @@ export default {
 
         ...mapGetters({
 
-            getAddClient            : 'client/getAddClient'                 ,
-            getUpdateClient         : 'client/getUpdateClient'              ,
-            getClientsChangeRoute   : 'client/getClientsChangeRoute'        ,
+            getAddClient            : 'client/getAddClient'                     ,
+            getUpdateClient         : 'client/getUpdateClient'                  ,
+            getClientsChangeRoute   : 'client/getClientsChangeRoute'            ,
 
-            getAddJourneyPlan       : 'journey_plan/getAddJourneyPlan'      ,
+            getAddJourneyPlan       : 'journey_plan/getAddJourneyPlan'          ,
 
             //
 
@@ -615,6 +616,11 @@ export default {
         this.emitter.on('reSetJourneeBDTerritory' , () =>  {
 
             this.showJourneeBDTerritories()
+        })
+
+        this.emitter.on('reSetUserBDTerritory' , () =>  {
+
+            this.showUserBDTerritories()
         })
     },
 
@@ -1673,6 +1679,39 @@ export default {
 			}
         },
 
+        async showUserBDTerritories() {
+
+            // Show Loading Page
+            this.$showLoadingPage()
+
+            let formData = new FormData();
+
+            formData.append("liste_user_territory"  ,   JSON.stringify(this.owner_filter_value)) 
+
+            console.log(this.owner_filter_value)
+
+            const res   = await this.$callApi('post'    ,   '/route_import/'+this.route_import.id+'/user_territories/util'   ,   formData)      
+            console.log(res.data)
+
+            if(res.status===200){
+
+                // Show BD Territories
+                this.$map.$showUserBDTerritories(res.data)
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+            }
+            
+            else{
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
+			}
+        },
+
         //
 
         showCurrentPosition() {
@@ -2432,9 +2471,11 @@ export default {
 
         getAddJourneyPlan(newValue, oldValue) {
 
+            console.log(newValue)
+
             if(newValue != null) {
                 
-                if((typeof newValue.journey_plan    ==  "undefined")&&(typeof newValue.journee  ==  "undefined")) {
+                if((typeof newValue.journey_plan    ==  "undefined")&&(typeof newValue.journee  ==  "undefined")&&(typeof newValue.user     ==  "undefined")) {
 
                     // ShowModal
                     var addJourneyPlanModal        =   new Modal(document.getElementById("addJourneyPlanModal"));
@@ -2444,7 +2485,7 @@ export default {
                     this.AddJourneyPlan(newValue.latlngs)
                 }
 
-                if(typeof newValue.journey_plan    !=  "undefined") {
+                if(typeof newValue.journey_plan     !=  "undefined") {
 
                     // ShowModal
                     var updateJourneyPlanModal      =   new Modal(document.getElementById("updateJourneyPlanModal"));
@@ -2462,6 +2503,16 @@ export default {
 
                     // Send DATA To Modal
                     this.UpdateJourneyPlan(newValue.journee)
+                }
+
+                if(typeof newValue.user             !=  "undefined") {
+
+                    // ShowModal
+                    var updateJourneyPlanModal      =   new Modal(document.getElementById("updateJourneyPlanModal"));
+                    updateJourneyPlanModal.show();
+
+                    // Send DATA To Modal
+                    this.UpdateJourneyPlan(newValue.user)
                 }
             }
         }

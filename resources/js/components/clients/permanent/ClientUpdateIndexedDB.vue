@@ -57,12 +57,12 @@
 
                         <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
-                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @input="checkClients()">
+                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @changed="checkClients()">
                         </div>
 
                         <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
-                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @input="checkClients()">
+                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @changed="checkClients()">
                         </div>
                     
                         <!--  -->
@@ -332,7 +332,6 @@ export default {
 
             formData.append("facade_image"                  ,   this.client.facade_image)
             formData.append("in_store_image"                ,   this.client.in_store_image)
-
             formData.append("facade_image_original_name"    ,   this.client.facade_image_original_name)
             formData.append("in_store_image_original_name"  ,   this.client.in_store_image_original_name)
 
@@ -562,20 +561,17 @@ export default {
                 // Journey Plan
                 this.client.JPlan               =   '',
 
-                this.client.status              =   '',
+                this.client.status                =   '',
 
                 this.willayas                   =   []  ,
                 this.cites                      =   []  ,
 
                 this.all_clients                =   []  ,
                 this.close_clients              =   []
-
             });
         },
 
         getData(client, all_clients) {
-
-            console.log(client)
 
             this.all_clients    =   all_clients
 
@@ -904,12 +900,14 @@ export default {
                 console.log(222)
 
                 this.client.facade_image_original_name      =   facade_image.name
-                this.client.facade_image                    =   await this.$imageToBase64(facade_image)
+                this.client.facade_image                    =   await this.$compressImage(facade_image)
 
                 //
 
+                let facade_image_base64                     =   await this.$imageToBase64(this.client.facade_image)
+
                 let facade_image_display                    =   document.getElementById("facade_image_display_update")
-                this.base64ToImage(this.client.facade_image, facade_image_display)
+                this.base64ToImage(facade_image_base64, facade_image_display)
             }
         },
 
@@ -922,12 +920,14 @@ export default {
             if(in_store_image) {
 
                 this.client.in_store_image_original_name    =   in_store_image.name
-                this.client.in_store_image                  =   await this.$imageToBase64(in_store_image)
+                this.client.in_store_image                  =   await this.$compressImage(in_store_image)
                 
                 //
 
+                let in_store_image_base64                   =   await this.$imageToBase64(this.client.in_store_image)
+
                 let in_store_image_display                  =   document.getElementById("in_store_image_display_update")
-                this.base64ToImage(this.client.in_store_image, in_store_image_display)
+                this.base64ToImage(in_store_image_base64, in_store_image_display)
             }
         },
 
@@ -946,18 +946,18 @@ export default {
 
             let distance        =   0
 
-            console.log(this.all_clients)
-
             for (let i = 0; i < this.all_clients.length; i++) {
 
-                if(this.all_clients[i].id   !=  this.client.id) {
+                distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
 
-                    distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
+                if(this.all_clients[i].CustomerNameE == "test") {
 
-                    if(distance <=  this.min_distance) {
-                    
-                        this.close_clients.push(this.all_clients[i])
-                    }
+                    console.log(distance)
+                }
+
+                if(distance <=  this.min_distance) {
+                
+                    this.close_clients.push(this.all_clients[i])
                 }
             }
         },

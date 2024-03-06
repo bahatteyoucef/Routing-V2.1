@@ -1,7 +1,7 @@
 <template>
 
     <!-- Modal -->
-    <div class="modal fade" id="modalClientUpdateIndexedDB" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="updateClientModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
 
@@ -53,18 +53,18 @@
                             </select>
                         </div>
 
-                        <!--  -->
+                         <!--  -->
 
                         <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
-                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @changed="checkClients()">
+                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @change="checkClients()">
                         </div>
 
                         <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
-                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @changed="checkClients()">
+                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @change="checkClients()">
                         </div>
-                    
+
                         <!--  -->
 
                         <div class="mb-3">
@@ -204,8 +204,8 @@
 
                     <div class="right-buttons"  style="display: flex; margin-left: auto;">
                         <button type="button"   class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <!-- <button type="button"   class="btn btn-success"                             v-if="client.status   !=  'validated'"  @click="validateData()">Validate</button> -->
-                        <button type="button"   class="btn btn-primary"                                                                     @click="sendData()">Confirm</button>
+                        <!-- <button type="button"   class="btn btn-success"                             @click="validateData()"   v-if="client.status   !=  'validated'"      >Validate</button> -->
+                        <button type="button"   class="btn btn-primary"                             @click="sendData()"                                                 >Confirm</button>
                     </div>
                 </div>
 
@@ -227,10 +227,14 @@ export default {
             client      :   {
 
                 // Images   
-                facade_image                     :   '',
-                in_store_image                   :   '',
-                facade_image_original_name       :   '',
-                in_store_image_original_name     :   '',
+                facade_image                    :   '',
+                in_store_image                  :   '',
+                facade_image_original_name      :   '',
+                in_store_image_original_name    :   '',
+
+                //
+                facade_image_updated            :   false,
+                in_store_image_updated          :   false,
 
                 // Client
                 id                  :   '',
@@ -261,7 +265,7 @@ export default {
                 JPlan               :   '',
                 Journee             :   '',
 
-                // Status
+                // 
                 status                  :   '',
                 status_original         :   '',
                 nonvalidated_details    :   ''
@@ -276,10 +280,10 @@ export default {
             liste_type_client               :   []  ,
 
             //
+
             all_clients                     :   []  ,
             close_clients                   :   []  ,
             min_distance                    :   0.03
-
         }
     },
 
@@ -294,7 +298,7 @@ export default {
 
     mounted() {
 
-        this.clearData("#modalClientUpdateIndexedDB")
+        this.clearData("#updateClientModal")
     },  
 
     methods : {
@@ -315,8 +319,8 @@ export default {
 
             let formData = new FormData();
 
-            formData.append("CustomerCode"                  ,   this.client.CustomerCode)
-            formData.append("CustomerNameE"                 ,   this.client.CustomerNameE)
+            formData.append("CustomerCode"  ,   this.client.CustomerCode)
+            formData.append("CustomerNameE" ,   this.client.CustomerNameE)
             formData.append("CustomerNameA"                 ,   this.client.CustomerNameA)
             formData.append("Latitude"                      ,   this.client.Latitude)
             formData.append("Longitude"                     ,   this.client.Longitude)
@@ -330,173 +334,104 @@ export default {
             formData.append("JPlan"                         ,   this.client.JPlan)
             formData.append("Journee"                       ,   this.client.Journee)
 
+            formData.append("facade_image_updated"          ,   this.client.facade_image_updated)
+            formData.append("in_store_image_updated"        ,   this.client.in_store_image_updated)
+
             formData.append("facade_image"                  ,   this.client.facade_image)
             formData.append("in_store_image"                ,   this.client.in_store_image)
+
             formData.append("facade_image_original_name"    ,   this.client.facade_image_original_name)
             formData.append("in_store_image_original_name"  ,   this.client.in_store_image_original_name)
-
-            formData.append("id_route_import"               ,   this.$route.params.id_route_import)
 
             formData.append("status"                        ,   this.client.status)
             formData.append("nonvalidated_details"          ,   this.client.nonvalidated_details)
 
-            if(this.$connectedToInternet) {
+            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/update",   formData)
 
-                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/update",   formData)
-                console.log(res.data)
-
-                if(res.status===200){
-
-                    this.client.id_route_import     =   this.$route.params.id_route_import
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
-                    // Send Feedback
-                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
-
-                    // Send Client
-                    this.emitter.emit('reSetUpdate' , this.client)
-
-                    // Close Modal
-                    this.$hideModal("modalClientUpdateIndexedDB")
-                }
-                
-                else{
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
-                    // Send Errors
-                    this.$showErrors("Error !", res.data.errors)
-                }
-            }
-
-            else {
-
-                this.client.id_route_import     =   this.$route.params.id_route_import
-
-                // Add in indexedDB
-                await this.$indexedDB.$setUpdatedClients(this.client, this.$route.params.id_route_import)
+            if(res.status===200){
 
                 // Hide Loading Page
                 this.$hideLoadingPage()
 
+                // Send Feedback
+                this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
+
                 // Send Client
-                this.emitter.emit('reSetUpdate' , this.client)
+                this.emitter.emit('reSetUpdate' , res.data.client)
 
                 // Close Modal
-                this.$hideModal("modalClientUpdateIndexedDB")
+                this.$hideModal("updateClientModal")
             }
+            
+            else{
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
+			}
         },
 
         async deleteData() {
 
             this.$showLoadingPage()
 
-            if(this.$connectedToInternet) {
+            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/delete",   null)
 
-                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/delete",   null)
-
-                if(res.status===200){
-
-                    this.client.id_route_import     =   this.$route.params.id_route_import
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
-                    // Send Feedback
-                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
-
-                    // Send Client
-                    this.emitter.emit('reSetDelete' , this.client)
-
-                    // Close Modal
-                    this.$hideModal("modalClientUpdateIndexedDB")
-                }
-                
-                else{
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
-                    // Send Errors
-                    this.$showErrors("Error !", res.data.errors)
-                }
-            }
-
-            else {
-
-                this.client.id_route_import     =   this.$route.params.id_route_import
-
-                // Add in indexedDB
-                await this.$indexedDB.$setDeletedClients(this.client, this.$route.params.id_route_import)
+            if(res.status===200){
 
                 // Hide Loading Page
                 this.$hideLoadingPage()
+
+                // Send Feedback
+                this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
                 // Send Client
                 this.emitter.emit('reSetDelete' , this.client)
 
                 // Close Modal
-                this.$hideModal("modalClientUpdateIndexedDB")
+                this.$hideModal("updateClientModal")
             }
+            
+            else{
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
+			}
         },
 
         async validateData() {
 
             this.$showLoadingPage()
 
-            if(this.$connectedToInternet) {
+            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/validate",   null)
 
-                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/validate",   null)
-
-                if(res.status===200){
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
-                    this.client.status                  =   this.client.status
-                    this.client.nonvalidated_details    =   this.client.nonvalidated_details
-                    this.client.id_route_import         =   this.$route.params.id_route_import
-
-                    // Send Feedback
-                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
-
-                    // Send Client
-                    this.emitter.emit('reSetValidate' , this.client)
-
-                    // Close Modal
-                    this.$hideModal("modalClientUpdateIndexedDB")
-                }
-                
-                else{
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
-                    // Send Errors
-                    this.$showErrors("Error !", res.data.errors)
-                }
-            }
-
-            else {
-
-                this.client.status                  =   this.client.status
-                this.client.nonvalidated_details    =   this.client.nonvalidated_details
-                this.client.id_route_import         =   this.$route.params.id_route_import
-
-                // Add in indexedDB
-                await this.$indexedDB.$setValidatedClients(this.client, this.$route.params.id_route_import)
+            if(res.status===200){
 
                 // Hide Loading Page
                 this.$hideLoadingPage()
+
+                // Send Feedback
+                this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
                 // Send Client
                 this.emitter.emit('reSetValidate' , this.client)
 
                 // Close Modal
-                this.$hideModal("modalClientUpdateIndexedDB")
+                this.$hideModal("updateClientModal")
+            }
+            
+            else{
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
             }
         },
 
@@ -526,8 +461,14 @@ export default {
 
                 this.client.facade_image                    =   '',
                 this.client.in_store_image                  =   '',
+
                 this.client.facade_image_original_name      =   '',
                 this.client.in_store_image_original_name    =   '',
+
+                this.client.facade_image_updated            =   false,
+                this.client.in_store_image_updated          =   false
+
+                //
 
                 // 
                 this.unsetJoursGetData()
@@ -561,14 +502,34 @@ export default {
                 // Journey Plan
                 this.client.JPlan               =   '',
 
-                this.client.status                =   '',
+                this.client.status              =   '',
 
                 this.willayas                   =   []  ,
                 this.cites                      =   []  ,
 
                 this.all_clients                =   []  ,
                 this.close_clients              =   []
+
+                // Remove Drawings
+                this.removeDrawings()
+
             });
+        },
+
+        removeDrawings() {
+
+            // Not Map
+            if(!this.$route.path.startsWith("/route/obs/")) {
+
+                // Do Nothing 
+            }
+
+            // Map
+            else {
+
+                // Remove Drawings
+                this.$map.$removeDrawings()
+            }   
         },
 
         getData(client, all_clients) {
@@ -586,49 +547,50 @@ export default {
 
         async getClientData(client) {
 
-            this.client.id                  =   client.id
+            this.client.id                              =   client.id
 
-            this.client.CustomerCode        =   client.CustomerCode
+            this.client.CustomerCode                    =   client.CustomerCode
 
-            this.client.old_CustomerNameE   =   client.CustomerNameE
+            this.client.old_CustomerNameE               =   client.CustomerNameE
 
-            this.client.CustomerNameE       =   client.CustomerNameE
-            this.client.CustomerNameA       =   client.CustomerNameA
-            this.client.Latitude            =   client.Latitude
-            this.client.Longitude           =   client.Longitude
+            this.client.CustomerNameE                   =   client.CustomerNameE
+            this.client.CustomerNameA                   =   client.CustomerNameA
+            this.client.Latitude                        =   client.Latitude
+            this.client.Longitude                       =   client.Longitude
 
-            this.client.Address             =   client.Address
-            this.client.DistrictNo          =   client.DistrictNo
+            this.client.Address                         =   client.Address
+            this.client.DistrictNo                      =   client.DistrictNo
 
-            this.client.CityNo              =   client.CityNo
+            this.client.CityNo                          =   client.CityNo
 
-            this.client.Tel                 =   client.Tel
+            this.client.Tel                             =   client.Tel
 
-            this.client.CustomerType        =   client.CustomerType
+            this.client.CustomerType                    =   client.CustomerType
 
-            this.client.JPlan               =   client.JPlan
+            this.client.JPlan                           =   client.JPlan
 
-            this.client.Journee             =   client.Journee
+            this.client.Journee                         =   client.Journee
 
-            this.client.status                  =   client.status
-            this.client.status_original         =   client.status
-            this.client.nonvalidated_details    =   client.nonvalidated_details
+            this.client.status                          =   client.status
+            this.client.status_original                 =   client.status
+            this.client.nonvalidated_details            =   client.nonvalidated_details
 
-            this.client.facade_image                        =   client.facade_image
-            this.client.in_store_image                      =   client.in_store_image
-            this.client.facade_image_original_name          =   client.facade_image_original_name
-            this.client.in_store_image_original_name        =   client.in_store_image_original_name
+            this.client.facade_image                    =   client.facade_image
+            this.client.in_store_image                  =   client.in_store_image
+
+            this.client.facade_image_original_name      =   client.facade_image_original_name
+            this.client.in_store_image_original_name    =   client.in_store_image_original_name
 
             // 
             this.$createFile(client.facade_image_original_name      ,   "facade_image_update")
             this.$createFile(client.in_store_image_original_name    ,   "in_store_image_update")
 
             // 
-            let facade_image_display_update     =   document.getElementById("facade_image_display_update")
-            let in_store_image_display_update   =   document.getElementById("in_store_image_display_update")
+            let facade_image_display_update             =   document.getElementById("facade_image_display_update")
+            let in_store_image_display_update           =   document.getElementById("in_store_image_display_update")
 
-            this.base64ToImage(this.client.facade_image             ,   facade_image_display_update)            
-            this.base64ToImage(this.client.in_store_image           ,   in_store_image_display_update)            
+            facade_image_display_update.src             =   "/uploads/clients/"+client.id+"/"+client.facade_image
+            in_store_image_display_update.src           =   "/uploads/clients/"+client.id+"/"+client.in_store_image
 
             this.setJoursGetData(client)
 
@@ -637,45 +599,20 @@ export default {
 
         async getComboData() {
 
-            if(this.$connectedToInternet) {
-
-                const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
-                this.willayas                   =   res_3.data
-            }
-
-            else {
-
-                this.willayas                   =   await this.$indexedDB.$getWillayas()
-            }
+            const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
+            this.willayas                   =   res_3.data
         },
 
         async getCites() {
 
-            if(this.$connectedToInternet) {
+            // Show Loading Page
+            this.$showLoadingPage()
 
-                // Show Loading Page
-                this.$showLoadingPage()
+            const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
+            this.cites                      =   res_3.data
 
-                const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
-                this.cites                      =   res_3.data
-
-                // Hide Loading Page
-                this.$hideLoadingPage()
-            }
-
-            else {
-
-                // Show Loading Page
-                this.$showLoadingPage()
-
-                let willaya                     =   await this.$indexedDB.$getWillaya(this.client.DistrictNo)
-                console.log(willaya)
-
-                this.cites                      =   willaya.cites
-
-                // Hide Loading Page
-                this.$hideLoadingPage()
-            }
+            // Hide Loading Page
+            this.$hideLoadingPage()
         },
 
         //
@@ -889,23 +826,55 @@ export default {
 
         //
 
+        checkClients() {
+
+            this.close_clients  =   []
+
+            let distance        =   0
+
+            for (let i = 0; i < this.all_clients.length; i++) {
+
+                if(this.all_clients[i].id   !=  this.client.id) {
+
+                    distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
+
+                    if(distance <=  this.min_distance) {
+                    
+                        this.close_clients.push(this.all_clients[i])
+                    }
+                }
+            }
+        },
+
+        getDistance(latitude_1, longitude_1, latitude_2, longitude_2) {
+
+            return this.$map.$setDistanceStraight(latitude_1, longitude_1, latitude_2, longitude_2)
+        },
+
+        //
+
         async facadeImage() {
 
             const facade_image  =   document.getElementById("facade_image_update").files[0];
 
-            console.log(facade_image)
-
             if(facade_image) {
 
-                console.log(222)
+                this.client.facade_image_updated            =   true
 
                 this.client.facade_image_original_name      =   facade_image.name
-                this.client.facade_image                    =   await this.$imageToBase64(facade_image)
+                this.client.facade_image                    =   await this.$compressImage(facade_image)
 
                 //
 
+                let facade_image_base64                     =   await this.$imageToBase64(this.client.facade_image)
+
                 let facade_image_display                    =   document.getElementById("facade_image_display_update")
-                this.base64ToImage(this.client.facade_image, facade_image_display)
+                this.base64ToImage(facade_image_base64, facade_image_display)
+            }
+
+            else {
+
+                this.client.facade_image_updated            =   false
             }
         },
 
@@ -917,13 +886,22 @@ export default {
 
             if(in_store_image) {
 
+                this.client.in_store_image_updated          =   true
+
                 this.client.in_store_image_original_name    =   in_store_image.name
-                this.client.in_store_image                  =   await this.$imageToBase64(in_store_image)
+                this.client.in_store_image                  =   await this.$compressImage(in_store_image)
                 
                 //
 
+                let in_store_image_base64                   =   await this.$imageToBase64(this.client.in_store_image)
+
                 let in_store_image_display                  =   document.getElementById("in_store_image_display_update")
-                this.base64ToImage(this.client.in_store_image, in_store_image_display)
+                this.base64ToImage(in_store_image_base64, in_store_image_display)
+            }
+
+            else {
+
+                this.client.in_store_image_updated            =   false
             }
         },
 
@@ -933,37 +911,6 @@ export default {
 
             this.$base64ToImage(image_base64, image_display_div)
         },
-
-        //
-
-        checkClients() {
-
-            this.close_clients  =   []
-
-            let distance        =   0
-
-            for (let i = 0; i < this.all_clients.length; i++) {
-
-                distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
-
-                if(this.all_clients[i].CustomerNameE == "test") {
-
-                    console.log(distance)
-                }
-
-                if(distance <=  this.min_distance) {
-                
-                    this.close_clients.push(this.all_clients[i])
-                }
-            }
-        },
-
-        getDistance(latitude_1, longitude_1, latitude_2, longitude_2) {
-
-            return this.$map.$setDistanceStraight(latitude_1, longitude_1, latitude_2, longitude_2)
-        }
-
-        //
     },
 
     watch : {

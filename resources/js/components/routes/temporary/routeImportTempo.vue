@@ -134,7 +134,7 @@
                         <!--  -->
 
                         <modalResume                    ref="modalResume"                       :key="route_import"     :type="'temporary'"                                                 :id_route_import_tempo="route_import.id_route_import_tempo"     ></modalResume>
-                        <modalValidate                  ref="modalValidate"                                                                                                                 :id_route_import_tempo="route_import.id_route_import_tempo"     ></modalValidate>
+                        <modalSubmit                    ref="modalSubmit"                                                                                                                   :id_route_import_tempo="route_import.id_route_import_tempo"     ></modalSubmit>
 
                         <!--  -->
 
@@ -156,15 +156,15 @@
 
 <script>
 
-import modalResume                  from "./modalResume.vue"
-import modalValidate                from "./modalValidate.vue"
+import modalResume                  from    "../modalResume.vue"
+import modalSubmit                  from    "./modalSubmit.vue"
 
-import modalValidateCustomerCode    from "./modalValidateCustomerCode.vue"
-import modalValidateCustomerNameE   from "./modalValidateCustomerNameE.vue"
-import modalValidateTel             from "./modalValidateTel.vue"
-import modalValidateGPS             from "./modalValidateGPS.vue"
+import modalValidateCustomerCode    from    "./validateDataTempo/modalValidateCustomerCode.vue"
+import modalValidateCustomerNameE   from    "./validateDataTempo/modalValidateCustomerNameE.vue"
+import modalValidateTel             from    "./validateDataTempo/modalValidateTel.vue"
+import modalValidateGPS             from    "./validateDataTempo/modalValidateGPS.vue"
 
-import modalClientUpdateTempo       from "../../clients/modalClientUpdateTempo.vue"
+import modalClientUpdateTempo       from    "../../clients/temporary/modalClientUpdateTempo.vue"
 
 import * as XLSX from "xlsx";
 
@@ -203,7 +203,7 @@ export default {
     components : {
 
         modalResume                 :   modalResume                 ,
-        modalValidate               :   modalValidate               ,
+        modalSubmit                 :   modalSubmit                 ,
 
         modalValidateCustomerCode   :   modalValidateCustomerCode   ,
         modalValidateCustomerNameE  :   modalValidateCustomerNameE  ,
@@ -233,7 +233,7 @@ export default {
 
         async validateRouteImport() {
 
-            await this.$refs.modalValidate.setResumeValidate()
+            await this.$refs.modalSubmit.setResumeValidate()
         },
 
         //

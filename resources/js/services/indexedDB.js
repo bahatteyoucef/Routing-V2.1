@@ -185,7 +185,7 @@ export default class MobileClientIndexedDB {
             if(willayas.length  ==  0) {
 
                 // Fill Liste Willayas
-                axios.post("/rtm_willayas/rtm_cites/details", null)
+                axios.post("/rtm_willayas/rtm_cites/details/indexedDB", null)
                 .then((res)=> {
 
                     console.log(res)
@@ -751,7 +751,10 @@ export default class MobileClientIndexedDB {
 
             results                                     =   await this.$fillWillayas(wilayas)
 
-            this.data_willayas                          =   results
+            let data_willayas                           =   results
+
+            this.data_willayas                          =   data_willayas.sort(this.$sortWillayasByDistrictNo)
+
             resolve(results)
         })
     }
@@ -824,6 +827,20 @@ export default class MobileClientIndexedDB {
 
         })
 
+    }
+
+    // Sorting function with clear comments
+    $sortWillayasByDistrictNo(a, b) {
+
+        // Safely handle cases where DistrictNo is non-numeric
+        const districtNoA   =   parseInt(a.DistrictNo, 10) || Number.MAX_SAFE_INTEGER; // Infinity for non-numeric values
+        const districtNoB   =   parseInt(b.DistrictNo, 10) || Number.MAX_SAFE_INTEGER; // Infinity for non-numeric values
+
+        // Sort in ascending order, with non-numeric values appearing at the end
+        if (districtNoA     <   districtNoB) return     -1;
+        if (districtNoA     >   districtNoB) return     1;
+     
+        return 0;
     }
 
     //

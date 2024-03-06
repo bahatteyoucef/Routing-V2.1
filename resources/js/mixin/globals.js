@@ -220,6 +220,42 @@ export default {
 
         //
 
+        async $imageURLToBase64(url) {
+
+            return new Promise((resolve, reject) => {
+
+                const xhr           =   new XMLHttpRequest();
+                xhr.open('GET', url, true);
+
+                xhr.responseType    =   'blob';
+
+                xhr.onload = function() {
+
+                    if (this.status === 200) {
+
+                        const reader = new FileReader();
+                        reader.readAsDataURL(this.response);
+                        reader.onloadend = function() {
+                            
+                            resolve(this.result);
+                        };
+                    } 
+
+                    else {
+
+                        resolve(null);
+                    }
+                };
+
+                xhr.onerror = function(error) {
+                
+                    resolve(null);
+                };
+
+                xhr.send();
+            });
+        },
+
         // Function to convert an image to Base64
         $imageToBase64(imageFile) {
 
@@ -235,8 +271,8 @@ export default {
         // Function to convert Base64 back to an image and display it
         $base64ToImage(base64String, outputElement) {
 
-            const image = new Image();
-            image.src = "data:image/jpeg;base64," + base64String;
+            const image     =   new Image();
+            image.src       =   "data:image/jpeg;base64," + base64String;
             
             image.onload = () => {
                 outputElement.src   =   image.src;
@@ -968,6 +1004,63 @@ export default {
             let kilobyteSize = byteSize / 1024;
 
             console.log('Size of FormData in KB:', kilobyteSize.toFixed(2), 'KB');
-        }
+        },
+
+        //
+
+        $compressImage(file) {
+
+            return new Promise((resolve, reject) => {
+
+                const reader = new FileReader();
+
+                reader.onload = (event) => {
+
+                    const img   =   new Image();
+                    img.src     =   event.target.result;
+
+                    img.onload  = () => {
+
+                        const maxWidth  =   300 // 300; // Maximum width
+                        const maxHeight =   300 // 300; // Maximum height
+
+                        let width       =   img.width;
+                        let height      =   img.height;
+
+                        // Scale the image to fit within the maximum dimensions while preserving aspect ratio
+                        if (width > maxWidth || height > maxHeight) {
+
+                            const aspectRatio = width / height;
+
+                            if (width > height) {
+
+                                width   =   maxWidth;
+                                height  =   width / aspectRatio;
+                            } else {
+
+                                height  =   maxHeight;
+                                width   =   height * aspectRatio;
+                            }
+                        }
+
+                        const canvas    =   document.createElement('canvas');
+                        const ctx       =   canvas.getContext('2d');
+
+                        canvas.width    =   width;
+                        canvas.height   =   height;
+
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        canvas.toBlob((blob) => {
+
+                            const compressedFile = new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() });
+                            resolve(compressedFile);
+                        }, 'image/jpeg', 0.9);
+                    };
+                };
+
+                reader.readAsDataURL(file);
+            });
+        },
     }
 }

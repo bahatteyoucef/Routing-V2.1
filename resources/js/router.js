@@ -49,24 +49,18 @@ const routes = [
         component   : () => import('./components/users/changePassword.vue')
     },
 
-    // Route Import Clients
-    {
-        path        : "/route_import/:id_route_import/clients",
-        component   : () => import('./components/routes/routeImportClients.vue')
-    },
-
     // 
 
     // ClientsAdd
     {
         path        : "/route_import/:id_route_import/clients/add/:latitude/:longitude",
-        component   : () => import('./components/clients/ClientAdd.vue')
+        component   : () => import('./components/clients/permanent/ClientAdd.vue')
     },
 
     // ClientsUpdate
     {
         path        : "/route_import/:id_route_import/clients/:id_client/update",
-        component   : () => import('./components/clients/ClientUpdate.vue')
+        component   : () => import('./components/clients/permanent/ClientUpdate.vue')
     },
 
     //  //  //  //  //  OBS     //  //  //
@@ -76,25 +70,31 @@ const routes = [
     // Imports Tempo
     {
         path        : "/route/obs/route_import_tempo",
-        component   : () => import('./components/routes/imports/routeImportTempo.vue')
+        component   : () => import('./components/routes/temporary/routeImportTempo.vue')
+    },
+
+    // Route Import Clients
+    {
+        path        : "/route_import/:id_route_import/clients",
+        component   : () => import('./components/routes/routeImportClients.vue')
     },
 
     // Imports Add
     {
         path        : "/route/obs/route_import/add",
-        component   : () => import('./components/routes/imports/RouteImportAdd.vue')
+        component   : () => import('./components/routes/RouteImportAdd.vue')
     },
 
     // Imports Details
     {
         path        : "/route/obs/route_import/:id_route_import/details",
-        component   : () => import('./components/routes/obs/ParRouteImportDetails.vue')
+        component   : () => import('./components/routes/permanent/obs/ParRouteImportDetails.vue')
     },
 
     // Imports ParRouteImportFrontOfficeDetails Details
     {
         path        : "/route/frontoffice/obs/route_import/:id_route_import/details",
-        component   : () => import('./components/routes/obs/ParRouteImportFrontOfficeDetails.vue')
+        component   : () => import('./components/routes/permanent/obs/ParRouteImportFrontOfficeDetails.vue')
     },
 ];
 

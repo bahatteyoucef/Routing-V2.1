@@ -48,28 +48,61 @@
 
                         <!--  -->
 
-                        <div class="mb-3">
+                        <div class="mb-3"   v-if="user.type_user    ==  'BackOffice'">
 
                             <label for="Route Imports"               class="form-label">Route Imports</label>
 
                             <Multiselect
                                 @select             =   "setListeRouteImport()"
                                 @deselect           =   "setListeRouteImport()"
+                                @clear              =   "setListeRouteImport()"
+
                                 v-model             =   "user.liste_route_import"
                                 :options            =   "liste_route_import"
                                 mode                =   "tags" 
                                 placeholder         =   "Select Maps"
                                 class               =   "mt-1"
 
-                                :close-on-select    =   "true"
+                                :close-on-select    =   "false"
                                 :searchable         =   "true"
+                                :create-option      =   "true"
 
                                 :canDeselect        =   "true"
-                                :canClear           =   "false"
-                                :allowAbsent        =   "true"
+                                :canClear           =   "true"
+                                :allowAbsent        =   "false"
                             />
 
                         </div>
+
+                        <!--  -->
+
+                        <div class="mb-3"   v-if="user.type_user    ==  'FrontOffice'">
+
+                            <label for="Route Imports"               class="form-label">Route Imports</label>
+
+                            <Multiselect
+                                @select             =   "setListeRouteImport()"
+                                @deselect           =   "setListeRouteImport()"
+                                @clear              =   "setListeRouteImport()"
+
+                                v-model             =   "user.selected_route_import"
+                                :options            =   "liste_route_import"
+                                mode                =   "single" 
+                                placeholder         =   "Select Map"
+                                class               =   "mt-1"
+
+                                :close-on-select    =   "false"
+                                :searchable         =   "true"
+                                :create-option      =   "true"
+
+                                :canDeselect        =   "true"
+                                :canClear           =   "true"
+                                :allowAbsent        =   "false"
+                            />
+
+                        </div>
+
+                        <!--  -->
 
                     </form>
 
@@ -106,7 +139,8 @@ export default {
 
                 max_route_import        :   0 ,
 
-                liste_route_import      :   null,
+                selected_route_import   :   null,
+                liste_route_import      :   null
             },
 
             liste_route_import          :   []
@@ -140,11 +174,11 @@ export default {
 
             formData.append("max_route_import"          , this.user.max_route_import)
 
+            formData.append("selected_route_import"     , JSON.stringify(this.user.selected_route_import))
             formData.append("liste_route_import"        , JSON.stringify(this.user.liste_route_import))
 
-            console.log(this.user.liste_route_import)
-
             const res   =   await this.$callApi('post' ,   '/users/'+this.user.id+'/update'    ,   formData)         
+            console.log(res)
 
             // Hide Loading Page
             this.$hideLoadingPage()
@@ -182,6 +216,7 @@ export default {
 
                 this.user.max_route_import          =   0
 
+                this.user.selected_route_import     =   null
                 this.user.liste_route_import        =   null
 
                 this.liste_route_import             =   []
@@ -197,6 +232,7 @@ export default {
         async getUserData(user) {
 
             const res                   =   await this.$callApi("post"  ,   "/users/"+user.id+"/show"    ,   null)
+            console.log(res)
 
             this.user.nom_original          =   res.data.nom
 
@@ -209,7 +245,15 @@ export default {
 
             this.user.max_route_import      =   res.data.max_route_import        
 
-            this.user.liste_route_import    =   res.data.liste_route_import   
+            if(this.user.type_user  ==  "BackOffice") {
+
+                this.user.liste_route_import        =   res.data.liste_route_import
+            }
+
+            if(this.user.type_user  ==  "FrontOffice") {
+
+                this.user.selected_route_import     =   res.data.liste_route_import
+            }
         },
 
         async getComboData() {

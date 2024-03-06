@@ -133,31 +133,40 @@ class User extends Authenticatable
 
         //
 
-        $liste_route_import     =   json_decode($request->get("liste_route_import"));
-
-        if($liste_route_import  !=  null) {
-
-            foreach ($liste_route_import as $route_import_elem) {
-
-                $route_import           =   new UserRouteImport([
-
-                    'id_user'           =>  $user->id           ,
-                    'id_route_import'   =>  $route_import_elem
-                ]);
-
-                $route_import->save();
-            } 
-        }
-
-        //
-
         if($request->get("type_user")   ==  "BackOffice") {
+
+            $liste_route_import     =   json_decode($request->get("liste_route_import"));
+
+            if($liste_route_import  !=  null) {
+
+                foreach ($liste_route_import as $route_import_elem) {
+
+                    $route_import           =   new UserRouteImport([
+
+                        'id_user'           =>  $user->id           ,
+                        'id_route_import'   =>  $route_import_elem
+                    ]);
+
+                    $route_import->save();
+                } 
+            }
 
             $BackOfficeRole = Role::findByName('BackOffice');
             $user->assignRole($BackOfficeRole);
         }
 
         if($request->get("type_user")   ==  "FrontOffice") {
+
+            if($request->get("selected_route_import")   !=  null) {
+
+                $route_import           =   new UserRouteImport([
+
+                    'id_user'           =>  $user->id                                   ,
+                    'id_route_import'   =>  $request->get("selected_route_import")
+                ]);
+
+                $route_import->save();
+            }
 
             $FrontOfficeRole = Role::findByName('FrontOffice');
             $user->assignRole($FrontOfficeRole);
@@ -205,30 +214,40 @@ class User extends Authenticatable
 
         //
 
-        $liste_route_import     =   json_decode($request->get("liste_route_import"));
-
-        if($liste_route_import  !=  null) {
-
-            foreach ($liste_route_import as $route_import_elem) {
-                
-                $route_import           =   new UserRouteImport([
-
-                    'id_user'           =>  $user->id               ,
-                    'id_route_import'   =>  $route_import_elem
-                ]);
-
-                $route_import->save();
-            }
-        }
-
-        //
-
         if($request->get("type_user")   ==  "BackOffice") {
 
+            $liste_route_import     =   json_decode($request->get("liste_route_import"));
+
+            if($liste_route_import  !=  null) {
+
+                foreach ($liste_route_import as $route_import_elem) {
+                    
+                    $route_import           =   new UserRouteImport([
+
+                        'id_user'           =>  $user->id               ,
+                        'id_route_import'   =>  $route_import_elem
+                    ]);
+
+                    $route_import->save();
+                }
+            }
+
+            //
             $user->syncRoles(['BackOffice']);
         }
 
         if($request->get("type_user")   ==  "FrontOffice") {
+
+            if($request->get("selected_route_import")   !=  null) {
+
+                $route_import           =   new UserRouteImport([
+
+                    'id_user'           =>  $user->id                                   ,
+                    'id_route_import'   =>  $request->get("selected_route_import")
+                ]);
+
+                $route_import->save();
+            }
 
             $user->syncRoles(['FrontOffice']);
         }
@@ -334,8 +353,7 @@ class User extends Authenticatable
 
     //
 
-    public static function validatechangePassword(Request $request) 
-    {
+    public static function validatechangePassword(Request $request) {
 
         $validator = Validator::make($request->all(), [
             'old_password'          =>  ["required", "current_password:api"             ],

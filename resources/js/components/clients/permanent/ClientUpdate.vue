@@ -225,6 +225,10 @@ export default {
                 facade_image_original_name       :   '',
                 in_store_image_original_name     :   '',
 
+                //
+                facade_image_updated            :   false,
+                in_store_image_updated          :   false,
+
                 // Client
                 id                  :   '',
 
@@ -334,8 +338,12 @@ export default {
             formData.append("JPlan"         ,   this.client.JPlan)
             formData.append("Journee"       ,   this.client.Journee)
 
+            formData.append("facade_image_updated"          ,   this.client.facade_image_updated)
+            formData.append("in_store_image_updated"        ,   this.client.in_store_image_updated)
+
             formData.append("facade_image"                  ,   this.client.facade_image)
             formData.append("in_store_image"                ,   this.client.in_store_image)
+
             formData.append("facade_image_original_name"    ,   this.client.facade_image_original_name)
             formData.append("in_store_image_original_name"  ,   this.client.in_store_image_original_name)
 
@@ -563,54 +571,55 @@ export default {
 
             if(this.$connectedToInternet) {
 
-                const res           =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.$route.params.id_client+"/show",   null)
-                let client          =   res.data
+                const res                                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.$route.params.id_client+"/show",   null)
+                let client                                  =   res.data
 
                 console.log(client)
 
-                this.client.id                  =   client.id
+                this.client.id                              =   client.id
 
-                this.client.CustomerCode        =   client.CustomerCode
+                this.client.CustomerCode                    =   client.CustomerCode
 
-                this.client.old_CustomerNameE   =   client.CustomerNameE
+                this.client.old_CustomerNameE               =   client.CustomerNameE
 
-                this.client.CustomerNameE       =   client.CustomerNameE
-                this.client.CustomerNameA       =   client.CustomerNameA
-                this.client.Latitude            =   client.Latitude
-                this.client.Longitude           =   client.Longitude
+                this.client.CustomerNameE                   =   client.CustomerNameE
+                this.client.CustomerNameA                   =   client.CustomerNameA
+                this.client.Latitude                        =   client.Latitude
+                this.client.Longitude                       =   client.Longitude
 
-                this.client.Address             =   client.Address
-                this.client.DistrictNo          =   client.DistrictNo
+                this.client.Address                         =   client.Address
+                this.client.DistrictNo                      =   client.DistrictNo
 
-                this.client.CityNo              =   client.CityNo
+                this.client.CityNo                          =   client.CityNo
 
-                this.client.Tel                 =   client.Tel
+                this.client.Tel                             =   client.Tel
 
-                this.client.CustomerType        =   client.CustomerType
+                this.client.CustomerType                    =   client.CustomerType
 
-                this.client.JPlan               =   client.JPlan
+                this.client.JPlan                           =   client.JPlan
 
-                this.client.Journee             =   client.Journee
+                this.client.Journee                         =   client.Journee
 
-                this.client.status                  =   client.status
-                this.client.status_original         =   client.status
-                this.client.nonvalidated_details    =   client.nonvalidated_details
+                this.client.status                          =   client.status
+                this.client.status_original                 =   client.status
+                this.client.nonvalidated_details            =   client.nonvalidated_details
 
-                this.client.facade_image                        =   client.facade_image
-                this.client.in_store_image                      =   client.in_store_image
-                this.client.facade_image_original_name          =   client.facade_image_original_name
-                this.client.in_store_image_original_name        =   client.in_store_image_original_name
+                this.client.facade_image                    =   client.facade_image
+                this.client.in_store_image                  =   client.in_store_image
+
+                this.client.facade_image_original_name      =   client.facade_image_original_name
+                this.client.in_store_image_original_name    =   client.in_store_image_original_name
 
                 // 
                 this.$createFile(client.facade_image_original_name      ,   "facade_image_update")
                 this.$createFile(client.in_store_image_original_name    ,   "in_store_image_update")
 
                 // 
-                let facade_image_display_update     =   document.getElementById("facade_image_display_update")
-                let in_store_image_display_update   =   document.getElementById("in_store_image_display_update")
+                let facade_image_display_update             =   document.getElementById("facade_image_display_update")
+                let in_store_image_display_update           =   document.getElementById("in_store_image_display_update")
 
-                this.base64ToImage(this.client.facade_image             ,   facade_image_display_update)            
-                this.base64ToImage(this.client.in_store_image           ,   in_store_image_display_update)            
+                facade_image_display_update.src             =   "/uploads/clients/"+client.id+"/"+client.facade_image
+                in_store_image_display_update.src           =   "/uploads/clients/"+client.id+"/"+client.in_store_image
 
                 this.setJoursGetData(client)
 
@@ -631,7 +640,6 @@ export default {
                 let facade_image_display_update     =   document.getElementById("facade_image_display_update")
                 let in_store_image_display_update   =   document.getElementById("in_store_image_display_update")
 
-                // 
                 this.base64ToImage(this.client.facade_image             ,   facade_image_display_update)            
                 this.base64ToImage(this.client.in_store_image           ,   in_store_image_display_update)            
 
@@ -676,7 +684,7 @@ export default {
                 // Show Loading Page
                 this.$showLoadingPage()
 
-                let willaya                     =   await this.$indexedDB.$getWillaya(this.client.DistrictNo)
+                let willaya                         =   await this.$indexedDB.$getWillaya(this.client.DistrictNo)
                 console.log(willaya)
 
                 if(willaya) {
@@ -937,15 +945,38 @@ export default {
 
             if(facade_image) {
 
-                console.log(222)
+                this.client.facade_image_updated            =   true
 
-                this.client.facade_image_original_name      =   facade_image.name
-                this.client.facade_image                    =   await this.$imageToBase64(facade_image)
+                if(this.$connectedToInternet) {
 
-                //
+                    this.client.facade_image_original_name      =   facade_image.name
+                    this.client.facade_image                    =   await this.$compressImage(facade_image)
 
-                let facade_image_display                    =   document.getElementById("facade_image_display_update")
-                this.base64ToImage(this.client.facade_image, facade_image_display)
+                    //
+
+                    let facade_image_base64                     =   await this.$imageToBase64(this.client.facade_image)
+
+                    let facade_image_display                    =   document.getElementById("facade_image_display_update")
+                    this.base64ToImage(facade_image_base64, facade_image_display)
+                }
+
+                else {
+
+                    this.client.facade_image_original_name      =   facade_image.name
+                    this.client.facade_image                    =   await this.$compressImage(facade_image)
+
+                    //
+
+                    this.client.facade_image                    =   await this.$imageToBase64(this.client.facade_image)
+
+                    let facade_image_display                    =   document.getElementById("facade_image_display_update")
+                    this.base64ToImage(this.client.facade_image, facade_image_display)
+                }
+            }
+
+            else {
+
+                this.client.facade_image_updated            =   false
             }
         },
 
@@ -957,13 +988,38 @@ export default {
 
             if(in_store_image) {
 
-                this.client.in_store_image_original_name    =   in_store_image.name
-                this.client.in_store_image                  =   await this.$imageToBase64(in_store_image)
-                
-                //
+                this.client.in_store_image_updated      =   true
 
-                let in_store_image_display                  =   document.getElementById("in_store_image_display_update")
-                this.base64ToImage(this.client.in_store_image, in_store_image_display)
+                if(this.$connectedToInternet) {
+
+                    this.client.in_store_image_original_name    =   in_store_image.name
+                    this.client.in_store_image                  =   await this.$compressImage(in_store_image)
+                    
+                    //
+
+                    let in_store_image_base64                   =   await this.$imageToBase64(this.client.in_store_image)
+
+                    let in_store_image_display                  =   document.getElementById("in_store_image_display_update")
+                    this.base64ToImage(in_store_image_base64, in_store_image_display)
+                }
+
+                else {
+    
+                    this.client.in_store_image_original_name    =   in_store_image.name
+                    this.client.in_store_image                  =   await this.$compressImage(in_store_image)
+                    
+                    //
+
+                    this.client.in_store_image                  =   await this.$imageToBase64(this.client.in_store_image)
+
+                    let in_store_image_display                  =   document.getElementById("in_store_image_display_update")
+                    this.base64ToImage(this.client.in_store_image, in_store_image_display)
+                }
+            }
+
+            else {
+
+                this.client.in_store_image_updated      =   false
             }
         },
 

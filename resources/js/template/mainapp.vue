@@ -37,7 +37,7 @@
             </div>
 
             <div class="col-7 text-light p-0">
-                <div><h5>Swalis Survey</h5></div>
+                <div><h5>Routing V2.0</h5></div>
                 <div><span>Get our app for better experience.</span></div>
             </div>
 
@@ -246,7 +246,6 @@
     }
 
 </script>
-
 
 <style>
 

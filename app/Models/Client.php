@@ -91,6 +91,8 @@ class Client extends Model
         }
     }
 
+    //
+
     public static function changeRouteClients(Request $request, int $id_route_import) {
 
         $liste_clients_elem =   json_decode($request->get("clients"));
@@ -99,12 +101,31 @@ class Client extends Model
 
             $client                 =   Client::find($client_elem->id);
 
-            $client->DistrictNo     =   $client_elem->DistrictNo;
-            $client->DistrictNameE  =   $client_elem->DistrictNameE;
-            $client->CityNo         =   $client_elem->CityNo;
-            $client->CityNameE      =   $client_elem->CityNameE;
-            $client->JPlan          =   $client_elem->JPlan;
-            $client->Journee        =   $client_elem->Journee;
+            // Set DistrictNo
+            if((isset($client_elem->DistrictNo))&&(isset($client_elem->DistrictNameE))) {
+
+                $client->DistrictNo     =   $client_elem->DistrictNo;
+                $client->DistrictNameE  =   $client_elem->DistrictNameE;
+            }
+
+            // Set CityNo
+            if((isset($client_elem->CityNo))&&(isset($client_elem->CityNameE))) {
+
+                $client->CityNo         =   $client_elem->CityNo;
+                $client->CityNameE      =   $client_elem->CityNameE;
+            }
+
+            // Set JPlan
+            if(isset($client_elem->JPlan)) {
+
+                $client->JPlan          =   $client_elem->JPlan;
+            }
+
+            // Set Journee
+            if(isset($client_elem->Journee)) {
+
+                $client->Journee        =   $client_elem->Journee;
+            }
 
             $client->save();
         }
@@ -154,6 +175,8 @@ class Client extends Model
             'owner'                         =>  Auth::user()->id
         ]);
 
+        $client->save();
+
         //
 
         if($request->input("JPlan") !=  null) {
@@ -180,26 +203,34 @@ class Client extends Model
 
         //
 
-        if($request->input("facade_image") !=  null) {
+        if($request->hasFile("facade_image")) {
 
-            $client->facade_image      =   $request->input("facade_image");
-        }
+            $fileName                   =   uniqid().'.'.$request->file("facade_image")->getClientOriginalExtension();
+
+            $request->file("facade_image")->move(public_path('uploads/clients/'.$client->id), $fileName);
+
+            $client->facade_image       =   $fileName;
+        } 
 
         else {
 
-            $client->facade_image      =   "";
+            $client->facade_image       =   "";
         }
 
         //
 
-        if($request->input("in_store_image") !=  null) {
+        if($request->hasFile("in_store_image")) {
 
-            $client->in_store_image      =   $request->input("in_store_image");
+            $fileName                   =   uniqid().'.'.$request->file("in_store_image")->getClientOriginalExtension();
+
+            $request->file("in_store_image")->move(public_path('uploads/clients/'.$client->id), $fileName);
+
+            $client->in_store_image     =   $fileName;
         }
 
         else {
 
-            $client->in_store_image      =   "";
+            $client->in_store_image     =   "";
         }
 
         //
@@ -325,26 +356,40 @@ class Client extends Model
 
             //
 
-            if($request->input("facade_image") !=  null) {
+            if($request->get("facade_image_updated")    ==  "true") {
 
-                $client->facade_image      =   $request->input("facade_image");
-            }
+                if($request->hasFile("facade_image")) {
 
-            else {
+                    $fileName                   =   uniqid().'.'.$request->file("facade_image")->getClientOriginalExtension();
 
-                $client->facade_image      =   "";
+                    $request->file("facade_image")->move(public_path('uploads/clients/'.$client->id), $fileName);
+
+                    $client->facade_image       =   $fileName;
+                } 
+
+                else {
+
+                    $client->facade_image       =   "";
+                }
             }
 
             //
 
-            if($request->input("in_store_image") !=  null) {
+            if($request->get("in_store_image_updated")  ==  "true") {
 
-                $client->in_store_image      =   $request->input("in_store_image");
-            }
+                if($request->hasFile("in_store_image")) {
 
-            else {
+                    $fileName                   =   uniqid().'.'.$request->file("in_store_image")->getClientOriginalExtension();
 
-                $client->in_store_image      =   "";
+                    $request->file("in_store_image")->move(public_path('uploads/clients/'.$client->id), $fileName);
+
+                    $client->in_store_image     =   $fileName;
+                }
+
+                else {
+
+                    $client->in_store_image     =   "";
+                }
             }
 
             //
@@ -397,6 +442,8 @@ class Client extends Model
 
             $client->save();
         }
+
+        return $client;
     }
 
     //

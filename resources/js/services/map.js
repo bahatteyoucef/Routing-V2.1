@@ -25,11 +25,14 @@ export default class Map {
 
         this.journey_plan_territories                       =   []
         this.journee_territories                            =   []
+        this.user_territories                               =   []
 
+        // Left Tools
         this.draw_plugin_options                            =   []
         this.draw_control                                   =   null
         this.editable_layers                                =   new L.FeatureGroup()
 
+        // Right Tools
         this.draw_plugin_journey_plan_territory_options     =   []
         this.draw_control_journey_plan_territory            =   null
         this.editable_layers_journey_plan_territory         =   new L.FeatureGroup()
@@ -519,7 +522,7 @@ export default class Map {
         }
     }
 
-    // JPlan Territories
+    // Territories
 
     $showTerritories() {
 
@@ -598,53 +601,6 @@ export default class Map {
         }
     }
 
-    $showJPlanBDTerritories(territories) {
-
-        // Hide
-        this.$hideTerritores()
-
-        // Show
-
-        for (let i = 0; i < territories.length; i++) {
-
-            var latlngs =   JSON.parse(territories[i].latlngs)
-
-            if(Array.isArray(latlngs) && (latlngs.length > 0)) {
-
-                // Territory
-                var territory           =   L.polygon(latlngs, { color: territories[i].color }).addTo(this.map)
-                this.journey_plan_territories.push(territory)
-
-                // Add to Editable Layers by Right Drawing tool
-                this.editable_layers_journey_plan_territory.addLayer(territory)
-
-                // Add Description 
-                let territory_obj             =   territory.bindTooltip("JPlan   : " + territories[i].JPlan)
-
-                territory_obj.journey_plan    =   territories[i]
-
-                // Add Event Edit
-                territory_obj.on("edit", function(event) {
-                    console.log("red layer edited !");
-                })
-
-                // Add Event Click
-                territory_obj.on("click", (event)   => {
-                    this.$addJourneyPlanTerritory(event)
-                })    
-            }          
-        }
-    }
-
-    $hideTerritores() {
-
-        // Clear Markers
-        this.journey_plan_territories.forEach(territory => {
-
-            this.map.removeLayer(territory)
-        });
-    }
-
     $getTerritoryLatLngs(markers) {
 
         // 
@@ -704,6 +660,55 @@ export default class Map {
         return false
     }
 
+    // JPlan Territories
+
+    $showJPlanBDTerritories(territories) {
+
+        // Hide
+        this.$hideTerritores()
+
+        // Show
+
+        for (let i = 0; i < territories.length; i++) {
+
+            var latlngs =   JSON.parse(territories[i].latlngs)
+
+            if(Array.isArray(latlngs) && (latlngs.length > 0)) {
+
+                // Territory
+                var territory           =   L.polygon(latlngs, { color: territories[i].color }).addTo(this.map)
+                this.journey_plan_territories.push(territory)
+
+                // Add to Editable Layers by Right Drawing tool
+                this.editable_layers_journey_plan_territory.addLayer(territory)
+
+                // Add Description 
+                let territory_obj             =   territory.bindTooltip("JPlan   : " + territories[i].JPlan)
+
+                territory_obj.journey_plan    =   territories[i]
+
+                // Add Event Edit
+                territory_obj.on("edit", function(event) {
+                    console.log("red layer edited !");
+                })
+
+                // Add Event Click
+                territory_obj.on("click", (event)   => {
+                    this.$addJourneyPlanTerritory(event)
+                })    
+            }          
+        }
+    }
+
+    $hideTerritores() {
+
+        // Clear Markers
+        this.journey_plan_territories.forEach(territory => {
+
+            this.map.removeLayer(territory)
+        });
+    }
+
     // Journee Territories
 
     $showJourneeBDTerritories(territories) {
@@ -750,6 +755,59 @@ export default class Map {
 
         // Clear Markers
         this.journee_territories.forEach(territory => {
+
+            this.map.removeLayer(territory)
+        });
+    }
+
+    // User Territories
+
+    $showUserBDTerritories(territories) {
+
+        // Hide
+        this.$hideUserTerritores()
+
+        // Show
+
+        for (let i = 0; i < territories.length; i++) {
+
+            var latlngs     =   JSON.parse(territories[i].latlngs)
+
+            if(Array.isArray(latlngs) && (latlngs.length > 0)) {
+
+                // Territory
+                var territory           =   L.polygon(latlngs, { color: territories[i].color }).addTo(this.map)
+                this.user_territories.push(territory)
+
+                // Add to Editable Layers by Right Drawing tool
+                this.editable_layers_journey_plan_territory.addLayer(territory)
+
+                // Add Description 
+                let territory_obj       =   territory.bindTooltip(
+                    "Description    : "     +territories[i].description     +"<br />"+
+                    "User           : "     +territories[i].user            +"<br />"
+                )
+
+                territory_obj.user    =   territories[i]
+
+                // Add Event Edit
+                territory_obj.on("edit", function(event) {
+                    console.log("red layer edited !");
+                })
+
+                // Add Event Click
+                territory_obj.on("click", (event)   => {
+                    
+                    this.$addUserTerritory(event)
+                })    
+            }          
+        }
+    }
+
+    $hideUserTerritores() {
+
+        // Clear Markers
+        this.user_territories.forEach(territory => {
 
             this.map.removeLayer(territory)
         });
@@ -1107,6 +1165,30 @@ export default class Map {
 
         // Add Journey Plan
         store.commit("journey_plan/setAddJourneyPlan" ,  {"journee" : journee})
+    }
+
+    $addUserTerritory(event) {
+
+        var latLngs = event.target.getLatLngs();
+            
+        // Extract the lat and lng values
+        var latlngs = latLngs[0].map(function(latlng) {
+            return [latlng.lat, latlng.lng];
+        });
+
+        //
+
+        let user    =   event.target.user
+        
+        if(user) {
+
+            user.latlngs    =   latlngs
+        }
+
+        //
+
+        // Add User Territory
+        store.commit("journey_plan/setAddJourneyPlan" ,  {"user" : user})
     }
 
     $addTerritory(event) {

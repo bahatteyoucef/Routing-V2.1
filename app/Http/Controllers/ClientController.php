@@ -92,7 +92,7 @@ class ClientController extends Controller
             //
 
             // validate
-            $validator    =   Client::validateUpdate($request);
+            $validator  =   Client::validateUpdate($request);
             
             if ($validator->fails()) {
                 return response()->json([
@@ -100,15 +100,16 @@ class ClientController extends Controller
                 ],422);
             }
 
-            // update 
-            Client::updateClient($request, $id_route_import, $id);
+            // update
+            $client     =   Client::updateClient($request, $id_route_import, $id);
             
             //
             DB::commit();
             //
 
             return response()->json([
-                "header"            =>  "Client Updated !"                      ,
+                "client"            =>  $client             ,
+                "header"            =>  "Client Updated !"  ,
                 "message"           =>  "a client has been updated successfully !"
             ]);
         }

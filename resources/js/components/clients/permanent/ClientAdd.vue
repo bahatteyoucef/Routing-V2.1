@@ -526,13 +526,31 @@ export default {
 
             if(facade_image) {
 
-                this.client.facade_image_original_name      =   facade_image.name
-                this.client.facade_image                    =   await this.$imageToBase64(facade_image)
+                if(this.$connectedToInternet) {
 
-                //
+                    this.client.facade_image_original_name      =   facade_image.name
+                    this.client.facade_image                    =   await this.$compressImage(facade_image)
 
-                let facade_image_display                    =   document.getElementById("facade_image_display")
-                this.base64ToImage(this.client.facade_image, facade_image_display)
+                    //
+
+                    let facade_image_base64                     =   await this.$imageToBase64(this.client.facade_image)
+
+                    let facade_image_display                    =   document.getElementById("facade_image_display")
+                    this.base64ToImage(facade_image_base64, facade_image_display)
+                }
+
+                else {
+
+                    this.client.facade_image_original_name      =   facade_image.name
+                    this.client.facade_image                    =   await this.$compressImage(facade_image)
+
+                    //
+
+                    this.client.facade_image                    =   await this.$imageToBase64(this.client.facade_image)
+
+                    let facade_image_display                    =   document.getElementById("facade_image_display")
+                    this.base64ToImage(this.client.facade_image, facade_image_display)
+                }
             }
         },
 
@@ -544,13 +562,31 @@ export default {
 
             if(in_store_image) {
 
-                this.client.in_store_image_original_name    =   in_store_image.name
-                this.client.in_store_image                  =   await this.$imageToBase64(in_store_image)
-                
-                //
+                if(this.$connectedToInternet) {
 
-                let in_store_image_display                  =   document.getElementById("in_store_image_display")
-                this.base64ToImage(this.client.in_store_image, in_store_image_display)
+                    this.client.in_store_image_original_name    =   in_store_image.name
+                    this.client.in_store_image                  =   await this.$compressImage(in_store_image)
+                    
+                    //
+
+                    let in_store_image_base64                   =   await this.$imageToBase64(this.client.in_store_image)
+
+                    let in_store_image_display                  =   document.getElementById("in_store_image_display")
+                    this.base64ToImage(in_store_image_base64, in_store_image_display)
+                }
+
+                else {
+
+                    this.client.in_store_image_original_name    =   in_store_image.name
+                    this.client.in_store_image                  =   await this.$compressImage(in_store_image)
+                    
+                    //
+
+                    this.client.in_store_image                  =   await this.$imageToBase64(this.client.in_store_image)
+
+                    let in_store_image_display                  =   document.getElementById("in_store_image_display")
+                    this.base64ToImage(this.client.in_store_image, in_store_image_display)
+                }
             }
         },
 

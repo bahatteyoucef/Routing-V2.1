@@ -14,19 +14,37 @@
 
                     <form>
 
-                        <div class="mb-3">
-                            <label for="JPlan"              class="form-label">JPlan</label>
-                            <input type="text"              class="form-control"        id="JPlan"                  v-model="territoire.JPlan">
+                        <!--  -->
+
+                        <div v-if="((territoire.type_territoire ==  '1')||(territoire.type_territoire ==  '2'))">
+                            <div class="mb-3">
+                                <label for="JPlan"              class="form-label">JPlan</label>
+                                <input type="text"              class="form-control"        id="JPlan"                  v-model="territoire.JPlan">
+                            </div>
+
+                            <div class="mb-3" v-if="territoire.type_territoire ==  '2'">
+                                <label for="Journee"            class="form-label">Journee</label>
+                                <input type="text"              class="form-control"        id="Journee"                v-model="territoire.Journee">
+                            </div>
                         </div>
 
-                        <div class="mb-3" v-if="territoire.type_territoire ==  '2'">
-                            <label for="Journee"            class="form-label">Journee</label>
-                            <input type="text"              class="form-control"        id="Journee"                v-model="territoire.Journee">
+                        <!--  -->
+
+                        <div v-if="(territoire.type_territoire ==  '3')">
+                            <div class="mb-3">
+                                <label for="Description"        class="form-label">Description</label>
+                                <input type="text"              class="form-control"        id="Description"        v-model="territoire.description">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="type_user"          class="form-label">User</label>
+                                <select                         class="form-select"         id="type_user"          v-model="territoire.id_user">
+                                    <option v-for="user, index in users" :key="index"   :value="user.id">{{ user.nom }}</option>
+                                </select>
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <input type="color"             class="form-control form-control-color w-100"           v-model="territoire.color">
-                        </div>
+                        <!--  -->
 
                     </form>
 
@@ -62,23 +80,30 @@ export default {
 
             territoire      :   {
 
-                id                  :   null ,
+                id                  :   null    ,
 
-                type_territoire     :   '1'  ,
+                type_territoire     :   '1'     ,
 
-                JPlan               :   '',
-                Journee             :   '',
+                JPlan               :   ''      ,
+                Journee             :   ''      ,
 
-                color               :   '',
+                description         :   ''      ,
+                id_user             :   ''      ,
+
+                color               :   ''      ,
 
                 latlngs             :   null
-            }
+            },
+
+            users                       :   []
         }
     },
 
-    mounted() {
+    async mounted() {
 
         this.clearData("#updateJourneyPlanModal")
+
+        await this.getComboData()
     },  
 
     methods : {
@@ -98,6 +123,8 @@ export default {
             formData.append("latlngs"           ,   JSON.stringify(this.territoire.latlngs))
             formData.append("JPlan"             ,   this.territoire.JPlan)
             formData.append("Journee"           ,   this.territoire.Journee)
+            formData.append("description"       ,   this.territoire.description)
+            formData.append("id_user"           ,   this.territoire.id_user)
             formData.append("color"             ,   this.territoire.color)
 
             console.log(this.territoire.color)
@@ -157,6 +184,34 @@ export default {
                     this.$showErrors("Error !", res.data.errors)
                 }            
             }
+
+            if(this.territoire.type_territoire    ==  '3') {
+
+                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/user_territories/"+this.territoire.id+"/update"       ,   formData)
+                console.log(res.data)
+
+                if(res.status===200){
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    // Send Client
+                    this.emitter.emit('reSetUserBDTerritory')
+
+                    // Close Modal
+                    this.$hideModal("updateJourneyPlanModal")
+
+                }
+                
+                else{
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    // Send Errors
+                    this.$showErrors("Error !", res.data.errors)
+                }            
+            }
         },
 
         async deleteData() {
@@ -168,6 +223,8 @@ export default {
             formData.append("latlngs"           ,   JSON.stringify(this.territoire.latlngs))
             formData.append("JPlan"             ,   this.territoire.JPlan)
             formData.append("Journee"           ,   this.territoire.Journee)
+            formData.append("description"       ,   this.territoire.description)
+            formData.append("id_user"           ,   this.territoire.id_user)
             formData.append("color"             ,   this.territoire.color)
 
             if(this.territoire.type_territoire    ==  '1') {
@@ -224,6 +281,36 @@ export default {
                     this.$showErrors("Error !", res.data.errors)
                 }            
             }
+
+            console.log(this.territoire.type_territoire)
+
+            if(this.territoire.type_territoire    ==  '3') {
+
+                const res                       =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/user_territories/"+this.territoire.id+"/delete"      ,   formData)
+                console.log(res.data)
+
+                if(res.status===200){
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    // Send Client
+                    this.emitter.emit('reSetUserBDTerritory')
+
+                    // Close Modal
+                    this.$hideModal("updateJourneyPlanModal")
+
+                }
+                
+                else{
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    // Send Errors
+                    this.$showErrors("Error !", res.data.errors)
+                }            
+            }
         },
 
         //
@@ -240,6 +327,9 @@ export default {
 
                 this.territoire.JPlan               =   '',
                 this.territoire.Journee             =   '',
+
+                this.territoire.description         =   '',
+                this.territoire.id_user             =   '',
 
                 this.territoire.color               =   '',
 
@@ -258,24 +348,48 @@ export default {
 
         //
 
+        async getComboData() {
+
+            const res       =   await this.$callApi("post",     "/route_import/"+this.$route.params.id_route_import+"/users/frontOffice",     null)
+
+            this.users      =   res.data
+        },
+
+        //
+
         getData(journey_plan) {
+
+            console.log(journey_plan)
+
+            //
 
             this.territoire.latlngs =   journey_plan.latlngs
 
-            if(journey_plan.Journee) {
+            if(journey_plan.user) {
 
-                this.territoire.type_territoire   =   '2'
+                this.territoire.type_territoire   =   '3'
             }
 
             else {
 
-                this.territoire.type_territoire   =   '1'
+                if(journey_plan.Journee) {
+
+                    this.territoire.type_territoire   =   '2'
+                }
+
+                else {
+
+                    this.territoire.type_territoire   =   '1'
+                }
             }
 
             this.territoire.id              =   journey_plan.id
 
             this.territoire.JPlan           =   journey_plan.JPlan  
             this.territoire.Journee         =   journey_plan.Journee
+
+            this.territoire.id_user         =   journey_plan.id_user
+            this.territoire.description     =   journey_plan.description
 
             this.territoire.color           =   journey_plan.color
         },

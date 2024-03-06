@@ -195,16 +195,16 @@
 
 import Multiselect              from '@vueform/multiselect'
 
-import modalClientAdd           from "../../clients/modalClientAdd.vue"
-import modalClientUpdate        from "../../clients/modalClientUpdate.vue"
-import modalClientsChangeRoute  from "../../clients/modalClientsChangeRoute.vue"
-import modalResume              from "../imports/modalResume.vue"
+import modalClientAdd           from "../../../clients/permanent/modalClientAdd.vue"
+import modalClientUpdate        from "../../../clients/permanent/modalClientUpdate.vue"
+import modalClientsChangeRoute  from "../../../clients/permanent/modalClientsChangeRoute.vue"
+import modalResume              from "../../modalResume.vue"
 
-import modalAddJourneyPlan      from "../../territoires/modalAddJourneyPlan.vue"
-import modalUpdateJourneyPlan   from "../../territoires/modalUpdateJourneyPlan.vue"
+import modalAddJourneyPlan      from "../../../territoires/modalAddJourneyPlan.vue"
+import modalUpdateJourneyPlan   from "../../../territoires/modalUpdateJourneyPlan.vue"
 
-import modalUpdateMap           from "../imports/Map/modalUpdateMap.vue"
-import modalValidateMap         from "../imports/Map/modalValidateMap.vue"
+import modalUpdateMap           from "../../../routes/permanent/modalUpdateMap.vue"
+import modalValidateMap         from "../../../routes/permanent/modalValidateMap.vue"
 
 import {mapGetters, mapActions} from "vuex"
 

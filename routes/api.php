@@ -7,6 +7,7 @@ use App\Http\Controllers\JourneyPlanController;
 use App\Http\Controllers\RouteImportController;
 use App\Http\Controllers\RouteImportTempoController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserTerritoryController;
 use App\Models\ClientTempo;
 use App\Models\JourneyPlan;
 use App\Models\RouteImport;
@@ -51,6 +52,18 @@ Route::post('/user/isAuthentificated', [UserController::class, 'isAuthentificate
 Route::middleware('auth:api')->group(function () {
     
     // RTM WIllaya Cite
+
+    Route::post('/rtm_willayas/rtm_cites/details/indexedDB'           ,   function()  { 
+
+        $willayas   =   DB::table("RTM_Willaya")->orderByRaw('CAST(DistrictNo AS SIGNED INTEGER)')->get();
+
+        foreach ($willayas as $willaya) {
+
+            $willaya->cites =   DB::table("RTM_City")->where('DistrictNo', $willaya->DistrictNo)->orderByRaw('CAST(CityNo AS SIGNED INTEGER)')->get();
+        }
+
+        return $willayas;
+    });
 
     Route::post('/rtm_willayas/rtm_cites/details'           ,   function()  { 
 
@@ -138,6 +151,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/route_import/header'                                                                  ,   [RouteImportController::class           , 'headerRouteImports'                      ]);
     Route::post('/route_import/index'                                                                   ,   [RouteImportController::class           , 'indexRouteImports'                       ]);
 
+    Route::post('/route_import/{id}/users/frontOffice'                                                  ,   [RouteImportController::class           , 'frontOffice'                             ]);
     //
 
     Route::post('/route_import/{id_route_import}/clients/doubles'                                       ,   [ClientController::class                , 'getDoublesClients'                       ]);
@@ -148,19 +162,32 @@ Route::middleware('auth:api')->group(function () {
 
     //
 
+    Route::post('/route_import/{id}/user_territories'                                                   ,   [RouteImportController::class           , 'userTerritory'                           ]);
+    Route::post('/route_import/{id}/user_territories/util'                                              ,   [RouteImportController::class           , 'userTerritoryUtil'                       ]);
+
+    Route::post('/route_import/{id}/user_territories/store'                                             ,   [UserTerritoryController::class         , 'storeUserTerritory'                      ]);
+    Route::post('/route_import/{id}/user_territories/{id_user_territory}/update'                        ,   [UserTerritoryController::class         , 'updateUserTerritory'                     ]);
+    Route::post('/route_import/{id}/user_territories/{id_user_territory}/delete'                        ,   [UserTerritoryController::class         , 'deleteUserTerritory'                     ]);
+
+    //
+
     Route::post('/route_import/{id}/journey_plan'                                                       ,   [RouteImportController::class           , 'journeyPlan'                             ]);
     Route::post('/route_import/{id}/journey_plan/util'                                                  ,   [RouteImportController::class           , 'journeyPlanUtil'                         ]);
-
-    Route::post('/route_import/{id}/journees'                                                           ,   [RouteImportController::class           , 'journees'                                ]);
-    Route::post('/route_import/{id}/journees/util'                                                      ,   [RouteImportController::class           , 'journeesUtil'                            ]);
 
     Route::post('/route_import/{id}/journey_plan/store'                                                 ,   [JourneyPlanController::class           , 'storeJourneyPlan'                        ]);
     Route::post('/route_import/{id}/journey_plan/{id_journey_plan}/update'                              ,   [JourneyPlanController::class           , 'updateJourneyPlan'                       ]);
     Route::post('/route_import/{id}/journey_plan/{id_journey_plan}/delete'                              ,   [JourneyPlanController::class           , 'deleteJourneyPlan'                       ]);
 
+    //
+
+    Route::post('/route_import/{id}/journees'                                                           ,   [RouteImportController::class           , 'journees'                                ]);
+    Route::post('/route_import/{id}/journees/util'                                                      ,   [RouteImportController::class           , 'journeesUtil'                            ]);
+
     Route::post('/route_import/{id}/journees/store'                                                     ,   [JourneeController::class               , 'storeJournee'                            ]);
     Route::post('/route_import/{id}/journees/{id_journee}/update'                                       ,   [JourneeController::class               , 'updateJournee'                           ]);
     Route::post('/route_import/{id}/journees/{id_journee}/delete'                                       ,   [JourneeController::class               , 'deleteJournee'                           ]);
+
+    //
 
     Route::post('/route_import/{id_route_import}/clients/{id}/validate'                                 ,   [ClientController::class                , 'validateClient'                          ]);
     Route::post('/route_import/{id_route_import}/clients/{id}/show'                                     ,   [ClientController::class                , 'showClient'                              ]);

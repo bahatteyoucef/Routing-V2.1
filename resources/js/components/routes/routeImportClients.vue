@@ -179,11 +179,11 @@
 
 import headerComponent              from    "../../template/components/headerComponent.vue"
 
-import modalClientAddIndexedDB      from    "../clients/modalClientAddIndexedDB.vue"
-import modalClientUpdateIndexedDB   from    "../clients/modalClientUpdateIndexedDB.vue"
+import modalClientAddIndexedDB      from    "../clients/permanent/modalClientAddIndexedDB.vue"
+import modalClientUpdateIndexedDB   from    "../clients/permanent/modalClientUpdateIndexedDB.vue"
 
-import modalClientAdd               from    "../clients/modalClientAdd.vue"
-import modalClientUpdate            from    "../clients/modalClientUpdate.vue"
+import modalClientAdd               from    "../clients/permanent/modalClientAdd.vue"
+import modalClientUpdate            from    "../clients/permanent/modalClientUpdate.vue"
 
 import {mapGetters, mapActions}     from    "vuex"
 
@@ -307,8 +307,6 @@ export default {
                 
                     // Initialisation 
                     this.clients    =   [];
-
-                    // await this.$indexedDB.$indexedDB_intialiazeSetDATA()
 
                     this.route_import                           =   await this.$indexedDB.$getRouteImport(this.$route.params.id_route_import)
                     this.clients                                =   this.route_import.clients

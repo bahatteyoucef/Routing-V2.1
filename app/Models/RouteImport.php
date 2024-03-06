@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Fluent;
@@ -239,6 +241,47 @@ class RouteImport extends Model
 
     //
 
+    // User Territory
+
+    public static function userTerritory(int $id) 
+    {
+
+        $liste_user_territory   =   UserTerritory::where('id_route_import', $id)->orderBy("id_user")->get();
+
+        return $liste_user_territory;
+    }
+
+    public static function userTerritoryUtil(Request $request, int $id) 
+    {
+
+        $liste_user_territory_array     =   json_decode($request->get("liste_user_territory"));
+
+        if($liste_user_territory_array  ==  []) {
+
+            $liste_user_territory           =   DB::table("user_territories")->select("user_territories.*"  ,   "users.nom   as  user")
+                                                ->join("users", "user_territories.id_user", "users.id")
+                                                ->where('id_route_import', $id)
+                                                ->whereNotNull('latlngs')
+                                                ->orderBy("id_user")
+                                                ->get();
+        }
+
+        else {
+
+            $liste_user_territory           =   DB::table("user_territories")->select("user_territories.*"  ,   "users.nom   as  user")
+                                                ->join("users", "user_territories.id_user", "users.id")
+                                                ->where('id_route_import', $id)
+                                                ->whereNotNull('latlngs')
+                                                ->whereIn('users.nom', $liste_user_territory_array)
+                                                ->orderBy("id_user")
+                                                ->get();
+        }
+
+        return $liste_user_territory;
+    }
+
+    //
+
     // Journey Plan
 
     public static function journeyPlan(int $id) 
@@ -266,6 +309,8 @@ class RouteImport extends Model
 
         return $liste_journey_plan;
     }
+
+    //
 
     // Journee
 
@@ -472,26 +517,62 @@ class RouteImport extends Model
 
                 //
 
-                if($client_elem->facade_image    !=  null) {
+                if($client_elem->facade_image_updated       ==  "true") {
 
-                    $client->facade_image           =   $client_elem->facade_image;
-                }
+                    if($client_elem->facade_image) {
 
-                else {
+                        $facade_image               =   $client_elem->facade_image;  // your base64 encoded
+                        $facade_image               =   str_replace('data:image/png;base64,', '', $facade_image);
+                        $facade_image               =   str_replace(' ', '+', $facade_image);
+                        $fileName                   =   uniqid().'.'.'png';
 
-                    $client->facade_image           =   "";
+                        $target_path                =   public_path('uploads/clients/' . $client->id . '/' . $fileName);
+
+                        // Create the directory if it doesn't exist
+                        if (!File::isDirectory(dirname($target_path))) {
+
+                            File::makeDirectory(dirname($target_path), 0775, true); // Ensure write permissions
+                        }
+
+                        file_put_contents($target_path, base64_decode($facade_image));
+
+                        $client->facade_image       =   $fileName; 
+                    } 
+
+                    else {
+
+                        $client->facade_image       =   "";
+                    }
                 }
 
                 //
 
-                if($client_elem->in_store_image    !=  null) {
+                if($client_elem->in_store_image_updated     ==  "true") {
 
-                    $client->in_store_image           =   $client_elem->in_store_image;
-                }
+                    if($client_elem->in_store_image) {
 
-                else {
+                        $in_store_image             =   $client_elem->in_store_image;  // your base64 encoded
+                        $in_store_image             =   str_replace('data:image/png;base64,', '', $in_store_image);
+                        $in_store_image             =   str_replace(' ', '+', $in_store_image);
+                        $fileName                   =   uniqid().'.'.'png';
 
-                    $client->in_store_image           =   "";
+                        $target_path                =   public_path('uploads/clients/' . $client->id . '/' . $fileName);
+
+                        // Create the directory if it doesn't exist
+                        if (!File::isDirectory(dirname($target_path))) {
+
+                            File::makeDirectory(dirname($target_path), 0775, true); // Ensure write permissions
+                        }
+
+                        file_put_contents($target_path, base64_decode($in_store_image));
+
+                        $client->in_store_image     =   $fileName;
+                    }
+
+                    else {
+
+                        $client->in_store_image     =   "";
+                    }
                 }
 
                 //
@@ -540,6 +621,8 @@ class RouteImport extends Model
 
         foreach ($added_clients as $client_elem) {
 
+            //
+
             $client         =   new Client([
                 'CustomerCode'      =>  $client_elem->CustomerCode      ,    
                 'CustomerNameE'     =>  $client_elem->CustomerNameE     ,
@@ -547,16 +630,18 @@ class RouteImport extends Model
                 'Latitude'          =>  $client_elem->Latitude          ,
                 'Longitude'         =>  $client_elem->Longitude         ,
                 'Address'           =>  $client_elem->Address           ,
-                'CityNo'            =>  $client_elem->CityNo           ,
-                'DistrictNo'        =>  $client_elem->DistrictNo           ,
-                'CityNameE'         =>  $client_elem->CityNameE           ,
-                'DistrictNameE'     =>  $client_elem->DistrictNameE           ,
+                'CityNo'            =>  $client_elem->CityNo            ,
+                'DistrictNo'        =>  $client_elem->DistrictNo        ,
+                'CityNameE'         =>  $client_elem->CityNameE         ,
+                'DistrictNameE'     =>  $client_elem->DistrictNameE     ,
                 'Tel'               =>  $client_elem->Tel               ,
                 'CustomerType'      =>  $client_elem->CustomerType      ,
                 'id_route_import'   =>  $client_elem->id_route_import   ,  
                 'status'            =>  $client_elem->status            ,
                 'owner'             =>  Auth::user()->id                ,
             ]);
+
+            $client->save();
 
             //
 
@@ -584,26 +669,56 @@ class RouteImport extends Model
 
             //
 
-            if($client_elem->facade_image    !=  null) {
+            if($client_elem->facade_image) {
 
-                $client->facade_image           =   $client_elem->facade_image;
-            }
+                $facade_image               =   $client_elem->facade_image;  // your base64 encoded
+                $facade_image               =   str_replace('data:image/png;base64,', '', $facade_image);
+                $facade_image               =   str_replace(' ', '+', $facade_image);
+                $fileName                   =   uniqid().'.'.'png';
+
+                $target_path                =   public_path('uploads/clients/' . $client->id . '/' . $fileName);
+
+                // Create the directory if it doesn't exist
+                if (!File::isDirectory(dirname($target_path))) {
+
+                    File::makeDirectory(dirname($target_path), 0775, true); // Ensure write permissions
+                }
+
+                file_put_contents($target_path, base64_decode($facade_image));
+
+                $client->facade_image       =   $fileName; 
+            } 
 
             else {
 
-                $client->facade_image           =   "";
+                $client->facade_image       =   "";
             }
 
             //
 
-            if($client_elem->in_store_image    !=  null) {
+            if($client_elem->in_store_image) {
 
-                $client->in_store_image           =   $client_elem->in_store_image;
+                $in_store_image             =   $client_elem->in_store_image;  // your base64 encoded
+                $in_store_image             =   str_replace('data:image/png;base64,', '', $in_store_image);
+                $in_store_image             =   str_replace(' ', '+', $in_store_image);
+                $fileName                   =   uniqid().'.'.'png';
+
+                $target_path                =   public_path('uploads/clients/' . $client->id . '/' . $fileName);
+
+                // Create the directory if it doesn't exist
+                if (!File::isDirectory(dirname($target_path))) {
+
+                    File::makeDirectory(dirname($target_path), 0775, true); // Ensure write permissions
+                }
+
+                file_put_contents($target_path, base64_decode($in_store_image));
+
+                $client->in_store_image     =   $fileName; 
             }
 
             else {
 
-                $client->in_store_image           =   "";
+                $client->in_store_image     =   "";
             }
 
             //
@@ -660,5 +775,39 @@ class RouteImport extends Model
         }
 
         //
+    }
+
+    //
+
+    public static function frontOffice(int $id_route_import) {
+
+        $users      =   DB::table('users')
+
+                        ->select([ 
+                            'users.id                               as  id'                 , 
+
+                            'users.nom                              as  nom'                ,
+                            'users.email                            as  email'              ,
+
+                            'users.tel                              as  tel'                ,
+                            'users.company                          as  company'            ,
+
+                            'users.type_user                        as  type_user'          ,
+
+                            'users.max_route_import                 as  max_route_import'   ,
+
+                            //
+
+                            'users_route_import.id_route_import     as  id_route_import'
+                        ])
+
+                        ->join("users_route_import",    "users.id",     "users_route_import.id_user")
+
+                        ->where([["users_route_import.id_route_import", $id_route_import],
+                                ["users.type_user", "FrontOffice"]])
+
+                        ->get();
+
+        return $users;
     }
 }

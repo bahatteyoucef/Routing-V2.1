@@ -204,6 +204,70 @@ class RouteImportController extends Controller
 
     //
 
+    public function userTerritory(int $id)
+    {
+
+        try {
+
+            //
+            DB::beginTransaction();
+            //
+
+            // store 
+            $liste_user_territory =   RouteImport::userTerritory($id);
+
+            //
+            DB::commit();
+            //
+
+            return $liste_user_territory;
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    public function userTerritoryUtil(Request $request, int $id)
+    {
+
+        try {
+
+            //
+            DB::beginTransaction();
+            //
+
+            // store 
+            $liste_user_territory   =   RouteImport::userTerritoryUtil($request, $id);
+
+            //
+            DB::commit();
+            //
+
+            return $liste_user_territory;
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    //
+
     public function journeyPlan(int $id)
     {
 
@@ -475,6 +539,25 @@ class RouteImportController extends Controller
 
             $liste_route_import     =   RouteImport::indexRouteImports();
             return User::filterRouteImport($liste_route_import);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    //
+
+    public static function frontOffice(int $id_route_import)
+    {
+
+        try {
+
+            $users      =   RouteImport::frontOffice($id_route_import);
+            return $users;
         }
 
         catch(Throwable $erreur) {

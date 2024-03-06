@@ -1,7 +1,7 @@
 <template>
 
     <!-- Modal -->
-    <div class="modal fade" id="modalClientAddIndexedDB" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="addClientModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
 
@@ -53,6 +53,8 @@
                             </select>
                         </div>
 
+                        <!--  -->
+                         
                         <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
                             <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @change="checkClients()">
@@ -120,15 +122,15 @@
                         <!--  -->
 
                         <div class="mb-3">
-                            <label for="facade_image"       class="form-label">Facade Image (Facade Image)</label>
-                            <input type="file"              class="form-control"        id="facade_image"               accept="image/*"    @change="facadeImage()">
-                            <img                                                        id="facade_image_display"       src=""              class="w-100">
+                            <label for="facade_image_add"   class="form-label">Facade Image (Facade Image)</label>
+                            <input type="file"              class="form-control"        id="facade_image_add"           accept="image/*"    @change="facadeImage()">
+                            <img                                                        id="facade_image_display_add"       src=""              class="w-100">
                         </div>
 
                         <div class="mb-3">
-                            <label for="in_store_image"     class="form-label">In-Store Image (In-Store Image)</label>
-                            <input type="file"              class="form-control"        id="in_store_image"             accept="image/*"    @change="inStoreImage()">
-                            <img                                                        id="in_store_image_display"     src=""              class="w-100">
+                            <label for="in_store_image_add" class="form-label">In-Store Image (In-Store Image)</label>
+                            <input type="file"              class="form-control"        id="in_store_image_add"             accept="image/*"    @change="inStoreImage()">
+                            <img                                                        id="in_store_image_display_add"     src=""              class="w-100">
                         </div>
 
                         <!--  -->
@@ -162,9 +164,15 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary"   @click="sendData()">Confirm</button>
                 </div>
+
+                <div class="modal-footer"       style="display: flex; justify-content: space-between;">
+                    <div class="right-buttons"  style="display: flex; margin-left: auto;">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary"   @click="sendData()">Confirm</button>
+                    </div>
+                </div>
+
 
             </div>
         </div>
@@ -190,46 +198,47 @@ export default {
                 in_store_image_original_name    :   '',
 
                 // Client
-                id                              :   '',
+                id              :   '',
 
-                CustomerCode                    :   '',
+                CustomerCode    :   '',
 
-                CustomerNameE                   :   '',
-                CustomerNameA                   :   '',
-                Tel                             :   '',
+                CustomerNameE   :   '',
+                CustomerNameA   :   '',
+                Tel             :   '',
 
-                Address                         :   '',
+                Address         :   '',
 
-                DistrictNo                      :   '',
-                DistrictNameE                   :   '',
+                DistrictNo      :   '',
+                DistrictNameE   :   '',
 
-                CityNo                          :   '',
-                CityNameE                       :   '',
+                CityNo          :   '',
+                CityNameE       :   '',
 
-                Latitude                        :   '',
-                Longitude                       :   '',
+                Latitude        :   0,
+                Longitude       :   0,
 
                 // Type
-                CustomerType                    :   '',
+                CustomerType    :   '',
 
                 // Journey Plan
-                JPlan                           :   '',
+                JPlan           :   '',
 
                 // Journee
-                Journee                         :   '',
+                Journee         :   '',
 
                 // Status
-                status                          :   '',
-                nonvalidated_details            :   ''
+                status                  :   '',
+                nonvalidated_details    :   ''
             },
 
-            willayas                            :   [],
-            cites                               :   [],
+            willayas                :   [],
+            cites                   :   [],
 
-            // 
-            liste_journey_plan                  :   []  ,
-            liste_journee                       :   []  ,
-            liste_type_client                   :   []  ,
+            //
+
+            liste_journey_plan              :   []  ,
+            liste_journee                   :   []  ,
+            liste_type_client               :   []  ,
 
             //
 
@@ -260,7 +269,7 @@ export default {
             this.client.status  =   "pending"
         }
 
-        this.clearData("#modalClientAddIndexedDB")
+        this.clearData("#addClientModal")
     },  
 
     methods : {
@@ -279,85 +288,61 @@ export default {
 
             let formData = new FormData();
 
-            formData.append("CustomerCode"                  ,   this.client.CustomerCode)
-            formData.append("CustomerNameE"                 ,   this.client.CustomerNameE)
-            formData.append("CustomerNameA"                 ,   this.client.CustomerNameA)
-            formData.append("Latitude"                      ,   this.client.Latitude)
-            formData.append("Longitude"                     ,   this.client.Longitude)
-            formData.append("Address"                       ,   this.client.Address)
-            formData.append("DistrictNo"                    ,   this.client.DistrictNo)
-            formData.append("DistrictNameE"                 ,   this.client.DistrictNameE)
-            formData.append("CityNo"                        ,   this.client.CityNo)
-            formData.append("CityNameE"                     ,   this.client.CityNameE)
-            formData.append("Tel"                           ,   this.client.Tel)
-            formData.append("CustomerType"                  ,   this.client.CustomerType)
-            formData.append("JPlan"                         ,   this.client.JPlan)
-            formData.append("Journee"                       ,   this.client.Journee)
-            formData.append("id_route_import"               ,   this.$route.params.id_route_import)
+            formData.append("CustomerCode"  ,   this.client.CustomerCode)
+            formData.append("CustomerNameE" ,   this.client.CustomerNameE)
+            formData.append("CustomerNameA" ,   this.client.CustomerNameA)
+            formData.append("Latitude"      ,   this.client.Latitude)
+            formData.append("Longitude"     ,   this.client.Longitude)
+            formData.append("Address"       ,   this.client.Address)
+            formData.append("DistrictNo"    ,   this.client.DistrictNo)
+            formData.append("DistrictNameE" ,   this.client.DistrictNameE)
+            formData.append("CityNo"        ,   this.client.CityNo)
+            formData.append("CityNameE"     ,   this.client.CityNameE)
+            formData.append("Tel"           ,   this.client.Tel)
+            formData.append("CustomerType"  ,   this.client.CustomerType)
+            formData.append("JPlan"         ,   this.client.JPlan)
+            formData.append("Journee"       ,   this.client.Journee)
 
             formData.append("facade_image"                  ,   this.client.facade_image)
             formData.append("in_store_image"                ,   this.client.in_store_image)
             formData.append("facade_image_original_name"    ,   this.client.facade_image_original_name)
             formData.append("in_store_image_original_name"  ,   this.client.in_store_image_original_name)
 
-            formData.append("status"                        ,   this.client.status)
-            formData.append("nonvalidated_details"          ,   this.client.nonvalidated_details)
+            formData.append("status"                ,   this.client.status)
+            formData.append("nonvalidated_details"  ,   this.client.nonvalidated_details)
 
-            if(this.$connectedToInternet) {
+            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/store",   formData)
+            console.log(res)
 
-                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/store",   formData)
-
-                if(res.status===200){
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
-                    // Send Client
-                    this.client.id                      =   res.data.client.id
-                    this.client.status                  =   this.client.status
-                    this.client.nonvalidated_details    =   this.client.nonvalidated_details
-                    this.client.id_route_import         =   this.$route.params.id_route_import
-
-                    // Send Feedback
-                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
-
-                    this.emitter.emit('reSetAdd' , this.client)
-
-                    // Close Modal
-                    this.$hideModal("modalClientAddIndexedDB")
-                }
-                
-                else{
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
-                    // Send Errors
-                    this.$showErrors("Error !", res.data.errors)
-                }       
-            }
-
-            else {
-
-                let max_local_id                =   await this.$indexedDB.$getMaxAddedClients()
-
-                this.client.id                      =   "local_id_"+(max_local_id   +   1) 
-                this.client.status                  =   this.client.status
-                this.client.nonvalidated_details    =   this.client.nonvalidated_details
-                this.client.id_route_import         =   this.$route.params.id_route_import
-
-                // Add in indexedDB
-                await this.$indexedDB.$setAddedClients(this.client, this.$route.params.id_route_import)
+            if(res.status===200){
 
                 // Hide Loading Page
                 this.$hideLoadingPage()
 
                 // Send Client
-                this.emitter.emit('reSetAdd' , this.client)
+
+                this.client.id                      =   res.data.client.id
+                this.client.status                  =   this.client.status
+                this.client.nonvalidated_details    =   this.client.nonvalidated_details
+
+                // Send Feedback
+                this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
+
+                this.emitter.emit('reSetAdd' , res.data.client)
 
                 // Close Modal
-                this.$hideModal("modalClientAddIndexedDB")
+                this.$hideModal("addClientModal")
+
             }
+            
+            else{
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
+			}            
         },
 
         //
@@ -366,29 +351,31 @@ export default {
 
             $(id_modal).on("hidden.bs.modal",   ()  => {
 
-                let facade_image            =   document.getElementById("facade_image")
-                facade_image.value          =   ""
+                //
 
-                let facade_image_display    =   document.getElementById("facade_image_display")
-                facade_image_display.src    =   ""
+                let facade_image_add             =   document.getElementById("facade_image_add")
+                facade_image_add.value           =   ""
 
-                // 
-
-                let in_store_image          =   document.getElementById("in_store_image")
-                in_store_image.value        =   ""
-
-                let in_store_image_display  =   document.getElementById("in_store_image_display")
-                in_store_image_display.src  =   ""
+                let facade_image_display_add     =   document.getElementById("facade_image_display_add")
+                facade_image_display_add.src     =   ""
 
                 //
 
-                this.setAddClientAction(null)
+                let in_store_image_add           =   document.getElementById("in_store_image_add")
+                in_store_image_add.value         =   ""
 
-                // 
+                let in_store_image_display_add   =   document.getElementById("in_store_image_display_add")
+                in_store_image_display_add.src   =   ""
+
+                //
+
                 this.client.facade_image                    =   '',
                 this.client.in_store_image                  =   '',
                 this.client.facade_image_original_name      =   '',
                 this.client.in_store_image_original_name    =   '',
+
+                // 
+                this.setAddClientAction(null)
 
                 // Client
                 this.client.CustomerCode    =   '',
@@ -419,12 +406,23 @@ export default {
 
                 this.willayas               =   []
                 this.cites                  =   []
+
+                // Remove Drawings
+                this.removeDrawings()
             });
+        },
+
+        removeDrawings() {
+
+            // Remove Drawings
+            this.$map.$removeDrawings()
         },
 
         //
 
         getData(client, all_clients) {
+
+            console.log(client)
 
             this.all_clients    =   all_clients
 
@@ -448,45 +446,20 @@ export default {
 
         async getComboData() {
 
-            if(this.$connectedToInternet) {
-
-                const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
-                this.willayas                   =   res_3.data
-            }
-
-            else {
-
-                this.willayas                   =   await this.$indexedDB.$getWillayas()
-            }
+            const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
+            this.willayas                   =   res_3.data
         },
 
         async getCites() {
 
-            if(this.$connectedToInternet) {
+            // Show Loading Page
+            this.$showLoadingPage()
 
-                // Show Loading Page
-                this.$showLoadingPage()
+            const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
+            this.cites                      =   res_3.data
 
-                const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
-                this.cites                      =   res_3.data
-
-                // Hide Loading Page
-                this.$hideLoadingPage()
-            }
-
-            else {
-
-                // Show Loading Page
-                this.$showLoadingPage()
-
-                let willaya                     =   await this.$indexedDB.$getWillaya(this.client.DistrictNo)
-                console.log(willaya)
-
-                this.cites                      =   willaya.cites
-
-                // Hide Loading Page
-                this.$hideLoadingPage()
-            }
+            // Hide Loading Page
+            this.$hideLoadingPage()
         },
 
         //
@@ -517,17 +490,19 @@ export default {
 
         async facadeImage() {
 
-            const facade_image  =   document.getElementById("facade_image").files[0];
+            const facade_image  =   document.getElementById("facade_image_add").files[0];
 
             if(facade_image) {
 
                 this.client.facade_image_original_name      =   facade_image.name
-                this.client.facade_image                    =   await this.$imageToBase64(facade_image)
+                this.client.facade_image                    =   await this.$compressImage(facade_image)
 
                 //
 
-                let facade_image_display                    =   document.getElementById("facade_image_display")
-                this.base64ToImage(this.client.facade_image, facade_image_display)
+                let facade_image_base64                     =   await this.$imageToBase64(this.client.facade_image)
+
+                let facade_image_display                    =   document.getElementById("facade_image_display_add")
+                this.base64ToImage(facade_image_base64, facade_image_display)
             }
         },
 
@@ -535,17 +510,19 @@ export default {
 
         async inStoreImage() {
 
-            const in_store_image  =   document.getElementById("in_store_image").files[0];
+            const in_store_image  =   document.getElementById("in_store_image_add").files[0];
 
             if(in_store_image) {
 
                 this.client.in_store_image_original_name    =   in_store_image.name
-                this.client.in_store_image                  =   await this.$imageToBase64(in_store_image)
+                this.client.in_store_image                  =   await this.$compressImage(in_store_image)
                 
                 //
 
-                let in_store_image_display                  =   document.getElementById("in_store_image_display")
-                this.base64ToImage(this.client.in_store_image, in_store_image_display)
+                let in_store_image_base64                   =   await this.$imageToBase64(this.client.in_store_image)
+
+                let in_store_image_display                  =   document.getElementById("in_store_image_display_add")
+                this.base64ToImage(in_store_image_base64, in_store_image_display)
             }
         },
 
@@ -568,11 +545,6 @@ export default {
 
                 distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
 
-                if(this.all_clients[i].CustomerNameE == "test") {
-
-                    console.log(distance)
-                }
-
                 if(distance <=  this.min_distance) {
                 
                     this.close_clients.push(this.all_clients[i])
@@ -586,7 +558,6 @@ export default {
         }
 
         //
-
     },
 
     watch : {

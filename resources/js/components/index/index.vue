@@ -65,7 +65,7 @@
 
 <script>
 
-import modalRouteImportDelete from "../routes/imports/modalRouteImportDelete.vue"
+import modalRouteImportDelete from "../routes/permanent/modalRouteImportDelete.vue"
 
 export default {
 
@@ -102,6 +102,8 @@ export default {
 
                         this.$callApi("post",   "/route_import/index",      null)
                         .then((res)=> {
+
+                            console.log(res)
 
                             this.liste_route_import     =   res.data
                         })
@@ -168,4 +170,4 @@ export default {
     }
 }
 
-</script>
+</script>../routes/permanent/modalRouteImportDelete.vue

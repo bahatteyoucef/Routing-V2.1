@@ -134,12 +134,12 @@
 
 <script>
 
-import modalValidateCustomerCodeMap     from "./modalValidateCustomerCodeMap.vue"
-import modalValidateCustomerNameEMap    from "./modalValidateCustomerNameEMap.vue"
-import modalValidateTelMap              from "./modalValidateTelMap.vue"
-import modalValidateGPSMap              from "./modalValidateGPSMap.vue"
+import modalValidateCustomerCodeMap     from "../permanent/validateData/modalValidateCustomerCodeMap.vue"
+import modalValidateCustomerNameEMap    from "../permanent/validateData/modalValidateCustomerNameEMap.vue"
+import modalValidateTelMap              from "../permanent/validateData/modalValidateTelMap.vue"
+import modalValidateGPSMap              from "../permanent/validateData/modalValidateGPSMap.vue"
 
-import modalClientUpdateMap             from "../../../clients/Map/modalClientUpdateMap.vue"
+import modalClientUpdateMap             from "../../clients/permanent/modalClientUpdateMap.vue"
 
 export default {
 
@@ -196,6 +196,7 @@ export default {
                 this.$showLoadingPage()
 
                 const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.route_import.id_route_import+"/clients/doubles", null)
+                console.log(res)
 
                 if(res.status===200){
 
