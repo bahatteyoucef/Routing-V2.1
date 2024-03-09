@@ -1062,5 +1062,39 @@ export default {
                 reader.readAsDataURL(file);
             });
         },
+
+        //
+
+        $showPositionOnMapLeaflet(map_id, latitude, longitude) {
+
+            // // Create Map
+            // const map           =   L.map(map_id).setView([latitude, longitude], 5);
+
+            // // TitleLayer
+            // const titleLayer    =   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            //     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            // }).addTo(map);
+
+            // // Define a custom icon for the user's position marker
+            // var customIcon      =   L.icon({
+            //     iconUrl         :   '/images/user_marker.png'     ,
+            //     iconSize        :   [35, 35]                      , // Set the size of the icon
+            //     iconAnchor      :   [17, 17]                      , // Set the anchor point of the icon (centered at the bottom)
+            // });
+
+            // // Create a marker with the custom icon
+            // L.marker([latitude, longitude], { icon  :   customIcon }).addTo(map);
+        },
+
+        $showPositionOnMap(map_id, latitude, longitude) {
+
+            const show_map  =   document.getElementById("show_map");
+
+            if(show_map) {
+
+                show_map.src            =   `https://maps.google.com/maps?q=${latitude},${longitude}&output=embed`
+                show_map.style.display  =   "block"
+            }
+        }
     }
 }

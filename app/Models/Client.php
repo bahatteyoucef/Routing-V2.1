@@ -47,21 +47,27 @@ class Client extends Model
             // Client
 
             $client         =   new Client([
-                'CustomerCode'          =>  $client_elem->CustomerCode      ,
-                'CustomerNameE'         =>  $client_elem->CustomerNameE     ,
-                'CustomerNameA'         =>  $client_elem->CustomerNameA     ,
-                'Latitude'              =>  $client_elem->Latitude          ,
-                'Longitude'             =>  $client_elem->Longitude         ,
-                'Address'               =>  $client_elem->Address           ,
-                'DistrictNo'            =>  $client_elem->DistrictNo        ,
-                'DistrictNameE'         =>  $client_elem->DistrictNameE     ,
-                'CityNo'                =>  $client_elem->CityNo            ,
-                'CityNameE'             =>  $client_elem->CityNameE         ,
-                'Tel'                   =>  $client_elem->Tel               ,
-                'CustomerType'          =>  $client_elem->CustomerType      ,
-                'id_route_import'       =>  $id_route_import                ,
-                'status'                =>  "pending"                       ,
-                'nonvalidated_details'  =>  ""                              ,
+                'CustomerCode'          =>  $client_elem->CustomerCode              ,
+                'CustomerNameE'         =>  $client_elem->CustomerNameE             ,
+                'CustomerNameA'         =>  $client_elem->CustomerNameA             ,
+                'Latitude'              =>  $client_elem->Latitude                  ,
+                'Longitude'             =>  $client_elem->Longitude                 ,
+                'Address'               =>  $client_elem->Address                   ,
+                'DistrictNo'            =>  $client_elem->DistrictNo                ,
+                'DistrictNameE'         =>  $client_elem->DistrictNameE             ,
+                'CityNo'                =>  $client_elem->CityNo                    ,
+                'CityNameE'             =>  $client_elem->CityNameE                 ,
+                'Tel'                   =>  $client_elem->Tel                       ,
+                'CustomerType'          =>  $client_elem->CustomerType              ,
+
+                'Neighborhood'          =>  $client_elem->Neighborhood              ,
+                'Landmark'              =>  $client_elem->Landmark                  ,
+                'BrandAvailability'     =>  $client_elem->BrandAvailability         ,
+                'BrandSourcePurchase'   =>  $client_elem->BrandSourcePurchase       ,
+
+                'id_route_import'       =>  $id_route_import                        ,
+                'status'                =>  "pending"                               ,
+                'nonvalidated_details'  =>  ""                                      ,
                 'created_at'            =>  1,
                 'owner'                 =>  Auth::user()->id
             ]);
@@ -169,6 +175,11 @@ class Client extends Model
             'CityNameE'                     =>  $request->input("CityNameE")                    ,
             'Tel'                           =>  $request->input("Tel")                          ,
             'CustomerType'                  =>  $request->input("CustomerType")                 ,
+
+            'Neighborhood'                  =>  $request->input("Neighborhood")                 ,
+            'Landmark'                      =>  $request->input("Landmark")                     ,
+            'BrandAvailability'             =>  $request->input("BrandAvailability")            ,
+            'BrandSourcePurchase'           =>  $request->input("BrandSourcePurchase")          ,
 
             'id_route_import'               =>  $id_route_import                                ,  
 
@@ -317,20 +328,25 @@ class Client extends Model
 
         if($client) {
 
-            $client->CustomerCode                   =   $request->get("CustomerCode")       ;
-            $client->CustomerNameE                  =   $request->get("CustomerNameE")      ;
-            $client->CustomerNameA                  =   $request->get("CustomerNameA")      ;
-            $client->Latitude                       =   $request->get("Latitude")           ;
-            $client->Longitude                      =   $request->get("Longitude")          ;
-            $client->Address                        =   $request->get("Address")            ;
-            $client->DistrictNo                     =   $request->get("DistrictNo")         ;
-            $client->DistrictNameE                  =   $request->get("DistrictNameE")      ;
-            $client->CityNo                         =   $request->get("CityNo")             ;
-            $client->CityNameE                      =   $request->get("CityNameE")          ;
-            $client->Tel                            =   $request->get("Tel")                ;
-            $client->CustomerType                   =   $request->get("CustomerType")       ;
+            $client->CustomerCode                   =   $request->get("CustomerCode")           ;
+            $client->CustomerNameE                  =   $request->get("CustomerNameE")          ;
+            $client->CustomerNameA                  =   $request->get("CustomerNameA")          ;
+            $client->Latitude                       =   $request->get("Latitude")               ;
+            $client->Longitude                      =   $request->get("Longitude")              ;
+            $client->Address                        =   $request->get("Address")                ;
+            $client->DistrictNo                     =   $request->get("DistrictNo")             ;
+            $client->DistrictNameE                  =   $request->get("DistrictNameE")          ;
+            $client->CityNo                         =   $request->get("CityNo")                 ;
+            $client->CityNameE                      =   $request->get("CityNameE")              ;
+            $client->Tel                            =   $request->get("Tel")                    ;
+            $client->CustomerType                   =   $request->get("CustomerType")           ;
 
-            $client->id_route_import                =   $id_route_import                    ;
+            $client->Neighborhood                   =   $request->get("Neighborhood")           ;
+            $client->Landmark                       =   $request->get("Landmark")               ;
+            $client->BrandAvailability              =   $request->get("BrandAvailability")      ;
+            $client->BrandSourcePurchase            =   $request->get("BrandSourcePurchase")    ;
+
+            $client->id_route_import                =   $id_route_import                        ;
 
             if($request->input("JPlan") !=  null) {
 
@@ -544,6 +560,11 @@ class Client extends Model
             $client->CityNameE                  =   $client_tempo->CityNameE;
             $client->Tel                        =   $client_tempo->Tel;
             $client->CustomerType               =   $client_tempo->CustomerType;
+
+            $client->Neighborhood               =   $client_tempo->Neighborhood;
+            $client->Landmark                   =   $client_tempo->Landmark;
+            $client->BrandAvailability          =   $client_tempo->BrandAvailability;
+            $client->BrandSourcePurchase        =   $client_tempo->BrandSourcePurchase;
 
             if($client_tempo->JPlan     !=  null) {
     

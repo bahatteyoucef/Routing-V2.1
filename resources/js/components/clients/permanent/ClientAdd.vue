@@ -21,6 +21,13 @@
                 <form>
 
                     <div class="mb-3">
+                        <label for="CustomerCode"       class="form-label">Current Position <button class="btn btn-sm" @click.prevent="$showPositionOnMap('show_map', client.Latitude, client.Longitude)"><i class="mdi mdi-reload"></i></button></label>
+                        <iframe id="show_map"   width="100%"    height="200px"  style="display : none"></iframe>
+                    </div>
+
+                    <hr />
+
+                    <div class="mb-3">
                         <label for="CustomerCode"       class="form-label">CustomerCode (CustomerCode)</label>
                         <input type="text"              class="form-control"        id="CustomerCode"           v-model="client.CustomerCode">
                     </div>
@@ -43,6 +50,16 @@
                     <div class="mb-3">
                         <label for="Address"            class="form-label">Address (Address)</label>
                         <input type="text"              class="form-control"        id="Address"                v-model="client.Address">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="Neighborhood"       class="form-label">Neighborhood (Neighborhood)</label>
+                        <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="Landmark"           class="form-label">Landmark (Landmark)</label>
+                        <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"></textarea>
                     </div>
 
                     <div class="mb-3">
@@ -75,7 +92,32 @@
 
                     <div class="mb-3">
                         <label for="text"               class="form-label">CustomerType (CustomerType)</label>
-                        <input type="text"              class="form-control"        id="CustomerType"           v-model="client.CustomerType">
+                        <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType">
+                            <option     :value="'Superette'">Superette</option>
+                            <option     :value="'Alimentation General'">Alimentation General</option>
+                            <option     :value="'Grossiste'">Grossiste</option>
+                        </select>
+                    </div>
+
+                    <!--  -->
+
+                    <div class="mb-3">
+                        <label for="text"               class="form-label">BrandAvailability (BrandAvailability)</label>
+                        <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability">
+                            <option     value="0">No</option>
+                            <option     value="1">Yes</option>
+                        </select>
+                    </div>
+ 
+                    <div class="mb-3">
+                        <label for="text"               class="form-label">BrandSourcePurchase (BrandSourcePurchase)</label>
+                        <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase">
+                            <option     value="Distribution Direct">Distribution Direct</option>
+                            <option     value="Grossiste Fixe">Grossiste Fixe</option>
+                            <option     value="Grossiste Mobile">Grossiste Mobile</option>
+                            <option     value="Multi Source">Multi Source</option>
+                            <option     value="Pas d'achat">Pas d'achat</option>
+                        </select>
                     </div>
 
                     <!--  -->
@@ -209,6 +251,9 @@ export default {
 
                 Address         :   '',
 
+                Neighborhood    :   '',
+                Landmark        :   '',
+
                 DistrictNo      :   '',
                 DistrictNameE   :   '',
 
@@ -219,7 +264,9 @@ export default {
                 Longitude       :   0,
 
                 // Type
-                CustomerType    :   '',
+                CustomerType        :   '',
+                BrandAvailability   :   '',
+                BrandSourcePurchase :   '',
 
                 // Journey Plan
                 JPlan           :   '',
@@ -312,12 +359,17 @@ export default {
             formData.append("Latitude"      ,   this.client.Latitude)
             formData.append("Longitude"     ,   this.client.Longitude)
             formData.append("Address"       ,   this.client.Address)
+            formData.append("Neighborhood"  ,   this.client.Neighborhood)
+            formData.append("Landmark"      ,   this.client.Landmark)
             formData.append("DistrictNo"    ,   this.client.DistrictNo)
             formData.append("DistrictNameE" ,   this.client.DistrictNameE)
             formData.append("CityNo"        ,   this.client.CityNo)
             formData.append("CityNameE"     ,   this.client.CityNameE)
             formData.append("Tel"           ,   this.client.Tel)
             formData.append("CustomerType"  ,   this.client.CustomerType)
+            formData.append("BrandAvailability"     ,   this.client.BrandAvailability)
+            formData.append("BrandSourcePurchase"   ,   this.client.BrandSourcePurchase)
+
             formData.append("JPlan"         ,   this.client.JPlan)
             formData.append("Journee"       ,   this.client.Journee)
 

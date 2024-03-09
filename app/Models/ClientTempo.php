@@ -49,18 +49,24 @@ class ClientTempo extends Model
             // Client
 
             $client         =   new ClientTempo([
-                'CustomerCode'              =>  $client_elem->CustomerCode   ,
-                'CustomerNameE'             =>  $client_elem->CustomerNameE  ,
-                'CustomerNameA'             =>  $client_elem->CustomerNameA  ,
-                'Latitude'                  =>  $client_elem->Latitude       ,
-                'Longitude'                 =>  $client_elem->Longitude      ,
-                'Address'                   =>  $client_elem->Address        ,
-                'DistrictNo'                =>  $client_elem->DistrictNo     ,
-                'DistrictNameE'             =>  $client_elem->DistrictNameE  ,
-                'CityNo'                    =>  $client_elem->CityNo         ,
-                'CityNameE'                 =>  $client_elem->CityNameE      ,
-                'Tel'                       =>  $client_elem->Tel            ,
-                'CustomerType'              =>  $client_elem->CustomerType   ,
+                'CustomerCode'              =>  $client_elem->CustomerCode          ,
+                'CustomerNameE'             =>  $client_elem->CustomerNameE         ,
+                'CustomerNameA'             =>  $client_elem->CustomerNameA         ,
+                'Latitude'                  =>  $client_elem->Latitude              ,
+                'Longitude'                 =>  $client_elem->Longitude             ,
+                'Address'                   =>  $client_elem->Address               ,
+                'DistrictNo'                =>  $client_elem->DistrictNo            ,
+                'DistrictNameE'             =>  $client_elem->DistrictNameE         ,
+                'CityNo'                    =>  $client_elem->CityNo                ,
+                'CityNameE'                 =>  $client_elem->CityNameE             ,
+                'Tel'                       =>  $client_elem->Tel                   ,
+                'CustomerType'              =>  $client_elem->CustomerType          ,
+
+                'Neighborhood'              =>  $client_elem->Neighborhood          ,
+                'Landmark'                  =>  $client_elem->Landmark              ,
+                'BrandAvailability'         =>  $client_elem->BrandAvailability     ,
+                'BrandSourcePurchase'       =>  $client_elem->BrandSourcePurchase   ,
+
                 'id_route_import_tempo'     =>  $id_route_import_tempo  ,
                 'owner'                     =>  Auth::user()->id
             ]);
@@ -106,6 +112,11 @@ class ClientTempo extends Model
         $client->CityNameE                  =   $request->get("CityNameE");
         $client->Tel                        =   $request->get("Tel");
         $client->CustomerType               =   $request->get("CustomerType");
+
+        $client->Neighborhood               =   $request->get("Neighborhood");
+        $client->Landmark                   =   $request->get("Landmark");
+        $client->BrandAvailability          =   $request->get("BrandAvailability");
+        $client->BrandSourcePurchase        =   $request->get("BrandSourcePurchase");
 
         if($request->get("JPlan")   !=  null) {
 
@@ -165,6 +176,12 @@ class ClientTempo extends Model
             $client->CityNameE                  =   $client_tempo->CityNameE;
             $client->Tel                        =   $client_tempo->Tel;
             $client->CustomerType               =   $client_tempo->CustomerType;
+
+            $client->Neighborhood               =   $client_tempo->Neighborhood;
+            $client->Landmark                   =   $client_tempo->Landmark;
+            $client->BrandAvailability          =   $client_tempo->BrandAvailability;
+            $client->BrandSourcePurchase        =   $client_tempo->BrandSourcePurchase;
+
             $client->id_route_import_tempo      =   $client_tempo->id_route_import_tempo;
 
             if($client_tempo->JPlan     !=  null) {

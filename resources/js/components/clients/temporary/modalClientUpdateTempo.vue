@@ -67,7 +67,11 @@
 
                         <div class="mb-3">
                             <label for="text"               class="form-label">CustomerType (CustomerType)</label>
-                            <input type="text"              class="form-control"        id="CustomerType"           v-model="client.CustomerType">
+                            <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType">
+                                <option     :value="'Superette'">Superette</option>
+                                <option     :value="'Alimentation General'">Alimentation General</option>
+                                <option     :value="'Grossiste'">Grossiste</option>
+                            </select>
                         </div>
 
                         <!--  -->

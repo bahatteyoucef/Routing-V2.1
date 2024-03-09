@@ -476,20 +476,26 @@ class RouteImport extends Model
 
             if($client) {
 
-                $client->CustomerCode       =   $client_elem->CustomerCode;
-                $client->CustomerNameE      =   $client_elem->CustomerNameE;
-                $client->CustomerNameA      =   $client_elem->CustomerNameA;
-                $client->Latitude           =   $client_elem->Latitude;
-                $client->Longitude          =   $client_elem->Longitude;
-                $client->Address            =   $client_elem->Address;
-                $client->CityNo             =   $client_elem->CityNo;
-                $client->DistrictNo         =   $client_elem->DistrictNo;
-                $client->CityNameE          =   $client_elem->CityNameE;
-                $client->DistrictNameE      =   $client_elem->DistrictNameE;
-                $client->Tel                =   $client_elem->Tel;
-                $client->CustomerType       =   $client_elem->CustomerType;
-                $client->id_route_import    =   $client_elem->id_route_import;
-                $client->owner              =   Auth::user()->id;
+                $client->CustomerCode           =   $client_elem->CustomerCode;
+                $client->CustomerNameE          =   $client_elem->CustomerNameE;
+                $client->CustomerNameA          =   $client_elem->CustomerNameA;
+                $client->Latitude               =   $client_elem->Latitude;
+                $client->Longitude              =   $client_elem->Longitude;
+                $client->Address                =   $client_elem->Address;
+                $client->CityNo                 =   $client_elem->CityNo;
+                $client->DistrictNo             =   $client_elem->DistrictNo;
+                $client->CityNameE              =   $client_elem->CityNameE;
+                $client->DistrictNameE          =   $client_elem->DistrictNameE;
+                $client->Tel                    =   $client_elem->Tel;
+                $client->CustomerType           =   $client_elem->CustomerType;
+
+                $client->Neighborhood           =   $client_elem->Neighborhood;
+                $client->Landmark               =   $client_elem->Landmark;
+                $client->BrandAvailability      =   $client_elem->BrandAvailability;
+                $client->BrandSourcePurchase    =   $client_elem->BrandSourcePurchase;
+
+                $client->id_route_import        =   $client_elem->id_route_import;
+                $client->owner                  =   Auth::user()->id;
 
                 //
 
@@ -624,21 +630,27 @@ class RouteImport extends Model
             //
 
             $client         =   new Client([
-                'CustomerCode'      =>  $client_elem->CustomerCode      ,    
-                'CustomerNameE'     =>  $client_elem->CustomerNameE     ,
-                'CustomerNameA'     =>  $client_elem->CustomerNameA     ,
-                'Latitude'          =>  $client_elem->Latitude          ,
-                'Longitude'         =>  $client_elem->Longitude         ,
-                'Address'           =>  $client_elem->Address           ,
-                'CityNo'            =>  $client_elem->CityNo            ,
-                'DistrictNo'        =>  $client_elem->DistrictNo        ,
-                'CityNameE'         =>  $client_elem->CityNameE         ,
-                'DistrictNameE'     =>  $client_elem->DistrictNameE     ,
-                'Tel'               =>  $client_elem->Tel               ,
-                'CustomerType'      =>  $client_elem->CustomerType      ,
-                'id_route_import'   =>  $client_elem->id_route_import   ,  
-                'status'            =>  $client_elem->status            ,
-                'owner'             =>  Auth::user()->id                ,
+                'CustomerCode'          =>  $client_elem->CustomerCode          ,    
+                'CustomerNameE'         =>  $client_elem->CustomerNameE         ,
+                'CustomerNameA'         =>  $client_elem->CustomerNameA         ,
+                'Latitude'              =>  $client_elem->Latitude              ,
+                'Longitude'             =>  $client_elem->Longitude             ,
+                'Address'               =>  $client_elem->Address               ,
+                'CityNo'                =>  $client_elem->CityNo                ,
+                'DistrictNo'            =>  $client_elem->DistrictNo            ,
+                'CityNameE'             =>  $client_elem->CityNameE             ,
+                'DistrictNameE'         =>  $client_elem->DistrictNameE         ,
+                'Tel'                   =>  $client_elem->Tel                   ,
+                'CustomerType'          =>  $client_elem->CustomerType          ,
+
+                'Neighborhood'          =>  $client_elem->Neighborhood          ,
+                'Landmark'              =>  $client_elem->Landmark              ,
+                'BrandAvailability'     =>  $client_elem->BrandAvailability     ,
+                'BrandSourcePurchase'   =>  $client_elem->BrandSourcePurchase   ,
+
+                'id_route_import'       =>  $client_elem->id_route_import       ,  
+                'status'                =>  $client_elem->status                ,
+                'owner'                 =>  Auth::user()->id                    ,
             ]);
 
             $client->save();

@@ -53,6 +53,12 @@ const routes = [
 
     // ClientsAdd
     {
+        path        : "/route_import/:id_route_import/clients/add",
+        component   : () => import('./components/clients/permanent/ClientAdd.vue')
+    },
+
+    // ClientsAdd
+    {
         path        : "/route_import/:id_route_import/clients/add/:latitude/:longitude",
         component   : () => import('./components/clients/permanent/ClientAdd.vue')
     },
