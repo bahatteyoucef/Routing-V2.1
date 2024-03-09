@@ -1,4 +1,4 @@
-<template> sss
+<template>
 
     <!-- Modal -->
     <div class="modal fade" id="addClientModal" tabindex="-1" aria-hidden="true">

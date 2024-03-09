@@ -160,12 +160,6 @@
             </div>
         </div>
 
-        <!-- Modal Add  -->
-        <!-- <modalClientAddIndexedDB    ref="modalClientAddIndexedDB">   </modalClientAddIndexedDB> -->
-
-        <!-- Modal Update  -->
-        <!-- <modalClientUpdateIndexedDB ref="modalClientUpdateIndexedDB"></modalClientUpdateIndexedDB> -->
-
         <!-- Modal Add                      -->
         <modalClientAdd             ref="modalClientAdd"            ></modalClientAdd>
 
@@ -178,9 +172,6 @@
 <script>
 
 import headerComponent              from    "../../template/components/headerComponent.vue"
-
-import modalClientAddIndexedDB      from    "../clients/permanent/modalClientAddIndexedDB.vue"
-import modalClientUpdateIndexedDB   from    "../clients/permanent/modalClientUpdateIndexedDB.vue"
 
 import modalClientAdd               from    "../clients/permanent/modalClientAdd.vue"
 import modalClientUpdate            from    "../clients/permanent/modalClientUpdate.vue"
@@ -210,12 +201,10 @@ export default {
     },
 
     components : {
-        headerComponent ,
-        modalClientAddIndexedDB,
-        modalClientUpdateIndexedDB,
+        headerComponent             ,
 
         modalClientAdd              ,
-        modalClientUpdate           ,
+        modalClientUpdate           
     },
 
     computed : {
@@ -335,20 +324,6 @@ export default {
 
             try {
 
-                if(this.$isRole("FrontOffice")) {
-
-                    let client      =   { lat : 0, lng : 0 }
-
-                    let position     =   await this.$currentPosition()
-
-                    client.lat      =   position.coords.latitude
-                    client.lng      =   position.coords.longitude
-
-                    await this.$refs.modalClientAddIndexedDB.getData(client, this.clients)
-                }
-
-                //
-
                 if(this.$isRole("Super Admin")||this.$isRole("BackOffice")) {
 
                     let client      =   { lat : 0, lng : 0 }
@@ -365,11 +340,6 @@ export default {
         async updateElement() {
 
             try {
-
-                if(this.$isRole("FrontOffice")) {
-
-                    await this.$refs.modalClientUpdateIndexedDB.getData(this.selected_row, this.clients)
-                }
 
                 if(this.$isRole("Super Admin")||this.$isRole("BackOffice")) {
 
