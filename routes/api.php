@@ -107,6 +107,8 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/users/{id}/update/password'                                                           ,   [UserController::class                  , 'changePassword'                          ]);
 
+    Route::post('/users/{id}/update/password'                                                           ,   [UserController::class                  , 'changePassword'                          ]);
+
     //
 
     // Route Import Tempo
@@ -204,4 +206,5 @@ Route::middleware('auth:api')->group(function () {
 
     //
 
+    Route::post('/route_import/{id_route_import}/clients/waiting_validation'                            ,   [RouteImportController::class           , 'clientsWaitingValidation'                ]);
 });

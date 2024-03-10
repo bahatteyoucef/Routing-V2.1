@@ -5,7 +5,14 @@
 
     <!-- Login -->
     <section v-if="component_login">
-        <login-page></login-page>
+
+        <div style="background-color : #F2EDF3;">
+
+            <header-store-part></header-store-part>
+
+            <login-page></login-page>
+
+        </div>
     </section>
 
     <div v-if="isAuthentificated">
@@ -14,17 +21,32 @@
 
             <div class="container-scroller" id="page_route">
 
-                <header-part></header-part>
+                <!-- BackOffice + Super Admin -->
+                <div v-if="(($isRole('Super Admin'))||($isRole('BackOffice')))">
 
-                <div class="container-fluid page-body-wrapper">
+                    <header-part></header-part>
 
-                    <div class="main-panel w-100 animate__animated" id="main_content">
-
-                        <router-view :key="$route.path"></router-view>
-
+                    <div class="container-fluid page-body-wrapper">
+                        <div class="main-panel w-100 animate__animated" id="main_content">
+                            <router-view :key="$route.path"></router-view>
+                        </div>
                     </div>
 
                 </div>
+
+                <!-- FrontOffice -->
+                <div v-if="$isRole('FrontOffice')">
+
+                    <header-store-part></header-store-part>       
+
+                    <div class="container-fluid page-body-wrapper">
+                        <div class="main-panel w-100 animate__animated" id="main_content">
+                            <router-view :key="$route.path"></router-view>
+                        </div>
+                    </div>
+
+                </div>
+
             </div>
         </section>
     </div>

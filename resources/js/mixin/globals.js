@@ -5,6 +5,14 @@ import * as XLSX from "xlsx";
 
 export default {
 
+    data() {
+
+        return {
+
+            show_map    :   null
+        }
+    },
+
     methods: {
 
         $somethingSideBar() {
@@ -1065,28 +1073,41 @@ export default {
 
         //
 
-        $showPositionOnMapLeaflet(map_id, latitude, longitude) {
+        $showPositionOnMap(map_id, latitude, longitude) {
 
-            // // Create Map
-            // const map           =   L.map(map_id).setView([latitude, longitude], 5);
+            if (this.show_map) {
 
-            // // TitleLayer
-            // const titleLayer    =   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            //     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            // }).addTo(map);
+                this.show_map.setView([latitude, longitude], 15); // Replace with your coordinates and zoom level
 
-            // // Define a custom icon for the user's position marker
-            // var customIcon      =   L.icon({
-            //     iconUrl         :   '/images/user_marker.png'     ,
-            //     iconSize        :   [35, 35]                      , // Set the size of the icon
-            //     iconAnchor      :   [17, 17]                      , // Set the anchor point of the icon (centered at the bottom)
-            // });
+                // Clear all existing layers (including markers)
+                this.show_map.eachLayer((layer) =>  {
+                    this.show_map.removeLayer(layer);
+                });
 
-            // // Create a marker with the custom icon
-            // L.marker([latitude, longitude], { icon  :   customIcon }).addTo(map);
+                // Define tile layer (e.g., OpenStreetMap)
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(this.show_map);
+
+                // Create a marker
+                L.marker([latitude, longitude]).addTo(this.show_map);
+            }
+
+            else {
+
+                this.show_map   =   L.map(map_id).setView([latitude, longitude], 15); // Replace with your coordinates and zoom level
+
+                // Define tile layer (e.g., OpenStreetMap)
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(this.show_map);
+
+                // Create a marker
+                L.marker([latitude, longitude]).addTo(this.show_map);
+            }
         },
 
-        $showPositionOnMap(map_id, latitude, longitude) {
+        $showPositionOnMapGMaps(map_id, latitude, longitude) {
 
             const show_map  =   document.getElementById("show_map");
 

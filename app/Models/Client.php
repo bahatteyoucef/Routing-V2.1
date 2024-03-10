@@ -668,7 +668,4 @@ class Client extends Model
                     })
                     ->get();
     }
-
-    //
-
 }

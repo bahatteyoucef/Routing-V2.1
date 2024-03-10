@@ -54,7 +54,7 @@ const routes = [
     // ClientsAdd
     {
         path        : "/route_import/:id_route_import/clients/add",
-        component   : () => import('./components/clients/permanent/ClientAdd.vue')
+        component   : () => import('./components/clients/permanent/ClientAddCurrentPosition.vue')
     },
 
     // ClientsAdd
@@ -68,6 +68,19 @@ const routes = [
         path        : "/route_import/:id_route_import/clients/:id_client/update",
         component   : () => import('./components/clients/permanent/ClientUpdate.vue')
     },
+
+    // ClientDetails
+    {
+        path        : "/route_import/:id_route_import/clients/:id_client/details",
+        component   : () => import('./components/clients/permanent/ClientDetails.vue')
+    },
+
+    // Route Import Non Validated Clients
+    {
+        path        : "/route_import/:id_user/clients/waiting_validation",
+        component   : () => import('./components/routes/routeImportClientsWaitingValidation.vue')
+    },
+
 
     //  //  //  //  //  OBS     //  //  //
 
@@ -101,7 +114,7 @@ const routes = [
     {
         path        : "/route/frontoffice/obs/route_import/:id_route_import/details",
         component   : () => import('./components/routes/permanent/obs/ParRouteImportFrontOfficeDetails.vue')
-    },
+    }
 ];
 
 const router = createRouter({

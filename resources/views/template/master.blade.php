@@ -106,7 +106,6 @@
 	<script src="https://rawgit.com/hayeswise/Leaflet.PointInPolygon/master/wise-leaflet-pip.js">	</script>
 
 	<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js">	</script>
-	<!-- <script src="https://unpkg.com/leaflet-editable@1.2.0/dist/leaflet.editable.js"></script> -->
 
 	<script src='//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js'></script>
 
@@ -115,30 +114,11 @@
 
 	<!--  -->
 
-	<!-- Template -->
-	<!-- <script src="{{url('template/js/chunk-2d0b9062.97448cc8.js')}}">	</script>
-	<script src="{{url('template/js/chunk-2d0ba2e9.eafd91ad.js')}}">	</script>
-	<script src="{{url('template/js/chunk-2d0c18ec.6a1ea22e.js')}}">	</script>
-	<script src="{{url('template/js/chunk-2d0ccf69.8e9fb9e3.js')}}">	</script>
-	<script src="{{url('template/js/chunk-2d0e2534.696069ec.js')}}">	</script>
-	<script src="{{url('template/js/chunk-2d20febb.edbe74cd.js')}}">	</script>
-	<script src="{{url('template/js/chunk-2d217b0a.1c1d01ec.js')}}">	</script>
-	<script src="{{url('template/js/chunk-2d21e985.34450ac3.js')}}">	</script>
-	<script src="{{url('template/js/chunk-2d22db47.8944bbc1.js')}}">	</script>
-	<script src="{{url('template/js/chunk-355d107d.c505912a.js')}}">	</script>
-	<script src="{{url('template/js/chunk-4218871c.b9ca3326.js') }}">	</script>
-	<script src="{{url('template/js/chunk-4c8b6c66.fc58459b.js')}}">	</script>
-	<script src="{{url('template/js/app.3c7ebefc.js') }}">				</script> -->
-
-	<!-- Datatable -->
-	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script> -->
-	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script> -->
-
 	<!-- Excel     -->
 	<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 
-	<!-- Customer -->
-	<!-- <script src="{{url('js/responsive.js')}}"></script> -->
+	<!-- Qr Bar code Reader -->
+	<script src="https://unpkg.com/html5-qrcode" ></script>
 
 	@vite('resources/js/app.js')
 

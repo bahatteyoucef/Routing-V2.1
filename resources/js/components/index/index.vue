@@ -1,8 +1,10 @@
 <template>
-    <div class="content-wrapper">
-        <section class="dashboard">
+    <div class="content-wrapper" style="padding : 15px;">
 
-            <div v-if="$isRole('Super Admin')||$isRole('BackOffice')" class="page-header">
+        <!-- Super Admin + BackOffice -->
+        <section v-if="$isRole('Super Admin')||$isRole('BackOffice')" class="dashboard">
+
+            <div class="page-header">
 
                 <div class="row w-100">
                     <div class="col-10">
@@ -60,12 +62,99 @@
 
         </section>
 
+        <!-- FrontOffice -->
+        <section v-if="$isRole('FrontOffice')"  class="dashboard"> 
+
+            <!-- Index Options -->
+            <div class="row d-flex justify-content-center h-100 mt-2">
+                <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="addClient()">
+                    <div class="text-center" style="height : 50px">  
+                        <img class="card-img-top" src="/images/store.png" style="height:100%;width:auto">
+                    </div>
+                    <div class="card-body p-0 mt-3">
+                        <p class="card-text font-weight-bold">New</p>
+                    </div>
+                </div>
+
+                <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="sync()">
+                    <div class="text-center" style="height : 50px">  
+                        <img class="card-img-top" src="/images/sync.png" style="height:100%;width:auto">
+                    </div>
+                    <div class="card-body p-0 mt-3">
+                        <p class="card-text font-weight-bold">Sync</p>
+                    </div>
+                </div>
+
+                <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="goToMap()">
+                    <div class="text-center" style="height : 50px">  
+                        <img class="card-img-top" src="/images/map_marker.png" style="height:100%;width:auto">
+                    </div>
+                    <div class="card-body p-0 mt-3">
+                        <p class="card-text font-weight-bold">Map</p>
+                    </div>
+                </div>
+
+                <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="showClientsWaitingValidation()">
+                    <div class="text-center" style="height : 50px">  
+                        <img class="card-img-top" src="/images/group_clients.png" style="height:100%;width:auto">
+                    </div>
+                    <div class="card-body p-0 mt-3">
+                        <p class="card-text font-weight-bold">Clients</p>
+                    </div>
+                </div>
+
+                <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="showNotifications()">
+                    <div class="text-center" style="height : 50px">  
+                        <img class="card-img-top" src="/images/notifications.png" style="height:100%;width:auto">
+                    </div>
+                    <div class="card-body p-0 mt-3">
+                        <p class="card-text font-weight-bold">Notifications</p>
+                    </div>
+                </div>
+
+                <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="showRemuneration()">
+                    <div class="text-center" style="height : 50px">  
+                        <img class="card-img-top" src="/images/credit_card.png" style="height:100%;width:auto">
+                    </div>
+                    <div class="card-body p-0 mt-3">
+                        <p class="card-text font-weight-bold">Remuneration</p>
+                    </div>
+                </div>
+
+                <div class="card col-5 m-1 shadow-sm rounded text-center h-25"  @click="showProfile()">
+                    <div class="text-center" style="height : 50px">  
+                        <img class="card-img-top" src="/images/profile.png" style="height:100%;width:auto">
+                    </div>
+                    <div class="card-body p-0 mt-3">
+                        <p class="card-text font-weight-bold">Profile</p>
+                    </div>
+                </div>
+
+                <div class="card col-5 m-1 shadow-sm rounded text-center h-25"  @click="logOut()">
+                    <div class="text-center" style="height : 50px">  
+                        <img class="card-img-top" src="/images/logout.png" style="height:100%;width:auto">
+                    </div>
+                    <div class="card-body p-0 mt-3">
+                        <p class="card-text font-weight-bold">Log Out</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Software Version -->
+            <div class="row mt-3">
+                <span class="text-small text-secondary">Software Version : 2.0</span>
+            </div>
+
+        </section>
+
     </div>
 </template>
 
 <script>
 
-import modalRouteImportDelete from "../routes/permanent/modalRouteImportDelete.vue"
+import modalRouteImportDelete   from    "../routes/permanent/modalRouteImportDelete.vue"
+
+import {mapGetters, mapActions} from    "vuex"
 
 export default {
 
@@ -80,6 +169,18 @@ export default {
         modalRouteImportDelete
     },
 
+    computed : {
+
+        ...mapGetters({
+            getUser                     :   'authentification/getUser'              ,
+            getAccessToken              :   'authentification/getAccessToken'       ,
+            getIsAuthentificated        :   'authentification/getIsAuthentificated' ,
+
+            getAddClient                :   'client/getAddClient'                   ,
+            getUpdateClient             :   'client/getUpdateClient'                
+        }),
+    },
+
     async mounted() {
 
         await this.getRouteImport()
@@ -91,6 +192,14 @@ export default {
     },
 
     methods : {
+
+        ...mapActions("authentification" ,  [
+            "setUserAction"                 ,
+            "setAccessTokenAction"          ,
+            "setIsAuthentificatedAction"    
+        ]),
+
+        //  //  BackOffice + Super Admin //  //
 
         async getRouteImport() {
 
@@ -145,15 +254,7 @@ export default {
 
         navToMap(id_route_import) {
             
-            if(this.$isRole("Super Admin")||this.$isRole("BackOffice")) {
-
-                this.$router.push('/route/obs/route_import/'+id_route_import+'/details')
-            }
-
-            if(this.$isRole("FrontOffice")) {
-
-                this.$router.push('/route/frontoffice/obs/route_import/'+id_route_import+'/details')
-            }
+            this.$router.push('/route/obs/route_import/'+id_route_import+'/details')
         },
 
         async setRouteImportDelete(id_route_import) {
@@ -161,12 +262,82 @@ export default {
             await this.$refs.modalRouteImportDelete.setRouteImportDelete(id_route_import)
         },
 
-        //
-
         getClients(id_route_import) {
 
             this.$router.push('/route_import/'+id_route_import+'/clients')
-        }
+        },
+
+        //  //  //  //  //  //  //  //  //  //
+
+        //  //  //  FrontOffice //  //  //  //
+
+        async addClient() {
+
+            this.$router.push('/route_import/'+this.getUser.id_route_import+'/clients/add')
+        },
+
+        async sync() {
+
+            this.$showLoadingPage()
+
+            let res = await this.$indexedDB.$sync()
+
+            if(res  ==  200) {
+
+                this.$feedbackSuccess("Synchronisation Perfomed !" , "a synchronisation has been performed successfuly!")
+            }
+
+            this.$hideLoadingPage()
+        },
+
+        goToMap() {
+
+            this.$router.push('/route/frontoffice/obs/route_import/'+this.getUser.id_route_import+'/details')
+        },
+
+        showClientsWaitingValidation() {
+
+            this.$router.push('/route_import/'+this.getUser.id_route_import+'/clients/waiting_validation')
+        },
+
+        async showProfile() {
+
+            this.$router.push('/users/'+this.getUser.id+'/show')
+        },
+
+        async showNotifications() {
+        
+        },
+
+        async showRemuneration() {
+        
+        },
+
+        async logOut() {
+
+            const res   =   await this.$callApi("post", "/logout" , null)
+
+            if(res.status ==  200) {
+
+                // Success
+                this.$feedbackSuccess("Logged Out !" , "")
+
+                // Update State
+                this.setUserAction({})
+                this.setAccessTokenAction("")
+                this.setIsAuthentificatedAction(false)
+
+                // Router
+                this.$goTo("/login")
+            }
+
+            else {
+
+                this.$showErrors("Error !" , res.errors)
+            }
+        },
+
+        //  //  //  //  //  //  //  //  //  //
     }
 }
 

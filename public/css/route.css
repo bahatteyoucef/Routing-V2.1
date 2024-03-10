@@ -334,4 +334,9 @@ path.leaflet-interactive.animate {
     right           : 7px;
 }
 
-/* 
+/*  */
+
+#show_map .leaflet-top {
+
+    margin-top      : 5px !important;
+}

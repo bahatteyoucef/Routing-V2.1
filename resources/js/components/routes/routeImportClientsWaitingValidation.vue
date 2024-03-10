@@ -1,0 +1,299 @@
+<template>
+    <div>
+
+        <!-- OPTIONS -->
+        <div class="row p-3 pb-0 pt-0">
+            <div class="col-lg-7 mx-auto">
+
+                <div class="row mt-2">
+                    <div class="p-1 pt-0 col-12 d-flex justify-content-end">
+
+                        <div class="col-8 p-0">
+                            <input class="form-control" placeholder="Filter By CustomerNameE..." v-model="search_by_CustomerNameE_value" @input="searchByCustomerNameE()"/>
+                        </div>
+
+                        <div class="col-2 pl-1 pr-1">
+                            <button class="btn primary w-100 m-0"   @click="showHideCodeBar()"><i class="mdi mdi-barcode"></i></button>
+                        </div>
+
+                        <div class="col-2 pl-1 pr-1">
+                            <button class="btn primary w-100 m-0"   @click="showMap()"><i class="mdi mdi-map-marker-circle"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-1" v-if="show_barcode_div">
+
+                    <div id="reader" class="scanner_reader mt-1"></div>
+
+                    <div v-show="search_by_clientbarcode_value   !=  ''"    id="refresh_client_barcode_filter_button" class="mt-1 p-0">
+                        <button type="button" class="btn primary w-100" @click="setBarCodeReader()">Re-Capture Bar Code</button>
+                    </div>
+
+                    <div v-show="search_by_clientbarcode_value   !=  ''"    id="clientbarcode_value" class="mt-1 p-0"></div>
+
+                </div>
+            </div>
+        </div>
+
+        <!--  -->
+
+        <!-- Client Cards -->
+        <div class="row mt-3" style="overflow-y: auto; height : 1000px">
+            <div class="col-lg-8 mx-auto mb-3">
+                <!-- List group-->
+                <ul class="list-group shadow mb-5">
+
+                    <!-- list group item-->
+                    <li v-for="client, index in clients_filtered" :key="index"  @click="getDetailsPage(client)"   class="list-group-item"     role="button">
+                        <!-- Custom content-->
+                        <div class="media align-items-lg-center flex-column flex-lg-row p-1">
+
+                            <div class="media-body order-2 order-lg-1 w-100">
+
+                                <h5 class="mt-0 font-weight-bold mb-2">{{ client.CustomerNameE }}</h5>
+                            
+                                <p class="font-italic text-muted mb-0 small">{{ client.Address }} - {{ client.CityNameE }}</p>
+
+                                <div v-if="client.status    ==  'pending'" class="badge badge-warning mt-1 mb-1">
+                                    Pending
+                                </div>
+
+                                <div v-if="client.status    ==  'nonvalidated'" class="badge badge-danger mt-1 mb-1">
+                                    Non Validated
+                                </div>
+
+                            </div>
+
+                        </div> <!-- End -->
+                    </li> <!-- End -->
+
+                </ul> <!-- End -->
+            </div>
+        </div>
+    </div>
+</template>
+ 
+<script>
+
+import Multiselect                  from    '@vueform/multiselect'
+
+import {mapGetters, mapActions}     from    "vuex"
+
+export default {
+
+    data() {
+        
+        return {
+
+            clients                           :   [],
+            clients_filtered                  :   [],
+
+            selected_day                        :   "",
+
+            current_day                         :   "",
+
+            //
+
+            search_by_CustomerNameE_value       :   "",
+            search_by_clientbarcode_value     :   "",
+        
+            //
+
+            scanner                             :   null,
+            show_barcode_div                    :   false
+        }
+    },
+
+    computed : {
+
+        ...mapGetters({
+            getUser                     :   'authentification/getUser'              ,
+            getAccessToken              :   'authentification/getAccessToken'       ,
+            getIsAuthentificated        :   'authentification/getIsAuthentificated' ,
+
+            getAddClient                :   'client/getAddClient'                   ,
+            getUpdateClient             :   'client/getUpdateClient'                
+        }),
+    },
+
+    components: {
+
+        Multiselect
+    },
+
+    async mounted() {
+
+        await this.getClients()
+    },
+
+    beforeUnmount() {
+
+        if(this.scanner) {
+
+            this.scanner.clear().then(_ => {
+
+            }).catch(error => {
+
+            });
+        }
+    },
+
+    //
+
+    methods : {
+
+        ...mapActions("client" ,  [
+            "setSelectedClientsAction"
+        ]),
+
+        //
+
+        async getClients() {
+
+            try {
+
+                this.$callApi("post",   "/route_import/"+this.getUser.id_route_import+"/clients/waiting_validation",    null).then(async (res)=> { 
+                    
+                    this.clients            =   res.data
+                    this.clients_filtered   =   this.clients 
+                })
+            }
+
+            catch(e) {
+
+                console.log(e)
+            }
+
+        },
+
+        //
+
+        getDetailsPage(client) {
+
+            this.$router.push('/route_import/'+client.id_route_import+'/clients/'+client.id+'/details')
+        },
+
+        showMap() {
+
+            this.setSelectedClientsAction(this.clients)
+
+            this.$router.push('/front_office/presellers/route/obs/clients/selected')
+        },
+
+        //
+
+        searchByCustomerNameE() {
+
+            this.clients_filtered     =   this.clients
+            
+            if ((this.search_by_CustomerNameE_value != '')&&(this.search_by_CustomerNameE_value)) {
+
+                this.clients_filtered     =   this.clients_filtered.filter((client) => {
+
+                    return client.CustomerNameE.toUpperCase().includes(this.search_by_CustomerNameE_value.toUpperCase())
+                })
+            }
+
+            return this.clients_filtered
+        },
+
+        //  //  //  BarCode
+
+        showHideCodeBar() {
+
+            if(this.show_barcode_div    ==  false) {
+
+                this.show_barcode_div   =   true
+
+                setTimeout(() => {
+
+                    this.setBarCodeReader()
+                }, 555);
+            }
+
+            else {
+
+                this.search_by_clientbarcode_value    =   ""
+
+                this.show_barcode_div                   =   false
+
+                this.scanner.clear().then(_ => {
+
+                }).catch(error => {
+
+                });
+            }
+        },
+
+        setBarCodeReader() {
+
+            document.getElementById('reader').style.display =   "block";
+
+            this.search_by_clientbarcode_value   =   ""
+
+            this.scanner = new Html5QrcodeScanner('reader', { 
+
+                    // Scanner will be initialized in DOM inside element with id of 'reader'
+                    qrbox: {
+                        width: 250,
+                        height: 250,
+                    },  // Sets dimensions of scanning box (set relative to reader element width)
+                    fps: 20, // Frames per second to attempt a scan
+                });
+
+            // 
+            this.scanner.render(this.success, this.error);
+        },
+
+        success(clientbarcode_value) {
+
+            document.getElementById('clientbarcode_value').innerHTML = `
+                <div class="col-12 p-0 text-center">
+                    <span class="">ClientBarCode : ${clientbarcode_value}</span>
+                </div>
+            `;
+
+            // 
+            this.search_by_clientbarcode_value   =   clientbarcode_value
+
+            this.scanner.clear();
+
+            document.getElementById('reader').style.display =   "none"
+
+            // searchByClientBarCode
+            this.searchByClientBarCode()
+        },
+
+        error(err) {
+
+            console.error("");
+            // Prints any errors to the console
+        },
+
+        searchByClientBarCode() {
+
+            this.clients_filtered =   this.clients
+            
+            if ((this.search_by_clientbarcode_value != '')&&(this.search_by_clientbarcode_value)) {
+
+                this.clients_filtered     =   this.clients_filtered.filter((client) => {
+
+                    return client.ClientBarCode.toUpperCase().includes(this.search_by_clientbarcode_value.toUpperCase())
+                })
+            }
+
+            return this.clients_filtered
+        }
+    },
+
+    watch : {
+
+        search_by_clientbarcode_value(newValue, oldValue) {
+
+            this.searchByClientBarCode()
+        }
+    }
+}
+
+</script>

@@ -1,9 +1,7 @@
 <template>
     <div class="login_page">
 
-        <div class="wallpaper_login"></div>
-
-        <div class="container">
+        <div class="container mb-3">
             <div class="row">
 
                 <form>

@@ -567,4 +567,28 @@ class RouteImportController extends Controller
             ],422);
         }
     }
+
+    //
+
+    public static function clientsWaitingValidation(int $id_route_import) {
+
+        try {
+
+            $clients    =   RouteImport::clientsWaitingValidation($id_route_import);
+
+            return $clients;
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
 }

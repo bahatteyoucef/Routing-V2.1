@@ -21,6 +21,16 @@
                 <form>
 
                     <div class="mb-3">
+                        <label for="CustomerCode"       class="form-label">Get Current Position <button class="btn btn-sm" @click.prevent="showPositionOnMap('show_map')"><i class="mdi mdi-reload"></i></button></label>
+                        <p class="text-secondary text-small mb-1">Latitude : {{ client.Latitude }}</p>
+                        <p class="text-secondary text-small mb-1">Longitude : {{ client.Longitude }}</p>
+
+                        <div id="show_map" style="width: 100%; height: 200px;"></div>
+                    </div>
+
+                    <hr />
+
+                    <div class="mb-3">
                         <label for="CustomerCode"       class="form-label">CustomerCode (CustomerCode)</label>
                         <input type="text"              class="form-control"        id="CustomerCode"           v-model="client.CustomerCode">
                     </div>
@@ -423,9 +433,6 @@ export default {
                 // Hide Loading Page
                 this.$hideLoadingPage()
 
-                // Send Client
-                // this.emitter.emit('reSetAdd' , this.client)
-
                 // Go Back
                 this.$goBack()
             }
@@ -443,14 +450,9 @@ export default {
 
         async getData() {
 
-            let client          =   { lat : 0, lng : 0 }
-
-            client.lat          =   this.$route.params.latitude
-            client.lng          =   this.$route.params.longitude
-
-            //
-
             if(this.$connectedToInternet) {
+
+                await this.showPositionOnMap('show_map')
 
                 const res           =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.$route.params.id_route_import+"/details",   null)
                 this.all_clients    =   res.data.route_import.data
@@ -464,7 +466,6 @@ export default {
 
             //
 
-            this.setCoords(client)
             this.getComboData()  
 
             // if(this.$isRole("FrontOffice")) {
@@ -475,15 +476,6 @@ export default {
             }
 
             // }
-        },
-
-        setCoords(client) {
-
-            if(client) {
-
-                this.client.Latitude    =   client.lat
-                this.client.Longitude   =   client.lng
-            }
         },
 
         async getComboData() {
@@ -654,6 +646,20 @@ export default {
         getDistance(latitude_1, longitude_1, latitude_2, longitude_2) {
 
             return this.$map.$setDistanceStraight(latitude_1, longitude_1, latitude_2, longitude_2)
+        },
+
+        //
+
+        async showPositionOnMap(map_id) {
+
+            let position                =   await this.$currentPosition()
+
+            console.log(position)
+
+            this.client.Latitude        =   position.coords.latitude
+            this.client.Longitude       =   position.coords.longitude
+
+            this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude)
         }
     },
 

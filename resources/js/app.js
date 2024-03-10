@@ -182,12 +182,15 @@ window.addEventListener('offline'   , ()    =>  {app.config.globalProperties.$co
 
 // Template
 import Header       from    "./template/partials/header.vue";
+import HeaderStore  from    "./template/partials/headerStore.vue";
 import Sidebar      from    "./template/partials/sidebar.vue";
 import Footer       from    "./template/partials/footer.vue";
 
-app.component('header-part'     ,   Header)
-app.component('sidebar-part'    ,   Sidebar)
-app.component('footer-part'     ,   Footer)
+app.component('header-part'         ,   Header)
+app.component('header-store-part'   ,   HeaderStore)
+
+app.component('sidebar-part'        ,   Sidebar)
+app.component('footer-part'         ,   Footer)
 
 //
 
