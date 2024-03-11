@@ -63,7 +63,7 @@
         </section>
 
         <!-- FrontOffice -->
-        <section v-if="$isRole('FrontOffice')"  class="dashboard"> 
+        <section v-if="$isRole('FrontOffice')"  class="dashboard mt-4"> 
 
             <!-- Index Options -->
             <div class="row d-flex justify-content-center h-100 mt-2">
@@ -103,6 +103,7 @@
                     </div>
                 </div>
 
+                <!--  
                 <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="showNotifications()">
                     <div class="text-center" style="height : 50px">  
                         <img class="card-img-top" src="/images/notifications.png" style="height:100%;width:auto">
@@ -111,7 +112,9 @@
                         <p class="card-text font-weight-bold">Notifications</p>
                     </div>
                 </div>
+                -->
 
+                <!--  
                 <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="showRemuneration()">
                     <div class="text-center" style="height : 50px">  
                         <img class="card-img-top" src="/images/credit_card.png" style="height:100%;width:auto">
@@ -120,6 +123,7 @@
                         <p class="card-text font-weight-bold">Remuneration</p>
                     </div>
                 </div>
+                -->
 
                 <div class="card col-5 m-1 shadow-sm rounded text-center h-25"  @click="showProfile()">
                     <div class="text-center" style="height : 50px">  
@@ -140,12 +144,12 @@
                 </div>
             </div>
 
-            <!-- Software Version -->
-            <div class="row mt-3">
-                <span class="text-small text-secondary">Software Version : 2.0</span>
-            </div>
-
         </section>
+
+        <!-- Software Version -->
+        <div class="row mt-3" style="position: absolute;bottom : 10px">
+            <span class="text-small text-secondary">Software Version : 2.1</span>
+        </div>
 
     </div>
 </template>

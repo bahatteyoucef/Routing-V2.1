@@ -15,6 +15,7 @@ use Illuminate\Validation\Rules;
 
 use App\Models\Role;
 use App\Models\UserRouteImport;
+use App\Models\UserTerritory;
 use Exception;
 use Throwable;
 
@@ -46,6 +47,12 @@ class UserController extends Controller
 
                     $user->id_route_import  =   null;
                 }
+
+                //
+
+                $user_territories           =   UserTerritory::where('id_user', $user->id)->get();  
+
+                $user->user_territories     =   $user_territories;
             }
 
             // 

@@ -21,8 +21,43 @@
                 <form>
 
                     <div class="mb-3">
-                        <label for="CustomerCode"       class="form-label">CustomerCode (CustomerCode)</label>
-                        <input type="text"              class="form-control"        id="CustomerCode"           v-model="client.CustomerCode">
+                        <label for="CustomerCode"       class="form-label">Get Current Position <button class="btn btn-sm" @click.prevent="showPositionOnMap('show_map')"><i class="mdi mdi-reload"></i></button></label>
+                        <p class="text-secondary text-small mb-1">Latitude : {{ client.Latitude }}</p>
+                        <p class="text-secondary text-small mb-1">Longitude : {{ client.Longitude }}</p>
+
+                        <div id="show_map" style="width: 100%; height: 200px;"></div>
+                    </div>
+
+                    <hr />
+
+                    <div class="mb-3">
+                        <div v-show="client.CustomerCode   ==  ''"     class="mt-1 p-0">
+                            <div    id="reader" class="scanner_reader w-100"></div>
+                        </div>
+
+                        <div v-show="client.CustomerCode   !=  ''"     class="mt-1 p-0">
+                            <div    id="result"></div>
+                        </div>
+
+                        <div v-show="client.CustomerCode   !=  ''"     class="mt-1 p-0">
+                            <div    id="customerCode_value"              class="text-center">
+                                <span class="">CustomerCode : {{ client.CustomerCode }}</span>
+                            </div>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-1 mb-1 w-100">
+                            <div class="w-100" id="refresh_client_barcode_button">
+                                <button type="button" class="btn btn-primary w-100"     @click="setBarCodeReader()">Capture Bar Code</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="CustomerBarCode_image_update"   class="form-label">CustomerBarCode Image (CustomerBarCode Image)</label>
+                        <input type="file"                          class="form-control"    id="CustomerBarCode_image_update"                   accept="image/*"    capture     @change="customerBarCodeImage()">
+                        <img                                                                id="CustomerBarCode_image_display_update"           src=""              class="w-100">
                     </div>
 
                     <div class="mb-3">
@@ -186,14 +221,14 @@
 
                     <div class="mb-3">
                         <label for="facade_image_update"    class="form-label">Facade Image (Facade Image)</label>
-                        <input type="file"                  class="form-control"    id="facade_image_update"               accept="image/*"    @change="facadeImage()">
-                        <img                                                        id="facade_image_display_update"       src=""              class="w-100">
+                        <input type="file"                  class="form-control"    id="facade_image_update"               accept="image/*"    capture  @change="facadeImage()">
+                        <img                                                        id="facade_image_display_update"       src=""                       class="w-100">
                     </div>
 
                     <div class="mb-3">
                         <label for="in_store_image_update"  class="form-label">In-Store Image (In-Store Image)</label>
-                        <input type="file"                  class="form-control"    id="in_store_image_update"             accept="image/*"    @change="inStoreImage()">
-                        <img                                                        id="in_store_image_display_update"     src=""              class="w-100">
+                        <input type="file"                  class="form-control"    id="in_store_image_update"             accept="image/*"    capture  @change="inStoreImage()">
+                        <img                                                        id="in_store_image_display_update"     src=""                       class="w-100">
                     </div>
 
                     <!--  -->
@@ -227,13 +262,13 @@
             </div>
 
             <div style="display: flex; justify-content: space-between;">
-                <div class="left-buttons"   style="display: flex;">
-                    <button type="button"   class="btn btn-danger float-left mb-3 mt-3" @click="deleteData()"   v-if="$connectedToInternet">Delete</button>
+                <div                    class="left-buttons"    style="display: flex;">
+                    <button v-if="((client.status !=  'validated')&&($connectedToInternet)&&(point_is_inside_user_polygons))"        type="button"   class="btn btn-danger float-left mb-3 mt-3" @click="deleteData()">Delete</button>
                 </div>
 
-                <div class="right-buttons"  style="display: flex; justify-content: space-between;">
-                    <button type="button"   class="btn btn-secondary mb-3 mt-3"     @click="$goBack()"  >Back</button>
-                    <button type="button"   class="btn btn-primary mb-3 mt-3"       @click="sendData()" >Confirm</button>
+                <div class="right-buttons"                      style="display: flex; justify-content: space-between;">
+                    <button                                                                                 type="button"   class="btn btn-secondary mb-3 mt-3"     @click="$goBack()"  >Back</button>
+                    <button v-if="((client.status !=  'validated')&&(point_is_inside_user_polygons))"       type="button"   class="btn btn-primary mb-3 mt-3"       @click="sendData()" >Confirm</button>
                 </div>
             </div>
 
@@ -251,18 +286,21 @@ export default {
     data() {
         return {
 
-
             client      :   {
 
                 // Images   
-                facade_image                     :   '',
-                in_store_image                   :   '',
-                facade_image_original_name       :   '',
-                in_store_image_original_name     :   '',
+                CustomerBarCode_image                   :   '',
+                facade_image                            :   '',
+                in_store_image                          :   '',
 
-                //
-                facade_image_updated            :   false,
-                in_store_image_updated          :   false,
+                CustomerBarCode_image_original_name     :   '',
+                facade_image_original_name              :   '',
+                in_store_image_original_name            :   '',
+
+                //  
+                CustomerBarCode_image_updated           :   false,
+                facade_image_updated                    :   false,
+                in_store_image_updated                  :   false,
 
                 // Client
                 id                  :   '',
@@ -303,19 +341,27 @@ export default {
                 nonvalidated_details    :   ''
             },
 
-            willayas                        :   []  ,
-            cites                           :   []  ,
+            willayas                        :   []      ,
+            cites                           :   []      ,
 
             // 
-            liste_journey_plan              :   []  ,
-            liste_journee                   :   []  ,
-            liste_type_client               :   []  ,
+            liste_journey_plan              :   []      ,
+            liste_journee                   :   []      ,
+            liste_type_client               :   []      ,
 
             //
 
-            all_clients                     :   []  ,
-            close_clients                   :   []  ,
-            min_distance                    :   0.03
+            all_clients                     :   []      ,
+            close_clients                   :   []      ,
+            min_distance                    :   0.03    ,
+
+            //
+
+            scanner                         :   null    ,
+
+            //
+
+            point_is_inside_user_polygons   :   false
         }
     },
 
@@ -327,8 +373,24 @@ export default {
             getListeJournee                 :   'journee/getListeJournee'               ,
 
             getAddClient                    :   'client/getAddClient'                   ,
-            getUpdateClient                 :   'client/getUpdateClient'                
+            getUpdateClient                 :   'client/getUpdateClient'                ,
+
+            //
+
+            getUser                         :   'authentification/getUser'              
         }),
+    },
+
+    beforeUnmount() {
+
+        if(this.scanner) {
+
+            this.scanner.clear().then(_ => {
+
+            }).catch(error => {
+
+            });
+        }
     },
 
     async mounted() {
@@ -362,38 +424,42 @@ export default {
 
             let formData = new FormData();
 
-            formData.append("CustomerCode"  ,   this.client.CustomerCode)
-            formData.append("CustomerNameE" ,   this.client.CustomerNameE)
-            formData.append("CustomerNameA" ,   this.client.CustomerNameA)
-            formData.append("Latitude"      ,   this.client.Latitude)
-            formData.append("Longitude"     ,   this.client.Longitude)
-            formData.append("Address"       ,   this.client.Address)
-            formData.append("Neighborhood"  ,   this.client.Neighborhood)
-            formData.append("Landmark"      ,   this.client.Landmark)
+            formData.append("CustomerCode"                          ,   this.client.CustomerCode)
+            formData.append("CustomerNameE"                         ,   this.client.CustomerNameE)
+            formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
+            formData.append("Latitude"                              ,   this.client.Latitude)
+            formData.append("Longitude"                             ,   this.client.Longitude)
+            formData.append("Address"                               ,   this.client.Address)
 
-            formData.append("DistrictNo"    ,   this.client.DistrictNo)
-            formData.append("DistrictNameE" ,   this.client.DistrictNameE)
-            formData.append("CityNo"        ,   this.client.CityNo)
-            formData.append("CityNameE"     ,   this.client.CityNameE)
-            formData.append("Tel"           ,   this.client.Tel)
-            formData.append("CustomerType"  ,   this.client.CustomerType)
-            formData.append("BrandAvailability"     ,   this.client.BrandAvailability)
-            formData.append("BrandSourcePurchase"   ,   this.client.BrandSourcePurchase)
+            formData.append("Neighborhood"                          ,   this.client.Neighborhood)
+            formData.append("Landmark"                              ,   this.client.Landmark)
 
-            formData.append("JPlan"         ,   this.client.JPlan)
-            formData.append("Journee"       ,   this.client.Journee)
+            formData.append("DistrictNo"                            ,   this.client.DistrictNo)
+            formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
+            formData.append("CityNo"                                ,   this.client.CityNo)
+            formData.append("CityNameE"                             ,   this.client.CityNameE)
+            formData.append("Tel"                                   ,   this.client.Tel)
+            formData.append("CustomerType"                          ,   this.client.CustomerType)
+            formData.append("BrandAvailability"                     ,   this.client.BrandAvailability)
+            formData.append("BrandSourcePurchase"                   ,   this.client.BrandSourcePurchase)
 
-            formData.append("facade_image_updated"          ,   this.client.facade_image_updated)
-            formData.append("in_store_image_updated"        ,   this.client.in_store_image_updated)
+            formData.append("JPlan"                                 ,   this.client.JPlan)
+            formData.append("Journee"                               ,   this.client.Journee)
 
-            formData.append("facade_image"                  ,   this.client.facade_image)
-            formData.append("in_store_image"                ,   this.client.in_store_image)
+            formData.append("CustomerBarCode_image_updated"         ,   this.client.CustomerBarCode_image_updated)
+            formData.append("facade_image_updated"                  ,   this.client.facade_image_updated)
+            formData.append("in_store_image_updated"                ,   this.client.in_store_image_updated)
 
-            formData.append("facade_image_original_name"    ,   this.client.facade_image_original_name)
-            formData.append("in_store_image_original_name"  ,   this.client.in_store_image_original_name)
+            formData.append("CustomerBarCode_image"                 ,   this.client.CustomerBarCode_image)
+            formData.append("facade_image"                          ,   this.client.facade_image)
+            formData.append("in_store_image"                        ,   this.client.in_store_image)
 
-            formData.append("status"                    ,   this.client.status)
-            formData.append("nonvalidated_details"      ,   this.client.nonvalidated_details)
+            formData.append("CustomerBarCode_image_original_name"   ,   this.client.CustomerBarCode_image_original_name)
+            formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
+            formData.append("in_store_image_original_name"          ,   this.client.in_store_image_original_name)
+
+            formData.append("status"                                ,   this.client.status)
+            formData.append("nonvalidated_details"                  ,   this.client.nonvalidated_details)
 
             if(this.$connectedToInternet) {
 
@@ -595,6 +661,8 @@ export default {
 
             if(this.$connectedToInternet) {
 
+                await this.showPositionOnMap('show_map')
+
                 const res           =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.$route.params.id_route_import+"/details",   null)
                 this.all_clients    =   res.data.route_import.data
             }
@@ -620,58 +688,63 @@ export default {
 
             if(this.$connectedToInternet) {
 
-                const res                                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.$route.params.id_client+"/show",   null)
-                let client                                  =   res.data
+                const res                                           =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.$route.params.id_client+"/show",   null)
+                let client                                          =   res.data
 
                 console.log(client)
 
-                this.client.id                              =   client.id
+                this.client.id                                      =   client.id
 
-                this.client.CustomerCode                    =   client.CustomerCode
+                this.client.CustomerCode                            =   client.CustomerCode
 
-                this.client.old_CustomerNameE               =   client.CustomerNameE
+                this.client.old_CustomerNameE                       =   client.CustomerNameE
 
-                this.client.CustomerNameE                   =   client.CustomerNameE
-                this.client.CustomerNameA                   =   client.CustomerNameA
-                this.client.Latitude                        =   client.Latitude
-                this.client.Longitude                       =   client.Longitude
+                this.client.CustomerNameE                           =   client.CustomerNameE
+                this.client.CustomerNameA                           =   client.CustomerNameA
+                this.client.Latitude                                =   client.Latitude
+                this.client.Longitude                               =   client.Longitude
 
-                this.client.Address                         =   client.Address
-                this.client.Neighborhood                    =   client.Neighborhood
-                this.client.Landmark                        =   client.Landmark
+                this.client.Address                                 =   client.Address
+                this.client.Neighborhood                            =   client.Neighborhood
+                this.client.Landmark                                =   client.Landmark
 
-                this.client.DistrictNo                      =   client.DistrictNo
+                this.client.DistrictNo                              =   client.DistrictNo
 
-                this.client.CityNo                          =   client.CityNo
+                this.client.CityNo                                  =   client.CityNo
 
-                this.client.Tel                             =   client.Tel
+                this.client.Tel                                     =   client.Tel
 
-                this.client.CustomerType                    =   client.CustomerType
-                this.client.BrandAvailability               =   client.BrandAvailability
-                this.client.BrandSourcePurchase             =   client.BrandSourcePurchase
+                this.client.CustomerType                            =   client.CustomerType
+                this.client.BrandAvailability                       =   client.BrandAvailability
+                this.client.BrandSourcePurchase                     =   client.BrandSourcePurchase
 
-                this.client.JPlan                           =   client.JPlan
+                this.client.JPlan                                   =   client.JPlan
 
-                this.client.Journee                         =   client.Journee
+                this.client.Journee                                 =   client.Journee
 
-                this.client.status                          =   client.status
-                this.client.status_original                 =   client.status
-                this.client.nonvalidated_details            =   client.nonvalidated_details
+                this.client.status                                  =   client.status
+                this.client.status_original                         =   client.status
+                this.client.nonvalidated_details                    =   client.nonvalidated_details
 
-                this.client.facade_image                    =   client.facade_image
-                this.client.in_store_image                  =   client.in_store_image
+                this.client.CustomerBarCode_image                   =   client.CustomerBarCode_image
+                this.client.facade_image                            =   client.facade_image
+                this.client.in_store_image                          =   client.in_store_image
 
-                this.client.facade_image_original_name      =   client.facade_image_original_name
-                this.client.in_store_image_original_name    =   client.in_store_image_original_name
-
-                // 
-                this.$createFile(client.facade_image_original_name      ,   "facade_image_update")
-                this.$createFile(client.in_store_image_original_name    ,   "in_store_image_update")
+                this.client.CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name
+                this.client.facade_image_original_name              =   client.facade_image_original_name
+                this.client.in_store_image_original_name            =   client.in_store_image_original_name
 
                 // 
+                this.$createFile(client.CustomerBarCode_image_original_name     ,   "CustomerBarCode_image_update")
+                this.$createFile(client.facade_image_original_name              ,   "facade_image_update")
+                this.$createFile(client.in_store_image_original_name            ,   "in_store_image_update")
+
+                // 
+                let CustomerBarCode_image_display_update    =   document.getElementById("CustomerBarCode_image_display_update")
                 let facade_image_display_update             =   document.getElementById("facade_image_display_update")
                 let in_store_image_display_update           =   document.getElementById("in_store_image_display_update")
 
+                CustomerBarCode_image_display_update.src    =   "/uploads/clients/"+client.id+"/"+client.CustomerBarCode_image
                 facade_image_display_update.src             =   "/uploads/clients/"+client.id+"/"+client.facade_image
                 in_store_image_display_update.src           =   "/uploads/clients/"+client.id+"/"+client.in_store_image
 
@@ -687,15 +760,18 @@ export default {
                 this.client     =   client
 
                 // 
-                this.$createFile(client.facade_image_original_name      ,   "facade_image_update")
-                this.$createFile(client.in_store_image_original_name    ,   "in_store_image_update")
+                this.$createFile(client.CustomerBarCode_image_original_name     ,   "CustomerBarCode_image_update")
+                this.$createFile(client.facade_image_original_name              ,   "facade_image_update")
+                this.$createFile(client.in_store_image_original_name            ,   "in_store_image_update")
 
                 // 
-                let facade_image_display_update     =   document.getElementById("facade_image_display_update")
-                let in_store_image_display_update   =   document.getElementById("in_store_image_display_update")
+                let CustomerBarCode_image_display_update    =   document.getElementById("CustomerBarCode_image_display_update")
+                let facade_image_display_update             =   document.getElementById("facade_image_display_update")
+                let in_store_image_display_update           =   document.getElementById("in_store_image_display_update")
 
-                this.base64ToImage(this.client.facade_image             ,   facade_image_display_update)            
-                this.base64ToImage(this.client.in_store_image           ,   in_store_image_display_update)            
+                this.base64ToImage(this.client.CustomerBarCode_image            ,   CustomerBarCode_image_display_update)            
+                this.base64ToImage(this.client.facade_image                     ,   facade_image_display_update)            
+                this.base64ToImage(this.client.in_store_image                   ,   in_store_image_display_update)            
 
                 // 
                 this.setJoursGetData(client)
@@ -991,6 +1067,51 @@ export default {
 
         //
 
+        async customerBarCodeImage() {
+
+            const CustomerBarCode_image  =   document.getElementById("CustomerBarCode_image_update").files[0];
+
+            console.log(CustomerBarCode_image)
+
+            if(CustomerBarCode_image) {
+
+                this.client.CustomerBarCode_image_updated            =   true
+
+                if(this.$connectedToInternet) {
+
+                    this.client.CustomerBarCode_image_original_name      =   CustomerBarCode_image.name
+                    this.client.CustomerBarCode_image                    =   await this.$compressImage(CustomerBarCode_image)
+
+                    //
+
+                    let CustomerBarCode_image_base64                     =   await this.$imageToBase64(this.client.CustomerBarCode_image)
+
+                    let CustomerBarCode_image_display                    =   document.getElementById("CustomerBarCode_image_display_update")
+                    this.base64ToImage(CustomerBarCode_image_base64, CustomerBarCode_image_display)
+                }
+
+                else {
+
+                    this.client.CustomerBarCode_image_original_name      =   CustomerBarCode_image.name
+                    this.client.CustomerBarCode_image                    =   await this.$compressImage(CustomerBarCode_image)
+
+                    //
+
+                    this.client.CustomerBarCode_image                    =   await this.$imageToBase64(this.client.CustomerBarCode_image)
+
+                    let CustomerBarCode_image_display                    =   document.getElementById("CustomerBarCode_image_display_update")
+                    this.base64ToImage(this.client.CustomerBarCode_image, CustomerBarCode_image_display)
+                }
+            }
+
+            else {
+
+                this.client.CustomerBarCode_image_updated            =   false
+            }
+        },
+
+        //
+
         async facadeImage() {
 
             const facade_image  =   document.getElementById("facade_image_update").files[0];
@@ -1082,6 +1203,65 @@ export default {
         base64ToImage(image_base64, image_display_div) {
 
             this.$base64ToImage(image_base64, image_display_div)
+        },
+
+        //
+
+        async showPositionOnMap(map_id) {
+
+            let position                =   await this.$currentPosition()
+
+            console.log(position)
+
+            this.client.Latitude        =   position.coords.latitude
+            this.client.Longitude       =   position.coords.longitude
+
+            this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
+        },
+
+        //
+
+        setBarCodeReader() {
+
+            const reader    =   document.getElementById('reader')
+
+            // 
+            this.client.CustomerCode    =   ""
+
+            if(reader) {
+
+                reader.style.display        =   "block";
+
+                this.scanner = new Html5QrcodeScanner('reader', { 
+
+                        // Scanner will be initialized in DOM inside element with id of 'reader'
+                        qrbox: {
+                            width: 250,
+                            height: 250,
+                        },  // Sets dimensions of scanning box (set relative to reader element width)
+                        fps: 20, // Frames per second to attempt a scan
+                    });
+
+                // 
+                this.scanner.render(this.success, this.error);
+            }
+        },
+
+        success(result) {
+             
+            // 
+            this.client.CustomerCode    =   result
+
+            this.scanner.clear();
+
+            document.getElementById('reader').style.display =   "none"
+            // Removes reader element from DOM since no longer needed 
+        },
+
+        error(err) {
+
+            // Prints any errors to the console
+            console.error("");
         },
     },
 

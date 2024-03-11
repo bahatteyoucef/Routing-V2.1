@@ -4,6 +4,8 @@ import store    from    "../store/store"
 
 export default class Map {
     
+    //
+
     constructor() {
 
         this.marker_cluster_mode                            =   "cluster"
@@ -762,6 +764,26 @@ export default class Map {
 
     // User Territories
 
+    $showUserBDTerritoriesFront(territories) {
+
+        // Show
+        for (let i = 0; i < territories.length; i++) {
+
+            var latlngs     =   JSON.parse(territories[i].latlngs)
+
+            if(Array.isArray(latlngs) && (latlngs.length > 0)) {
+
+                // Territory
+                var territory           =   L.polygon(latlngs, { color: territories[i].color }).addTo(this.map)
+
+                this.user_territories.push(territory)
+
+                // Add to Editable Layers by Right Drawing tool
+                this.editable_layers_journey_plan_territory.addLayer(territory)
+            }          
+        }
+    }
+
     $showUserBDTerritories(territories) {
 
         // Hide
@@ -906,7 +928,7 @@ export default class Map {
                 polyline        : false ,
                 circle          : false , 
                 rectangle       : false ,
-                marker          : true  ,
+                marker          : false ,
                 circlemarker    : false ,
                 polygon         : false
             },
@@ -914,7 +936,7 @@ export default class Map {
             edit: {
                 featureGroup    : this.editable_layers, // REQUIRED!!
                 edit            : false,                // Exclude the edit option
-                remove          : true
+                remove          : false
             }
         };
 
@@ -1281,5 +1303,22 @@ export default class Map {
             // Add new layers
             this.kml_layers[kml_layer]   =   omnivore.kml('/kml/'+kml_layer+'.kml').addTo(this.map);
         });
+    }
+
+    //
+
+    $checkPointInsideUserPolygons(latitude, longitude) {
+
+        let point   =   L.marker([latitude, longitude])
+
+        for (let index = 0; index < this.user_territories.length; index++) {
+
+            if (this.user_territories[index].contains(point.getLatLng())) {
+
+                return true
+            }
+        }
+
+        return false
     }
 }

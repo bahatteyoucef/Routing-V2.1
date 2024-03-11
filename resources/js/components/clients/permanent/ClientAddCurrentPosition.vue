@@ -31,8 +31,33 @@
                     <hr />
 
                     <div class="mb-3">
-                        <label for="CustomerCode"       class="form-label">CustomerCode (CustomerCode)</label>
-                        <input type="text"              class="form-control"        id="CustomerCode"           v-model="client.CustomerCode">
+                        <div v-show="client.CustomerCode   ==  ''"     class="mt-1 p-0">
+                            <div    id="reader" class="scanner_reader w-100"></div>
+                        </div>
+
+                        <div v-show="client.CustomerCode   !=  ''"     class="mt-1 p-0">
+                            <div    id="result"></div>
+                        </div>
+
+                        <div v-show="client.CustomerCode   !=  ''"     class="mt-1 p-0">
+                            <div    id="customerCode_value"              class="text-center">
+                                <span class="">CustomerCode : {{ client.CustomerCode }}</span>
+                            </div>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-1 mb-1 w-100">
+                            <div class="w-100" id="refresh_client_barcode_button">
+                                <button type="button" class="btn btn-primary w-100"     @click="setBarCodeReader()">Capture Bar Code</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="CustomerBarCode_image"    class="form-label">CustomerBarCode Image (CustomerBarCode Image)</label>
+                        <input type="file"              class="form-control"        id="CustomerBarCode_image"              accept="image/*"    capture     @change="customerBarCodeImage()">
+                        <img                                                        id="CustomerBarCode_image_display"      src=""              class="w-100">
                     </div>
 
                     <div class="mb-3">
@@ -174,14 +199,14 @@
 
                     <div class="mb-3">
                         <label for="facade_image"       class="form-label">Facade Image (Facade Image)</label>
-                        <input type="file"              class="form-control"        id="facade_image"               accept="image/*"    @change="facadeImage()">
-                        <img                                                        id="facade_image_display"       src=""              class="w-100">
+                        <input type="file"              class="form-control"        id="facade_image"               accept="image/*"    capture     @change="facadeImage()">
+                        <img                                                        id="facade_image_display"       src=""                          class="w-100">
                     </div>
 
                     <div class="mb-3">
                         <label for="in_store_image"     class="form-label">In-Store Image (In-Store Image)</label>
-                        <input type="file"              class="form-control"        id="in_store_image"             accept="image/*"    @change="inStoreImage()">
-                        <img                                                        id="in_store_image_display"     src=""              class="w-100">
+                        <input type="file"              class="form-control"        id="in_store_image"             accept="image/*"    capture     @change="inStoreImage()">
+                        <img                                                        id="in_store_image_display"     src=""                          class="w-100">
                     </div>
 
                     <!--  -->
@@ -217,7 +242,7 @@
             <div        style="display: flex; justify-content: space-between;">
                 <div    class="right-buttons"  style="display: flex; margin-left: auto;">
                     <button type="button" class="btn btn-secondary mb-3 mt-3"   @click="$goBack()">Back</button>
-                    <button type="button" class="btn btn-primary mb-3 mt-3"     @click="sendData()">Confirm</button>
+                    <button v-if="point_is_inside_user_polygons" type="button" class="btn btn-primary mb-3 mt-3"     @click="sendData()">Confirm</button>
                 </div>
             </div>
         </div>
@@ -238,10 +263,13 @@ export default {
             client      :   {
 
                 // Images   
-                facade_image                    :   '',
-                in_store_image                  :   '',
-                facade_image_original_name      :   '',
-                in_store_image_original_name    :   '',
+                CustomerBarCode_image                   :   '',
+                facade_image                            :   '',
+                in_store_image                          :   '',
+
+                CustomerBarCode_image_original_name     :   '',
+                facade_image_original_name              :   '',
+                in_store_image_original_name            :   '',
 
                 // Client
                 id              :   '',
@@ -293,9 +321,17 @@ export default {
 
             //
 
-            all_clients                     :   []  ,
-            close_clients                   :   []  ,
-            min_distance                    :   0.03
+            all_clients                     :   []      ,
+            close_clients                   :   []      ,
+            min_distance                    :   0.03    ,
+
+            //
+
+            scanner                         :   null    ,
+
+            //
+
+            point_is_inside_user_polygons   :   false
         }
     },
 
@@ -308,7 +344,11 @@ export default {
 
             //
 
-            getAllClients                   :   'client/getAllClients'    
+            getAllClients                   :   'client/getAllClients'                  ,
+
+            //
+
+            getUser                         :   'authentification/getUser'              
         }),
     },
 
@@ -328,7 +368,19 @@ export default {
         //
 
         await this.getData()
-    },  
+    }, 
+
+    beforeUnmount() {
+
+        if(this.scanner) {
+
+            this.scanner.clear().then(_ => {
+
+            }).catch(error => {
+
+            });
+        }
+    },
 
     methods : {
 
@@ -366,10 +418,13 @@ export default {
             formData.append("JPlan"         ,   this.client.JPlan)
             formData.append("Journee"       ,   this.client.Journee)
 
-            formData.append("facade_image"                  ,   this.client.facade_image)
-            formData.append("in_store_image"                ,   this.client.in_store_image)
-            formData.append("facade_image_original_name"    ,   this.client.facade_image_original_name)
-            formData.append("in_store_image_original_name"  ,   this.client.in_store_image_original_name)
+            formData.append("CustomerBarCode_image"                 ,   this.client.CustomerBarCode_image)
+            formData.append("facade_image"                          ,   this.client.facade_image)
+            formData.append("in_store_image"                        ,   this.client.in_store_image)
+
+            formData.append("CustomerBarCode_image_original_name"   ,   this.client.CustomerBarCode_image_original_name)
+            formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
+            formData.append("in_store_image_original_name"          ,   this.client.in_store_image_original_name)
 
             formData.append("status"                ,   this.client.status)
             formData.append("nonvalidated_details"  ,   this.client.nonvalidated_details)
@@ -547,6 +602,42 @@ export default {
 
         //
 
+        async customerBarCodeImage() {
+
+            const CustomerBarCode_image  =   document.getElementById("CustomerBarCode_image").files[0];
+
+            if(CustomerBarCode_image) {
+
+                if(this.$connectedToInternet) {
+
+                    this.client.CustomerBarCode_image_original_name      =   CustomerBarCode_image.name
+                    this.client.CustomerBarCode_image                    =   await this.$compressImage(CustomerBarCode_image)
+
+                    //
+
+                    let CustomerBarCode_image_base64                     =   await this.$imageToBase64(this.client.CustomerBarCode_image)
+
+                    let CustomerBarCode_image_display                    =   document.getElementById("CustomerBarCode_image_display")
+                    this.base64ToImage(CustomerBarCode_image_base64, CustomerBarCode_image_display)
+                }
+
+                else {
+
+                    this.client.CustomerBarCode_image_original_name      =   CustomerBarCode_image.name
+                    this.client.CustomerBarCode_image                    =   await this.$compressImage(CustomerBarCode_image)
+
+                    //
+
+                    this.client.CustomerBarCode_image                    =   await this.$imageToBase64(this.client.CustomerBarCode_image)
+
+                    let CustomerBarCode_image_display                    =   document.getElementById("CustomerBarCode_image_display")
+                    this.base64ToImage(this.client.CustomerBarCode_image, CustomerBarCode_image_display)
+                }
+            }
+        },
+
+        //
+
         async facadeImage() {
 
             const facade_image  =   document.getElementById("facade_image").files[0];
@@ -650,6 +741,51 @@ export default {
 
         //
 
+        setBarCodeReader() {
+
+            const reader    =   document.getElementById('reader')
+
+            // 
+            this.client.CustomerCode    =   ""
+
+            if(reader) {
+
+                reader.style.display        =   "block";
+
+                this.scanner = new Html5QrcodeScanner('reader', { 
+
+                        // Scanner will be initialized in DOM inside element with id of 'reader'
+                        qrbox: {
+                            width: 250,
+                            height: 250,
+                        },  // Sets dimensions of scanning box (set relative to reader element width)
+                        fps: 20, // Frames per second to attempt a scan
+                    });
+
+                // 
+                this.scanner.render(this.success, this.error);
+            }
+        },
+
+        success(result) {
+             
+            // 
+            this.client.CustomerCode    =   result
+
+            this.scanner.clear();
+
+            document.getElementById('reader').style.display =   "none"
+            // Removes reader element from DOM since no longer needed 
+        },
+
+        error(err) {
+
+            // Prints any errors to the console
+            console.error("");
+        },
+
+        //
+
         async showPositionOnMap(map_id) {
 
             let position                =   await this.$currentPosition()
@@ -659,7 +795,10 @@ export default {
             this.client.Latitude        =   position.coords.latitude
             this.client.Longitude       =   position.coords.longitude
 
-            this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude)
+            this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
+
+            //
+            this.point_is_inside_user_polygons  =   this.$map.$checkPointInsideUserPolygons(this.client.Latitude, this.client.Longitude)
         }
     },
 

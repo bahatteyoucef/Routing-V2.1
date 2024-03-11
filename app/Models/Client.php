@@ -66,7 +66,7 @@ class Client extends Model
                 'BrandSourcePurchase'   =>  $client_elem->BrandSourcePurchase       ,
 
                 'id_route_import'       =>  $id_route_import                        ,
-                'status'                =>  "pending"                               ,
+                'status'                =>  "nonvalidated"                          ,
                 'nonvalidated_details'  =>  ""                                      ,
                 'created_at'            =>  1,
                 'owner'                 =>  Auth::user()->id
@@ -214,6 +214,22 @@ class Client extends Model
 
         //
 
+        if($request->hasFile("CustomerBarCode_image")) {
+
+            $fileName                           =   uniqid().'.'.$request->file("CustomerBarCode_image")->getClientOriginalExtension();
+
+            $request->file("CustomerBarCode_image")->move(public_path('uploads/clients/'.$client->id), $fileName);
+
+            $client->CustomerBarCode_image      =   $fileName;
+        } 
+
+        else {
+
+            $client->CustomerBarCode_image      =   "";
+        }
+
+        //
+
         if($request->hasFile("facade_image")) {
 
             $fileName                   =   uniqid().'.'.$request->file("facade_image")->getClientOriginalExtension();
@@ -246,26 +262,38 @@ class Client extends Model
 
         //
 
-        if($request->input("facade_image_original_name") !=  null) {
+        if($request->input("CustomerBarCode_image_original_name") !=  null) {
 
-            $client->facade_image_original_name      =   $request->input("facade_image_original_name");
+            $client->CustomerBarCode_image_original_name    =   $request->input("CustomerBarCode_image_original_name");
         }
 
         else {
 
-            $client->facade_image_original_name      =   "";
+            $client->CustomerBarCode_image_original_name    =   "";
+        }
+
+        //
+
+        if($request->input("facade_image_original_name") !=  null) {
+
+            $client->facade_image_original_name             =   $request->input("facade_image_original_name");
+        }
+
+        else {
+
+            $client->facade_image_original_name             =   "";
         }
 
         //
 
         if($request->input("in_store_image_original_name") !=  null) {
 
-            $client->in_store_image_original_name      =   $request->input("in_store_image_original_name");
+            $client->in_store_image_original_name           =   $request->input("in_store_image_original_name");
         }
 
         else {
 
-            $client->in_store_image_original_name      =   "";
+            $client->in_store_image_original_name           =   "";
         }
 
         //
@@ -372,6 +400,25 @@ class Client extends Model
 
             //
 
+            if($request->get("CustomerBarCode_image_updated")    ==  "true") {
+
+                if($request->hasFile("CustomerBarCode_image")) {
+
+                    $fileName                           =   uniqid().'.'.$request->file("CustomerBarCode_image")->getClientOriginalExtension();
+
+                    $request->file("CustomerBarCode_image")->move(public_path('uploads/clients/'.$client->id), $fileName);
+
+                    $client->CustomerBarCode_image      =   $fileName;
+                } 
+
+                else {
+
+                    $client->CustomerBarCode_image      =   "";
+                }
+            }
+
+            //
+
             if($request->get("facade_image_updated")    ==  "true") {
 
                 if($request->hasFile("facade_image")) {
@@ -406,6 +453,18 @@ class Client extends Model
 
                     $client->in_store_image     =   "";
                 }
+            }
+
+            //
+
+            if($request->input("CustomerBarCode_image_original_name") !=  null) {
+
+                $client->CustomerBarCode_image_original_name      =   $request->input("CustomerBarCode_image_original_name");
+            }
+
+            else {
+
+                $client->CustomerBarCode_image_original_name      =   "";
             }
 
             //

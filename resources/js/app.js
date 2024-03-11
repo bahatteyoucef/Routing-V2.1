@@ -175,8 +175,6 @@ app.config.globalProperties.$indexedDB                  =   new IndexedDB()
 
 // Internet
 app.config.globalProperties.$connectedToInternet        =   window.navigator.onLine
-window.addEventListener('online'    , ()    =>  {app.config.globalProperties.$connectedToInternet   =   true});
-window.addEventListener('offline'   , ()    =>  {app.config.globalProperties.$connectedToInternet   =   false});
 
 // 
 
@@ -210,10 +208,11 @@ app.component('map-route-part'                  ,   MapRoute)
 // Sync Page
 
 import LoadingPage              from    "./template/partials/loadingPage.vue";
-
+import InternetErrorPage        from    "./template/partials/InternetErrorPage.vue";
 import LoginPage                from    "./components/login/login.vue"
 
 app.component('loading-page'                    ,   LoadingPage)
+app.component('internet-error-page'             ,   InternetErrorPage)
 app.component('login-page'                      ,   LoginPage)
 
 // 

@@ -3,18 +3,15 @@
     <!-- Loading -->
     <loading-page></loading-page>
 
-    <!-- Login -->
+    <!-- Internet Error Page    -->
+    <internet-error-page    v-show="show_internet_error_page  ==  false"></internet-error-page>
+
+    <!-- Login      -->
     <section v-if="component_login">
-
-        <div style="background-color : #F2EDF3;">
-
-            <header-store-part></header-store-part>
-
-            <login-page></login-page>
-
-        </div>
+        <login-page></login-page>
     </section>
 
+    <!-- Dashboard  -->
     <div v-if="isAuthentificated">
         <!-- Dashboard + Route -->
         <section v-if="component_dashboard">
@@ -51,7 +48,7 @@
         </section>
     </div>
 
-    <!-- Install Banner -->
+    <!-- Install Banner         -->
     <div v-if="$isRole('FrontOffice')" v-show="show_install_button" id="BlockInstall" class="w-100 p-3">
         <div class="row">
             <div @click="closeInstallBanner()"  class="col-2 p-0 d-flex justify-content-center align-items-center">
@@ -81,16 +78,20 @@
 
             return {
 
-                user                    :   {}      ,
+                user                        :   {}      ,
 
-                isAuthentificated       :   false   ,
+                isAuthentificated           :   false   ,
 
-                component_login         :   false   ,
-                component_dashboard     :   false   ,
+                component_login             :   false   ,
+                component_dashboard         :   false   ,
 
                 //
 
-                show_install_button     :   false
+                show_install_button         :   false   ,
+
+                //
+
+                show_internet_error_page    :   window.navigator.onLine
             }
         },
 
@@ -105,10 +106,15 @@
 
         beforeMount() {
 
-            this.isAuthentificated  =   false
+            this.isAuthentificated              =   false
+            this.show_internet_error_page       =   window.navigator.onLine
         },
 
         async mounted() {
+
+            //
+            window.addEventListener('online'    , ()    =>  {this.$connectedToInternet  =   true    ,   this.show_internet_error_page   =   true    });
+            window.addEventListener('offline'   , ()    =>  {this.$connectedToInternet  =   false   ,   this.show_internet_error_page   =   false   });
 
             // 
             this.isAuthentificated      =   await this.checkIfUserIsAuthentificated()
@@ -263,7 +269,7 @@
 
                     this.isAuthentificated      =   false
                 }
-            }
+            },
         }
     }
 

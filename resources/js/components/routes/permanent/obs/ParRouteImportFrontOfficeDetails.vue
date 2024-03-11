@@ -321,6 +321,9 @@ export default {
         // add Map
         this.addMap()
 
+        //
+        this.showUserBDTerritoriesFront()
+
         // 
         this.setValues()
 
@@ -419,7 +422,9 @@ export default {
             // Show Loading Page
             this.$showLoadingPage()
 
-            const res                   =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.id_route_import+"/details",   null)
+            const res                   =   await this.$callApi("post"  ,   "route/obs/route_import/"+this.id_route_import+"/details/by_owner",   null)
+            console.log(res)
+
             this.route_import           =   res.data.route_import
 
             // Set Clients
@@ -1487,6 +1492,12 @@ export default {
                 // Send Errors
                 this.$showErrors("Error !", res.data.errors)
 			}
+        },
+
+        async showUserBDTerritoriesFront() {
+
+            // Show BD Territories
+            this.$map.$showUserBDTerritoriesFront(this.getUser.user_territories)
         },
 
         //

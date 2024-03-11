@@ -27,9 +27,18 @@
 
 /* Loading */
 
-.center_screen {
+.center_screen_loading_screen {
     position        :   fixed   ;
     top             :   45%     ;
+
+    width           :   100%    ;
+
+    margin          :   auto    ;
+}
+
+.center_screen_internet_error_screen {
+    position        :   fixed   ;
+    top             :   30%     ;
 
     width           :   100%    ;
 
@@ -45,6 +54,18 @@
     z-index         :   99999;
 
     background      : rgba(255, 255, 255, 0.1);
+    backdrop-filter :   blur(5px);
+}
+
+#internet_error_screen {
+    position        :   fixed;
+
+    width           :   100%;
+    height          :   100%;
+
+    z-index         :   99999;
+
+    background      : rgba(255, 255, 255, 0.5);
     backdrop-filter :   blur(5px);
 }
 

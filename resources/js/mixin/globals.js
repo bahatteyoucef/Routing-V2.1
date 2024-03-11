@@ -9,7 +9,8 @@ export default {
 
         return {
 
-            show_map    :   null
+            show_map        :   null    ,
+            territories     :   []
         }
     },
 
@@ -1073,10 +1074,15 @@ export default {
 
         //
 
-        $showPositionOnMap(map_id, latitude, longitude) {
+        $showPositionOnMap(map_id, latitude, longitude, territories) {
 
             if (this.show_map) {
 
+                //
+                this.$hideTerritores()
+                this.$showTerritories(territories)
+
+                //
                 this.show_map.setView([latitude, longitude], 15); // Replace with your coordinates and zoom level
 
                 // Clear all existing layers (including markers)
@@ -1097,6 +1103,10 @@ export default {
 
                 this.show_map   =   L.map(map_id).setView([latitude, longitude], 15); // Replace with your coordinates and zoom level
 
+                //
+                this.$hideTerritores()
+                this.$showTerritories(territories)
+
                 // Define tile layer (e.g., OpenStreetMap)
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -1115,6 +1125,32 @@ export default {
 
                 show_map.src            =   `https://maps.google.com/maps?q=${latitude},${longitude}&output=embed`
                 show_map.style.display  =   "block"
+            }
+        },
+
+        //
+
+        $hideTerritores() {
+
+            // Clear Markers
+            this.territories.forEach(territory => {
+
+                this.show_map.removeLayer(territory)
+            });
+        },
+
+        $showTerritories(territories) {
+
+            for (let i = 0; i < territories.length; i++) {
+
+                var latlngs     =   JSON.parse(territories[i].latlngs)
+
+                if(Array.isArray(latlngs) && (latlngs.length > 0)) {
+
+                    // Territory
+                    var territory           =   L.polygon(latlngs, { color: territories[i].color }).addTo(this.show_map)
+                    this.territories.push(territory)
+                }          
             }
         }
     }

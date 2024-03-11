@@ -203,6 +203,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/clients/resume/update'                                                                ,   [ClientController::class                , 'updateResumeClients'                     ]);
 
     Route::post('/route/obs/route_import/{id}/details'                                                  ,   [RouteImportController::class           , 'obsDetailsRouteImport'                   ]);
+    Route::post('/route/obs/route_import/{id}/details/by_owner'                                         ,   [RouteImportController::class           , 'obsDetailsRouteImportByOwner'            ]);
 
     //
 

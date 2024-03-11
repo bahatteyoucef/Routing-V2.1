@@ -127,7 +127,7 @@ export default {
 
                                 this.setLatitudeLongitudeStandard()
                                 this.setNecessaryAttributs()
-                                this.setCustomerNo()
+                                // this.setCustomerNo()
 
                                 // 
 
@@ -179,6 +179,9 @@ export default {
                 let Latitude_existe         =   columns.includes("Latitude")
                 let Longitude_existe        =   columns.includes("Longitude")
                 let Address_existe          =   columns.includes("Address")
+                let Neighborhood_existe     =   columns.includes("Neighborhood")
+                let Landmark_existe         =   columns.includes("Landmark")
+
                 let DistrictNo_existe       =   columns.includes("DistrictNo")
                 let DistrictNameE_existe    =   columns.includes("DistrictNameE")
                 let CityNo_existe           =   columns.includes("CityNo")
@@ -214,6 +217,16 @@ export default {
                 if(!Address_existe) {
 
                     errors.push("Your file doesn't contain the column 'Address'")
+                }
+
+                if(!Neighborhood_existe) {
+
+                    errors.push("Your file doesn't contain the column 'Neighborhood'")
+                }
+
+                if(!Landmark_existe) {
+
+                    errors.push("Your file doesn't contain the column 'Landmark'")
                 }
 
                 if(!DistrictNo_existe) {
@@ -315,6 +328,16 @@ export default {
                 if(!this.clients[i].hasOwnProperty("Address")) {
 
                     this.clients[i].Address         =   ""
+                }
+
+                if(!this.clients[i].hasOwnProperty("Neighborhood")) {
+
+                    this.clients[i].Neighborhood    =   ""
+                }
+
+                if(!this.clients[i].hasOwnProperty("Landmark")) {
+
+                    this.clients[i].Landmark        =   ""
                 }
 
                 if(!this.clients[i].hasOwnProperty("DistrictNo")) {

@@ -1,7 +1,7 @@
 <template>
     <div>
         <div id="loading_screen" style="display:none;">
-            <div class="text-center align-middle center_screen">
+            <div class="text-center align-middle center_screen_loading_screen">
                 <div class="spinner-grow" role="status">
                 </div>
 

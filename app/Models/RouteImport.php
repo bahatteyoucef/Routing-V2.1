@@ -448,6 +448,16 @@ class RouteImport extends Model
         return $route_import;
     }
 
+    public static function obsDetailsRouteImportByOwner(string $id)
+    {
+
+        $route_import           =   RouteImport::find($id);
+
+        $route_import->data     =   Client::where([["id_route_import", $id], ["clients.owner", Auth::user()->id]])->join('users', 'clients.owner', '=', 'users.id')->select('clients.*', 'users.nom as owner_name')->get();   
+
+        return $route_import;
+    }
+
     //
 
     // Clients
