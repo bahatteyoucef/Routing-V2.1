@@ -77,10 +77,17 @@ const routes = [
 
     // Route Import Non Validated Clients
     {
-        path        : "/route_import/:id_user/clients/waiting_validation",
-        component   : () => import('./components/routes/routeImportClientsWaitingValidation.vue')
+        path        : "/route_import/:id_user/clients/by_status",
+        component   : () => import('./components/routes/routeImportClientsByStatus.vue')
     },
 
+    //
+
+    // Stats
+    {
+        path        : "/stats",
+        component   : () => import('./components/stats/index.vue')
+    },
 
     //  //  //  //  //  OBS     //  //  //
 

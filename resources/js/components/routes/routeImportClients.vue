@@ -295,7 +295,7 @@ export default {
                     }
                 
                     // Initialisation 
-                    this.clients    =   [];
+                    this.clients                                =   [];
 
                     this.route_import                           =   await this.$indexedDB.$getRouteImport(this.$route.params.id_route_import)
                     this.clients                                =   this.route_import.clients
@@ -544,6 +544,5 @@ export default {
             }
         },
     }
-
 };
 </script>

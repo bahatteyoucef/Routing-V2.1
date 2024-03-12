@@ -25,5 +25,12 @@ export default {
     setClient(state, value) {
 
         state.client                =   value
+    },
+
+    //
+
+    setFilterStatusRouteImportClientsByStatus(state, value) {
+
+        state.filter_status_route_import_clients_by_status  =   value
     }
 }

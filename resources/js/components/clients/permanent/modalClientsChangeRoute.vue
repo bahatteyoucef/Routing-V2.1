@@ -17,6 +17,17 @@
 
                         <div class="row mb-3">
 
+                            <!-- Owner                        -->
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="owner"          class="form-label">Owner (Owner)</label>
+                                    <select                     class="form-select"     id="owner"          v-model="owner">
+                                        <option value=""></option>
+                                        <option v-for="user in users"                   :key="user.id"      :value="user.id">{{user.nom}}</option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <!-- DistrictNo                        -->
                             <div class="col">
                                 <div class="mb-3">
@@ -187,6 +198,10 @@ export default {
             DistrictNo                      :   ""  ,
             CityNo                          :   ""  ,
             JPlan                           :   ""  ,
+            Journee                         :   ""  ,
+            owner                           :   ""  ,
+
+            //
 
             all_clients                     :   []  ,
             clients                         :   []  ,
@@ -201,10 +216,7 @@ export default {
 
             districts                       :   []  ,
             cites                           :   []  ,
-
-            //
-
-            Journee                         :   ""
+            users                           :   []
         }
     },
 
@@ -263,6 +275,13 @@ export default {
             let clients_copy            =   [...this.clients]
 
             for (let i = 0; i < clients_copy.length; i++) {
+
+                // Set Owner
+                if(this.owner      !=  "") {
+
+                    clients_copy[i].owner           =   this.owner
+                    clients_copy[i].owner_name      =   this.getOwnerName(this.owner)
+                }
 
                 // Set District City
                 if(this.DistrictNo      !=  "") {
@@ -415,9 +434,11 @@ export default {
                 // 
                 this.setClientsChangeRouteAction(null)
 
-                this.DistrictNo                      =   ''
-                this.CityNo                          =   ''
-                this.JPlan                           =   ''
+                this.DistrictNo                      =  ''
+                this.CityNo                          =  ''
+                this.JPlan                           =  ''
+                this.Journee                         =  ''
+                this.owner                           =  ''
 
                 //
 
@@ -429,10 +450,9 @@ export default {
 
                 this.districts                       =   []  
                 this.cites                           =   []  
+                this.users                           =   []  
 
                 //
-
-                this.Journee                         =   ''
 
                 this.removeDrawings()
             });
@@ -473,8 +493,11 @@ export default {
 
         async getComboData() {
 
-            const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
-            this.districts                  =   res_3.data
+            const res_1                     =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/users/frontOffice"    ,   null)
+            const res_2                     =   await this.$callApi("post"  ,   "/rtm_willayas"                                                             ,   null)
+
+            this.users                      =   res_1.data
+            this.districts                  =   res_2.data
         },
 
         async getCites() {
@@ -490,6 +513,17 @@ export default {
         },
 
         //
+
+        getOwnerName(owner) {
+
+            for (let i = 0; i < this.users.length; i++) {
+
+                if(this.users[i].id     ==  owner) {
+
+                    return this.users[i].nom
+                }                
+            }
+        },
 
         getDistrictNameE(DistrictNo) {
 
@@ -533,207 +567,480 @@ export default {
 
         clientMapRightProperties(clients) {
 
-            if(this.DistrictNo  ==  "") {
+            if(this.owner   ==  "") {
 
-                if(this.CityNo      ==  "") {
+                if(this.DistrictNo  ==  "") {
 
-                    if(this.JPlan       ==  "") {
+                    if(this.CityNo      ==  "") {
 
-                        if(this.Journee     ==  "") {
+                        if(this.JPlan       ==  "") {
 
-                            return []
+                            if(this.Journee     ==  "") {
+
+                                return []
+                            }
+
+                            else {
+
+                                return  clients.map(obj => { 
+                                        return {    id          :   obj.id          ,   
+                                                    Journee     :   obj.Journee     };});
+                            }
                         }
 
                         else {
 
-                            return  clients.map(obj => { 
-                                    return {    id          :   obj.id          ,   
-                                                Journee     :   obj.Journee     };});
+                            if(this.Journee     ==  "") {
+
+                                return  clients.map(obj => { 
+                                        return {    id          :   obj.id          ,   
+                                                    JPlan       :   obj.JPlan       };});
+                            }
+
+                            else {
+
+                                return  clients.map(obj => { 
+                                        return {    id          :   obj.id          , 
+
+                                                    JPlan       :   obj.JPlan       ,   
+                                                    Journee     :   obj.Journee     };});
+                            }
                         }
                     }
 
                     else {
 
-                        if(this.Journee     ==  "") {
+                        if(this.JPlan       ==  "") {
 
-                            return  clients.map(obj => { 
-                                    return {    id          :   obj.id          ,   
-                                                JPlan       :   obj.JPlan       };});
+                            if(this.Journee     ==  "") {
+
+                                return  clients.map(obj => { 
+                                        return {    id          :   obj.id          ,   
+
+                                                    CityNo      :   obj.CityNo      ,
+                                                    CityNameE   :   obj.CityNameE   };});
+                            }
+
+                            else {
+
+                                return  clients.map(obj => { 
+                                        return {    id          :   obj.id          ,   
+
+                                                    CityNo      :   obj.CityNo      ,
+                                                    CityNameE   :   obj.CityNameE   ,
+
+                                                    Journee     :   obj.Journee     };});
+                            }
                         }
 
                         else {
 
-                            return  clients.map(obj => { 
-                                    return {    id          :   obj.id          , 
+                            if(this.Journee     ==  "") {
 
-                                                JPlan       :   obj.JPlan       ,   
-                                                Journee     :   obj.Journee     };});
+                                return  clients.map(obj => { 
+                                        return {    id          :   obj.id          , 
+
+                                                    CityNo      :   obj.CityNo      ,
+                                                    CityNameE   :   obj.CityNameE   ,
+
+                                                    JPlan       :   obj.JPlan       };});
+                            }
+
+                            else {
+
+                                return  clients.map(obj => { 
+                                        return {    id          :   obj.id          , 
+
+                                                    CityNo      :   obj.CityNo      ,
+                                                    CityNameE   :   obj.CityNameE   ,
+
+                                                    JPlan       :   obj.JPlan       ,   
+                                                    Journee     :   obj.Journee     };});
+                            }
                         }
                     }
-                }
+                }  
 
                 else {
 
-                    if(this.JPlan       ==  "") {
+                    if(this.CityNo      ==  "") {
 
-                        if(this.Journee     ==  "") {
+                        if(this.JPlan       ==  "") {
 
-                            return  clients.map(obj => { 
-                                    return {    id          :   obj.id          ,   
-                                                CityNo      :   obj.CityNo      };});
+                            if(this.Journee     ==  "") {
+
+                                return clients.map(obj => { 
+                                        return {    id              :   obj.id              ,  
+
+                                                    DistrictNo      :   obj.DistrictNo      ,
+                                                    DistrictNameE   :   obj.DistrictNameE   };});
+                            }
+
+                            else {
+
+                                return  clients.map(obj => { 
+                                        return {    id              :   obj.id              ,  
+
+                                                    DistrictNo      :   obj.DistrictNo      ,
+                                                    DistrictNameE   :   obj.DistrictNameE   ,
+
+                                                    Journee         :   obj.Journee         };});
+                            }
                         }
 
                         else {
 
-                            return  clients.map(obj => { 
-                                    return {    id          :   obj.id          ,   
+                            if(this.Journee     ==  "") {
 
-                                                CityNo      :   obj.CityNo      ,
+                                return  clients.map(obj => { 
+                                        return {    id              :   obj.id              ,  
 
-                                                Journee     :   obj.Journee     };});
+                                                    DistrictNo      :   obj.DistrictNo      ,
+                                                    DistrictNameE   :   obj.DistrictNameE   ,
+
+                                                    JPlan           :   obj.JPlan           };});
+                            }
+
+                            else {
+
+                                return  clients.map(obj => { 
+                                        return {    id              :   obj.id              , 
+
+                                                    DistrictNo      :   obj.DistrictNo      ,
+                                                    DistrictNameE   :   obj.DistrictNameE   ,
+
+                                                    JPlan           :   obj.JPlan           ,   
+                                                    Journee         :   obj.Journee         };});
+                            }
                         }
                     }
 
                     else {
 
-                        if(this.Journee     ==  "") {
+                        if(this.JPlan       ==  "") {
 
-                            return  clients.map(obj => { 
-                                    return {    id          :   obj.id          , 
+                            if(this.Journee     ==  "") {
 
-                                                CityNo      :   obj.CityNo      ,
+                                return  clients.map(obj => { 
+                                        return {    id              :   obj.id              ,  
 
-                                                JPlan       :   obj.JPlan       };});
+                                                    DistrictNo      :   obj.DistrictNo      ,
+                                                    DistrictNameE   :   obj.DistrictNameE   ,
+
+                                                    CityNo          :   obj.CityNo          ,
+                                                    CityNameE       :   obj.CityNameE       };});
+                            }
+
+                            else {
+
+                                return  clients.map(obj => { 
+                                        return {    id              :   obj.id              ,  
+
+                                                    DistrictNo      :   obj.DistrictNo      ,
+                                                    DistrictNameE   :   obj.DistrictNameE   ,
+
+                                                    CityNo          :   obj.CityNo          , 
+                                                    CityNameE       :   obj.CityNameE       ,
+
+                                                    Journee         :   obj.Journee         };});
+                            }
                         }
 
                         else {
 
-                            return  clients.map(obj => { 
-                                    return {    id          :   obj.id          , 
+                            if(this.Journee     ==  "") {
 
-                                                CityNo      :   obj.CityNo      ,
+                                return  clients.map(obj => { 
+                                        return {    id              :   obj.id              , 
 
-                                                JPlan       :   obj.JPlan       ,   
-                                                Journee     :   obj.Journee     };});
+                                                    DistrictNo      :   obj.DistrictNo      ,
+                                                    DistrictNameE   :   obj.DistrictNameE   ,
+
+                                                    CityNo          :   obj.CityNo          , 
+                                                    CityNameE       :   obj.CityNameE       ,
+
+                                                    JPlan           :   obj.JPlan           };});
+                            }
+
+                            else {
+
+                                return  clients.map(obj => { 
+                                        return {    id              :   obj.id              , 
+
+                                                    DistrictNo      :   obj.DistrictNo      ,
+                                                    DistrictNameE   :   obj.DistrictNameE   ,
+
+                                                    CityNo          :   obj.CityNo          , 
+                                                    CityNameE       :   obj.CityNameE       ,
+
+                                                    JPlan           :   obj.JPlan           ,   
+                                                    Journee         :   obj.Journee         };});
+                            }
                         }
                     }
                 }
-            }  
+            }
 
             else {
 
-                if(this.CityNo      ==  "") {
+                if(this.DistrictNo  ==  "") {
 
-                    if(this.JPlan       ==  "") {
+                    if(this.CityNo      ==  "") {
 
-                        if(this.Journee     ==  "") {
+                        if(this.JPlan       ==  "") {
 
-                            return clients.map(obj => { 
-                                    return {    id              :   obj.id              ,  
+                            if(this.Journee     ==  "") {
 
-                                                DistrictNo      :   obj.DistrictNo      ,
-                                                DistrictNameE   :   obj.DistrictNameE   };});
+                                return  clients.map(obj => { 
+                                        return {    id          :   obj.id          ,
+
+                                                    owner       :   obj.owner       ,
+                                                    owner_name  :   obj.owner_name  };});
+                            }
+
+                            else {
+
+                                return  clients.map(obj => { 
+                                        return {    id          :   obj.id          ,
+
+                                                    owner       :   obj.owner       ,
+                                                    owner_name  :   obj.owner_name  ,
+
+                                                    Journee     :   obj.Journee     };});
+                            }
                         }
 
                         else {
 
-                            return  clients.map(obj => { 
-                                    return {    id              :   obj.id              ,  
+                            if(this.Journee     ==  "") {
 
-                                                DistrictNo      :   obj.DistrictNo      ,
-                                                DistrictNameE   :   obj.DistrictNameE   ,
+                                return  clients.map(obj => { 
+                                        return {    id          :   obj.id          ,  
 
-                                                Journee         :   obj.Journee         };});
+                                                    owner       :   obj.owner       ,
+                                                    owner_name  :   obj.owner_name  ,
+
+                                                    JPlan       :   obj.JPlan       };});
+                            }
+
+                            else {
+
+                                return  clients.map(obj => { 
+                                        return {    id          :   obj.id          , 
+
+                                                    owner       :   obj.owner       ,
+                                                    owner_name  :   obj.owner_name  ,
+
+                                                    JPlan       :   obj.JPlan       ,   
+                                                    Journee     :   obj.Journee     };});
+                            }
                         }
                     }
 
                     else {
 
-                        if(this.Journee     ==  "") {
+                        if(this.JPlan       ==  "") {
 
-                            return  clients.map(obj => { 
-                                    return {    id              :   obj.id              ,  
+                            if(this.Journee     ==  "") {
 
-                                                DistrictNo      :   obj.DistrictNo      ,
-                                                DistrictNameE   :   obj.DistrictNameE   ,
+                                return  clients.map(obj => { 
+                                        return {    id          :   obj.id          ,  
 
-                                                JPlan           :   obj.JPlan           };});
+                                                    owner       :   obj.owner       ,
+                                                    owner_name  :   obj.owner_name  ,
+
+                                                    CityNo      :   obj.CityNo      ,
+                                                    CityNameE   :   obj.CityNameE   };});
+                            }
+
+                            else {
+
+                                return  clients.map(obj => { 
+                                        return {    id          :   obj.id          ,
+
+                                                    owner       :   obj.owner       ,
+                                                    owner_name  :   obj.owner_name  ,
+
+                                                    CityNo      :   obj.CityNo      ,
+                                                    CityNameE   :   obj.CityNameE   ,
+
+                                                    Journee     :   obj.Journee     };});
+                            }
                         }
 
                         else {
 
-                            return  clients.map(obj => { 
-                                    return {    id              :   obj.id              , 
+                            if(this.Journee     ==  "") {
 
-                                                DistrictNo      :   obj.DistrictNo      ,
-                                                DistrictNameE   :   obj.DistrictNameE   ,
+                                return  clients.map(obj => { 
+                                        return {    id          :   obj.id          , 
 
-                                                JPlan           :   obj.JPlan           ,   
-                                                Journee         :   obj.Journee         };});
+                                                    owner       :   obj.owner       ,
+                                                    owner_name  :   obj.owner_name  ,
+
+                                                    CityNo      :   obj.CityNo      ,
+                                                    CityNameE   :   obj.CityNameE   ,
+
+                                                    JPlan       :   obj.JPlan       };});
+                            }
+
+                            else {
+
+                                return  clients.map(obj => { 
+                                        return {    id          :   obj.id          , 
+
+                                                    owner       :   obj.owner       ,
+                                                    owner_name  :   obj.owner_name  ,
+
+                                                    CityNo      :   obj.CityNo      ,
+                                                    CityNameE   :   obj.CityNameE   ,
+
+                                                    JPlan       :   obj.JPlan       ,   
+                                                    Journee     :   obj.Journee     };});
+                            }
                         }
                     }
-                }
+                }  
 
                 else {
 
-                    if(this.JPlan       ==  "") {
+                    if(this.CityNo      ==  "") {
 
-                        if(this.Journee     ==  "") {
+                        if(this.JPlan       ==  "") {
 
-                            return  clients.map(obj => { 
-                                    return {    id              :   obj.id              ,  
+                            if(this.Journee     ==  "") {
 
-                                                DistrictNo      :   obj.DistrictNo      ,
-                                                DistrictNameE   :   obj.DistrictNameE   ,
+                                return clients.map(obj => { 
+                                        return {    id              :   obj.id              ,  
 
-                                                CityNo          :   obj.CityNo          ,
-                                                CityNameE       :   obj.CityNameE       };});
+                                                    owner           :   obj.owner           ,
+                                                    owner_name      :   obj.owner_name      ,
+
+                                                    DistrictNo      :   obj.DistrictNo      ,
+                                                    DistrictNameE   :   obj.DistrictNameE   };});
+                            }
+
+                            else {
+
+                                return  clients.map(obj => { 
+                                        return {    id              :   obj.id              ,  
+
+                                                    owner           :   obj.owner           ,
+                                                    owner_name      :   obj.owner_name      ,
+
+                                                    DistrictNo      :   obj.DistrictNo      ,
+                                                    DistrictNameE   :   obj.DistrictNameE   ,
+
+                                                    Journee         :   obj.Journee         };});
+                            }
                         }
 
                         else {
 
-                            return  clients.map(obj => { 
-                                    return {    id              :   obj.id              ,  
+                            if(this.Journee     ==  "") {
 
-                                                DistrictNo      :   obj.DistrictNo      ,
-                                                DistrictNameE   :   obj.DistrictNameE   ,
+                                return  clients.map(obj => { 
+                                        return {    id              :   obj.id              ,  
 
-                                                CityNo          :   obj.CityNo          , 
-                                                CityNameE       :   obj.CityNameE       ,
+                                                    owner           :   obj.owner           ,
+                                                    owner_name      :   obj.owner_name      ,
 
-                                                Journee         :   obj.Journee         };});
+                                                    DistrictNo      :   obj.DistrictNo      ,
+                                                    DistrictNameE   :   obj.DistrictNameE   ,
+
+                                                    JPlan           :   obj.JPlan           };});
+                            }
+
+                            else {
+
+                                return  clients.map(obj => { 
+                                        return {    id              :   obj.id              , 
+
+                                                    owner           :   obj.owner           ,
+                                                    owner_name      :   obj.owner_name      ,
+
+                                                    DistrictNo      :   obj.DistrictNo      ,
+                                                    DistrictNameE   :   obj.DistrictNameE   ,
+
+                                                    JPlan           :   obj.JPlan           ,   
+                                                    Journee         :   obj.Journee         };});
+                            }
                         }
                     }
 
                     else {
 
-                        if(this.Journee     ==  "") {
+                        if(this.JPlan       ==  "") {
 
-                            return  clients.map(obj => { 
-                                    return {    id              :   obj.id              , 
+                            if(this.Journee     ==  "") {
 
-                                                DistrictNo      :   obj.DistrictNo      ,
-                                                DistrictNameE   :   obj.DistrictNameE   ,
+                                return  clients.map(obj => { 
+                                        return {    id              :   obj.id              ,  
 
-                                                CityNo          :   obj.CityNo          , 
-                                                CityNameE       :   obj.CityNameE       ,
+                                                    owner           :   obj.owner           ,
+                                                    owner_name      :   obj.owner_name      ,
 
-                                                JPlan           :   obj.JPlan           };});
+                                                    DistrictNo      :   obj.DistrictNo      ,
+                                                    DistrictNameE   :   obj.DistrictNameE   ,
+
+                                                    CityNo          :   obj.CityNo          ,
+                                                    CityNameE       :   obj.CityNameE       };});
+                            }
+
+                            else {
+
+                                return  clients.map(obj => { 
+                                        return {    id              :   obj.id              ,  
+
+                                                    owner           :   obj.owner           ,
+                                                    owner_name      :   obj.owner_name      ,
+
+                                                    DistrictNo      :   obj.DistrictNo      ,
+                                                    DistrictNameE   :   obj.DistrictNameE   ,
+
+                                                    CityNo          :   obj.CityNo          , 
+                                                    CityNameE       :   obj.CityNameE       ,
+
+                                                    Journee         :   obj.Journee         };});
+                            }
                         }
 
                         else {
 
-                            return  clients.map(obj => { 
-                                    return {    id              :   obj.id              , 
+                            if(this.Journee     ==  "") {
 
-                                                DistrictNo      :   obj.DistrictNo      ,
-                                                DistrictNameE   :   obj.DistrictNameE   ,
+                                return  clients.map(obj => { 
+                                        return {    id              :   obj.id              , 
 
-                                                CityNo          :   obj.CityNo          , 
-                                                CityNameE       :   obj.CityNameE       ,
+                                                    owner           :   obj.owner           ,
+                                                    owner_name      :   obj.owner_name      ,
 
-                                                JPlan           :   obj.JPlan           ,   
-                                                Journee         :   obj.Journee         };});
+                                                    DistrictNo      :   obj.DistrictNo      ,
+                                                    DistrictNameE   :   obj.DistrictNameE   ,
+
+                                                    CityNo          :   obj.CityNo          , 
+                                                    CityNameE       :   obj.CityNameE       ,
+
+                                                    JPlan           :   obj.JPlan           };});
+                            }
+
+                            else {
+
+                                return  clients.map(obj => { 
+                                        return {    id              :   obj.id              , 
+
+                                                    owner           :   obj.owner           ,
+                                                    owner_name      :   obj.owner_name      ,
+
+                                                    DistrictNo      :   obj.DistrictNo      ,
+                                                    DistrictNameE   :   obj.DistrictNameE   ,
+
+                                                    CityNo          :   obj.CityNo          , 
+                                                    CityNameE       :   obj.CityNameE       ,
+
+                                                    JPlan           :   obj.JPlan           ,   
+                                                    Journee         :   obj.Journee         };});
+                            }
                         }
                     }
                 }

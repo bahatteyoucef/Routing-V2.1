@@ -207,5 +207,5 @@ Route::middleware('auth:api')->group(function () {
 
     //
 
-    Route::post('/route_import/{id_route_import}/clients/waiting_validation'                            ,   [RouteImportController::class           , 'clientsWaitingValidation'                ]);
+    Route::post('/route_import/{id_route_import}/clients/by_status'                                     ,   [RouteImportController::class           , 'clientsByStatus'                         ]);
 });

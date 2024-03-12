@@ -1,6 +1,6 @@
 <template>
 
-    <div>
+    <div class="mt-3">
 
         <div class="page-header">
 
@@ -14,237 +14,213 @@
 
         </div>
 
-        <div class="row">
+        <div>
 
-            <div class="mt-3">
+            <div class="container"  style="height : 58vh; overflow : auto;">
 
                 <form>
 
-                    <div class="mb-3">
-                        <label for="CustomerCode"       class="form-label">Get Current Position <button class="btn btn-sm" @click.prevent="showPositionOnMap('show_map')"><i class="mdi mdi-reload"></i></button></label>
-                        <p class="text-secondary text-small mb-1">Latitude : {{ client.Latitude }}</p>
-                        <p class="text-secondary text-small mb-1">Longitude : {{ client.Longitude }}</p>
+                    <div class="slideshow-container">
 
-                        <div id="show_map" style="width: 100%; height: 200px;"></div>
-                    </div>
+                        <div class="mb-3 mySlides slide_1">
+                            <label for="CustomerCode"       class="form-label">Get Current Position <button class="btn btn-sm" @click.prevent="showPositionOnMap('show_map')"><i class="mdi mdi-reload"></i></button></label>
+                            <p class="text-secondary text-small mb-1">Latitude : {{ client.Latitude }}</p>
+                            <p class="text-secondary text-small mb-1">Longitude : {{ client.Longitude }}</p>
 
-                    <hr />
+                            <div id="show_map" style="width: 100%; height: 200px;"></div>
 
-                    <div class="mb-3">
-                        <div v-show="client.CustomerCode   ==  ''"     class="mt-1 p-0">
-                            <div    id="reader" class="scanner_reader w-100"></div>
+                            <hr />
+
+                            <h5>Nearby Clients</h5>
+
+                            <hr />
+
+                            <table class="table table-bordered mt-1">
+                                <thead>
+                                    <tr>
+                                        <th class="col-sm-1">CustomerNameE</th>
+                                        <th class="col-sm-2">Tel</th>
+                                        <th class="col-sm-1">CustomerType</th>
+                                    </tr>
+                                </thead>
+                                
+                                <tbody>
+                                    <tr v-for="client in close_clients" :key="client">
+                                        <td>{{client.CustomerNameE}}</td>
+                                        <td>{{client.Tel}}</td>
+                                        <td>{{client.CustomerType}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
 
-                        <div v-show="client.CustomerCode   !=  ''"     class="mt-1 p-0">
-                            <div    id="result"></div>
-                        </div>
+                        <div class="mb-3 mySlides slide_2">
+                            <div v-show="client.CustomerCode   ==  ''"     class="mt-1 p-0">
+                                <div    id="reader" class="scanner_reader w-100"></div>
+                            </div>
 
-                        <div v-show="client.CustomerCode   !=  ''"     class="mt-1 p-0">
-                            <div    id="customerCode_value"              class="text-center">
-                                <span class="">CustomerCode : {{ client.CustomerCode }}</span>
+                            <div v-show="client.CustomerCode   !=  ''"     class="mt-1 p-0">
+                                <div    id="result"></div>
+                            </div>
+
+                            <div v-show="client.CustomerCode   !=  ''"     class="mt-1 p-0">
+                                <div    id="customerCode_value"              class="text-center">
+                                    <span class="">CustomerCode : {{ client.CustomerCode }}</span>
+                                </div>
+                            </div>
+
+                            <!--  -->
+
+                            <div class="mt-1 mb-1 w-100">
+                                <div class="w-100" id="refresh_client_barcode_button">
+                                    <button type="button" class="btn btn-primary w-100"     @click="setBarCodeReader()">Capture Bar Code</button>
+                                </div>
                             </div>
                         </div>
 
-                        <!--  -->
-
-                        <div class="mt-1 mb-1 w-100">
-                            <div class="w-100" id="refresh_client_barcode_button">
-                                <button type="button" class="btn btn-primary w-100"     @click="setBarCodeReader()">Capture Bar Code</button>
-                            </div>
+                        <div class="mb-3 mySlides slide_3">
+                            <label for="CustomerBarCode_image"    class="form-label">CustomerBarCode Image (CustomerBarCode Image)</label>
+                            <input type="file"              class="form-control"        id="CustomerBarCode_image"              accept="image/*"    capture     @change="customerBarCodeImage()">
+                            <img                                                        id="CustomerBarCode_image_display"      src=""              class="w-100">
                         </div>
-                    </div>
 
-                    <div class="mb-3">
-                        <label for="CustomerBarCode_image"    class="form-label">CustomerBarCode Image (CustomerBarCode Image)</label>
-                        <input type="file"              class="form-control"        id="CustomerBarCode_image"              accept="image/*"    capture     @change="customerBarCodeImage()">
-                        <img                                                        id="CustomerBarCode_image_display"      src=""              class="w-100">
-                    </div>
+                        <div class="mb-3 mySlides slide_4">
+                            <label for="CustomerNameE"      class="form-label">CustomerNameE (CustomerNameE)</label>
+                            <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE">
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="CustomerNameE"      class="form-label">CustomerNameE (CustomerNameE)</label>
-                        <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE">
-                    </div>
+                        <div class="mb-3 mySlides slide_5">
+                            <label for="CustomerNameA"      class="form-label">CustomerNameA (CustomerNameA)</label>
+                            <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA">
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="CustomerNameA"      class="form-label">CustomerNameA (CustomerNameA)</label>
-                        <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA">
-                    </div>
+                        <div class="mb-3 mySlides slide_6">
+                            <label for="Tel"                class="form-label">Phone Number (Tel)</label>
+                            <input type="text"              class="form-control"        id="Tel"                    v-model="client.Tel">
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="Tel"                class="form-label">Phone Number (Tel)</label>
-                        <input type="text"              class="form-control"        id="Tel"                    v-model="client.Tel">
-                    </div>
+                        <div class="mb-3 mySlides slide_7">
+                            <label for="Address"            class="form-label">Address (Address)</label>
+                            <input type="text"              class="form-control"        id="Address"                v-model="client.Address">
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="Address"            class="form-label">Address (Address)</label>
-                        <input type="text"              class="form-control"        id="Address"                v-model="client.Address">
-                    </div>
+                        <div class="mb-3 mySlides slide_8">
+                            <label for="Neighborhood"       class="form-label">Neighborhood (Neighborhood)</label>
+                            <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood">
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="Neighborhood"       class="form-label">Neighborhood (Neighborhood)</label>
-                        <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood">
-                    </div>
+                        <div class="mb-3 mySlides slide_9">
+                            <label for="Landmark"           class="form-label">Landmark (Landmark)</label>
+                            <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"></textarea>
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="Landmark"           class="form-label">Landmark (Landmark)</label>
-                        <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"></textarea>
-                    </div>
+                        <div class="mb-3 mySlides slide_10">
+                            <label for="DistrictNo"         class="form-label">DistrictNo (DistrictNo)</label>
+                            <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()">
+                                <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
+                            </select>
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="DistrictNo"         class="form-label">DistrictNo (DistrictNo)</label>
-                        <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()">
-                            <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
-                        </select>
-                    </div>
+                        <div class="mb-3 mySlides slide_11">
+                            <label for="CityNo"             class="form-label">CityNo (CityNo)</label>
+                            <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo">
+                                <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CITYNO}}- {{cite.CityNameE}}</option>
+                            </select>
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="CityNo"             class="form-label">CityNo (CityNo)</label>
-                        <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo">
-                            <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CITYNO}}- {{cite.CityNameE}}</option>
-                        </select>
-                    </div>
+                        <div class="mb-3 mySlides slide_12">
+                            <label for="text"               class="form-label">CustomerType (CustomerType)</label>
+                            <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType">
+                                <option     :value="'Superette'">Superette</option>
+                                <option     :value="'Alimentation General'">Alimentation General</option>
+                                <option     :value="'Grossiste'">Grossiste</option>
+                            </select>
+                        </div>
 
-                    <!--  -->
+                        <div class="mb-3 mySlides slide_13">
+                            <label for="text"               class="form-label">BrandAvailability (BrandAvailability)</label>
+                            <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability">
+                                <option     value="0">No</option>
+                                <option     value="1">Yes</option>
+                            </select>
+                        </div>
+    
+                        <div class="mb-3 mySlides slide_14">
+                            <label for="text"               class="form-label">BrandSourcePurchase (BrandSourcePurchase)</label>
+                            <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase">
+                                <option     value="Distribution Direct">Distribution Direct</option>
+                                <option     value="Grossiste Fixe">Grossiste Fixe</option>
+                                <option     value="Grossiste Mobile">Grossiste Mobile</option>
+                                <option     value="Multi Source">Multi Source</option>
+                                <option     value="Pas d'achat">Pas d'achat</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3 mySlides slide_15">
+                            <label for="JPlan"              class="form-label">JPlan (JPlan)</label>
+                            <input type="text"              class="form-control"        id="JPlan"                  v-model="client.JPlan">
+                        </div>
                         
-                    <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
-                        <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
-                        <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @changed="checkClients()">
-                    </div>
+                        <div class="mb-3 mySlides slide_16">
+                            <label for="Journee"            class="form-label">WorkDay (Journee)</label>
+                            <input type="text"              class="form-control"        id="Journee"                v-model="client.Journee">
+                        </div>
 
-                    <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
-                        <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
-                        <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @changed="checkClients()">
-                    </div>
+                        <div class="mb-3 mySlides slide_17">
+                            <label for="status"             class="form-label">Status</label>
+                            <select                         class="form-select"         id="status"                 v-model="client.status">
+                                <option value="pending" selected>pending</option>
+                                <option value="nonvalidated">nonvalidated</option>
+                            </select>
 
-                    <!--  -->
-
-                    <div class="mb-3">
-                        <label for="text"               class="form-label">CustomerType (CustomerType)</label>
-                        <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType">
-                            <option     :value="'Superette'">Superette</option>
-                            <option     :value="'Alimentation General'">Alimentation General</option>
-                            <option     :value="'Grossiste'">Grossiste</option>
-                        </select>
-                    </div>
-
-                    <!--  -->
-
-                    <div class="mb-3">
-                        <label for="text"               class="form-label">BrandAvailability (BrandAvailability)</label>
-                        <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability">
-                            <option     value="0">No</option>
-                            <option     value="1">Yes</option>
-                        </select>
-                    </div>
- 
-                    <div class="mb-3">
-                        <label for="text"               class="form-label">BrandSourcePurchase (BrandSourcePurchase)</label>
-                        <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase">
-                            <option     value="Distribution Direct">Distribution Direct</option>
-                            <option     value="Grossiste Fixe">Grossiste Fixe</option>
-                            <option     value="Grossiste Mobile">Grossiste Mobile</option>
-                            <option     value="Multi Source">Multi Source</option>
-                            <option     value="Pas d'achat">Pas d'achat</option>
-                        </select>
-                    </div>
-
-                    <!--  -->
-
-                    <div class="mb-3">
-                        <label for="JPlan"              class="form-label">JPlan (JPlan)</label>
-                        <input type="text"              class="form-control"        id="JPlan"                  v-model="client.JPlan">
-                    </div>
-
-                    <!--  -->
-                    
-                    <div class="mb-3">
-                        <label for="Journee"            class="form-label">WorkDay (Journee)</label>
-                        <input type="text"              class="form-control"        id="Journee"                v-model="client.Journee">
-                    </div>
-
-                    <!--  -->
-
-                    <div v-if="$isRole('Super Admin')||$isRole('BackOffice')" class="mb-3">
-                        <label for="status"             class="form-label">Status</label>
-                        <select                         class="form-select"         id="status"                 v-model="client.status">
-                            <option value="validated" selected>validated</option>
-                            <option value="pending">pending</option>
-                            <option value="nonvalidated">nonvalidated</option>
-                        </select>
-
-                        <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
-                            <div class="form-group">
-                                <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
-                                <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
+                            <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
+                                <div class="form-group">
+                                    <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
+                                    <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div v-if="$isRole('FrontOffice')" class="mb-3">
-                        <label for="status"             class="form-label">Status</label>
-                        <select                         class="form-select"         id="status"                 v-model="client.status">
-                            <option value="pending" selected>pending</option>
-                            <option value="nonvalidated">nonvalidated</option>
-                        </select>
-
-                        <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
-                            <div class="form-group">
-                                <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
-                                <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
-                            </div>
+                        <div class="mb-3 mySlides slide_18">
+                            <label for="facade_image"       class="form-label">Facade Image (Facade Image)</label>
+                            <input type="file"              class="form-control"        id="facade_image"               accept="image/*"    capture     @change="facadeImage()">
+                            <img                                                        id="facade_image_display"       src=""                          class="w-100">
                         </div>
+
+                        <div class="mb-3 mySlides slide_19">
+                            <label for="in_store_image"     class="form-label">In-Store Image (In-Store Image)</label>
+                            <input type="file"              class="form-control"        id="in_store_image"             accept="image/*"    capture     @change="inStoreImage()">
+                            <img                                                        id="in_store_image_display"     src=""                          class="w-100">
+                        </div>
+
                     </div>
-
-                    <!--  -->
-
-                    <div class="mb-3">
-                        <label for="facade_image"       class="form-label">Facade Image (Facade Image)</label>
-                        <input type="file"              class="form-control"        id="facade_image"               accept="image/*"    capture     @change="facadeImage()">
-                        <img                                                        id="facade_image_display"       src=""                          class="w-100">
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="in_store_image"     class="form-label">In-Store Image (In-Store Image)</label>
-                        <input type="file"              class="form-control"        id="in_store_image"             accept="image/*"    capture     @change="inStoreImage()">
-                        <img                                                        id="in_store_image_display"     src=""                          class="w-100">
-                    </div>
-
-                    <!--  -->
-
-                    <hr />
-
-                    <h5>Nearby Clients</h5>
-
-                    <hr />
-
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th class="col-sm-1">CustomerNameE</th>
-                                <th class="col-sm-2">Tel</th>
-                                <th class="col-sm-1">CustomerType</th>
-                            </tr>
-                        </thead>
-                        
-                        <tbody>
-                            <tr v-for="client in close_clients" :key="client">
-                                <td>{{client.CustomerNameE}}</td>
-                                <td>{{client.Tel}}</td>
-                                <td>{{client.CustomerType}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
 
                 </form>
 
             </div>
 
-            <div        style="display: flex; justify-content: space-between;">
-                <div    class="right-buttons"  style="display: flex; margin-left: auto;">
-                    <button type="button" class="btn btn-secondary mb-3 mt-3"   @click="$goBack()">Back</button>
-                    <button v-if="point_is_inside_user_polygons" type="button" class="btn btn-primary mb-3 mt-3"     @click="sendData()">Confirm</button>
+            <!--  -->
+
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-6 mt-3">
+                        <button v-if="slideIndex    >   1"      type="button" class="btn btn-secondary w-100"   @click="plusSlides(-1)">Previous</button>
+                    </div>
+
+                    <div class="col-6 mt-3">
+                        <button v-if="slideIndex    <   19"     type="button" class="btn btn-primary w-100"     @click="plusSlides(1)">Next</button>
+                    </div>
                 </div>
             </div>
+
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col mt-3">
+                        <button v-if="slideIndex  ==  19"       type="button" class="btn btn-primary w-100"     @click="sendData()">Confirm</button>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     </div>
@@ -331,7 +307,11 @@ export default {
 
             //
 
-            point_is_inside_user_polygons   :   false
+            point_is_inside_user_polygons   :   false   ,
+
+            //
+
+            slideIndex                      :   1
         }
     },
 
@@ -354,16 +334,11 @@ export default {
 
     async mounted() {
 
-        // 
-        if(this.$isRole("Super Admin")||this.$isRole("BackOffice")) {
+        this.slideIndex     =   this.$showSlides(this.slideIndex, this.slideIndex);
 
-            this.client.status  =   "validated"
-        }
+        //
 
-        if(this.$isRole("FrontOffice")) {
-
-            this.client.status  =   "pending"
-        }
+        this.client.status  =   "pending"
 
         //
 
@@ -523,14 +498,10 @@ export default {
 
             this.getComboData()  
 
-            // if(this.$isRole("FrontOffice")) {
-
             if(this.$connectedToInternet) {
 
                 this.checkClients()
             }
-
-            // }
         },
 
         async getComboData() {
@@ -799,6 +770,38 @@ export default {
 
             //
             this.point_is_inside_user_polygons  =   this.$map.$checkPointInsideUserPolygons(this.client.Latitude, this.client.Longitude)
+        },
+
+        //
+
+        plusSlides(current_slide) {
+
+            // Go Next
+            if(current_slide    ==  1) {
+
+                // let validation  =   this.validationCompetitorAnalysis(this.slideIndex  -   1)
+
+                // if(validation   ==  true)  {
+
+                    this.slideIndex     =   this.$plusSlides(this.slideIndex += current_slide, this.slideIndex)
+                // }
+
+                // else {
+
+                //     this.$showErrors("Error !"  ,   ["Quantity must be superieur to 0", "Price must be superieur or equal to 0"])
+                //     return false;
+                // }
+            }
+
+            else {
+
+                this.slideIndex     =   this.$plusSlides(this.slideIndex += current_slide, this.slideIndex)
+            }
+        },
+
+        currentSlide(current_slide) {
+
+            this.slideIndex     =   this.$currentSlide(this.slideIndex = current_slide, this.slideIndex)
         }
     },
 

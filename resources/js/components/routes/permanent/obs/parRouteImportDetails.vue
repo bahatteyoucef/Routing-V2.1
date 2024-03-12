@@ -1893,6 +1893,12 @@ export default {
                     if(this.route_import.clients[j].id  ==  clients[i].id) {
 
                         // Update Client
+                        if(clients[i].owner         !=  "") {
+
+                            this.route_import.clients[j].owner          =   clients[i].owner      
+                            this.route_import.clients[j].owner_name     =   clients[i].owner_name      
+                        }
+
                         if(clients[i].DistrictNo    !=  "") {
 
                             this.route_import.clients[j].DistrictNo     =   clients[i].DistrictNo      

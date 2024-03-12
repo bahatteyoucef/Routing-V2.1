@@ -7,11 +7,6 @@
 
                 <div class="row mt-2">
                     <div class="p-1 pt-0 col-12 d-flex justify-content-end">
-
-                        <div class="col-8 p-0">
-                            <input class="form-control" placeholder="Filter By CustomerNameE..." v-model="search_by_CustomerNameE_value" @input="searchByCustomerNameE()"/>
-                        </div>
-
                         <div class="col-2 pl-1 pr-1">
                             <button class="btn primary w-100 m-0"   @click="showHideCodeBar()"><i class="mdi mdi-barcode"></i></button>
                         </div>
@@ -19,6 +14,20 @@
                         <div class="col-2 pl-1 pr-1">
                             <button class="btn primary w-100 m-0"   @click="showMap()"><i class="mdi mdi-map-marker-circle"></i></button>
                         </div>
+
+                        <div class="col-8 pl-1 pr-1">
+                            <select         class="form-select"     id="filter_status"      v-model="filter_status"     @change="getClients()">
+                                <option     :value="'validated'">validated</option>
+                                <option     :value="'pending'">pending</option>
+                                <option     :value="'nonvalidated'">nonvalidated</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-12 p-0">
+                        <input class="form-control" placeholder="Filter By CustomerNameE..." v-model="search_by_CustomerNameE_value" @input="searchByCustomerNameE()"/>
                     </div>
                 </div>
 
@@ -55,12 +64,22 @@
                             
                                 <p class="font-italic text-muted mb-0 small">{{ client.Address }} - {{ client.CityNameE }}</p>
 
-                                <div v-if="client.status    ==  'pending'" class="badge badge-warning mt-1 mb-1">
-                                    Pending
+                                <div>
+                                    <div v-if="client.status    ==  'validated'"        class="badge badge-success mt-1 mb-1">
+                                        Validated
+                                    </div>
+
+                                    <div v-if="client.status    ==  'pending'"          class="badge badge-warning mt-1 mb-1">
+                                        Pending
+                                    </div>
+
+                                    <div v-if="client.status    ==  'nonvalidated'"     class="badge badge-danger mt-1 mb-1">
+                                        Non Validated
+                                    </div>
                                 </div>
 
-                                <div v-if="client.status    ==  'nonvalidated'" class="badge badge-danger mt-1 mb-1">
-                                    Non Validated
+                                <div v-if="client.status    ==  'nonvalidated'" class="mt-1 mb-1">
+                                    <span class="text-small text-danger">{{ client.nonvalidated_details }}</span>
                                 </div>
 
                             </div>
@@ -86,40 +105,53 @@ export default {
         
         return {
 
-            clients                           :   [],
-            clients_filtered                  :   [],
-
-            selected_day                        :   "",
-
-            current_day                         :   "",
+            clients                             :   [],
+            clients_filtered                    :   [],
 
             //
 
             search_by_CustomerNameE_value       :   "",
-            search_by_clientbarcode_value     :   "",
+            search_by_clientbarcode_value       :   "",
         
             //
 
             scanner                             :   null,
-            show_barcode_div                    :   false
+            show_barcode_div                    :   false,
+
+            //
+
+            filter_status                       :   "validated"           
         }
     },
 
     computed : {
 
         ...mapGetters({
-            getUser                     :   'authentification/getUser'              ,
-            getAccessToken              :   'authentification/getAccessToken'       ,
-            getIsAuthentificated        :   'authentification/getIsAuthentificated' ,
+            getUser                                     :   'authentification/getUser'                          ,
+            getAccessToken                              :   'authentification/getAccessToken'                   ,
+            getIsAuthentificated                        :   'authentification/getIsAuthentificated'             ,
 
-            getAddClient                :   'client/getAddClient'                   ,
-            getUpdateClient             :   'client/getUpdateClient'                
+            getAddClient                                :   'client/getAddClient'                               ,
+            getUpdateClient                             :   'client/getUpdateClient'                            ,
+            getFilterStatusRouteImportClientsByStatus   :   'client/getFilterStatusRouteImportClientsByStatus'
         }),
     },
 
     components: {
 
         Multiselect
+    },
+
+    beforeMount() {
+
+        let filter_status       =   this.getFilterStatusRouteImportClientsByStatus
+
+        console.log(filter_status)
+
+        if(filter_status    !=  "") {
+
+            this.filter_status      =   this.getFilterStatusRouteImportClientsByStatus
+        }
     },
 
     async mounted() {
@@ -144,7 +176,10 @@ export default {
     methods : {
 
         ...mapActions("client" ,  [
-            "setSelectedClientsAction"
+            "setSelectedClientsAction"                          ,
+            "setFilterStatusRouteImportClientsByStatusAction"   ,
+
+            "setUpdateClientAction"
         ]),
 
         //
@@ -153,11 +188,39 @@ export default {
 
             try {
 
-                this.$callApi("post",   "/route_import/"+this.getUser.id_route_import+"/clients/waiting_validation",    null).then(async (res)=> { 
-                    
-                    this.clients            =   res.data
-                    this.clients_filtered   =   this.clients 
-                })
+                if(this.$connectedToInternet) {
+
+                    this.$showLoadingPage()
+
+                    let formData    =   new FormData()
+
+                    formData.append("status", this.filter_status)
+
+                    this.$callApi("post",   "/route_import/"+this.getUser.id_route_import+"/clients/by_status",     formData).then(async (res)=> { 
+                        
+                        console.log(res)
+
+                        this.clients            =   res.data
+                        this.clients_filtered   =   this.clients
+
+                        //
+                        this.setFilterStatusRouteImportClientsByStatusAction(this.filter_status)
+
+                        //
+                        this.$hideLoadingPage()
+                    })
+                }
+
+                else {
+
+                    this.clients            =   await this.$indexedDB.$getClientsByStatus(this.getUser.id_route_import, this.filter_status)
+                    this.clients_filtered   =   this.clients
+
+                    //
+                    this.setFilterStatusRouteImportClientsByStatusAction(this.filter_status)
+
+                    console.log(this.clients)
+                }
             }
 
             catch(e) {
@@ -170,6 +233,8 @@ export default {
         //
 
         getDetailsPage(client) {
+
+            this.setUpdateClientAction(client)      
 
             this.$router.push('/route_import/'+client.id_route_import+'/clients/'+client.id+'/details')
         },
@@ -267,8 +332,6 @@ export default {
 
         error(err) {
 
-            console.error("");
-            // Prints any errors to the console
         },
 
         searchByClientBarCode() {

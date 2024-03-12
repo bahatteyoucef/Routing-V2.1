@@ -118,7 +118,8 @@
 	<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 
 	<!-- Qr Bar code Reader -->
-	<script src="https://unpkg.com/html5-qrcode" ></script>
+	<!-- <script src="https://unpkg.com/html5-qrcode" ></script> -->
+	<script src="{{url('/js/html5-qrcode.js')}}" ></script>
 
 	@vite('resources/js/app.js')
 

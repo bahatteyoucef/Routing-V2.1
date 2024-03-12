@@ -596,11 +596,11 @@ class RouteImportController extends Controller
 
     //
 
-    public static function clientsWaitingValidation(int $id_route_import) {
+    public static function clientsByStatus(Request $request, int $id_route_import) {
 
         try {
 
-            $clients    =   RouteImport::clientsWaitingValidation($id_route_import);
+            $clients    =   RouteImport::clientsByStatus($request, $id_route_import);
 
             return $clients;
         }

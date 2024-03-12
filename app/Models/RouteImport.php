@@ -835,11 +835,12 @@ class RouteImport extends Model
 
     //
 
-    public static function clientsWaitingValidation(int $id_route_import) {
+    public static function clientsByStatus(Request $request, int $id_route_import) {
 
         $clients        =   Client::where([
                                 ["clients.id_route_import"  ,   $id_route_import],
-                                ["clients.owner"            ,   Auth::user()->id]
+                                ["clients.owner"            ,   Auth::user()->id],
+                                ["clients.status"           ,   $request->get("status")]
                                 ])
                                 ->join('users', 'clients.owner', '=', 'users.id')
                                 ->select('clients.*', 'users.nom as owner_name')

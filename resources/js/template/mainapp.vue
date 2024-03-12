@@ -4,7 +4,7 @@
     <loading-page></loading-page>
 
     <!-- Internet Error Page    -->
-    <internet-error-page    v-show="show_internet_error_page  ==  false"></internet-error-page>
+    <!-- <internet-error-page    v-show="show_internet_error_page  ==  false"></internet-error-page> -->
 
     <!-- Login      -->
     <section v-if="component_login">
@@ -107,14 +107,14 @@
         beforeMount() {
 
             this.isAuthentificated              =   false
-            this.show_internet_error_page       =   window.navigator.onLine
+            // this.show_internet_error_page       =   window.navigator.onLine
         },
 
         async mounted() {
 
             //
-            window.addEventListener('online'    , ()    =>  {this.$connectedToInternet  =   true    ,   this.show_internet_error_page   =   true    });
-            window.addEventListener('offline'   , ()    =>  {this.$connectedToInternet  =   false   ,   this.show_internet_error_page   =   false   });
+            // window.addEventListener('online'    , ()    =>  {this.$connectedToInternet  =   true    ,   this.show_internet_error_page   =   true    });
+            // window.addEventListener('offline'   , ()    =>  {this.$connectedToInternet  =   false   ,   this.show_internet_error_page   =   false   });
 
             // 
             this.isAuthentificated      =   await this.checkIfUserIsAuthentificated()

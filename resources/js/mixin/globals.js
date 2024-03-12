@@ -1076,55 +1076,47 @@ export default {
 
         $showPositionOnMap(map_id, latitude, longitude, territories) {
 
-            if (this.show_map) {
+            if(window.navigator.onLine) {
 
-                //
-                this.$hideTerritores()
-                this.$showTerritories(territories)
+                if (this.show_map) {
 
-                //
-                this.show_map.setView([latitude, longitude], 15); // Replace with your coordinates and zoom level
+                    // Clear all existing layers (including markers)
+                    this.show_map.eachLayer((layer) =>  {
+                        this.show_map.removeLayer(layer);
+                    });
 
-                // Clear all existing layers (including markers)
-                this.show_map.eachLayer((layer) =>  {
-                    this.show_map.removeLayer(layer);
-                });
+                    //
+                    this.$hideTerritores()
+                    this.$showTerritories(territories)
 
-                // Define tile layer (e.g., OpenStreetMap)
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(this.show_map);
+                    //
+                    this.show_map.setView([latitude, longitude], 15); // Replace with your coordinates and zoom level
 
-                // Create a marker
-                L.marker([latitude, longitude]).addTo(this.show_map);
-            }
+                    // Define tile layer (e.g., OpenStreetMap)
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(this.show_map);
 
-            else {
+                    // Create a marker
+                    L.marker([latitude, longitude]).addTo(this.show_map);
+                }
 
-                this.show_map   =   L.map(map_id).setView([latitude, longitude], 15); // Replace with your coordinates and zoom level
+                else {
 
-                //
-                this.$hideTerritores()
-                this.$showTerritories(territories)
+                    this.show_map   =   L.map(map_id).setView([latitude, longitude], 15); // Replace with your coordinates and zoom level
 
-                // Define tile layer (e.g., OpenStreetMap)
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(this.show_map);
+                    //
+                    this.$hideTerritores()
+                    this.$showTerritories(territories)
 
-                // Create a marker
-                L.marker([latitude, longitude]).addTo(this.show_map);
-            }
-        },
+                    // Define tile layer (e.g., OpenStreetMap)
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(this.show_map);
 
-        $showPositionOnMapGMaps(map_id, latitude, longitude) {
-
-            const show_map  =   document.getElementById("show_map");
-
-            if(show_map) {
-
-                show_map.src            =   `https://maps.google.com/maps?q=${latitude},${longitude}&output=embed`
-                show_map.style.display  =   "block"
+                    // Create a marker
+                    L.marker([latitude, longitude]).addTo(this.show_map);
+                }
             }
         },
 
@@ -1132,26 +1124,77 @@ export default {
 
         $hideTerritores() {
 
-            // Clear Markers
-            this.territories.forEach(territory => {
+            if(window.navigator.onLine) {
 
-                this.show_map.removeLayer(territory)
-            });
+                // Clear Markers
+                this.territories.forEach(territory => {
+
+                    this.show_map.removeLayer(territory)
+                });
+            }
         },
 
         $showTerritories(territories) {
 
-            for (let i = 0; i < territories.length; i++) {
+            if(window.navigator.onLine) {
 
-                var latlngs     =   JSON.parse(territories[i].latlngs)
+                for (let i = 0; i < territories.length; i++) {
 
-                if(Array.isArray(latlngs) && (latlngs.length > 0)) {
+                    var latlngs     =   JSON.parse(territories[i].latlngs)
 
-                    // Territory
-                    var territory           =   L.polygon(latlngs, { color: territories[i].color }).addTo(this.show_map)
-                    this.territories.push(territory)
-                }          
+                    if(Array.isArray(latlngs) && (latlngs.length > 0)) {
+
+                        // Territory
+                        var territory           =   L.polygon(latlngs, { color: territories[i].color }).addTo(this.show_map)
+                        this.territories.push(territory)
+                    }          
+                }
             }
+        },
+
+        //
+
+        $plusSlides(slide_number, slideIndex) {
+
+            return this.$showSlides(slide_number, slideIndex);
+        },
+
+        $currentSlide(current_slide, slideIndex) {
+
+            return this.$showSlides(current_slide, slideIndex);
+        },
+
+        $showSlides(current_slide, slideIndex) {
+
+            let i           =   0;
+
+            let slides  =   document.getElementsByClassName("mySlides");
+            // let dots    =   document.getElementsByClassName("dot");
+
+            if (current_slide > slides.length) {
+
+                slideIndex = 1
+            }
+
+            if (current_slide < 1) {
+
+                slideIndex = slides.length
+            }
+
+            for (i = 0; i < slides.length; i++) {
+
+                slides[i].style.display = "none";  
+            }
+
+            // for (i = 0; i < dots.length; i++) {
+
+            //     dots[i].className               =   dots[i].className.replace(" active", "");
+            // }
+
+            slides[slideIndex-1].style.display  =   "block";  
+            // dots[slideIndex-1].className        +=  " active";
+
+            return slideIndex
         }
     }
 }

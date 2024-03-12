@@ -65,8 +65,21 @@
         <!-- FrontOffice -->
         <section v-if="$isRole('FrontOffice')"  class="dashboard mt-4"> 
 
+            <!-- Header Options -->
+            <div class="container">
+                <div class="row d-flex justify-content-start h-100 mt-2">
+                    <div class="col-10 d-flex align-items-center">
+                        <i class="mdi mdi-dice-1 mr-1 ml-1 fw-bold" style="color : #A25CFF"></i><span class="fw-bold mb-1">{{ getUser.nom }}</span>
+                    </div>
+
+                    <div class="col-2 d-flex align-items-center pl-1"   role="button"   @click="logOut()">
+                        <i class="mdi mdi-power mr-1 ml-1 fw-bold" style="color : #A25CFF; font-size: 25px;"></i>
+                    </div>
+                </div>
+            </div>
+
             <!-- Index Options -->
-            <div class="row d-flex justify-content-center h-100 mt-2">
+            <div class="row d-flex justify-content-center h-100 mt-5">
                 <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="addClient()">
                     <div class="text-center" style="height : 50px">  
                         <img class="card-img-top" src="/images/store.png" style="height:100%;width:auto">
@@ -76,6 +89,16 @@
                     </div>
                 </div>
 
+                <div class="card col-5 m-1 shadow-sm rounded text-center h-25"  @click="showProfile()">
+                    <div class="text-center" style="height : 50px">  
+                        <img class="card-img-top" src="/images/profile.png" style="height:100%;width:auto">
+                    </div>
+                    <div class="card-body p-0 mt-3">
+                        <p class="card-text font-weight-bold">Profile</p>
+                    </div>
+                </div>
+
+                <!--
                 <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="sync()">
                     <div class="text-center" style="height : 50px">  
                         <img class="card-img-top" src="/images/sync.png" style="height:100%;width:auto">
@@ -84,6 +107,7 @@
                         <p class="card-text font-weight-bold">Sync</p>
                     </div>
                 </div>
+                -->
 
                 <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="goToMap()">
                     <div class="text-center" style="height : 50px">  
@@ -94,7 +118,7 @@
                     </div>
                 </div>
 
-                <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="showClientsWaitingValidation()">
+                <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="showClientsByStatus()">
                     <div class="text-center" style="height : 50px">  
                         <img class="card-img-top" src="/images/group_clients.png" style="height:100%;width:auto">
                     </div>
@@ -125,23 +149,14 @@
                 </div>
                 -->
 
-                <div class="card col-5 m-1 shadow-sm rounded text-center h-25"  @click="showProfile()">
-                    <div class="text-center" style="height : 50px">  
-                        <img class="card-img-top" src="/images/profile.png" style="height:100%;width:auto">
-                    </div>
-                    <div class="card-body p-0 mt-3">
-                        <p class="card-text font-weight-bold">Profile</p>
-                    </div>
-                </div>
-
-                <div class="card col-5 m-1 shadow-sm rounded text-center h-25"  @click="logOut()">
+                <!-- <div class="card col-5 m-1 shadow-sm rounded text-center h-25"  @click="logOut()">
                     <div class="text-center" style="height : 50px">  
                         <img class="card-img-top" src="/images/logout.png" style="height:100%;width:auto">
                     </div>
                     <div class="card-body p-0 mt-3">
                         <p class="card-text font-weight-bold">Log Out</p>
                     </div>
-                </div>
+                </div> -->
             </div>
 
         </section>
@@ -299,9 +314,9 @@ export default {
             this.$router.push('/route/frontoffice/obs/route_import/'+this.getUser.id_route_import+'/details')
         },
 
-        showClientsWaitingValidation() {
+        showClientsByStatus() {
 
-            this.$router.push('/route_import/'+this.getUser.id_route_import+'/clients/waiting_validation')
+            this.$router.push('/route_import/'+this.getUser.id_route_import+'/clients/by_status')
         },
 
         async showProfile() {

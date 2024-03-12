@@ -108,6 +108,12 @@ class Client extends Model
             $client                 =   Client::find($client_elem->id);
 
             // Set DistrictNo
+            if(isset($client_elem->owner)) {
+
+                $client->owner          =   $client_elem->owner;
+            }
+
+            // Set DistrictNo
             if((isset($client_elem->DistrictNo))&&(isset($client_elem->DistrictNameE))) {
 
                 $client->DistrictNo     =   $client_elem->DistrictNo;

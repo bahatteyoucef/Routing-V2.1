@@ -3,17 +3,8 @@
         
         <!-- Logo -->
         <div class="text-center navbar-brand-wrapper d-flex align-items-top justify-content-center" id="logo_div_parent">
-            <div v-if="$isRole('FrontOffice')">
-              <router-link to="/" aria-current="page" class="navbar-brand brand-logo active router-link-active p-0 w-100">
-                <img  :src="'/images/profile.jpg'"     alt="logo" class="mt-3 ml-3 w-100"/>
-              </router-link>
 
-              <router-link to="/" aria-current="page"   class="navbar-brand brand-logo-mini active router-link-active p-0 w-100" id="mini_logo_custom">
-                <img  :src="'/images/profile.jpg'"     alt="logo" id="mini_logo_custom_image" class="mt-3 ml-3 w-100"/>
-              </router-link>
-            </div>
-
-            <div v-if="$isRole('Super Admin')||$isRole('BackOffice')">
+            <div>
               <router-link to="/" aria-current="page" class="navbar-brand brand-logo active router-link-active p-0">
                 <img  :src="'/images/header.png'"     alt="logo" class="mt-2"/>
               </router-link>
@@ -21,30 +12,6 @@
               <router-link to="/" aria-current="page"   class="navbar-brand brand-logo-mini active router-link-active p-0" id="mini_logo_custom">
                 <img  :src="'/images/header.png'"     alt="logo" id="mini_logo_custom_image" class="mt-2"/>
               </router-link>
-            </div>
-
-            <!--  -->
-
-            <div class="mr-3 ml-3 row w-100" v-if="$isRole('FrontOffice')">
-              <div class="p-1 pt-0 mt-3 col">
-                  <button v-if="/^\/route_import\/[^\/]+\/clients$/.test($route.path)" class="btn primary w-100 m-0"     @click="updateClient()"><i class="mdi mdi-pencil"></i></button>
-              </div>
-
-              <div class="p-1 pt-0 mt-3 col">
-                  <button class="btn primary w-100 m-0"                                                                  @click="addClient()"><i class="mdi mdi-plus"></i></button>
-              </div>
-
-              <div class="p-1 pt-0 mt-3 col">
-                  <button class="btn primary w-100 m-0"                                                                  @click="getClients()"><i class="mdi mdi-account-multiple"></i></button>
-              </div>
-
-              <div class="p-1 pt-0 mt-3 col">
-                  <button class="btn primary w-100 m-0"                                                                  @click="sync()"><i class="mdi mdi-repeat"></i></button>
-              </div>
-
-              <div class="p-1 pt-0 mt-3 col">
-                  <button v-if="$route.path  != '/'" class="btn primary w-100 m-0"                                      @click="$goBack()"><i class="mdi mdi-arrow-left"></i></button>
-              </div>
             </div>
 
             <!--  -->
@@ -62,6 +29,7 @@
                 </span> 
               </div>
             </div>
+
         </div>
 
         <div class="navbar-menu-wrapper d-flex align-items-end row h-100 w-100 pr-0 pl-4">
@@ -70,7 +38,7 @@
             <ul class="navbar-nav navbar-nav-right ml-5 container m-0 mt-1 animate__animated pr-0" id="header_menu">
 
               <!-- Route -->
-              <li v-if="$isRole('Super Admin')||$isRole('BackOffice')" class="col-sm-3 nav-item" >
+              <li class="col-sm-3 nav-item" >
                 <Multiselect
                     v-model             =   "route_link"
                     :options            =   "liste_route_link"
@@ -93,15 +61,19 @@
               <li class="col-sm-7 nav-item">
 
                 <div class="row justify-content-end">
+                  <div class="col-sm-3 mt-1">
+                    <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToStats()">Stats</button>
+                  </div>
+
                   <div class="col-sm-3 mt-1"  v-if="$isRole('Super Admin')">
                     <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToUsers()">Users</button>
                   </div>
 
-                  <div class="col-sm-3 mt-1"  v-if="$isRole('Super Admin')||$isRole('BackOffice')">
+                  <div class="col-sm-3 mt-1">
                     <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="AddRouteImport()">New Import</button>
                   </div>
 
-                  <div class="col-sm-3 mt-1"  v-if="($isRole('Super Admin')||$isRole('BackOffice'))&&(route_import_existe)">
+                  <div class="col-sm-3 mt-1"  v-if="(route_import_existe)">
                     <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToRouteTempo()">Suspended Import</button>
                   </div>
                 </div>
@@ -200,10 +172,6 @@ export default {
 
     async mounted() {
 
-        this.showFrontofficeButtons(this.$route)
-
-        // 
-
         this.user = this.getUser
 
         await this.getRouteTempo()
@@ -300,6 +268,12 @@ export default {
 
         //
 
+        goToStats() {
+
+            // Go To Route
+            this.$router.push('/stats')
+        },
+
         goToUsers() {
 
             // Go To Route
@@ -349,20 +323,6 @@ export default {
           else {
 
             this.$showErrors("Error !" , res.errors)
-          }
-        },
-
-        // 
-
-        showFrontofficeButtons(route) {
-
-          console.log(route)
-
-          if(this.$isRole("FrontOffice")) {
-
-            const pattern = /^\/route\/frontoffice\/obs\/route_import\/\d+\/details$/;
-              
-            let route_obs_frontOffice   =   pattern.test(route.path);
           }
         },
 
@@ -418,7 +378,6 @@ export default {
         $route(to, from) {
 
             this.setRouteLink()
-            this.showFrontofficeButtons(to)
         }
     }
 };

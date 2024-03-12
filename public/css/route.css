@@ -340,3 +340,26 @@ path.leaflet-interactive.animate {
 
     margin-top      : 5px !important;
 }
+
+/*  */
+
+@media only screen and (max-device-width: 767px) {
+    
+    #show_position_button {
+
+        position        : fixed;
+        top             : 10px;
+        right           : 7px;
+    }
+
+    #map_top_middle_options_div {
+
+        left        : 31%;
+        top         : 20px;
+    }
+
+    .leaflet-top {
+
+        margin-top: 5px;
+    }
+}

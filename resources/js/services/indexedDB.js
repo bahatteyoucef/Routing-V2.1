@@ -346,6 +346,48 @@ export default class MobileClientIndexedDB {
         })   
     }
 
+    async $getClientsByStatus(id_route_import, filter_status) {
+
+        return new Promise(async (resolve, error) => {
+
+            let result                                  =   []
+
+            this.transaction_route_import               =   this.route_import_db.transaction("route_import", "readwrite")
+            this.store_route_import                     =   this.transaction_route_import.objectStore("route_import")
+
+            let id_route_import_number                  =   parseInt(id_route_import, 10)
+
+            if(isNaN(id_route_import_number)) {
+
+                resolve([])
+            }
+
+            let route_import                            =   this.store_route_import.get(id_route_import_number)
+
+            result                                      =   await this.$findRouteImport(route_import)
+
+            if(result   !=  {}) {
+
+                let clients         =   []
+
+                for (let index = 0; index < result.clients.length; index++) {
+
+                    if(result.clients[index].status     ==  filter_status) {
+
+                        clients.push(result.clients[index])
+                    }
+                }
+
+                resolve(clients)
+            }
+
+            else {
+
+                resolve([])
+            }
+        })
+    }
+
     //
 
     // Added Clients

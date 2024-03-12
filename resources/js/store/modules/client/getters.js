@@ -25,5 +25,12 @@ export default {
     getClient(state) {
 
         return state.client
-    }    
+    },
+
+    //
+
+    getFilterStatusRouteImportClientsByStatus(state) {
+
+        return state.filter_status_route_import_clients_by_status
+    }
 }
