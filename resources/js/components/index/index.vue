@@ -72,14 +72,14 @@
                         <i class="mdi mdi-dice-1 mr-1 ml-1 fw-bold" style="color : #A25CFF"></i><span class="fw-bold mb-1">{{ getUser.nom }}</span>
                     </div>
 
-                    <div class="col-2 d-flex align-items-center pl-1"   role="button"   @click="logOut()">
+                    <!-- <div class="col-2 d-flex align-items-center pl-1"   role="button"   @click="logOut()">
                         <i class="mdi mdi-power mr-1 ml-1 fw-bold" style="color : #A25CFF; font-size: 25px;"></i>
-                    </div>
+                    </div> -->
                 </div>
             </div>
 
             <!-- Index Options -->
-            <div class="row d-flex justify-content-center h-100 mt-5">
+            <div class="row d-flex justify-content-center h-100 mt-4">
                 <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="addClient()">
                     <div class="text-center" style="height : 50px">  
                         <img class="card-img-top" src="/images/store.png" style="height:100%;width:auto">
@@ -97,17 +97,6 @@
                         <p class="card-text font-weight-bold">Profile</p>
                     </div>
                 </div>
-
-                <!--
-                <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="sync()">
-                    <div class="text-center" style="height : 50px">  
-                        <img class="card-img-top" src="/images/sync.png" style="height:100%;width:auto">
-                    </div>
-                    <div class="card-body p-0 mt-3">
-                        <p class="card-text font-weight-bold">Sync</p>
-                    </div>
-                </div>
-                -->
 
                 <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="goToMap()">
                     <div class="text-center" style="height : 50px">  
@@ -149,14 +138,23 @@
                 </div>
                 -->
 
-                <!-- <div class="card col-5 m-1 shadow-sm rounded text-center h-25"  @click="logOut()">
+                <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="sync()">
+                    <div class="text-center" style="height : 50px">  
+                        <img class="card-img-top" src="/images/sync.png" style="height:100%;width:auto">
+                    </div>
+                    <div class="card-body p-0 mt-3">
+                        <p class="card-text font-weight-bold">Sync</p>
+                    </div>
+                </div>
+               
+                <div class="card col-5 m-1 shadow-sm rounded text-center h-25"  @click="logOut()">
                     <div class="text-center" style="height : 50px">  
                         <img class="card-img-top" src="/images/logout.png" style="height:100%;width:auto">
                     </div>
                     <div class="card-body p-0 mt-3">
                         <p class="card-text font-weight-bold">Log Out</p>
                     </div>
-                </div> -->
+                </div>
             </div>
 
         </section>
@@ -304,6 +302,11 @@ export default {
             if(res  ==  200) {
 
                 this.$feedbackSuccess("Synchronisation Perfomed !" , "a synchronisation has been performed successfuly!")
+            }
+
+            if(res  ==  400) {
+
+                this.$showErrors("Synchronisation Failed !" , ["all your local data has been failed!"])
             }
 
             this.$hideLoadingPage()

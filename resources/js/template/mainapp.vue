@@ -125,9 +125,6 @@
 
                 if(this.user.nom) {
 
-                    console.log(this.user.nom)
-                    console.log(this.$isRole("FrontOffice"))
-
                     if(this.$isRole("FrontOffice")) {
 
                         // Set Local DB

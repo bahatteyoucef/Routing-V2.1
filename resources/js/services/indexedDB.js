@@ -83,8 +83,6 @@ export default class MobileClientIndexedDB {
     async $indexedDB_setDATA() {
         this.openRequestPlanRTM    =   this.indexedDB.open("route_import_db"   , 1);
 
-        console.log(456)
-
         return new Promise((resolve, reject) => {
 
             // CASE 1 : DB New (not existe)
@@ -159,6 +157,23 @@ export default class MobileClientIndexedDB {
                 await this.$getWillayasFromDB()
 
                 return 200
+            }
+
+            else {
+
+                //
+                this.$clearListeRouteImport()
+
+                //
+                this.$clearUpdatedClients()
+                this.$clearAddedClients()
+                this.$clearDeletedClients()
+
+                //
+                await this.$getListeRouteImportFromDB()
+                await this.$getWillayasFromDB()
+
+                return 400
             }
         }
     }

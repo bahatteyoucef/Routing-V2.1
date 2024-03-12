@@ -223,7 +223,7 @@ class RouteImport extends Model
 
         $route_import                       =   RouteImport::find($id);
 
-        $route_import->clients              =   Client::where("id_route_import", $id)->join('users', 'clients.owner', '=', 'users.id')->select('clients.*', 'users.nom as owner_name')->get();
+        $route_import->clients              =   Client::where([["id_route_import", $id], ["clients.owner", Auth::user()->id]])->join('users', 'clients.owner', '=', 'users.id')->select('clients.*', 'users.nom as owner_name')->get();
 
         return $route_import;
     }
@@ -509,14 +509,26 @@ class RouteImport extends Model
 
                 //
 
-                if($client_elem->facade_image_original_name    !=  null) {
+                if($client_elem->CustomerBarCode_image_original_name    !=  null) {
 
-                    $client->facade_image_original_name           =   $client_elem->facade_image_original_name;
+                    $client->CustomerBarCode_image_original_name    =   $client_elem->CustomerBarCode_image_original_name;
                 }
 
                 else {
 
-                    $client->facade_image_original_name           =   "";
+                    $client->CustomerBarCode_image_original_name    =   "";
+                }
+
+                //
+
+                if($client_elem->facade_image_original_name    !=  null) {
+
+                    $client->facade_image_original_name             =   $client_elem->facade_image_original_name;
+                }
+
+                else {
+
+                    $client->facade_image_original_name             =   "";
                 }
 
                 //
@@ -529,6 +541,36 @@ class RouteImport extends Model
                 else {
 
                     $client->in_store_image_original_name           =   "";
+                }
+
+                //
+
+                if($client_elem->CustomerBarCode_image_updated       ==  "true") {
+
+                    if($client_elem->CustomerBarCode_image) {
+
+                        $CustomerBarCode_image              =   $client_elem->CustomerBarCode_image;  // your base64 encoded
+                        $CustomerBarCode_image              =   str_replace('data:image/png;base64,', '', $CustomerBarCode_image);
+                        $CustomerBarCode_image              =   str_replace(' ', '+', $CustomerBarCode_image);
+                        $fileName                           =   uniqid().'.'.'png';
+
+                        $target_path                        =   public_path('uploads/clients/' . $client->id . '/' . $fileName);
+
+                        // Create the directory if it doesn't exist
+                        if (!File::isDirectory(dirname($target_path))) {
+
+                            File::makeDirectory(dirname($target_path), 0775, true); // Ensure write permissions
+                        }
+
+                        file_put_contents($target_path, base64_decode($CustomerBarCode_image));
+
+                        $client->CustomerBarCode_image       =   $fileName; 
+                    } 
+
+                    else {
+
+                        $client->CustomerBarCode_image       =   "";
+                    }
                 }
 
                 //
@@ -667,6 +709,18 @@ class RouteImport extends Model
 
             //
 
+            if($client_elem->CustomerBarCode_image_original_name    !=  null) {
+
+                $client->CustomerBarCode_image_original_name    =   $client_elem->CustomerBarCode_image_original_name;
+            }
+
+            else {
+
+                $client->CustomerBarCode_image_original_name    =   "";
+            }
+
+            //
+
             if($client_elem->facade_image_original_name    !=  null) {
 
                 $client->facade_image_original_name           =   $client_elem->facade_image_original_name;
@@ -687,6 +741,33 @@ class RouteImport extends Model
             else {
 
                 $client->in_store_image_original_name           =   "";
+            }
+
+            //
+
+            if($client_elem->CustomerBarCode_image) {
+
+                $CustomerBarCode_image      =   $client_elem->CustomerBarCode_image;  // your base64 encoded
+                $CustomerBarCode_image      =   str_replace('data:image/png;base64,', '', $CustomerBarCode_image);
+                $CustomerBarCode_image      =   str_replace(' ', '+', $CustomerBarCode_image);
+                $fileName                   =   uniqid().'.'.'png';
+
+                $target_path                =   public_path('uploads/clients/' . $client->id . '/' . $fileName);
+
+                // Create the directory if it doesn't exist
+                if (!File::isDirectory(dirname($target_path))) {
+
+                    File::makeDirectory(dirname($target_path), 0775, true); // Ensure write permissions
+                }
+
+                file_put_contents($target_path, base64_decode($CustomerBarCode_image));
+
+                $client->CustomerBarCode_image       =   $fileName; 
+            } 
+
+            else {
+
+                $client->CustomerBarCode_image       =   "";
             }
 
             //
