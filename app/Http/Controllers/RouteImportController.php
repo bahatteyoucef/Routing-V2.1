@@ -575,6 +575,23 @@ class RouteImportController extends Controller
         }
     }
 
+    public function statsRouteImports()
+    {
+
+        try {
+
+            $liste_route_import     =   RouteImport::statsRouteImports();
+            return User::filterRouteImport($liste_route_import);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
     //
 
     public static function frontOffice(int $id_route_import)
@@ -616,5 +633,4 @@ class RouteImportController extends Controller
             ],422);
         }
     }
-
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\JourneeController;
 use App\Http\Controllers\JourneyPlanController;
 use App\Http\Controllers\RouteImportController;
 use App\Http\Controllers\RouteImportTempoController;
+use App\Http\Controllers\StatisticController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserTerritoryController;
 use App\Models\ClientTempo;
@@ -208,4 +209,10 @@ Route::middleware('auth:api')->group(function () {
     //
 
     Route::post('/route_import/{id_route_import}/clients/by_status'                                     ,   [RouteImportController::class           , 'clientsByStatus'                         ]);
+
+    //
+
+    Route::post('/route_import/stats'                                                                   ,   [RouteImportController::class           , 'statsRouteImports'                       ]);
+    Route::post('/daily_reports'                                                                        ,   [StatisticController::class             , 'dailyReports'                            ]);
+
 });

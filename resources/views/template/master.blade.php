@@ -121,6 +121,9 @@
 	<!-- <script src="https://unpkg.com/html5-qrcode" ></script> -->
 	<script src="{{url('/js/html5-qrcode.js')}}" ></script>
 
+	<!-- Chart JS -->
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 	@vite('resources/js/app.js')
 
 </html>
