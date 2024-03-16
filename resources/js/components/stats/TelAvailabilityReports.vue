@@ -3,7 +3,7 @@
     <div class="m-3 p-3">
 
         <!-- Chart Filters -->
-        <div class="row chart_filters" id="daily_reports_chart_filters">
+        <div class="row chart_filters" id="tel_availability_chart_filters">
 
             <!-- Select Map         -->
             <div class="col-4 map_filter">
@@ -50,10 +50,20 @@
         <div class="row">
 
             <!-- Daily Reports  -->
+            <!-- <div class="col-4">
+
+                <div v-if="show_tel_availability_chart"        id="tel_availability_ratio_container"    class="chart_scroll pt-5 pb-1">
+                    <div class="pie_chart_container">
+                        <canvas id="tel_availability_chart"    ref="tel_availability_chart"></canvas>
+                    </div>
+                </div>
+
+            </div> -->
+
             <div class="col-12">
-                <div v-if="show_daily_reports_chart"        id="daily_reports_container"    class="chart_scroll pt-5 pb-1">
+                <div v-if="show_tel_availability_chart"        id="tel_availability_reports_container"    class="chart_scroll pt-5 pb-1">
                     <div class="bar_chart_container">
-                        <canvas id="daily_reports_chart"    ref="daily_reports_chart"></canvas>
+                        <canvas id="tel_availability_chart"    ref="tel_availability_chart"></canvas>
                     </div>
                 </div>
             </div>
@@ -62,15 +72,15 @@
         <!--  -->
 
         <!-- Show Table         -->
-        <div v-if="show_daily_reports_chart"    class="table_scroll table_container mt-5">
-            <table class="table w-100" id="daily_reports_table">
+        <!-- <div v-if="show_tel_availability_chart"    class="table_scroll table_container mt-5">
+            <table class="table w-100" id="tel_availability_reports_table">
                 <tr>
                     <th>User</th>
-                    <th v-for="label, index_1 in daily_reports_data.labels" :key="index_1">{{ label }}</th>
+                    <th v-for="label, index_1 in tel_availability_reports_data.labels" :key="index_1">{{ label }}</th>
                     <th>Total</th>
                 </tr>
 
-                <tr v-for="dataset, index_2 in daily_reports_data.datasets" :key="index_2">
+                <tr v-for="dataset, index_2 in tel_availability_reports_data.datasets" :key="index_2">
                     <th>{{dataset.label}}</th>
                     <td v-for="data_value, index_3 in dataset.data" :key="index_3">{{ data_value }}</td>
                     <th>{{ dataset.total }}</th>
@@ -82,7 +92,7 @@
                     <th>{{ total_by_day_object.total }}</th>
                 </tr>
             </table>
-        </div>
+        </div> -->
         <!--  -->
 
     </div>
@@ -113,29 +123,29 @@ export default {
 
             //
 
-            daily_reports_chart     :   null,
+            tel_availability_chart     :   null,
 
-            daily_reports_options   :   {
-                maintainAspectRatio     :   false,
-                scales                  :   {
-                    y                       :   {
+            tel_availability_reports_options    :   {
+                maintainAspectRatio                 :   false,
+                scales                              :   {
+                    y                                   :   {
                         beginAtZero: true
                     }
                 }
             },
 
-            daily_reports_data      :   {
-                labels                  :   [],
-                datasets                :   []
+            tel_availability_reports_data       :   {
+                labels                              :   [],
+                datasets                            :   []
             },
 
             //
 
-            total_by_day_object         :   null,
+            total_by_day_object                 :   null,
 
             //
 
-            show_daily_reports_chart    :   false
+            show_tel_availability_chart         :   false
         }
     },
 
@@ -159,18 +169,18 @@ export default {
                 formData.append("start_date"    , this.start_date)
                 formData.append("end_date"      , this.end_date)
 
-                await this.$callApi("post",     "/statistics/daily_reports",   formData)
+                await this.$callApi("post",     "/statistics/tel_availability_reports",   formData)
                 .then(async (res)=> {
 
                     console.log(res)
 
                     //
-                    this.daily_reports_data.labels          =   res.data.daily_reports.labels;
-                    this.daily_reports_data.datasets        =   res.data.daily_reports.datasets;
-                    this.total_by_day_object                =   res.data.daily_reports.total_by_day_object;
+                    this.tel_availability_reports_data.labels           =   res.data.tel_availability_reports.labels;
+                    this.tel_availability_reports_data.datasets         =   res.data.tel_availability_reports.datasets;
+                    // this.total_by_day_object                            =   res.data.tel_availability_reports.total_by_day_object;
 
                     //
-                    this.show_daily_reports_chart           =   true
+                    this.show_tel_availability_chart           =   true
 
                     //
                     await this.$nextTick()
@@ -191,26 +201,26 @@ export default {
 
         setChart() {
 
-            if (this.daily_reports_chart) {
-                this.daily_reports_chart.destroy();   // Destroy existing chart for proper updates
+            if (this.tel_availability_chart) {
+                this.tel_availability_chart.destroy();   // Destroy existing chart for proper updates
             }
 
-            const daily_reports_chart   =   this.$refs.daily_reports_chart.getContext('2d');
+            const tel_availability_chart    =   this.$refs.tel_availability_chart.getContext('2d');
 
-            this.daily_reports_chart    =   new Chart(daily_reports_chart, {
-                type                    :   "bar"                   ,
-                data                    :   this.daily_reports_data    ,
-                options                 :   this.daily_reports_options
+            this.tel_availability_chart     =   new Chart(tel_availability_chart, {
+                type                        :   "bar"                                   ,
+                data                        :   this.tel_availability_reports_data      ,
+                options                     :   this.tel_availability_reports_options
             });
 
             //
 
             const bar_chart_container       =   document.querySelector(".bar_chart_container")
-            const totalLabels           =   this.daily_reports_chart.data.labels.length
+            const totalLabels               =   this.tel_availability_chart.data.labels.length
 
             if(totalLabels  >  5) {
 
-                const newWidth                  =   700 + ((totalLabels - 7) * 90)
+                const newWidth                      =   700 + ((totalLabels - 7) * 90)
                 bar_chart_container.style.width     =   newWidth+"px"
             }
         },

@@ -31,4 +31,26 @@ class StatisticController extends Controller
             ],422);
         }
     }
+
+    public static function telAvailabilityReports(Request $request) {
+
+        try {
+
+            //
+            $tel_availability_reports   =   Statistic::telAvailabilityReports($request);
+
+            //
+            return response()->json([
+
+                "tel_availability_reports"  =>  $tel_availability_reports
+            ]);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
 }

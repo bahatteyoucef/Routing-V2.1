@@ -183,3 +183,37 @@
 }
 
 /*  */
+
+.chart_scroll, .table_scroll {
+
+    overflow-x          : scroll;
+}
+
+.chart_scroll::-webkit-scrollbar, .table_scroll::-webkit-scrollbar {
+
+	height              : 7px;
+    width               : 7px;
+	background-color    : #A25CFF;
+}
+
+.chart_scroll::-webkit-scrollbar-track, .table_scroll::-webkit-scrollbar-track {
+
+	border-radius       : 10px;
+	-webkit-box-shadow  : inset 0 0 6px rgba(0,0,0,0.3);
+	background-color    : #F5F5F5;
+}
+
+.chart_scroll::-webkit-scrollbar-thumb, .table_scroll::-webkit-scrollbar-thumb {
+
+	border-radius       : 10px;
+	-webkit-box-shadow  : inset 0 0 6px rgba(0,0,0,0.3);
+	background-color    : #A25CFF;
+}
+
+.bar_chart_container {
+
+    height              : 500px;
+}
+
+/*  */
+

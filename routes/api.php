@@ -213,6 +213,7 @@ Route::middleware('auth:api')->group(function () {
     //
 
     Route::post('/route_import/stats'                                                                   ,   [RouteImportController::class           , 'statsRouteImports'                       ]);
-    Route::post('/daily_reports'                                                                        ,   [StatisticController::class             , 'dailyReports'                            ]);
 
+    Route::post('/statistics/daily_reports'                                                             ,   [StatisticController::class             , 'dailyReports'                            ]);
+    Route::post('/statistics/tel_availability_reports'                                                  ,   [StatisticController::class             , 'telAvailabilityReports'                  ]);
 });
