@@ -212,8 +212,15 @@ Route::middleware('auth:api')->group(function () {
 
     //
 
+    Route::post('/route_import/{id_route_import}/districts/{DistrictNo}/cities'                         ,   [RouteImportController::class           , 'RouteImportCities'                       ]);
+
+    //
+
     Route::post('/route_import/stats'                                                                   ,   [RouteImportController::class           , 'statsRouteImports'                       ]);
 
     Route::post('/statistics/daily_reports'                                                             ,   [StatisticController::class             , 'dailyReports'                            ]);
     Route::post('/statistics/tel_availability_reports'                                                  ,   [StatisticController::class             , 'telAvailabilityReports'                  ]);
+    Route::post('/statistics/by_customer_type_reports'                                                  ,   [StatisticController::class             , 'byCustomerTypeReports'                   ]);
+    Route::post('/statistics/by_source_achat_reports'                                                   ,   [StatisticController::class             , 'bySourceAchatReports'                    ]);
+    Route::post('/statistics/by_brand_availability_reports'                                             ,   [StatisticController::class             , 'byBrandAvailabilityReports'              ]);
 });

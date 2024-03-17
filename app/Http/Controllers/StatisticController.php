@@ -32,17 +32,83 @@ class StatisticController extends Controller
         }
     }
 
-    public static function telAvailabilityReports(Request $request) {
+    public static function byTelAvailabilityReports(Request $request) {
 
         try {
 
             //
-            $tel_availability_reports   =   Statistic::telAvailabilityReports($request);
+            $by_tel_availability_reports    =   Statistic::byTelAvailabilityReports($request);
 
             //
             return response()->json([
 
-                "tel_availability_reports"  =>  $tel_availability_reports
+                "by_tel_availability_reports"   =>  $by_tel_availability_reports
+            ]);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    public static function byCustomerTypeReports(Request $request) {
+
+        try {
+
+            //
+            $by_customer_type_reports   =   Statistic::byCustomerTypeReports($request);
+
+            //
+            return response()->json([
+
+                "by_customer_type_reports"  =>  $by_customer_type_reports
+            ]);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    public static function bySourceAchatReports(Request $request) {
+
+        try {
+
+            //
+            $by_source_achat_reports    =   Statistic::bySourceAchatReports($request);
+
+            //
+            return response()->json([
+
+                "by_source_achat_reports"  =>  $by_source_achat_reports
+            ]);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    public static function byBrandAvailabilityReports(Request $request) {
+
+        try {
+
+            //
+            $by_brand_availability_reports  =   Statistic::byBrandAvailabilityReports($request);
+
+            //
+            return response()->json([
+
+                "by_brand_availability_reports"  =>  $by_brand_availability_reports
             ]);
         }
 

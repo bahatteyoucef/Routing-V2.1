@@ -939,4 +939,17 @@ class RouteImport extends Model
 
         return $clients;
     }
+
+    //
+
+    public static function RouteImportCities(int $id_route_import, string $DistrictNo) {
+
+        $cities     =   DB::table("route_import_cities")
+                            ->select("RTM_City.*", "route_import_cities.expected_clients", "route_import_cities.id_route_import")
+                            ->join("RTM_City", "route_import_cities.CityNo", "RTM_City.CityNo")
+                            ->where([["route_import_cities.id_route_import", $id_route_import], ["RTM_City.DistrictNo", $DistrictNo]])
+                            ->get();
+
+        return $cities;
+    }
 }

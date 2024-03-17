@@ -3,7 +3,7 @@
     <div class="m-3 p-3">
 
         <!-- Chart Filters -->
-        <div class="row chart_filters" id="tel_availability_chart_filters">
+        <div class="row chart_filters" id="by_source_achat_chart_filters">
 
             <!-- Select Map         -->
             <div class="col-4 map_filter">
@@ -49,21 +49,10 @@
         <!-- Show Chart         -->
         <div class="row">
 
-            <!-- Daily Reports  -->
-            <!-- <div class="col-4">
-
-                <div v-if="show_tel_availability_chart"        id="tel_availability_ratio_container"    class="chart_scroll pt-5 pb-1">
+            <div class="col-6">
+                <div v-if="show_by_source_achat_chart"        id="by_source_achat_reports_container"    class="pt-5 pb-1">
                     <div class="pie_chart_container">
-                        <canvas id="tel_availability_chart"    ref="tel_availability_chart"></canvas>
-                    </div>
-                </div>
-
-            </div> -->
-
-            <div class="col-12">
-                <div v-if="show_tel_availability_chart"        id="tel_availability_reports_container"    class="chart_scroll pt-5 pb-1">
-                    <div class="bar_chart_container">
-                        <canvas id="tel_availability_chart"    ref="tel_availability_chart"></canvas>
+                        <canvas id="by_source_achat_chart"    ref="by_source_achat_chart"></canvas>
                     </div>
                 </div>
             </div>
@@ -72,28 +61,27 @@
         <!--  -->
 
         <!-- Show Table         -->
-        <!-- <div v-if="show_tel_availability_chart"    class="table_scroll table_container mt-5">
-            <table class="table w-100" id="tel_availability_reports_table">
+        <div v-if="by_source_achat_table"    class="table_scroll table_container mt-5">
+            <table class="table w-100" id="by_source_achat_reports_table">
                 <tr>
-                    <th>User</th>
-                    <th v-for="label, index_1 in tel_availability_reports_data.labels" :key="index_1">{{ label }}</th>
+                    <th>CustomerType</th>
+                    <th>Clients</th>
                     <th>Total</th>
                 </tr>
 
-                <tr v-for="dataset, index_2 in tel_availability_reports_data.datasets" :key="index_2">
-                    <th>{{dataset.label}}</th>
-                    <td v-for="data_value, index_3 in dataset.data" :key="index_3">{{ data_value }}</td>
-                    <th>{{ dataset.total }}</th>
+                <tr v-for="row, index_1 in by_source_achat_table.rows" :key="index_1">
+                    <th>{{ row.label }}</th>
+                    <td>{{ row.count_clients }}</td>
+                    <th>{{ row.percentage_clients * 100 }} %</th>
                 </tr>
 
                 <tr>
-                    <th>Total</th>
-                    <th v-for="total_by_day, index_4 in total_by_day_object.data" :key="index_4">{{ total_by_day }}</th>
-                    <th>{{ total_by_day_object.total }}</th>
+                    <th>{{ by_source_achat_table.total_row.label }}</th>
+                    <th>{{ by_source_achat_table.total_row.count_clients }}</th>
+                    <th>{{ by_source_achat_table.total_row.percentage_clients * 100 }} %</th>
                 </tr>
             </table>
-        </div> -->
-        <!--  -->
+        </div>
 
     </div>
 
@@ -123,29 +111,20 @@ export default {
 
             //
 
-            tel_availability_chart     :   null,
+            by_source_achat_chart              :   null,
 
-            tel_availability_reports_options    :   {
-                maintainAspectRatio                 :   false,
-                scales                              :   {
-                    y                                   :   {
-                        beginAtZero: true
-                    }
-                }
-            },
-
-            tel_availability_reports_data       :   {
+            by_source_achat_reports_data       :   {
                 labels                              :   [],
                 datasets                            :   []
             },
 
             //
 
-            total_by_day_object                 :   null,
+            by_source_achat_table              :   null,
 
             //
 
-            show_tel_availability_chart         :   false
+            show_by_source_achat_chart         :   false
         }
     },
 
@@ -169,18 +148,18 @@ export default {
                 formData.append("start_date"    , this.start_date)
                 formData.append("end_date"      , this.end_date)
 
-                await this.$callApi("post",     "/statistics/tel_availability_reports",   formData)
+                await this.$callApi("post",     "/statistics/by_source_achat_reports",   formData)
                 .then(async (res)=> {
 
                     console.log(res)
 
                     //
-                    this.tel_availability_reports_data.labels           =   res.data.tel_availability_reports.labels;
-                    this.tel_availability_reports_data.datasets         =   res.data.tel_availability_reports.datasets;
-                    // this.total_by_day_object                            =   res.data.tel_availability_reports.total_by_day_object;
+                    this.by_source_achat_reports_data.labels       =   res.data.by_source_achat_reports.labels;
+                    this.by_source_achat_reports_data.datasets     =   res.data.by_source_achat_reports.datasets;
+                    this.by_source_achat_table                     =   res.data.by_source_achat_reports.by_source_achat_table;
 
                     //
-                    this.show_tel_availability_chart           =   true
+                    this.show_by_source_achat_chart                =   true
 
                     //
                     await this.$nextTick()
@@ -201,28 +180,17 @@ export default {
 
         setChart() {
 
-            if (this.tel_availability_chart) {
-                this.tel_availability_chart.destroy();   // Destroy existing chart for proper updates
+            if (this.by_source_achat_chart) {
+                this.by_source_achat_chart.destroy();   // Destroy existing chart for proper updates
             }
 
-            const tel_availability_chart    =   this.$refs.tel_availability_chart.getContext('2d');
+            const by_source_achat_chart    =   this.$refs.by_source_achat_chart.getContext('2d');
 
-            this.tel_availability_chart     =   new Chart(tel_availability_chart, {
-                type                        :   "bar"                                   ,
-                data                        :   this.tel_availability_reports_data      ,
-                options                     :   this.tel_availability_reports_options
+            this.by_source_achat_chart     =   new Chart(by_source_achat_chart, {
+                type                        :   "pie"                                   ,
+                data                        :   this.by_source_achat_reports_data      ,
+                options                     :   {}
             });
-
-            //
-
-            const bar_chart_container       =   document.querySelector(".bar_chart_container")
-            const totalLabels               =   this.tel_availability_chart.data.labels.length
-
-            if(totalLabels  >  5) {
-
-                const newWidth                      =   700 + ((totalLabels - 7) * 90)
-                bar_chart_container.style.width     =   newWidth+"px"
-            }
         },
 
         //  //  //  //  //

@@ -22,17 +22,17 @@ class Statistic extends Model
         $route_links    =   json_decode($request->get("route_links"));
 
         //
+        $startDate      =   Carbon::parse($request->get("start_date")); // Replace with your start date
+        $endDate        =   Carbon::parse($request->get("end_date"));   // Replace with your end date
+        //
+
+        //
         $users          =   DB::table("users")
                                 ->select("users.*")
                                 ->join("users_route_import", "users.id", "users_route_import.id_user")
                                 ->whereIn('users_route_import.id_route_import', $route_links)
                                 ->distinct("users.id")
                                 ->get();
-        //
-
-        //
-        $startDate      =   Carbon::parse($request->get("start_date")); // Replace with your start date
-        $endDate        =   Carbon::parse($request->get("end_date"));   // Replace with your end date
         //
 
         //
@@ -68,6 +68,7 @@ class Statistic extends Model
                 //
                 $count                      =   DB::table("clients")
                                                     ->where('owner', $user->id)
+                                                    ->whereIn('clients.id_route_import', $route_links)
                                                     ->whereRaw('STR_TO_DATE(created_at, "%d %M %Y") = ?', [$day]) // Use Y-m-d format for comparison
                                                     ->count();
 
@@ -106,9 +107,16 @@ class Statistic extends Model
         return $daily_reports;
     }
 
-    public static function telAvailabilityReports(Request $request) {
+    //
+
+    public static function byTelAvailabilityReports(Request $request) {
 
         $route_links    =   json_decode($request->get("route_links"));
+
+        //
+        $startDate      =   Carbon::parse($request->get("start_date")); // Replace with your start date
+        $endDate        =   Carbon::parse($request->get("end_date"));   // Replace with your end date
+        //
 
         //
         $users          =   DB::table("users")
@@ -117,11 +125,6 @@ class Statistic extends Model
                                 ->whereIn('users_route_import.id_route_import', $route_links)
                                 ->distinct("users.id")
                                 ->get();
-        //
-
-        //
-        $startDate      =   Carbon::parse($request->get("start_date")); // Replace with your start date
-        $endDate        =   Carbon::parse($request->get("end_date"));   // Replace with your end date
         //
 
         //  //  //  //  //
@@ -149,6 +152,7 @@ class Statistic extends Model
                                                     $query->whereNotNull('Tel')
                                                             ->where('Tel', '!=', '');
                                                 })
+                                                ->whereIn('clients.id_route_import', $route_links)
                                                 ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
                                                 ->count();
 
@@ -178,6 +182,7 @@ class Statistic extends Model
                                                     $query->whereNull('Tel')
                                                             ->orWhere('Tel', '');
                                                 })
+                                                ->whereIn('clients.id_route_import', $route_links)
                                                 ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
                                                 ->count();
 
@@ -201,12 +206,357 @@ class Statistic extends Model
 
         //  //  //  //  //
 
-        $tel_availability_reports               =   new stdClass();
+        $by_tel_availability_reports                                =   new stdClass();
 
-        $tel_availability_reports->labels       =   $labels;
-        $tel_availability_reports->datasets     =   $datasets;
+        $by_tel_availability_reports->labels                        =   $labels;
+        $by_tel_availability_reports->datasets                      =   $datasets;
+
+        $by_tel_availability_reports->by_tel_availability_table     =   Statistic::byTelAvailabilityTable($users, $route_links, $startDate, $endDate);
 
         //
-        return $tel_availability_reports;
+        return $by_tel_availability_reports;
     }
+
+    public static function byTelAvailabilityTable($users, $route_links, $startDate, $endDate) {
+
+        $rows               =   [];
+
+        $count_total_yes    =   0;
+        $count_total_no     =   0;
+
+        foreach ($users as $key => $user) {
+
+            //
+            $row                            =   new stdClass();
+            $row->label                     =   $user->nom . " (" . $user->id . ")";
+            //
+
+            //
+            $count_yes                      =   DB::table("clients")
+                                                    ->where('owner', $user->id)
+                                                    ->where(function ($query) {
+                                                        $query->whereNotNull('Tel')
+                                                                ->where('Tel', '!=', '');
+                                                    })
+                                                    ->whereIn('clients.id_route_import', $route_links)
+                                                    ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                                    ->count();
+            //
+
+            //
+            $count_no                       =   DB::table("clients")
+                                                    ->where('owner', $user->id)
+                                                    ->where(function ($query) {
+                                                        $query->whereNull('Tel')
+                                                                ->orWhere('Tel', '');
+                                                    })
+                                                    ->whereIn('clients.id_route_import', $route_links)
+                                                    ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                                    ->count();
+            //
+
+            //
+            $row->count_yes                 =   $count_yes;
+            $row->count_no                  =   $count_no;
+            $row->count_total               =   $count_yes + $count_no;
+            //
+
+            //
+            $count_total_yes                =   $count_total_yes    +   $count_yes;
+            $count_total_no                 =   $count_total_no     +   $count_no;
+            //
+
+            array_push($rows, $row);
+        }
+
+        // Set Total By Yes/    
+        $by_tel_availability_table                             =   new stdClass();
+
+        $by_tel_availability_table->rows                       =   $rows;
+
+        $by_tel_availability_table->total_row                  =   new stdClass();
+        $by_tel_availability_table->total_row->label           =   "Total";
+        $by_tel_availability_table->total_row->count_yes       =   $count_total_yes;
+        $by_tel_availability_table->total_row->count_no        =   $count_total_no;
+        $by_tel_availability_table->total_row->count_total     =   $count_total_yes + $count_total_no;
+
+        return $by_tel_availability_table;
+    }
+
+    //
+
+    public static function byCustomerTypeReports(Request $request) {
+
+        $route_links    =   json_decode($request->get("route_links"));
+
+        //
+        $startDate      =   Carbon::parse($request->get("start_date")); // Replace with your start date
+        $endDate        =   Carbon::parse($request->get("end_date"));   // Replace with your end date
+        //
+
+        //
+        $customer_types     =   DB::table("clients")
+                                    ->select("clients.CustomerType")
+                                    ->whereIn('clients.id_route_import', $route_links)
+                                    ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                    ->distinct("clients.CustomerType")
+                                    ->pluck('CustomerType');
+
+        $total_clients      =   DB::table("clients")
+                                    ->select("clients.id")
+                                    ->whereIn('clients.id_route_import', $route_links)
+                                    ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                    ->count();
+
+        //
+
+        //
+        $datasets                   =   [];
+
+        $dataset                    =   new stdClass();
+        $dataset->data              =   [];
+
+        //
+        $rows                       =   [];
+
+        foreach ($customer_types as $customer_type) {
+
+            //  //  //  //  //  //  //  //  //  //
+            $count                      =   DB::table("clients")
+                                                ->where('clients.CustomerType', $customer_type)
+                                                ->whereIn('clients.id_route_import', $route_links)
+                                                ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                                ->count();
+
+            //
+            array_push($dataset->data, $count);
+
+            //  //  //  //  //  //  //  //  //  //
+
+            //  //  //  //  //  //  //  //  //  //
+
+            //
+            $row                            =   new stdClass();
+            $row->label                     =   $customer_type;
+            $row->count_clients             =   $count;
+            $row->percentage_clients        =   $count/$total_clients;
+
+            array_push($rows, $row);
+            //
+
+            //  //  //  //  //  //  //  //  //  //
+        }
+
+        array_push($datasets, $dataset);
+        //
+
+        //
+        $by_customer_type_reports                           =   new stdClass();
+
+        $by_customer_type_reports->labels                   =   $customer_types;
+        $by_customer_type_reports->datasets                 =   $datasets;
+        //
+
+        //  //  //  //  Prepare Table   //  //  //  //
+        
+        // Set Total By Yes/No    
+        $by_customer_type_table                                 =   new stdClass();
+
+        $by_customer_type_table->rows                           =   $rows;
+
+        $by_customer_type_table->total_row                      =   new stdClass();
+        $by_customer_type_table->total_row->label               =   "Total";
+        $by_customer_type_table->total_row->count_clients       =   $total_clients;
+        $by_customer_type_table->total_row->percentage_clients  =   1;
+
+        $by_customer_type_reports->by_customer_type_table       =   $by_customer_type_table;
+
+        //
+        return $by_customer_type_reports;
+    }
+
+    //
+
+    public static function bySourceAchatReports(Request $request) {
+
+        $route_links        =   json_decode($request->get("route_links"));
+
+        //
+        $startDate          =   Carbon::parse($request->get("start_date")); // Replace with your start date
+        $endDate            =   Carbon::parse($request->get("end_date"));   // Replace with your end date
+        //
+
+        //
+        $source_achats      =   DB::table("clients")
+                                    ->select("clients.BrandSourcePurchase")
+                                    ->whereIn('clients.id_route_import', $route_links)
+                                    ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                    ->distinct("clients.BrandSourcePurchase")
+                                    ->pluck('BrandSourcePurchase');
+
+        $total_clients      =   DB::table("clients")
+                                    ->select("clients.id")
+                                    ->whereIn('clients.id_route_import', $route_links)
+                                    ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                    ->count();
+        //
+
+        //
+        $datasets                   =   [];
+
+        $dataset                    =   new stdClass();
+        $dataset->data              =   [];
+
+        //
+        $rows                       =   [];
+
+        foreach ($source_achats as $source_achat) {
+
+            //  //  //  //  //  //  //  //  //  //
+            $count                      =   DB::table("clients")
+                                                ->where('clients.BrandSourcePurchase', $source_achat)
+                                                ->whereIn('clients.id_route_import', $route_links)
+                                                ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                                ->count();
+
+            //
+            array_push($dataset->data, $count);
+
+            //  //  //  //  //  //  //  //  //  //
+
+            //  //  //  //  //  //  //  //  //  //
+
+            //
+            $row                            =   new stdClass();
+            $row->label                     =   $source_achat;
+            $row->count_clients             =   $count;
+            $row->percentage_clients        =   $count/$total_clients;
+
+            array_push($rows, $row);
+            //
+
+            //  //  //  //  //  //  //  //  //  //
+        }
+
+        array_push($datasets, $dataset);
+        //
+
+        //
+        $by_source_achat_reports                            =   new stdClass();
+
+        $by_source_achat_reports->labels                    =   $source_achats;
+        $by_source_achat_reports->datasets                  =   $datasets;
+        //
+
+        //  //  //  //  Prepare Table   //  //  //  //
+        
+        // Set Total By Yes/No    
+        $by_source_achat_table                                  =   new stdClass();
+
+        $by_source_achat_table->rows                            =   $rows;
+
+        $by_source_achat_table->total_row                       =   new stdClass();
+        $by_source_achat_table->total_row->label                =   "Total";
+        $by_source_achat_table->total_row->count_clients        =   $total_clients;
+        $by_source_achat_table->total_row->percentage_clients   =   1;
+
+        $by_source_achat_reports->by_source_achat_table         =   $by_source_achat_table;
+
+        //
+        return $by_source_achat_reports;
+    }
+
+    //
+
+    public static function byBrandAvailabilityReports(Request $request) {
+
+        $route_links        =   json_decode($request->get("route_links"));
+
+        //
+        $startDate          =   Carbon::parse($request->get("start_date")); // Replace with your start date
+        $endDate            =   Carbon::parse($request->get("end_date"));   // Replace with your end date
+        //
+
+        //
+        $total_clients          =   DB::table("clients")
+                                        ->select("clients.id")
+                                        ->whereIn('clients.id_route_import', $route_links)
+                                        ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                        ->count();
+        //
+
+        //
+        $datasets                   =   [];
+
+        //  //  //  //  //  //  //  //  //  //
+
+        $dataset                    =   new stdClass();
+        $dataset->data              =   [];
+
+        $count_yes                  =   DB::table("clients")
+                                            ->where('clients.BrandAvailability', 1)
+                                            ->whereIn('clients.id_route_import', $route_links)
+                                            ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                            ->count();
+
+        array_push($dataset->data, $count_yes);
+
+        //  //  //  //  //  //  //  //  //  //
+
+        $count_no                   =   DB::table("clients")
+                                            ->where('clients.BrandAvailability', 0)
+                                            ->whereIn('clients.id_route_import', $route_links)
+                                            ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                            ->count();
+
+        array_push($dataset->data, $count_no);
+
+        //  //  //  //  //  //  //  //  //  //
+
+        array_push($datasets, $dataset);
+
+        //
+        $rows                           =   [];
+
+        $row                            =   new stdClass();
+        $row->label                     =   "Yes";
+        $row->count_clients             =   $count_yes;
+        $row->percentage_clients        =   $count_yes/$total_clients;
+
+        array_push($rows, $row);
+        //
+
+        $row                            =   new stdClass();
+        $row->label                     =   "No";
+        $row->count_clients             =   $count_no;
+        $row->percentage_clients        =   $count_no/$total_clients;
+
+        array_push($rows, $row);
+        //
+
+        //
+        $by_brand_availability_reports                                      =   new stdClass();
+
+        $by_brand_availability_reports->labels                              =   ["Yes", "No"];
+        $by_brand_availability_reports->datasets                            =   $datasets;
+        //
+
+        //  //  //  //  Prepare Table   //  //  //  //
+        
+        // Set Total By Yes/No    
+        $by_brand_availability_table                                        =   new stdClass();
+
+        $by_brand_availability_table->rows                                  =   $rows;
+
+        $by_brand_availability_table->total_row                             =   new stdClass();
+        $by_brand_availability_table->total_row->label                      =   "Total";
+        $by_brand_availability_table->total_row->count_clients              =   $total_clients;
+        $by_brand_availability_table->total_row->percentage_clients         =   1;
+
+        $by_brand_availability_reports->by_brand_availability_table         =   $by_brand_availability_table;
+
+        //
+        return $by_brand_availability_reports;
+    }
+
 }
