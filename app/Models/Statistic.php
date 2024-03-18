@@ -558,5 +558,4 @@ class Statistic extends Model
         //
         return $by_brand_availability_reports;
     }
-
 }

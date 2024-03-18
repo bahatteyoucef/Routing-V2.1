@@ -1,24 +1,37 @@
 <template>
 
-    <div class="mt-3">
-        <!-- Header -->
-        <div class="col-sm-3">
-            <h5 class="ml-1 card-title title-with-line">Set Cities</h5>
+    <div class="mt-5">
+
+        <div class="row">
+            <!-- Header -->
+            <div class="col-2 d-flex align-items-center">
+                <h5 class="ml-1 card-title title-with-line">Set Route Import Cities</h5>
+            </div>
+
+            <div class="col-2">
+                <button class="btn primary w-100" @click="sendData()">Submit</button>
+            </div>
         </div>
 
         <form class="mt-3">
 
-            Youcef
+            <div class="mb-2">
 
-            <div class="m-3" v-for="(city,index) in cities" :key="index">
+                <div class="row">
+                    <div class="col-3 p-0" v-for="(city,index) in route_import_cities" :key="index">
+                        <div class="p-1 m-1">
+                            <div class="p-3">
+                                <div class="row">
+                                    <div class="col-4 d-flex align-items-center">
+                                        {{ city.CityNameE }}
+                                    </div>
 
-                <div class="form-row mb-2">
-                    <div class="form-group col-2 m-0">
-                        <label class="form-label ml-1">{{city.CityNameE}}</label> 
-                    </div>
-
-                    <div class="form-group col-2 m-0">
-                        <input type="button" class="form-control"/>
+                                    <div class="col-8">
+                                        <input :class="'form-control expected_clients_'+id_route_import+'_'+city.CityNo" v-model="city.expected_clients"/>
+                                    </div>
+                                </div>                                
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -39,7 +52,11 @@ export default {
         }
     },
 
-    props : ["cities"],
+    props : ["id_route_import", "DistrictNo", "route_import_cities"],
+
+    mounted() {
+
+    },
 
     methods : {
 
@@ -47,19 +64,14 @@ export default {
 
             this.$showLoadingPage()
 
-            this.setCitiesJSON()
-            this.setareasJSON()
+            //
+            this.validateRouteImportCities()
 
             let formData = new FormData();
 
-            formData.append("buid"              , this.organisation.BUID)
-            formData.append("cities"            , JSON.stringify(this.cities))
-            formData.append("areas"             , JSON.stringify(this.areas))
+            formData.append("route_import_cities"   ,   JSON.stringify(this.route_import_cities))
 
-            console.log(this.cities)
-            console.log(this.areas)
-
-            const res                   =   await this.$callApi("post"  ,   "/cities/store",  formData)
+            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.id_route_import+"/districts/"+this.DistrictNo+"/cities/set",   formData)
             console.log(res.data)
 
             if(res.status===200){
@@ -69,9 +81,6 @@ export default {
 
                 // Send Feedback
                 this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
-
-                // 
-                this.$goBack()
             }
             
             else{
@@ -86,32 +95,23 @@ export default {
 
         //
 
-        setCitiesJSON() {
+        validateRouteImportCities() {
 
-            let city             =   {}
+            for (let index = 0; index < this.route_import_cities.length; index++) {
 
-            let cities            =   []
-            let city_checkbox    =   null
+                // Try to parse the input value as a number
+                var expected_clients    =   parseFloat(this.route_import_cities[index].expected_clients);
 
-            for (let i = 0; i < this.tout_cities.length; i++) {
+                // Check if the parsed value is a valid number
+                if (!isNaN(expected_clients)) {
 
-                city_checkbox    =   document.getElementById("checkbox_city_"+this.tout_cities[i].CityNo)
-                
-                if((city_checkbox)&&(city_checkbox.checked)) {
+                } 
 
-                    city                =   {}
+                else {
 
-                    city.CityNo         =   this.tout_cities[i].CityNo
-                    city.RegionNo       =   this.tout_cities[i].RegionNo
-                    city.CityNameE      =   this.tout_cities[i].CityNameE
-                    city.CityNoNameA    =   this.tout_cities[i].CityNoNameA
-                    city.areas          =   this.tout_cities[i].areas
-
-                    cities.push(city)
+                    this.route_import_cities[index].expected_clients    =   0
                 }
             }
-
-            this.cities   =   cities
         }
     }
 };

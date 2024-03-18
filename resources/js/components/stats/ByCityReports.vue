@@ -74,7 +74,7 @@
 
             <!-- Show Route Cities -->
             <div v-show="show_set_cities_content"   style="min-height : 255px"  id="set_cities_div" class="p-0 animate__animated animate__fadeInDown">
-                <SetCityMapExpected :key="cities"></SetCityMapExpected>
+                <SetCityMapExpected :key="route_import_cities"  :id_route_import="route_link"   :DistrictNo="DistrictNo"    :route_import_cities="route_import_cities"></SetCityMapExpected>
             </div>
             <!--  -->
 
@@ -127,18 +127,12 @@ import SetCityMapExpected   from    '../city/SetCityMapExpected.vue'
 
 export default {
 
-    components  : { 
-
-        Multiselect         :   Multiselect         ,
-        SetCityMapExpected  :   SetCityMapExpected
-    },
-
     data() {
         return {
 
             liste_route_link    :   [],
             liste_districts     :   [],
-            cities              :   [],
+            route_import_cities :   [],
 
             //
 
@@ -169,6 +163,12 @@ export default {
 
             show_set_cities_content     :   false
         }
+    },
+
+    components  : { 
+
+        Multiselect         :   Multiselect         ,
+        SetCityMapExpected  :   SetCityMapExpected
     },
 
     async mounted() {
@@ -309,7 +309,8 @@ export default {
                     await this.$callApi("post",     "/route_import/"+this.route_link+"/districts/"+this.DistrictNo+"/cities",      null)
                     .then(async (res)=> {
 
-                        console.log(res)
+                        //
+                        this.route_import_cities    =   res.data.route_import_cities
 
                         //
                         this.$hideLoadingPage()

@@ -942,14 +942,21 @@ class RouteImport extends Model
 
     //
 
-    public static function RouteImportCities(int $id_route_import, string $DistrictNo) {
+    public static function routeImportCities(int $id_route_import, string $DistrictNo) {
 
-        $cities     =   DB::table("route_import_cities")
-                            ->select("RTM_City.*", "route_import_cities.expected_clients", "route_import_cities.id_route_import")
-                            ->join("RTM_City", "route_import_cities.CityNo", "RTM_City.CityNo")
-                            ->where([["route_import_cities.id_route_import", $id_route_import], ["RTM_City.DistrictNo", $DistrictNo]])
-                            ->get();
+        $route_import_cities    =   DB::table("RTM_City")
+                                        ->select("RTM_City.*", "route_import_cities.expected_clients", "route_import_cities.id_route_import")
 
-        return $cities;
+                                        ->leftJoin('route_import_cities', function($join) use($id_route_import) {
+                                            $join->on('RTM_City.CityNo', '=', 'route_import_cities.CityNo')
+                                                ->where("route_import_cities.id_route_import", $id_route_import);
+                                        })
+
+                                        ->where("RTM_City.DistrictNo", $DistrictNo)
+                                        ->get();
+
+        return $route_import_cities;
     }
+
+    //
 }

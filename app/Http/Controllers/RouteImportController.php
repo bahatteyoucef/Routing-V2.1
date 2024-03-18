@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\RouteImport;
+use App\Models\RouteImportCity;
 use App\Models\RTMWillaya;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -636,16 +637,14 @@ class RouteImportController extends Controller
 
     //
 
-    public static function RouteImportCities(int $id_route_import, string $DistrictNo) {
+    public static function routeImportCities(int $id_route_import, string $DistrictNo) {
 
         try {
 
             $route_import_cities    =   RouteImport::RouteImportCities($id_route_import, $DistrictNo);
-            $cities                 =   DB::table("RTM_City")->where('DistrictNo', $DistrictNo)->orderByRaw('CAST(CityNo AS SIGNED INTEGER)')->get();
 
             return response()->json([
-                'route_import_cities'   =>  $route_import_cities,
-                'cities'                =>  $cities
+                'route_import_cities'   =>  $route_import_cities
             ],200);
         }
 
@@ -656,4 +655,6 @@ class RouteImportController extends Controller
             ],422);
         }
     }
+
+    //
 }

@@ -4,6 +4,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ClientTempoController;
 use App\Http\Controllers\JourneeController;
 use App\Http\Controllers\JourneyPlanController;
+use App\Http\Controllers\RouteImportCityController;
 use App\Http\Controllers\RouteImportController;
 use App\Http\Controllers\RouteImportTempoController;
 use App\Http\Controllers\StatisticController;
@@ -212,7 +213,9 @@ Route::middleware('auth:api')->group(function () {
 
     //
 
-    Route::post('/route_import/{id_route_import}/districts/{DistrictNo}/cities'                         ,   [RouteImportController::class           , 'RouteImportCities'                       ]);
+    Route::post('/route_import/{id_route_import}/districts/{DistrictNo}/cities'                         ,   [RouteImportController::class           , 'routeImportCities'                       ]);
+    
+    Route::post('/route_import/{id_route_import}/districts/{DistrictNo}/cities/set'                     ,   [RouteImportCityController::class       , 'setRouteImportCities'                    ]);
 
     //
 
