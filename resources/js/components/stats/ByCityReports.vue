@@ -96,21 +96,33 @@
             <div v-if="by_city_table"    class="table_scroll table_container mt-5">
                 <table class="table w-100" id="by_city_reports_table">
                     <tr>
-                        <th>CustomerType</th>
-                        <th>Clients</th>
-                        <th>Total</th>
+                        <th>Index</th>
+                        <th>City</th>
+                        <th>Expected</th>
+                        <th>Added</th>
+                        <th>Gap</th>
+                        <th>Percentage</th>
+                        <th>Status</th>
                     </tr>
 
                     <tr v-for="row, index_1 in by_city_table.rows" :key="index_1">
-                        <th>{{ row.label }}</th>
-                        <td>{{ row.count_clients }}</td>
-                        <th>{{ row.percentage_clients * 100 }} %</th>
+                        <td>{{ index_1 }}</td>
+                        <td>{{ row.CityNameE }}</td>
+                        <td>{{ row.expected_clients }}</td>
+                        <td>{{ row.added_clients }}</td>
+                        <td>{{ row.gap }}</td>
+                        <td>{{ row.percentage_clients * 100 }} %</td>
+                        <td>{{ row.status_clients }}</td>
                     </tr>
 
                     <tr>
-                        <th>{{ by_city_table.total_row.label }}</th>
-                        <th>{{ by_city_table.total_row.count_clients }}</th>
-                        <th>{{ by_city_table.total_row.percentage_clients * 100 }} %</th>
+                        <td>{{ by_city_table.total_row.label }}</td>
+                        <td></td>
+                        <td>{{ by_city_table.total_row.expected_clients }}</td>
+                        <td>{{ by_city_table.total_row.added_clients }}</td>
+                        <td>{{ by_city_table.total_row.gap }}</td>
+                        <td>{{ by_city_table.total_row.percentage_clients * 100 }} %</td>
+                        <td>{{ by_city_table.total_row.status_clients }}</td>
                     </tr>
                 </table>
             </div>
@@ -186,36 +198,41 @@ export default {
 
             try {
 
-                this.$showLoadingPage()
+                if((this.start_date  !=  "")&&(this.end_date  !=  "")) {
 
-                let formData    =   new FormData()
+                    this.$showLoadingPage()
 
-                formData.append("route_links"   , JSON.stringify(this.route_links))
-                formData.append("start_date"    , this.start_date)
-                formData.append("end_date"      , this.end_date)
+                    let formData    =   new FormData()
 
-                await this.$callApi("post",     "/statistics/by_city_reports",   formData)
-                .then(async (res)=> {
+                    formData.append("route_link"    , this.route_link)
+                    formData.append("DistrictNo"    , this.DistrictNo)
 
-                    console.log(res)
+                    formData.append("start_date"    , this.start_date)
+                    formData.append("end_date"      , this.end_date)
 
-                    //
-                    this.by_city_reports_data.labels       =   res.data.by_city_reports.labels;
-                    this.by_city_reports_data.datasets     =   res.data.by_city_reports.datasets;
-                    this.by_city_table                     =   res.data.by_city_reports.by_city_table;
+                    await this.$callApi("post",     "/statistics/by_city_reports",   formData)
+                    .then(async (res)=> {
 
-                    //
-                    this.show_by_city_chart                =   true
+                        console.log(res)
 
-                    //
-                    await this.$nextTick()
+                        //
+                        // this.by_city_reports_data.labels       =   res.data.by_city_reports.labels;
+                        // this.by_city_reports_data.datasets     =   res.data.by_city_reports.datasets;
+                        this.by_city_table                      =   res.data.by_city_table;
 
-                    //
-                    this.setChart();
+                        //
+                        // this.show_by_city_chart                =   true
 
-                    //
-                    this.$hideLoadingPage()
-                })
+                        //
+                        // await this.$nextTick()
+
+                        //
+                        // this.setChart();
+
+                        //
+                        this.$hideLoadingPage()
+                    })
+                }
             }
 
             catch(e) {

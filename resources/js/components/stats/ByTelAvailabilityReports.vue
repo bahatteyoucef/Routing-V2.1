@@ -164,36 +164,39 @@ export default {
 
             try {
 
-                this.$showLoadingPage()
+                if((this.start_date  !=  "")&&(this.end_date  !=  "")) {
 
-                let formData    =   new FormData()
+                    this.$showLoadingPage()
 
-                formData.append("route_links"   , JSON.stringify(this.route_links))
-                formData.append("start_date"    , this.start_date)
-                formData.append("end_date"      , this.end_date)
+                    let formData    =   new FormData()
 
-                await this.$callApi("post",     "/statistics/by_tel_availability_reports",   formData)
-                .then(async (res)=> {
+                    formData.append("route_links"   , JSON.stringify(this.route_links))
+                    formData.append("start_date"    , this.start_date)
+                    formData.append("end_date"      , this.end_date)
 
-                    console.log(res)
+                    await this.$callApi("post",     "/statistics/by_tel_availability_reports",   formData)
+                    .then(async (res)=> {
 
-                    //
-                    this.by_tel_availability_reports_data.labels       =   res.data.by_tel_availability_reports.labels;
-                    this.by_tel_availability_reports_data.datasets     =   res.data.by_tel_availability_reports.datasets;
-                    this.by_tel_availability_table                     =   res.data.by_tel_availability_reports.by_tel_availability_table;
+                        console.log(res)
 
-                    //
-                    this.show_by_tel_availability_chart                =   true
+                        //
+                        this.by_tel_availability_reports_data.labels       =   res.data.by_tel_availability_reports.labels;
+                        this.by_tel_availability_reports_data.datasets     =   res.data.by_tel_availability_reports.datasets;
+                        this.by_tel_availability_table                     =   res.data.by_tel_availability_reports.by_tel_availability_table;
 
-                    //
-                    await this.$nextTick()
+                        //
+                        this.show_by_tel_availability_chart                =   true
 
-                    //
-                    this.setChart();
+                        //
+                        await this.$nextTick()
 
-                    //
-                    this.$hideLoadingPage()
-                })
+                        //
+                        this.setChart();
+
+                        //
+                        this.$hideLoadingPage()
+                    })
+                }
             }
 
             catch(e) {

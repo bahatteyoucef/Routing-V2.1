@@ -40,6 +40,16 @@ class Client extends Model
 
     public static function storeClients(Request $request, int $id_route_import) {
 
+        //
+        $start_adding_date      =   Carbon::now();
+        $finish_adding_date     =   Carbon::now();
+
+        $adding_duration        =   $start_adding_date->diff($finish_adding_date);
+
+        $start_adding_time      =   $start_adding_date->format('H:i:s');
+        $adding_duration        =   $adding_duration->format('%H:%I:%S');
+        //
+
         $clients    =   json_decode($request->get("data"));
 
         foreach ($clients as $client_elem) {
@@ -64,6 +74,10 @@ class Client extends Model
                 'Landmark'              =>  $client_elem->Landmark                  ,
                 'BrandAvailability'     =>  $client_elem->BrandAvailability         ,
                 'BrandSourcePurchase'   =>  $client_elem->BrandSourcePurchase       ,
+
+                'start_adding_time'     =>  $start_adding_time                      ,
+                'adding_duration'       =>  $adding_duration                        ,
+                'comment'               =>  ""                                      ,
 
                 'id_route_import'       =>  $id_route_import                        ,
                 'status'                =>  "nonvalidated"                          ,
@@ -167,7 +181,18 @@ class Client extends Model
     }
 
     public static function storeClient(Request $request, int $id_route_import) {
+        
+        //
+        $start_adding_date      =   Carbon::parse($request->get("start_adding_date"));
+        $finish_adding_date     =   Carbon::parse($request->get("finish_adding_date"));
 
+        $adding_duration        =   $start_adding_date->diff($finish_adding_date);
+
+        $start_adding_time      =   $start_adding_date->format('H:i:s');
+        $adding_duration        =   $adding_duration->format('%H:%I:%S');
+        //
+
+        //
         $client     =   new Client([
             'CustomerCode'                  =>  $request->input("CustomerCode")                 ,
             'CustomerNameE'                 =>  $request->input("CustomerNameE")                ,
@@ -186,6 +211,10 @@ class Client extends Model
             'Landmark'                      =>  $request->input("Landmark")                     ,
             'BrandAvailability'             =>  $request->input("BrandAvailability")            ,
             'BrandSourcePurchase'           =>  $request->input("BrandSourcePurchase")          ,
+
+            'start_adding_time'             =>  $start_adding_time                              ,
+            'adding_duration'               =>  $adding_duration                                ,
+            'comment'                       =>  $request->input("comment")                      ,
 
             'id_route_import'               =>  $id_route_import                                ,  
 

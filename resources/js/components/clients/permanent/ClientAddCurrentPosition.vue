@@ -193,6 +193,11 @@
                             <img                                                        id="in_store_image_display"     src=""                          class="w-100">
                         </div>
 
+                        <div class="mb-3 mySlides slide_20">
+                            <label      for="comment">Comment</label>
+                            <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"></textarea>
+                        </div>
+
                     </div>
 
                 </form>
@@ -208,7 +213,7 @@
                     </div>
 
                     <div class="col-6 mt-3">
-                        <button v-if="slideIndex    <   19"     type="button" class="btn btn-primary w-100"     @click="plusSlides(1)">Next</button>
+                        <button v-if="slideIndex    <   total_questions"     type="button" class="btn btn-primary w-100"     @click="plusSlides(1)">Next</button>
                     </div>
                 </div>
             </div>
@@ -216,7 +221,7 @@
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col mt-3">
-                        <button v-if="slideIndex  ==  19"       type="button" class="btn btn-primary w-100"     @click="sendData()">Confirm</button>
+                        <button v-if="slideIndex  ==  total_questions"       type="button" class="btn btn-primary w-100"     @click="sendData()">Confirm</button>
                     </div>
                 </div>
             </div>
@@ -230,6 +235,9 @@
 <script>
 
 import {mapGetters, mapActions} from    "vuex"
+
+import moment                   from    "moment"
+import "moment-timezone"
 
 export default {
 
@@ -283,7 +291,10 @@ export default {
 
                 // Status
                 status                  :   '',
-                nonvalidated_details    :   ''
+                nonvalidated_details    :   '', 
+
+                // Comment
+                comment                 :   ''
             },
 
             willayas                :   [],
@@ -311,7 +322,15 @@ export default {
 
             //
 
-            slideIndex                      :   1
+            slideIndex                      :   1       ,
+
+            //
+
+            total_questions                 :   20      ,
+
+            //
+
+            start_adding_date               :   ""
         }
     },
 
@@ -373,25 +392,25 @@ export default {
 
             let formData = new FormData();
 
-            formData.append("CustomerCode"  ,   this.client.CustomerCode)
-            formData.append("CustomerNameE" ,   this.client.CustomerNameE)
-            formData.append("CustomerNameA" ,   this.client.CustomerNameA)
-            formData.append("Latitude"      ,   this.client.Latitude)
-            formData.append("Longitude"     ,   this.client.Longitude)
-            formData.append("Address"       ,   this.client.Address)
-            formData.append("Neighborhood"  ,   this.client.Neighborhood)
-            formData.append("Landmark"      ,   this.client.Landmark)
-            formData.append("DistrictNo"    ,   this.client.DistrictNo)
-            formData.append("DistrictNameE" ,   this.client.DistrictNameE)
-            formData.append("CityNo"        ,   this.client.CityNo)
-            formData.append("CityNameE"     ,   this.client.CityNameE)
-            formData.append("Tel"           ,   this.client.Tel)
-            formData.append("CustomerType"  ,   this.client.CustomerType)
-            formData.append("BrandAvailability"     ,   this.client.BrandAvailability)
-            formData.append("BrandSourcePurchase"   ,   this.client.BrandSourcePurchase)
+            formData.append("CustomerCode"                          ,   this.client.CustomerCode)
+            formData.append("CustomerNameE"                         ,   this.client.CustomerNameE)
+            formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
+            formData.append("Latitude"                              ,   this.client.Latitude)
+            formData.append("Longitude"                             ,   this.client.Longitude)
+            formData.append("Address"                               ,   this.client.Address)
+            formData.append("Neighborhood"                          ,   this.client.Neighborhood)
+            formData.append("Landmark"                              ,   this.client.Landmark)
+            formData.append("DistrictNo"                            ,   this.client.DistrictNo)
+            formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
+            formData.append("CityNo"                                ,   this.client.CityNo)
+            formData.append("CityNameE"                             ,   this.client.CityNameE)
+            formData.append("Tel"                                   ,   this.client.Tel)
+            formData.append("CustomerType"                          ,   this.client.CustomerType)
+            formData.append("BrandAvailability"                     ,   this.client.BrandAvailability)
+            formData.append("BrandSourcePurchase"                   ,   this.client.BrandSourcePurchase)
 
-            formData.append("JPlan"         ,   this.client.JPlan)
-            formData.append("Journee"       ,   this.client.Journee)
+            formData.append("JPlan"                                 ,   this.client.JPlan)
+            formData.append("Journee"                               ,   this.client.Journee)
 
             formData.append("CustomerBarCode_image"                 ,   this.client.CustomerBarCode_image)
             formData.append("facade_image"                          ,   this.client.facade_image)
@@ -401,8 +420,13 @@ export default {
             formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
             formData.append("in_store_image_original_name"          ,   this.client.in_store_image_original_name)
 
-            formData.append("status"                ,   this.client.status)
-            formData.append("nonvalidated_details"  ,   this.client.nonvalidated_details)
+            formData.append("status"                                ,   this.client.status)
+            formData.append("nonvalidated_details"                  ,   this.client.nonvalidated_details)
+
+            formData.append("comment"                               ,   this.client.comment)
+
+            formData.append("start_adding_date"                     ,   this.start_adding_date)
+            formData.append("finish_adding_date"                    ,   moment(new Date()).format())
 
             if(this.$connectedToInternet) {
 
@@ -479,6 +503,9 @@ export default {
         //
 
         async getData() {
+
+            // Set Start Added
+            this.start_adding_date  =   moment(new Date()).format()
 
             if(this.$connectedToInternet) {
 

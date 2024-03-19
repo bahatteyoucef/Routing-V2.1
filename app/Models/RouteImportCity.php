@@ -25,7 +25,7 @@ class RouteImportCity extends Model
 
         foreach ($route_import_cities as $route_import_city) {
 
-            $route_import_city_elem     =   RouteImportCity::where([["CityNo", $route_import_city->CITYNO], ["id_route_import", $id_route_import]])->first();
+            $route_import_city_elem     =   RouteImportCity::where([["CityNo", $route_import_city->CITYNO], ["DistrictNo", $DistrictNo], ["id_route_import", $id_route_import]])->first();
 
             if($route_import_city_elem) {
 
@@ -38,6 +38,7 @@ class RouteImportCity extends Model
 
                 $route_import_city_elem    =   new RouteImportCity([
                     'id_route_import'       =>  $id_route_import                        ,
+                    'DistrictNo'            =>  $DistrictNo                             ,
                     'CityNo'                =>  $route_import_city->CITYNO              ,
                     'expected_clients'      =>  $route_import_city->expected_clients                  
                 ]);

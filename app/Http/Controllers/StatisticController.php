@@ -119,4 +119,48 @@ class StatisticController extends Controller
             ],422);
         }
     }
+
+    public static function byCityReports(Request $request) {
+
+        try {
+
+            //
+            $by_city_table    =   Statistic::byCityReports($request);
+
+            //
+            return response()->json([
+
+                "by_city_table"   =>  $by_city_table
+            ]);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    public static function dataCensusReports(Request $request) {
+
+        try {
+
+            //
+            $data_census_table  =   Statistic::dataCensusReports($request);
+
+            //
+            return response()->json([
+
+                "data_census_table"     =>  $data_census_table
+            ]);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
 }

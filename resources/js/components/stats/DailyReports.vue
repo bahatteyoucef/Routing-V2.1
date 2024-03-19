@@ -151,36 +151,39 @@ export default {
 
             try {
 
-                this.$showLoadingPage()
+                if((this.start_date  !=  "")&&(this.end_date  !=  "")) {
 
-                let formData    =   new FormData()
+                    this.$showLoadingPage()
 
-                formData.append("route_links"   , JSON.stringify(this.route_links))
-                formData.append("start_date"    , this.start_date)
-                formData.append("end_date"      , this.end_date)
+                    let formData    =   new FormData()
 
-                await this.$callApi("post",     "/statistics/daily_reports",   formData)
-                .then(async (res)=> {
+                    formData.append("route_links"   , JSON.stringify(this.route_links))
+                    formData.append("start_date"    , this.start_date)
+                    formData.append("end_date"      , this.end_date)
 
-                    console.log(res)
+                    await this.$callApi("post",     "/statistics/daily_reports",   formData)
+                    .then(async (res)=> {
 
-                    //
-                    this.daily_reports_data.labels          =   res.data.daily_reports.labels;
-                    this.daily_reports_data.datasets        =   res.data.daily_reports.datasets;
-                    this.total_by_day_object                =   res.data.daily_reports.total_by_day_object;
+                        console.log(res)
 
-                    //
-                    this.show_daily_reports_chart           =   true
+                        //
+                        this.daily_reports_data.labels          =   res.data.daily_reports.labels;
+                        this.daily_reports_data.datasets        =   res.data.daily_reports.datasets;
+                        this.total_by_day_object                =   res.data.daily_reports.total_by_day_object;
 
-                    //
-                    await this.$nextTick()
+                        //
+                        this.show_daily_reports_chart           =   true
 
-                    //
-                    this.setChart();
+                        //
+                        await this.$nextTick()
 
-                    //
-                    this.$hideLoadingPage()
-                })
+                        //
+                        this.setChart();
+
+                        //
+                        this.$hideLoadingPage()
+                    })
+                }
             }
 
             catch(e) {

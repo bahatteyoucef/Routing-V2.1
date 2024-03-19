@@ -40,6 +40,8 @@
         "jquery": "^3.6.2",
         "jszip": "^3.10.1",
         "mitt": "^3.0.0",
+        "moment": "^2.30.1",
+        "moment-timezone": "^0.5.45",
         "simple-line-icons": "^2.5.5",
         "ti-icons": "^0.1.2",
         "vue": "^3.2.36",

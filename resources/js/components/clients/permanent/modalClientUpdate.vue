@@ -204,6 +204,13 @@
 
                         <!--  -->
 
+                        <div class="mb-3">
+                            <label      for="comment">Comment</label>
+                            <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"></textarea>
+                        </div>
+
+                        <!--  -->
+
                         <hr />
 
                         <h5>Nearby Clients</h5>
@@ -307,7 +314,10 @@ export default {
                 // 
                 status                  :   '',
                 status_original         :   '',
-                nonvalidated_details    :   ''
+                nonvalidated_details    :   '', 
+
+                // Comment
+                comment                 :   ''
             },
 
             willayas                        :   []  ,
@@ -390,6 +400,8 @@ export default {
 
             formData.append("status"                        ,   this.client.status)
             formData.append("nonvalidated_details"          ,   this.client.nonvalidated_details)
+
+            formData.append("comment"                       ,   this.client.comment)
 
             const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/update",   formData)
 

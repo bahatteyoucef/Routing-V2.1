@@ -193,6 +193,11 @@
                             <img                                                        id="in_store_image_display"     src=""              class="w-100">
                         </div>
 
+                        <div class="mb-3 mySlides slide_21">
+                            <label      for="comment">Comment</label>
+                            <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"></textarea>
+                        </div>
+
                     </div>
 
                 </form>
@@ -206,7 +211,7 @@
                     </div>
 
                     <div class="col-6 mt-3">
-                        <button v-if="slideIndex    <   20"     type="button" class="btn btn-primary w-100"     @click="plusSlides(1)">Next</button>
+                        <button v-if="slideIndex    <   total_questions"     type="button" class="btn btn-primary w-100"     @click="plusSlides(1)">Next</button>
                     </div>
                 </div>
             </div>
@@ -214,7 +219,7 @@
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col mt-3">
-                        <button v-if="slideIndex  ==  20"       type="button" class="btn btn-primary w-100"     @click="sendData()">Confirm</button>
+                        <button v-if="slideIndex  ==  total_questions"       type="button" class="btn btn-primary w-100"     @click="sendData()">Confirm</button>
                     </div>
                 </div>
             </div>
@@ -228,6 +233,9 @@
 <script>
 
 import {mapGetters, mapActions} from    "vuex"
+
+import moment                   from    "moment"
+import "moment-timezone"
 
 export default {
 
@@ -281,7 +289,10 @@ export default {
 
                 // Status
                 status                  :   '',
-                nonvalidated_details    :   ''
+                nonvalidated_details    :   '', 
+
+                // Comment
+                comment                 :   ''
             },
 
             willayas                        :   [],
@@ -309,7 +320,15 @@ export default {
 
             //
 
-            slideIndex                      :   1
+            slideIndex                      :   1       ,
+
+            //
+
+            total_questions                 :   21      ,
+
+            //
+
+            start_adding_date               :   ""
         }
     },
 
@@ -397,8 +416,13 @@ export default {
             formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
             formData.append("in_store_image_original_name"          ,   this.client.in_store_image_original_name)
 
-            formData.append("status"                ,   this.client.status)
-            formData.append("nonvalidated_details"  ,   this.client.nonvalidated_details)
+            formData.append("status"                                ,   this.client.status)
+            formData.append("nonvalidated_details"                  ,   this.client.nonvalidated_details)
+
+            formData.append("comment"                               ,   this.client.comment)
+
+            formData.append("start_adding_date"                     ,   this.start_adding_date)
+            formData.append("finish_adding_date"                    ,   moment(new Date()).format())
 
             if(this.$connectedToInternet) {
 
@@ -475,6 +499,11 @@ export default {
         //
 
         async getData() {
+
+            // Set Start Added
+            this.start_adding_date  =   moment(new Date()).format()
+
+            //
 
             let client          =   { lat : 0, lng : 0 }
 

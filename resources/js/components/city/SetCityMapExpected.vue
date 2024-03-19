@@ -18,15 +18,15 @@
             <div class="mb-2">
 
                 <div class="row">
-                    <div class="col-3 p-0" v-for="(city,index) in route_import_cities" :key="index">
+                    <div class="col-2 p-0" v-for="(city,index) in route_import_cities" :key="index">
                         <div class="p-1 m-1">
                             <div class="p-3">
                                 <div class="row">
-                                    <div class="col-4 d-flex align-items-center">
+                                    <div class="col-6 d-flex align-items-center">
                                         {{ city.CityNameE }}
                                     </div>
 
-                                    <div class="col-8">
+                                    <div class="col-6">
                                         <input :class="'form-control expected_clients_'+id_route_import+'_'+city.CityNo" v-model="city.expected_clients"/>
                                     </div>
                                 </div>                                

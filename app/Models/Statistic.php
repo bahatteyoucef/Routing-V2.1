@@ -558,4 +558,140 @@ class Statistic extends Model
         //
         return $by_brand_availability_reports;
     }
+
+    //
+
+    public static function byCityReports(Request $request) {
+
+        //
+        $total_expected_clients     =   0;
+        $total_added_clients        =   0;
+        //
+
+        //
+        $startDate      =   Carbon::parse($request->get("start_date")); // Replace with your start date
+        $endDate        =   Carbon::parse($request->get("end_date"));   // Replace with your end date
+        //
+
+        //
+        $cities        =   DB::table("route_import_cities")
+                                        ->select("route_import_cities.*", "RTM_City.CityNameE")
+                                        ->join("RTM_City", "route_import_cities.CityNo", "RTM_City.CITYNO")
+                                        ->where([["route_import_cities.DistrictNo", $request->get("DistrictNo")], ["route_import_cities.id_route_import", $request->get("route_link")]])
+                                        ->get();
+
+        //
+        foreach ($cities as $city) {
+
+            $city->added_clients        =   DB::table("clients")
+                                                ->select("clients.*")
+                                                ->where("clients.id_route_import", $request->get("route_link"))
+                                                ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                                ->count();
+
+            //
+            $city->gap                  =   $city->expected_clients -   $city->added_clients;
+
+            //
+            if($city->expected_clients  ==  0) {
+
+                $city->percentage_clients   =   1;
+            } 
+
+            else {
+
+                $city->percentage_clients   =   $city->added_clients / $city->expected_clients;
+            }
+
+            //
+            if($city->percentage_clients    ==  0) {
+
+                $city->status_clients       =   "Not Started";
+            }
+
+            if(($city->percentage_clients    >  0)&&(($city->percentage_clients    <  1))) {
+
+                $city->status_clients       =   "In Progress";
+            }
+
+            if($city->percentage_clients    >=  1) {
+
+                $city->status_clients       =   "Done";
+            }
+
+            //
+            $total_expected_clients         =   $total_expected_clients +   $city->expected_clients;
+            $total_added_clients            =   $total_added_clients    +   $city->added_clients;
+        }
+
+        $by_city_table                                      =   new stdClass();
+
+        $by_city_table->rows                                =   $cities;
+
+        $by_city_table->total_row                           =   new stdClass();
+        $by_city_table->total_row->label                    =   "Total";
+        $by_city_table->total_row->expected_clients         =   $total_expected_clients;
+        $by_city_table->total_row->added_clients            =   $total_added_clients;
+        $by_city_table->total_row->gap                      =   $by_city_table->total_row->expected_clients     -   $by_city_table->total_row->added_clients;
+
+        if($by_city_table->total_row->expected_clients  ==  0) {
+
+            $by_city_table->total_row->percentage_clients       =   1;
+        }
+
+        else {
+
+            $by_city_table->total_row->percentage_clients       =   $by_city_table->total_row->added_clients / $by_city_table->total_row->expected_clients;
+        }
+
+        //
+        if($by_city_table->total_row->percentage_clients    ==  0) {
+
+            $by_city_table->total_row->status_clients       =   "Not Started";
+        }
+
+        if(($by_city_table->total_row->percentage_clients    >  0)&&(($by_city_table->total_row->percentage_clients    <  1))) {
+
+            $by_city_table->total_row->status_clients       =   "In Progress";
+        }
+
+        if($by_city_table->total_row->percentage_clients    >=  1) {
+
+            $by_city_table->total_row->status_clients       =   "Done";
+        }
+
+        //
+        return $by_city_table;
+    }
+
+    //
+
+    public static function dataCensusReports(Request $request) {
+
+        //
+        $route_links    =   json_decode($request->get("route_links"));
+        //
+
+        //
+        $startDate      =   Carbon::parse($request->get("start_date")); // Replace with your start date
+        $endDate        =   Carbon::parse($request->get("end_date"));   // Replace with your end date
+        //
+
+        //
+        $clients        =   DB::table("clients")
+                                ->select("clients.*", "users.nom as OwnerName")
+                                ->join("users", "clients.owner", "users.id")
+                                ->whereIn('clients.id_route_import', $route_links)
+                                ->whereBetween(DB::raw('STR_TO_DATE(clients.created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                ->get();
+        //
+
+        //
+        $data_census_table          =   new stdClass();
+
+        $data_census_table->rows    =   $clients;
+
+        //
+        return $data_census_table;
+    }
 }

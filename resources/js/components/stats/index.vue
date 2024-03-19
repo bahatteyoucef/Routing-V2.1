@@ -4,6 +4,20 @@
 
     <ul class="list-group" id="reports">
 
+      <!-- Data Census Reports      -->
+      <li class="list-group-item p-0" id="data_census_reports_div">
+
+        <div id="data_census_reports_header" class="p-3" :class="{ 'primary': show_data_census_reports_content }" @click="showHideDataCensusReports()" role="button">
+          <h4 class="mb-0">Data Census Reports</h4>
+        </div>
+
+        <div v-show="show_data_census_reports_content" id="data_census_reports_content" class="reports_li animate__animated animate__fadeInDown">
+          <DataCensusReports></DataCensusReports>
+        </div>
+
+      </li>
+      <!--  -->
+
       <!-- Daily Reports            -->
       <li class="list-group-item p-0" id="daily_reports_div">
 
@@ -95,6 +109,7 @@
 
 <script>
 
+import DataCensusReports              from  "./DataCensusReports.vue"
 import DailyReports                   from  "./DailyReports.vue"
 import ByTelAvailabilityReports       from  "./ByTelAvailabilityReports.vue"
 import ByCityReports                  from  "./ByCityReports.vue"
@@ -108,6 +123,7 @@ export default {
 
     return {
 
+      show_data_census_reports_content            : false ,
       show_daily_reports_content                  : false ,
       show_by_tel_availability_reports_content    : false ,
       show_by_city_reports_content                : false ,
@@ -119,6 +135,7 @@ export default {
 
   components : {
 
+    DataCensusReports           : DataCensusReports           ,
     DailyReports                : DailyReports                ,
     ByTelAvailabilityReports    : ByTelAvailabilityReports    ,
     ByCityReports               : ByCityReports               ,
@@ -128,6 +145,11 @@ export default {
   },
 
   methods : {
+
+    showHideDataCensusReports() {
+
+      this.show_data_census_reports_content   =   !this.show_data_census_reports_content
+    },
 
     showHideDailyReports() {
 
