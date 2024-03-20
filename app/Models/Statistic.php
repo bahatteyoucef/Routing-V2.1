@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PhpParser\Node\Stmt\Static_;
 use stdClass;
 
 class Statistic extends Model
@@ -564,6 +565,67 @@ class Statistic extends Model
     public static function byCityReports(Request $request) {
 
         //
+        $startDate      =   Carbon::parse($request->get("start_date")); // Replace with your start date
+        $endDate        =   Carbon::parse($request->get("end_date"));   // Replace with your end date
+        //
+
+        //
+        $cities         =   DB::table("route_import_cities")
+                                ->select("route_import_cities.*", "RTM_City.CityNameE")
+                                ->join("RTM_City", "route_import_cities.CityNo", "RTM_City.CITYNO")
+                                ->where([["route_import_cities.DistrictNo", $request->get("DistrictNo")], ["route_import_cities.id_route_import", $request->get("route_link")]])
+                                ->get();
+        //
+
+        //
+        $datasets                   =   [];
+
+        $dataset_expected           =   new stdClass();
+        $dataset_expected->label    =   "Expected";
+        $dataset_expected->data     =   [];
+
+        $dataset_added              =   new stdClass();
+        $dataset_added->label       =   "Added";
+        $dataset_added->data        =   [];
+        //
+
+        //
+        foreach ($cities as $city) {
+
+            $city->added_clients        =   DB::table("clients")
+                                                ->select("clients.*")
+                                                ->where([["clients.id_route_import", $request->get("route_link")], ["clients.CityNo", $city->CityNo]])
+                                                ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                                ->count();
+
+            //
+            array_push($dataset_expected->data  , $city->expected_clients);
+            array_push($dataset_added->data     , $city->added_clients);
+            //
+        }
+        //
+
+        //
+        array_push($datasets, $dataset_expected);
+        array_push($datasets, $dataset_added);
+        //
+
+
+        //
+        $by_city_reports                    =   new stdClass();
+
+        $by_city_reports->labels            =   $cities->pluck('CityNameE');
+        $by_city_reports->datasets          =   $datasets;
+        $by_city_reports->by_city_table     =   Statistic::byCityTable($request);
+        //
+
+        //
+        return $by_city_reports;
+    }
+
+    public static function byCityTable(Request $request) {
+
+        //
         $total_expected_clients     =   0;
         $total_added_clients        =   0;
         //
@@ -666,7 +728,7 @@ class Statistic extends Model
         $by_city_reports->by_city_table =   $by_city_table;
 
         //
-        return $by_city_reports;
+        return $by_city_table;
     }
 
     //

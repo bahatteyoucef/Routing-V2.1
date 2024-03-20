@@ -205,19 +205,19 @@ export default {
             const daily_reports_chart   =   this.$refs.daily_reports_chart.getContext('2d');
 
             this.daily_reports_chart    =   new Chart(daily_reports_chart, {
-                type                    :   "bar"                   ,
-                data                    :   this.daily_reports_data    ,
+                type                    :   "bar"                       ,
+                data                    :   this.daily_reports_data     ,
                 options                 :   this.daily_reports_options
             });
 
             //
 
             const bar_chart_container       =   document.querySelector(".bar_chart_container")
-            const totalLabels           =   this.daily_reports_chart.data.labels.length
+            const totalLabels               =   this.daily_reports_chart.data.labels.length
 
             if(totalLabels  >  5) {
 
-                const newWidth                  =   700 + ((totalLabels - 7) * 90)
+                const newWidth                      =   700 + ((totalLabels - 7) * 90)
                 bar_chart_container.style.width     =   newWidth+"px"
             }
         },

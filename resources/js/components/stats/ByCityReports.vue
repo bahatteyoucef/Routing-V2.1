@@ -1,136 +1,137 @@
 <template>
 
     <div class="m-3 p-3">
-        <div>
-            <!-- Chart Filters -->
-            <div class="row chart_filters" id="by_city_chart_filters">
 
-                <!-- Select Map         -->
-                <div class="col-2 map_filter">
-                    <Multiselect
-                        v-model             =   "route_link"
-                        :options            =   "liste_route_link"
-                        mode                =   "single" 
-                        placeholder         =   "Select Map"
-                        class               =   "mt-1"
+        <!-- Chart Filters -->
+        <div class="row chart_filters" id="by_city_chart_filters">
 
-                        :close-on-select    =   "false"
-                        :searchable         =   "true"
-                        :create-option      =   "false"
+            <!-- Select Map         -->
+            <div class="col-2 map_filter">
+                <Multiselect
+                    v-model             =   "route_link"
+                    :options            =   "liste_route_link"
+                    mode                =   "single" 
+                    placeholder         =   "Select Map"
+                    class               =   "mt-1"
 
-                        :canDeselect        =   "true"
-                        :canClear           =   "true"
-                        :allowAbsent        =   "true"
-                    />
-                </div>
-                <!--  -->
+                    :close-on-select    =   "false"
+                    :searchable         =   "true"
+                    :create-option      =   "false"
 
-                <!-- Select District    -->
-                <div class="col-2 district_filter">
-                    <Multiselect
-                        v-model             =   "DistrictNo"
-                        :options            =   "liste_districts"
-                        mode                =   "single" 
-                        placeholder         =   "Select District"
-                        class               =   "mt-1"
-
-                        :close-on-select    =   "false"
-                        :searchable         =   "true"
-                        :create-option      =   "false"
-
-                        :canDeselect        =   "true"
-                        :canClear           =   "true"
-                        :allowAbsent        =   "true"
-                    />
-                </div>
-                <!--  -->
-
-                <!-- Select Date Range  -->
-                <div class="col-2 mt-1">
-                    <input type="date" class="form-control" v-model="start_date"/>
-                </div>
-                <!--  -->
-
-                <!-- Select Date Range  -->
-                <div class="col-2 mt-1">
-                    <input type="date" class="form-control" v-model="end_date"/>
-                </div>
-                <!--  -->
-
-                <!-- Get Data           -->
-                <div class="col-2 mt-1">
-                    <button class="btn primary w-100"   @click="getData()">Get Data</button>
-                </div>
-                <!--  -->
-
-                <!-- Set Cities         -->
-                <div class="col-2 mt-1 pl-3">
-                    <button class="btn primary w-100" @click="showCities()">Show Cities</button>
-                </div>
-                <!--  -->
-                
+                    :canDeselect        =   "true"
+                    :canClear           =   "true"
+                    :allowAbsent        =   "true"
+                />
             </div>
             <!--  -->
 
-            <!-- Show Route Cities -->
-            <div v-show="show_set_cities_content"   style="min-height : 255px"  id="set_cities_div" class="p-0 animate__animated animate__fadeInDown">
-                <SetCityMapExpected :key="route_import_cities"  :id_route_import="route_link"   :DistrictNo="DistrictNo"    :route_import_cities="route_import_cities"></SetCityMapExpected>
+            <!-- Select District    -->
+            <div class="col-2 district_filter">
+                <Multiselect
+                    v-model             =   "DistrictNo"
+                    :options            =   "liste_districts"
+                    mode                =   "single" 
+                    placeholder         =   "Select District"
+                    class               =   "mt-1"
+
+                    :close-on-select    =   "false"
+                    :searchable         =   "true"
+                    :create-option      =   "false"
+
+                    :canDeselect        =   "true"
+                    :canClear           =   "true"
+                    :allowAbsent        =   "true"
+                />
             </div>
             <!--  -->
 
-            <!-- Show Chart             -->
-            <!-- <div class="row">
+            <!-- Select Date Range  -->
+            <div class="col-2 mt-1">
+                <input type="date" class="form-control" v-model="start_date"/>
+            </div>
+            <!--  -->
 
-                <div class="col-6">
-                    <div v-if="show_by_city_chart"        id="by_city_reports_container"    class="pt-5 pb-1">
-                        <div class="pie_chart_container">
-                            <canvas id="by_city_chart"    ref="by_city_chart"></canvas>
-                        </div>
+            <!-- Select Date Range  -->
+            <div class="col-2 mt-1">
+                <input type="date" class="form-control" v-model="end_date"/>
+            </div>
+            <!--  -->
+
+            <!-- Get Data           -->
+            <div class="col-2 mt-1">
+                <button class="btn primary w-100"   @click="getData()">Get Data</button>
+            </div>
+            <!--  -->
+
+            <!-- Set Cities         -->
+            <div class="col-2 mt-1 pl-3">
+                <button class="btn primary w-100" @click="showCities()">Show Cities</button>
+            </div>
+            <!--  -->
+            
+        </div>
+        <!--  -->
+
+        <!-- Show Route Cities -->
+        <div v-show="show_set_cities_content"   style="min-height : 255px"  id="set_cities_div" class="p-0 animate__animated animate__fadeInDown">
+            <SetCityMapExpected :key="route_import_cities"  :id_route_import="route_link"   :DistrictNo="DistrictNo"    :route_import_cities="route_import_cities"></SetCityMapExpected>
+        </div>
+        <!--  -->
+
+        <!-- Show Chart             -->
+        <div class="row">
+
+            <!-- By City Reports  -->
+            <div class="col-12">
+                <div v-if="show_by_city_reports_chart"        id="by_city_reports_container"    class="chart_scroll pt-5 pb-1">
+                    <div class="bar_chart_container">
+                        <canvas id="by_city_reports_chart"    ref="by_city_reports_chart"></canvas>
                     </div>
                 </div>
-
-            </div> -->
-            <!--  -->
-
-            <!-- Show Table             -->
-            <div v-if="by_city_table"    class="table_scroll table_scroll_x table_scroll_y table_container table_container mt-5">
-                <table class="table table-bordered w-100" id="by_city_reports_table">
-                    <thead>
-                        <tr>
-                            <th>Index</th>
-                            <th>City</th>
-                            <th>Expected</th>
-                            <th>Added</th>
-                            <th>Gap</th>
-                            <th>Percentage</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr v-for="row, index_1 in by_city_table.rows" :key="index_1">
-                            <td>{{ index_1 }}</td>
-                            <td>{{ row.CityNameE }}</td>
-                            <td>{{ row.expected_clients }}</td>
-                            <td>{{ row.added_clients }}</td>
-                            <td>{{ row.gap }}</td>
-                            <td>{{ row.percentage_clients * 100 }} %</td>
-                            <td>{{ row.status_clients }}</td>
-                        </tr>
-
-                        <tr>
-                            <th>{{ by_city_table.total_row.label }}</th>
-                            <th></th>
-                            <th>{{ by_city_table.total_row.expected_clients }}</th>
-                            <th>{{ by_city_table.total_row.added_clients }}</th>
-                            <th>{{ by_city_table.total_row.gap }}</th>
-                            <th>{{ by_city_table.total_row.percentage_clients * 100 }} %</th>
-                            <th>{{ by_city_table.total_row.status_clients }}</th>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
+
         </div>
+        <!--  -->
+
+        <!-- Show Table             -->
+        <div v-if="by_city_table"    class="table_scroll table_scroll_x table_scroll_y table_container table_container mt-5">
+            <table class="table table-bordered w-100" id="by_city_reports_table">
+                <thead>
+                    <tr>
+                        <th>Index</th>
+                        <th>City</th>
+                        <th>Expected</th>
+                        <th>Added</th>
+                        <th>Gap</th>
+                        <th>Percentage</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr v-for="row, index_1 in by_city_table.rows" :key="index_1">
+                        <td>{{ index_1 }}</td>
+                        <td>{{ row.CityNameE }}</td>
+                        <td>{{ row.expected_clients }}</td>
+                        <td>{{ row.added_clients }}</td>
+                        <td>{{ row.gap }}</td>
+                        <td>{{ row.percentage_clients * 100 }} %</td>
+                        <td>{{ row.status_clients }}</td>
+                    </tr>
+
+                    <tr>
+                        <th>{{ by_city_table.total_row.label }}</th>
+                        <th></th>
+                        <th>{{ by_city_table.total_row.expected_clients }}</th>
+                        <th>{{ by_city_table.total_row.added_clients }}</th>
+                        <th>{{ by_city_table.total_row.gap }}</th>
+                        <th>{{ by_city_table.total_row.percentage_clients * 100 }} %</th>
+                        <th>{{ by_city_table.total_row.status_clients }}</th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 
 </template>
@@ -173,7 +174,7 @@ export default {
 
             //
 
-            show_by_city_chart          :   false,
+            show_by_city_reports_chart  :   false,
 
             //
 
@@ -218,21 +219,22 @@ export default {
                     .then(async (res)=> {
 
                         console.log(res)
-                        console.log(res.data.by_city_reports.by_city_table)
+                        console.log(res.data.by_city_reports.datasets)
+                        console.log(res.data.by_city_reports.labels)
 
                         //
-                        // this.by_city_reports_data.labels        =   res.data.by_city_reports.labels;
-                        // this.by_city_reports_data.datasets      =   res.data.by_city_reports.datasets;
+                        this.by_city_reports_data.labels        =   res.data.by_city_reports.labels;
+                        this.by_city_reports_data.datasets      =   res.data.by_city_reports.datasets;
                         this.by_city_table                      =   res.data.by_city_reports.by_city_table;
 
                         //
-                        this.show_by_city_chart                =   true
+                        this.show_by_city_reports_chart         =   true
 
                         //
-                        // await this.$nextTick()
+                        await this.$nextTick()
 
                         //
-                        // this.setChart();
+                        this.setChart();
 
                         //
                         this.$hideLoadingPage()
@@ -248,17 +250,28 @@ export default {
 
         setChart() {
 
-            if (this.by_city_chart) {
-                this.by_city_chart.destroy();   // Destroy existing chart for proper updates
+            if (this.by_city_reports_chart) {
+                this.by_city_reports_chart.destroy();   // Destroy existing chart for proper updates
             }
 
-            const by_city_chart    =   this.$refs.by_city_chart.getContext('2d');
+            const by_city_reports_chart     =   this.$refs.by_city_reports_chart.getContext('2d');
 
-            this.by_city_chart     =   new Chart(by_city_chart, {
-                type                        :   "doughnut"                      ,
+            this.by_city_reports_chart      =   new Chart(by_city_reports_chart , {
+                type                        :   "bar"                           ,
                 data                        :   this.by_city_reports_data       ,
-                options                     :   {}
+                options                     :   this.by_city_reports_options
             });
+
+            //
+
+            const bar_chart_container       =   document.querySelector(".bar_chart_container")
+            const totalLabels               =   this.by_city_reports_chart.data.labels.length
+
+            if(totalLabels  >  5) {
+
+                const newWidth                      =   700 + ((totalLabels - 7) * 90)
+                bar_chart_container.style.width     =   newWidth+"px"
+            }
         },
 
         //  //  //  //  //
