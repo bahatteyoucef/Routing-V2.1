@@ -47,7 +47,7 @@
         <!--  -->
 
         <!-- Show Table         -->
-        <div v-if="show_data_census_reports_chart"    class="table_scroll table_container mt-5">
+        <div v-if="show_data_census_reports_chart"    class="table_scroll table_scroll_x table_container table_container mt-5">
             <table class="table table-bordered w-100" id="data_census_table">
                 <thead>
                     <tr>
@@ -68,6 +68,7 @@
 
                         <th class="col-sm-2">CustomerNameE</th>
 
+                        <th class="col-sm-2">TelAvailability</th>
                         <th class="col-sm-2">Tel</th>
 
                         <th class="col-sm-2">Address</th>
@@ -100,6 +101,7 @@
                         <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"/></th>
                         <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="BrandAvailability"/></th>
                         <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"/></th>
+                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="TelAvailability"/></th>
                         <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Tel"/></th>
                         <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Address"/></th>
                         <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Neighborhood"/></th>
@@ -133,10 +135,11 @@
                         <td>{{ row.CityNameE }}</td>
 
                         <td>{{ row.CustomerNameA }}</td>
-                        <td>{{ row.BrandAvailability }}</td>
+                        <td>{{ row.BrandAvailabilityText }}</td>
 
                         <td>{{ row.CustomerNameE }}</td>
 
+                        <td>{{ row.TelAvailabilityText }}</td>
                         <td>{{ row.Tel }}</td>
 
                         <td>{{ row.Address }}</td>
@@ -242,7 +245,7 @@ export default {
                     }
 
                     // Initialisation 
-                    this.datatable_data_census_table    =   [];
+                    this.data_census_table              =   [];
 
                     //
 
@@ -265,13 +268,11 @@ export default {
                         //
                         this.show_data_census_reports_chart             =   true
 
+                        //
+                        await this.$nextTick()
+
+                        //
                         this.datatable_data_census_table                =   await this.$DataTableCreate("data_census_table")
-
-                        //
-                        // await this.$nextTick()
-
-                        //
-                        // this.setChart();
 
                         //
                         this.$hideLoadingPage()

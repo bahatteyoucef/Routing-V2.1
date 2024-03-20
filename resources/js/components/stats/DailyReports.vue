@@ -62,7 +62,7 @@
         <!--  -->
 
         <!-- Show Table         -->
-        <div v-if="show_daily_reports_chart"    class="table_scroll table_container mt-5">
+        <div v-if="show_daily_reports_chart"    class="table_scroll table_scroll_x table_scroll_y table_container table_container mt-5">
             <table class="table w-100" id="daily_reports_table">
                 <tr>
                     <th>User</th>

@@ -184,9 +184,20 @@
 
 /*  */
 
-.chart_scroll, .table_scroll {
+.chart_scroll {
 
-    overflow-x          : scroll;
+    overflow-x          : auto;
+}
+
+.table_scroll_x {
+
+    overflow-x          : auto;
+}
+
+.table_scroll_y {
+
+    overflow-y          : auto;
+    max-height          : 500px;
 }
 
 .chart_scroll::-webkit-scrollbar, .table_scroll::-webkit-scrollbar {
@@ -215,5 +226,18 @@
     height              : 500px;
 }
 
+.pie_chart_container {
+
+    display             : flex;
+    justify-content     : center;
+    align-items         : center;
+}
+
 /*  */
 
+.table thead th {
+
+    font-weight         : bold;
+}
+
+/*  */

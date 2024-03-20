@@ -585,7 +585,7 @@ class Statistic extends Model
 
             $city->added_clients        =   DB::table("clients")
                                                 ->select("clients.*")
-                                                ->where("clients.id_route_import", $request->get("route_link"))
+                                                ->where([["clients.id_route_import", $request->get("route_link")], ["clients.CityNo", $city->CityNo]])
                                                 ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
                                                 ->count();
 
@@ -679,7 +679,10 @@ class Statistic extends Model
 
         //
         $clients        =   DB::table("clients")
-                                ->select("clients.*", "users.nom as OwnerName")
+                                ->select("clients.*", 
+                                        DB::raw('CASE WHEN clients.BrandAvailability = 1 THEN "Yes" ELSE "No" END AS BrandAvailabilityText'), 
+                                        DB::raw('CASE WHEN clients.Tel IS NOT NULL AND clients.Tel != "" THEN "Yes" ELSE "No" END AS TelAvailabilityText'),
+                                        "users.nom as OwnerName")
                                 ->join("users", "clients.owner", "users.id")
                                 ->whereIn('clients.id_route_import', $route_links)
                                 ->whereBetween(DB::raw('STR_TO_DATE(clients.created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison

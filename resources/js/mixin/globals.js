@@ -1,7 +1,6 @@
-import axios from 'axios'
-import { entries, sortedIndex } from 'lodash';
+import axios        from 'axios'
 
-import * as XLSX from "xlsx";
+import * as XLSX    from 'xlsx';
 
 export default {
 
@@ -1195,6 +1194,36 @@ export default {
             // dots[slideIndex-1].className        +=  " active";
 
             return slideIndex
+        },
+
+        //
+
+        $exportChart(chart, chart_name) {
+
+            //
+            var a       =   document.createElement('a');
+            a.href      =   chart.toBase64Image();
+            a.download  =   chart_name+'.png';
+
+            // Trigger the download
+            a.click();
+        },
+
+        $exportTable(table_id, table_name) {
+
+            /* Get table element */
+            var table   =   document.getElementById(table_id);
+
+            /* Convert table to worksheet */
+            var ws      =   XLSX.utils.table_to_sheet(table);
+
+            /* Create workbook and add the worksheet */
+            var wb      =   XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+            /* Save workbook to file */
+            var filename = table_name+".xlsx";
+            XLSX.writeFile(wb, filename);
         }
     }
 }

@@ -2,7 +2,7 @@
 
   <div class="content-wrapper" style="padding : 15px;">
 
-    <ul class="list-group" id="reports">
+    <ul class="list-group mb-5"       id="reports">
 
       <!-- Data Census Reports      -->
       <li class="list-group-item p-0" id="data_census_reports_div">
@@ -46,20 +46,6 @@
       </li>
       <!--  -->
 
-      <!-- By CustomerType Reports  -->
-      <li class="list-group-item p-0" id="by_customer_type_reports_div">
-
-        <div id="by_customer_type_reports_header" class="p-3" :class="{ 'primary': show_by_customer_type_reports_content }" @click="showHideByCustomerTypeReports()" role="button">
-          <h4 class="mb-0">By Customer Type Reports</h4>
-        </div>
-
-        <div v-show="show_by_customer_type_reports_content" id="by_customer_type_reports_content" class="reports_li animate__animated animate__fadeInDown">
-          <ByCustomerTypeReports></ByCustomerTypeReports>
-        </div>
-
-      </li>
-      <!--  -->
-
       <!-- By City Reports          -->
       <li class="list-group-item p-0" id="by_city_reports_div">
 
@@ -69,6 +55,20 @@
 
         <div v-show="show_by_city_reports_content" id="by_city_reports_content" class="reports_li animate__animated animate__fadeInDown">
           <ByCityReports></ByCityReports>
+        </div>
+
+      </li>
+      <!--  -->
+
+      <!-- By CustomerType Reports  -->
+      <li class="list-group-item p-0" id="by_customer_type_reports_div">
+
+        <div id="by_customer_type_reports_header" class="p-3" :class="{ 'primary': show_by_customer_type_reports_content }" @click="showHideByCustomerTypeReports()" role="button">
+          <h4 class="mb-0">By Customer Type Reports</h4>
+        </div>
+
+        <div v-show="show_by_customer_type_reports_content" id="by_customer_type_reports_content" class="reports_li animate__animated animate__fadeInDown">
+          <ByCustomerTypeReports></ByCustomerTypeReports>
         </div>
 
       </li>

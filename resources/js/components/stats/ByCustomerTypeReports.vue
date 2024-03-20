@@ -49,8 +49,34 @@
         <!-- Show Chart         -->
         <div class="row">
 
-            <div class="col-6">
-                <div v-if="show_by_customer_type_chart"        id="by_customer_type_reports_container"    class="pt-5 pb-1">
+            <!-- Show Table         -->
+            <div class="col-8 d-flex align-items-end">
+                <div v-if="by_customer_type_table"    class="table_scroll table_scroll_x table_scroll_y table_container mt-5 w-100">
+                    <table class="table table-bordered w-100" id="by_customer_type_reports_table">
+                        <tr>
+                            <th>CustomerType</th>
+                            <th>Clients</th>
+                            <th>Total</th>
+                        </tr>
+
+                        <tr v-for="row, index_1 in by_customer_type_table.rows" :key="index_1">
+                            <th>{{ row.label }}</th>
+                            <td>{{ row.count_clients }}</td>
+                            <th>{{ row.percentage_clients * 100 }} %</th>
+                        </tr>
+
+                        <tr>
+                            <th>{{ by_customer_type_table.total_row.label }}</th>
+                            <th>{{ by_customer_type_table.total_row.count_clients }}</th>
+                            <th>{{ by_customer_type_table.total_row.percentage_clients * 100 }} %</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Show Chart         -->
+            <div class="col-4">
+                <div v-if="show_by_customer_type_chart"        id="by_customer_type_reports_container"    class="pb-1">
                     <div class="pie_chart_container">
                         <canvas id="by_customer_type_chart"    ref="by_customer_type_chart"></canvas>
                     </div>
@@ -59,29 +85,6 @@
 
         </div>
         <!--  -->
-
-        <!-- Show Table         -->
-        <div v-if="by_customer_type_table"    class="table_scroll table_container mt-5">
-            <table class="table w-100" id="by_customer_type_reports_table">
-                <tr>
-                    <th>CustomerType</th>
-                    <th>Clients</th>
-                    <th>Total</th>
-                </tr>
-
-                <tr v-for="row, index_1 in by_customer_type_table.rows" :key="index_1">
-                    <th>{{ row.label }}</th>
-                    <td>{{ row.count_clients }}</td>
-                    <th>{{ row.percentage_clients * 100 }} %</th>
-                </tr>
-
-                <tr>
-                    <th>{{ by_customer_type_table.total_row.label }}</th>
-                    <th>{{ by_customer_type_table.total_row.count_clients }}</th>
-                    <th>{{ by_customer_type_table.total_row.percentage_clients * 100 }} %</th>
-                </tr>
-            </table>
-        </div>
 
     </div>
 

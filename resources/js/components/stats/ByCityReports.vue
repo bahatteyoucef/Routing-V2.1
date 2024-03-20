@@ -93,8 +93,8 @@
             <!--  -->
 
             <!-- Show Table             -->
-            <div v-if="by_city_table"    class="table_scroll table_container mt-5">
-                <table class="table w-100" id="by_city_reports_table">
+            <div v-if="by_city_table"    class="table_scroll table_scroll_x table_scroll_y table_container table_container mt-5">
+                <table class="table table-bordered w-100" id="by_city_reports_table">
                     <tr>
                         <th>Index</th>
                         <th>City</th>
@@ -116,13 +116,13 @@
                     </tr>
 
                     <tr>
-                        <td>{{ by_city_table.total_row.label }}</td>
-                        <td></td>
-                        <td>{{ by_city_table.total_row.expected_clients }}</td>
-                        <td>{{ by_city_table.total_row.added_clients }}</td>
-                        <td>{{ by_city_table.total_row.gap }}</td>
-                        <td>{{ by_city_table.total_row.percentage_clients * 100 }} %</td>
-                        <td>{{ by_city_table.total_row.status_clients }}</td>
+                        <th>{{ by_city_table.total_row.label }}</th>
+                        <th></th>
+                        <th>{{ by_city_table.total_row.expected_clients }}</th>
+                        <th>{{ by_city_table.total_row.added_clients }}</th>
+                        <th>{{ by_city_table.total_row.gap }}</th>
+                        <th>{{ by_city_table.total_row.percentage_clients * 100 }} %</th>
+                        <th>{{ by_city_table.total_row.status_clients }}</th>
                     </tr>
                 </table>
             </div>

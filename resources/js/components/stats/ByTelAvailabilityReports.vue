@@ -49,17 +49,36 @@
         <!-- Show Chart         -->
         <div class="row">
 
-            <!-- Daily Reports  -->
-            <!-- <div class="col-4">
+            <!-- Show Table         -->
+            <div class="col-6 d-flex align-items-end">
+                <div v-if="by_tel_availability_table"    class="table_scroll table_scroll_x table_scroll_y table_container table_container mt-5 w-100">
+                    <table class="table table-bordered w-100" id="by_tel_availability_reports_table">
+                        <tr>
+                            <th>User</th>
+                            <th>Yes</th>
+                            <th>No</th>
+                            <th>Total</th>
+                        </tr>
 
-                <div v-if="show_by_tel_availability_chart"        id="by_tel_availability_ratio_container"    class="chart_scroll pt-5 pb-1">
-                    <div class="pie_chart_container">
-                        <canvas id="by_tel_availability_chart"    ref="by_tel_availability_chart"></canvas>
-                    </div>
+                        <tr v-for="row, index_1 in by_tel_availability_table.rows" :key="index_1">
+                            <th>{{ row.label }}</th>
+                            <td>{{ row.count_yes }}</td>
+                            <td>{{ row.count_no }}</td>
+                            <th>{{ row.count_total }}</th>
+                        </tr>
+
+                        <tr>
+                            <th>{{ by_tel_availability_table.total_row.label }}</th>
+                            <th>{{ by_tel_availability_table.total_row.count_yes }}</th>
+                            <th>{{ by_tel_availability_table.total_row.count_no }}</th>
+                            <th>{{ by_tel_availability_table.total_row.count_total }}</th>
+                        </tr>
+                    </table>
                 </div>
+            </div>
+            <!--  -->
 
-            </div> -->
-
+            <!-- Show Chart         -->
             <div class="col-6">
                 <div v-if="show_by_tel_availability_chart"        id="by_tel_availability_reports_container"    class="chart_scroll pt-5 pb-1">
                     <div class="bar_chart_container">
@@ -67,34 +86,8 @@
                     </div>
                 </div>
             </div>
+            <!--  -->
 
-        </div>
-        <!--  -->
-
-        <!-- Show Table         -->
-        <div v-if="by_tel_availability_table"    class="table_scroll table_container mt-5">
-            <table class="table w-100" id="by_tel_availability_reports_table">
-                <tr>
-                    <th>User</th>
-                    <th>Yes</th>
-                    <th>No</th>
-                    <th>Total</th>
-                </tr>
-
-                <tr v-for="row, index_1 in by_tel_availability_table.rows" :key="index_1">
-                    <th>{{ row.label }}</th>
-                    <td>{{ row.count_yes }}</td>
-                    <td>{{ row.count_no }}</td>
-                    <th>{{ row.count_total }}</th>
-                </tr>
-
-                <tr>
-                    <th>{{ by_tel_availability_table.total_row.label }}</th>
-                    <th>{{ by_tel_availability_table.total_row.count_yes }}</th>
-                    <th>{{ by_tel_availability_table.total_row.count_no }}</th>
-                    <th>{{ by_tel_availability_table.total_row.count_total }}</th>
-                </tr>
-            </table>
         </div>
         <!--  -->
 
