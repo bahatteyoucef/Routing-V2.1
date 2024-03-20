@@ -53,23 +53,27 @@
             <div class="col-8 d-flex align-items-end">
                 <div v-if="by_source_achat_table"    class="table_scroll table_scroll_x table_scroll_y table_container mt-5 w-100">
                     <table class="table table-bordered w-100" id="by_source_achat_reports_table">
-                        <tr>
-                            <th>CustomerType</th>
-                            <th>Clients</th>
-                            <th>Total</th>
-                        </tr>
+                        <thead>
+                            <tr>
+                                <th>CustomerType</th>
+                                <th>Clients</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
 
-                        <tr v-for="row, index_1 in by_source_achat_table.rows" :key="index_1">
-                            <th>{{ row.label }}</th>
-                            <td>{{ row.count_clients }}</td>
-                            <th>{{ row.percentage_clients * 100 }} %</th>
-                        </tr>
+                        <tbody>
+                            <tr v-for="row, index_1 in by_source_achat_table.rows" :key="index_1">
+                                <th>{{ row.label }}</th>
+                                <td>{{ row.count_clients }}</td>
+                                <th>{{ row.percentage_clients * 100 }} %</th>
+                            </tr>
 
-                        <tr>
-                            <th>{{ by_source_achat_table.total_row.label }}</th>
-                            <th>{{ by_source_achat_table.total_row.count_clients }}</th>
-                            <th>{{ by_source_achat_table.total_row.percentage_clients * 100 }} %</th>
-                        </tr>
+                            <tr>
+                                <th>{{ by_source_achat_table.total_row.label }}</th>
+                                <th>{{ by_source_achat_table.total_row.count_clients }}</th>
+                                <th>{{ by_source_achat_table.total_row.percentage_clients * 100 }} %</th>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -193,8 +197,8 @@ export default {
             const by_source_achat_chart    =   this.$refs.by_source_achat_chart.getContext('2d');
 
             this.by_source_achat_chart     =   new Chart(by_source_achat_chart, {
-                type                        :   "pie"                                   ,
-                data                        :   this.by_source_achat_reports_data      ,
+                type                        :   "doughnut"                              ,
+                data                        :   this.by_source_achat_reports_data       ,
                 options                     :   {}
             });
         },

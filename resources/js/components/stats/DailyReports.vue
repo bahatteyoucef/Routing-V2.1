@@ -64,23 +64,27 @@
         <!-- Show Table         -->
         <div v-if="show_daily_reports_chart"    class="table_scroll table_scroll_x table_scroll_y table_container table_container mt-5">
             <table class="table w-100" id="daily_reports_table">
-                <tr>
-                    <th>User</th>
-                    <th v-for="label, index_1 in daily_reports_data.labels" :key="index_1">{{ label }}</th>
-                    <th>Total</th>
-                </tr>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th v-for="label, index_1 in daily_reports_data.labels" :key="index_1">{{ label }}</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
 
-                <tr v-for="dataset, index_2 in daily_reports_data.datasets" :key="index_2">
-                    <th>{{dataset.label}}</th>
-                    <td v-for="data_value, index_3 in dataset.data" :key="index_3">{{ data_value }}</td>
-                    <th>{{ dataset.total }}</th>
-                </tr>
+                <tbody>
+                    <tr v-for="dataset, index_2 in daily_reports_data.datasets" :key="index_2">
+                        <th>{{dataset.label}}</th>
+                        <td v-for="data_value, index_3 in dataset.data" :key="index_3">{{ data_value }}</td>
+                        <th>{{ dataset.total }}</th>
+                    </tr>
 
-                <tr>
-                    <th>Total</th>
-                    <th v-for="total_by_day, index_4 in total_by_day_object.data" :key="index_4">{{ total_by_day }}</th>
-                    <th>{{ total_by_day_object.total }}</th>
-                </tr>
+                    <tr>
+                        <th>Total</th>
+                        <th v-for="total_by_day, index_4 in total_by_day_object.data" :key="index_4">{{ total_by_day }}</th>
+                        <th>{{ total_by_day_object.total }}</th>
+                    </tr>
+                </tbody>
             </table>
         </div>
         <!--  -->

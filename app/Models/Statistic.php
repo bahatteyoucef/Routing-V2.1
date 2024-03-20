@@ -661,7 +661,12 @@ class Statistic extends Model
         }
 
         //
-        return $by_city_table;
+        $by_city_reports                =   new stdClass();
+
+        $by_city_reports->by_city_table =   $by_city_table;
+
+        //
+        return $by_city_reports;
     }
 
     //

@@ -125,12 +125,12 @@ class StatisticController extends Controller
         try {
 
             //
-            $by_city_table    =   Statistic::byCityReports($request);
+            $by_city_reports    =   Statistic::byCityReports($request);
 
             //
             return response()->json([
 
-                "by_city_table"   =>  $by_city_table
+                "by_city_reports"   =>  $by_city_reports
             ]);
         }
 

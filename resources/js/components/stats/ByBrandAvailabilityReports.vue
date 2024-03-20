@@ -205,7 +205,7 @@ export default {
             const by_brand_availability_chart    =   this.$refs.by_brand_availability_chart.getContext('2d');
 
             this.by_brand_availability_chart     =   new Chart(by_brand_availability_chart, {
-                type                        :   "pie"                                   ,
+                type                        :   "doughnut"                                   ,
                 data                        :   this.by_brand_availability_reports_data      ,
                 options                     :   {}
             });

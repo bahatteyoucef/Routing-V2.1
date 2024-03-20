@@ -79,7 +79,7 @@
             <!--  -->
 
             <!-- Show Chart             -->
-            <div class="row">
+            <!-- <div class="row">
 
                 <div class="col-6">
                     <div v-if="show_by_city_chart"        id="by_city_reports_container"    class="pt-5 pb-1">
@@ -89,41 +89,45 @@
                     </div>
                 </div>
 
-            </div>
+            </div> -->
             <!--  -->
 
             <!-- Show Table             -->
             <div v-if="by_city_table"    class="table_scroll table_scroll_x table_scroll_y table_container table_container mt-5">
                 <table class="table table-bordered w-100" id="by_city_reports_table">
-                    <tr>
-                        <th>Index</th>
-                        <th>City</th>
-                        <th>Expected</th>
-                        <th>Added</th>
-                        <th>Gap</th>
-                        <th>Percentage</th>
-                        <th>Status</th>
-                    </tr>
+                    <thead>
+                        <tr>
+                            <th>Index</th>
+                            <th>City</th>
+                            <th>Expected</th>
+                            <th>Added</th>
+                            <th>Gap</th>
+                            <th>Percentage</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
 
-                    <tr v-for="row, index_1 in by_city_table.rows" :key="index_1">
-                        <td>{{ index_1 }}</td>
-                        <td>{{ row.CityNameE }}</td>
-                        <td>{{ row.expected_clients }}</td>
-                        <td>{{ row.added_clients }}</td>
-                        <td>{{ row.gap }}</td>
-                        <td>{{ row.percentage_clients * 100 }} %</td>
-                        <td>{{ row.status_clients }}</td>
-                    </tr>
+                    <tbody>
+                        <tr v-for="row, index_1 in by_city_table.rows" :key="index_1">
+                            <td>{{ index_1 }}</td>
+                            <td>{{ row.CityNameE }}</td>
+                            <td>{{ row.expected_clients }}</td>
+                            <td>{{ row.added_clients }}</td>
+                            <td>{{ row.gap }}</td>
+                            <td>{{ row.percentage_clients * 100 }} %</td>
+                            <td>{{ row.status_clients }}</td>
+                        </tr>
 
-                    <tr>
-                        <th>{{ by_city_table.total_row.label }}</th>
-                        <th></th>
-                        <th>{{ by_city_table.total_row.expected_clients }}</th>
-                        <th>{{ by_city_table.total_row.added_clients }}</th>
-                        <th>{{ by_city_table.total_row.gap }}</th>
-                        <th>{{ by_city_table.total_row.percentage_clients * 100 }} %</th>
-                        <th>{{ by_city_table.total_row.status_clients }}</th>
-                    </tr>
+                        <tr>
+                            <th>{{ by_city_table.total_row.label }}</th>
+                            <th></th>
+                            <th>{{ by_city_table.total_row.expected_clients }}</th>
+                            <th>{{ by_city_table.total_row.added_clients }}</th>
+                            <th>{{ by_city_table.total_row.gap }}</th>
+                            <th>{{ by_city_table.total_row.percentage_clients * 100 }} %</th>
+                            <th>{{ by_city_table.total_row.status_clients }}</th>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -214,14 +218,15 @@ export default {
                     .then(async (res)=> {
 
                         console.log(res)
+                        console.log(res.data.by_city_reports.by_city_table)
 
                         //
-                        // this.by_city_reports_data.labels       =   res.data.by_city_reports.labels;
-                        // this.by_city_reports_data.datasets     =   res.data.by_city_reports.datasets;
-                        this.by_city_table                      =   res.data.by_city_table;
+                        // this.by_city_reports_data.labels        =   res.data.by_city_reports.labels;
+                        // this.by_city_reports_data.datasets      =   res.data.by_city_reports.datasets;
+                        this.by_city_table                      =   res.data.by_city_reports.by_city_table;
 
                         //
-                        // this.show_by_city_chart                =   true
+                        this.show_by_city_chart                =   true
 
                         //
                         // await this.$nextTick()
@@ -250,8 +255,8 @@ export default {
             const by_city_chart    =   this.$refs.by_city_chart.getContext('2d');
 
             this.by_city_chart     =   new Chart(by_city_chart, {
-                type                        :   "pie"                                   ,
-                data                        :   this.by_city_reports_data      ,
+                type                        :   "doughnut"                      ,
+                data                        :   this.by_city_reports_data       ,
                 options                     :   {}
             });
         },
