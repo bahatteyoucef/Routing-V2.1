@@ -1,137 +1,194 @@
 <template>
 
-  <div class="content-wrapper" style="padding : 15px;">
+  <div class="p-3 m-2" style="background-color: #f2edf3; padding : 15px;">
 
-    <ul class="list-group mb-5"       id="reports">
+    <!-- Stats Filters  -->
+    <div class="col-12 p-0 mb-3" id="stats_filters">
+        <div class="card">
+            <div class="card-body p-0">
+              <div class="row">
 
-      <!-- Data Census Reports      -->
-      <li class="list-group-item p-0" id="data_census_reports_div">
+                <!-- Select Map         -->
+                <div class="col-4 map_filter">
+                    <Multiselect
+                        v-model             =   "route_links"
+                        :options            =   "liste_route_link"
+                        mode                =   "tags" 
+                        placeholder         =   "Select Maps"
+                        class               =   "mt-1"
 
-        <div id="data_census_reports_header" class="p-3" :class="{ 'primary': show_data_census_reports_content }" @click="showHideDataCensusReports()" role="button">
-          <h4 class="mb-0">Data Census Reports</h4>
+                        :close-on-select    =   "false"
+                        :searchable         =   "true"
+                        :create-option      =   "false"
+
+                        :canDeselect        =   "true"
+                        :canClear           =   "true"
+                        :allowAbsent        =   "true"
+                    />
+                </div>
+                <!--  -->
+
+                <!-- Select Date Range  -->
+                <div class="col-2 mt-1">
+                    <input type="date" class="form-control" v-model="start_date"/>
+                </div>
+                <!--  -->
+
+                <!-- Select Date Range  -->
+                <div class="col-2 mt-1">
+                    <input type="date" class="form-control" v-model="end_date"/>
+                </div>
+                <!--  -->
+
+                <!-- Select Date Range  -->
+                <div class="col-2 mt-1">
+                    <button class="btn primary w-100"   @click="getData()">Get Data</button>
+                </div>
+                <!--  -->
+
+                <!-- Select Date Range  -->
+                <div class="col-2 mt-1">
+                    <button class="btn primary w-100"   @click="getData()">Export Data</button>
+                </div>
+                <!--  -->
+
+              </div>
+            </div>
+        </div>
+    </div>
+    <!--                -->
+
+    <!-- Small Stats -->
+    <div class="col-12 p-0 mb-3" id="small_stats">
+
+      <!-- Small Report  -->
+      <div class="row h-equal p-0 m-0">
+        <div class="col-4 p-2">
+          <div class="row">
+            <div class="col p-1">
+              <div class="card bg-gradient-info card-img-holder text-white">
+                <div class="card-body">
+                  <h4 class="font-weight-normal mb-3">Weekly Orders <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
+                  </h4>
+                  <h2 class="mb-5">45,6334</h2>
+                </div>
+              </div>
+            </div>
+
+            <div class="col p-1">
+              <div class="card bg-gradient-info card-img-holder text-white">
+                <div class="card-body">
+                  <h4 class="font-weight-normal mb-3">Weekly Orders <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
+                  </h4>
+                  <h2 class="mb-5">45,6334</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col p-1">
+              <div class="card bg-gradient-info card-img-holder text-white">
+                <div class="card-body">
+                  <h4 class="font-weight-normal mb-3">Weekly Orders <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
+                  </h4>
+                  <h2 class="mb-5">45,6334</h2>
+                </div>
+              </div>
+            </div>
+
+            <div class="col p-1">
+              <div class="card bg-gradient-info card-img-holder text-white">
+                <div class="card-body">
+                  <h4 class="font-weight-normal mb-3">Weekly Orders <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
+                  </h4>
+                  <h2 class="mb-5">45,6334</h2>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div v-show="show_data_census_reports_content" id="data_census_reports_content" class="reports_li animate__animated animate__fadeInDown">
-          <DataCensusReports></DataCensusReports>
+        <!-- v-if="show_by_brand_availability_report_content" -->
+        <div class="col-8 p-2">
+          <div class="card h-100">
+            <div class="card-body p-0">
+              <ByBrandAvailabilityReport></ByBrandAvailabilityReport>
+            </div>
+          </div>
         </div>
 
-      </li>
-      <!--  -->
+      </div>
+      <!--                -->
 
-      <!-- Daily Reports            -->
-      <li class="list-group-item p-0" id="daily_reports_div">
+    </div>
+    <!--                -->
 
-        <div id="daily_reports_header" class="p-3" :class="{ 'primary': show_daily_reports_content }" @click="showHideDailyReports()" role="button">
-          <h4 class="mb-0">Daily Reports</h4>
+    <!-- Report        -->
+    <div class="col-12 p-0 mb-2" id="reports">
+
+      <!-- Small Report  -->
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="card-body p-0">
+              <div class="row stats_filters" id="stats_filters">
+                
+                <div class="report_div" id="by_customer_type_reports">
+                    <ByCustomerTypeReport></ByCustomerTypeReport>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div v-show="show_daily_reports_content" id="daily_reports_content" class="reports_li animate__animated animate__fadeInDown">
-          <DailyReports></DailyReports>
+        <div class="col">
+          <div class="card">
+            <div class="card-body p-0">
+              <div class="row stats_filters" id="stats_filters">
+
+                <div class="report_div by_customer_type_reports" id="by_customer_type_reports">
+
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
 
-      </li>
-      <!--  -->
+        <div class="col">
+          <div class="card">
+            <div class="card-body p-0">
+              <div class="row stats_filters" id="stats_filters">
 
-      <!-- BY Tel Availability      -->
-      <li class="list-group-item p-0" id="by_tel_availability_reports_div">
+                <div class="report_div by_customer_type_reports" id="by_customer_type_reports">
 
-        <div id="by_tel_availability_reports_header" class="p-3" :class="{ 'primary': show_by_tel_availability_reports_content }" @click="showHideByTelAvailabilityReports()" role="button">
-          <h4 class="mb-0">By Tel Availability Reports</h4>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+      <!--                -->
 
-        <div v-show="show_by_tel_availability_reports_content" id="by_tel_availability_reports_content" class="reports_li animate__animated animate__fadeInDown">
-          <ByTelAvailabilityReports></ByTelAvailabilityReports>
-        </div>
-
-      </li>
-      <!--  -->
-
-      <!-- By City Reports          -->
-      <li class="list-group-item p-0" id="by_city_reports_div">
-
-        <div id="by_city_reports_header" class="p-3" :class="{ 'primary': show_by_city_reports_content }" @click="showHideByCityReports()" role="button">
-          <h4 class="mb-0">By City Reports</h4>
-        </div>
-
-        <div v-show="show_by_city_reports_content" id="by_city_reports_content" class="reports_li animate__animated animate__fadeInDown">
-          <ByCityReports></ByCityReports>
-        </div>
-
-      </li>
-      <!--  -->
-
-      <!-- By CustomerType Reports  -->
-      <li class="list-group-item p-0" id="by_customer_type_reports_div">
-
-        <div id="by_customer_type_reports_header" class="p-3" :class="{ 'primary': show_by_customer_type_reports_content }" @click="showHideByCustomerTypeReports()" role="button">
-          <h4 class="mb-0">By Customer Type Reports</h4>
-        </div>
-
-        <div v-show="show_by_customer_type_reports_content" id="by_customer_type_reports_content" class="reports_li animate__animated animate__fadeInDown">
-          <ByCustomerTypeReports></ByCustomerTypeReports>
-        </div>
-
-      </li>
-      <!--  -->
-
-      <!-- By Source Achat Reports  -->
-      <li class="list-group-item p-0" id="by_source_achat_reports_div">
-
-        <div id="by_source_achat_reports_header" class="p-3" :class="{ 'primary': show_by_source_achat_reports_content }" @click="showHideBySourceAchatReports()" role="button">
-          <h4 class="mb-0">By Source Achat Reports</h4>
-        </div>
-
-        <div v-show="show_by_source_achat_reports_content" id="by_source_achat_reports_content" class="reports_li animate__animated animate__fadeInDown">
-          <BySourceAchatReports></BySourceAchatReports>
-        </div>
-
-      </li>
-      <!--  -->
-
-      <!-- By Brand Availability Reports  -->
-      <li class="list-group-item p-0" id="by_brand_availability_reports_div">
-
-        <div id="by_brand_availability_reports_header" class="p-3" :class="{ 'primary': show_by_brand_availability_reports_content }" @click="showHideByBrandAvailabilityReports()" role="button">
-          <h4 class="mb-0">By Brand Availability Reports</h4>
-        </div>
-
-        <div v-show="show_by_brand_availability_reports_content" id="by_brand_availability_reports_content" class="reports_li animate__animated animate__fadeInDown">
-          <ByBrandAvailabilityReports></ByBrandAvailabilityReports>
-        </div>
-
-      </li>
-      <!--  -->
-
-      <!-- By Brand Availability By CustomerType Reports  -->
-      <li class="list-group-item p-0" id="by_brand_availability_by_customer_type_reports_div">
-
-        <div id="by_brand_availability_by_customer_type_reports_header" class="p-3" :class="{ 'primary': show_by_brand_availability_by_customer_type_reports_content }" @click="showHideByBrandAvailabilityByCustomerTypeReports()" role="button">
-          <h4 class="mb-0">By Brand Availability By CustomerType Reports</h4>
-        </div>
-
-        <div v-show="show_by_brand_availability_by_customer_type_reports_content" id="by_brand_availability_by_customer_type_reports_content" class="reports_li animate__animated animate__fadeInDown">
-          <ByBrandAvailabilityByCustomerTypeReports></ByBrandAvailabilityByCustomerTypeReports>
-        </div>
-
-      </li>
-      <!--  -->
-
-    </ul>
+    </div>
+    <!--                -->
 
   </div>
+
 </template>
 
 <script>
 
-import DataCensusReports                          from  "./DataCensusReports.vue"
-import DailyReports                               from  "./DailyReports.vue"
-import ByTelAvailabilityReports                   from  "./ByTelAvailabilityReports.vue"
-import ByCityReports                              from  "./ByCityReports.vue"
-import ByCustomerTypeReports                      from  "./ByCustomerTypeReports.vue"
-import BySourceAchatReports                       from  "./BySourceAchatReports.vue"
-import ByBrandAvailabilityReports                 from  "./ByBrandAvailabilityReports.vue"
+import ByCustomerTypeReport                      from  "./parts/ByCustomerTypeReport.vue"
+import ByBrandAvailabilityReport                 from  "./parts/ByBrandAvailabilityReport.vue"
+import BySourceAchatReport                       from  "./parts/BySourceAchatReport.vue"
 
-import ByBrandAvailabilityByCustomerTypeReports   from  "./ByBrandAvailabilityByCustomerTypeReports.vue"
+//
+
+import Multiselect                                from  "@vueform/multiselect"
 
 export default {
 
@@ -139,78 +196,75 @@ export default {
 
     return {
 
-      show_data_census_reports_content                            : false ,
-      show_daily_reports_content                                  : false ,
-      show_by_tel_availability_reports_content                    : false ,
-      show_by_city_reports_content                                : false ,
-      show_by_customer_type_reports_content                       : false ,
-      show_by_source_achat_reports_content                        : false ,
-      show_by_brand_availability_reports_content                  : false ,
+      show_data_census_report_content                            : false  ,
+      show_daily_report_content                                  : false  ,
+      show_by_tel_availability_report_content                    : false  ,
+      show_by_city_report_content                                : false  ,
+      show_by_customer_type_report_content                       : false  ,
+      show_by_source_achat_report_content                        : false  ,
+      show_by_brand_availability_report_content                  : false  ,
 
-      show_by_brand_availability_by_customer_type_reports_content : false
+      //
+
+      liste_route_link    :   [],
+
+      route_links         :   [],
+      start_date          :   "",
+      end_date            :   ""
     }
   },
 
   components : {
 
-    DataCensusReports                         : DataCensusReports                         ,
-    DailyReports                              : DailyReports                              ,
-    ByTelAvailabilityReports                  : ByTelAvailabilityReports                  ,
-    ByCityReports                             : ByCityReports                             ,
-    ByCustomerTypeReports                     : ByCustomerTypeReports                     ,
-    BySourceAchatReports                      : BySourceAchatReports                      ,
-    ByBrandAvailabilityReports                : ByBrandAvailabilityReports                ,
+    BySourceAchatReport           :   BySourceAchatReport                      ,
+    ByBrandAvailabilityReport     :   ByBrandAvailabilityReport                ,
+    ByCustomerTypeReport          :   ByCustomerTypeReport                     ,
 
-    ByBrandAvailabilityByCustomerTypeReports  : ByBrandAvailabilityByCustomerTypeReports
+    //
+
+    Multiselect                   :   Multiselect
   },
 
   methods : {
 
-    showHideDataCensusReports() {
+    showHideDataCensusReport() {
 
-      this.show_data_census_reports_content   =   !this.show_data_census_reports_content
+      this.show_data_census_report_content              =   !this.show_data_census_report_content
     },
 
-    showHideDailyReports() {
+    showHideDailyReport() {
 
-      this.show_daily_reports_content             = !this.show_daily_reports_content
+      this.show_daily_report_content                    =   !this.show_daily_report_content
     },
 
-    showHideByTelAvailabilityReports() {
+    showHideByTelAvailabilityReport() {
 
-      this.show_by_tel_availability_reports_content  = !this.show_by_tel_availability_reports_content
+      this.show_by_tel_availability_report_content      =   !this.show_by_tel_availability_report_content
     },
 
-    showHideByCityReports() {
+    showHideByCityReport() {
 
-      this.show_by_city_reports_content = !this.show_by_city_reports_content
+      this.show_by_city_report_content                  =   !this.show_by_city_report_content
     },
 
-    showHideByCustomerTypeReports() {
+    showHideByCustomerTypeReport() {
 
-      this.show_by_customer_types_report_content = !this.show_by_customer_types_report_content
+      this.show_by_customer_types_report_content        =   !this.show_by_customer_types_report_content
     },
 
-    showHideByCustomerTypeReports() {
+    showHideByCustomerTypeReport() {
 
-      this.show_by_customer_type_reports_content  = !this.show_by_customer_type_reports_content
+      this.show_by_customer_type_report_content         =   !this.show_by_customer_type_report_content
     },
 
-    showHideBySourceAchatReports() {
+    showHideBySourceAchatReport() {
 
-      this.show_by_source_achat_reports_content   =   !this.show_by_source_achat_reports_content
+      this.show_by_source_achat_report_content          =   !this.show_by_source_achat_report_content
     },
 
-    showHideByBrandAvailabilityReports() {
+    showHideByBrandAvailabilityReport() {
 
-      this.show_by_brand_availability_reports_content   =   !this.show_by_brand_availability_reports_content
-    },
-
-    showHideByBrandAvailabilityByCustomerTypeReports() {
-
-      console.log("2323")
-
-      this.show_by_brand_availability_by_customer_type_reports_content   =   !this.show_by_brand_availability_by_customer_type_reports_content
+      this.show_by_brand_availability_report_content    =   !this.show_by_brand_availability_report_content
     }
   }
 }
@@ -219,7 +273,7 @@ export default {
 
 <style scoped>
 
-.reports_li {
+.report_div {
 
   min-height : 225px
 }
