@@ -72,8 +72,8 @@ class Client extends Model
 
                 'Neighborhood'          =>  $client_elem->Neighborhood              ,
                 'Landmark'              =>  $client_elem->Landmark                  ,
-                'BrandAvailability'     =>  $client_elem->BrandAvailability         ,
-                'BrandSourcePurchase'   =>  $client_elem->BrandSourcePurchase       ,
+                'BrandAvailability'     =>  0                                       ,
+                'BrandSourcePurchase'   =>  ""                                      ,
 
                 'start_adding_time'     =>  $start_adding_time                      ,
                 'adding_duration'       =>  $adding_duration                        ,

@@ -173,6 +173,8 @@ export default {
 
                 let columns =   Object.keys(this.clients[0])
 
+                console.log(this.clients[0])
+
                 let CustomerCode_existe     =   columns.includes("CustomerCode")
                 let CustomerNameE_existe    =   columns.includes("CustomerNameE")
                 let CustomerNameA_existe    =   columns.includes("CustomerNameA")

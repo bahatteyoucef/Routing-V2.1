@@ -102,6 +102,20 @@
       </li>
       <!--  -->
 
+      <!-- By Brand Availability By CustomerType Reports  -->
+      <li class="list-group-item p-0" id="by_brand_availability_by_customer_type_reports_div">
+
+        <div id="by_brand_availability_by_customer_type_reports_header" class="p-3" :class="{ 'primary': show_by_brand_availability_by_customer_type_reports_content }" @click="showHideByBrandAvailabilityByCustomerTypeReports()" role="button">
+          <h4 class="mb-0">By Brand Availability By CustomerType Reports</h4>
+        </div>
+
+        <div v-show="show_by_brand_availability_by_customer_type_reports_content" id="by_brand_availability_by_customer_type_reports_content" class="reports_li animate__animated animate__fadeInDown">
+          <ByBrandAvailabilityByCustomerTypeReports></ByBrandAvailabilityByCustomerTypeReports>
+        </div>
+
+      </li>
+      <!--  -->
+
     </ul>
 
   </div>
@@ -109,13 +123,15 @@
 
 <script>
 
-import DataCensusReports              from  "./DataCensusReports.vue"
-import DailyReports                   from  "./DailyReports.vue"
-import ByTelAvailabilityReports       from  "./ByTelAvailabilityReports.vue"
-import ByCityReports                  from  "./ByCityReports.vue"
-import ByCustomerTypeReports          from  "./ByCustomerTypeReports.vue"
-import BySourceAchatReports           from  "./BySourceAchatReports.vue"
-import ByBrandAvailabilityReports     from  "./ByBrandAvailabilityReports.vue"
+import DataCensusReports                          from  "./DataCensusReports.vue"
+import DailyReports                               from  "./DailyReports.vue"
+import ByTelAvailabilityReports                   from  "./ByTelAvailabilityReports.vue"
+import ByCityReports                              from  "./ByCityReports.vue"
+import ByCustomerTypeReports                      from  "./ByCustomerTypeReports.vue"
+import BySourceAchatReports                       from  "./BySourceAchatReports.vue"
+import ByBrandAvailabilityReports                 from  "./ByBrandAvailabilityReports.vue"
+
+import ByBrandAvailabilityByCustomerTypeReports   from  "./ByBrandAvailabilityByCustomerTypeReports.vue"
 
 export default {
 
@@ -123,25 +139,29 @@ export default {
 
     return {
 
-      show_data_census_reports_content            : false ,
-      show_daily_reports_content                  : false ,
-      show_by_tel_availability_reports_content    : false ,
-      show_by_city_reports_content                : false ,
-      show_by_customer_type_reports_content       : false ,
-      show_by_source_achat_reports_content        : false ,
-      show_by_brand_availability_reports_content  : false
+      show_data_census_reports_content                            : false ,
+      show_daily_reports_content                                  : false ,
+      show_by_tel_availability_reports_content                    : false ,
+      show_by_city_reports_content                                : false ,
+      show_by_customer_type_reports_content                       : false ,
+      show_by_source_achat_reports_content                        : false ,
+      show_by_brand_availability_reports_content                  : false ,
+
+      show_by_brand_availability_by_customer_type_reports_content : false
     }
   },
 
   components : {
 
-    DataCensusReports           : DataCensusReports           ,
-    DailyReports                : DailyReports                ,
-    ByTelAvailabilityReports    : ByTelAvailabilityReports    ,
-    ByCityReports               : ByCityReports               ,
-    ByCustomerTypeReports       : ByCustomerTypeReports       ,
-    BySourceAchatReports        : BySourceAchatReports        ,
-    ByBrandAvailabilityReports  : ByBrandAvailabilityReports
+    DataCensusReports                         : DataCensusReports                         ,
+    DailyReports                              : DailyReports                              ,
+    ByTelAvailabilityReports                  : ByTelAvailabilityReports                  ,
+    ByCityReports                             : ByCityReports                             ,
+    ByCustomerTypeReports                     : ByCustomerTypeReports                     ,
+    BySourceAchatReports                      : BySourceAchatReports                      ,
+    ByBrandAvailabilityReports                : ByBrandAvailabilityReports                ,
+
+    ByBrandAvailabilityByCustomerTypeReports  : ByBrandAvailabilityByCustomerTypeReports
   },
 
   methods : {
@@ -184,6 +204,13 @@ export default {
     showHideByBrandAvailabilityReports() {
 
       this.show_by_brand_availability_reports_content   =   !this.show_by_brand_availability_reports_content
+    },
+
+    showHideByBrandAvailabilityByCustomerTypeReports() {
+
+      console.log("2323")
+
+      this.show_by_brand_availability_by_customer_type_reports_content   =   !this.show_by_brand_availability_by_customer_type_reports_content
     }
   }
 }

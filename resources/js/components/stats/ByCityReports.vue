@@ -163,6 +163,15 @@ export default {
 
             by_city_chart               :   null,
 
+            by_city_reports_options     :   {
+                maintainAspectRatio         :   false,
+                scales                      :   {
+                    y                           :   {
+                        beginAtZero: true
+                    }
+                }
+            },
+
             by_city_reports_data        :   {
                 labels                      :   [],
                 datasets                    :   []

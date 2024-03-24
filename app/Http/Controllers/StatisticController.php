@@ -163,4 +163,28 @@ class StatisticController extends Controller
             ],422);
         }
     }
+
+    //
+
+    public static function byBrandAvailabilityByCustomerTypeReports(Request $request) {
+
+        try {
+
+            //
+            $by_brand_availability_by_customer_type_reports     =   Statistic::byBrandAvailabilityByCustomerTypeReports($request);
+
+            //
+            return response()->json([
+
+                "by_brand_availability_by_customer_type_reports"    =>  $by_brand_availability_by_customer_type_reports
+            ]);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    } 
 }

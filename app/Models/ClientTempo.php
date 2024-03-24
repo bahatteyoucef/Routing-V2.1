@@ -64,8 +64,8 @@ class ClientTempo extends Model
 
                 'Neighborhood'              =>  $client_elem->Neighborhood          ,
                 'Landmark'                  =>  $client_elem->Landmark              ,
-                'BrandAvailability'         =>  $client_elem->BrandAvailability     ,
-                'BrandSourcePurchase'       =>  $client_elem->BrandSourcePurchase   ,
+                'BrandAvailability'         =>  0                                   ,
+                'BrandSourcePurchase'       =>  ""                                  ,
 
                 'id_route_import_tempo'     =>  $id_route_import_tempo  ,
                 'owner'                     =>  Auth::user()->id

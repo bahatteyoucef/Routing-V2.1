@@ -764,4 +764,96 @@ class Statistic extends Model
         //
         return $data_census_table;
     }
+
+    //
+
+    public static function byBrandAvailabilityByCustomerTypeReports(Request $request) {
+
+        $route_links    =   json_decode($request->get("route_links"));
+
+        //
+        $startDate      =   Carbon::parse($request->get("start_date")); // Replace with your start date
+        $endDate        =   Carbon::parse($request->get("end_date"));   // Replace with your end date
+        //
+
+        //
+        $customer_types     =   DB::table("clients")
+                                    ->select("clients.CustomerType")
+                                    ->whereIn('clients.id_route_import', $route_links)
+                                    ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                    ->distinct("clients.CustomerType")
+                                    ->pluck('CustomerType');
+
+        $total_clients      =   DB::table("clients")
+                                    ->select("clients.id")
+                                    ->whereIn('clients.id_route_import', $route_links)
+                                    ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                    ->count();
+
+        //
+
+        //
+        $datasets                   =   [];
+
+        $dataset                    =   new stdClass();
+        $dataset->data              =   [];
+
+        //
+        $rows                       =   [];
+
+        foreach ($customer_types as $customer_type) {
+
+            //  //  //  //  //  //  //  //  //  //
+            $count                      =   DB::table("clients")
+                                                ->where([['clients.CustomerType', $customer_type], ['clients.BrandAvailability', 1]])
+                                                ->whereIn('clients.id_route_import', $route_links)
+                                                ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                                ->count();
+
+            //
+            array_push($dataset->data, $count);
+
+            //  //  //  //  //  //  //  //  //  //
+
+            //  //  //  //  //  //  //  //  //  //
+
+            //
+            $row                            =   new stdClass();
+            $row->label                     =   $customer_type;
+            $row->count_clients             =   $count;
+            $row->percentage_clients        =   $count/$total_clients;
+
+            array_push($rows, $row);
+            //
+
+            //  //  //  //  //  //  //  //  //  //
+        }
+
+        array_push($datasets, $dataset);
+        //
+
+        //
+        $by_brand_availability_by_customer_type_reports                           =   new stdClass();
+
+        $by_brand_availability_by_customer_type_reports->labels                   =   $customer_types;
+        $by_brand_availability_by_customer_type_reports->datasets                 =   $datasets;
+        //
+
+        //  //  //  //  Prepare Table   //  //  //  //
+        
+        // Set Total By Yes/No    
+        $by_brand_availability_by_customer_type_table                                 =   new stdClass();
+
+        $by_brand_availability_by_customer_type_table->rows                           =   $rows;
+
+        $by_brand_availability_by_customer_type_table->total_row                      =   new stdClass();
+        $by_brand_availability_by_customer_type_table->total_row->label               =   "Total";
+        $by_brand_availability_by_customer_type_table->total_row->count_clients       =   $total_clients;
+        $by_brand_availability_by_customer_type_table->total_row->percentage_clients  =   1;
+
+        $by_brand_availability_by_customer_type_reports->by_brand_availability_by_customer_type_table       =   $by_brand_availability_by_customer_type_table;
+
+        //
+        return $by_brand_availability_by_customer_type_reports;
+    }
 }
