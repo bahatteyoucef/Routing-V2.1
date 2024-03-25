@@ -8,10 +8,8 @@
                 <h5 class="mb-0 ml-2">By Customer Type Report</h5>
             </div>
 
-            <div class="col-3 p-0 text-end">
-                <img v-if="true"    src="/images/slide_down.png" @click="setChart()"    role="button"/>
-
-                <img v-if="false"   src="/images/slide_up.png" @click="setChart()"      role="button"/>
+            <div class="col-3 text-end">
+                <img    src="/images/switch_arrows.png" @click="setChart()"    role="button"    class="mb-0 mr-2"/>
             </div>
         </div>
 

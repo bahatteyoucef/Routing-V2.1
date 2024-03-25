@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Exception;
+use GuzzleHttp\Psr7\Request as Psr7Request;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -64,6 +65,109 @@ class Statistic extends Model
 
         //
         return $by_customer_type_reports;
+    }
+
+    //
+
+    public static function byBrandSourcePurchaseReport(Request $request) {
+
+        $route_links        =   json_decode($request->get("route_links"));
+
+        //
+        $startDate          =   Carbon::parse($request->get("start_date")); // Replace with your start date
+        $endDate            =   Carbon::parse($request->get("end_date"));   // Replace with your end date
+        //
+
+        //
+        $source_achats      =   DB::table("clients")
+                                    ->select("clients.BrandSourcePurchase")
+                                    ->whereIn('clients.id_route_import', $route_links)
+                                    ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                    ->distinct("clients.BrandSourcePurchase")
+                                    ->pluck('BrandSourcePurchase');
+        //
+
+        //
+        $datasets                   =   [];
+
+        $dataset                    =   new stdClass();
+        $dataset->data              =   [];
+
+        foreach ($source_achats as $source_achat) {
+
+            //  //  //  //  //  //  //  //  //  //
+            $count                      =   DB::table("clients")
+                                                ->where('clients.BrandSourcePurchase', $source_achat)
+                                                ->whereIn('clients.id_route_import', $route_links)
+                                                ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                                ->count();
+
+            array_push($dataset->data, $count);
+        }
+
+        array_push($datasets, $dataset);
+        //
+
+        //
+        $by_source_achat_reports                            =   new stdClass();
+
+        $by_source_achat_reports->labels                    =   $source_achats;
+        $by_source_achat_reports->datasets                  =   $datasets;
+        //
+
+        //
+        return $by_source_achat_reports;
+    }
+
+    //
+
+    public static function byBrandAvailabilityReport(Request $request) {
+
+        $route_links        =   json_decode($request->get("route_links"));
+
+        //
+        $startDate          =   Carbon::parse($request->get("start_date")); // Replace with your start date
+        $endDate            =   Carbon::parse($request->get("end_date"));   // Replace with your end date
+        //
+
+        //
+        $datasets                   =   [];
+
+        //  //  //  //  //  //  //  //  //  //
+
+        $dataset                    =   new stdClass();
+        $dataset->data              =   [];
+
+        $count_yes                  =   DB::table("clients")
+                                            ->where('clients.BrandAvailability', 1)
+                                            ->whereIn('clients.id_route_import', $route_links)
+                                            ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                            ->count();
+
+        array_push($dataset->data, $count_yes);
+
+        //  //  //  //  //  //  //  //  //  //
+
+        $count_no                   =   DB::table("clients")
+                                            ->where('clients.BrandAvailability', 0)
+                                            ->whereIn('clients.id_route_import', $route_links)
+                                            ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                            ->count();
+
+        array_push($dataset->data, $count_no);
+
+        //  //  //  //  //  //  //  //  //  //
+
+        array_push($datasets, $dataset);
+
+        //
+        $by_brand_availability_reports                                      =   new stdClass();
+
+        $by_brand_availability_reports->labels                              =   ["Yes", "No"];
+        $by_brand_availability_reports->datasets                            =   $datasets;
+
+        //
+        return $by_brand_availability_reports;
     }
 
     //
@@ -443,19 +547,25 @@ class Statistic extends Model
         $stats_details  =   new stdClass();
 
         // by_customer_type_report_chart_data
-        $stats_details->by_customer_type_report_chart_data      =   Statistic::byCustomerTypeReport($request);
+        $stats_details->by_customer_type_report_chart_data          =   Statistic::byCustomerTypeReport($request);
+
+        // by_brand_source_purchase_report_chart_data
+        $stats_details->by_brand_source_purchase_report_chart_data  =   Statistic::byBrandSourcePurchaseReport($request);
+
+        // by_brand_availability_report_chart_data
+        $stats_details->by_brand_availability_report_chart_data     =   Statistic::byBrandAvailabilityReport($request);
 
         // Daily Report
-        $stats_details->daily_report_chart_data                 =   Statistic::dailyReport($request);
+        $stats_details->daily_report_chart_data                     =   Statistic::dailyReport($request);
 
         // By Tel Report
-        $stats_details->by_tel_availability_report_chart_data   =   Statistic::byTelAvailabilityReport($request);
+        $stats_details->by_tel_availability_report_chart_data       =   Statistic::byTelAvailabilityReport($request);
 
         // By City Report
-        $stats_details->by_city_report_chart_data               =   Statistic::byCityReport($request);
+        $stats_details->by_city_report_chart_data                   =   Statistic::byCityReport($request);
 
         // Data Census
-        $stats_details->data_census_report_table_data           =   Statistic::dataCensusReport($request);
+        $stats_details->data_census_report_table_data               =   Statistic::dataCensusReport($request);
 
         //
         return $stats_details;

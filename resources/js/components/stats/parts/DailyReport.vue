@@ -9,12 +9,7 @@
             </div>
 
             <div class="col-3 text-end">
-                <img v-if="true"    src="/images/slide_down.png" @click="setChart()"    role="button"/>
-
-                <img v-if="false"   src="/images/slide_up.png" @click="setChart()"      role="button"/>
-            </div>
-
-            <div class="col-4">
+                <img    src="/images/switch_arrows.png" @click="setChart()"    role="button"    class="mb-0 mr-2"/>
             </div>
         </div>
 

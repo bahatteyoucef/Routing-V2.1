@@ -108,7 +108,7 @@
       </div>
       <!--                -->
 
-      <!-- ByCustomerTypeReport + BySourceAchatReport + ByBrandAvailabilityReport -->
+      <!-- ByCustomerTypeReport + ByBrandSourcePurchaseReport + ByBrandAvailabilityReport -->
       <div class="row h-equal p-0 m-0">
 
         <!--  ByCustomerTypeReport  -->
@@ -122,14 +122,14 @@
           </div>
         </div>
 
-        <!--  BySourceAchatReport       -->
+        <!--  ByBrandSourcePurchaseReport -->
         <div class="col-4 p-2">
           <div class="card">
             <div class="card-body p-0">
               <div class="row">
 
                 <div class="report_div by_source_achat_report" id="by_source_achat_report">
-                    <!-- <BySourceAchatReport v-if="show_by_source_achat_report_content"></BySourceAchatReport> -->
+                    <ByBrandSourcePurchaseReport v-if="show_by_brand_source_purchase_report_content"  :key="by_brand_source_purchase_report_chart_data" :by_brand_source_purchase_report_chart_data="by_brand_source_purchase_report_chart_data"></ByBrandSourcePurchaseReport>
                 </div>
 
               </div>
@@ -144,7 +144,7 @@
               <div class="row">
 
                 <div class="report_div by_brand_availability_report" id="by_brand_availability_report">
-                    <!-- <ByBrandAvailabilityReport v-if="show_by_brand_availability_report_content"></ByBrandAvailabilityReport> -->
+                    <ByBrandAvailabilityReport v-if="show_by_brand_availability_report_content"   :key="by_brand_availability_report_chart_data"  :by_brand_availability_report_chart_data="by_brand_availability_report_chart_data"></ByBrandAvailabilityReport>
                 </div>
 
               </div>
@@ -153,7 +153,7 @@
         </div>
 
       </div>
-      <!--                                                                        -->
+      <!--                                                                                -->
 
       <!-- DailyReport    -->
       <div class="row h-equal p-0 m-0">
@@ -233,13 +233,12 @@
 <script>
 
 import ByCustomerTypeReport               from  "./parts/ByCustomerTypeReport.vue"
+import ByBrandSourcePurchaseReport        from  "./parts/ByBrandSourcePurchaseReport.vue"
 
 import DailyReport                        from  "./parts/DailyReport.vue"
 import ByTelAvailabilityReport            from  "./parts/ByTelAvailabilityReport.vue"
 import ByCityReport                       from  "./parts/ByCityReport.vue"
-
 import ByBrandAvailabilityReport          from  "./parts/ByBrandAvailabilityReport.vue"
-import BySourcePurchaseReport             from  "./parts/BySourcePurchaseReport.vue"
 import DataCensusReport                   from  "./parts/DataCensusReport.vue"
 
 //
@@ -253,6 +252,11 @@ export default {
 
       show_by_customer_type_report_content                      : false   ,
       by_customer_type_report_chart_data                        : null    ,
+
+      //
+
+      show_by_brand_source_purchase_report_content              : false   ,
+      by_brand_source_purchase_report_chart_data                : null    ,
 
       //
 
@@ -299,7 +303,7 @@ export default {
     ByBrandAvailabilityReport     :   ByBrandAvailabilityReport   ,
     ByCityReport                  :   ByCityReport                ,
     ByCustomerTypeReport          :   ByCustomerTypeReport        ,
-    BySourcePurchaseReport        :   BySourcePurchaseReport      ,
+    ByBrandSourcePurchaseReport        :   ByBrandSourcePurchaseReport      ,
     ByTelAvailabilityReport       :   ByTelAvailabilityReport     ,
     DailyReport                   :   DailyReport                 ,
     DataCensusReport              :   DataCensusReport            ,
@@ -333,24 +337,32 @@ export default {
                 console.log(res)
 
                 //
-                this.by_customer_type_report_chart_data       =   res.data.stats_details.by_customer_type_report_chart_data
-                this.show_by_customer_type_report_content     =   true
+                this.by_customer_type_report_chart_data           =   res.data.stats_details.by_customer_type_report_chart_data
+                this.show_by_customer_type_report_content         =   true
 
                 //
-                this.daily_report_chart_data                  =   res.data.stats_details.daily_report_chart_data
-                this.show_daily_report_content                =   true
+                this.by_brand_source_purchase_report_chart_data   =   res.data.stats_details.by_brand_source_purchase_report_chart_data
+                this.show_by_brand_source_purchase_report_content =   true
 
                 //
-                this.by_tel_availability_report_chart_data    =   res.data.stats_details.by_tel_availability_report_chart_data
-                this.show_by_tel_availability_report_content  =   true
+                this.by_brand_availability_report_chart_data      =   res.data.stats_details.by_brand_availability_report_chart_data
+                this.show_by_brand_availability_report_content    =   true
 
                 //
-                this.by_city_report_chart_data                =   res.data.stats_details.by_city_report_chart_data
-                this.show_by_city_report_content              =   true
+                this.daily_report_chart_data                      =   res.data.stats_details.daily_report_chart_data
+                this.show_daily_report_content                    =   true
 
                 //
-                this.data_census_report_table_data            =   res.data.stats_details.data_census_report_table_data
-                this.show_data_census_report_content          =   true
+                this.by_tel_availability_report_chart_data        =   res.data.stats_details.by_tel_availability_report_chart_data
+                this.show_by_tel_availability_report_content      =   true
+
+                //
+                this.by_city_report_chart_data                    =   res.data.stats_details.by_city_report_chart_data
+                this.show_by_city_report_content                  =   true
+
+                //
+                this.data_census_report_table_data                =   res.data.stats_details.data_census_report_table_data
+                this.show_data_census_report_content              =   true
 
                 //
                 this.$hideLoadingPage()
