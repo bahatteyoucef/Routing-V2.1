@@ -2,8 +2,8 @@
 
   <div class="p-3 m-2" style="background-color: #f2edf3; padding : 15px;">
 
-    <!-- Stats Filters  -->
-    <div class="col-12 p-0 mb-3" id="stats_filters">
+    <!-- Stats Filters    -->
+    <div class="col-12 p-2" id="stats_filters">
         <div class="card">
             <div class="card-body p-0">
               <div class="row">
@@ -56,125 +56,175 @@
             </div>
         </div>
     </div>
-    <!--                -->
+    <!--                  -->
 
-    <!-- Small Stats -->
-    <div class="col-12 p-0 mb-3" id="small_stats">
-
-      <!-- Small Report  -->
-      <div class="row h-equal p-0 m-0">
-        <div class="col-4 p-2">
-          <div class="row">
-            <div class="col p-1">
-              <div class="card bg-gradient-info card-img-holder text-white">
-                <div class="card-body">
-                  <h4 class="font-weight-normal mb-3">Weekly Orders <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
-                  </h4>
-                  <h2 class="mb-5">45,6334</h2>
-                </div>
-              </div>
-            </div>
-
-            <div class="col p-1">
-              <div class="card bg-gradient-info card-img-holder text-white">
-                <div class="card-body">
-                  <h4 class="font-weight-normal mb-3">Weekly Orders <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
-                  </h4>
-                  <h2 class="mb-5">45,6334</h2>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col p-1">
-              <div class="card bg-gradient-info card-img-holder text-white">
-                <div class="card-body">
-                  <h4 class="font-weight-normal mb-3">Weekly Orders <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
-                  </h4>
-                  <h2 class="mb-5">45,6334</h2>
-                </div>
-              </div>
-            </div>
-
-            <div class="col p-1">
-              <div class="card bg-gradient-info card-img-holder text-white">
-                <div class="card-body">
-                  <h4 class="font-weight-normal mb-3">Weekly Orders <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
-                  </h4>
-                  <h2 class="mb-5">45,6334</h2>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- v-if="show_by_brand_availability_report_content" -->
-        <div class="col-8 p-2">
-          <div class="card h-100">
-            <div class="card-body p-0">
-              <ByBrandAvailabilityReport></ByBrandAvailabilityReport>
-            </div>
-          </div>
-        </div>
-
-      </div>
-      <!--                -->
-
-    </div>
-    <!--                -->
-
-    <!-- Report        -->
+    <!-- Reports          -->
     <div class="col-12 p-0 mb-2" id="reports">
 
-      <!-- Small Report  -->
-      <div class="row">
-        <div class="col">
-          <div class="card">
-            <div class="card-body p-0">
-              <div class="row stats_filters" id="stats_filters">
-                
-                <div class="report_div" id="by_customer_type_reports">
-                    <ByCustomerTypeReport></ByCustomerTypeReport>
-                </div>
+      <!-- Card Stats     -->
+      <div class="row h-equal p-0 pl-2 m-0">
 
-              </div>
+        <!-- Card : Validated + Not Validated -->
+        <div class="col-3 p-1">
+          <div class="card bg-gradient-info card-img-holder text-white p-3">
+            <div class="card-body p-1">
+              <h4 class="font-weight-normal mb-3">Validated <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
+              </h4>
+              <h2 class="mb-1">45,6334</h2>
             </div>
           </div>
         </div>
 
-        <div class="col">
-          <div class="card">
-            <div class="card-body p-0">
-              <div class="row stats_filters" id="stats_filters">
-
-                <div class="report_div by_customer_type_reports" id="by_customer_type_reports">
-
-                </div>
-
-              </div>
+        <div class="col-3 p-1">
+          <div class="card bg-gradient-info card-img-holder text-white p-3">
+            <div class="card-body p-1">
+              <h4 class="font-weight-normal mb-3">Non Validated <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
+              </h4>
+              <h2 class="mb-1">45,6334</h2>
             </div>
           </div>
         </div>
 
-        <div class="col">
-          <div class="card">
-            <div class="card-body p-0">
-              <div class="row stats_filters" id="stats_filters">
-
-                <div class="report_div by_customer_type_reports" id="by_customer_type_reports">
-
-                </div>
-
-              </div>
+        <div class="col-3 p-1">
+          <div class="card bg-gradient-success card-img-holder text-white p-3">
+            <div class="card-body p-1">
+              <h4 class="font-weight-normal mb-3">Total <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
+              </h4>
+              <h2 class="mb-1">45,6334</h2>
             </div>
           </div>
         </div>
+
+        <div class="col-3 p-1 h-100">
+          <div class="card bg-gradient-success card-img-holder text-white p-3">
+            <div class="card-body p-1">
+              <h4 class="font-weight-normal mb-3">Expected <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
+              </h4>
+              <h2 class="mb-1">45,6334</h2>
+            </div>
+          </div>
+        </div>
+
       </div>
       <!--                -->
 
+      <!-- ByCustomerTypeReport + BySourceAchatReport + ByBrandAvailabilityReport -->
+      <div class="row h-equal p-0 m-0">
+
+        <!--  ByCustomerTypeReport  -->
+        <div class="col-4 p-2">
+          <div class="card">
+            <div class="card-body p-0">                
+              <div class="report_div" id="by_customer_type_report">
+                  <ByCustomerTypeReport v-if="show_by_customer_type_report_content"   :key="by_customer_type_report_chart_data"   :by_customer_type_report_chart_data="by_customer_type_report_chart_data"></ByCustomerTypeReport>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!--  BySourceAchatReport       -->
+        <div class="col-4 p-2">
+          <div class="card">
+            <div class="card-body p-0">
+              <div class="row">
+
+                <div class="report_div by_source_achat_report" id="by_source_achat_report">
+                    <!-- <BySourceAchatReport v-if="show_by_source_achat_report_content"></BySourceAchatReport> -->
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!--  ByBrandAvailabilityReport -->
+        <div class="col-4 p-2">
+          <div class="card">
+            <div class="card-body p-0">
+              <div class="row">
+
+                <div class="report_div by_brand_availability_report" id="by_brand_availability_report">
+                    <!-- <ByBrandAvailabilityReport v-if="show_by_brand_availability_report_content"></ByBrandAvailabilityReport> -->
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!--                                                                        -->
+
+      <!-- DailyReport    -->
+      <div class="row h-equal p-0 m-0">
+
+        <!--  DailyReport  -->
+        <div class="col-12 p-2">
+          <div class="card">
+            <div class="card-body p-0">                
+              <div class="report_div" id="daily_report">
+                <DailyReport v-if="show_daily_report_content"   :key="daily_report_chart_data"  :daily_report_chart_data="daily_report_chart_data"></DailyReport>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!--                -->
+
+      <!-- ByTelAvailability    -->
+      <div class="row h-equal p-0 m-0">
+
+        <!--  ByTelAvailabilityReport -->
+        <div class="col-12 p-2">
+          <div class="card">
+            <div class="card-body p-0">
+              <div class="report_div" id="by_tel_availability_report">
+                  <ByTelAvailabilityReport v-if="show_by_tel_availability_report_content"   :key="by_tel_availability_report_chart_data"    :by_tel_availability_report_chart_data="by_tel_availability_report_chart_data"></ByTelAvailabilityReport>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!--                      -->
+
+      <!-- ByCityReport         -->
+      <div class="row h-equal p-0 m-0">
+
+        <!--  ByCityReport  -->
+        <div class="col-12 p-2">
+          <div class="card">
+            <div class="card-body p-0">                
+              <div class="report_div" id="by_city_report">
+                  <ByCityReport v-if="show_by_city_report_content"  :key="by_city_report_chart_data"  :by_city_report_chart_data="by_city_report_chart_data"></ByCityReport>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!--                      -->
+
+      <!-- DataCensusReport -->
+      <div class="row h-equal p-0 m-0">
+
+        <!--  DataCensusReport  -->
+        <div class="col-12 p-2">
+          <div class="card">
+            <div class="card-body p-0">                
+              <div class="report_div" id="data_census_report">
+                  <DataCensusReport v-if="show_data_census_report_content"  :key="data_census_report_table_data"  :data_census_report_table_data="data_census_report_table_data"></DataCensusReport>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!--                  -->
+
     </div>
-    <!--                -->
+    <!--                  -->
 
   </div>
 
@@ -182,13 +232,18 @@
 
 <script>
 
-import ByCustomerTypeReport                      from  "./parts/ByCustomerTypeReport.vue"
-import ByBrandAvailabilityReport                 from  "./parts/ByBrandAvailabilityReport.vue"
-import BySourceAchatReport                       from  "./parts/BySourceAchatReport.vue"
+import ByCustomerTypeReport               from  "./parts/ByCustomerTypeReport.vue"
+
+import DailyReport                        from  "./parts/DailyReport.vue"
+import ByTelAvailabilityReport            from  "./parts/ByTelAvailabilityReport.vue"
+import ByCityReport                       from  "./parts/ByCityReport.vue"
+
+import ByBrandAvailabilityReport          from  "./parts/ByBrandAvailabilityReport.vue"
+import BySourcePurchaseReport             from  "./parts/BySourcePurchaseReport.vue"
+import DataCensusReport                   from  "./parts/DataCensusReport.vue"
 
 //
-
-import Multiselect                                from  "@vueform/multiselect"
+import Multiselect                        from  "@vueform/multiselect"
 
 export default {
 
@@ -196,13 +251,33 @@ export default {
 
     return {
 
-      show_data_census_report_content                            : false  ,
-      show_daily_report_content                                  : false  ,
-      show_by_tel_availability_report_content                    : false  ,
-      show_by_city_report_content                                : false  ,
-      show_by_customer_type_report_content                       : false  ,
-      show_by_source_achat_report_content                        : false  ,
-      show_by_brand_availability_report_content                  : false  ,
+      show_by_customer_type_report_content                      : false   ,
+      by_customer_type_report_chart_data                        : null    ,
+
+      //
+
+      show_daily_report_content                                 : false   ,
+      daily_report_chart_data                                   : null    ,
+
+      //
+
+      show_by_tel_availability_report_content                   : false   ,
+      by_tel_availability_report_chart_data                     : null    ,
+
+      //
+
+      show_by_city_report_content                               : false   ,
+      by_city_report_chart_data                                 : null    ,
+
+      //
+
+      show_data_census_report_content                           : false   ,
+      data_census_report_table_data                             : null    ,
+
+      //
+
+      show_by_source_achat_report_content                       : false   ,
+      show_by_brand_availability_report_content                 : false   ,
 
       //
 
@@ -214,11 +289,20 @@ export default {
     }
   },
 
+  async mounted() {
+
+    await this.fetchMaps()
+  },
+
   components : {
 
-    BySourceAchatReport           :   BySourceAchatReport                      ,
-    ByBrandAvailabilityReport     :   ByBrandAvailabilityReport                ,
-    ByCustomerTypeReport          :   ByCustomerTypeReport                     ,
+    ByBrandAvailabilityReport     :   ByBrandAvailabilityReport   ,
+    ByCityReport                  :   ByCityReport                ,
+    ByCustomerTypeReport          :   ByCustomerTypeReport        ,
+    BySourcePurchaseReport        :   BySourcePurchaseReport      ,
+    ByTelAvailabilityReport       :   ByTelAvailabilityReport     ,
+    DailyReport                   :   DailyReport                 ,
+    DataCensusReport              :   DataCensusReport            ,
 
     //
 
@@ -227,45 +311,88 @@ export default {
 
   methods : {
 
-    showHideDataCensusReport() {
+    async getData() {
 
-      this.show_data_census_report_content              =   !this.show_data_census_report_content
+      try {
+
+        if((this.start_date  !=  "")&&(this.end_date  !=  "")) {
+
+            this.$showLoadingPage()
+
+            //
+
+            let formData    =   new FormData()
+
+            formData.append("route_links"   , JSON.stringify(this.route_links))
+            formData.append("start_date"    , this.start_date)
+            formData.append("end_date"      , this.end_date)
+
+            await this.$callApi("post",   "/statistics/details",    formData)
+            .then(async (res)=> {
+
+                console.log(res)
+
+                //
+                this.by_customer_type_report_chart_data       =   res.data.stats_details.by_customer_type_report_chart_data
+                this.show_by_customer_type_report_content     =   true
+
+                //
+                this.daily_report_chart_data                  =   res.data.stats_details.daily_report_chart_data
+                this.show_daily_report_content                =   true
+
+                //
+                this.by_tel_availability_report_chart_data    =   res.data.stats_details.by_tel_availability_report_chart_data
+                this.show_by_tel_availability_report_content  =   true
+
+                //
+                this.by_city_report_chart_data                =   res.data.stats_details.by_city_report_chart_data
+                this.show_by_city_report_content              =   true
+
+                //
+                this.data_census_report_table_data            =   res.data.stats_details.data_census_report_table_data
+                this.show_data_census_report_content          =   true
+
+                //
+                this.$hideLoadingPage()
+            })
+        }
+      }
+
+      catch(e) {
+
+        console.log(e)
+      }
     },
 
-    showHideDailyReport() {
+    //
 
-      this.show_daily_report_content                    =   !this.show_daily_report_content
+    async fetchMaps() {
+
+      try {
+
+          this.$callApi("post",    "/route_import/stats", null)
+          .then((res)=> {
+
+              this.liste_route_import = res.data
+
+              this.prepareRouteLink()
+          })
+      }
+      catch(e) {
+
+          console.log(e)
+      }
     },
 
-    showHideByTelAvailabilityReport() {
+    prepareRouteLink() {
 
-      this.show_by_tel_availability_report_content      =   !this.show_by_tel_availability_report_content
+      this.liste_route_link     =   []
+
+      for (let i = 0; i < this.liste_route_import.length; i++) {
+
+          this.liste_route_link.push({ value : this.liste_route_import[i].id , label : this.liste_route_import[i].libelle})
+      }
     },
-
-    showHideByCityReport() {
-
-      this.show_by_city_report_content                  =   !this.show_by_city_report_content
-    },
-
-    showHideByCustomerTypeReport() {
-
-      this.show_by_customer_types_report_content        =   !this.show_by_customer_types_report_content
-    },
-
-    showHideByCustomerTypeReport() {
-
-      this.show_by_customer_type_report_content         =   !this.show_by_customer_type_report_content
-    },
-
-    showHideBySourceAchatReport() {
-
-      this.show_by_source_achat_report_content          =   !this.show_by_source_achat_report_content
-    },
-
-    showHideByBrandAvailabilityReport() {
-
-      this.show_by_brand_availability_report_content    =   !this.show_by_brand_availability_report_content
-    }
   }
 }
 

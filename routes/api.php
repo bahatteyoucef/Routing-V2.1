@@ -220,15 +220,8 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/route_import/stats'                                                                   ,   [RouteImportController::class           , 'statsRouteImports'                           ]);
 
-    Route::post('/statistics/daily_reports'                                                             ,   [StatisticController::class             , 'dailyReports'                                ]);
-    Route::post('/statistics/by_tel_availability_reports'                                               ,   [StatisticController::class             , 'byTelAvailabilityReports'                    ]);
-    Route::post('/statistics/by_customer_type_reports'                                                  ,   [StatisticController::class             , 'byCustomerTypeReports'                       ]);
-    Route::post('/statistics/by_source_achat_reports'                                                   ,   [StatisticController::class             , 'bySourceAchatReports'                        ]);
-    Route::post('/statistics/by_brand_availability_reports'                                             ,   [StatisticController::class             , 'byBrandAvailabilityReports'                  ]);
-    Route::post('/statistics/by_city_reports'                                                           ,   [StatisticController::class             , 'byCityReports'                               ]);
-    Route::post('/statistics/data_census_reports'                                                       ,   [StatisticController::class             , 'dataCensusReports'                           ]);
+    //
 
-    Route::post('/statistics/by_brand_availability_by_customer_type_reports'                            ,   [StatisticController::class             , 'byBrandAvailabilityByCustomerTypeReports'    ]);
-
+    Route::post('/statistics/details'                                                                   ,   [StatisticController::class             , 'statsDetails'                                ]);
 
 });
