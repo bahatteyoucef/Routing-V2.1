@@ -1,6 +1,6 @@
 <template>
 
-  <div class="p-3 m-2" style="background-color: #f2edf3; padding : 15px;">
+  <div class="p-3 m-2 h-100" style="background-color: #f2edf3; padding : 15px;">
 
     <!-- Stats Filters    -->
     <div class="col-12 p-2" id="stats_filters">
@@ -66,41 +66,41 @@
 
         <!-- Card : Validated + Not Validated -->
         <div class="col-3 p-1">
-          <div class="card h-100 bg-gradient-info card-img-holder text-white p-3">
+          <div class="card h-100 bg-gradient-info card-img-holder text-white p-3" v-if="number_clients_validated">
             <div class="card-body p-1">
               <h4 class="font-weight-normal mb-3">Validated <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
               </h4>
-              <h2 v-if="number_clients_validated"     class="mb-1 animate__animated animate__pulse">{{number_clients_validated}}</h2>
+              <h2 class="mb-1 animate__animated animate__pulse">{{number_clients_validated}}</h2>
             </div>
           </div>
         </div>
 
         <div class="col-3 p-1">
-          <div class="card h-100 bg-gradient-info card-img-holder text-white p-3">
+          <div class="card h-100 bg-gradient-info card-img-holder text-white p-3" v-if="number_clients_nonvalidated">
             <div class="card-body p-1">
               <h4 class="font-weight-normal mb-3">Non Validated <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
               </h4>
-              <h2 v-if="number_clients_nonvalidated"  class="mb-1 animate__animated animate__pulse">{{number_clients_nonvalidated}}</h2>
+              <h2 class="mb-1 animate__animated animate__pulse">{{number_clients_nonvalidated}}</h2>
             </div>
           </div>
         </div>
 
         <div class="col-3 p-1">
-          <div class="card h-100 bg-gradient-success card-img-holder text-white p-3">
+          <div class="card h-100 bg-gradient-success card-img-holder text-white p-3" v-if="number_clients_total">
             <div class="card-body p-1">
               <h4 class="font-weight-normal mb-3">Total <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
               </h4>
-              <h2 v-if="number_clients_total"         class="mb-1 animate__animated animate__pulse">{{number_clients_total}}</h2>
+              <h2 class="mb-1 animate__animated animate__pulse">{{number_clients_total}}</h2>
             </div>
           </div>
         </div>
 
         <div class="col-3 p-1 h-100">
-          <div class="card h-100 bg-gradient-success card-img-holder text-white p-3">
+          <div class="card h-100 bg-gradient-success card-img-holder text-white p-3" v-if="number_clients_expected">
             <div class="card-body p-1">
               <h4 class="font-weight-normal mb-3">Expected <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
               </h4>
-              <h2 v-if="number_clients_expected"      class="mb-1 animate__animated animate__pulse">{{number_clients_expected}}</h2>
+              <h2 class="mb-1 animate__animated animate__pulse">{{number_clients_expected}}</h2>
             </div>
           </div>
         </div>
@@ -113,10 +113,10 @@
 
         <!--  ByCustomerTypeReport  -->
         <div class="col-4 p-2">
-          <div class="card h-100">
+          <div class="card h-100" v-if="show_by_customer_type_report_content">
             <div class="card-body p-0">                
               <div class="report_div" id="by_customer_type_report">
-                  <ByCustomerTypeReport v-if="show_by_customer_type_report_content"   :key="by_customer_type_report_chart_data"   :by_customer_type_report_chart_data="by_customer_type_report_chart_data"  :by_customer_type_report_table_data="by_customer_type_report_table_data"></ByCustomerTypeReport>
+                  <ByCustomerTypeReport :key="by_customer_type_report_chart_data"   :by_customer_type_report_chart_data="by_customer_type_report_chart_data"  :by_customer_type_report_table_data="by_customer_type_report_table_data"></ByCustomerTypeReport>
               </div>
             </div>
           </div>
@@ -124,12 +124,12 @@
 
         <!--  ByBrandSourcePurchaseReport -->
         <div class="col-4 p-2">
-          <div class="card h-100">
+          <div class="card h-100" v-if="show_by_brand_source_purchase_report_content">
             <div class="card-body p-0">
               <div class="row">
 
                 <div class="report_div by_source_achat_report" id="by_source_achat_report">
-                    <ByBrandSourcePurchaseReport v-if="show_by_brand_source_purchase_report_content"  :key="by_brand_source_purchase_report_chart_data" :by_brand_source_purchase_report_chart_data="by_brand_source_purchase_report_chart_data"  :by_brand_source_purchase_report_table_data="by_brand_source_purchase_report_table_data"></ByBrandSourcePurchaseReport>
+                    <ByBrandSourcePurchaseReport :key="by_brand_source_purchase_report_chart_data" :by_brand_source_purchase_report_chart_data="by_brand_source_purchase_report_chart_data"  :by_brand_source_purchase_report_table_data="by_brand_source_purchase_report_table_data"></ByBrandSourcePurchaseReport>
                 </div>
 
               </div>
@@ -139,12 +139,12 @@
 
         <!--  ByBrandAvailabilityReport -->
         <div class="col-4 p-2">
-          <div class="card h-100">
+          <div class="card h-100" v-if="show_by_brand_availability_report_content">
             <div class="card-body p-0">
               <div class="row">
 
                 <div class="report_div by_brand_availability_report" id="by_brand_availability_report">
-                    <ByBrandAvailabilityReport v-if="show_by_brand_availability_report_content"   :key="by_brand_availability_report_chart_data"  :by_brand_availability_report_chart_data="by_brand_availability_report_chart_data"  :by_brand_availability_report_table_data="by_brand_availability_report_table_data"></ByBrandAvailabilityReport>
+                    <ByBrandAvailabilityReport  :key="by_brand_availability_report_chart_data"  :by_brand_availability_report_chart_data="by_brand_availability_report_chart_data"  :by_brand_availability_report_table_data="by_brand_availability_report_table_data"></ByBrandAvailabilityReport>
                 </div>
 
               </div>
@@ -160,10 +160,10 @@
 
         <!--  DailyReport  -->
         <div class="col-12 p-2">
-          <div class="card h-100">
+          <div class="card h-100" v-if="show_daily_report_content">
             <div class="card-body p-0">                
               <div class="report_div" id="daily_report">
-                <DailyReport v-if="show_daily_report_content"   :key="daily_report_chart_data"  :daily_report_chart_data="daily_report_chart_data"  :daily_report_table_data="daily_report_table_data"></DailyReport>
+                <DailyReport  :key="daily_report_chart_data"  :daily_report_chart_data="daily_report_chart_data"  :daily_report_table_data="daily_report_table_data"></DailyReport>
               </div>
             </div>
           </div>
@@ -177,10 +177,10 @@
 
         <!--  ByTelAvailabilityReport -->
         <div class="col-12 p-2">
-          <div class="card h-100">
+          <div class="card h-100" v-if="show_by_tel_availability_report_content">
             <div class="card-body p-0">
               <div class="report_div" id="by_tel_availability_report">
-                  <ByTelAvailabilityReport v-if="show_by_tel_availability_report_content"   :key="by_tel_availability_report_chart_data"    :by_tel_availability_report_chart_data="by_tel_availability_report_chart_data"  :by_tel_availability_report_table_data="by_tel_availability_report_table_data"></ByTelAvailabilityReport>
+                  <ByTelAvailabilityReport  :key="by_tel_availability_report_chart_data"    :by_tel_availability_report_chart_data="by_tel_availability_report_chart_data"  :by_tel_availability_report_table_data="by_tel_availability_report_table_data"></ByTelAvailabilityReport>
               </div>
             </div>
           </div>
@@ -194,10 +194,10 @@
 
         <!--  ByCityReport  -->
         <div class="col-12 p-2">
-          <div class="card h-100">
+          <div class="card h-100" v-if="show_by_city_report_content">
             <div class="card-body p-0">                
               <div class="report_div" id="by_city_report">
-                  <ByCityReport v-if="show_by_city_report_content"  :key="by_city_report_chart_data"  :by_city_report_chart_data="by_city_report_chart_data"  :by_city_report_table_data="by_city_report_table_data"></ByCityReport>
+                  <ByCityReport :key="by_city_report_chart_data"  :by_city_report_chart_data="by_city_report_chart_data"  :by_city_report_table_data="by_city_report_table_data"></ByCityReport>
               </div>
             </div>
           </div>
@@ -211,10 +211,10 @@
 
         <!--  DataCensusReport  -->
         <div class="col-12 p-2">
-          <div class="card h-100">
+          <div class="card h-100" v-if="show_data_census_report_content">
             <div class="card-body p-0">                
               <div class="report_div" id="data_census_report">
-                  <DataCensusReport v-if="show_data_census_report_content"  :key="data_census_report_table_data"  :data_census_report_table_data="data_census_report_table_data"></DataCensusReport>
+                  <DataCensusReport :key="data_census_report_table_data"  :data_census_report_table_data="data_census_report_table_data"></DataCensusReport>
               </div>
             </div>
           </div>
