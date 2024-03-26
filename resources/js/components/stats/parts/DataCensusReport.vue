@@ -149,10 +149,13 @@ export default {
     async mounted() {
 
         //
+        this.setTable()
+
+        //
         await this.$nextTick()
 
         //
-        this.setTable()
+        this.emitter.emit('show_data_census_report_content_ready')
     },
 
     methods : {

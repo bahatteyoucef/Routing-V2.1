@@ -83,10 +83,13 @@ export default {
     async mounted() {
 
         //
+        this.setChart();
+
+        //
         await this.$nextTick()
 
         //
-        this.setChart();
+        this.emitter.emit('show_by_brand_availability_report_content_ready')
     },
 
     methods : {

@@ -42,13 +42,13 @@
 
                 <!-- Select Date Range  -->
                 <div class="col-2 mt-1">
-                    <button class="btn primary w-100"   @click="getData()">Get Data</button>
+                    <button v-if="show_get_data_button"     class="btn primary w-100"   @click="getData()">Get Data</button>
                 </div>
                 <!--  -->
 
                 <!-- Select Date Range  -->
                 <div class="col-2 mt-1">
-                    <button class="btn primary w-100"   @click="getData()">Export Data</button>
+                    <button v-if="show_export_data_button"  class="btn primary w-100"   @click="getData()">Export Data</button>
                 </div>
                 <!--  -->
 
@@ -70,7 +70,7 @@
             <div class="card-body p-1">
               <h4 class="font-weight-normal mb-3">Validated <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
               </h4>
-              <h2 class="mb-1">{{number_clients_validated}}</h2>
+              <h2 v-if="number_clients_validated"     class="mb-1 animate__animated animate__pulse">{{number_clients_validated}}</h2>
             </div>
           </div>
         </div>
@@ -80,7 +80,7 @@
             <div class="card-body p-1">
               <h4 class="font-weight-normal mb-3">Non Validated <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
               </h4>
-              <h2 class="mb-1">{{number_clients_nonvalidated}}</h2>
+              <h2 v-if="number_clients_nonvalidated"  class="mb-1 animate__animated animate__pulse">{{number_clients_nonvalidated}}</h2>
             </div>
           </div>
         </div>
@@ -90,7 +90,7 @@
             <div class="card-body p-1">
               <h4 class="font-weight-normal mb-3">Total <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
               </h4>
-              <h2 class="mb-1">{{number_clients_total}}</h2>
+              <h2 v-if="number_clients_total"         class="mb-1 animate__animated animate__pulse">{{number_clients_total}}</h2>
             </div>
           </div>
         </div>
@@ -100,7 +100,7 @@
             <div class="card-body p-1">
               <h4 class="font-weight-normal mb-3">Expected <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
               </h4>
-              <h2 class="mb-1">{{number_clients_expected}}</h2>
+              <h2 v-if="number_clients_expected"      class="mb-1 animate__animated animate__pulse">{{number_clients_expected}}</h2>
             </div>
           </div>
         </div>
@@ -250,10 +250,15 @@ export default {
 
     return {
 
-      number_clients_validated                                  : 0       ,
-      number_clients_nonvalidated                               : 0       ,
-      number_clients_total                                      : 0       ,
-      number_clients_expected                                   : 0       ,
+      show_get_data_button                                      : true    ,
+      show_export_data_button                                   : false   ,
+
+      //
+
+      number_clients_validated                                  : null    ,
+      number_clients_nonvalidated                               : null    ,
+      number_clients_total                                      : null    ,
+      number_clients_expected                                   : null    ,
 
       //
 
@@ -338,6 +343,11 @@ export default {
 
             //
 
+            this.show_get_data_button     =   false
+            this.show_export_data_button  =   false
+
+            //
+
             let formData    =   new FormData()
 
             formData.append("route_links"   , JSON.stringify(this.route_links))
@@ -348,6 +358,9 @@ export default {
             .then(async (res)=> {
 
                 console.log(res)
+
+                //
+                this.$hideLoadingPage()
 
                 //
                 this.number_clients_validated                     =   res.data.stats_details.number_clients_validated
@@ -363,43 +376,64 @@ export default {
 
                 this.show_by_customer_type_report_content         =   true
 
-                //
-                this.by_brand_source_purchase_report_chart_data   =   res.data.stats_details.by_brand_source_purchase_report_chart_data
-                this.by_brand_source_purchase_report_table_data   =   res.data.stats_details.by_brand_source_purchase_report_table_data
+                this.emitter.on('show_by_customer_type_report_content_ready' , () =>  {
 
-                this.show_by_brand_source_purchase_report_content =   true
+                    //
+                    this.by_brand_source_purchase_report_chart_data   =   res.data.stats_details.by_brand_source_purchase_report_chart_data
+                    this.by_brand_source_purchase_report_table_data   =   res.data.stats_details.by_brand_source_purchase_report_table_data
 
-                //
-                this.by_brand_availability_report_chart_data      =   res.data.stats_details.by_brand_availability_report_chart_data
-                this.by_brand_availability_report_table_data      =   res.data.stats_details.by_brand_availability_report_table_data
+                    this.show_by_brand_source_purchase_report_content =   true
 
-                this.show_by_brand_availability_report_content    =   true
+                    this.emitter.on('show_by_brand_source_purchase_report_content_ready' , () =>  {
 
-                //
-                this.daily_report_chart_data                      =   res.data.stats_details.daily_report_chart_data
-                this.daily_report_table_data                      =   res.data.stats_details.daily_report_table_data
+                        //
+                        this.by_brand_availability_report_chart_data      =   res.data.stats_details.by_brand_availability_report_chart_data
+                        this.by_brand_availability_report_table_data      =   res.data.stats_details.by_brand_availability_report_table_data
 
-                this.show_daily_report_content                    =   true
+                        this.show_by_brand_availability_report_content    =   true
 
-                //
-                this.by_tel_availability_report_chart_data        =   res.data.stats_details.by_tel_availability_report_chart_data
-                this.by_tel_availability_report_table_data        =   res.data.stats_details.by_tel_availability_report_table_data
+                        this.emitter.on('show_by_brand_availability_report_content_ready' , () =>  {
 
-                this.show_by_tel_availability_report_content      =   true
+                            //
+                            this.daily_report_chart_data                      =   res.data.stats_details.daily_report_chart_data
+                            this.daily_report_table_data                      =   res.data.stats_details.daily_report_table_data
 
-                //
-                this.by_city_report_chart_data                    =   res.data.stats_details.by_city_report_chart_data
-                this.by_city_report_table_data                    =   res.data.stats_details.by_city_report_table_data
+                            this.show_daily_report_content                    =   true
 
-                this.show_by_city_report_content                  =   true
+                            this.emitter.on('show_daily_report_content_ready' , () =>  {
 
-                //
-                this.data_census_report_table_data                =   res.data.stats_details.data_census_report_table_data
+                                //
+                                this.by_tel_availability_report_chart_data        =   res.data.stats_details.by_tel_availability_report_chart_data
+                                this.by_tel_availability_report_table_data        =   res.data.stats_details.by_tel_availability_report_table_data
 
-                this.show_data_census_report_content              =   true
-                
-                //
-                this.$hideLoadingPage()
+                                this.show_by_tel_availability_report_content      =   true
+
+                                this.emitter.on('show_by_tel_availability_report_content_ready' , () =>  {
+
+                                    //
+                                    this.by_city_report_chart_data                    =   res.data.stats_details.by_city_report_chart_data
+                                    this.by_city_report_table_data                    =   res.data.stats_details.by_city_report_table_data
+
+                                    this.show_by_city_report_content                  =   true
+
+                                    this.emitter.on('show_by_city_report_content_ready' , () =>  {
+
+                                        //
+                                        this.data_census_report_table_data                =   res.data.stats_details.data_census_report_table_data
+
+                                        this.show_data_census_report_content              =   true
+
+                                        this.emitter.on('show_data_census_report_content_ready' , () =>  {
+
+                                            this.show_get_data_button     =   true
+                                            this.show_export_data_button  =   true
+                                        })
+                                    })
+                                })
+                            })
+                        })
+                    })
+                })
             })
         }
       }
