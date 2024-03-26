@@ -9,12 +9,12 @@
             </div>
 
             <div class="col-3 text-end">
-                <img    src="/images/switch_arrows.png" @click="setChart()"    role="button"    class="mb-0 mr-2"/>
+                <img    src="/images/switch_arrows.png" @click="toggleChartTable()"    role="button"    class="mb-0 mr-2"/>
             </div>
         </div>
 
         <!-- Show Chart         -->
-        <div class="row">
+        <div v-show="show_by_city_report_chart_data"    class="row animate__animated animate__pulse">
 
             <!-- By City Reports  -->
             <div class="col-12">
@@ -25,6 +25,47 @@
                 </div>
             </div>
 
+        </div>
+
+        <!-- Show Table             -->
+        <div v-show="show_by_city_report_table_data"    class="row animate__animated animate__pulse">
+            <div        class="table_scroll table_scroll_x table_scroll_y table_container table_container mt-5">
+                <table  class="table table-bordered w-100" id="by_city_report_table_data">
+                    <thead>
+                        <tr>
+                            <th>Index</th>
+                            <th>City</th>
+                            <th>Expected</th>
+                            <th>Added</th>
+                            <th>Gap</th>
+                            <th>Percentage</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr v-for="row, index_1 in by_city_report_table_data.rows" :key="index_1">
+                            <td>{{ index_1 }}</td>
+                            <td>{{ row.CityNameE }}</td>
+                            <td>{{ row.expected_clients }}</td>
+                            <td>{{ row.added_clients }}</td>
+                            <td>{{ row.gap }}</td>
+                            <td>{{ row.percentage_clients * 100 }} %</td>
+                            <td>{{ row.status_clients }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>{{ by_city_report_table_data.total_row.label }}</th>
+                            <th></th>
+                            <th>{{ by_city_report_table_data.total_row.expected_clients }}</th>
+                            <th>{{ by_city_report_table_data.total_row.added_clients }}</th>
+                            <th>{{ by_city_report_table_data.total_row.gap }}</th>
+                            <th>{{ by_city_report_table_data.total_row.percentage_clients * 100 }} %</th>
+                            <th>{{ by_city_report_table_data.total_row.status_clients }}</th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
     </div>
@@ -40,18 +81,23 @@ export default {
 
             by_city_chart               :   null,
 
-            by_city_report_chart_options     :   {
-                maintainAspectRatio         :   false,
-                scales                      :   {
-                    y                           :   {
+            by_city_report_chart_options    :   {
+                maintainAspectRatio             :   false,
+                scales                          :   {
+                    y                               :   {
                         beginAtZero: true
                     }
                 }
             },
+
+            //
+
+            show_by_city_report_chart_data      :   true    ,
+            show_by_city_report_table_data      :   false   
         }
     },
 
-    props : ["by_city_report_chart_data"],
+    props : ["by_city_report_chart_data", "by_city_report_table_data"],
 
     async mounted() {
 
@@ -93,6 +139,23 @@ export default {
                 by_city_report_chart_container.style.width         =   by_city_report_chart_scroll_width
             }
         },
+
+        //
+
+        toggleChartTable() {
+
+            if(this.show_by_city_report_chart_data      ==  false) {
+
+                this.show_by_city_report_table_data     =   false
+                this.show_by_city_report_chart_data     =   true
+            }
+
+            else {
+
+                this.show_by_city_report_chart_data     =   false
+                this.show_by_city_report_table_data     =   true
+            }
+        }
     }
 }
 </script>

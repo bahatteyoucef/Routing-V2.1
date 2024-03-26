@@ -9,12 +9,12 @@
             </div>
 
             <div class="col-3 text-end">
-                <img    src="/images/switch_arrows.png" @click="setChart()"    role="button"    class="mb-0 mr-2"/>
+                <img    src="/images/switch_arrows.png" @click="toggleChartTable()"    role="button"    class="mb-0 mr-2"/>
             </div>
         </div>
 
         <!-- Show Chart         -->
-        <div class="row">
+        <div v-show="show_daily_report_chart_data"      class="row animate__animated animate__pulse">
 
             <!-- Daily Reports  -->
             <div class="col-12">
@@ -27,7 +27,35 @@
             </div>
 
         </div>
-        <!--  -->
+
+        <!-- Show Table         -->
+        <div v-show="show_daily_report_table_data"      class="row animate__animated animate__pulse">
+            <div        class="table_scroll table_scroll_x table_scroll_y table_container table_container mt-5">
+                <table  class="table w-100" id="daily_report_table_data">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th v-for="label, index_1 in daily_report_table_data.allDays" :key="index_1">{{ label }}</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr v-for="row, index_2 in daily_report_table_data.rows" :key="index_2">
+                            <th>{{row.label}}</th>
+                            <td v-for="data_value, index_3 in row.data" :key="index_3">{{ data_value }}</td>
+                            <th>{{ row.total }}</th>
+                        </tr>
+
+                        <tr>
+                            <th>Total</th>
+                            <th v-for="total_by_day, index_4 in daily_report_table_data.total_by_day_object.data" :key="index_4">{{ total_by_day }}</th>
+                            <th>{{ daily_report_table_data.total_by_day_object.total }}</th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
     </div>
 
@@ -42,18 +70,23 @@ export default {
 
             daily_report_chart     :   null,
 
-            daily_report_chart_options   :   {
-                maintainAspectRatio     :   false,
-                scales                  :   {
-                    y                       :   {
+            daily_report_chart_options      :   {
+                maintainAspectRatio             :   false,
+                scales                          :   {
+                    y                               :   {
                         beginAtZero: true
                     }
                 }
             },
+
+            //
+
+            show_daily_report_chart_data    :   true    ,
+            show_daily_report_table_data    :   false   
         }
     },
 
-    props : ["daily_report_chart_data"],
+    props : ["daily_report_chart_data", "daily_report_table_data"],
 
     async mounted() {
 
@@ -93,6 +126,23 @@ export default {
             if(parseFloat(daily_report_chart_scroll_width)      >   parseFloat(daily_report_chart_container.style.width)) {
 
                 daily_report_chart_container.style.width    =   daily_report_chart_scroll_width
+            }
+        },
+
+        //
+
+        toggleChartTable() {
+
+            if(this.show_daily_report_chart_data ==  false) {
+
+                this.show_daily_report_table_data   =   false
+                this.show_daily_report_chart_data   =   true
+            }
+
+            else {
+
+                this.show_daily_report_chart_data   =   false
+                this.show_daily_report_table_data   =   true
             }
         }
     }

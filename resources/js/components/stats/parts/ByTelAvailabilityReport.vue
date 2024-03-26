@@ -9,12 +9,12 @@
             </div>
 
             <div class="col-3 text-end">
-                <img    src="/images/switch_arrows.png" @click="setChart()"    role="button"    class="mb-0 mr-2"/>
+                <img    src="/images/switch_arrows.png" @click="toggleChartTable()"    role="button"    class="mb-0 mr-2"/>
             </div>
         </div>
 
         <!-- Show Chart         -->
-        <div class="row">
+        <div v-show="show_by_tel_availability_report_chart_data"    class="row animate__animated animate__pulse">
 
             <!-- Daily Reports  -->
             <div class="col-12">
@@ -25,6 +25,38 @@
                 </div>
             </div>
 
+        </div>
+
+        <!-- Show Table -->
+        <div v-show="show_by_tel_availability_report_table_data"    class="row animate__animated animate__pulse">
+            <div        class="table_scroll table_scroll_x table_scroll_y table_container mt-5">
+                <table  class="table table-bordered w-100" id="by_tel_availability_report_table_data">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Yes</th>
+                            <th>No</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr v-for="row, index_1 in by_tel_availability_report_table_data.rows" :key="index_1">
+                            <th>{{ row.label }}</th>
+                            <td>{{ row.count_yes }}</td>
+                            <td>{{ row.count_no }}</td>
+                            <th>{{ row.count_total }}</th>
+                        </tr>
+
+                        <tr>
+                            <th>{{ by_tel_availability_report_table_data.total_row.label }}</th>
+                            <th>{{ by_tel_availability_report_table_data.total_row.count_yes }}</th>
+                            <th>{{ by_tel_availability_report_table_data.total_row.count_no }}</th>
+                            <th>{{ by_tel_availability_report_table_data.total_row.count_total }}</th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
     </div>
@@ -40,18 +72,23 @@ export default {
 
             by_tel_availability_report_chart        :   null,
 
-            by_tel_availability_report_chart_options     :   {
-                maintainAspectRatio                     :   false,
-                scales                                  :   {
-                    y                                       :   {
+            by_tel_availability_report_chart_options    :   {
+                maintainAspectRatio                         :   false,
+                scales                                      :   {
+                    y                                           :   {
                         beginAtZero: true
                     }
                 }
             },
+
+            //
+
+            show_by_tel_availability_report_chart_data  :   true    ,
+            show_by_tel_availability_report_table_data  :   false   
         }
     },
 
-    props : ["by_tel_availability_report_chart_data"],
+    props : ["by_tel_availability_report_chart_data", "by_tel_availability_report_table_data"],
 
     async mounted() {
 
@@ -93,6 +130,23 @@ export default {
                 by_tel_availability_report_chart_container.style.width         =   by_tel_availability_report_chart_scroll_width
             }
         },
+
+        //
+
+        toggleChartTable() {
+
+            if(this.show_by_tel_availability_report_chart_data ==  false) {
+
+                this.show_by_tel_availability_report_table_data     =   false
+                this.show_by_tel_availability_report_chart_data     =   true
+            }
+
+            else {
+
+                this.show_by_tel_availability_report_chart_data     =   false
+                this.show_by_tel_availability_report_table_data     =   true
+            }
+        }
     }
 }
 

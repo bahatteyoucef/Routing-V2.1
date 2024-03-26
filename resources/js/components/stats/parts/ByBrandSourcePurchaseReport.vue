@@ -9,12 +9,12 @@
             </div>
 
             <div class="col-3 text-end">
-                <img    src="/images/switch_arrows.png" @click="setChart()"    role="button"    class="mb-0 mr-2"/>
+                <img    src="/images/switch_arrows.png" @click="toggleChartTable()"    role="button"    class="mb-0 mr-2"/>
             </div>
         </div>
 
         <!-- Show Chart         -->
-        <div class="row">
+        <div v-show="show_by_brand_source_purchase_report_chart_data"    class="row animate__animated animate__pulse">
 
             <!-- By BrandSourcePurchase  -->
             <div class="col-12">
@@ -28,7 +28,35 @@
             </div>
 
         </div>
-        <!--  -->
+
+        <!-- Show Table         -->
+        <div v-show="show_by_brand_source_purchase_report_table_data"    class="row animate__animated animate__pulse">
+            <div class="table_scroll table_scroll_x table_scroll_y table_container mt-5">
+                <table  class="table table-bordered w-100" id="by_brand_source_purchase_report_table_data">
+                    <thead>
+                        <tr>
+                            <th>CustomerType</th>
+                            <th>Clients</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr v-for="row, index_1 in by_brand_source_purchase_report_table_data.rows" :key="index_1">
+                            <th>{{ row.label }}</th>
+                            <td>{{ row.count_clients }}</td>
+                            <th>{{ row.percentage_clients * 100 }} %</th>
+                        </tr>
+
+                        <tr>
+                            <th>{{ by_brand_source_purchase_report_table_data.total_row.label }}</th>
+                            <th>{{ by_brand_source_purchase_report_table_data.total_row.count_clients }}</th>
+                            <th>{{ by_brand_source_purchase_report_table_data.total_row.percentage_clients * 100 }} %</th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
     </div>
 
@@ -41,11 +69,16 @@ export default {
     data() {
         return {
 
-            by_brand_source_purchase_chart  :   null
+            by_brand_source_purchase_chart                      :   null    ,
+
+            //
+
+            show_by_brand_source_purchase_report_chart_data     :   true    ,
+            show_by_brand_source_purchase_report_table_data     :   false   
         }
     },
 
-    props : ["by_brand_source_purchase_report_chart_data"],
+    props : ["by_brand_source_purchase_report_chart_data", "by_brand_source_purchase_report_table_data"],
 
     async mounted() {
 
@@ -72,6 +105,23 @@ export default {
                 options                                     :   {}
             });
         },
+
+        //
+
+        toggleChartTable() {
+
+            if(this.show_by_brand_source_purchase_report_chart_data     ==  false) {
+
+                this.show_by_brand_source_purchase_report_table_data    =   false
+                this.show_by_brand_source_purchase_report_chart_data    =   true
+            }
+
+            else {
+
+                this.show_by_brand_source_purchase_report_chart_data    =   false
+                this.show_by_brand_source_purchase_report_table_data    =   true
+            }
+        }
     }
 }
 </script>
