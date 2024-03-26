@@ -363,7 +363,7 @@ export default {
                 //
                 this.data_census_report_table_data                =   res.data.stats_details.data_census_report_table_data
                 this.show_data_census_report_content              =   true
-
+                
                 //
                 this.$hideLoadingPage()
             })

@@ -137,6 +137,11 @@ export default {
     data() {
         return {
 
+            show_data_census_reports_chart      :   false,
+
+            //
+
+            datatable_data_census_report_table  :   null
         }
     },
 
@@ -144,10 +149,28 @@ export default {
 
     async mounted() {
 
+        //
+        await this.$nextTick()
+
+        //
+        this.setTable()
     },
 
     methods : {
 
+        async setTable() {
+
+            try {
+
+                this.datatable_data_census_report_table     =   await this.$DataTableCreate("data_census_report_table")
+            }
+
+            catch(e) {
+
+                console.log(e)
+            }
+        },
     }
 }
+
 </script>
