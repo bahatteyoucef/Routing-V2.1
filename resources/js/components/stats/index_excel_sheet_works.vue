@@ -244,16 +244,21 @@
 
 import ByCustomerTypeReport               from  "./parts/ByCustomerTypeReport.vue"
 import ByBrandSourcePurchaseReport        from  "./parts/ByBrandSourcePurchaseReport.vue"
-import ByBrandAvailabilityReport          from  "./parts/ByBrandAvailabilityReport.vue"
 
 import DailyReport                        from  "./parts/DailyReport.vue"
 import ByTelAvailabilityReport            from  "./parts/ByTelAvailabilityReport.vue"
 import ByCityReport                       from  "./parts/ByCityReport.vue"
+import ByBrandAvailabilityReport          from  "./parts/ByBrandAvailabilityReport.vue"
 import DataCensusReport                   from  "./parts/DataCensusReport.vue"
 
 //
 
 import Multiselect                        from  "@vueform/multiselect"
+
+//
+
+import ExcelJS from 'exceljs';
+import axios from 'axios';
 
 export default {
 
@@ -325,7 +330,15 @@ export default {
 
       //
 
-      workbook            :   null
+      table1: [
+        { header1: 'Data 1', header2: 'Data 2' },
+        { header1: 'Data 3', header2: 'Data 4' },
+      ],
+
+      table2: [
+        { headerA: 'Data A1', headerB: 'Data B2' },
+        { headerA: 'Data A3', headerB: 'Data B4' },
+      ]
     }
   },
 
@@ -468,50 +481,26 @@ export default {
     async exportData() {
 
         // Create a workbook
-        this.workbook = new ExcelJS.Workbook();
-
-        // File name
-        let filename = "Student_Report.xlsx";
-
-        //
-        this.exportByCustomerTypeReport()
-        this.exportByBrandSourcePurchaseReport()
-        this.exportByBrandAvailabilityReport()
-        this.exportDailyReport()
-        this.exportByTelAvailabilityReport()
-        this.exportByCityReport()
-        this.exportDataCensusReport()
-
-        // Write workbook to buffer then convert to Excel file and download
-        this.workbook.xlsx.writeBuffer().then(data => {
-          const file = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
-          saveAs(file, filename);
-        });
-    },
-
-    //
-
-    exportByCustomerTypeReport() {
+        const workbook = new ExcelJS.Workbook();
 
         // Add a new worksheet to workbook variable
-        const worksheet = this.workbook.addWorksheet('By Customer Type Report');
+        const worksheet = workbook.addWorksheet('Student Report');
 
         // Add columns to worksheet variable
         worksheet.columns = [
-          // { header: 'Id', key: 'id', width: 8 },
-          // { header: 'First Name', key: 'firstname', width: 32 },
-          // { header: 'Last Name', key: 'lastname', width: 32 },
-          // { header: 'Class', key: 'class', width: 16 },
-          // { header: 'Grade', key: 'grade', width: 8 }
+          { header: 'Id', key: 'id', width: 8 },
+          { header: 'First Name', key: 'firstname', width: 32 },
+          { header: 'Last Name', key: 'lastname', width: 32 },
+          { header: 'Class', key: 'class', width: 16 },
+          { header: 'Grade', key: 'grade', width: 8 }
         ];
 
         // Add data to the worksheet
         worksheet.addRows([
-          // { id: 1, firstname: 'John', lastname: 'Doe', class: 'Math', grade: 'A' },
-          // { id: 2, firstname: 'Jane', lastname: 'Smith', class: 'History', grade: 'B' },
-          // { id: 3, firstname: 'Emily', lastname: 'Brown', class: 'Science', grade: 'A-' },
-          // { id: 4, firstname: 'Michael', lastname: 'Johnson', class: 'English', grade: 'B+' }
-          {}
+          { id: 1, firstname: 'John', lastname: 'Doe', class: 'Math', grade: 'A' },
+          { id: 2, firstname: 'Jane', lastname: 'Smith', class: 'History', grade: 'B' },
+          { id: 3, firstname: 'Emily', lastname: 'Brown', class: 'Science', grade: 'A-' },
+          { id: 4, firstname: 'Michael', lastname: 'Johnson', class: 'English', grade: 'B+' }
         ]);
 
         // Determine the last row of the table
@@ -523,7 +512,7 @@ export default {
         const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
         //
-        const imgId = this.workbook.addImage({
+        const imgId = workbook.addImage({
           base64    : this.imageDataToBase64(imgData),
           extension : 'png',
         });
@@ -533,233 +522,16 @@ export default {
           tl  : { col: 1, row: lastRow + 2 },
           ext : { width: canvas.width, height: canvas.height },
         });
-    },
 
-    exportByBrandSourcePurchaseReport() {
+        // File name
+        let filename = "Student_Report.xlsx";
 
-        // Add a new worksheet to workbook variable
-        const worksheet = this.workbook.addWorksheet('By Brand Source Purchase Report');
-
-        // Add columns to worksheet variable
-        worksheet.columns = [
-          // { header: 'Id', key: 'id', width: 8 },
-          // { header: 'First Name', key: 'firstname', width: 32 },
-          // { header: 'Last Name', key: 'lastname', width: 32 },
-          // { header: 'Class', key: 'class', width: 16 },
-          // { header: 'Grade', key: 'grade', width: 8 }
-        ];
-
-        // Add data to the worksheet
-        worksheet.addRows([
-          // { id: 1, firstname: 'John', lastname: 'Doe', class: 'Math', grade: 'A' },
-          // { id: 2, firstname: 'Jane', lastname: 'Smith', class: 'History', grade: 'B' },
-          // { id: 3, firstname: 'Emily', lastname: 'Brown', class: 'Science', grade: 'A-' },
-          // { id: 4, firstname: 'Michael', lastname: 'Johnson', class: 'English', grade: 'B+' }
-          {}
-        ]);
-
-        // Determine the last row of the table
-        const lastRow = worksheet.lastRow.number;
-
-        //
-        const canvas = document.getElementById("by_brand_source_purchase_report_chart")
-        const ctx = canvas.getContext('2d');
-        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-        //
-        const imgId = this.workbook.addImage({
-          base64    : this.imageDataToBase64(imgData),
-          extension : 'png',
-        });
-
-        // Add the image to the worksheet
-        worksheet.addImage(imgId, {
-          tl  : { col: 1, row: lastRow + 2 },
-          ext : { width: canvas.width, height: canvas.height },
+        // Write workbook to buffer then convert to Excel file and download
+        workbook.xlsx.writeBuffer().then(data => {
+          const file = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
+          saveAs(file, filename);
         });
     },
-
-    exportByBrandAvailabilityReport() {
-
-        // Add a new worksheet to workbook variable
-        const worksheet = this.workbook.addWorksheet('By Brand Availability Report');
-
-        // Add columns to worksheet variable
-        worksheet.columns = [
-          // { header: 'Id', key: 'id', width: 8 },
-          // { header: 'First Name', key: 'firstname', width: 32 },
-          // { header: 'Last Name', key: 'lastname', width: 32 },
-          // { header: 'Class', key: 'class', width: 16 },
-          // { header: 'Grade', key: 'grade', width: 8 }
-        ];
-
-        // Add data to the worksheet
-        worksheet.addRows([
-          // { id: 1, firstname: 'John', lastname: 'Doe', class: 'Math', grade: 'A' },
-          // { id: 2, firstname: 'Jane', lastname: 'Smith', class: 'History', grade: 'B' },
-          // { id: 3, firstname: 'Emily', lastname: 'Brown', class: 'Science', grade: 'A-' },
-          // { id: 4, firstname: 'Michael', lastname: 'Johnson', class: 'English', grade: 'B+' }
-          {}
-        ]);
-
-        // Determine the last row of the table
-        const lastRow = worksheet.lastRow.number;
-
-        //
-        const canvas = document.getElementById("by_brand_availability_report_chart")
-        const ctx = canvas.getContext('2d');
-        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-        //
-        const imgId = this.workbook.addImage({
-          base64    : this.imageDataToBase64(imgData),
-          extension : 'png',
-        });
-
-        // Add the image to the worksheet
-        worksheet.addImage(imgId, {
-          tl  : { col: 1, row: lastRow + 2 },
-          ext : { width: canvas.width, height: canvas.height },
-        });
-    },
-
-    exportDailyReport() {
-
-        // Add a new worksheet to workbook variable
-        const worksheet = this.workbook.addWorksheet('Daily Report');
-
-        // Add columns to worksheet variable
-        worksheet.columns = [
-          // { header: 'Id', key: 'id', width: 8 },
-          // { header: 'First Name', key: 'firstname', width: 32 },
-          // { header: 'Last Name', key: 'lastname', width: 32 },
-          // { header: 'Class', key: 'class', width: 16 },
-          // { header: 'Grade', key: 'grade', width: 8 }
-        ];
-
-        // Add data to the worksheet
-        worksheet.addRows([
-          // { id: 1, firstname: 'John', lastname: 'Doe', class: 'Math', grade: 'A' },
-          // { id: 2, firstname: 'Jane', lastname: 'Smith', class: 'History', grade: 'B' },
-          // { id: 3, firstname: 'Emily', lastname: 'Brown', class: 'Science', grade: 'A-' },
-          // { id: 4, firstname: 'Michael', lastname: 'Johnson', class: 'English', grade: 'B+' }
-          {}
-        ]);
-
-        // Determine the last row of the table
-        const lastRow = worksheet.lastRow.number;
-
-        //
-        const canvas = document.getElementById("daily_report_chart")
-        const ctx = canvas.getContext('2d');
-        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-        //
-        const imgId = this.workbook.addImage({
-          base64    : this.imageDataToBase64(imgData),
-          extension : 'png',
-        });
-
-        // Add the image to the worksheet
-        worksheet.addImage(imgId, {
-          tl  : { col: 1, row: lastRow + 2 },
-          ext : { width: canvas.width, height: canvas.height },
-        });
-    },
-
-    exportByTelAvailabilityReport() {
-
-        // Add a new worksheet to workbook variable
-        const worksheet = this.workbook.addWorksheet('By Tel Availability Report');
-
-        // Add columns to worksheet variable
-        worksheet.columns = [
-          // { header: 'Id', key: 'id', width: 8 },
-          // { header: 'First Name', key: 'firstname', width: 32 },
-          // { header: 'Last Name', key: 'lastname', width: 32 },
-          // { header: 'Class', key: 'class', width: 16 },
-          // { header: 'Grade', key: 'grade', width: 8 }
-        ];
-
-        // Add data to the worksheet
-        worksheet.addRows([
-          // { id: 1, firstname: 'John', lastname: 'Doe', class: 'Math', grade: 'A' },
-          // { id: 2, firstname: 'Jane', lastname: 'Smith', class: 'History', grade: 'B' },
-          // { id: 3, firstname: 'Emily', lastname: 'Brown', class: 'Science', grade: 'A-' },
-          // { id: 4, firstname: 'Michael', lastname: 'Johnson', class: 'English', grade: 'B+' }
-          {}
-        ]);
-
-        // Determine the last row of the table
-        const lastRow = worksheet.lastRow.number;
-
-        //
-        const canvas = document.getElementById("by_tel_availability_report_chart")
-        const ctx = canvas.getContext('2d');
-        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-        //
-        const imgId = this.workbook.addImage({
-          base64    : this.imageDataToBase64(imgData),
-          extension : 'png',
-        });
-
-        // Add the image to the worksheet
-        worksheet.addImage(imgId, {
-          tl  : { col: 1, row: lastRow + 2 },
-          ext : { width: canvas.width, height: canvas.height },
-        });
-    },
-
-    exportByCityReport() {
-
-        // Add a new worksheet to workbook variable
-        const worksheet = this.workbook.addWorksheet('By City Report');
-
-        // Add columns to worksheet variable
-        worksheet.columns = [
-          // { header: 'Id', key: 'id', width: 8 },
-          // { header: 'First Name', key: 'firstname', width: 32 },
-          // { header: 'Last Name', key: 'lastname', width: 32 },
-          // { header: 'Class', key: 'class', width: 16 },
-          // { header: 'Grade', key: 'grade', width: 8 }
-        ];
-
-        // Add data to the worksheet
-        worksheet.addRows([
-          // { id: 1, firstname: 'John', lastname: 'Doe', class: 'Math', grade: 'A' },
-          // { id: 2, firstname: 'Jane', lastname: 'Smith', class: 'History', grade: 'B' },
-          // { id: 3, firstname: 'Emily', lastname: 'Brown', class: 'Science', grade: 'A-' },
-          // { id: 4, firstname: 'Michael', lastname: 'Johnson', class: 'English', grade: 'B+' }
-          {}
-        ]);
-    },
-
-    exportDataCensusReport() {
-
-        // Add a new worksheet to workbook variable
-        const worksheet = this.workbook.addWorksheet('Data Census Report');
-
-        // Add columns to worksheet variable
-        worksheet.columns = [
-          // { header: 'Id', key: 'id', width: 8 },
-          // { header: 'First Name', key: 'firstname', width: 32 },
-          // { header: 'Last Name', key: 'lastname', width: 32 },
-          // { header: 'Class', key: 'class', width: 16 },
-          // { header: 'Grade', key: 'grade', width: 8 }
-        ];
-
-        // Add data to the worksheet
-        worksheet.addRows([
-          // { id: 1, firstname: 'John', lastname: 'Doe', class: 'Math', grade: 'A' },
-          // { id: 2, firstname: 'Jane', lastname: 'Smith', class: 'History', grade: 'B' },
-          // { id: 3, firstname: 'Emily', lastname: 'Brown', class: 'Science', grade: 'A-' },
-          // { id: 4, firstname: 'Michael', lastname: 'Johnson', class: 'English', grade: 'B+' }
-          {}
-        ]);
-    },
-
-    //
 
     imageDataToBase64(imgData) {
 

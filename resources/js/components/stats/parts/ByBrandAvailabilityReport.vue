@@ -45,7 +45,7 @@
                         <tr v-for="row, index_1 in by_brand_availability_report_table_data.rows" :key="index_1">
                             <th>{{ row.label }}</th>
                             <td>{{ row.count_clients }}</td>
-                            <th>{{ row.percentage_clients * 100 }} %</th>
+                            <th>{{ parseInt(row.percentage_clients * 100) }} %</th>
                         </tr>
 
                         <tr>

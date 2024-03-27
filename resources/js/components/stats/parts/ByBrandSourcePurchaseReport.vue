@@ -45,13 +45,13 @@
                         <tr v-for="row, index_1 in by_brand_source_purchase_report_table_data.rows" :key="index_1">
                             <th>{{ row.label }}</th>
                             <td>{{ row.count_clients }}</td>
-                            <th>{{ row.percentage_clients * 100 }} %</th>
+                            <th>{{ parseInt(row.percentage_clients * 100) }} %</th>
                         </tr>
 
                         <tr>
                             <th>{{ by_brand_source_purchase_report_table_data.total_row.label }}</th>
                             <th>{{ by_brand_source_purchase_report_table_data.total_row.count_clients }}</th>
-                            <th>{{ by_brand_source_purchase_report_table_data.total_row.percentage_clients * 100 }} %</th>
+                            <th>{{ parseInt(by_brand_source_purchase_report_table_data.total_row.percentage_clients * 100) }} %</th>
                         </tr>
                     </tbody>
                 </table>

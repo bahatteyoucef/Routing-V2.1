@@ -124,6 +124,12 @@
 	<!-- Chart JS -->
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+	<!-- execlJS import -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js" 			integrity="sha512-UnrKxsCMN9hFk7M56t4I4ckB4N/2HHi0w/7+B/1JsXIX3DmyBcsGpT3/BsuZMZf+6mAr0vP81syWtfynHJ69JA=="	crossorigin="anonymous"	referrerpolicy="no-referrer"></script>
+	
+	<!-- fileSaverJS import -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js" 	integrity="sha512-csNcFYJniKjJxRWRV1R7fvnXrycHP6qDR21mgz1ZP55xY5d+aHLfo9/FcGDQLfn2IfngbAHd8LdfsagcCqgTcQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 	@vite('resources/js/app.js')
 
 </html>

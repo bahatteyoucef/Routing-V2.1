@@ -35,6 +35,25 @@ class Statistic extends Model
         return $number_clients_validated;
     }
 
+    public static function numberClientsPending($request) {
+
+        //
+        $route_links                    =   json_decode($request->get("route_links"));
+        
+        //
+        $startDate                      =   Carbon::parse($request->get("start_date")); // Replace with your start date
+        $endDate                        =   Carbon::parse($request->get("end_date"));   // Replace with your end date
+
+        //
+        $number_clients_pending    =   DB::table("clients")
+                                                ->where("clients.status", "pending")
+                                                ->whereIn('clients.id_route_import', $route_links)
+                                                ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                                ->count();
+
+        return $number_clients_pending;
+    }
+
     public static function numberClientsNonValidated($request) {
 
         //
@@ -114,6 +133,7 @@ class Statistic extends Model
         //
         $customer_types     =   DB::table("clients")
                                     ->select("clients.CustomerType")
+                                    ->where('clients.status', "validated")
                                     ->whereIn('clients.id_route_import', $route_links)
                                     ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
                                     ->distinct("clients.CustomerType")
@@ -129,7 +149,7 @@ class Statistic extends Model
 
             //
             $count                      =   DB::table("clients")
-                                                ->where('clients.CustomerType', $customer_type)
+                                                ->where([['clients.CustomerType', $customer_type], ['clients.status', "validated"]])
                                                 ->whereIn('clients.id_route_import', $route_links)
                                                 ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
                                                 ->count();
@@ -163,6 +183,7 @@ class Statistic extends Model
         //
         $customer_types     =   DB::table("clients")
                                     ->select("clients.CustomerType")
+                                    ->where('clients.status', "validated")
                                     ->whereIn('clients.id_route_import', $route_links)
                                     ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
                                     ->distinct("clients.CustomerType")
@@ -170,6 +191,7 @@ class Statistic extends Model
 
         $total_clients      =   DB::table("clients")
                                     ->select("clients.id")
+                                    ->where('clients.status', "validated")
                                     ->whereIn('clients.id_route_import', $route_links)
                                     ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
                                     ->count();
@@ -179,9 +201,8 @@ class Statistic extends Model
 
         foreach ($customer_types as $customer_type) {
 
-            //  //  //  //  //  //  //  //  //  //
             $count                          =   DB::table("clients")
-                                                    ->where('clients.CustomerType', $customer_type)
+                                                    ->where([['clients.CustomerType', $customer_type], ['clients.status', "validated"]])
                                                     ->whereIn('clients.id_route_import', $route_links)
                                                     ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
                                                     ->count();
@@ -1004,10 +1025,11 @@ class Statistic extends Model
 
         // cards    //  //  //  //  //  //  //  //  //  //  //  //  //
 
-        $stats_details->number_clients_validated                     =   Statistic::numberClientsValidated($request);
-        $stats_details->number_clients_nonvalidated                  =   Statistic::numberClientsNonValidated($request);
-        $stats_details->number_clients_total                         =   Statistic::numberClientsTotal($request);
-        $stats_details->number_clients_expected                      =   Statistic::numberClientsExpected($request);
+        $stats_details->number_clients_validated                    =   Statistic::numberClientsValidated($request);
+        $stats_details->number_clients_pending                      =   Statistic::numberClientsPending($request);
+        $stats_details->number_clients_nonvalidated                 =   Statistic::numberClientsNonValidated($request);
+        $stats_details->number_clients_total                        =   Statistic::numberClientsTotal($request);
+        $stats_details->number_clients_expected                     =   Statistic::numberClientsExpected($request);
 
         //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //
 
@@ -1032,7 +1054,7 @@ class Statistic extends Model
         $stats_details->by_tel_availability_report_table_data       =   Statistic::byTelAvailabilityReportTable($request);
 
         // By City Report
-        $stats_details->by_city_report_chart_data                   =   Statistic::byCityReport($request);
+        // $stats_details->by_city_report_chart_data                   =   Statistic::byCityReport($request);
         $stats_details->by_city_report_table_data                   =   Statistic::byCityReportTable($request);
 
         // Data Census

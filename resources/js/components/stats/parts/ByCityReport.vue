@@ -3,15 +3,17 @@
     <div class="m-1">
 
         <!-- Title -->
+        
         <div class="row">
             <div class="col-9 d-flex align-items-center">
                 <h4 class="mb-0 ml-2">By City Report</h4>
             </div>
 
-            <div class="col-3 text-end">
+            <!-- <div class="col-3 text-end">
                 <img    src="/images/switch_arrows.png" @click="toggleChartTable()"    role="button"    class="mb-0 mr-2"/>
-            </div>
-        </div>
+            </div> -->
+        </div> 
+       
 
         <!-- Show Chart         -->
         <div v-show="show_by_city_report_chart_data"    class="row animate__animated animate__pulse">
@@ -50,7 +52,7 @@
                             <td>{{ row.expected_clients }}</td>
                             <td>{{ row.added_clients }}</td>
                             <td>{{ row.gap }}</td>
-                            <td>{{ row.percentage_clients * 100 }} %</td>
+                            <td>{{ parseInt(row.percentage_clients * 100) }} %</td>
                             <td>{{ row.status_clients }}</td>
                         </tr>
 
@@ -60,7 +62,7 @@
                             <th>{{ by_city_report_table_data.total_row.expected_clients }}</th>
                             <th>{{ by_city_report_table_data.total_row.added_clients }}</th>
                             <th>{{ by_city_report_table_data.total_row.gap }}</th>
-                            <th>{{ by_city_report_table_data.total_row.percentage_clients * 100 }} %</th>
+                            <th>{{ parseInt(by_city_report_table_data.total_row.percentage_clients * 100) }} %</th>
                             <th>{{ by_city_report_table_data.total_row.status_clients }}</th>
                         </tr>
                     </tbody>
@@ -92,8 +94,8 @@ export default {
 
             //
 
-            show_by_city_report_chart_data      :   true    ,
-            show_by_city_report_table_data      :   false   
+            show_by_city_report_chart_data      :   false    ,
+            show_by_city_report_table_data      :   true   
         }
     },
 
@@ -102,7 +104,7 @@ export default {
     async mounted() {
 
         //
-        this.setChart();
+        // this.setChart();
 
         //
         await this.$nextTick()
