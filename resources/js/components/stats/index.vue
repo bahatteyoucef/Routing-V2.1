@@ -474,13 +474,13 @@ export default {
         let filename = "Student_Report.xlsx";
 
         //
-        this.exportByCustomerTypeReport()
-        this.exportByBrandSourcePurchaseReport()
-        this.exportByBrandAvailabilityReport()
-        this.exportDailyReport()
+        // this.exportByCustomerTypeReport()
+        // this.exportByBrandSourcePurchaseReport()
+        // this.exportByBrandAvailabilityReport()
+        // this.exportDailyReport()
         this.exportByTelAvailabilityReport()
-        this.exportByCityReport()
-        this.exportDataCensusReport()
+        // this.exportByCityReport()
+        // this.exportDataCensusReport()
 
         // Write workbook to buffer then convert to Excel file and download
         this.workbook.xlsx.writeBuffer().then(data => {
@@ -496,23 +496,19 @@ export default {
         // Add a new worksheet to workbook variable
         const worksheet = this.workbook.addWorksheet('By Customer Type Report');
 
-        // Add columns to worksheet variable
-        worksheet.columns = [
-          // { header: 'Id', key: 'id', width: 8 },
-          // { header: 'First Name', key: 'firstname', width: 32 },
-          // { header: 'Last Name', key: 'lastname', width: 32 },
-          // { header: 'Class', key: 'class', width: 16 },
-          // { header: 'Grade', key: 'grade', width: 8 }
-        ];
+        console.log(this.by_customer_type_report_table_data)
 
-        // Add data to the worksheet
-        worksheet.addRows([
-          // { id: 1, firstname: 'John', lastname: 'Doe', class: 'Math', grade: 'A' },
-          // { id: 2, firstname: 'Jane', lastname: 'Smith', class: 'History', grade: 'B' },
-          // { id: 3, firstname: 'Emily', lastname: 'Brown', class: 'Science', grade: 'A-' },
-          // { id: 4, firstname: 'Michael', lastname: 'Johnson', class: 'English', grade: 'B+' }
-          {}
-        ]);
+        //
+
+        worksheet.columns =   this.getByCustomerTypeReportColumns()
+
+        //
+
+        let rows          =   this.getByCustomerTypeReportRows()
+
+        worksheet.addRows(rows)
+
+        //
 
         // Determine the last row of the table
         const lastRow = worksheet.lastRow.number;
@@ -535,28 +531,50 @@ export default {
         });
     },
 
+    getByCustomerTypeReportRows() {
+
+      return this.data_census_report_table_data.rows
+    },
+
+    getByCustomerTypeReportColumns() {
+
+        let columns =   []
+
+        if(array.length > 0) {
+
+            const keys  =   Object.keys(array[0])
+            console.log(array)
+            console.log(keys)
+
+            for (let index = 0; index < keys.length; index++) {
+
+                columns.push({header: keys[index], key: keys[index], width: 10})
+            }
+        }
+
+        return columns
+    },
+
+    //
+
     exportByBrandSourcePurchaseReport() {
 
         // Add a new worksheet to workbook variable
         const worksheet = this.workbook.addWorksheet('By Brand Source Purchase Report');
 
-        // Add columns to worksheet variable
-        worksheet.columns = [
-          // { header: 'Id', key: 'id', width: 8 },
-          // { header: 'First Name', key: 'firstname', width: 32 },
-          // { header: 'Last Name', key: 'lastname', width: 32 },
-          // { header: 'Class', key: 'class', width: 16 },
-          // { header: 'Grade', key: 'grade', width: 8 }
-        ];
+        console.log(this.by_brand_source_purchase_report_table_data)
 
-        // Add data to the worksheet
-        worksheet.addRows([
-          // { id: 1, firstname: 'John', lastname: 'Doe', class: 'Math', grade: 'A' },
-          // { id: 2, firstname: 'Jane', lastname: 'Smith', class: 'History', grade: 'B' },
-          // { id: 3, firstname: 'Emily', lastname: 'Brown', class: 'Science', grade: 'A-' },
-          // { id: 4, firstname: 'Michael', lastname: 'Johnson', class: 'English', grade: 'B+' }
-          {}
-        ]);
+        //
+
+        worksheet.columns =   this.getByBrandSourcePurchaseReportColumns()
+
+        //
+
+        let rows          =   this.getByBrandSourcePurchaseReportRows()
+
+        worksheet.addRows(rows)
+
+        //
 
         // Determine the last row of the table
         const lastRow = worksheet.lastRow.number;
@@ -579,28 +597,50 @@ export default {
         });
     },
 
+    getByBrandSourcePurchaseReportRows() {
+
+      return this.data_census_report_table_data.rows
+    },
+
+    getByBrandSourcePurchaseReportColumns() {
+
+        let columns =   []
+
+        if(array.length > 0) {
+
+            const keys  =   Object.keys(array[0])
+            console.log(array)
+            console.log(keys)
+
+            for (let index = 0; index < keys.length; index++) {
+
+                columns.push({header: keys[index], key: keys[index], width: 10})
+            }
+        }
+
+        return columns
+    },
+
+    //
+
     exportByBrandAvailabilityReport() {
 
         // Add a new worksheet to workbook variable
         const worksheet = this.workbook.addWorksheet('By Brand Availability Report');
 
-        // Add columns to worksheet variable
-        worksheet.columns = [
-          // { header: 'Id', key: 'id', width: 8 },
-          // { header: 'First Name', key: 'firstname', width: 32 },
-          // { header: 'Last Name', key: 'lastname', width: 32 },
-          // { header: 'Class', key: 'class', width: 16 },
-          // { header: 'Grade', key: 'grade', width: 8 }
-        ];
+        console.log(this.by_brand_availability_report_table_data)
 
-        // Add data to the worksheet
-        worksheet.addRows([
-          // { id: 1, firstname: 'John', lastname: 'Doe', class: 'Math', grade: 'A' },
-          // { id: 2, firstname: 'Jane', lastname: 'Smith', class: 'History', grade: 'B' },
-          // { id: 3, firstname: 'Emily', lastname: 'Brown', class: 'Science', grade: 'A-' },
-          // { id: 4, firstname: 'Michael', lastname: 'Johnson', class: 'English', grade: 'B+' }
-          {}
-        ]);
+        //
+
+        worksheet.columns =   this.getByBrandAvailabilityReportColumns()
+
+        //
+
+        let rows          =   this.getByBrandAvailabilityReportRows()
+
+        worksheet.addRows(rows)
+
+        //
 
         // Determine the last row of the table
         const lastRow = worksheet.lastRow.number;
@@ -623,41 +663,63 @@ export default {
         });
     },
 
+    getByBrandAvailabilityReportRows() {
+
+      return this.data_census_report_table_data.rows
+    },
+
+    getByBrandAvailabilityReportColumns() {
+
+        let columns =   []
+
+        if(array.length > 0) {
+
+            const keys  =   Object.keys(array[0])
+            console.log(array)
+            console.log(keys)
+
+            for (let index = 0; index < keys.length; index++) {
+
+                columns.push({header: keys[index], key: keys[index], width: 10})
+            }
+        }
+
+        return columns
+    },
+
+    //
+
     exportDailyReport() {
 
         // Add a new worksheet to workbook variable
         const worksheet = this.workbook.addWorksheet('Daily Report');
 
-        // Add columns to worksheet variable
-        worksheet.columns = [
-          // { header: 'Id', key: 'id', width: 8 },
-          // { header: 'First Name', key: 'firstname', width: 32 },
-          // { header: 'Last Name', key: 'lastname', width: 32 },
-          // { header: 'Class', key: 'class', width: 16 },
-          // { header: 'Grade', key: 'grade', width: 8 }
-        ];
+        console.log(this.daily_report_table_data)
 
-        // Add data to the worksheet
-        worksheet.addRows([
-          // { id: 1, firstname: 'John', lastname: 'Doe', class: 'Math', grade: 'A' },
-          // { id: 2, firstname: 'Jane', lastname: 'Smith', class: 'History', grade: 'B' },
-          // { id: 3, firstname: 'Emily', lastname: 'Brown', class: 'Science', grade: 'A-' },
-          // { id: 4, firstname: 'Michael', lastname: 'Johnson', class: 'English', grade: 'B+' }
-          {}
-        ]);
+        //
+
+        worksheet.columns =   this.getDailyReportColumns()
+
+        //
+
+        let rows          =   this.getDailyReportRows()
+
+        worksheet.addRows(rows)
+
+        //
 
         // Determine the last row of the table
         const lastRow = worksheet.lastRow.number;
 
         //
-        const canvas = document.getElementById("daily_report_chart")
-        const ctx = canvas.getContext('2d');
+        const canvas  = document.getElementById("daily_report_chart")
+        const ctx     = canvas.getContext('2d');
         const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
         //
-        const imgId = this.workbook.addImage({
-          base64    : this.imageDataToBase64(imgData),
-          extension : 'png',
+        const imgId   = this.workbook.addImage({
+          base64      : this.imageDataToBase64(imgData),
+          extension   : 'png',
         });
 
         // Add the image to the worksheet
@@ -667,28 +729,48 @@ export default {
         });
     },
 
+    getDailyReportRows() {
+
+      return this.data_census_report_table_data.rows
+    },
+
+    getDailyReportColumns() {
+
+        let columns =   []
+
+        if(array.length > 0) {
+
+            const keys  =   Object.keys(array[0])
+            console.log(array)
+            console.log(keys)
+
+            for (let index = 0; index < keys.length; index++) {
+
+                columns.push({header: keys[index], key: keys[index], width: 10})
+            }
+        }
+
+        return columns
+    },
+
+    //
+
     exportByTelAvailabilityReport() {
 
         // Add a new worksheet to workbook variable
         const worksheet = this.workbook.addWorksheet('By Tel Availability Report');
 
-        // Add columns to worksheet variable
-        worksheet.columns = [
-          // { header: 'Id', key: 'id', width: 8 },
-          // { header: 'First Name', key: 'firstname', width: 32 },
-          // { header: 'Last Name', key: 'lastname', width: 32 },
-          // { header: 'Class', key: 'class', width: 16 },
-          // { header: 'Grade', key: 'grade', width: 8 }
-        ];
+        //
 
-        // Add data to the worksheet
-        worksheet.addRows([
-          // { id: 1, firstname: 'John', lastname: 'Doe', class: 'Math', grade: 'A' },
-          // { id: 2, firstname: 'Jane', lastname: 'Smith', class: 'History', grade: 'B' },
-          // { id: 3, firstname: 'Emily', lastname: 'Brown', class: 'Science', grade: 'A-' },
-          // { id: 4, firstname: 'Michael', lastname: 'Johnson', class: 'English', grade: 'B+' }
-          {}
-        ]);
+        worksheet.columns =   this.getByTelAvailabilityReportColumns()
+
+        //
+
+        let rows          =   this.getByTelAvailabilityReportRows()
+
+        worksheet.addRows(rows)
+
+        //
 
         // Determine the last row of the table
         const lastRow = worksheet.lastRow.number;
@@ -711,52 +793,135 @@ export default {
         });
     },
 
+    getByTelAvailabilityReportRows() {
+
+      let obj = { "label"           : this.by_tel_availability_report_table_data.total_row.label        , 
+                  "count_yes"       : this.by_tel_availability_report_table_data.total_row.count_yes    ,
+                  "count_no"        : this.by_tel_availability_report_table_data.total_row.count_no     ,
+                  "count_total"     : this.by_tel_availability_report_table_data.total_row.count_total
+                }
+
+      this.by_tel_availability_report_table_data.rows.push(obj)
+
+      console.log(this.by_tel_availability_report_table_data.rows)
+
+      return this.by_tel_availability_report_table_data.rows
+    },
+
+    getByTelAvailabilityReportColumns() {
+
+        let columns =   []
+
+        if(this.by_tel_availability_report_table_data.rows.length > 0) {
+
+            const keys  =   Object.keys(this.by_tel_availability_report_table_data.rows[0])
+            console.log(this.by_tel_availability_report_table_data)
+            console.log(keys)
+
+            for (let index = 0; index < keys.length; index++) {
+
+                columns.push({header: keys[index], key: keys[index], width: 10})
+            }
+        }
+
+        return columns
+    },
+
+    //
+
     exportByCityReport() {
 
         // Add a new worksheet to workbook variable
         const worksheet = this.workbook.addWorksheet('By City Report');
 
-        // Add columns to worksheet variable
-        worksheet.columns = [
-          // { header: 'Id', key: 'id', width: 8 },
-          // { header: 'First Name', key: 'firstname', width: 32 },
-          // { header: 'Last Name', key: 'lastname', width: 32 },
-          // { header: 'Class', key: 'class', width: 16 },
-          // { header: 'Grade', key: 'grade', width: 8 }
-        ];
+        console.log(this.by_city_report_table_data)
 
-        // Add data to the worksheet
-        worksheet.addRows([
-          // { id: 1, firstname: 'John', lastname: 'Doe', class: 'Math', grade: 'A' },
-          // { id: 2, firstname: 'Jane', lastname: 'Smith', class: 'History', grade: 'B' },
-          // { id: 3, firstname: 'Emily', lastname: 'Brown', class: 'Science', grade: 'A-' },
-          // { id: 4, firstname: 'Michael', lastname: 'Johnson', class: 'English', grade: 'B+' }
-          {}
-        ]);
+        //
+
+        worksheet.columns =   this.getByCityReportColumns()
+
+        //
+
+        let rows          =   this.getByCityReportRows()
+
+        worksheet.addRows(rows)
     },
+
+    getByCityReportRows() {
+
+      let obj = { "label"               : this.by_city_report_table_data.total_row.label                                              , 
+                  "empty"               : ""                                                                                          ,
+                  "expected_clients"    : this.by_city_report_table_data.total_row.expected_clients                                   , 
+                  "added_clients"       : this.by_city_report_table_data.total_row.added_clients                                      ,
+                  "gap"                 : this.by_city_report_table_data.total_row.gap                                                ,
+                  "percentage_clients"  : parseInt(this.by_city_report_table_data.total_row.percentage_clients * 100) + "%" ,
+                  "status_clients"      : this.by_city_report_table_data.total_row.status_clients
+                }
+
+      this.by_city_report_table_data.rows.push(obj)
+
+      return this.by_city_report_table_data.rows
+    },
+
+    getByCityReportColumns() {
+
+        let columns =   []
+
+        if(this.by_city_report_table_data.rows.length > 0) {
+
+            const keys  =   Object.keys(this.by_city_report_table_data.rows[0])
+            console.log(this.by_city_report_table_data)
+            console.log(keys)
+
+            for (let index = 0; index < keys.length; index++) {
+
+                columns.push({header: keys[index], key: keys[index], width: 10})
+            }
+        }
+
+        return columns
+    },
+
+    //
 
     exportDataCensusReport() {
 
         // Add a new worksheet to workbook variable
-        const worksheet = this.workbook.addWorksheet('Data Census Report');
+        const worksheet   =   this.workbook.addWorksheet('Data Census Report');
 
-        // Add columns to worksheet variable
-        worksheet.columns = [
-          // { header: 'Id', key: 'id', width: 8 },
-          // { header: 'First Name', key: 'firstname', width: 32 },
-          // { header: 'Last Name', key: 'lastname', width: 32 },
-          // { header: 'Class', key: 'class', width: 16 },
-          // { header: 'Grade', key: 'grade', width: 8 }
-        ];
+        //
 
-        // Add data to the worksheet
-        worksheet.addRows([
-          // { id: 1, firstname: 'John', lastname: 'Doe', class: 'Math', grade: 'A' },
-          // { id: 2, firstname: 'Jane', lastname: 'Smith', class: 'History', grade: 'B' },
-          // { id: 3, firstname: 'Emily', lastname: 'Brown', class: 'Science', grade: 'A-' },
-          // { id: 4, firstname: 'Michael', lastname: 'Johnson', class: 'English', grade: 'B+' }
-          {}
-        ]);
+        worksheet.columns =   this.getDataCensusReportColumns()
+
+        //
+
+        let rows          =   this.getDataCensusReportRows()
+
+        worksheet.addRows(rows)
+    },
+
+    getDataCensusReportRows() {
+
+      return this.data_census_report_table_data.rows
+    },
+
+    getDataCensusReportColumns() {
+
+        let columns =   []
+
+        if(this.data_census_report_table_data.rows.length > 0) {
+
+            const keys  =   Object.keys(this.data_census_report_table_data.rows[0])
+            console.log(this.data_census_report_table_data.rows)
+            console.log(keys)
+
+            for (let index = 0; index < keys.length; index++) {
+
+                columns.push({header: keys[index], key: keys[index], width: 10})
+            }
+        }
+
+        return columns
     },
 
     //

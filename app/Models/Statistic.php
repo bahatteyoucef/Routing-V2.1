@@ -585,7 +585,7 @@ class Statistic extends Model
                                                     ->count();
 
                 // 
-                $row->total             =   $row->total             +   $count;
+                $row->total                 =   $row->total             +   $count;
                 $total_by_day_object->total =   $total_by_day_object->total +   $count;
 
                 //

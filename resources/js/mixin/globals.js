@@ -1244,6 +1244,27 @@ export default {
             a.download  = filename;
             a.click();
             URL.revokeObjectURL(url);
+        },
+
+        //
+
+        $getArrayOfObjectsColumns(array) {
+
+            let columns =   []
+
+            if(array.length > 0) {
+
+                const keys  =   Object.keys(array[0])
+                console.log(array)
+                console.log(keys)
+
+                for (let index = 0; index < keys.length; index++) {
+
+                    columns.push({header: keys[index], key: keys[index], width: 10})
+                }
+            }
+
+            return columns
         }
     }
 }

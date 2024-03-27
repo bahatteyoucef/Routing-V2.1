@@ -47,7 +47,7 @@
 
                     <tbody>
                         <tr v-for="row, index_1 in by_city_report_table_data.rows" :key="index_1">
-                            <td>{{ index_1 }}</td>
+                            <td>{{ index_1 + 1 }}</td>
                             <td>{{ row.CityNameE }}</td>
                             <td>{{ row.expected_clients }}</td>
                             <td>{{ row.added_clients }}</td>
