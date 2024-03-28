@@ -138,7 +138,7 @@ export default {
         $showLoadingPage() {
 
             const loading_page          =   document.getElementById("loading_screen")
-            loading_page.style.display  =   "block";
+            loading_page.style.display  =   "flex";
         },
 
         // 

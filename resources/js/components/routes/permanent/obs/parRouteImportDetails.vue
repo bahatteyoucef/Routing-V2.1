@@ -649,7 +649,7 @@ export default {
 
             // Show Loading Page
             this.$showLoadingPage()
-
+                
             const res                   =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.id_route_import+"/details",   null)
             this.route_import           =   res.data.route_import
 

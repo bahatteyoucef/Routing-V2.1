@@ -467,6 +467,9 @@ export default {
 
     async exportData() {
 
+        //
+        this.$showLoadingPage()
+
         // Create a workbook
         this.workbook = new ExcelJS.Workbook();
 
@@ -474,19 +477,22 @@ export default {
         let filename = "Student_Report.xlsx";
 
         //
-        // this.exportByCustomerTypeReport()
-        // this.exportByBrandSourcePurchaseReport()
-        // this.exportByBrandAvailabilityReport()
-        // this.exportDailyReport()
+        this.exportByCustomerTypeReport()
+        this.exportByBrandSourcePurchaseReport()
+        this.exportByBrandAvailabilityReport()
+        this.exportDailyReport()
         this.exportByTelAvailabilityReport()
-        // this.exportByCityReport()
-        // this.exportDataCensusReport()
+        this.exportByCityReport()
+        this.exportDataCensusReport()
 
         // Write workbook to buffer then convert to Excel file and download
         this.workbook.xlsx.writeBuffer().then(data => {
           const file = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
           saveAs(file, filename);
         });
+
+        //
+        this.$hideLoadingPage()
     },
 
     //
@@ -533,24 +539,41 @@ export default {
 
     getByCustomerTypeReportRows() {
 
-      return this.data_census_report_table_data.rows
+      let rows  =   []
+
+      let row   =   {}
+
+      for (let index = 0; index < this.by_customer_type_report_table_data.rows.length; index++) {
+
+        row                         =   {}
+
+        row["CustomerType"]         =   this.by_customer_type_report_table_data.rows[index].label 
+        row["Clients"]              =   this.by_customer_type_report_table_data.rows[index].count_clients 
+        row["Total"]                =   parseInt(this.by_customer_type_report_table_data.rows[index].percentage_clients * 100) + "%"
+
+        rows.push(row)
+      }
+
+      // Set Total
+      row                         =   {}
+
+      row["CustomerType"]         =   this.by_customer_type_report_table_data.total_row.label
+      row["Clients"]              =   this.by_customer_type_report_table_data.total_row.count_clients
+      row["Total"]                =   parseInt(this.by_customer_type_report_table_data.total_row.percentage_clients * 100) + "%"
+
+      rows.push(row)
+
+      return rows
     },
 
     getByCustomerTypeReportColumns() {
 
-        let columns =   []
+        let columns =   [
+                          {header: "CustomerType"       , key: "CustomerType"       , width: 10},
+                          {header: "Clients"            , key: "Clients"            , width: 10},
+                          {header: "Total"              , key: "Total"              , width: 10}
+                        ]
 
-        if(array.length > 0) {
-
-            const keys  =   Object.keys(array[0])
-            console.log(array)
-            console.log(keys)
-
-            for (let index = 0; index < keys.length; index++) {
-
-                columns.push({header: keys[index], key: keys[index], width: 10})
-            }
-        }
 
         return columns
     },
@@ -599,24 +622,40 @@ export default {
 
     getByBrandSourcePurchaseReportRows() {
 
-      return this.data_census_report_table_data.rows
+      let rows  =   []
+
+      let row   =   {}
+
+      for (let index = 0; index < this.by_brand_source_purchase_report_table_data.rows.length; index++) {
+
+        row                         =   {}
+
+        row["BrandSourcePurchase"]  =   this.by_brand_source_purchase_report_table_data.rows[index].label 
+        row["Clients"]              =   this.by_brand_source_purchase_report_table_data.rows[index].count_clients 
+        row["Total"]                =   parseInt(this.by_brand_source_purchase_report_table_data.rows[index].percentage_clients * 100) + "%"
+
+        rows.push(row)
+      }
+
+      // Set Total
+      row                         =   {}
+
+      row["BrandSourcePurchase"]  =   this.by_brand_source_purchase_report_table_data.total_row.label
+      row["Clients"]              =   this.by_brand_source_purchase_report_table_data.total_row.count_clients
+      row["Total"]                =   parseInt(this.by_brand_source_purchase_report_table_data.total_row.percentage_clients * 100) + "%"
+
+      rows.push(row)
+
+      return rows
     },
 
     getByBrandSourcePurchaseReportColumns() {
 
-        let columns =   []
-
-        if(array.length > 0) {
-
-            const keys  =   Object.keys(array[0])
-            console.log(array)
-            console.log(keys)
-
-            for (let index = 0; index < keys.length; index++) {
-
-                columns.push({header: keys[index], key: keys[index], width: 10})
-            }
-        }
+        let columns =   [
+                          {header: "BrandSourcePurchase"  , key: "BrandSourcePurchase"  , width: 10},
+                          {header: "Clients"              , key: "Clients"              , width: 10},
+                          {header: "Total"                , key: "Total"                , width: 10}
+                        ]
 
         return columns
     },
@@ -626,9 +665,7 @@ export default {
     exportByBrandAvailabilityReport() {
 
         // Add a new worksheet to workbook variable
-        const worksheet = this.workbook.addWorksheet('By Brand Availability Report');
-
-        console.log(this.by_brand_availability_report_table_data)
+        const worksheet   =   this.workbook.addWorksheet('By Brand Availability Report');
 
         //
 
@@ -665,24 +702,40 @@ export default {
 
     getByBrandAvailabilityReportRows() {
 
-      return this.data_census_report_table_data.rows
+      let rows  =   []
+
+      let row   =   {}
+
+      for (let index = 0; index < this.by_brand_availability_report_table_data.rows.length; index++) {
+
+        row                         =   {}
+
+        row["Brand Availability"]   =   this.by_brand_availability_report_table_data.rows[index].label 
+        row["Clients"]              =   this.by_brand_availability_report_table_data.rows[index].count_clients 
+        row["Total"]                =   parseInt(this.by_brand_availability_report_table_data.rows[index].percentage_clients * 100) + "%"
+
+        rows.push(row)
+      }
+
+      // Set Total
+      row                         =   {}
+
+      row["Brand Availability"]   =   this.by_brand_availability_report_table_data.total_row.label
+      row["Clients"]              =   this.by_brand_availability_report_table_data.total_row.count_clients
+      row["Total"]                =   parseInt(this.by_brand_availability_report_table_data.total_row.percentage_clients * 100) + "%"
+
+      rows.push(row)
+
+      return rows
     },
 
     getByBrandAvailabilityReportColumns() {
 
-        let columns =   []
-
-        if(array.length > 0) {
-
-            const keys  =   Object.keys(array[0])
-            console.log(array)
-            console.log(keys)
-
-            for (let index = 0; index < keys.length; index++) {
-
-                columns.push({header: keys[index], key: keys[index], width: 10})
-            }
-        }
+        let columns =   [
+                          {header: "Brand Availability" , key: "Brand Availability" , width: 10},
+                          {header: "Clients"            , key: "Clients"            , width: 10},
+                          {header: "Total"              , key: "Total"              , width: 10}
+                        ]
 
         return columns
     },
@@ -731,23 +784,67 @@ export default {
 
     getDailyReportRows() {
 
-      return this.data_census_report_table_data.rows
+      let rows  = []
+
+      let row   = {}
+
+      // Set Rows
+      for (let index_1 = 0; index_1 < this.daily_report_table_data.rows.length; index_1++) {
+
+          row           =   {}
+
+          //
+          row["User"]   =   this.daily_report_table_data.rows[index_1].label
+
+          //
+          for (let index_2 = 0; index_2 < this.daily_report_table_data.rows[index_1].data.length; index_2++) {
+
+            row[this.daily_report_table_data.allDays[index_2]] = this.daily_report_table_data.rows[index_1].data[index_2]
+          }
+
+          //
+          row["Total"]  =   this.daily_report_table_data.rows[index_1].total
+
+          rows.push(row)
+      }
+
+      //  //  //  //  //  //  //  //  //  //  //  //  //
+
+      // Set Total
+      row           =   {}
+
+      //
+      row["User"]   =   "Total"
+
+      //
+      for (let index_2 = 0; index_2 < this.daily_report_table_data.total_by_day_object.data.length; index_2++) {
+
+        row[this.daily_report_table_data.allDays[index_2]] = this.daily_report_table_data.total_by_day_object.data[index_2]
+      }
+
+      //
+      row["Total"]   =   this.daily_report_table_data.total_by_day_object.total
+
+      rows.push(row)
+
+      //
+      return rows
     },
 
     getDailyReportColumns() {
 
         let columns =   []
 
-        if(array.length > 0) {
+        if(this.daily_report_table_data.allDays.length > 0) {
 
-            const keys  =   Object.keys(array[0])
-            console.log(array)
-            console.log(keys)
+            columns.push({header: "User", key: "User", width: 10})
 
-            for (let index = 0; index < keys.length; index++) {
+            for (let index = 0; index < this.daily_report_table_data.allDays.length; index++) {
 
-                columns.push({header: keys[index], key: keys[index], width: 10})
+                columns.push({header: this.daily_report_table_data.allDays[index], key: this.daily_report_table_data.allDays[index], width: 10})
             }
+
+            columns.push({header: "Total", key: "Total", width: 10})
         }
 
         return columns
@@ -795,34 +892,43 @@ export default {
 
     getByTelAvailabilityReportRows() {
 
-      let obj = { "label"           : this.by_tel_availability_report_table_data.total_row.label        , 
-                  "count_yes"       : this.by_tel_availability_report_table_data.total_row.count_yes    ,
-                  "count_no"        : this.by_tel_availability_report_table_data.total_row.count_no     ,
-                  "count_total"     : this.by_tel_availability_report_table_data.total_row.count_total
-                }
+      let rows  =   []
 
-      this.by_tel_availability_report_table_data.rows.push(obj)
+      let row   =   {}
 
-      console.log(this.by_tel_availability_report_table_data.rows)
+      for (let index = 0; index < this.by_tel_availability_report_table_data.rows.length; index++) {
 
-      return this.by_tel_availability_report_table_data.rows
+        row                         =   {}
+
+        row["User"]   =   this.by_tel_availability_report_table_data.rows[index].label 
+        row["Yes"]    =   this.by_tel_availability_report_table_data.rows[index].count_yes 
+        row["No"]     =   this.by_tel_availability_report_table_data.rows[index].count_no
+        row["Total"]  =   this.by_tel_availability_report_table_data.rows[index].count_total
+
+        rows.push(row)
+      }
+
+      // Set Total
+      row             =   {}
+
+      row["User"]     =   this.by_tel_availability_report_table_data.total_row.label 
+      row["Yes"]      =   this.by_tel_availability_report_table_data.total_row.count_yes 
+      row["No"]       =   this.by_tel_availability_report_table_data.total_row.count_no
+      row["Total"]    =   this.by_tel_availability_report_table_data.total_row.count_total
+
+      rows.push(row)
+
+      return rows
     },
 
     getByTelAvailabilityReportColumns() {
 
-        let columns =   []
-
-        if(this.by_tel_availability_report_table_data.rows.length > 0) {
-
-            const keys  =   Object.keys(this.by_tel_availability_report_table_data.rows[0])
-            console.log(this.by_tel_availability_report_table_data)
-            console.log(keys)
-
-            for (let index = 0; index < keys.length; index++) {
-
-                columns.push({header: keys[index], key: keys[index], width: 10})
-            }
-        }
+        let columns =   [
+                          {header: "User"   , key: "User"   , width: 10},
+                          {header: "Yes"    , key: "Yes"    , width: 10},
+                          {header: "No"     , key: "No"     , width: 10},
+                          {header: "Total"  , key: "Total"  , width: 10}
+                        ]
 
         return columns
     },
@@ -849,35 +955,53 @@ export default {
 
     getByCityReportRows() {
 
-      let obj = { "label"               : this.by_city_report_table_data.total_row.label                                              , 
-                  "empty"               : ""                                                                                          ,
-                  "expected_clients"    : this.by_city_report_table_data.total_row.expected_clients                                   , 
-                  "added_clients"       : this.by_city_report_table_data.total_row.added_clients                                      ,
-                  "gap"                 : this.by_city_report_table_data.total_row.gap                                                ,
-                  "percentage_clients"  : parseInt(this.by_city_report_table_data.total_row.percentage_clients * 100) + "%" ,
-                  "status_clients"      : this.by_city_report_table_data.total_row.status_clients
-                }
+      let rows  =   []
 
-      this.by_city_report_table_data.rows.push(obj)
+      let row   =   {}
 
-      return this.by_city_report_table_data.rows
+      //
+      for (let index = 0; index < this.by_city_report_table_data.rows.length; index++) {
+
+        row                         =   {}
+
+        row["Index"]      =   index + 1 
+        row["City"]       =   this.by_city_report_table_data.rows[index].CityNameE 
+        row["Expected"]   =   this.by_city_report_table_data.rows[index].expected_clients
+        row["Added"]      =   this.by_city_report_table_data.rows[index].added_clients
+        row["Gap"]        =   this.by_city_report_table_data.rows[index].gap
+        row["Percentage"] =   parseInt(this.by_city_report_table_data.rows[index].percentage_clients * 100) + "%"
+        row["Status"]     =   this.by_city_report_table_data.rows[index].status_clients
+
+        rows.push(row)
+      }
+
+      // Set Total
+      row                 =   {}
+
+      row["Index"]        =   this.by_city_report_table_data.total_row.label 
+      row["City"]         =   ""
+      row["Expected"]     =   this.by_city_report_table_data.total_row.expected_clients 
+      row["Added"]        =   this.by_city_report_table_data.total_row.added_clients
+      row["Gap"]          =   this.by_city_report_table_data.total_row.gap
+      row["Percentage"]   =   parseInt(this.by_city_report_table_data.total_row.percentage_clients * 100) + "%"
+      row["Status"]       =   this.by_city_report_table_data.total_row.status_clients
+
+      rows.push(row)
+
+      return rows
     },
 
     getByCityReportColumns() {
 
-        let columns =   []
-
-        if(this.by_city_report_table_data.rows.length > 0) {
-
-            const keys  =   Object.keys(this.by_city_report_table_data.rows[0])
-            console.log(this.by_city_report_table_data)
-            console.log(keys)
-
-            for (let index = 0; index < keys.length; index++) {
-
-                columns.push({header: keys[index], key: keys[index], width: 10})
-            }
-        }
+        let columns =   [
+                          {header: "Index"      , key: "Index"        , width: 10},
+                          {header: "City"       , key: "City"         , width: 10},
+                          {header: "Expected"   , key: "Expected"     , width: 10},
+                          {header: "Added"      , key: "Added"        , width: 10},
+                          {header: "Gap"        , key: "Gap"          , width: 10},
+                          {header: "Percentage" , key: "Percentage"   , width: 10},
+                          {header: "Status"     , key: "Status"       , width: 10}
+                        ]
 
         return columns
     },
@@ -902,24 +1026,72 @@ export default {
 
     getDataCensusReportRows() {
 
-      return this.data_census_report_table_data.rows
+      let rows  =   []
+
+      let row   =   {}
+
+      //
+      for (let index = 0; index < this.data_census_report_table_data.rows.length; index++) {
+
+        row                         =   {}
+
+        row["Index"]                =   index + 1 
+        row["Created At"]           =   this.data_census_report_table_data.rows[index].created_at 
+        row["Start Adding Time"]    =   this.data_census_report_table_data.rows[index].start_adding_time
+        row["Adding Duration"]      =   this.data_census_report_table_data.rows[index].adding_duration
+        row["Status"]               =   this.data_census_report_table_data.rows[index].status
+        row["CustomerType"]         =   this.data_census_report_table_data.rows[index].CustomerType
+        row["DistrictNameE"]        =   this.data_census_report_table_data.rows[index].DistrictNameE
+        row["CityNameE"]            =   this.data_census_report_table_data.rows[index].CityNameE
+        row["CustomerNameA"]        =   this.data_census_report_table_data.rows[index].CustomerNameA
+        row["BrandAvailability"]    =   this.data_census_report_table_data.rows[index].BrandAvailabilityText
+        row["CustomerNameE"]        =   this.data_census_report_table_data.rows[index].CustomerNameE
+        row["TelAvailability"]      =   this.data_census_report_table_data.rows[index].TelAvailabilityText
+        row["Tel"]                  =   this.data_census_report_table_data.rows[index].Tel
+        row["Address"]              =   this.data_census_report_table_data.rows[index].Address
+        row["Neighborhood"]         =   this.data_census_report_table_data.rows[index].Neighborhood
+        row["Landmark"]             =   this.data_census_report_table_data.rows[index].Landmark
+        row["BrandSourcePurchase"]  =   this.data_census_report_table_data.rows[index].BrandSourcePurchase
+        row["CustomerCode"]         =   this.data_census_report_table_data.rows[index].CustomerCode
+        row["GPS"]                  =   this.data_census_report_table_data.rows[index].Latitude + ", " + this.data_census_report_table_data.rows[index].Longitude
+        row["Comment"]              =   this.data_census_report_table_data.rows[index].Comment
+        row["OwnerName"]            =   this.data_census_report_table_data.rows[index].OwnerName
+        row["JPlan"]                =   this.data_census_report_table_data.rows[index].JPlan
+        row["Journee"]              =   this.data_census_report_table_data.rows[index].Journee
+
+        rows.push(row)
+      }
+
+      return rows
     },
 
     getDataCensusReportColumns() {
 
-        let columns =   []
-
-        if(this.data_census_report_table_data.rows.length > 0) {
-
-            const keys  =   Object.keys(this.data_census_report_table_data.rows[0])
-            console.log(this.data_census_report_table_data.rows)
-            console.log(keys)
-
-            for (let index = 0; index < keys.length; index++) {
-
-                columns.push({header: keys[index], key: keys[index], width: 10})
-            }
-        }
+        let columns =   [
+                          {header: "Index"                  , key: "Index"                , width: 10},
+                          {header: "Created At"             , key: "Created At"           , width: 10},
+                          {header: "Start Adding Time"      , key: "Start Adding Time"    , width: 10},
+                          {header: "Adding Duration"        , key: "Adding Duration"      , width: 10},
+                          {header: "Status"                 , key: "Status"               , width: 10},
+                          {header: "CustomerType"           , key: "CustomerType"         , width: 10},
+                          {header: "DistrictNameE"          , key: "DistrictNameE"        , width: 10},
+                          {header: "CityNameE"              , key: "CityNameE"            , width: 10},
+                          {header: "CustomerNameA"          , key: "CustomerNameA"        , width: 10},
+                          {header: "BrandAvailability"      , key: "BrandAvailability"    , width: 10},
+                          {header: "CustomerNameE"          , key: "CustomerNameE"        , width: 10},
+                          {header: "TelAvailability"        , key: "TelAvailability"      , width: 10},
+                          {header: "Tel"                    , key: "Tel"                  , width: 10},
+                          {header: "Address"                , key: "Address"              , width: 10},
+                          {header: "Neighborhood"           , key: "Neighborhood"         , width: 10},
+                          {header: "Landmark"               , key: "Landmark"             , width: 10},
+                          {header: "BrandSourcePurchase"    , key: "BrandSourcePurchase"  , width: 10},
+                          {header: "CustomerCode"           , key: "CustomerCode"         , width: 10},
+                          {header: "GPS"                    , key: "GPS"                  , width: 10},
+                          {header: "Comment"                , key: "Comment"              , width: 10},
+                          {header: "OwnerName"              , key: "OwnerName"            , width: 10},
+                          {header: "JPlan"                  , key: "JPlan"                , width: 10},
+                          {header: "Journee"                , key: "Journee"              , width: 10},
+                        ]
 
         return columns
     },

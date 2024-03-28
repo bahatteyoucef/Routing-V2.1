@@ -23,7 +23,7 @@ const app           =   createApp(App)
 
 import mitt from 'mitt'
 
-const emitter       =   mitt()
+const emitter                                   =   mitt()
 app.config.globalProperties.emitter             =   emitter
 
 app.config.globalProperties.$colors             =   [   '#A52714'       , '#F9A825'     , '#3949AB'     , '#817717'     , '#558B2F'     , 

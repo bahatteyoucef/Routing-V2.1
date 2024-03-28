@@ -35,7 +35,7 @@
                 <table  class="table table-bordered w-100" id="by_brand_source_purchase_report_table_data">
                     <thead>
                         <tr>
-                            <th>CustomerType</th>
+                            <th>BrandSourcePurchase</th>
                             <th>Clients</th>
                             <th>Total</th>
                         </tr>
