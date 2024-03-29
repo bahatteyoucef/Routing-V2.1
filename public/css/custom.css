@@ -48,10 +48,8 @@
 /*  */
 
 #loading_screen {
-    display: block;
-    text-align: center; /* Horizontally center the content */
-    height: 100vh; /* Set container height to 100 viewport height */
-    width: 100vw; /* Set container width to 100 viewport width */
+    height          :   100vh; /* Set container height to 100 viewport height */
+    width           :   100vw; /* Set container width to 100 viewport width */
 
     position        :   fixed;
     z-index         :   99999;
@@ -59,26 +57,32 @@
     backdrop-filter :   blur(5px);
 }
 
-.center-content {
-    display: inline-block;
-    vertical-align: middle;
+.circular-progress{
+    /* position: relative; */
+    height              :   250px;
+    width               :   250px;
+    border-radius       :   50%;
+    /* background       :   conic-gradient(#7d2ae8 0deg, #ededed 0deg); */
+    display             :   flex;
+    align-items         :   center;
+    justify-content     :   center;
 }
 
-/* 
-#loading_screen {
-
-    position        :   fixed;
-    z-index         :   99999;
-    background      :   rgba(255, 255, 255, 0.1);
-    backdrop-filter :   blur(5px);
-
-    display         :   flex;
-    justify-content :   center;
-    align-items     :   center;
-    height          :   100vh; 
-    width           :   100vw; 
+.circular-progress::before{
+    content             : "";
+    position            : absolute;
+    height              : 210px;
+    width               : 210px;
+    border-radius       : 50%;
+    background-color    : #fff;
 }
-*/
+
+.progress-value{
+    position            : relative;
+    font-size           : 40px;
+    font-weight         : 600;
+    color               : #7d2ae8;
+}
 
 /*  */
 

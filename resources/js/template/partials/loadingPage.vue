@@ -1,5 +1,5 @@
 <template>
-    <div id="loading_screen" style="display:none;">
+    <div id="loading_screen" class="justify-content-center align-items-center" style="display:none;">
 
         <div class="circular-progress center-content">
             <span class="progress-value">{{ progress_integer }} %</span>
@@ -152,31 +152,5 @@ export default {
 
 <style scoped>
 
-.circular-progress{
-    position: relative;
-    height: 250px;
-    width: 250px;
-    border-radius: 50%;
-    background: conic-gradient(#7d2ae8 0deg, #ededed 0deg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.circular-progress::before{
-    content: "";
-    position: absolute;
-    height: 210px;
-    width: 210px;
-    border-radius: 50%;
-    background-color: #fff;
-}
-
-.progress-value{
-    position: relative;
-    font-size: 40px;
-    font-weight: 600;
-    color: #7d2ae8;
-}
 
 </style>
