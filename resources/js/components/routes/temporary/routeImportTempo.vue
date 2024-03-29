@@ -24,7 +24,7 @@
                         <form class="row mt-3 mb-5">
                             <div class="col-4">
                                 <label for="libelle"        class="form-label">Label</label>
-                                <input type="text"          class="form-control"        id="libelle"        v-model="route_import.libelle"  disabled="disabled">
+                                <input type="text"          class="form-control"        id="libelle"        v-model="route_import.libelle"      disabled="disabled">
                             </div>
 
                             <div class="col-4">
@@ -34,6 +34,11 @@
                                                             disabled="disabled"
                                                             accept=".csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, 
                                                                     application/vnd.ms-excel">
+                            </div>
+
+                            <div class="col-4">
+                                <label for="District"       class="form-label">District</label>
+                                <input type="text"          class="form-control"        id="District"       v-model="route_import.District"     disabled="disabled">
                             </div>
                         </form>
 
@@ -177,6 +182,7 @@ export default {
             route_import    : {
 
                 libelle                     :   "",
+                District                    :   "",
                 file                        :   "",
                 file_original_name          :   "",
 
@@ -269,6 +275,11 @@ export default {
                     if(typeof res.data.libelle              !=  "undefined") {
 
                         this.route_import.libelle                                   =   res.data.libelle
+                    }
+
+                    if(typeof res.data.District             !=  "undefined") {
+
+                        this.route_import.District                                  =   res.data.District
                     }
 
                     if(typeof res.data.file                 !=  "undefined") {

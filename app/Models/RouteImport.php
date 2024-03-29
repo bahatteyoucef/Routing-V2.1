@@ -85,6 +85,7 @@ class RouteImport extends Model
 
         $validator = Validator::make($request->all(), [
             'libelle'                   =>  ["required", "max:255"                  ],
+            'District'                  =>  ["required"                             ],
             'new_upload'                =>  ["required"                             ],
             'data'                      =>  ["required", "json"                     ]
         ]);
@@ -107,6 +108,7 @@ class RouteImport extends Model
 
         $route_import   =   new RouteImport([
             'libelle'       =>  $request->input('libelle')  ,
+            'District'      =>  $request->input('District') ,
             'owner'         =>  Auth::user()->id
         ]);
 

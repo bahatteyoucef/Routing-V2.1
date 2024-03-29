@@ -47,6 +47,7 @@ class RouteImportTempo extends Model
         $validator = Validator::make($request->all(), [
             'libelle'           =>  ["required", "max:255"      ],
             'data'              =>  ["required", "json"         ],
+            'District'          =>  ["required"                 ],
             'file'              =>  ["required", "mimes:xlsx"   ]
         ]);
 
@@ -70,6 +71,7 @@ class RouteImportTempo extends Model
 
         $route_import_tempo =   new RouteImportTempo([
             'libelle'       =>  $request->get("libelle")    ,
+            'District'      =>  $request->get("District")   ,
             'owner'         =>  Auth::user()->id
         ]);
 

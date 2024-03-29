@@ -891,11 +891,15 @@ class Statistic extends Model
         //
 
         //
-        $cities         =   DB::table("RTM_City")
-                                ->select("RTM_City.*", "clients.CityNo")
-                                ->join("clients", "RTM_City.CITYNO", "clients.CityNo")
-                                ->whereIn('clients.id_route_import', $route_links)
-                                ->distinct("clients.CityNo")
+        $cities         =   DB::table("route_import")
+                                ->select("RTM_City.*"   , "RTM_City.CITYNO as CityNo")
+
+                                ->join("RTM_City"       , "route_import.District"  , "RTM_City.DistrictNo")
+
+                                ->whereIn('route_import.id', $route_links)
+
+                                ->distinct("RTM_City.CITYNO")
+
                                 ->get();
 
         //

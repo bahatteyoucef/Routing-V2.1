@@ -14,12 +14,12 @@
                         <hr />
 
                         <form class="row mt-3 mb-3">
-                            <div class="col-4">
+                            <div class="col-3">
                                 <label for="libelle"        class="form-label">Label</label>
-                                <input type="text"          class="form-control"        id="libelle"        v-model="route_import.libelle">
+                                <input type="text"          class="form-control"    id="libelle"    v-model="route_import.libelle">
                             </div>
 
-                            <div class="col-4">
+                            <div class="col-3">
                                 <label for="file"           class="form-label">File</label>
                                 <input  type="file"         class="form-control"        
                                                             id="file"
@@ -28,7 +28,14 @@
                                                                     application/vnd.ms-excel">
                             </div>
 
-                            <div class="col-4 mt-auto">
+                            <div class="col-3">
+                                <label for="District"       class="form-label">District</label>
+                                <select                     class="form-select"     id="District"   v-model="route_import.District">
+                                    <option v-for="district in districts" :key="district.DistrictNo" :value="district.DistrictNo">{{district.DistrictNo}}- {{district.DistrictNameE}}</option>
+                                </select>
+                            </div>
+
+                            <div class="col-2 mt-auto">
                                 <button type="button" class="btn btn-primary"   @click="sendDataTempo()"    >Import     </button>
                             </div>
                         </form>
@@ -55,6 +62,7 @@ export default {
                 libelle                     :   "",
                 file                        :   "",
                 file_original_name          :   "",
+                District                    :   "",
 
                 id_route_import_tempo       :   null,
                 file_route_import_tempo     :   null,
@@ -63,15 +71,18 @@ export default {
                 sent_tempo                  :   false
             },
 
-            rdy_send        :   false       ,
+            rdy_send                            :   false   ,
 
-            clients         :   ""      
+            clients                             :   ""      ,
+
+            districts                           :   []
         }
 
     },
 
-    mounted() {
+    async mounted() {
 
+        await this.getComboData()
     },
 
     methods : {
@@ -163,6 +174,14 @@ export default {
             }
         },
 
+        async getComboData() {
+
+            const res       =   await this.$callApi("post",     "/rtm_willayas",    null)
+            console.log(res)
+
+            this.districts  =   res.data
+        },
+
         //
 
         checkFileFormat() {
@@ -172,8 +191,6 @@ export default {
             if(this.clients.length  >   0) {
 
                 let columns =   Object.keys(this.clients[0])
-
-                console.log(this.clients[0])
 
                 let CustomerCode_existe     =   columns.includes("CustomerCode")
                 let CustomerNameE_existe    =   columns.includes("CustomerNameE")
@@ -276,7 +293,9 @@ export default {
 
             else {
 
-                this.$showErrors("Error !", "Your file is empty !")
+                this.$feedbackWarning("Error !", "Your file is empty !")
+
+                this.rdy_send   =   true
             }
         },
 
@@ -427,6 +446,7 @@ export default {
                 let formData = new FormData();
 
                 formData.append("libelle"   ,   this.route_import.libelle)
+                formData.append("District"  ,   this.route_import.District)
                 formData.append("file"      ,   this.route_import.file)
                 formData.append("data"      ,   JSON.stringify(this.clients))
 

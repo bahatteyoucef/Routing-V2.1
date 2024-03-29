@@ -157,6 +157,7 @@ export default {
             let formData = new FormData();
 
             formData.append("libelle"   ,   this.$parent.route_import.libelle)
+            formData.append("District"  ,   this.$parent.route_import.District)
 
             if(this.$parent.route_import.new_upload ==  true) {
 
