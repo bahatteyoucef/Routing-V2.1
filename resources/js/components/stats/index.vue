@@ -66,7 +66,7 @@
 
         <!-- Card : Validated + Pending + Not Validated -->
         <div class="col p-1">
-          <div class="card h-100 bg-gradient-success card-img-holder text-white p-3" v-if="number_clients_validated">
+          <div class="card h-100 bg-gradient-success card-img-holder text-white p-3" v-if="number_clients_validated   !=  null">
             <div class="card-body p-1">
               <h4 class="font-weight-normal mb-3">Validated <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
               </h4>
@@ -76,7 +76,7 @@
         </div>
 
         <div class="col p-1">
-          <div class="card h-100 bg-gradient-warning card-img-holder text-white p-3" v-if="number_clients_pending">
+          <div class="card h-100 bg-gradient-warning card-img-holder text-white p-3" v-if="number_clients_pending     !=  null">
             <div class="card-body p-1">
               <h4 class="font-weight-normal mb-3">Pending <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
               </h4>
@@ -86,7 +86,7 @@
         </div>
 
         <div class="col p-1">
-          <div class="card h-100 bg-gradient-danger card-img-holder text-white p-3" v-if="number_clients_nonvalidated">
+          <div class="card h-100 bg-gradient-danger card-img-holder text-white p-3" v-if="number_clients_nonvalidated !=  null">
             <div class="card-body p-1">
               <h4 class="font-weight-normal mb-3">Non Validated <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
               </h4>
@@ -96,7 +96,7 @@
         </div>
 
         <div class="col p-1">
-          <div class="card h-100 bg-gradient-info card-img-holder text-white p-3" v-if="number_clients_total">
+          <div class="card h-100 bg-gradient-info card-img-holder text-white p-3" v-if="number_clients_total          !=  null">
             <div class="card-body p-1">
               <h4 class="font-weight-normal mb-3">Total <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
               </h4>
@@ -106,7 +106,7 @@
         </div>
 
         <div class="col p-1 h-100">
-          <div class="card h-100 bg-gradient-info card-img-holder text-white p-3" v-if="number_clients_expected">
+          <div class="card h-100 bg-gradient-info card-img-holder text-white p-3" v-if="number_clients_expected       !=  null">
             <div class="card-body p-1">
               <h4 class="font-weight-normal mb-3">Expected <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
               </h4>
@@ -361,8 +361,16 @@ export default {
 
             //
 
-            this.show_get_data_button     =   false
-            this.show_export_data_button  =   false
+            this.show_get_data_button                           =   false
+            this.show_export_data_button                        =   false
+
+            this.show_by_customer_type_report_content           =   false
+            this.show_by_brand_source_purchase_report_content   =   false
+            this.show_by_brand_availability_report_content      =   false
+            this.show_daily_report_content                      =   false
+            this.show_by_tel_availability_report_content        =   false
+            this.show_by_city_report_content                    =   false
+            this.show_data_census_report_content                =   false
 
             //
 
@@ -395,7 +403,9 @@ export default {
 
                 this.show_by_customer_type_report_content         =   true
 
-                this.emitter.on('show_by_customer_type_report_content_ready' , (by_customer_type_report_chart) =>  {
+                this.emitter.on('show_by_customer_type_report_content_ready' , () =>  {
+
+                    console.log('show_by_customer_type_report_content_ready')
 
                     //
                     this.by_brand_source_purchase_report_chart_data   =   res.data.stats_details.by_brand_source_purchase_report_chart_data
@@ -405,6 +415,8 @@ export default {
 
                     this.emitter.on('show_by_brand_source_purchase_report_content_ready' , () =>  {
 
+                        console.log('show_by_brand_source_purchase_report_content_ready')
+
                         //
                         this.by_brand_availability_report_chart_data      =   res.data.stats_details.by_brand_availability_report_chart_data
                         this.by_brand_availability_report_table_data      =   res.data.stats_details.by_brand_availability_report_table_data
@@ -412,6 +424,8 @@ export default {
                         this.show_by_brand_availability_report_content    =   true
 
                         this.emitter.on('show_by_brand_availability_report_content_ready' , () =>  {
+
+                            console.log('show_by_brand_availability_report_content_ready')
 
                             //
                             this.daily_report_chart_data                      =   res.data.stats_details.daily_report_chart_data
@@ -421,6 +435,8 @@ export default {
 
                             this.emitter.on('show_daily_report_content_ready' , () =>  {
 
+                                console.log('show_daily_report_content_ready')
+
                                 //
                                 this.by_tel_availability_report_chart_data        =   res.data.stats_details.by_tel_availability_report_chart_data
                                 this.by_tel_availability_report_table_data        =   res.data.stats_details.by_tel_availability_report_table_data
@@ -428,6 +444,8 @@ export default {
                                 this.show_by_tel_availability_report_content      =   true
 
                                 this.emitter.on('show_by_tel_availability_report_content_ready' , () =>  {
+
+                                    console.log('show_by_tel_availability_report_content_ready')
 
                                     //
                                     // this.by_city_report_chart_data                    =   res.data.stats_details.by_city_report_chart_data
@@ -437,12 +455,16 @@ export default {
 
                                     this.emitter.on('show_by_city_report_content_ready' , () =>  {
 
+                                        console.log('show_by_city_report_content_ready')
+
                                         //
                                         this.data_census_report_table_data                =   res.data.stats_details.data_census_report_table_data
 
                                         this.show_data_census_report_content              =   true
 
                                         this.emitter.on('show_data_census_report_content_ready' , () =>  {
+
+                                            console.log('show_data_census_report_content_ready')
 
                                             this.show_get_data_button     =   true
                                             this.show_export_data_button  =   true
@@ -474,7 +496,7 @@ export default {
         this.workbook = new ExcelJS.Workbook();
 
         // File name
-        let filename = "Student_Report.xlsx";
+        let filename = "Reports.xlsx";
 
         //
         this.exportByCustomerTypeReport()

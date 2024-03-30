@@ -95,19 +95,22 @@ class Statistic extends Model
 
         //
         $route_links                =   json_decode($request->get("route_links"));
-        
+                
         //
-        $startDate                  =   Carbon::parse($request->get("start_date")); // Replace with your start date
-        $endDate                    =   Carbon::parse($request->get("end_date"));   // Replace with your end date
-        
-        //
-        $cities                     =   DB::table("RTM_City")
-                                            ->select("RTM_City.*")
-                                            ->join("clients", "RTM_City.CITYNO", "clients.CityNo")
-                                            ->whereIn('clients.id_route_import', $route_links)
-                                            ->whereBetween(DB::raw('STR_TO_DATE(clients.created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
-                                            ->distinct("clients.CityNo")
+        $cities                     =   DB::table("route_import")
+                                            ->select("RTM_City.*"   , "RTM_City.CITYNO as CityNo")
+                                            ->join("RTM_City"       , "route_import.District"  , "RTM_City.DistrictNo")
+                                            ->whereIn('route_import.id', $route_links)
+                                            ->distinct("RTM_City.CITYNO")
                                             ->get();
+
+                                        // DB::table("RTM_City")
+                                        //     ->select("RTM_City.*")
+                                        //     ->join("clients", "RTM_City.CITYNO", "clients.CityNo")
+                                        //     ->whereIn('clients.id_route_import', $route_links)
+                                        //     ->whereBetween(DB::raw('STR_TO_DATE(clients.created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
+                                        //     ->distinct("clients.CityNo")
+                                        //     ->get();
 
         //
         $number_clients_expected    =   0;
@@ -210,7 +213,16 @@ class Statistic extends Model
             $row                            =   new stdClass();
             $row->label                     =   $customer_type;
             $row->count_clients             =   $count;
-            $row->percentage_clients        =   $count/$total_clients;
+
+            if($total_clients   ==  0) {
+
+                $row->percentage_clients        =   1;
+            }
+
+            else {
+
+                $row->percentage_clients        =   $count/$total_clients;
+            }
 
             array_push($rows, $row);
         }
@@ -320,7 +332,16 @@ class Statistic extends Model
             $row                            =   new stdClass();
             $row->label                     =   $brand_source_purchase;
             $row->count_clients             =   $count;
-            $row->percentage_clients        =   $count/$total_clients;
+
+            if($total_clients   ==  0) {
+
+                $row->percentage_clients        =   1;
+            }
+
+            else {
+
+                $row->percentage_clients        =   $count/$total_clients;
+            }
 
             array_push($rows, $row);
         }
@@ -431,7 +452,20 @@ class Statistic extends Model
         $row                            =   new stdClass();
         $row->label                     =   "Yes";
         $row->count_clients             =   $count_yes;
-        $row->percentage_clients        =   $count_yes/$total_clients;
+
+        //
+
+        if($total_clients   ==  0) {
+
+            $row->percentage_clients        =   1;
+        }
+
+        else {
+
+            $row->percentage_clients        =   $count_yes/$total_clients;
+        }
+
+        //
 
         array_push($rows, $row);
         //
@@ -439,7 +473,20 @@ class Statistic extends Model
         $row                            =   new stdClass();
         $row->label                     =   "No";
         $row->count_clients             =   $count_no;
-        $row->percentage_clients        =   $count_no/$total_clients;
+
+        //
+
+        if($total_clients   ==  0) {
+
+            $row->percentage_clients        =   1;
+        }
+
+        else {
+
+            $row->percentage_clients        =   $count_no/$total_clients;
+        }
+
+        //
 
         array_push($rows, $row);
         //

@@ -3,7 +3,6 @@
     <div class="m-1">
 
         <!-- Title -->
-        
         <div class="row">
             <div class="col-9 d-flex align-items-center">
                 <h4 class="mb-0 ml-2">By City Report</h4>
@@ -13,7 +12,6 @@
                 <img    src="/images/switch_arrows.png" @click="toggleChartTable()"    role="button"    class="mb-0 mr-2"/>
             </div> -->
         </div> 
-       
 
         <!-- Show Chart         -->
         <div v-show="show_by_city_report_chart_data"    class="row animate__animated animate__pulse">
