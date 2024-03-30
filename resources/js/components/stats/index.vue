@@ -496,7 +496,7 @@ export default {
         this.workbook = new ExcelJS.Workbook();
 
         // File name
-        let filename = "Reports.xlsx";
+        let filename = "Reports ("+this.start_date+" __ "+this.end_date+").xlsx";
 
         //
         this.exportByCustomerTypeReport()

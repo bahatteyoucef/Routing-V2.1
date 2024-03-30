@@ -136,7 +136,7 @@ class Statistic extends Model
         //
         $customer_types     =   DB::table("clients")
                                     ->select("clients.CustomerType")
-                                    ->where('clients.status', "validated")
+                                    // ->where('clients.status', "validated")
                                     ->whereIn('clients.id_route_import', $route_links)
                                     ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
                                     ->distinct("clients.CustomerType")
@@ -186,7 +186,7 @@ class Statistic extends Model
         //
         $customer_types     =   DB::table("clients")
                                     ->select("clients.CustomerType")
-                                    ->where('clients.status', "validated")
+                                    // ->where('clients.status', "validated")
                                     ->whereIn('clients.id_route_import', $route_links)
                                     ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
                                     ->distinct("clients.CustomerType")
@@ -272,7 +272,7 @@ class Statistic extends Model
 
             //  //  //  //  //  //  //  //  //  //
             $count                      =   DB::table("clients")
-                                                ->where('clients.BrandSourcePurchase', $source_achat)
+                                                ->where([['clients.BrandSourcePurchase', $source_achat], ['clients.status', "validated"]])
                                                 ->whereIn('clients.id_route_import', $route_links)
                                                 ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
                                                 ->count();
@@ -313,6 +313,7 @@ class Statistic extends Model
 
         $total_clients              =   DB::table("clients")
                                             ->select("clients.id")
+                                            ->where('clients.status', 'validated')
                                             ->whereIn('clients.id_route_import', $route_links)
                                             ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
                                             ->count();
@@ -324,7 +325,8 @@ class Statistic extends Model
         foreach ($brand_source_purchases as $brand_source_purchase) {
 
             $count                      =   DB::table("clients")
-                                                ->where('clients.BrandSourcePurchase', $brand_source_purchase)
+                                                ->where([['clients.BrandSourcePurchase', $brand_source_purchase], ['clients.status', "validated"]])
+
                                                 ->whereIn('clients.id_route_import', $route_links)
                                                 ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
                                                 ->count();
@@ -380,7 +382,7 @@ class Statistic extends Model
         $dataset->data              =   [];
 
         $count_yes                  =   DB::table("clients")
-                                            ->where('clients.BrandAvailability', 1)
+                                            ->where([['clients.BrandAvailability', 1], ['clients.status', "validated"]])
                                             ->whereIn('clients.id_route_import', $route_links)
                                             ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
                                             ->count();
@@ -390,7 +392,7 @@ class Statistic extends Model
         //  //  //  //  //  //  //  //  //  //
 
         $count_no                   =   DB::table("clients")
-                                            ->where('clients.BrandAvailability', 0)
+                                            ->where([['clients.BrandAvailability', 0], ['clients.status', "validated"]])
                                             ->whereIn('clients.id_route_import', $route_links)
                                             ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
                                             ->count();
@@ -423,6 +425,7 @@ class Statistic extends Model
         //
         $total_clients          =   DB::table("clients")
                                         ->select("clients.id")
+                                        ->where('clients.status', 'validated')
                                         ->whereIn('clients.id_route_import', $route_links)
                                         ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
                                         ->count();
@@ -431,7 +434,7 @@ class Statistic extends Model
         //  //  //  //  //  //  //  //  //  //
 
         $count_yes                  =   DB::table("clients")
-                                            ->where('clients.BrandAvailability', 1)
+                                            ->where([['clients.BrandAvailability', 1], ['clients.status', "validated"]])
                                             ->whereIn('clients.id_route_import', $route_links)
                                             ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
                                             ->count();
@@ -439,7 +442,7 @@ class Statistic extends Model
         //  //  //  //  //  //  //  //  //  //
 
         $count_no                   =   DB::table("clients")
-                                            ->where('clients.BrandAvailability', 0)
+                                            ->where([['clients.BrandAvailability', 0], ['clients.status', "validated"]])
                                             ->whereIn('clients.id_route_import', $route_links)
                                             ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
                                             ->count();
@@ -706,7 +709,7 @@ class Statistic extends Model
 
             //
             $count                      =   DB::table("clients")
-                                                ->where('owner', $user->id)
+                                                ->where([['owner', $user->id], ['clients.status', "validated"]])
                                                 ->where(function ($query) {
                                                     $query->whereNotNull('Tel')
                                                             ->where('Tel', '!=', '');
@@ -736,7 +739,7 @@ class Statistic extends Model
 
             //
             $count                      =   DB::table("clients")
-                                                ->where('owner', $user->id)
+                                                ->where([['owner', $user->id], ['clients.status', "validated"]])
                                                 ->where(function ($query) {
                                                     $query->whereNull('Tel')
                                                             ->orWhere('Tel', '');
@@ -808,7 +811,7 @@ class Statistic extends Model
 
             //
             $count_yes                      =   DB::table("clients")
-                                                    ->where('owner', $user->id)
+                                                    ->where([['owner', $user->id], ['clients.status', "validated"]])
                                                     ->where(function ($query) {
                                                         $query->whereNotNull('Tel')
                                                                 ->where('Tel', '!=', '');
@@ -820,7 +823,7 @@ class Statistic extends Model
 
             //
             $count_no                       =   DB::table("clients")
-                                                    ->where('owner', $user->id)
+                                                    ->where([['owner', $user->id], ['clients.status', "validated"]])
                                                     ->where(function ($query) {
                                                         $query->whereNull('Tel')
                                                                 ->orWhere('Tel', '');
@@ -895,7 +898,7 @@ class Statistic extends Model
 
             $city->added_clients        =   DB::table("clients")
                                                 ->select("clients.*")
-                                                ->where("clients.CityNo", $city->CityNo)
+                                                ->where([["clients.CityNo", $city->CityNo], ["clients.status", "validated"]])
                                                 ->whereIn('clients.id_route_import', $route_links)
                                                 ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
                                                 ->count();
@@ -954,7 +957,7 @@ class Statistic extends Model
 
             $city->added_clients        =   DB::table("clients")
                                                 ->select("clients.*")
-                                                ->where("clients.CityNo", $city->CityNo)
+                                                ->where([["clients.CityNo", $city->CityNo], ["clients.status", "validated"]])
                                                 ->whereIn('clients.id_route_import', $route_links)
                                                 ->whereBetween(DB::raw('STR_TO_DATE(created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
                                                 ->count();
