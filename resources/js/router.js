@@ -75,9 +75,9 @@ const routes = [
         component   : () => import('./components/clients/permanent/ClientDetails.vue')
     },
 
-    // Route Import Non Validated Clients
+    // Route Import Clients
     {
-        path        : "/route_import/:id_user/clients/by_status",
+        path        : "/route_import/:id_route_import/clients/by_status",
         component   : () => import('./components/routes/routeImportClientsByStatus.vue')
     },
 
@@ -121,7 +121,13 @@ const routes = [
     {
         path        : "/route/frontoffice/obs/route_import/:id_route_import/details",
         component   : () => import('./components/routes/permanent/obs/ParRouteImportFrontOfficeDetails.vue')
-    }
+    },
+
+    // Route Import Selected Clients
+    {
+        path        : "/route/frontoffice/obs/route_import/:id_route_import/clients/selected",
+        component   : () => import('./components/routes/permanent/obs/showCustomersMap.vue')
+    },
 ];
 
 const router = createRouter({

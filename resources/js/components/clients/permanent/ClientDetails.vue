@@ -9,31 +9,31 @@
                 <img    id="facade_image_display_update"    :src="'/uploads/clients/'+client.id+'/'+client.facade_image"  class="w-100">
 
                 <div class="mt-3">
-                    <div class="d-flex flex-row justify-content-center align-items-center gap-2">
-                        <span class="idd">CustomerCode : {{ client.CustomerCode }}</span>
+                    <div class="d-flex flex-row justify-content-center gap-2">
+                        <span class="idd">QR Code : {{ client.CustomerCode }}</span>
                     </div>
 
-                    <div class="d-flex flex-row justify-content-center align-items-center gap-2">
-                        <span class="idd">CustomerNameE : {{ client.CustomerNameE }}</span>
+                    <div class="d-flex flex-row justify-content-center gap-2">
+                        <span class="idd">Raison Social : {{ client.CustomerNameE }}</span>
                     </div>
 
-                    <div class="d-flex flex-row justify-content-center align-items-center gap-2">
-                        <span class="idd">Address : {{ client.Address }} - {{ client.AreaNameE }}</span>
+                    <div class="d-flex flex-row justify-content-center gap-2">
+                        <span class="idd">Adresse : {{ client.Address }} - {{ client.AreaNameE }}</span>
                     </div>
 
-                    <div class="d-flex flex-row justify-content-center align-items-center gap-2">
-                        <span class="idd">CustomerType : {{ client.CustomerType }}</span>
+                    <div class="d-flex flex-row justify-content-center gap-2">
+                        <span class="idd">Type de Magasin : {{ client.CustomerType }}</span>
                     </div>
 
-                    <div class="d-flex flex-row justify-content-center align-items-center gap-2">
-                        <span class="idd">Tel : {{ client.Tel }}</span>
+                    <div class="d-flex flex-row justify-content-center gap-2">
+                        <span class="idd">Téléphone : {{ client.Tel }}</span>
                     </div>
                 </div>
 
                 <div class="d-flex mt-3"       style="display: flex; justify-content: space-between;">
                     <div style="display: flex; margin-left: auto;">
                         <button class="rounded btn1 primary m-1" @click="updateInformations()">Update Informations</button>
-                        <button class="rounded btn1 btn-secondary m-1 text-white" @click="openDirectionsInGoogleMaps()">Show Itinerary <i class="mdi mdi-map-marker-radius"></i></button>
+                        <button class="rounded btn1 btn-secondary m-1 text-white" @click="openDirectionsInGoogleMaps()">Itinéraire <i class="mdi mdi-map-marker-radius"></i></button>
                     </div>
                 </div>
 

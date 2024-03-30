@@ -2,14 +2,12 @@
 
     <div class="mt-3">
 
-        <div class="page-header">
+        <div class="page-header mb-2">
 
-            <div class="row w-100">
-                <div class="col-10">
-                    <h3 class="page-title">
-                        Add a new Client 
-                    </h3>
-                </div>
+            <div class="container w-100">
+                <h3 class="page-title">
+                    Add a new Client 
+                </h3>
             </div>
 
         </div>
@@ -22,8 +20,8 @@
 
                     <div class="slideshow-container">
 
-                        <div class="mb-3 mySlides slide_1">
-                            <label for="CustomerCode"       class="form-label">Get Current Position <button class="btn btn-sm" @click.prevent="showPositionOnMap('show_map')"><i class="mdi mdi-reload"></i></button></label>
+                        <div class="mySlides slide_1">
+                            <label for="CustomerCode"       class="form-label">Detecter la Position Actuel <button class="btn btn-sm" @click.prevent="showPositionOnMap('show_map')"><i class="mdi mdi-reload"></i></button></label>
                             <p class="text-secondary text-small mb-1">Latitude : {{ client.Latitude }}</p>
                             <p class="text-secondary text-small mb-1">Longitude : {{ client.Longitude }}</p>
 
@@ -31,16 +29,16 @@
 
                             <hr />
 
-                            <h5>Nearby Clients</h5>
+                            <h5>Clients a Proximité</h5>
 
                             <hr />
 
                             <table class="table table-bordered mt-1">
                                 <thead>
                                     <tr>
-                                        <th class="col-sm-1">CustomerNameE</th>
-                                        <th class="col-sm-2">Tel</th>
-                                        <th class="col-sm-1">CustomerType</th>
+                                        <th class="col-sm-1">Raison Sociale</th>
+                                        <th class="col-sm-2">Téléphone</th>
+                                        <th class="col-sm-1">Type de Magasin</th>
                                     </tr>
                                 </thead>
                                 
@@ -54,7 +52,7 @@
                             </table>
                         </div>
 
-                        <div class="mb-3 mySlides slide_2">
+                        <div class="mySlides slide_2">
                             <div v-show="client.CustomerCode   ==  ''"     class="mt-1 p-0">
                                 <div    id="reader" class="scanner_reader w-100"></div>
                             </div>
@@ -65,7 +63,7 @@
 
                             <div v-show="client.CustomerCode   !=  ''"     class="mt-1 p-0">
                                 <div    id="customerCode_value"              class="text-center">
-                                    <span class="">CustomerCode : {{ client.CustomerCode }}</span>
+                                    <span class="">QR Code : {{ client.CustomerCode }}</span>
                                 </div>
                             </div>
 
@@ -73,63 +71,63 @@
 
                             <div class="mt-1 mb-1 w-100">
                                 <div class="w-100" id="refresh_client_barcode_button">
-                                    <button type="button" class="btn btn-primary w-100"     @click="setBarCodeReader()">Capture Bar Code</button>
+                                    <button type="button" class="btn btn-primary w-100"     @click="setBarCodeReader()">Capturer QR Code</button>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="mb-3 mySlides slide_3">
-                            <label for="CustomerBarCode_image"    class="form-label">CustomerBarCode Image (CustomerBarCode Image)</label>
+                        <div class="mySlides slide_3">
+                            <label for="CustomerBarCode_image"    class="form-label">QR Code Image</label>
                             <input type="file"              class="form-control"        id="CustomerBarCode_image"              accept="image/*"    capture     @change="customerBarCodeImage()">
                             <img                                                        id="CustomerBarCode_image_display"      src=""              class="w-100">
                         </div>
 
-                        <div class="mb-3 mySlides slide_4">
-                            <label for="CustomerNameE"      class="form-label">CustomerNameE (CustomerNameE)</label>
+                        <div class="mySlides slide_4">
+                            <label for="CustomerNameE"      class="form-label">Nom et Prénom de l'Acheteur</label>
                             <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE">
                         </div>
 
-                        <div class="mb-3 mySlides slide_5">
-                            <label for="CustomerNameA"      class="form-label">CustomerNameA (CustomerNameA)</label>
+                        <div class="mySlides slide_5">
+                            <label for="CustomerNameA"      class="form-label">Raison Sociale</label>
                             <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA">
                         </div>
 
-                        <div class="mb-3 mySlides slide_6">
-                            <label for="Tel"                class="form-label">Phone Number (Tel)</label>
+                        <div class="mySlides slide_6">
+                            <label for="Tel"                class="form-label">Téléphone</label>
                             <input type="text"              class="form-control"        id="Tel"                    v-model="client.Tel">
                         </div>
 
-                        <div class="mb-3 mySlides slide_7">
-                            <label for="Address"            class="form-label">Address (Address)</label>
+                        <div class="mySlides slide_7">
+                            <label for="Address"            class="form-label">Adresse</label>
                             <input type="text"              class="form-control"        id="Address"                v-model="client.Address">
                         </div>
 
-                        <div class="mb-3 mySlides slide_8">
-                            <label for="Neighborhood"       class="form-label">Neighborhood (Neighborhood)</label>
+                        <div class="mySlides slide_8">
+                            <label for="Neighborhood"       class="form-label">Quartier</label>
                             <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood">
                         </div>
 
-                        <div class="mb-3 mySlides slide_9">
-                            <label for="Landmark"           class="form-label">Landmark (Landmark)</label>
+                        <div class="mySlides slide_9">
+                            <label for="Landmark"           class="form-label">Point de Repere</label>
                             <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"></textarea>
                         </div>
 
-                        <div class="mb-3 mySlides slide_10">
-                            <label for="DistrictNo"         class="form-label">DistrictNo (DistrictNo)</label>
+                        <div class="mySlides slide_10">
+                            <label for="DistrictNo"         class="form-label">Willaya</label>
                             <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()">
                                 <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
                             </select>
                         </div>
 
-                        <div class="mb-3 mySlides slide_11">
-                            <label for="CityNo"             class="form-label">CityNo (CityNo)</label>
+                        <div class="mySlides slide_11">
+                            <label for="CityNo"             class="form-label">Commune</label>
                             <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo">
                                 <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CITYNO}}- {{cite.CityNameE}}</option>
                             </select>
                         </div>
 
-                        <div class="mb-3 mySlides slide_12">
-                            <label for="text"               class="form-label">CustomerType (CustomerType)</label>
+                        <div class="mySlides slide_12">
+                            <label for="text"               class="form-label">Type de Magasin</label>
                             <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType">
                                 <option     :value="'Superette'">Superette</option>
                                 <option     :value="'Alimentation General'">Alimentation General</option>
@@ -137,16 +135,16 @@
                             </select>
                         </div>
 
-                        <div class="mb-3 mySlides slide_13">
-                            <label for="text"               class="form-label">BrandAvailability (BrandAvailability)</label>
+                        <div class="mySlides slide_13">
+                            <label for="text"               class="form-label">Disponibilité Produits</label>
                             <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability">
                                 <option     value="0">No</option>
                                 <option     value="1">Yes</option>
                             </select>
                         </div>
     
-                        <div class="mb-3 mySlides slide_14">
-                            <label for="text"               class="form-label">BrandSourcePurchase (BrandSourcePurchase)</label>
+                        <div class="mySlides slide_14">
+                            <label for="text"               class="form-label">Source d'Achat</label>
                             <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase">
                                 <option     value="Distribution Direct">Distribution Direct</option>
                                 <option     value="Grossiste Fixe">Grossiste Fixe</option>
@@ -156,45 +154,45 @@
                             </select>
                         </div>
 
-                        <div class="mb-3 mySlides slide_15">
-                            <label for="JPlan"              class="form-label">JPlan (JPlan)</label>
+                        <div class="mySlides slide_15">
+                            <label for="JPlan"              class="form-label">Nom de Vendeur</label>
                             <input type="text"              class="form-control"        id="JPlan"                  v-model="client.JPlan">
                         </div>
                         
-                        <div class="mb-3 mySlides slide_16">
-                            <label for="Journee"            class="form-label">WorkDay (Journee)</label>
+                        <div class="mySlides slide_16">
+                            <label for="Journee"            class="form-label">Journee</label>
                             <input type="text"              class="form-control"        id="Journee"                v-model="client.Journee">
                         </div>
 
-                        <div class="mb-3 mySlides slide_17">
-                            <label for="status"             class="form-label">Status</label>
+                        <div class="mySlides slide_17">
+                            <label for="status"             class="form-label">Status Client</label>
                             <select                         class="form-select"         id="status"                 v-model="client.status">
-                                <option value="pending" selected>pending</option>
-                                <option value="nonvalidated">nonvalidated</option>
+                                <option value="pending" selected>en Attente</option>
+                                <option value="nonvalidated">Refusé</option>
                             </select>
 
                             <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
                                 <div class="form-group">
-                                    <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
+                                    <label      for="nonvalidated_details" class="form-label">Details Refus</label>
                                     <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="mb-3 mySlides slide_18">
-                            <label for="facade_image"       class="form-label">Facade Image (Facade Image)</label>
+                        <div class="mySlides slide_18">
+                            <label for="facade_image"       class="form-label">Image Facade</label>
                             <input type="file"              class="form-control"        id="facade_image"               accept="image/*"    capture     @change="facadeImage()">
                             <img                                                        id="facade_image_display"       src=""                          class="w-100">
                         </div>
 
-                        <div class="mb-3 mySlides slide_19">
-                            <label for="in_store_image"     class="form-label">In-Store Image (In-Store Image)</label>
+                        <div class="mySlides slide_19">
+                            <label for="in_store_image"     class="form-label">Image In-Store</label>
                             <input type="file"              class="form-control"        id="in_store_image"             accept="image/*"    capture     @change="inStoreImage()">
                             <img                                                        id="in_store_image_display"     src=""                          class="w-100">
                         </div>
 
-                        <div class="mb-3 mySlides slide_20">
-                            <label      for="comment">Comment</label>
+                        <div class="mySlides slide_20">
+                            <label      for="comment">Commentaire</label>
                             <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"></textarea>
                         </div>
 
@@ -206,10 +204,10 @@
 
             <!--  -->
 
-            <div class="container">
+            <div class="container position-absolute start-0 w-100"          style="bottom: 65px;">
                 <div class="row justify-content-center">
                     <div class="col-6 mt-3">
-                        <button v-if="slideIndex    >   1"      type="button" class="btn btn-secondary w-100"   @click="plusSlides(-1)">Previous</button>
+                        <button v-if="slideIndex    >   1"                  type="button" class="btn btn-secondary w-100"   @click="plusSlides(-1)">Previous</button>
                     </div>
 
                     <div class="col-6 mt-3">
@@ -218,13 +216,13 @@
                 </div>
             </div>
 
-            <div class="container">
+            <div class="container position-absolute start-0 w-100 mb-3"    style="bottom: 0px;">
                 <div class="row justify-content-center">
                     <div class="col mt-3">
-                        <button v-if="slideIndex  ==  total_questions"       type="button" class="btn btn-primary w-100"     @click="sendData()">Confirm</button>
+                        <button v-if="slideIndex  ==  total_questions"      type="button" class="btn btn-primary w-100"     @click="sendData()">Confirm</button>
                     </div>
                 </div>
-            </div>
+            </div>            
 
         </div>
 

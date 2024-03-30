@@ -17,9 +17,9 @@
 
                         <div class="col-8 pl-1 pr-1">
                             <select         class="form-select"     id="filter_status"      v-model="filter_status"     @change="getClients()">
-                                <option     :value="'validated'">validated</option>
-                                <option     :value="'pending'">pending</option>
-                                <option     :value="'nonvalidated'">nonvalidated</option>
+                                <option     :value="'validated'">Validé</option>
+                                <option     :value="'pending'">en Attente</option>
+                                <option     :value="'nonvalidated'">Refusé</option>
                             </select>
                         </div>
                     </div>
@@ -27,7 +27,7 @@
 
                 <div class="row mt-2">
                     <div class="col-12 p-0">
-                        <input class="form-control" placeholder="Filter By CustomerNameE..." v-model="search_by_CustomerNameE_value" @input="searchByCustomerNameE()"/>
+                        <input class="form-control" placeholder="Filtrer Par Raison Social..." v-model="search_by_CustomerNameE_value" @input="searchByCustomerNameE()"/>
                     </div>
                 </div>
 
@@ -60,21 +60,21 @@
 
                             <div class="media-body order-2 order-lg-1 w-100">
 
-                                <h5 class="mt-0 font-weight-bold mb-2">{{ client.CustomerNameE }}</h5>
+                                <h5 class="mt-0 font-weight-bold mb-2">{{ client.CustomerNameE }} ({{ client.CustomerNameA }})</h5>
                             
                                 <p class="font-italic text-muted mb-0 small">{{ client.Address }} - {{ client.CityNameE }}</p>
 
                                 <div>
                                     <div v-if="client.status    ==  'validated'"        class="badge badge-success mt-1 mb-1">
-                                        Validated
+                                        Validé
                                     </div>
 
                                     <div v-if="client.status    ==  'pending'"          class="badge badge-warning mt-1 mb-1">
-                                        Pending
+                                        en Attente
                                     </div>
 
                                     <div v-if="client.status    ==  'nonvalidated'"     class="badge badge-danger mt-1 mb-1">
-                                        Non Validated
+                                        Refusé
                                     </div>
                                 </div>
 
@@ -241,9 +241,9 @@ export default {
 
         showMap() {
 
-            this.setSelectedClientsAction(this.clients)
+            this.setSelectedClientsAction(this.clients_filtered)
 
-            this.$router.push('/front_office/presellers/route/obs/clients/selected')
+            this.$router.push('/route/frontoffice/obs/route_import/'+this.$route.params.id_route_import+'/clients/selected')
         },
 
         //
@@ -342,7 +342,7 @@ export default {
 
                 this.clients_filtered     =   this.clients_filtered.filter((client) => {
 
-                    return client.ClientBarCode.toUpperCase().includes(this.search_by_clientbarcode_value.toUpperCase())
+                    return client.CustomerCode.toUpperCase().includes(this.search_by_clientbarcode_value.toUpperCase())
                 })
             }
 

@@ -409,7 +409,11 @@ class Client extends Model
             $client->BrandAvailability              =   $request->get("BrandAvailability")      ;
             $client->BrandSourcePurchase            =   $request->get("BrandSourcePurchase")    ;
 
+            $client->comment                        =   $request->input("comment")              ;
+
             $client->id_route_import                =   $id_route_import                        ;
+
+            //
 
             if($request->input("JPlan") !=  null) {
 

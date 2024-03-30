@@ -534,6 +534,7 @@ export default {
                 this.setUpdateClientAction(null)
 
                 // Client
+                this.client.id                  =   '',
                 this.client.CustomerCode        =   '',
 
                 this.client.old_CustomerNameE   =   '',
@@ -563,13 +564,26 @@ export default {
                 // Journey Plan
                 this.client.JPlan               =   '',
 
-                this.client.status              =   '',
+                // Status
+                this.client.status                  =   '',
+                this.client.status_original         =   '',
+                this.client.nonvalidated_details    =   '',
+
+                // Comment
+                this.client.comment             =   ''  ,
+
+                //
 
                 this.willayas                   =   []  ,
                 this.cites                      =   []  ,
 
+                this.liste_journey_plan         =   []  ,
+                this.liste_journee              =   []  ,
+                this.liste_type_client          =   []  ,
+
                 this.all_clients                =   []  ,
-                this.close_clients              =   []
+                this.close_clients              =   []  ,
+                this.min_distance               =   0.03,
 
                 // Remove Drawings
                 this.removeDrawings()
@@ -640,6 +654,8 @@ export default {
             this.client.status                          =   client.status
             this.client.status_original                 =   client.status
             this.client.nonvalidated_details            =   client.nonvalidated_details
+
+            this.client.comment                         =   client.comment
 
             this.client.facade_image                    =   client.facade_image
             this.client.in_store_image                  =   client.in_store_image

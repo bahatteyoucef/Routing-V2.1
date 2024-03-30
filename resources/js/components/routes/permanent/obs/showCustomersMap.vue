@@ -7,58 +7,12 @@
 
             <!--  -->
 
-            <div id="hide_route_datatable_icon_div" class="animate__animated"   style="display : none">
-                <img  :src="'/images/hide_route_datatable.png'" role="button"   @click="hideRouteDatatable()"/>
-            </div>
-
             <div id="map_top_middle_options_div">
 
                 <div class="row">
-                    <!-- Map Info -->
-                    <div v-if="(($isRole('Super Admin'))||($isRole('BackOffice')))" class="col p-0 ml-1">
-                        <div class="map_top_infos_div">
-                            <table class="table table-borderless">
-
-                                <Popper click placement="bottom">
-                                    <img  :src="'/images/map_infos_2.png'" role="button" style="width : 35px; padding : 0;"/>
-
-                                    <template #content>
-                                        <table class="table table-borderless scrollbar scrollbar-deep-blue">
-                                            <tr v-for="groupe in clients_markers_affiche" :key="groupe">
-                                                <th class="p-1 col-7"><span @click="reAfficherClientsAndMarkersByColor(groupe.column_name)" role="button">{{ groupe.column_name }} : </span></th>
-                                                <td class="p-1 col-3"><span>{{ groupe.clients.length }} Clients </span></td>
-                                                <td class="p-1 col-1">
-                                                    <span   :style="    'display: inline-block;'+
-                                                                        'width: 15px;          '+
-                                                                        'height: 15px;         '+
-                                                                        'float: right;         '+
-                                                                        'background-color: '    +groupe.color+';'">
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        </table>                            
-                                    </template>
-                                </Popper>
-
-                            </table>
-                        </div>
-                    </div>
 
                     <!-- Toggle -->
-                    <div v-if="(($isRole('Super Admin'))||($isRole('BackOffice')))" class="col p-0 ml-1">
-                        <div id="toggle_div">
-
-                            <div class="btn-container" id="marker_cluster_mode_div">
-                                <label class="switch btn-color-mode-switch">
-                                    <input type="checkbox" name="marker_cluster_mode" id="marker_cluster_mode" @change="switchMarkerClusterMode()">
-                                    <label for="marker_cluster_mode" data-on="Marker" data-off="Cluster" class="btn-color-mode-switch-inner"></label>
-                                </label>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div v-if="$isRole('FrontOffice')" class="col p-0 ml-1">
+                    <div class="col p-0 ml-4">
                         <div id="toggle_div">
 
                             <div class="btn-container" id="marker_cluster_mode_div">
@@ -73,37 +27,6 @@
 
                 </div>
 
-            </div>
-
-            <!--  -->
-
-            <div class="leaflet-top leaflet-left" style="margin-top : 150px;margin-left: 15px;">  
-                <div class="leaflet-control-zoom leaflet-bar leaflet-control ml-0">
-                    <div id="refresh_button_map_data_div"       class="col p-0 h-100" >   
-                        <button id="refresh_button_map_data"    class="btn btn-sm p-1"  style="background-color : #3498DB;"    @click="getData()">
-                            <i class="mdi mdi-refresh"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="leaflet-bottom leaflet-right"               style="margin-bottom: 135px; width: 120px;">  
-                <div class="leaflet-control-zoom leaflet-control">
-                    <div id="map_buttons_div"   class="col p-0">   
-                        
-                        <div v-if="(($isRole('Super Admin'))||($isRole('BackOffice')))">
-                            <button class="btn secondary w-100 m-0 mt-1"    style="background-color : #FFFFFF; color : #424242; font-size : 13px; border-radius : 26px; box-shadow : 0px 0px 6px -2px #111"      @click="focuseMarkers()">Focus</button>
-                            <button class="btn secondary w-100 m-0 mt-1"    style="background-color : #FFFFFF; color : #424242; font-size : 13px; border-radius : 26px; box-shadow : 0px 0px 6px -2px #111"      @click="showTerritories()">Auto</button>
-                            <button class="btn secondary w-100 m-0 mt-1"    style="background-color : #FFFFFF; color : #424242; font-size : 13px; border-radius : 26px; box-shadow : 0px 0px 6px -2px #111"      @click="showJPIDBDTerritories()">JPID</button>
-                            <button class="btn secondary w-100 m-0 mt-1"    style="background-color : #FFFFFF; color : #424242; font-size : 13px; border-radius : 26px; box-shadow : 0px 0px 6px -2px #111"      @click="showJourneeBDTerritories()">Journee</button>
-                        </div>
-
-                        <div v-if="$isRole('FrontOffice')">
-                            <button class="btn secondary w-100 m-0 mt-1"    style="background-color : #FFFFFF; color : #424242; font-size : 13px; border-radius : 26px; box-shadow : 0px 0px 6px -2px #111"      @click="showCurrentPosition()">Position</button>
-                        </div>
-
-                    </div>
-                </div>
             </div>
 
             <!--  -->
@@ -118,176 +41,38 @@
         <!-- Modal Change Route             -->
         <modalClientsChangeRoute                                        ref="modalClientsChangeRoute"                                                                               >   </modalClientsChangeRoute>
 
+        <!-- Modal Decoupe By Journee       -->
+        <modalResume                                                    ref="modalResume"               :key="id_route_import"      :type="'permanent'"                             >   </modalResume>
+
         <!-- Modal Add New Journey Plan     -->
         <modalAddJourneyPlan                                            ref="modalAddJourneyPlan"                                                                                   >   </modalAddJourneyPlan>
 
         <!-- Modal Add New Journey Plan     -->
         <modalUpdateJourneyPlan                                         ref="modalUpdateJourneyPlan"                                                                                >   </modalUpdateJourneyPlan>
 
-        <!--  -->
+        <!-- Modal Update Map               -->
+        <modalUpdateMap                                                 ref="modalUpdateMap"           :key="id_route_import"       :id_route_import="id_route_import"              >   </modalUpdateMap>
+
+        <!-- Modal Update Map               -->
+        <modalValidateMap                                               ref="modalValidateMap"         :key="id_route_import"       :id_route_import="id_route_import"              >   </modalValidateMap>
+
+        <!--                                -->   
 
         <div id="tableau_data">
 
-            <!-- Buttons and Filter -->
-            <div v-if="$isRole('BackOffice')||$isRole('Super Admin')" class="map_top_buttons_parent_div animate__animated" style="width : 10%" id="map_top_buttons_parent_div">
-                <div class="map_top_buttons_div float-right" id="map_top_buttons_div">
-                    <div class="row d-flex justify-content-end">
-
-                        <div class="col-12">
-
-                            <select class="form-select w-100 m-0 mt-1"                                                          @change="reAfficherClientsAndMarkers()"  v-model="column_group">
-                                <option value="1">JPID</option>
-                                <option value="2">CityNameE</option>
-                                <option value="3">AreaNameE</option>
-                                <option value="4">CustomerType</option>
-                                <option value="5">Journee</option>
-                                <option value="6">Owner</option>
-                                <option value="7">Status</option>
-                            </select>
-
-                            <!-- Journey Plan   -->
-                            <Multiselect
-                                v-model     =   "journey_plan_filter_value"
-                                :options    =   "liste_journey_plan"
-                                mode        =   "tags"
-                                placeholder =   "Filter By JPID"
-                                class       =   "mt-1"
-
-                                :close-on-select    =   "false"
-                                :searchable         =   "true"
-                                :create-option      =   "true"
-
-                                @change             =   "reAfficherClientsAndMarkers()"
-                            />
-                            <!--                -->
-
-                            <!-- City       -->
-                            <Multiselect
-                                v-model     =   "city_filter_value"
-                                :options    =   "cities"
-                                mode        =   "tags"
-                                placeholder =   "Filter By CityNameE"
-                                class       =   "mt-1"
-
-                                :close-on-select    =   "false"
-                                :searchable         =   "true"
-                                :create-option      =   "true"
-
-                                @change             =   "reAfficherClientsAndMarkers()"
-                            />
-                            <!--                -->
-
-                            <!-- Area           -->
-                            <Multiselect
-                                v-model     =   "area_filter_value"
-                                :options    =   "areas"
-                                mode        =   "tags"
-                                placeholder =   "Filter By AreaNameE"
-                                class       =   "mt-1"
-
-                                :close-on-select    =   "false"
-                                :searchable         =   "true"
-                                :create-option      =   "true"
-
-                                @change             =   "reAfficherClientsAndMarkers()"
-                            />
-                            <!--                -->
-
-                            <!-- CustomerType   -->
-                            <Multiselect
-                                v-model     =   "type_client_filter_value"
-                                :options    =   "liste_type_client"
-                                mode        =   "tags"
-                                placeholder =   "Filter By CustomerType"
-                                class       =   "mt-1"
-
-                                :close-on-select    =   "false"
-                                :searchable         =   "true"
-                                :create-option      =   "true"
-
-                                @change             =   "reAfficherClientsAndMarkers()"
-                            />
-
-                            <!-- Journee        -->
-                            <Multiselect
-                                v-model     =   "journee_filter_value"
-                                :options    =   "liste_journee"
-                                mode        =   "tags"
-                                placeholder =   "Filter By Journee"
-                                class       =   "mt-1"
-
-                                :close-on-select    =   "false"
-                                :searchable         =   "true"
-                                :create-option      =   "true"
-
-                                @change             =   "reAfficherClientsAndMarkers()"
-                            />
-                            <!--                -->
-
-                            <!-- Owners        -->
-                            <Multiselect
-                                v-model     =   "owner_filter_value"
-                                :options    =   "owners"
-                                mode        =   "tags"
-                                placeholder =   "Filter By Owner"
-                                class       =   "mt-1"
-
-                                :close-on-select    =   "false"
-                                :searchable         =   "true"
-                                :create-option      =   "true"
-
-                                @change             =   "reAfficherClientsAndMarkers()"
-                            />
-                            <!--                -->
-
-                            <!-- Status        -->
-                            <Multiselect
-                                v-model     =   "status_filter_value"
-                                :options    =   "liste_status"
-                                mode        =   "tags"
-                                placeholder =   "Filter By Status"
-                                class       =   "mt-1"
-
-                                :close-on-select    =   "false"
-                                :searchable         =   "true"
-                                :create-option      =   "true"
-
-                                @change             =   "reAfficherClientsAndMarkers()"
-                            />
-                            <!--                -->
-
-                            <!-- Status        -->
-                            <Multiselect
-                                v-model     =   "kml_layers"
-                                :options    =   "kml_cities"
-                                mode        =   "tags"
-                                placeholder =   "Select City KML"
-                                class       =   "mt-1"
-
-                                :close-on-select    =   "false"
-                                :searchable         =   "true"
-                                :create-option      =   "true"
-
-                                @select             =   "setKMLLayers()"
-                                @deselect           =   "setKMLLayers()"
-                                @clear              =   "setKMLLayers()"
-                            />
-                            <!--                -->
-                        </div>
-                    </div>
-                </div>
+            <div v-if="$isRole('FrontOffice')" class="col-2 float-right mt-1 p-0" id="show_position_button">
+                <button class="btn primary w-100 m-0 mt-1 pr-0 pl-0"                                                        @click="showCurrentPosition()"><i class="mdi mdi-crosshairs-gps"></i></button>
             </div>
 
             <!--  -->
 
             <div id="datatable_par_route_import_parent" class="scrollbar scrollbar-deep-blue bg-white p-1 animate__animated" style="display : none">
-                <table class="table datatable_par_route_import_details" id="datatable_par_route_import_details" style="margin-top : 105px">
+                <table class="table datatable_par_route_import_details" id="datatable_par_route_import_details">
                     <thead>
                         <tr>
                             <th class="col-sm-1">Index</th>
 
-                            <th class="col-sm-2">CustomerNo</th>
-
+                            <th class="col-sm-2">CustomerCode</th>
                             <th class="col-sm-2">CustomerNameE</th>
                             <th class="col-sm-2">CustomerNameA</th>
 
@@ -296,8 +81,8 @@
 
                             <th class="col-sm-2">Address</th>
 
-                            <th class="col-sm-1">AreaNo</th>
-                            <th class="col-sm-2">AreaNameE</th>
+                            <th class="col-sm-1">DistrictNo</th>
+                            <th class="col-sm-2">DistrictNameE</th>
 
                             <th class="col-sm-1">CityNo</th>
                             <th class="col-sm-2">CityNameE</th>
@@ -305,15 +90,17 @@
                             <th class="col-sm-2">Tel</th>
 
                             <th class="col-sm-1">CustomerType</th>
-                            <th class="col-sm-1">CategoryNo</th>
 
-                            <th class="col-sm-2">JPID</th>
+                            <th class="col-sm-2">JPlan</th>
+
                             <th class="col-sm-2">Journee</th>
 
                             <!--  -->
 
                             <th class="col-sm-2">Owner</th>
+                            <th class="col-sm-2">Created At</th>
                             <th class="col-sm-2">Status</th>
+
                         </tr>
                     </thead>
 
@@ -322,8 +109,7 @@
 
                             <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Index"            /></th>
 
-                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNo"       /></th>
-
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
 
@@ -332,23 +118,24 @@
 
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Address"          /></th>
 
-                            <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="AreaNo"           /></th>
-                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="AreaNameE"        /></th>
+                            <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="DistrictNo"       /></th>
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="DistrictNameE"    /></th>
 
-                            <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CityNo"       /></th>
-                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CityNameE"    /></th>
+                            <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CityNo"           /></th>
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CityNameE"        /></th>
 
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Tel"              /></th>
 
                             <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerType"     /></th>
-                            <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CategoryNo"       /></th>
 
-                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="JPID"             /></th>
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="JPlan"            /></th>
+
                             <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Journee"          /></th>
 
                             <!--  -->
 
                             <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Owner"            /></th>
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Created_At"       /></th>
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Status"           /></th>
                         </tr>
                     </thead>
@@ -357,7 +144,7 @@
                         <tr v-for="(client, index) in clients_table_affiche" :key="client" role="button" @click="showModalupdateClient(client)">
                             <td>{{index +   1}}</td>
 
-                            <td>{{client.CustomerNo}}</td>
+                            <td>{{client.CustomerCode}}</td>
                             <td>{{client.CustomerNameE}}</td>
                             <td>{{client.CustomerNameA}}</td>
 
@@ -366,8 +153,8 @@
 
                             <td>{{client.Address}}</td>
 
-                            <td>{{client.AreaNo}}</td>
-                            <td>{{client.AreaNameE}}</td>
+                            <td>{{client.DistrictNo}}</td>
+                            <td>{{client.DistrictNameE}}</td>
 
                             <td>{{client.CityNo}}</td>
                             <td>{{client.CityNameE}}</td>
@@ -375,19 +162,20 @@
                             <td>{{client.Tel}}</td>
 
                             <td>{{client.CustomerType}}</td>
-                            <td>{{client.CategoryNo}}</td>
 
-                            <td>{{client.JPID}}</td>
+                            <td>{{client.JPlan}}</td>
+
                             <td>{{client.Journee}}</td>
 
                             <!--  -->
 
                             <td>{{client.owner_name}}</td>
+                            <td>{{client.created_at}}</td>
 
                             <td>
-                                <span v-if="client.CustomerStatus=='nonvalidated'"  href="#" class="badge badge-danger">{{client.CustomerStatus}}</span>
-                                <span v-if="client.CustomerStatus=='pending'"       href="#" class="badge badge-warning">{{client.CustomerStatus}}</span>
-                                <span v-if="client.CustomerStatus=='validated'"     href="#" class="badge badge-success">{{client.CustomerStatus}}</span>
+                                <span v-if="client.status=='nonvalidated'"  href="#" class="badge badge-danger">{{client.status}}</span>
+                                <span v-if="client.status=='pending'"       href="#" class="badge badge-warning">{{client.status}}</span>
+                                <span v-if="client.status=='validated'"     href="#" class="badge badge-success">{{client.status}}</span>
                             </td>
 
                         </tr>
@@ -407,17 +195,16 @@
 
 import Multiselect              from '@vueform/multiselect'
 
-import modalClientAdd           from "../../../back_office/clients/modalClientAdd.vue"
-import modalClientUpdate        from "../../../back_office/clients/modalClientUpdate.vue"
-import modalClientsChangeRoute  from "../../../back_office/clients/modalClientsChangeRoute.vue"
-import modalResume              from "../../../back_office/routes/imports/modalResume.vue"
-import modalDevide              from "../../../back_office/routes/imports/modalDevide.vue"
+import modalClientAdd           from "../../../clients/permanent/modalClientAdd.vue"
+import modalClientUpdate        from "../../../clients/permanent/modalClientUpdate.vue"
+import modalClientsChangeRoute  from "../../../clients/permanent/modalClientsChangeRoute.vue"
+import modalResume              from "../../modalResume.vue"
 
-import modalAddJourneyPlan      from "../../../back_office/territoires/modalAddJourneyPlan.vue"
-import modalUpdateJourneyPlan   from "../../../back_office/territoires/modalUpdateJourneyPlan.vue"
+import modalAddJourneyPlan      from "../../../territoires/modalAddJourneyPlan.vue"
+import modalUpdateJourneyPlan   from "../../../territoires/modalUpdateJourneyPlan.vue"
 
-import modalUpdateMap           from "../../../back_office/routes/imports/Map/modalUpdateMap.vue"
-import modalValidateMap         from "../../../back_office/routes/imports/Map/modalValidateMap.vue"
+import modalUpdateMap           from "../../../routes/permanent/modalUpdateMap.vue"
+import modalValidateMap         from "../../../routes/permanent/modalValidateMap.vue"
 
 import {mapGetters, mapActions} from "vuex"
 
@@ -436,15 +223,15 @@ export default {
             journey_plan_filter_value   :   []                          ,
             liste_journey_plan          :   {}                          ,
 
+            // District
+
+            district_filter_value       :   []                          ,
+            districts                   :   {}                          ,
+
             // City
 
             city_filter_value           :   []                          ,
-            cities                      :   {}                          ,
-
-            // Area
-
-            area_filter_value           :   []                          ,
-            areas                       :   {}                          ,
+            cites                       :   {}                          ,
 
             // Type Client
 
@@ -487,10 +274,10 @@ export default {
                 lng :   0
             },
 
-            //
-
-            kml_cities                :   [],
-            kml_layers                  :   null,
+            clients_non_owner               :   [],
+            clients_owner_validated         :   [],
+            clients_owner_pending           :   [],
+            clients_owner_non_validated     :   []
         }
     },  
 
@@ -502,7 +289,6 @@ export default {
         modalClientUpdate           ,
         modalClientsChangeRoute     ,
         modalResume                 ,
-        modalDevide                 ,
 
         modalAddJourneyPlan         ,
         modalUpdateJourneyPlan      ,
@@ -518,6 +304,7 @@ export default {
             getAddClient            : 'client/getAddClient'                 ,
             getUpdateClient         : 'client/getUpdateClient'              ,
             getClientsChangeRoute   : 'client/getClientsChangeRoute'        ,
+            getSelectedClients      : 'client/getSelectedClients'           ,
 
             getAddJourneyPlan       : 'journey_plan/getAddJourneyPlan'      ,
 
@@ -525,18 +312,21 @@ export default {
 
             getUser                 :   'authentification/getUser'              ,
             getAccessToken          :   'authentification/getAccessToken'       ,
-            getIsAuthentificated    :   'authentification/getIsAuthentificated' ,
-
-            //
-
-            getSelectedClients      :   'client/getSelectedClients' 
+            getIsAuthentificated    :   'authentification/getIsAuthentificated'
         })
+
     },
 
     async mounted() {
 
         // add Map
         this.addMap()
+
+        //
+        this.showUserBDTerritoriesFront()
+
+        // 
+        this.setValues()
 
         // 
         await this.getData()
@@ -592,9 +382,9 @@ export default {
 
         //
 
-        this.emitter.on('reSetJPIDBDTerritory' , () =>  {
+        this.emitter.on('reSetJPlanBDTerritory' , () =>  {
 
-            this.showJPIDBDTerritories()
+            this.showJPlanBDTerritories()
         })
 
         this.emitter.on('reSetJourneeBDTerritory' , () =>  {
@@ -605,47 +395,43 @@ export default {
 
     methods : {
 
-        ...mapActions("journey_plan"    ,  [
+        ...mapActions("journey_plan" ,  [
             "setListeJourneyPlanAction"     ,
         ]),
 
-        ...mapActions("type_client"     ,  [
-            "setListeTypeClientAction"      ,
+        ...mapActions("type_client" ,  [
+            "setListeTypeClientAction"     ,
         ]),
 
-        ...mapActions("journee"         ,  [
-            "setListeJourneeAction"         ,
+        ...mapActions("journee" ,  [
+            "setListeJourneeAction"     ,
         ]),
 
-        ...mapActions("client"          ,  [
-            "setSelectedClientsAction"
+        ...mapActions("client" ,  [
+            "setAllClientsAction"     ,
         ]),
 
         //
+
+        setValues() {
+
+            this.id_route_import    =   this.$route.params.id_route_import
+        },
 
         async getData() {
 
             // Show Loading Page
             this.$showLoadingPage()
 
-            // const res                   =   await this.$callApi("post"  ,   "/front_office/presellers/rtm_cities",   null)
-
             this.route_import           =   {}
+
+            console.log(this.getSelectedClients)
 
             // Set Clients
             this.route_import.clients   =   this.getSelectedClients
 
-            // 
-            // this.setKMLCities(res.data.cities)
-
-            // Extract JPID, Areas, City
-            this.extractMetaData()
-
-            // Prepare Clients
-            this.prepareClients()
-
-            // Prepare Affiche Clients
-            await this.reAfficheClients()
+            // Set Data in Vuex
+            this.setAllClientsAction(this.route_import.clients)
 
             // Set Markers
             this.setRouteMarkers()
@@ -659,32 +445,32 @@ export default {
         extractMetaData() {
 
             let journey_plan_count                  =   0
-            let city_count                          =   0
-            let area_count                          =   0
+            let district_count                      =   0
+            let cite_count                          =   0
             let type_client_count                   =   0
             let journee_count                       =   0
             let owner_count                         =   0
             let status_count                        =   0
 
             let journey_plan_existe                 =   false
-            let city_existe                         =   false
-            let area_existe                         =   false
+            let district_existe                     =   false
+            let cite_existe                         =   false
             let type_client_existe                  =   false
             let journee_existe                      =   false
             let owner_existe                        =   false
             let status_existe                       =   false
 
             let journey_plan_util                   =   {}
-            let city_util                           =   {}
-            let area_util                           =   {}
+            let district_util                       =   {}
+            let cite_util                           =   {}
             let type_client_util                    =   {}
             let journee_util                        =   {}
             let owner_util                          =   {}
-            let status_util                         =   {}
+            let status_util                          =   {}
 
             let liste_journey_plan_colors           =   {}
-            let cities_colors                       =   {}
-            let areas_colors                        =   {}
+            let districts_colors                    =   {}
+            let cites_colors                        =   {}
             let liste_type_client_colors            =   {}
             let liste_journee_colors                =   {}
             let owners_colors                       =   {}
@@ -702,19 +488,19 @@ export default {
                 }
             }
 
-            for (const [key, value] of Object.entries(this.cities)) {
+            for (const [key, value] of Object.entries(this.districts)) {
 
-                if(typeof cities_colors[this.cities[key].color]                         ==  "undefined") {
+                if(typeof districts_colors[this.districts[key].color]                   ==  "undefined") {
 
-                    cities_colors[this.cities[key].color]                                   =   this.cities[key].color
+                    districts_colors[this.districts[key].color]                             =   this.districts[key].color
                 }
             }
 
-            for (const [key, value] of Object.entries(this.areas)) {
+            for (const [key, value] of Object.entries(this.cites)) {
 
-                if(typeof areas_colors[this.areas[key].color]                           ==  "undefined") {
+                if(typeof cites_colors[this.cites[key].color]                           ==  "undefined") {
 
-                    areas_colors[this.areas[key].color]                                     =   this.areas[key].color
+                    cites_colors[this.cites[key].color]                                     =   this.cites[key].color
                 }
             }
 
@@ -736,36 +522,36 @@ export default {
 
             for (const [key, value] of Object.entries(this.owners)) {
 
-                if(typeof owner_util[this.owners[key].color]                            ==  "undefined") {
+                if(typeof owner_util[this.owners[key].color]  ==  "undefined") {
 
-                    owners_colors[this.owners[key].color]                                   =   this.owners[key].color
+                    owners_colors[this.owners[key].color]           =   this.owners[key].color
                 }
             }
 
             for (const [key, value] of Object.entries(this.liste_status)) {
 
-                if(typeof status_util[this.liste_status[key].color]                     ==  "undefined") {
+                if(typeof status_util[this.liste_status[key].color]  ==  "undefined") {
 
-                    liste_status_colors[this.liste_status[key].color]                       =   this.liste_status[key].color
+                    liste_status_colors[this.liste_status[key].color]           =   this.liste_status[key].color
                 }
             }
 
             // Make Groupe
             for (let i = 0; i < this.route_import.clients.length; i++) {
 
-                if(typeof journey_plan_util[this.route_import.clients[i].JPID]          ==  "undefined") {
+                if(typeof journey_plan_util[this.route_import.clients[i].JPlan]         ==  "undefined") {
 
-                    journey_plan_util[this.route_import.clients[i].JPID]                    =   this.route_import.clients[i].JPID
+                    journey_plan_util[this.route_import.clients[i].JPlan]                   =   this.route_import.clients[i].JPlan
                 }    
 
-                if(typeof city_util[this.route_import.clients[i].CityNo]                ==  "undefined") {
+                if(typeof district_util[this.route_import.clients[i].DistrictNo]        ==  "undefined") {
 
-                    city_util[this.route_import.clients[i].CityNo]                          =   this.route_import.clients[i].CityNameE
+                    district_util[this.route_import.clients[i].DistrictNo]                  =   this.route_import.clients[i].DistrictNameE
                 }
 
-                if(typeof area_util[this.route_import.clients[i].AreaNo]                ==  "undefined") {
+                if(typeof cite_util[this.route_import.clients[i].CityNo]                ==  "undefined") {
 
-                    area_util[this.route_import.clients[i].AreaNo]                          =   this.route_import.clients[i].AreaNameE
+                    cite_util[this.route_import.clients[i].CityNo]                          =   this.route_import.clients[i].CityNameE
                 }
 
                 if(typeof type_client_util[this.route_import.clients[i].CustomerType]   ==  "undefined") {
@@ -778,7 +564,7 @@ export default {
                     journee_util[this.route_import.clients[i].Journee]                      =   this.route_import.clients[i].Journee
                 }
 
-                if(typeof owner_util[this.route_import.clients[i].owner_name]           ==  "undefined") {
+                if(typeof owner_util[this.route_import.clients[i].owner_name]                ==  "undefined") {
 
                     owner_util[this.route_import.clients[i].owner_name]                     =   this.route_import.clients[i].owner_name
                 }
@@ -788,13 +574,13 @@ export default {
                     status_util[this.route_import.clients[i].status]                        =   this.route_import.clients[i].status
                 }
 
-                // JPID
-                journey_plan_existe         =   this.checkExistJPID(this.liste_journey_plan, this.route_import.clients[i].JPID) 
+                // JPlan
+                journey_plan_existe         =   this.checkExistJPlan(this.liste_journey_plan, this.route_import.clients[i].JPlan) 
 
                 if(!journey_plan_existe) {
 
-                    this.liste_journey_plan[this.route_import.clients[i].JPID]                         =   {JPID  :   ""}
-                    this.liste_journey_plan[this.route_import.clients[i].JPID].JPID                   =   this.route_import.clients[i].JPID
+                    this.liste_journey_plan[this.route_import.clients[i].JPlan]                         =   {JPlan  :   ""}
+                    this.liste_journey_plan[this.route_import.clients[i].JPlan].JPlan                   =   this.route_import.clients[i].JPlan
 
                     if(Object.keys(liste_journey_plan_colors).length    >   0) {
 
@@ -804,56 +590,57 @@ export default {
                         }
                     }
 
-                    this.liste_journey_plan[this.route_import.clients[i].JPID].color                   =   this.$colors[journey_plan_count % this.$colors.length]
+                    this.liste_journey_plan[this.route_import.clients[i].JPlan].color                   =   this.$colors[journey_plan_count % this.$colors.length]
                     journey_plan_count                                                                  =   journey_plan_count +   1
                 }
 
                 //
 
-                // City
-                city_existe             =   this.checkExistCityNo(this.cities, this.route_import.clients[i].CityNo) 
+                // District
+                district_existe             =   this.checkExistDistrictNo(this.districts, this.route_import.clients[i].DistrictNo) 
 
-                if(!city_existe) {
+                if(!district_existe) {
 
-                    this.cities[this.route_import.clients[i].CityNo]                            =   {CityNameComplete : "", CityNameE : "", CityNo : ""}
-                    this.cities[this.route_import.clients[i].CityNo].CityNo                     =   this.route_import.clients[i].CityNo 
-                    this.cities[this.route_import.clients[i].CityNo].CityNameE                  =   this.route_import.clients[i].CityNameE 
-                    this.cities[this.route_import.clients[i].CityNo].CityNameComplete           =   this.route_import.clients[i].CityNo +   "- "    +   this.route_import.clients[i].CityNameE 
+                    this.districts[this.route_import.clients[i].DistrictNo]                                 =   {DistrictNameComplete : "", DistrictNameE : "", DistrictNo : ""}
+                    this.districts[this.route_import.clients[i].DistrictNo].DistrictNo                      =   this.route_import.clients[i].DistrictNo 
+                    this.districts[this.route_import.clients[i].DistrictNo].DistrictNameE                   =   this.route_import.clients[i].DistrictNameE 
+                    this.districts[this.route_import.clients[i].DistrictNo].DistrictNameComplete            =   this.route_import.clients[i].DistrictNo +   "- "    +   this.route_import.clients[i].DistrictNameE 
 
-                    if(Object.keys(cities_colors).length    >   0) {
+                    if(Object.keys(districts_colors).length    >   0) {
 
-                        while(typeof cities_colors[this.$colors[city_count % this.$colors.length]]                   !=  "undefined") {
+                        while(typeof districts_colors[this.$colors[district_count % this.$colors.length]]                   !=  "undefined") {
 
-                            city_count                                                                  =   city_count +   1
+                            district_count                                                                  =   district_count +   1
                         }
                     }
 
-                    this.cities[this.route_import.clients[i].CityNo].color                              =   this.$colors[city_count % this.$colors.length]
-                    city_count                                                                          =   city_count +   1
+                    this.districts[this.route_import.clients[i].DistrictNo].color                           =   this.$colors[district_count % this.$colors.length]
+                    district_count                                                                          =   district_count +   1
                 }
 
                 //
 
-                // Area
-                area_existe                 =   this.checkExistAreaNo(this.areas, this.route_import.clients[i].AreaNo) 
+                // Cite
+                cite_existe                 =   this.checkExistCityNo(this.cites, this.route_import.clients[i].CityNo) 
 
-                if(!area_existe) {
+                if(!cite_existe) {
 
-                    this.areas[this.route_import.clients[i].AreaNo]                                         =   {AreaNameComplete : "", AreaNameE : "", AreaNo : ""}
-                    this.areas[this.route_import.clients[i].AreaNo].AreaNo                                  =   this.route_import.clients[i].AreaNo 
-                    this.areas[this.route_import.clients[i].AreaNo].AreaNameE                               =   this.route_import.clients[i].AreaNameE 
-                    this.areas[this.route_import.clients[i].AreaNo].AreaNameComplete                        =   this.route_import.clients[i].AreaNo +   "- " +   this.route_import.clients[i].AreaNameE 
+                    this.cites[this.route_import.clients[i].CityNo]                                         =   {CityNameComplete : "", CityNameE : "", CityNo : ""}
+                    this.cites[this.route_import.clients[i].CityNo].CityNo                                  =   this.route_import.clients[i].CityNo 
+                    this.cites[this.route_import.clients[i].CityNo].CityNameE                               =   this.route_import.clients[i].CityNameE 
+                    this.cites[this.route_import.clients[i].CityNo].CityNameComplete                        =   this.route_import.clients[i].CityNo +   "- " +   this.route_import.clients[i].CityNameE 
 
-                    if(Object.keys(areas_colors).length    >   0) {
+                    if(Object.keys(cites_colors).length    >   0) {
 
-                        while(typeof areas_colors[this.$colors[area_count % this.$colors.length]]                           !=  "undefined") {
+                        while(typeof cites_colors[this.$colors[cite_count % this.$colors.length]]                           !=  "undefined") {
 
-                            area_count                                                                      =   area_count +   1
+                            cite_count                                                                      =   cite_count +   1
                         }
                     }
 
-                    this.areas[this.route_import.clients[i].AreaNo].color                                   =   this.$colors[area_count % this.$colors.length]
-                    area_count                                                                              =   area_count +   1
+                    this.cites[this.route_import.clients[i].CityNo].color                                   =   this.$colors[cite_count % this.$colors.length]
+                    cite_count                                                                              =   cite_count +   1
+
                 }
 
                 //
@@ -948,19 +735,19 @@ export default {
                 }
             }
 
-            for (const [key, value] of Object.entries(this.cities)) {
+            for (const [key, value] of Object.entries(this.districts)) {
 
-                if(typeof city_util[key]   ==  "undefined") {
+                if(typeof district_util[key]   ==  "undefined") {
 
-                    delete this.cities[key]
+                    delete this.districts[key]
                 }
             }
 
-            for (const [key, value] of Object.entries(this.areas)) {
+            for (const [key, value] of Object.entries(this.cites)) {
 
-                if(typeof area_util[key]   ==  "undefined") {
+                if(typeof cite_util[key]   ==  "undefined") {
 
-                    delete this.areas[key]
+                    delete this.cites[key]
                 }
             }
 
@@ -996,33 +783,98 @@ export default {
                 }
             }
 
-            // Sort JPID
-            this.liste_journey_plan                 =   this.sortFilterJPID()
+            //
+
+            sortedArray                 =   Object.values(this.liste_journey_plan);
+            sortedArray.sort((a, b)     =>  a.JPlan.localeCompare(b.JPlan));
+            sortedObject                =   sortedArray.reduce((acc, journey_plan, index) => {
+                
+                acc[journey_plan.JPlan]             =   journey_plan;
+                return acc;
+            }, {});
+
+            this.liste_journey_plan                 =   sortedObject
             this.route_import.liste_journey_plan    =   this.liste_journey_plan
 
-            // Sort CityNo
-            this.cities                             =   this.sortFilterCityNo()
-            this.route_import.cities                =   this.cities
+            //
 
-            // Sort AreaNo
-            this.areas                              =   this.sortFilterAreaNo()
-            this.route_import.areas                 =   this.areas
+            sortedArray                 =   Object.values(this.districts);
+            sortedArray.sort((a, b)     =>  a.DistrictNameComplete.localeCompare(b.DistrictNameComplete));
 
-            // Sort CustomerType
-            this.liste_type_client                  =   this.sortFilterCustomerType()
+            sortedObject                =   sortedArray.reduce((acc, district, index) => {
+                
+                acc[district.DistrictNo]            =   district;
+                return acc;
+            }, {});
+
+            this.districts                          =   sortedObject
+            this.route_import.districts             =   this.districts
+
+            //
+
+            sortedArray                 =   Object.values(this.cites);
+            sortedArray.sort((a, b)     =>  a.CityNameComplete.localeCompare(b.CityNameComplete));
+
+            sortedObject                =   sortedArray.reduce((acc, cite, index) => {
+
+                acc[cite.CityNo]                    =   cite;
+                return acc;
+            }, {});
+
+            this.cites                              =   sortedObject
+            this.route_import.cites                 =   this.cites
+
+            //
+
+            sortedArray                 =   Object.values(this.liste_type_client);
+            sortedArray.sort((a, b)     =>  a.CustomerType.localeCompare(b.CustomerType));
+            sortedObject                =   sortedArray.reduce((acc, type_client, index) => {
+
+                acc[type_client.CustomerType]       =   type_client;
+                return acc;
+            }, {});
+
+            this.liste_type_client                  =   sortedObject
             this.route_import.liste_type_client     =   this.liste_type_client
 
-            // Sort Journee
-            this.liste_journee                      =   this.sortFilterJournee()
+            //
+
+            sortedArray                 =   Object.values(this.liste_journee);
+            sortedArray.sort((a, b)     =>  a.Journee.localeCompare(b.Journee));
+            sortedObject                =   sortedArray.reduce((acc, journee, index) => {
+
+                acc[journee.Journee]                =   journee;
+                return acc;
+            }, {});
+
+            this.liste_journee                      =   sortedObject
             this.route_import.liste_journee         =   this.liste_journee
 
-            // Sort Owner
-            this.owners                             =   this.sortFilterOwner()
-            this.route_import.owners                =   this.owners
+            //
 
-            // Sort Status
-            this.liste_status                       =   this.sortFilterStatus()
-            this.route_import.liste_status          =   this.liste_status
+            sortedArray                 =   Object.values(this.owners);
+            sortedArray.sort((a, b)     =>  a.owner_name.localeCompare(b.owner_name));
+            sortedObject                =   sortedArray.reduce((acc, owner, index) => {
+
+                acc[owner.owner_name]        =   owner;
+                return acc;
+            }, {});
+
+            this.owners                      =   sortedObject
+            this.route_import.owners         =   this.owners
+
+            // 
+
+            sortedArray                 =   Object.values(this.liste_status);
+            sortedArray.sort((a, b)     =>  a.status.localeCompare(b.status));
+            sortedObject                =   sortedArray.reduce((acc, status, index) => {
+
+                acc[status.status]   =   status;
+                return acc;
+            }, {});
+
+            this.liste_status                      =   sortedObject
+            this.route_import.liste_status         =   this.liste_status
 
             //
 
@@ -1034,11 +886,11 @@ export default {
 
         // 
 
-        checkExistJPID(liste_journey_plan, JPID) {
+        checkExistJPlan(liste_journey_plan, JPlan) {
 
             for (const [key, value] of Object.entries(liste_journey_plan)) {
 
-                if(key  ==  JPID) {
+                if(key  ==  JPlan) {
 
                     return true
                 }
@@ -1047,24 +899,24 @@ export default {
             return false
         },
 
-        checkExistCityNo(cities, CityNo) {
+        checkExistDistrictNo(districts, DistrictNo) {
 
-            for (const [key, value] of Object.entries(cities)) {
+            for (const [key, value] of Object.entries(districts)) {
+            
+                if(key  ==  DistrictNo) {
+
+                    return true
+                }
+            }
+
+            return false
+        },
+
+        checkExistCityNo(cites, CityNo) {
+
+            for (const [key, value] of Object.entries(cites)) {
             
                 if(key  ==  CityNo) {
-
-                    return true
-                }
-            }
-
-            return false
-        },
-
-        checkExistAreaNo(areas, AreaNo) {
-
-            for (const [key, value] of Object.entries(areas)) {
-            
-                if(key  ==  AreaNo) {
 
                     return true
                 }
@@ -1134,12 +986,6 @@ export default {
 
             setTimeout(async () => {
 
-                // Prepare Clients
-                this.prepareClients()
-
-                // reAffiche Clients
-                await this.reAfficheClients()
-
                 // reAffiche Markers
                 this.setRouteMarkers()
 
@@ -1157,15 +1003,6 @@ export default {
 
             setTimeout(async () => {
 
-                // Extract JPID, Areas, City
-                this.extractMetaData()
-
-                // Prepare Clients
-                this.prepareClients()
-
-                // reAffiche Clients
-                await this.reAfficheClients()
-
                 // reAffiche Markers
                 this.setRouteMarkers()
 
@@ -1177,24 +1014,24 @@ export default {
 
         reAfficherClientsAndMarkersByColor(column_name) {
 
-            // JPID
+            // JPlan
             if(this.column_group    ==  1) {
 
                 this.journey_plan_filter_value      =   [column_name]
             }
 
-            // City
+            // District
             if(this.column_group    ==  2) {
 
-                let CityNo                      =   this.getCityNo(column_name)
-                this.city_filter_value          =   [CityNo]
+                let DistrictNo                      =   this.getDistrictNo(column_name)
+                this.district_filter_value          =   [DistrictNo]
             }
 
-            // Area
+            // City
             if(this.column_group    ==  3) {
 
-                let AreaNo                          =   this.getAreaNo(column_name)
-                this.area_filter_value              =   [AreaNo]
+                let CityNo                          =   this.getCityNo(column_name)
+                this.city_filter_value              =   [CityNo]
             }
 
             // CustomerType
@@ -1224,22 +1061,22 @@ export default {
 
         //
 
-        getCityNo(CityNameE) {
+        getDistrictNo(DistrictNameE) {
 
-            for (const [key, value] of Object.entries(this.cities)) {
+            for (const [key, value] of Object.entries(this.districts)) {
 
-                if(this.cities[key].CityNameE    ==  CityNameE) {
+                if(this.districts[key].DistrictNameE    ==  DistrictNameE) {
 
                     return key
                 }
             }
         },
 
-        getAreaNo(AreaNameE) {
+        getCityNo(CityNameE) {
 
-            for (const [key, value] of Object.entries(this.areas)) {
+            for (const [key, value] of Object.entries(this.cites)) {
 
-                if(this.areas[key].AreaNameE            ==  AreaNameE) {
+                if(this.cites[key].CityNameE            ==  CityNameE) {
 
                     return key
                 }
@@ -1271,7 +1108,7 @@ export default {
 
                     for (let j = 0; j < this.route_import.clients.length; j++) {
 
-                        if(this.route_import.clients[j].JPID   ==  i) {
+                        if(this.route_import.clients[j].JPlan   ==  i) {
 
                             this.clients_group[i].clients.push(this.route_import.clients[j])
                         }
@@ -1281,13 +1118,13 @@ export default {
 
             if(this.column_group    ==  2) {
 
-                for (const [i, value] of Object.entries(this.route_import.cities)) {
+                for (const [i, value] of Object.entries(this.route_import.districts)) {
 
-                    this.clients_group[i]                                                       =   {column_name : this.route_import.cities[i].CityNameE, clients : [], color : this.route_import.cities[i].color}
+                    this.clients_group[i]                                                       =   {column_name : this.route_import.districts[i].DistrictNameE, clients : [], color : this.route_import.districts[i].color}
                 
                     for (let j = 0; j < this.route_import.clients.length; j++) {
 
-                        if(this.route_import.clients[j].CityNo  ==  i) {
+                        if(this.route_import.clients[j].DistrictNo  ==  i) {
 
                             this.clients_group[i].clients.push(this.route_import.clients[j])
                         }
@@ -1297,13 +1134,13 @@ export default {
 
             if(this.column_group    ==  3) {
 
-                for (const [i, value] of Object.entries(this.route_import.areas)) {
+                for (const [i, value] of Object.entries(this.route_import.cites)) {
 
-                    this.clients_group[i]                                                       =   {column_name : this.route_import.areas[i].AreaNameE, clients : [], color : this.route_import.areas[i].color}
+                    this.clients_group[i]                                                       =   {column_name : this.route_import.cites[i].CityNameE, clients : [], color : this.route_import.cites[i].color}
 
                     for (let j = 0; j < this.route_import.clients.length; j++) {
 
-                        if(this.route_import.clients[j].AreaNo  ==  i) {
+                        if(this.route_import.clients[j].CityNo  ==  i) {
 
                             this.clients_group[i].clients.push(this.route_import.clients[j])
                         }
@@ -1421,7 +1258,7 @@ export default {
 
                     if(this.journey_plan_filter_value.length    >   0) {
 
-                        if (this.journey_plan_filter_value.indexOf(this.clients_markers_affiche[key].clients[i].JPID)         ==  -1) {
+                        if (this.journey_plan_filter_value.indexOf(this.clients_markers_affiche[key].clients[i].JPlan)         ==  -1) {
 
                             // splice
                             this.clients_markers_affiche[key].clients.splice(i, 1)
@@ -1431,9 +1268,9 @@ export default {
 
                     if(splice   ==  false) {
 
-                        if(this.city_filter_value.length    >   0) {
+                        if(this.district_filter_value.length    >   0) {
 
-                            if (this.city_filter_value.indexOf(this.clients_markers_affiche[key].clients[i].CityNo.toString())  ==  -1) {
+                            if (this.district_filter_value.indexOf(this.clients_markers_affiche[key].clients[i].DistrictNo.toString())  ==  -1) {
 
                                 // splice
                                 this.clients_markers_affiche[key].clients.splice(i, 1)
@@ -1443,9 +1280,9 @@ export default {
 
                         if(splice   ==  false) {
 
-                            if(this.area_filter_value.length    >   0) {
+                            if(this.city_filter_value.length    >   0) {
 
-                                if (this.area_filter_value.indexOf(this.clients_markers_affiche[key].clients[i].AreaNo.toString())      ==  -1) {
+                                if (this.city_filter_value.indexOf(this.clients_markers_affiche[key].clients[i].CityNo.toString())      ==  -1) {
 
                                     // splice
                                     this.clients_markers_affiche[key].clients.splice(i, 1)
@@ -1594,7 +1431,7 @@ export default {
 
         //
 
-        async showJPIDBDTerritories() {
+        async showJPlanBDTerritories() {
 
             // Show Loading Page
             this.$showLoadingPage()
@@ -1604,12 +1441,12 @@ export default {
             formData.append("liste_journey_plan", JSON.stringify(this.journey_plan_filter_value)) 
 
             const res   = await this.$callApi('post'    ,   '/route_import/'+this.route_import.id+'/journey_plan/util'   ,   formData)      
-            console.log(res)
+            console.log(res.data)
 
             if(res.status===200){
 
                 // Show BD Territories
-                this.$map.$showJPIDBDTerritories(res.data)
+                this.$map.$showJPlanBDTerritories(res.data)
 
                 // Hide Loading Page
                 this.$hideLoadingPage()
@@ -1636,6 +1473,7 @@ export default {
             formData.append("journees"              , JSON.stringify(this.journee_filter_value)) 
 
             const res   = await this.$callApi('post'    ,   '/route_import/'+this.route_import.id+'/journees/util'   ,   formData)      
+            console.log(res.data)
 
             if(res.status===200){
 
@@ -1656,6 +1494,12 @@ export default {
 			}
         },
 
+        async showUserBDTerritoriesFront() {
+
+            // Show BD Territories
+            this.$map.$showUserBDTerritoriesFront(this.getUser.user_territories)
+        },
+
         //
 
         showCurrentPosition() {
@@ -1674,16 +1518,69 @@ export default {
 
         setMarkers() {
 
-            let i = 0
+            this.setClientsArrays()
 
-            // Set Markers
-            for (const [key, value] of Object.entries(this.clients_markers_affiche)) {
+            console.log(1)
 
-                this.$map.$setRouteMarkers(this.clients_markers_affiche[key].clients, i, this.clients_markers_affiche[key].color)
+            this.$map.$setRouteMarkers(this.clients_non_owner               , 1, "#000000")
 
-                i   =   i + 1
-            }
+            console.log(2)
+
+            this.$map.$setRouteMarkers(this.clients_owner_validated         , 2, "#0F9D58")
+
+            console.log(3)
+
+            this.$map.$setRouteMarkers(this.clients_owner_pending           , 3, "#F57C00")
+
+            console.log(4)
+
+            this.$map.$setRouteMarkers(this.clients_owner_non_validated     , 4, "#F70000")
+
+            console.log(5)
         },
+
+        setClientsArrays() {
+
+            this.clients_non_owner               =   []
+            this.clients_owner_validated         =   []
+            this.clients_owner_pending           =   []
+            this.clients_owner_non_validated     =   []
+
+            for (let i = 0; i < this.route_import.clients.length; i++) {
+
+                // Black
+                if(this.route_import.clients[i].owner   !=  this.getUser.id) {
+
+                    this.clients_non_owner.push(this.route_import.clients[i])
+                }
+
+                else {
+
+                    if(this.route_import.clients[i].status == "validated") {
+
+                        this.clients_owner_validated.push(this.route_import.clients[i])
+                    }
+
+                    else {
+
+                        if(this.route_import.clients[i].status == "pending") {
+
+                            this.clients_owner_pending.push(this.route_import.clients[i])
+                        }
+
+                        else {
+
+                            if(this.route_import.clients[i].status == "nonvalidated") {
+
+                                this.clients_owner_non_validated.push(this.route_import.clients[i])
+                            }
+                        }
+                    }
+                }
+            }
+        },        
+
+        //
 
         removeDrawings() {
 
@@ -1711,24 +1608,25 @@ export default {
             let new_client      =   {}
 
             // Add Client
-            new_client.CustomerNo       =   client.CustomerNo
+            new_client.id               =   client.id
+            new_client.CustomerCode     =   client.CustomerCode
 
             new_client.CustomerNameE    =   client.CustomerNameE
             new_client.CustomerNameA    =   client.CustomerNameA
             new_client.Tel              =   client.Tel
 
             new_client.Address          =   client.Address
-            new_client.CityNo           =   client.CityNo      
-            new_client.CityNameE        =   client.CityNameE   
-            new_client.AreaNo           =   client.AreaNo           
-            new_client.AreaNameE        =   client.AreaNameE       
+            new_client.DistrictNo       =   client.DistrictNo      
+            new_client.DistrictNameE    =   client.DistrictNameE   
+            new_client.CityNo           =   client.CityNo           
+            new_client.CityNameE        =   client.CityNameE       
 
             new_client.Latitude         =   client.Latitude         
             new_client.Longitude        =   client.Longitude        
 
             new_client.CustomerType     =   client.CustomerType     
 
-            new_client.JPID             =   client.JPID            
+            new_client.JPlan            =   client.JPlan            
             new_client.Journee          =   client.Journee        
 
             new_client.owner_name       =   this.getUser.nom
@@ -1752,32 +1650,32 @@ export default {
 
             for (let i = 0; i < this.route_import.clients.length; i++) {
                 
-                if(this.route_import.clients[i].CustomerNo  ==  client.CustomerNo) {
+                if(this.route_import.clients[i].id  ==  client.id) {
 
                     // Update Client
 
-                    this.route_import.clients[i].CustomerNo     =   client.CustomerNo
+                    this.route_import.clients[i].CustomerCode   =   client.CustomerCode
 
                     this.route_import.clients[i].CustomerNameE  =   client.CustomerNameE
                     this.route_import.clients[i].CustomerNameA  =   client.CustomerNameA
                     this.route_import.clients[i].Tel            =   client.Tel
 
                     this.route_import.clients[i].Address        =   client.Address
-                    this.route_import.clients[i].CityNo         =   client.CityNo      
-                    this.route_import.clients[i].CityNameE      =   client.CityNameE   
-                    this.route_import.clients[i].AreaNo         =   client.AreaNo           
-                    this.route_import.clients[i].AreaNameE      =   client.AreaNameE       
+                    this.route_import.clients[i].DistrictNo     =   client.DistrictNo      
+                    this.route_import.clients[i].DistrictNameE  =   client.DistrictNameE   
+                    this.route_import.clients[i].CityNo         =   client.CityNo           
+                    this.route_import.clients[i].CityNameE      =   client.CityNameE       
 
                     this.route_import.clients[i].Latitude       =   client.Latitude         
                     this.route_import.clients[i].Longitude      =   client.Longitude        
 
                     this.route_import.clients[i].CustomerType   =   client.CustomerType     
 
-                    this.route_import.clients[i].JPID           =   client.JPID            
-                    this.route_import.clients[i].Journee        =   client.Journee        
+                    this.route_import.clients[i].JPlan              =   client.JPlan            
+                    this.route_import.clients[i].Journee            =   client.Journee        
 
-                    this.route_import.clients[i].status                         =   client.status            
-                    this.route_import.clients[i].nonvalidated_details           =   client.nonvalidated_details        
+                    this.route_import.clients[i].status                 =   client.status            
+                    this.route_import.clients[i].nonvalidated_details   =   client.nonvalidated_details        
 
                     this.route_import.clients[i].facade_image                   =   client.facade_image            
                     this.route_import.clients[i].in_store_image                 =   client.in_store_image        
@@ -1796,7 +1694,7 @@ export default {
 
             for (let i = 0; i < this.route_import.clients.length; i++) {
                 
-                if(this.route_import.clients[i].CustomerNo  ==  client.CustomerNo) {
+                if(this.route_import.clients[i].id  ==  client.id) {
 
                     // Update Client
 
@@ -1815,7 +1713,7 @@ export default {
 
             for (let i = 0; i < this.route_import.clients.length; i++) {
                 
-                if(this.route_import.clients[i].CustomerNo  ==  client.CustomerNo) {
+                if(this.route_import.clients[i].id  ==  client.id) {
 
                     this.route_import.clients.splice(i, 1)
 
@@ -1833,24 +1731,30 @@ export default {
             for(let i = 0; i < clients.length; i++) {
                 for (let j = 0; j < this.route_import.clients.length; j++) {
                     
-                    if(this.route_import.clients[j].CustomerNo  ==  clients[i].CustomerNo) {
+                    if(this.route_import.clients[j].id  ==  clients[i].id) {
 
                         // Update Client
-                        if(clients[i].CityNo    !=  "") {
+                        if(clients[i].owner         !=  "") {
 
-                            this.route_import.clients[j].CityNo     =   clients[i].CityNo      
-                            this.route_import.clients[j].CityNameE  =   clients[i].CityNameE   
+                            this.route_import.clients[j].owner          =   clients[i].owner      
+                            this.route_import.clients[j].owner_name     =   clients[i].owner_name      
                         }
 
-                        if(clients[i].AreaNo        !=  "") {
+                        if(clients[i].DistrictNo    !=  "") {
 
-                            this.route_import.clients[j].AreaNo         =   clients[i].AreaNo           
-                            this.route_import.clients[j].AreaNameE      =   clients[i].AreaNameE       
+                            this.route_import.clients[j].DistrictNo     =   clients[i].DistrictNo      
+                            this.route_import.clients[j].DistrictNameE  =   clients[i].DistrictNameE   
                         }
 
-                        if(clients[i].JPID         !=  "") {
+                        if(clients[i].CityNo        !=  "") {
 
-                            this.route_import.clients[j].JPID          =   clients[i].JPID     
+                            this.route_import.clients[j].CityNo         =   clients[i].CityNo           
+                            this.route_import.clients[j].CityNameE      =   clients[i].CityNameE       
+                        }
+
+                        if(clients[i].JPlan         !=  "") {
+
+                            this.route_import.clients[j].JPlan          =   clients[i].JPlan     
                         }
 
                         if(clients[i].Journee       !=  "") {
@@ -1897,11 +1801,6 @@ export default {
                 // Send Errors
                 this.$showErrors("Error !", res.data.errors)
 			}
-        },
-
-        async showDevide() {
-
-            await this.$refs.modalDevide.getClients()
         },
 
         async showResume() {
@@ -1972,7 +1871,6 @@ export default {
 
             try {
             
-
                 let position     =   await this.$currentPosition()
 
                 let client      =   { lat : 0, lng : 0 }
@@ -2100,8 +1998,9 @@ export default {
 
         switchMarkerClusterMode() {
 
+            console.log(22222222222)
+
             const marker_cluster_mode   =   document.getElementById("marker_cluster_mode")
-            console.log(232323)
 
             if(marker_cluster_mode.checked) {
 
@@ -2120,302 +2019,32 @@ export default {
                 // Show Markers
                 this.reAfficherClientsAndMarkersSelect()
             }
-        },
-
-        //
-
-        setKMLCities(kml_cities) {
-
-            this.kml_cities   =   []
-
-            for (let i = 0; i < kml_cities.length; i++) {
-
-                this.kml_cities.push({ value : kml_cities[i].CityNo , label : kml_cities[i].CityNo + "- " + kml_cities[i].CityNameE})
-            }
-        },
-
-        setKMLLayers() {
-
-            setTimeout(() => {
-
-                this.$map.$setKMLLayers(this.kml_layers)
-            }, 555);
-        },
-
-        // SORT FILTERS
-
-        sortFilterJPID() {
-
-            let sortedArray                 =   Object.values(this.liste_journey_plan);
-
-            /*
-
-            sortedArray.sort((a, b)             =>  {
-
-                // Use a regular expression to match numbers at the end of the string
-                let regex = /\d+$/;
-                
-                // Use the match method to find the matched numbers
-                let a_last_number   =   a.JPID.match(regex);
-                let b_last_number   =   b.JPID.match(regex);
-
-                // Check if there is a match and return the result, or return null if there's no match
-                if(a_last_number    ==  null) {
-
-                    if(b_last_number    ==  null) {
-
-                        return a.JPID.localeCompare(b.JPID)
-                    }
-
-                    else {
-
-                        return -1
-                    }
-                }
-
-                else {
-
-                    if(b_last_number    ==  null) {
-
-                        return 1
-                    }
-
-                    else {
-
-                        return a_last_number - b_last_number
-                    }
-                }
-            })
-
-            let sortedObject                =   sortedArray.reduce((acc, journey_plan, index) => {
-
-            */
-
-            sortedArray.sort((a, b)         =>  b.JPID - a.JPID);
-                
-            let sortedObject                    =   sortedArray.reduce((acc, journey_plan, index) => {
-                
-                acc[journey_plan.JPID]         =   journey_plan;
-                return acc;
-            }, {});
-
-            return sortedObject
-        },
-
-        sortFilterCityNo() {
-
-            let sortedArray                 =   Object.values(this.cities);
-
-            sortedArray.sort((a, b)             =>  {
-
-                // Use a regular expression to match numbers at the end of the string
-                let regex = /\d+$/;
-                
-                // Use the match method to find the matched numbers
-                let a_last_number   =   a.CityNo.match(regex);
-                let b_last_number   =   b.CityNo.match(regex);
-
-                // Check if there is a match and return the result, or return null if there's no match
-                if(a_last_number    ==  null) {
-
-                    return -1
-                }
-
-                else {
-
-                    if(b_last_number    ==  null) {
-
-                        return 1
-                    }
-
-                    else {
-
-                        return a_last_number - b_last_number
-                    }
-                }
-            })
-
-            let sortedObject                =   sortedArray.reduce((acc, city, index) => {
-                
-                acc[city.CityNo]            =   city;
-                return acc;
-            }, {});
-
-            return sortedObject
-        },
-
-        sortFilterAreaNo() {
-
-            let sortedArray                 =   Object.values(this.areas);
-
-            /*
-
-            sortedArray.sort((a, b)             =>  {
-
-                // Use a regular expression to match numbers at the end of the string
-                let regex = /\d+$/;
-                
-                // Use the match method to find the matched numbers
-                let a_last_number   =   a.AreaNo.match(regex);
-                let b_last_number   =   b.AreaNo.match(regex);
-
-                // Check if there is a match and return the result, or return null if there's no match
-                if(a_last_number    ==  null) {
-
-                    return -1
-                }
-
-                else {
-
-                    if(b_last_number    ==  null) {
-
-                        return 1
-                    }
-
-                    else {
-
-                        return a_last_number - b_last_number
-                    }
-                }
-            })
-
-            */
-
-            let sortedObject                =   sortedArray.reduce((acc, area, index) => {
-
-                acc[area.AreaNo]                    =   area;
-                return acc;
-            }, {});
-
-            return sortedObject
-        },
-
-        sortFilterCustomerType() {
-
-            let sortedArray                 =   Object.values(this.liste_type_client);
-            
-            sortedArray.sort((a, b)     =>  a.CustomerType.localeCompare(b.CustomerType));
-            
-            let sortedObject                =   sortedArray.reduce((acc, type_client, index) => {
-
-                acc[type_client.CustomerType]       =   type_client;
-                return acc;
-            }, {});
-
-            return sortedObject
-        },
-
-        sortFilterJournee() {
-
-            let sortedArray                 =   Object.values(this.liste_journee);
-
-            sortedArray.sort((a, b)             =>  {
-
-                // Use a regular expression to match numbers at the end of the string
-                let regex = /\d+$/;
-                
-                // Use the match method to find the matched numbers
-                let a_last_number   =   a.Journee.match(regex);
-                let b_last_number   =   b.Journee.match(regex);
-
-                // Check if there is a match and return the result, or return null if there's no match
-                if(a_last_number    ==  null) {
-
-                    if(b_last_number    ==  null) {
-
-                        return a.Journee.localeCompare(b.Journee)
-                    }
-
-                    else {
-
-                        return -1
-                    }
-                }
-
-                else {
-
-                    if(b_last_number    ==  null) {
-
-                        return 1
-                    }
-
-                    else {
-
-                        return a_last_number - b_last_number
-                    }
-                }
-            })
-
-            let sortedObject                =   sortedArray.reduce((acc, journee, index) => {
-
-                acc[journee.Journee]                =   journee;
-                return acc;
-            }, {});
-
-            return sortedObject
-        },
-
-        sortFilterOwner() {
-
-            let sortedArray                 =   Object.values(this.owners);
-            
-            sortedArray.sort((a, b)         =>  {
-
-                a.owner_name.localeCompare(b.owner_name)
-            });
-            
-            let sortedObject                =   sortedArray.reduce((acc, owner, index) => {
-
-                acc[owner.owner_name]       =   owner;
-                return acc;
-            }, {});
-
-            return sortedObject
-        },
-
-        sortFilterStatus() {
-
-            let sortedArray                 =   Object.values(this.liste_status);
-            
-            sortedArray.sort((a, b)     =>  a.status.localeCompare(b.status));
-            
-            let sortedObject                =   sortedArray.reduce((acc, status, index) => {
-
-                acc[status.status]   =   status;
-                return acc;
-            }, {});
-
-            return sortedObject
         }
     },
 
     watch: {
 
-        getAddClient(newValue, oldValue) {
+        async getAddClient(newValue, oldValue) {
 
             if(newValue != null) {
                 
-                // Version Customer
-                this.$router.push('/route_import/'+this.$route.params.id_route_import+'/customers/add/'+newValue.lat+'/'+newValue.lng)
+                this.$router.push('/route_import/'+this.$route.params.id_route_import+'/clients/add/'+newValue.lat+'/'+newValue.lng)
 
-                // Version Client
-                // this.$router.push('/route_import/'+this.$route.params.id_route_import+'/clients/add/'+newValue.lat+'/'+newValue.lng)
+                // Send DATA To Modal
+                // this.addClient(newValue)
             }
         },
 
-        getUpdateClient(newValue, oldValue) {
+        async getUpdateClient(newValue, oldValue) {
 
             if(newValue != null) {
                 
-                // Version Customer
-                // this.$router.push('/route_import/'+this.$route.params.id_route_import+'/customers/'+newValue.CustomerNo+'/edit')
+                this.$router.push('/route_import/'+this.$route.params.id_route_import+'/clients/'+newValue.id+'/update')
 
-                // Version Client
-                this.$router.push('/route_import/'+this.$route.params.id_route_import+'/customers/'+newValue.CustomerNo+'/choice')
+                // Send DATA To Modal
+                // this.updateClient(newValue)
             }
         },
-
-        //
 
         async getClientsChangeRoute(newValue, oldValue) {
 
@@ -2471,5 +2100,4 @@ export default {
         //
     },
 }
-
 </script>

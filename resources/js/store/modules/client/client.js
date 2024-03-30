@@ -17,7 +17,8 @@ export default {
             all_clients                                             :   null,
             client                                                  :   null,
 
-            filter_status_route_import_clients_by_status            :   ""
+            filter_status_route_import_clients_by_status            :   ""  ,
+            selected_clients                                        :   []
         }
     },
 
