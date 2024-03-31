@@ -220,17 +220,19 @@
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th class="col-sm-1">CustomerNameE</th>
-                                    <th class="col-sm-2">Tel</th>
-                                    <th class="col-sm-1">CustomerType</th>
+                                    <th class="text-wrap">CustomerNameE</th>
+                                    <th class="text-wrap">CustomerNameA</th>
+                                    <!-- <th class="col-sm-2">Tel</th> -->
+                                    <th class="text-wrap">CustomerType</th>
                                 </tr>
                             </thead>
                             
                             <tbody>
                                 <tr v-for="client in close_clients" :key="client">
-                                    <td>{{client.CustomerNameE}}</td>
-                                    <td>{{client.Tel}}</td>
-                                    <td>{{client.CustomerType}}</td>
+                                    <td class="text-wrap">{{client.CustomerNameE}}</td>
+                                    <td class="text-wrap">{{client.CustomerNameA}}</td>
+                                    <!-- <td class="text-wrap">{{client.Tel}}</td> -->
+                                    <td class="text-wrap">{{client.CustomerType}}</td>
                                 </tr>
                             </tbody>
                         </table>

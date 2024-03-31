@@ -49,15 +49,15 @@
         </section>
     </div>
 
-    <!-- Install Banner         -->
-    <div v-if="$isRole('FrontOffice')" v-show="show_install_button" id="BlockInstall" class="w-100 p-3">
+    <!-- Install Banner -->
+    <div v-if="mobile_device" v-show="show_install_button"   id="BlockInstall" class="w-100 p-3">
         <div class="row">
             <div @click="closeInstallBanner()"  class="col-2 p-0 d-flex justify-content-center align-items-center">
                 <i class="mdi mdi-close font-weight-bold text-light" style="font-size: 30px;"></i>
             </div>
 
             <div class="col-7 text-light p-0">
-                <div><h5>Routing V2.0</h5></div>
+                <div><h5>Swalis Survey</h5></div>
                 <div><span>Get our app for better experience.</span></div>
             </div>
 
@@ -92,7 +92,11 @@
 
                 //
 
-                show_internet_error_page    :   window.navigator.onLine
+                show_internet_error_page    :   window.navigator.onLine ,
+
+                //
+
+                mobile_device               :   false
             }
         },
 
@@ -108,14 +112,9 @@
         beforeMount() {
 
             this.isAuthentificated              =   false
-            // this.show_internet_error_page       =   window.navigator.onLine
         },
 
         async mounted() {
-
-            //
-            // window.addEventListener('online'    , ()    =>  {this.$connectedToInternet  =   true    ,   this.show_internet_error_page   =   true    });
-            // window.addEventListener('offline'   , ()    =>  {this.$connectedToInternet  =   false   ,   this.show_internet_error_page   =   false   });
 
             // 
             this.isAuthentificated      =   await this.checkIfUserIsAuthentificated()
@@ -160,6 +159,24 @@
                 this.$goTo("/login")
             }
 
+            //
+            await this.$nextTick()
+
+            //
+            if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+
+                this.mobile_device  =   true
+            }
+
+            else {
+
+                this.mobile_device  =   false
+            }
+
+            //
+            await this.$nextTick()
+
+            //
             this.pwaFunction()
         },
 
@@ -188,7 +205,7 @@
 
             pwaFunction() {
 
-                setTimeout(() => {
+                // setTimeout(() => {
 
                     let deferredPrompt;
 
@@ -202,8 +219,6 @@
 
                         this.show_install_button  = true
                 
-                        await this.$nextTick()
-
                         //
                         console.log("test_1")
                     });
@@ -236,7 +251,7 @@
                         });
                     }
 
-                }, 555)
+                // }, 1111)
             },
 
             closeInstallBanner() {

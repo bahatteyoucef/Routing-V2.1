@@ -34,17 +34,19 @@
                             <table class="table table-bordered mt-1">
                                 <thead>
                                     <tr>
-                                        <th class="col-sm-1">Acheteur</th>
-                                        <th class="col-sm-2">Téléphone</th>
-                                        <th class="col-sm-1">Type de Magasin</th>
+                                        <th class="text-wrap">Acheteur</th>
+                                        <th class="text-wrap">Raison Social</th>
+                                        <!-- <th class="text-wrap">Tél</th> -->
+                                        <th class="text-wrap">Type</th>
                                     </tr>
                                 </thead>
                                 
                                 <tbody>
                                     <tr v-for="client in close_clients" :key="client">
-                                        <td>{{client.CustomerNameE}}</td>
-                                        <td>{{client.Tel}}</td>
-                                        <td>{{client.CustomerType}}</td>
+                                        <td class="text-wrap">{{client.CustomerNameE}}</td>
+                                        <td class="text-wrap">{{client.CustomerNameA}}</td>
+                                        <!-- <td class="text-wrap">{{client.Tel}}</td> -->
+                                        <td class="text-wrap">{{client.CustomerType}}</td>
                                     </tr>
                                 </tbody>
                             </table>

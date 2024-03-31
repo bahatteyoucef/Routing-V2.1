@@ -116,7 +116,7 @@
 
                     <li class="m-3 text-secondary">
                         <span  role="button">
-                          software version : 2.0
+                          software version : 2.1
                         </span>
                     </li>
                 </ul>
@@ -148,9 +148,7 @@ export default {
 
           route_import_existe       :   false ,
 
-          user                      :   {}    ,
-
-          show_install_button       :   false
+          user                      :   {}    
       }
     },
 
@@ -181,6 +179,9 @@ export default {
 
           await this.fetchMaps()
         })
+
+        //
+        this.hideProfileHeaderList()
     },  
 
     methods: {
@@ -360,6 +361,27 @@ export default {
           }
 
           this.$hideLoadingPage()
+        },
+
+        //
+
+        hideProfileHeaderList() {
+
+          var profile_header_list_element = document.getElementById('profile_header_list');
+          var map_options_element = document.getElementById('map_options');
+
+          window.onclick = function (event) {
+
+            if(profile_header_list_element) {
+
+              profile_header_list_element.classList.remove("show")
+            }
+
+            if(map_options_element) {
+
+              map_options_element.classList.remove("show")
+            }
+          }
         }
     },
 
