@@ -24,7 +24,7 @@
 
                                 <div>
                                     <form class="form-group mb-3">
-                                        <input v-model="email"          type="text"     class="form-control form-control-lg"    placeholder="Email"   >
+                                        <input v-model="nom"            type="text"     class="form-control form-control-lg"    placeholder="Name"   >
                                         <input v-model="password"       type="password" class="form-control form-control-lg"    placeholder="Password">
 
                                         <div class="d-grid gap-2 mb-3 mt-3">
@@ -56,7 +56,7 @@
 
             return {
 
-                email     : "",
+                nom     : "",
                 password  : ""
             }
         },
@@ -89,7 +89,7 @@
 
                     let formData = new FormData()
 
-                    formData.append("email"     ,   this.email)
+                    formData.append("nom"     ,   this.nom)
                     formData.append("password"  ,   this.password)
 
                     let response = await this.$callApi('post' ,   '/login'    ,   formData)

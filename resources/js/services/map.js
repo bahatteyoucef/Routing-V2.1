@@ -1311,6 +1311,8 @@ export default class Map {
 
         let point   =   L.marker([latitude, longitude])
 
+        console.log(this.user_territories)
+
         for (let index = 0; index < this.user_territories.length; index++) {
 
             if (this.user_territories[index].contains(point.getLatLng())) {
@@ -1321,4 +1323,7 @@ export default class Map {
 
         return false
     }
+
+    //
+
 }

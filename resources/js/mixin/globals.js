@@ -1097,7 +1097,10 @@ export default {
                     }).addTo(this.show_map);
 
                     // Create a marker
-                    L.marker([latitude, longitude]).addTo(this.show_map);
+                    let marker  =   L.marker([latitude, longitude])
+                    marker.addTo(this.show_map);
+
+                    return marker
                 }
 
                 else {
@@ -1114,9 +1117,25 @@ export default {
                     }).addTo(this.show_map);
 
                     // Create a marker
-                    L.marker([latitude, longitude]).addTo(this.show_map);
+                    let marker  =   L.marker([latitude, longitude])
+                    marker.addTo(this.show_map);
+
+                    return marker
                 }
             }
+        },
+
+        $checkMarkerInsideUserPolygons(marker) {
+
+            for (let index = 0; index < this.territories.length; index++) {
+
+                if (this.territories[index].contains(marker.getLatLng())) {
+
+                    return true
+                }
+            }
+
+            return false
         },
 
         //
