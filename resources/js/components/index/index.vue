@@ -1,8 +1,8 @@
 <template>
     <div class="content-wrapper" style="padding : 15px;">
 
-        <!-- Super Admin + BackOffice -->
-        <section v-if="$isRole('Super Admin')||$isRole('BackOffice')" class="dashboard">
+        <!-- Super Admin + BU Manager + BackOffice -->
+        <section v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')" class="dashboard">
 
             <div class="page-header">
 
@@ -32,7 +32,7 @@
                                     <h4 class="font-weight-normal mb-3">{{route_import.libelle}}</h4>
                                 </div>
 
-                                <div class="col-1 p-0"  v-if="$isRole('Super Admin')||$isRole('BackOffice')">
+                                <div class="col-1 p-0"  v-if="$isRole('Super Admin')||$isRole('BU Manager')">
                                     <i class="mdi mdi-delete mdi-24px p-1" role="button" data-bs-toggle="modal" :data-bs-target="'#modalRouteImportDelete'"     @click="setRouteImportDelete(route_import.id)">
                                     </i> 
                                 </div>
@@ -82,7 +82,7 @@
             <div class="row d-flex justify-content-center h-100 mt-4">
                 <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="addClient()">
                     <div class="text-center" style="height : 50px">  
-                        <img class="card-img-top" src="/images/store.png" style="height:100%;width:auto">
+                        <img class="card-img-top" :src="'/images/store.png'" style="height:100%;width:auto">
                     </div>
                     <div class="card-body p-0 mt-3">
                         <p class="card-text font-weight-bold">New</p>
@@ -91,7 +91,7 @@
 
                 <div class="card col-5 m-1 shadow-sm rounded text-center h-25"  @click="showProfile()">
                     <div class="text-center" style="height : 50px">  
-                        <img class="card-img-top" src="/images/profile.png" style="height:100%;width:auto">
+                        <img class="card-img-top" :src="'/images/profile.png'" style="height:100%;width:auto">
                     </div>
                     <div class="card-body p-0 mt-3">
                         <p class="card-text font-weight-bold">Profile</p>
@@ -100,7 +100,7 @@
 
                 <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="goToMap()">
                     <div class="text-center" style="height : 50px">  
-                        <img class="card-img-top" src="/images/map_marker.png" style="height:100%;width:auto">
+                        <img class="card-img-top" :src="'/images/map_marker.png'" style="height:100%;width:auto">
                     </div>
                     <div class="card-body p-0 mt-3">
                         <p class="card-text font-weight-bold">Map</p>
@@ -109,7 +109,7 @@
 
                 <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="showClientsByStatus()">
                     <div class="text-center" style="height : 50px">  
-                        <img class="card-img-top" src="/images/group_clients.png" style="height:100%;width:auto">
+                        <img class="card-img-top" :src="'/images/group_clients.png'" style="height:100%;width:auto">
                     </div>
                     <div class="card-body p-0 mt-3">
                         <p class="card-text font-weight-bold">Clients</p>
@@ -119,7 +119,7 @@
                 <!--  
                 <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="showNotifications()">
                     <div class="text-center" style="height : 50px">  
-                        <img class="card-img-top" src="/images/notifications.png" style="height:100%;width:auto">
+                        <img class="card-img-top" :src="'/images/notifications.png'" style="height:100%;width:auto">
                     </div>
                     <div class="card-body p-0 mt-3">
                         <p class="card-text font-weight-bold">Notifications</p>
@@ -130,7 +130,7 @@
                 <!--  
                 <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="showRemuneration()">
                     <div class="text-center" style="height : 50px">  
-                        <img class="card-img-top" src="/images/credit_card.png" style="height:100%;width:auto">
+                        <img class="card-img-top" :src="'/images/credit_card.png'" style="height:100%;width:auto">
                     </div>
                     <div class="card-body p-0 mt-3">
                         <p class="card-text font-weight-bold">Remuneration</p>
@@ -140,7 +140,7 @@
 
                 <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="sync()">
                     <div class="text-center" style="height : 50px">  
-                        <img class="card-img-top" src="/images/sync.png" style="height:100%;width:auto">
+                        <img class="card-img-top" :src="'/images/sync.png'" style="height:100%;width:auto">
                     </div>
                     <div class="card-body p-0 mt-3">
                         <p class="card-text font-weight-bold">Sync</p>
@@ -149,7 +149,7 @@
                
                 <div class="card col-5 m-1 shadow-sm rounded text-center h-25"  @click="logOut()">
                     <div class="text-center" style="height : 50px">  
-                        <img class="card-img-top" src="/images/logout.png" style="height:100%;width:auto">
+                        <img class="card-img-top" :src="'/images/logout.png'" style="height:100%;width:auto">
                     </div>
                     <div class="card-body p-0 mt-3">
                         <p class="card-text font-weight-bold">Log Out</p>
@@ -216,7 +216,7 @@ export default {
             "setIsAuthentificatedAction"    
         ]),
 
-        //  //  BackOffice + Super Admin //  //
+        //  //  BackOffice + BU Manager + Super Admin //  //
 
         async getRouteImport() {
 
@@ -235,7 +235,7 @@ export default {
                         })
                     }
 
-                    if((this.$isRole("BackOffice"))||(this.$isRole("Super Admin"))) {
+                    if((this.$isRole("BackOffice"))||(this.$isRole('BU Manager'))||(this.$isRole("Super Admin"))) {
 
                         this.$callApi("post",    "/route_import/index",     null)
                         .then((res)=> {

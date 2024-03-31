@@ -192,27 +192,12 @@ app.component('footer-part'         ,   Footer)
 
 //
 
-// Route
-import HeaderRoute              from    "./template/routePartials/headerRoute.vue";
-import SidebarRoute             from    "./template/routePartials/sidebarRoute.vue";
-import FooterRoute              from    "./template/routePartials/footerRoute.vue";
-import MapRoute                 from    "./template/routePartials/mapRoute.vue";
-
-app.component('header-route-part'               ,   HeaderRoute)
-app.component('sidebar-route-part'              ,   SidebarRoute)
-app.component('footer-route-part'               ,   FooterRoute)
-app.component('map-route-part'                  ,   MapRoute)
-
-//
-
 // Sync Page
 
 import LoadingPage              from    "./template/partials/loadingPage.vue";
-import InternetErrorPage        from    "./template/partials/InternetErrorPage.vue";
 import LoginPage                from    "./components/login/login.vue"
 
 app.component('loading-page'                    ,   LoadingPage)
-app.component('internet-error-page'             ,   InternetErrorPage)
 app.component('login-page'                      ,   LoginPage)
 
 // 

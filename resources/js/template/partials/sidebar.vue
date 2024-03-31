@@ -35,8 +35,6 @@
 
 <script>
 
-import sidebarRouteImport       from    "../routePartials/sidebarRouteImport.vue"
-
 import {mapGetters, mapActions} from    "vuex"
 
 export default {
@@ -63,11 +61,6 @@ export default {
                 active_item : this.$route.path    ==  "/"
             }
         }
-    },
-
-    components : {
-
-        sidebarRouteImport  :   sidebarRouteImport
     },
 
     mounted() {

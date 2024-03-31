@@ -9,7 +9,7 @@
             </div>
 
             <!-- <div class="col-3 text-end">
-                <img    src="/images/switch_arrows.png" @click="toggleChartTable()"    role="button"    class="mb-0 mr-2"/>
+                <img    :src="'/images/switch_arrows.png'" @click="toggleChartTable()"    role="button"    class="mb-0 mr-2"/>
             </div> -->
         </div> 
 

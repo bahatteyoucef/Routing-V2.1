@@ -57,7 +57,7 @@ class RouteImportTempo extends Model
     public static function storeRouteImportTempo(Request $request) 
     {
 
-        if(Auth::user()->hasRole("BackOffice")) {
+        if(Auth::user()->hasRole("BU Manager")||Auth::user()->hasRole("BackOffice")) {
 
             $liste_route_import    =   RouteImport::where("owner", Auth::user()->id)->get();
 

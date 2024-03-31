@@ -7,7 +7,7 @@
             <div class="row w-100">
                 <div class="col-10">
                     <h3 class="page-title">
-                        Add a new Client 
+                        Ajouter un Nouveau Client 
                     </h3>
                 </div>
             </div>
@@ -207,11 +207,11 @@
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-6 mt-3">
-                        <button v-if="slideIndex    >   1"      type="button" class="btn btn-secondary w-100"   @click="plusSlides(-1)">Previous</button>
+                        <button v-if="slideIndex    >   1"      type="button" class="btn btn-secondary w-100"   @click="plusSlides(-1)">Precedent</button>
                     </div>
 
                     <div class="col-6 mt-3">
-                        <button v-if="slideIndex    <   total_questions"     type="button" class="btn btn-primary w-100"     @click="plusSlides(1)">Next</button>
+                        <button v-if="slideIndex    <   total_questions"     type="button" class="btn btn-primary w-100"     @click="plusSlides(1)">Suivant</button>
                     </div>
                 </div>
             </div>
@@ -219,7 +219,7 @@
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col mt-3">
-                        <button v-if="slideIndex  ==  total_questions"       type="button" class="btn btn-primary w-100"     @click="sendData()">Confirm</button>
+                        <button v-if="slideIndex  ==  total_questions"       type="button" class="btn btn-primary w-100"     @click="sendData()">Confirmer</button>
                     </div>
                 </div>
             </div>

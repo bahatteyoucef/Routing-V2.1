@@ -1,7 +1,7 @@
 <template>
 
     <nav v-if="map_route_obs_page" id="template-header">
-        <img style="width : 100%; height : auto; position: relative; z-index: 9;" src="/images/header_mobile.png"/>
+        <img style="width : 100%; height : auto; position: relative; z-index: 9;" :src="'/images/header_mobile.png'"/>
     </nav>
 
 </template>

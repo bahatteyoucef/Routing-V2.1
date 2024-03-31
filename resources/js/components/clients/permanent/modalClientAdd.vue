@@ -65,12 +65,12 @@
 
                         <!--  -->
                          
-                        <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
+                        <div v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
                             <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @change="checkClients()">
                         </div>
 
-                        <div v-if="$isRole('Super Admin')||$isRole('BackOffice')"   class="mb-3">
+                        <div v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
                             <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @change="checkClients()">
                         </div>
@@ -123,7 +123,7 @@
 
                         <!--  -->
 
-                        <div v-if="$isRole('Super Admin')||$isRole('BackOffice')" class="mb-3">
+                        <div v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')" class="mb-3">
                             <label for="status"             class="form-label">Status</label>
                             <select                         class="form-select"         id="status"                 v-model="client.status">
                                 <option value="validated" selected>validated</option>
@@ -315,7 +315,7 @@ export default {
 
     mounted() {
 
-        if(this.$isRole("Super Admin")||this.$isRole("BackOffice")) {
+        if(this.$isRole("Super Admin")||this.$isRole("BU Manager")||this.$isRole("BackOffice")) {
 
             this.client.status  =   "validated"
         }

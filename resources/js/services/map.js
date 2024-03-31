@@ -77,7 +77,7 @@ export default class Map {
         // User Role
         this.user_role      =   role
 
-        if((this.user_role == "Super Admin")||(this.user_role == "BackOffice")) {
+        if((this.user_role == "Super Admin")||(this.user_role   ==  "BU Manager")||(this.user_role == "BackOffice")) {
 
             // Add Journey Plan Territory
             this.$drawJourneyPlanTerritory()

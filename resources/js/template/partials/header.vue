@@ -65,11 +65,11 @@
                     <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToStats()">Stats</button>
                   </div>
 
-                  <div class="col-sm-3 mt-1"  v-if="$isRole('Super Admin')">
+                  <div class="col-sm-3 mt-1"  v-if="$isRole('Super Admin')||$isRole('BU Manager')">
                     <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToUsers()">Users</button>
                   </div>
 
-                  <div class="col-sm-3 mt-1">
+                  <div class="col-sm-3 mt-1"  v-if="$isRole('Super Admin')||$isRole('BU Manager')">
                     <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="AddRouteImport()">New Import</button>
                   </div>
 

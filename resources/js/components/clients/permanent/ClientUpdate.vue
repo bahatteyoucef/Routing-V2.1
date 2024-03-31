@@ -5,7 +5,7 @@
         <div class="page-header mb-2">
             <div class="container w-100">
                 <h3 class="page-title">
-                        Update Client : {{ client.old_CustomerNameE }} 
+                        Modifier le Client : {{ client.old_CustomerNameE }} 
                 </h3>
             </div>
         </div>
@@ -34,7 +34,7 @@
                             <table class="table table-bordered mt-1">
                                 <thead>
                                     <tr>
-                                        <th class="col-sm-1">Raison Sociale</th>
+                                        <th class="col-sm-1">Acheteur</th>
                                         <th class="col-sm-2">Téléphone</th>
                                         <th class="col-sm-1">Type de Magasin</th>
                                     </tr>
@@ -232,11 +232,11 @@
             <div class="container position-absolute start-0 w-100"          style="bottom: 65px;">
                 <div class="row justify-content-center">
                     <div class="col-6 mt-3">
-                        <button v-if="slideIndex    >   1"                  type="button" class="btn btn-secondary w-100"   @click="plusSlides(-1)">Previous</button>
+                        <button v-if="slideIndex    >   1"                  type="button" class="btn btn-secondary w-100"   @click="plusSlides(-1)">Precedent</button>
                     </div>
 
                     <div class="col-6 mt-3">
-                        <button v-if="slideIndex    <   total_questions"     type="button" class="btn btn-primary w-100"     @click="plusSlides(1)">Next</button>
+                        <button v-if="slideIndex    <   total_questions"     type="button" class="btn btn-primary w-100"     @click="plusSlides(1)">Suivant</button>
                     </div>
                 </div>
             </div>
@@ -244,7 +244,7 @@
             <div class="container position-absolute start-0 w-100 mb-3"    style="bottom: 0px;">
                 <div class="row justify-content-center">
                     <div class="col mt-3">
-                        <button v-if="slideIndex  ==  total_questions"      type="button" class="btn btn-primary w-100"     @click="sendData()">Confirm</button>
+                        <button v-if="slideIndex  ==  total_questions"      type="button" class="btn btn-primary w-100"     @click="sendData()">Confirmer</button>
                     </div>
                 </div>
             </div>            

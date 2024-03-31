@@ -7,11 +7,11 @@
                     <!-- Header -->
                     <headerComponent    v-if="route_import&&($isRole('FrontOffice'))"                           :title="'List of clients du route import : '+route_import.libelle"      />
 
-                    <headerComponent    v-if="route_import&&($isRole('Super Admin')||$isRole('BackOffice'))"    :title="'List of clients du route import : '+route_import.libelle"      :add_modal="'addClientModal'"  :update_modal="'updateClientModal'"    :add_button="'New Client'"   
-                                                                                                                :update_button="'Update Client'"                                        />
+                    <headerComponent    v-if="route_import&&($isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice'))"     :title="'List of clients du route import : '+route_import.libelle"      :add_modal="'addClientModal'"  :update_modal="'updateClientModal'"    :add_button="'New Client'"   
+                                                                                                                                        :update_button="'Update Client'"                                        />
 
                     <!-- Table -->
-                    <table  v-if="$isRole('Super Admin')||$isRole('BackOffice')" class="table table-bordered clickable_table" id="route_import_client_index">
+                    <table  v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')" class="table table-bordered clickable_table" id="route_import_client_index">
                         <thead>
                             <tr>
                                 <th class="col-sm-1">Index</th>
@@ -324,7 +324,7 @@ export default {
 
             try {
 
-                if(this.$isRole("Super Admin")||this.$isRole("BackOffice")) {
+                if(this.$isRole("Super Admin")||$isRole('BU Manager')||this.$isRole("BackOffice")) {
 
                     let client      =   { lat : 0, lng : 0 }
 
@@ -341,7 +341,7 @@ export default {
 
             try {
 
-                if(this.$isRole("Super Admin")||this.$isRole("BackOffice")) {
+                if(this.$isRole("Super Admin")||$isRole('BU Manager')||this.$isRole("BackOffice")) {
 
                     console.log(this.selected_row)
 

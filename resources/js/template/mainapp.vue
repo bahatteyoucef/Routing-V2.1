@@ -19,7 +19,7 @@
             <div class="container-scroller" id="page_route">
 
                 <!-- BackOffice + Super Admin -->
-                <div v-if="(($isRole('Super Admin'))||($isRole('BackOffice')))">
+                <div v-if="(($isRole('Super Admin'))||($isRole('BU Manager'))||($isRole('BackOffice')))">
 
                     <header-part></header-part>
 

@@ -20,7 +20,7 @@
                 <div class="row">
 
                     <!-- Map Info -->
-                    <div v-if="(($isRole('Super Admin'))||($isRole('BackOffice')))" class="col p-0">
+                    <div v-if="(($isRole('Super Admin'))||($isRole('BU Manager'))||($isRole('BackOffice')))" class="col p-0">
                         <div class="map_top_infos_div">
                             <table class="table table-borderless">
 
@@ -50,7 +50,7 @@
                     </div>
 
                     <!-- Toggle -->
-                    <div v-if="(($isRole('Super Admin'))||($isRole('BackOffice')))" class="col p-0 ml-1">
+                    <div v-if="(($isRole('Super Admin'))||($isRole('BU Manager'))||($isRole('BackOffice')))" class="col p-0 ml-1">
                         <div id="toggle_div">
 
                             <div class="btn-container" id="marker_cluster_mode_div">
@@ -131,7 +131,7 @@
                 <div class="map_top_buttons_div" id="map_top_buttons_div">
                     <div class="row">
 
-                        <div v-if="(($isRole('Super Admin'))||($isRole('BackOffice')))" class="col-5">
+                        <div v-if="(($isRole('Super Admin'))||($isRole('BU Manager'))||($isRole('BackOffice')))" class="col-5">
                             <button class="btn primary w-100 m-0 mt-1"                                                                  @click="focuseMarkers()">Focus</button>
                             <button class="btn primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#modalResume'"         @click="showResume()">Resume</button>
                             <button class="btn primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#modalUpdateMap'"      >Update</button>

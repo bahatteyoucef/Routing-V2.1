@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -62,7 +60,9 @@ class User extends Authenticatable
 
                             'users.type_user            as  type_user'          ,
 
-                            'users.max_route_import     as  max_route_import'
+                            'users.max_route_import     as  max_route_import'   ,
+
+                            'users.owner                as  owner'   
                         ])
 
                         ->get();
@@ -86,7 +86,9 @@ class User extends Authenticatable
 
                             'users.type_user            as  type_user'          ,
 
-                            'users.max_route_import     as  max_route_import'
+                            'users.max_route_import     as  max_route_import'   ,
+
+                            'users.owner                as  owner'
                         ])
 
                         ->get();
@@ -108,7 +110,7 @@ class User extends Authenticatable
 
         $validator->sometimes('max_route_import',  ["required", "integer"] , function (Fluent $input) {
     
-            return $input->type_user    ==  "BackOffice";
+            return ($input->type_user    ==  "BU Manager")||($input->type_user    ==  "BackOffice");
         });
     
         return $validator;
@@ -132,6 +134,28 @@ class User extends Authenticatable
         $user->save();
 
         //
+
+        if($request->get("type_user")   ==  "BU Manager") {
+
+            $liste_route_import     =   json_decode($request->get("liste_route_import"));
+
+            if($liste_route_import  !=  null) {
+
+                foreach ($liste_route_import as $route_import_elem) {
+
+                    $route_import           =   new UserRouteImport([
+
+                        'id_user'           =>  $user->id           ,
+                        'id_route_import'   =>  $route_import_elem
+                    ]);
+
+                    $route_import->save();
+                } 
+            }
+
+            $BUManagerRole = Role::findByName('BU Manager');
+            $user->assignRole($BUManagerRole);
+        }
 
         if($request->get("type_user")   ==  "BackOffice") {
 
@@ -188,7 +212,7 @@ class User extends Authenticatable
 
         $validator->sometimes('max_route_import',  ["required", "integer"] , function (Fluent $input) {
     
-            return $input->type_user    ==  "BackOffice";
+            return ($input->type_user    ==  "BU Manager")||($input->type_user    ==  "BackOffice");
         });
     
         return $validator;
@@ -213,6 +237,28 @@ class User extends Authenticatable
         UserRouteImport::where("id_user", $user->id)->delete();
 
         //
+
+        if($request->get("type_user")   ==  "BU Manager") {
+
+            $liste_route_import     =   json_decode($request->get("liste_route_import"));
+
+            if($liste_route_import  !=  null) {
+
+                foreach ($liste_route_import as $route_import_elem) {
+                    
+                    $route_import           =   new UserRouteImport([
+
+                        'id_user'           =>  $user->id               ,
+                        'id_route_import'   =>  $route_import_elem
+                    ]);
+
+                    $route_import->save();
+                }
+            }
+
+            //
+            $user->syncRoles(['BU Manager']);
+        }
 
         if($request->get("type_user")   ==  "BackOffice") {
 
@@ -280,16 +326,28 @@ class User extends Authenticatable
         }
 
         else {
-            if(Auth::user()->hasRole("BackOffice")) {
 
-                return [];
+            if(Auth::user()->hasRole("BU Manager")) {
+
+                return $users->where("owner", Auth::user()->id);
             }
 
             else {
 
-                if(Auth::user()->hasRole("FrontOffice")) {
+                if(Auth::user()->hasRole("BackOffice")) {
 
-                    return [];
+                    $users->filter(function ($user, $key) {
+
+                        return [];
+                    });
+                }
+
+                else {
+
+                    if(Auth::user()->hasRole("FrontOffice")) {
+
+                        return [];
+                    }
                 }
             }
         }
@@ -306,7 +364,7 @@ class User extends Authenticatable
 
         else {
 
-            if(Auth::user()->hasRole("BackOffice")) {
+            if(Auth::user()->hasRole("BU Manager")) {
 
                 foreach ($liste_route_import as $route_import) {
 
@@ -327,7 +385,7 @@ class User extends Authenticatable
 
             else {
 
-                if(Auth::user()->hasRole("FrontOffice")) {
+                if(Auth::user()->hasRole("BackOffice")) {
 
                     foreach ($liste_route_import as $route_import) {
 
@@ -344,6 +402,28 @@ class User extends Authenticatable
                     }
 
                     return $liste_route_import_final;
+                }
+
+                else {
+
+                    if(Auth::user()->hasRole("FrontOffice")) {
+
+                        foreach ($liste_route_import as $route_import) {
+
+                            # code...
+                            $liste_user_route_import            =   UserRouteImport::where('id_user', Auth::user()->id)->get();
+
+                            foreach ($liste_user_route_import as $user_route_import) {
+
+                                if($user_route_import->id_route_import  ==  $route_import->id) {
+
+                                    array_push($liste_route_import_final, $route_import);
+                                }
+                            }
+                        }
+
+                        return $liste_route_import_final;
+                    }
                 }
             }
         }
