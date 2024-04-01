@@ -221,7 +221,7 @@
             <div class="container position-absolute start-0 w-100 mb-3"    style="bottom: 0px;">
                 <div class="row justify-content-center">
                     <div class="col mt-3">
-                        <button v-if="slideIndex  ==  total_questions"      type="button" class="btn btn-primary w-100"     @click="sendData()">Confirmer</button>
+                        <button v-if="((slideIndex  ==  total_questions)&&(this.$connectedToInternet))"      type="button" class="btn btn-primary w-100"     @click="sendData()">Confirmer</button>
                     </div>
                 </div>
             </div>            

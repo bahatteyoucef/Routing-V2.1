@@ -4,6 +4,9 @@ import axios        from    "axios"
 // store
 import store        from    "../store/store"
 
+// globals
+import Globals        from  "../mixin/globals"
+
 export default class MobileClientIndexedDB {
     
     constructor() {
@@ -220,12 +223,17 @@ export default class MobileClientIndexedDB {
         this.transaction_route_import               =   this.route_import_db.transaction("route_import", "readwrite")
         this.store_route_import                     =   this.transaction_route_import.objectStore("route_import")
 
+        let clients_tempo                           =   []
         let clients                                 =   []
 
         for (let i = 0; i < liste_route_import.length; i++) {
 
-            clients =   liste_route_import[i].clients.map((client) => ({ ...client }));
+            clients_tempo                           =   liste_route_import[i].clients.map((client) => ({ ...client }));
 
+            // fetch only clients who are inside the polygon
+            clients                                 =   Globals.methods.$checkIfClientsInsideTheZone(clients_tempo, store.getters[`authentification/getUser`].user_territories)
+
+            //
             this.store_route_import.put({ "id" : liste_route_import[i].id, "libelle" : liste_route_import[i].libelle, "owner" : liste_route_import[i].owner, "clients" : clients})
         }
         //

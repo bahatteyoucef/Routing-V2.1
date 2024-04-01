@@ -63,8 +63,6 @@ export default {
             })
         },
 
-        // 
-
         $showErrors(message,errors)
         {
             let validation_errors   =   "<ul>";

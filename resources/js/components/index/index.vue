@@ -116,28 +116,6 @@
                     </div>
                 </div>
 
-                <!--  
-                <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="showNotifications()">
-                    <div class="text-center" style="height : 50px">  
-                        <img class="card-img-top" :src="'/images/notifications.png'" style="height:100%;width:auto">
-                    </div>
-                    <div class="card-body p-0 mt-3">
-                        <p class="card-text font-weight-bold">Notifications</p>
-                    </div>
-                </div>
-                -->
-
-                <!--  
-                <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="showRemuneration()">
-                    <div class="text-center" style="height : 50px">  
-                        <img class="card-img-top" :src="'/images/credit_card.png'" style="height:100%;width:auto">
-                    </div>
-                    <div class="card-body p-0 mt-3">
-                        <p class="card-text font-weight-bold">Remuneration</p>
-                    </div>
-                </div>
-                -->
-
                 <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="sync()">
                     <div class="text-center" style="height : 50px">  
                         <img class="card-img-top" :src="'/images/sync.png'" style="height:100%;width:auto">
@@ -224,17 +202,6 @@ export default {
 
                 if(this.$connectedToInternet) {
 
-                    if(this.$isRole("FrontOffice")) {
-
-                        this.$callApi("post",   "/route_import/index",      null)
-                        .then((res)=> {
-
-                            console.log(res)
-
-                            this.liste_route_import     =   res.data
-                        })
-                    }
-
                     if((this.$isRole("BackOffice"))||(this.$isRole('BU Manager'))||(this.$isRole("Super Admin"))) {
 
                         this.$callApi("post",    "/route_import/index",     null)
@@ -249,17 +216,6 @@ export default {
                             }
                         })
                     }
-                }
-
-                else {
-
-                    setTimeout(async () => {
-                        
-                        if(this.$isRole("FrontOffice")) {
-
-                            this.liste_route_import         =   await this.$indexedDB.$getListeRouteImport()
-                        }
-                    }, 555);
                 }
             }
 

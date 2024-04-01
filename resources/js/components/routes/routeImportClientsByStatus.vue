@@ -27,7 +27,7 @@
 
                 <div class="row mt-2">
                     <div class="col-12 p-0">
-                        <input class="form-control" placeholder="Filtrer Par Raison Social..." v-model="search_by_CustomerNameE_value" @input="searchByCustomerNameE()"/>
+                        <input class="form-control" placeholder="Filtrer Par Raison Social..." v-model="search_by_CustomerNameA_value" @input="searchByCustomerNameA()"/>
                     </div>
                 </div>
 
@@ -60,7 +60,7 @@
 
                             <div class="media-body order-2 order-lg-1 w-100">
 
-                                <h5 class="mt-0 font-weight-bold mb-2">{{ client.CustomerNameE }} ({{ client.CustomerNameA }})</h5>
+                                <h5 class="mt-0 font-weight-bold mb-2">{{ client.CustomerNameA }} ({{ client.CustomerNameE }})</h5>
                             
                                 <p class="font-italic text-muted mb-0 small">{{ client.Address }} - {{ client.CityNameE }}</p>
 
@@ -110,7 +110,7 @@ export default {
 
             //
 
-            search_by_CustomerNameE_value       :   "",
+            search_by_CustomerNameA_value       :   "",
             search_by_clientbarcode_value       :   "",
         
             //
@@ -198,9 +198,10 @@ export default {
 
                     this.$callApi("post",   "/route_import/"+this.getUser.id_route_import+"/clients/by_status",     formData).then(async (res)=> { 
                         
-                        console.log(res)
+                        //
+                        let clients             =   this.$checkIfClientsInsideTheZone(res.data, this.getUser.user_territories)
 
-                        this.clients            =   res.data
+                        this.clients            =   clients
                         this.clients_filtered   =   this.clients
 
                         //
@@ -248,15 +249,15 @@ export default {
 
         //
 
-        searchByCustomerNameE() {
+        searchByCustomerNameA() {
 
             this.clients_filtered     =   this.clients
             
-            if ((this.search_by_CustomerNameE_value != '')&&(this.search_by_CustomerNameE_value)) {
+            if ((this.search_by_CustomerNameA_value != '')&&(this.search_by_CustomerNameA_value)) {
 
                 this.clients_filtered     =   this.clients_filtered.filter((client) => {
 
-                    return client.CustomerNameE.toUpperCase().includes(this.search_by_CustomerNameE_value.toUpperCase())
+                    return client.CustomerNameA.toUpperCase().includes(this.search_by_CustomerNameA_value.toUpperCase())
                 })
             }
 

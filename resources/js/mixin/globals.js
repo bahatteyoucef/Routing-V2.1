@@ -1138,6 +1138,53 @@ export default {
             return false
         },
 
+        $checkMarkerInsideUserPolygonsWithoutMap(point_latitude, point_longitude ,polygons_latitude_longitude_array) {
+
+            for (let index = 0; index < polygons_latitude_longitude_array.length; index++) {
+
+                console.log(JSON.parse(polygons_latitude_longitude_array[index].latlngs))
+                console.log(point_latitude)
+                console.log(point_longitude)
+
+                // Initialize a polygon using Leaflet
+                let polygon     =   L.polygon(JSON.parse(polygons_latitude_longitude_array[index].latlngs));
+
+                // Create a point
+                let point       =   L.latLng(point_latitude, point_longitude);
+
+                // Check if the point is inside the polygon
+                let isInside    =   polygon.contains(point);
+
+                //
+                if(isInside) {
+
+                    return true
+                }
+            }
+
+            return false
+        },
+
+        $checkIfClientsInsideTheZone(clients, user_territories) {
+
+            let clients_result  =   []
+
+            for (let index = 0; index < clients.length; index++) {
+
+                //
+                let point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygonsWithoutMap(clients[index].Latitude, clients[index].Longitude, user_territories)
+
+                //
+                if(point_is_inside_user_polygons) {
+
+                    clients_result.push(clients[index])
+                }
+            }
+
+            //
+            return clients_result
+        },
+
         //
 
         $hideTerritores() {

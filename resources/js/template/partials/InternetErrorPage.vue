@@ -1,4 +1,5 @@
 <template>
+    <!--
     <div>
         <div id="internet_error_screen">
             <div class="text-center align-middle center_screen_internet_error_screen">
@@ -20,4 +21,10 @@
             </div>
         </div>
     </div>
+    -->
+
+    <div>
+
+    </div>
 </template>
+

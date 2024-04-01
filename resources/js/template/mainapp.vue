@@ -3,9 +3,6 @@
     <!-- Loading -->
     <loading-page></loading-page>
 
-    <!-- Internet Error Page    -->
-    <!-- <internet-error-page    v-show="show_internet_error_page  ==  false"></internet-error-page> -->
-
     <!-- Login      -->
     <section v-if="component_login">
         <login-page></login-page>
@@ -57,7 +54,7 @@
             </div>
 
             <div class="col-7 text-light p-0">
-                <div><h5>Swalis Survey</h5></div>
+                <div><h5>Routing V2.1 App</h5></div>
                 <div><span>Get our app for better experience.</span></div>
             </div>
 
@@ -89,10 +86,6 @@
                 //
 
                 show_install_button         :   false   ,
-
-                //
-
-                show_internet_error_page    :   window.navigator.onLine ,
 
                 //
 
