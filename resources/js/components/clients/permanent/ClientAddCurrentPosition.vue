@@ -756,7 +756,14 @@ export default {
                             width: 250,
                             height: 250,
                         },  // Sets dimensions of scanning box (set relative to reader element width)
+
                         fps: 20, // Frames per second to attempt a scan
+
+                        facingMode: "environment",  // Use the back camera
+
+                        supportedScanTypes: [
+                            Html5QrcodeScanType.SCAN_TYPE_CAMERA
+                        ],
                     });
 
                 // 
@@ -854,3 +861,17 @@ export default {
 };
 
 </script>
+
+<style scoped>
+
+#reader__dashboard_section_csr > div:first-child {
+
+    display : none;
+}
+
+#reader__dashboard_section_csr > span:first-child {
+
+    display : none;
+}
+
+</style>
