@@ -1207,7 +1207,7 @@ export default {
 
         //
 
-        setBarCodeReader() {
+        async setBarCodeReader() {
 
             const reader    =   document.getElementById('reader')
 
@@ -1218,25 +1218,42 @@ export default {
 
                 reader.style.display        =   "block";
 
-                this.scanner = new Html5QrcodeScanner('reader', { 
+                //
+                const requestCamera = async () => {
+                    const devices       = await navigator.mediaDevices.enumerateDevices();
+                    const videoDevices  = devices.filter(device => device.kind === 'videoinput');
+                    const backCamera    = videoDevices.find(device => device.label.includes('back') || device.label.includes('rear'));
+                    
+                    console.log(backCamera)
 
-                        // Scanner will be initialized in DOM inside element with id of 'reader'
-                        qrbox: {
-                            width: 250,
-                            height: 250,
-                        },  // Sets dimensions of scanning box (set relative to reader element width)
+                    if (backCamera) {
 
-                        fps: 20, // Frames per second to attempt a scan
+                        return { exact: backCamera.deviceId };
+                    }
+                    
+                    return undefined;
+                };
 
-                        facingMode: "environment",  // Use the back camera
+                //
+                this.scanner = new Html5QrcodeScanner('reader', {
 
-                        supportedScanTypes: [
-                            Html5QrcodeScanType.SCAN_TYPE_CAMERA
-                        ],
-                    });
+                    qrbox   : {
+                        width   : 250,
+                        height  : 250,
+                    },
 
-                // 
-                this.scanner.render(this.success, this.error);
+                    fps     : 20,
+
+                    supportedScanTypes  : [
+                        Html5QrcodeScanType.SCAN_TYPE_CAMERA
+                    ],
+                });
+
+                try {
+                    await this.scanner.render(this.success, this.error, requestCamera);
+                } catch (error) {
+                    console.error('Error rendering scanner:', error);
+                }
             }
         },
 
@@ -1311,17 +1328,3 @@ export default {
 };
 
 </script>
-
-<style scoped>
-
-#reader__dashboard_section_csr > div:first-child {
-
-    display : none;
-}
-
-#reader__dashboard_section_csr > span:first-child {
-
-    display : none;
-}
-
-</style>
