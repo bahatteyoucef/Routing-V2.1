@@ -18,7 +18,7 @@
                     </div>
 
                     <div class="d-flex flex-row justify-content-center gap-2">
-                        <span class="idd">Adresse : {{ client.Address }} - {{ client.AreaNameE }}</span>
+                        <span class="idd">Adresse : {{ client.Address }} - {{ client.CityNameE }}</span>
                     </div>
 
                     <div class="d-flex flex-row justify-content-center gap-2">
@@ -62,13 +62,13 @@ export default {
 
                 RegionNo                        : '',
                 DistrictNo                      : '',
+                DistrictNo                          : '',
                 CityNo                          : '',
-                AreaNo                          : '',
                 Address                         : '',
 
                 DistrictNameE                   : '',
+                DistrictNameE                       : '',
                 CityNameE                       : '',
-                AreaNameE                       : '',
                 AddressA                        : '',
 
                 Latitude                        : '',
@@ -129,13 +129,13 @@ export default {
 
                 this.client.RegionNo                      =   res.data.RegionNo
                 this.client.DistrictNo                    =   res.data.DistrictNo
+                this.client.DistrictNo                        =   res.data.DistrictNo
                 this.client.CityNo                        =   res.data.CityNo
-                this.client.AreaNo                        =   res.data.AreaNo
                 this.client.Address                       =   res.data.Address
 
                 this.client.AddressA                      =   res.data.AddressA                 
-                this.client.AreaNameE                     =   res.data.AreaNameE
                 this.client.CityNameE                     =   res.data.CityNameE
+                this.client.DistrictNameE                     =   res.data.DistrictNameE
 
                 this.client.Tel                           =   res.data.Tel
 

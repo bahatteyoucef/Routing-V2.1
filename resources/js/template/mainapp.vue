@@ -22,7 +22,7 @@
 
                     <div class="container-fluid page-body-wrapper">
                         <div class="main-panel w-100 animate__animated" id="main_content">
-                            <router-view :key="$route.path"></router-view>
+                            <router-view    :key="$route.path"></router-view>
                         </div>
                     </div>
 
@@ -36,7 +36,7 @@
                     <div class="container-fluid page-body-wrapper">
                         <!-- <div class="main-panel w-100 h-100" id="main_content"> -->
                         <div class="main-panel" id="main_content">
-                            <router-view :key="$route.path"></router-view>
+                            <router-view    :key="$route.path"></router-view>
                         </div>
                     </div>
 

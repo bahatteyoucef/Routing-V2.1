@@ -1331,6 +1331,28 @@ export default {
             }
 
             return columns
+        },
+
+        //
+
+        $setToDefaultFileInputs() {
+
+            const file_inputs   =   document.querySelectorAll('input[type="file"]');
+
+            file_inputs.forEach(function(file_input) {
+
+                file_input.value    =   ""
+            });
+        },
+
+        $setToDefaultImages() {
+
+            const image_elements    =   document.querySelectorAll('img');
+
+            image_elements.forEach(function(image_element) {
+
+                image_element.src       =   ""
+            });
         }
     }
 }

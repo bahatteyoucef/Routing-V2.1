@@ -36,7 +36,6 @@
                                 <tr>
                                     <th class="text-wrap">Acheteur</th>
                                     <th class="text-wrap">Raison Social</th>
-                                    <!-- <th class="text-wrap">Tél</th> -->
                                     <th class="text-wrap">Type</th>
                                 </tr>
                             </thead>
@@ -45,7 +44,6 @@
                                 <tr v-for="client in close_clients" :key="client">
                                     <td class="text-wrap">{{client.CustomerNameE}}</td>
                                     <td class="text-wrap">{{client.CustomerNameA}}</td>
-                                    <!-- <td class="text-wrap">{{client.Tel}}</td> -->
                                     <td class="text-wrap">{{client.CustomerType}}</td>
                                 </tr>
                             </tbody>
@@ -238,6 +236,7 @@ import {mapGetters, mapActions} from    "vuex"
 
 import moment                   from    "moment"
 import "moment-timezone"
+import { isNumeric } from 'jquery';
 
 export default {
 
@@ -832,7 +831,7 @@ export default {
             // Go Next
             if(current_slide    ==  1) {
 
-                // let validation  =   this.validationCompetitorAnalysis(this.slideIndex  -   1)
+                // let validation          =   this.validationQuestion()
 
                 // if(validation   ==  true)  {
 
@@ -841,7 +840,7 @@ export default {
 
                 // else {
 
-                //     this.$showErrors("Error !"  ,   ["Quantity must be superieur to 0", "Price must be superieur or equal to 0"])
+                //     this.$showErrors("Error !"  ,   ["Veuillez répondre avant de passer à la question suivante !"])
                 //     return false;
                 // }
             }
@@ -855,7 +854,156 @@ export default {
         currentSlide(current_slide) {
 
             this.slideIndex     =   this.$currentSlide(this.slideIndex = current_slide, this.slideIndex)
+        },
+
+        //
+
+        validationQuestion() {
+
+            return true
+        },
+
+        validationAnswer(index) {
+
+            let type_input                      =   this.questions[index].id_type_question
+
+            if(this.questions[index].obligatoire    ==  1)  {
+
+                //Type 1 2 3 4 7 8 9 11 (choix non multiple)
+                if((type_input  !=  5)&&(type_input  !=  6)&&(type_input  !=  9)&&(type_input  !=  10)) {
+
+                    if(type_input   !=  8) {
+
+                        return this.validationSimple(index)
+                    }
+
+                    else {
+
+                        return this.validationImage(index)
+                    }
+                }
+
+                //Type 5 Checkbox (choix multiple)
+                if((type_input  ==  5)||(type_input  ==  6)) {
+
+                    return this.validationCheckBoxRadio(index)
+                }
+
+                //Type 9 (GPS)
+                if(type_input  ==  9) {
+
+                    return true
+                }
+
+                //Type 10 (choix multiple)
+                if(type_input  ==  10) {
+
+                    return this.validationComplexe(index)
+                }
+            }
+
+            else {
+
+                return true
+            }
+        },
+
+        validationSimple(index)   {
+
+            let answer      =   $('#answer_'+this.questions[index].id).val()
+
+            if((answer      !=  "")&&(answer    !=  null)) {
+
+                return true
+            }
+
+            else {
+
+                return false
+            }
+        },
+
+        validationImage(index)  {
+
+            let image_uploaded                  =   $('#answer_'+this.questions[index].id).prop('files')[0]
+
+            if(image_uploaded)  {
+
+                return true
+            }
+
+            else {
+
+                if($('#image_'+this.questions[index].id).attr("src"))  {
+
+                    return true
+                }
+
+                else {
+
+                    return false
+                }
+            }
+        },
+
+        validationCheckBoxRadio(index)   {
+
+            if($("input[name^='answer_"+this.questions[index].id+"']:checked").length  >  0)  {
+
+                return true
+            }
+
+            else {
+
+                return false
+            }
+        },
+
+        validationComplexe(index)   {
+
+            let answer_tr_list      =   $("#answer_"+this.questions[index].id).find( "tr[name^='answer_tr_']")
+            let answer_list         =   null
+
+            let validation          =   true
+
+            answer_tr_list.each((i)   =>  {
+                
+                answer_list            =   $(answer_tr_list[i]).find( "input[name^='answer_']") 
+
+                answer_list.each((j)   =>  {
+
+                    if($(answer_list[j]).attr("data") ==  1)    {
+
+                        if(answer_list[j].value    ==  "") {
+
+                            validation  =   false
+                        }
+                    }
+
+                    else {                        
+
+                        if($(answer_list[j]).prop("files").length ==  0)   {
+
+                            if(!($(answer_list[j]).parent().parent().find(".image_answer_display").attr("src")))  {
+
+                                validation  =   false
+                            }
+                        }
+                    }
+                })
+
+                if(validation   ==  false)  {
+
+                    validation  =   false
+                }
+            });
+
+            //
+            
+            return validation
         }
+
+        //
     },
 
     watch : {
