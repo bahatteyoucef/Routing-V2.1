@@ -343,8 +343,6 @@ export default {
 
                 if(this.$isRole("Super Admin")||$isRole('BU Manager')||this.$isRole("BackOffice")) {
 
-                    console.log(this.selected_row)
-
                     this.$refs.modalClientUpdate.getData(this.selected_row, this.clients)
                 }
             }
@@ -530,8 +528,6 @@ export default {
                 this.selected_row   =   client
 
                 this.setUpdateClientAction(client)      
-
-                console.log(this.getUpdateClient)
             }
 
             else {

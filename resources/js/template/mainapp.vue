@@ -210,24 +210,16 @@
                         // 
                         deferredPrompt = e;
 
-                        this.show_install_button  = true
-                
-                        //
-                        console.log("test_1")
+                        this.show_install_button  = true                
                     });
 
-                    console.log("test_2")
-
                     const BlockInstallButton = document.getElementById('BlockInstallButton');
-                    console.log(BlockInstallButton)
 
                     if(BlockInstallButton) {
 
                         BlockInstallButton.addEventListener('click', async () => {
 
                             this.$showLoadingPage()
-
-                            console.log(22222)
 
                             if (deferredPrompt !== null) {
 

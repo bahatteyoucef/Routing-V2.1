@@ -22,75 +22,116 @@
                         <table class="table table-striped datatable_client_double_namee" id="datatable_client_double_namee">
                             <thead>
                                 <tr>
-                                    <th class="col-sm-1">CustomerCode (CustomerCode)</th>
-                                    <th class="col-sm-1">CustomerNameE (CustomerNameE)</th>
-                                    <th class="col-sm-1">CustomerNameA (CustomerNameA)</th>
+                                    <th class="col-sm-1">Index</th>
 
-                                    <th class="col-sm-2">Latitude (Latitude)</th>
-                                    <th class="col-sm-2">Longitude (Longitude)</th>
+                                    <th class="col-sm-2">CustomerCode</th>
 
-                                    <th class="col-sm-2">Address (Address)</th>
+                                    <th class="col-sm-2">CustomerNameE</th>
+                                    <th class="col-sm-2">CustomerNameA</th>
 
-                                    <th class="col-sm-1">DistrictNo (DistrictNo)</th>
-                                    <th class="col-sm-2">DistrictNameE (DistrictNameE)</th>
+                                    <th class="col-sm-1">DistrictNo</th>
+                                    <th class="col-sm-2">DistrictNameE</th>
 
-                                    <th class="col-sm-1">CityNo (CityNo)</th>
-                                    <th class="col-sm-2">CityNameE (CityNameE)</th>
+                                    <th class="col-sm-1">CityNo</th>
+                                    <th class="col-sm-2">CityNameE</th>
 
-                                    <th class="col-sm-2">Phone Number (Tel)</th>
+                                    <th class="col-sm-2">Address</th>
+                                    <th class="col-sm-2">Neighborhood</th>
+                                    <th class="col-sm-2">Landmark</th>
 
-                                    <th class="col-sm-1">CustomerType (CustomerType)</th>
+                                    <th class="col-sm-2">Latitude</th>
+                                    <th class="col-sm-2">Longitude</th>
 
-                                    <th class="col-sm-2">JPlan (JPlan)</th>
+                                    <th class="col-sm-2">Tel</th>
 
-                                    <th class="col-sm-1">WorkDay (Journee)</th>
+                                    <th class="col-sm-1">CustomerType</th>
+
+                                    <th class="col-sm-2">JPlan</th>
+
+                                    <th class="col-sm-2">Journee</th>
+
+                                    <!--  -->
+
+                                    <th class="col-sm-2">Comment</th>
+                                    <th class="col-sm-2">BrandAvailability</th>
+                                    <th class="col-sm-2">BrandSourcePurchase</th>
+                                    <th class="col-sm-2">Start Adding Time</th>
+                                    <th class="col-sm-2">Adding Duration</th>
+
+                                    <!--  -->
+
+                                    <th class="col-sm-2">Created At</th>
+                                    <th class="col-sm-2">Status</th>
+                                    <th class="col-sm-2">Owner</th>
                                 </tr>
                             </thead>
 
                             <thead>
                                 <tr class="datatable_client_double_namee_filters">
 
-                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
-                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
-                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Index"            /></th>
 
-                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Latitude"         /></th>
-                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Longitude"        /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
 
-                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Address"          /></th>
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="DistrictNo"       /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="DistrictNameE"    /></th>
 
-                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="DistrictNo"       /></th>
-                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="DistrictNameE"    /></th>
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CityNo"           /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CityNameE"        /></th>
 
-                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CityNo"           /></th>
-                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CityNameE"        /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Address"          /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Neighborhood"     /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Landmark"         /></th>
 
-                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Tel"              /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Latitude"         /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Longitude"        /></th>
 
-                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerType"     /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Tel"              /></th>
 
-                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="JPlan"            /></th>
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerType"     /></th>
 
-                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Journee"          /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="JPlan"            /></th>
+
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Journee"          /></th>
+
+                                <!--  -->
+
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Comment"              /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="BrandAvailability"    /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="BrandSourcePurchase"  /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Start Adding Time"    /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Adding Duration"      /></th>
+
+                                <!--  -->
+
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Created_At"       /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Status"           /></th>
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Owner"            /></th>
                                 </tr>
                             </thead>
-
+                            
                             <tbody>
-                                <tr v-for="client in getDoublantCustomerNameE" :key="client.id" @click="updateElementMap(client)" role="button">
+                                <tr v-for="(client, index) in getDoublantCustomerNameE" :key="client" role="button" @click="updateElementMap(client)">
+                                    <td>{{index +   1}}</td>
+
                                     <td>{{client.CustomerCode}}</td>
                                     <td>{{client.CustomerNameE}}</td>
                                     <td>{{client.CustomerNameA}}</td>
-
-                                    <td>{{client.Latitude}}</td>
-                                    <td>{{client.Longitude}}</td>
-
-                                    <td>{{client.Address}}</td>
 
                                     <td>{{client.DistrictNo}}</td>
                                     <td>{{client.DistrictNameE}}</td>
 
                                     <td>{{client.CityNo}}</td>
                                     <td>{{client.CityNameE}}</td>
+
+                                    <td>{{client.Address}}</td>
+                                    <td>{{client.Neighborhood}}</td>
+                                    <td>{{client.Landmark}}</td>
+
+                                    <td>{{client.Latitude}}</td>
+                                    <td>{{client.Longitude}}</td>
 
                                     <td>{{client.Tel}}</td>
 
@@ -99,6 +140,25 @@
                                     <td>{{client.JPlan}}</td>
 
                                     <td>{{client.Journee}}</td>
+
+                                    <!--  -->
+
+                                    <td>{{client.comment}}</td>
+                                    <td>{{client.BrandAvailability}}</td>
+                                    <td>{{client.BrandSourcePurchase}}</td>
+                                    <td>{{client.start_adding_time}}</td>
+                                    <td>{{client.adding_duration}}</td>
+
+                                    <!--  -->
+                                    <td>{{client.created_at}}</td>
+
+                                    <td>
+                                        <span v-if="client.status=='nonvalidated'"  href="#" class="badge badge-danger">{{client.status}}</span>
+                                        <span v-if="client.status=='pending'"       href="#" class="badge badge-warning">{{client.status}}</span>
+                                        <span v-if="client.status=='validated'"     href="#" class="badge badge-success">{{client.status}}</span>
+                                    </td>
+
+                                    <td>{{client.owner_name}}</td>
                                 </tr>
                             </tbody>
                         </table>

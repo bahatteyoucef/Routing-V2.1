@@ -423,7 +423,6 @@ export default {
             this.$showLoadingPage()
 
             const res                   =   await this.$callApi("post"  ,   "route/obs/route_import/"+this.id_route_import+"/details/by_owner",   null)
-            console.log(res)
 
             this.route_import           =   res.data.route_import
 
@@ -1441,7 +1440,6 @@ export default {
             formData.append("liste_journey_plan", JSON.stringify(this.journey_plan_filter_value)) 
 
             const res   = await this.$callApi('post'    ,   '/route_import/'+this.route_import.id+'/journey_plan/util'   ,   formData)      
-            console.log(res.data)
 
             if(res.status===200){
 
@@ -1473,7 +1471,6 @@ export default {
             formData.append("journees"              , JSON.stringify(this.journee_filter_value)) 
 
             const res   = await this.$callApi('post'    ,   '/route_import/'+this.route_import.id+'/journees/util'   ,   formData)      
-            console.log(res.data)
 
             if(res.status===200){
 
@@ -1520,23 +1517,13 @@ export default {
 
             this.setClientsArrays()
 
-            console.log(1)
-
             this.$map.$setRouteMarkers(this.clients_non_owner               , 1, "#000000")
-
-            console.log(2)
 
             this.$map.$setRouteMarkers(this.clients_owner_validated         , 2, "#0F9D58")
 
-            console.log(3)
-
             this.$map.$setRouteMarkers(this.clients_owner_pending           , 3, "#F57C00")
 
-            console.log(4)
-
             this.$map.$setRouteMarkers(this.clients_owner_non_validated     , 4, "#F70000")
-
-            console.log(5)
         },
 
         setClientsArrays() {
@@ -1997,8 +1984,6 @@ export default {
         //
 
         switchMarkerClusterMode() {
-
-            console.log(22222222222)
 
             const marker_cluster_mode   =   document.getElementById("marker_cluster_mode")
 

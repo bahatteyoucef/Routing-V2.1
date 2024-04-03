@@ -157,7 +157,6 @@ export default {
             // Set Data
 
             const res   =   await this.$callApi('post'  ,   '/route_import_tempo/last'  ,   null)         
-            console.log(res)
 
             if(res.status===200){
 
@@ -749,7 +748,6 @@ export default {
                 formData.append("data"  ,   JSON.stringify(clients))
 
                 const res                   =   await this.$callApi("post"  ,   "/clients_tempo/resume/update", formData)
-                console.log(res.data)
 
                 if(res.status===200){
 
@@ -788,7 +786,6 @@ export default {
                 formData.append("data"      ,   JSON.stringify(clients))
 
                 const res                   =   await this.$callApi("post"  ,   "/clients/resume/update",  formData)
-                console.log(res.data)
 
                 if(res.status===200){
 

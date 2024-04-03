@@ -383,8 +383,6 @@ export default {
             await this.$callApi("post",   "/statistics/details",    formData)
             .then(async (res)=> {
 
-                console.log(res)
-
                 //
                 this.$hideLoadingPage()
 
@@ -405,8 +403,6 @@ export default {
 
                 this.emitter.on('show_by_customer_type_report_content_ready' , () =>  {
 
-                    console.log('show_by_customer_type_report_content_ready')
-
                     //
                     this.by_brand_source_purchase_report_chart_data   =   res.data.stats_details.by_brand_source_purchase_report_chart_data
                     this.by_brand_source_purchase_report_table_data   =   res.data.stats_details.by_brand_source_purchase_report_table_data
@@ -414,8 +410,6 @@ export default {
                     this.show_by_brand_source_purchase_report_content =   true
 
                     this.emitter.on('show_by_brand_source_purchase_report_content_ready' , () =>  {
-
-                        console.log('show_by_brand_source_purchase_report_content_ready')
 
                         //
                         this.by_brand_availability_report_chart_data      =   res.data.stats_details.by_brand_availability_report_chart_data
@@ -425,8 +419,6 @@ export default {
 
                         this.emitter.on('show_by_brand_availability_report_content_ready' , () =>  {
 
-                            console.log('show_by_brand_availability_report_content_ready')
-
                             //
                             this.daily_report_chart_data                      =   res.data.stats_details.daily_report_chart_data
                             this.daily_report_table_data                      =   res.data.stats_details.daily_report_table_data
@@ -434,8 +426,6 @@ export default {
                             this.show_daily_report_content                    =   true
 
                             this.emitter.on('show_daily_report_content_ready' , () =>  {
-
-                                console.log('show_daily_report_content_ready')
 
                                 //
                                 this.by_tel_availability_report_chart_data        =   res.data.stats_details.by_tel_availability_report_chart_data
@@ -445,8 +435,6 @@ export default {
 
                                 this.emitter.on('show_by_tel_availability_report_content_ready' , () =>  {
 
-                                    console.log('show_by_tel_availability_report_content_ready')
-
                                     //
                                     // this.by_city_report_chart_data                    =   res.data.stats_details.by_city_report_chart_data
                                     this.by_city_report_table_data                    =   res.data.stats_details.by_city_report_table_data
@@ -455,16 +443,12 @@ export default {
 
                                     this.emitter.on('show_by_city_report_content_ready' , () =>  {
 
-                                        console.log('show_by_city_report_content_ready')
-
                                         //
                                         this.data_census_report_table_data                =   res.data.stats_details.data_census_report_table_data
 
                                         this.show_data_census_report_content              =   true
 
                                         this.emitter.on('show_data_census_report_content_ready' , () =>  {
-
-                                            console.log('show_data_census_report_content_ready')
 
                                             this.show_get_data_button     =   true
                                             this.show_export_data_button  =   true
@@ -523,8 +507,6 @@ export default {
 
         // Add a new worksheet to workbook variable
         const worksheet = this.workbook.addWorksheet('By Customer Type Report');
-
-        console.log(this.by_customer_type_report_table_data)
 
         //
 
@@ -606,8 +588,6 @@ export default {
 
         // Add a new worksheet to workbook variable
         const worksheet = this.workbook.addWorksheet('By Brand Source Purchase Report');
-
-        console.log(this.by_brand_source_purchase_report_table_data)
 
         //
 
@@ -768,8 +748,6 @@ export default {
 
         // Add a new worksheet to workbook variable
         const worksheet = this.workbook.addWorksheet('Daily Report');
-
-        console.log(this.daily_report_table_data)
 
         //
 
@@ -961,8 +939,6 @@ export default {
 
         // Add a new worksheet to workbook variable
         const worksheet = this.workbook.addWorksheet('By City Report');
-
-        console.log(this.by_city_report_table_data)
 
         //
 

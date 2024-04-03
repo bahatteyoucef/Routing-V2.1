@@ -72,7 +72,6 @@ export default {
             formData.append("route_import_cities"   ,   JSON.stringify(this.route_import_cities))
 
             const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.id_route_import+"/districts/"+this.DistrictNo+"/cities/set",   formData)
-            console.log(res.data)
 
             if(res.status===200){
 

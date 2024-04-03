@@ -201,8 +201,6 @@ export default {
             this.$callApi("post",    "/route_import_tempo/last", null)
             .then((res)=> {
 
-              console.log(res.data)
-
               if(res.data) {
 
                 this.route_import_existe  = true

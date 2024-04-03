@@ -303,19 +303,22 @@
                             <th class="col-sm-1">Index</th>
 
                             <th class="col-sm-2">CustomerCode</th>
+
                             <th class="col-sm-2">CustomerNameE</th>
                             <th class="col-sm-2">CustomerNameA</th>
-
-                            <th class="col-sm-2">Latitude</th>
-                            <th class="col-sm-2">Longitude</th>
-
-                            <th class="col-sm-2">Address</th>
 
                             <th class="col-sm-1">DistrictNo</th>
                             <th class="col-sm-2">DistrictNameE</th>
 
                             <th class="col-sm-1">CityNo</th>
                             <th class="col-sm-2">CityNameE</th>
+
+                            <th class="col-sm-2">Address</th>
+                            <th class="col-sm-2">Neighborhood</th>
+                            <th class="col-sm-2">Landmark</th>
+
+                            <th class="col-sm-2">Latitude</th>
+                            <th class="col-sm-2">Longitude</th>
 
                             <th class="col-sm-2">Tel</th>
 
@@ -327,10 +330,17 @@
 
                             <!--  -->
 
-                            <th class="col-sm-2">Owner</th>
+                            <th class="col-sm-2">Comment</th>
+                            <th class="col-sm-2">BrandAvailability</th>
+                            <th class="col-sm-2">BrandSourcePurchase</th>
+                            <th class="col-sm-2">Start Adding Time</th>
+                            <th class="col-sm-2">Adding Duration</th>
+
+                            <!--  -->
+
                             <th class="col-sm-2">Created At</th>
                             <th class="col-sm-2">Status</th>
-
+                            <th class="col-sm-2">Owner</th>
                         </tr>
                     </thead>
 
@@ -343,16 +353,18 @@
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
 
-                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Latitude"         /></th>
-                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Longitude"        /></th>
-
-                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Address"          /></th>
-
                             <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="DistrictNo"       /></th>
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="DistrictNameE"    /></th>
 
                             <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CityNo"           /></th>
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CityNameE"        /></th>
+
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Address"          /></th>
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Neighborhood"     /></th>
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Landmark"         /></th>
+
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Latitude"         /></th>
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Longitude"        /></th>
 
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Tel"              /></th>
 
@@ -364,9 +376,17 @@
 
                             <!--  -->
 
-                            <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Owner"            /></th>
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Comment"              /></th>
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="BrandAvailability"    /></th>
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="BrandSourcePurchase"  /></th>
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Start Adding Time"    /></th>
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Adding Duration"      /></th>
+
+                            <!--  -->
+
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Created_At"       /></th>
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Status"           /></th>
+                            <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Owner"            /></th>
                         </tr>
                     </thead>
                     
@@ -378,16 +398,18 @@
                             <td>{{client.CustomerNameE}}</td>
                             <td>{{client.CustomerNameA}}</td>
 
-                            <td>{{client.Latitude}}</td>
-                            <td>{{client.Longitude}}</td>
-
-                            <td>{{client.Address}}</td>
-
                             <td>{{client.DistrictNo}}</td>
                             <td>{{client.DistrictNameE}}</td>
 
                             <td>{{client.CityNo}}</td>
                             <td>{{client.CityNameE}}</td>
+
+                            <td>{{client.Address}}</td>
+                            <td>{{client.Neighborhood}}</td>
+                            <td>{{client.Landmark}}</td>
+
+                            <td>{{client.Latitude}}</td>
+                            <td>{{client.Longitude}}</td>
 
                             <td>{{client.Tel}}</td>
 
@@ -399,7 +421,13 @@
 
                             <!--  -->
 
-                            <td>{{client.owner_name}}</td>
+                            <td>{{client.comment}}</td>
+                            <td>{{client.BrandAvailability}}</td>
+                            <td>{{client.BrandSourcePurchase}}</td>
+                            <td>{{client.start_adding_time}}</td>
+                            <td>{{client.adding_duration}}</td>
+
+                            <!--  -->
                             <td>{{client.created_at}}</td>
 
                             <td>
@@ -407,6 +435,8 @@
                                 <span v-if="client.status=='pending'"       href="#" class="badge badge-warning">{{client.status}}</span>
                                 <span v-if="client.status=='validated'"     href="#" class="badge badge-success">{{client.status}}</span>
                             </td>
+
+                            <td>{{client.owner_name}}</td>
 
                         </tr>
                     </tbody>
@@ -1626,7 +1656,6 @@ export default {
             formData.append("liste_journey_plan", JSON.stringify(this.journey_plan_filter_value)) 
 
             const res   = await this.$callApi('post'    ,   '/route_import/'+this.route_import.id+'/journey_plan/util'   ,   formData)      
-            console.log(res.data)
 
             if(res.status===200){
 
@@ -1658,7 +1687,6 @@ export default {
             formData.append("journees"              , JSON.stringify(this.journee_filter_value)) 
 
             const res   = await this.$callApi('post'    ,   '/route_import/'+this.route_import.id+'/journees/util'   ,   formData)      
-            console.log(res.data)
 
             if(res.status===200){
 
@@ -1688,10 +1716,7 @@ export default {
 
             formData.append("liste_user_territory"  ,   JSON.stringify(this.owner_filter_value)) 
 
-            console.log(this.owner_filter_value)
-
             const res   = await this.$callApi('post'    ,   '/route_import/'+this.route_import.id+'/user_territories/util'   ,   formData)      
-            console.log(res.data)
 
             if(res.status===200){
 
@@ -1774,30 +1799,41 @@ export default {
             new_client.CustomerNameA    =   client.CustomerNameA
             new_client.Tel              =   client.Tel
 
-            new_client.Address          =   client.Address
-            new_client.DistrictNo       =   client.DistrictNo      
-            new_client.DistrictNameE    =   client.DistrictNameE   
-            new_client.CityNo           =   client.CityNo           
-            new_client.CityNameE        =   client.CityNameE       
-
             new_client.Latitude         =   client.Latitude         
             new_client.Longitude        =   client.Longitude        
 
+            new_client.Address          =   client.Address
+            new_client.Neighborhood     =   client.Neighborhood
+            new_client.Landmark         =   client.Landmark
+
+            new_client.DistrictNo       =   client.DistrictNo      
+            new_client.DistrictNameE    =   client.DistrictNameE 
+
+            new_client.CityNo           =   client.CityNo           
+            new_client.CityNameE        =   client.CityNameE       
+
             new_client.CustomerType     =   client.CustomerType     
 
-            new_client.JPlan            =   client.JPlan            
-            new_client.Journee          =   client.Journee        
+            new_client.BrandAvailability        =   client.BrandAvailability       
+            new_client.BrandSourcePurchase      =   client.BrandSourcePurchase       
+
+            new_client.JPlan                    =   client.JPlan            
+            new_client.Journee                  =   client.Journee        
+
+            new_client.status                   =   client.status            
+            new_client.nonvalidated_details     =   client.nonvalidated_details        
+
+            new_client.comment                  =   client.comment
+
+            new_client.facade_image                         =   client.facade_image            
+            new_client.in_store_image                       =   client.in_store_image        
+            new_client.facade_image_original_name           =   client.facade_image_original_name            
+            new_client.in_store_image_original_name         =   client.in_store_image_original_name        
+            new_client.CustomerBarCode_image                =   client.CustomerBarCode_image            
+            new_client.CustomerBarCode_image_original_name  =   client.CustomerBarCode_image_original_name        
 
             new_client.owner_name       =   this.getUser.nom
             new_client.created_at       =   this.$formatDate(new Date())
-
-            new_client.status                  =   client.status            
-            new_client.nonvalidated_details    =   client.nonvalidated_details        
-
-            new_client.facade_image                     =   client.facade_image            
-            new_client.in_store_image                   =   client.in_store_image        
-            new_client.facade_image_original_name       =   client.facade_image_original_name            
-            new_client.in_store_image_original_name     =   client.in_store_image_original_name        
 
             this.route_import.clients.push(new_client)
 
@@ -1819,16 +1855,23 @@ export default {
                     this.route_import.clients[i].CustomerNameA  =   client.CustomerNameA
                     this.route_import.clients[i].Tel            =   client.Tel
 
-                    this.route_import.clients[i].Address        =   client.Address
-                    this.route_import.clients[i].DistrictNo     =   client.DistrictNo      
-                    this.route_import.clients[i].DistrictNameE  =   client.DistrictNameE   
-                    this.route_import.clients[i].CityNo         =   client.CityNo           
-                    this.route_import.clients[i].CityNameE      =   client.CityNameE       
-
                     this.route_import.clients[i].Latitude       =   client.Latitude         
                     this.route_import.clients[i].Longitude      =   client.Longitude        
 
+                    this.route_import.clients[i].Address        =   client.Address
+                    this.route_import.clients[i].Neighborhood   =   client.Neighborhood
+                    this.route_import.clients[i].Landmark       =   client.Landmark
+
+                    this.route_import.clients[i].DistrictNo     =   client.DistrictNo      
+                    this.route_import.clients[i].DistrictNameE  =   client.DistrictNameE  
+
+                    this.route_import.clients[i].CityNo         =   client.CityNo           
+                    this.route_import.clients[i].CityNameE      =   client.CityNameE       
+
                     this.route_import.clients[i].CustomerType   =   client.CustomerType     
+
+                    this.route_import.clients[i].BrandAvailability      =   client.BrandAvailability       
+                    this.route_import.clients[i].BrandSourcePurchase    =   client.BrandSourcePurchase       
 
                     this.route_import.clients[i].JPlan              =   client.JPlan            
                     this.route_import.clients[i].Journee            =   client.Journee        
@@ -1836,10 +1879,14 @@ export default {
                     this.route_import.clients[i].status                 =   client.status            
                     this.route_import.clients[i].nonvalidated_details   =   client.nonvalidated_details        
 
-                    this.route_import.clients[i].facade_image                   =   client.facade_image            
-                    this.route_import.clients[i].in_store_image                 =   client.in_store_image        
-                    this.route_import.clients[i].facade_image_original_name     =   client.facade_image_original_name            
-                    this.route_import.clients[i].in_store_image_original_name   =   client.in_store_image_original_name        
+                    this.route_import.clients[i].comment                =   client.comment        
+
+                    this.route_import.clients[i].facade_image                           =   client.facade_image            
+                    this.route_import.clients[i].in_store_image                         =   client.in_store_image        
+                    this.route_import.clients[i].facade_image_original_name             =   client.facade_image_original_name            
+                    this.route_import.clients[i].in_store_image_original_name           =   client.in_store_image_original_name        
+                    this.route_import.clients[i].CustomerBarCode_image                  =   client.CustomerBarCode_image            
+                    this.route_import.clients[i].CustomerBarCode_image_original_name    =   client.CustomerBarCode_image_original_name        
 
                     break
                 }
@@ -2195,7 +2242,6 @@ export default {
 
             setTimeout(() => {
 
-                console.log(this.kml_layers)
                 this.$map.$setKMLLayers(this.kml_layers)
             }, 555);
         },
@@ -2476,8 +2522,6 @@ export default {
         //
 
         getAddJourneyPlan(newValue, oldValue) {
-
-            console.log(newValue)
 
             if(newValue != null) {
                 

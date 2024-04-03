@@ -177,7 +177,6 @@ export default {
         async getComboData() {
 
             const res       =   await this.$callApi("post",     "/rtm_willayas",    null)
-            console.log(res)
 
             this.districts  =   res.data
         },
@@ -421,7 +420,6 @@ export default {
             formData.append("clients"       ,   JSON.stringify(this.clients))
 
             const res   = await this.$callApi('post' ,   '/route_import/set_willayas_cites'    ,   formData)         
-            console.log(res.data)
 
             if(res.status===200){
 
@@ -451,7 +449,6 @@ export default {
                 formData.append("data"      ,   JSON.stringify(this.clients))
 
                 const res   = await this.$callApi('post' ,   '/route_import_tempo/store'    ,   formData)         
-                console.log(res.data)
 
                 if(res.status===200){
 

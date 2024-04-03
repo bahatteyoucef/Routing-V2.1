@@ -81,7 +81,6 @@ export default {
             this.$showLoadingPage()
 
             const res_3                             =   await this.$callApi("post"  ,   "/route_import/"+this.route_import.id_route_import+"/show"      ,   null)
-            console.log(res_3)
 
             this.route_import.clients               =   res_3.data.clients
             this.route_import.liste_journey_plan    =   res_3.data.liste_journey_plan

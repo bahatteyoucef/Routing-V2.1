@@ -196,7 +196,6 @@ export default {
                 this.$showLoadingPage()
 
                 const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.route_import.id_route_import+"/clients/doubles", null)
-                console.log(res)
 
                 if(res.status===200){
 

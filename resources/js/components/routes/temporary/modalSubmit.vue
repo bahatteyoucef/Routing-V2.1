@@ -177,7 +177,6 @@ export default {
             }
 
             const res   = await this.$callApi('post'    ,   '/route_import/store'   ,   formData)         
-            console.log(res.data)
 
             if(res.status===200){
 
@@ -223,7 +222,6 @@ export default {
                 await this.setDataTableClients()
 
                 const res                   =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.id_route_import_tempo+"/clients_tempo/doubles", null)
-                console.log(res.data)
 
                 if(res.status===200){
 

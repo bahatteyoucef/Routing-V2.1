@@ -195,7 +195,6 @@ export default {
             formData.append("password_confirmation"     , this.user.password_confirmation)
 
             const res   = await this.$callApi('post' ,   '/users/store'    ,   formData)         
-            console.log(res.data)
 
             // Hide Loading Page
             this.$hideLoadingPage()

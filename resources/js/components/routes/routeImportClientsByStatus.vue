@@ -146,8 +146,6 @@ export default {
 
         let filter_status       =   this.getFilterStatusRouteImportClientsByStatus
 
-        console.log(filter_status)
-
         if(filter_status    !=  "") {
 
             this.filter_status      =   this.getFilterStatusRouteImportClientsByStatus
@@ -219,8 +217,6 @@ export default {
 
                     //
                     this.setFilterStatusRouteImportClientsByStatusAction(this.filter_status)
-
-                    console.log(this.clients)
                 }
             }
 
@@ -304,8 +300,6 @@ export default {
                 const videoDevices  = devices.filter(device => device.kind === 'videoinput');
                 const backCamera    = videoDevices.find(device => device.label.includes('back') || device.label.includes('rear'));
                 
-                console.log(backCamera)
-
                 if (backCamera) {
 
                     return { exact: backCamera.deviceId };

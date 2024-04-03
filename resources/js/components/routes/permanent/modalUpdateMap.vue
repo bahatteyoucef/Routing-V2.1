@@ -75,7 +75,6 @@ export default {
             formData.append("file"                      ,   this.route_import.file)
 
             const res   =   await this.$callApi('post'    ,   '/route_import/'+this.id_route_import+'/update' ,   formData)         
-            console.log(res.data)
 
             if(res.status===200){
 
@@ -394,7 +393,6 @@ export default {
             formData.append("clients"       ,   JSON.stringify(this.clients))
 
             const res   = await this.$callApi('post' ,   '/route_import/set_willayas_cites'    ,   formData)         
-            console.log(res.data)
 
             if(res.status===200){
 

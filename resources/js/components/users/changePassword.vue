@@ -105,7 +105,6 @@ export default {
             formData.append("new_password_confirmation"     , this.user.new_password_confirmation)
 
             const res   =   await this.$callApi('post' ,   '/users/'+this.$route.params.id_user+'/update/password'    ,   formData)         
-            console.log(res.data)
 
             // Hide Loading Page
             this.$hideLoadingPage()

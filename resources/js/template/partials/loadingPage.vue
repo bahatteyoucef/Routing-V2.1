@@ -37,8 +37,6 @@ export default {
 
         updateProgress() {
 
-            console.log(1223)
-
             let progressStartValue  = 0    
             let progressEndValue    = 100    
             let speed               = 125
@@ -91,9 +89,6 @@ export default {
                 }
 
                 //
-                console.log(step)
-
-                //
                 if(progressStartValue >= progressEndValue){
 
                     clearInterval(this.progress_animation);
@@ -107,9 +102,6 @@ export default {
 
             this.loading_screen     =   document.getElementById("loading_screen")
             this.circularProgress   =   document.querySelector(".circular-progress")   
-
-            console.log(this.loading_screen)
-            console.log(this.circularProgress)
 
             const observer = new MutationObserver((mutations) => {
 

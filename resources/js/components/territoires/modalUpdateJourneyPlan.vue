@@ -127,12 +127,9 @@ export default {
             formData.append("id_user"           ,   this.territoire.id_user)
             formData.append("color"             ,   this.territoire.color)
 
-            console.log(this.territoire.color)
-
             if(this.territoire.type_territoire    ==  '1') {
 
                 const res                       =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/journey_plan/"+this.territoire.id+"/update"   ,   formData)
-                console.log(res.data)
 
                 if(res.status===200){
 
@@ -160,7 +157,6 @@ export default {
             if(this.territoire.type_territoire    ==  '2') {
 
                 const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/journees/"+this.territoire.id+"/update"       ,   formData)
-                console.log(res.data)
 
                 if(res.status===200){
 
@@ -188,7 +184,6 @@ export default {
             if(this.territoire.type_territoire    ==  '3') {
 
                 const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/user_territories/"+this.territoire.id+"/update"       ,   formData)
-                console.log(res.data)
 
                 if(res.status===200){
 
@@ -230,7 +225,6 @@ export default {
             if(this.territoire.type_territoire    ==  '1') {
 
                 const res                       =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/journey_plan/"+this.territoire.id+"/delete"    ,   formData)
-                console.log(res.data)
 
                 if(res.status===200){
 
@@ -257,7 +251,6 @@ export default {
             if(this.territoire.type_territoire    ==  '2') {
 
                 const res                       =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/journees/"+this.territoire.id+"/delete"      ,   formData)
-                console.log(res.data)
 
                 if(res.status===200){
 
@@ -282,12 +275,9 @@ export default {
                 }            
             }
 
-            console.log(this.territoire.type_territoire)
-
             if(this.territoire.type_territoire    ==  '3') {
 
                 const res                       =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/user_territories/"+this.territoire.id+"/delete"      ,   formData)
-                console.log(res.data)
 
                 if(res.status===200){
 
@@ -358,10 +348,6 @@ export default {
         //
 
         getData(journey_plan) {
-
-            console.log(journey_plan)
-
-            //
 
             this.territoire.latlngs =   journey_plan.latlngs
 

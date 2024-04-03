@@ -319,7 +319,6 @@ export default {
                 this.$showLoadingPage()
 
                 const res                   =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.route_import.id_route_import_tempo+"/clients_tempo/doubles", null)
-                console.log(res.data)
 
                 if(res.status===200){
 
@@ -349,7 +348,6 @@ export default {
             this.$showLoadingPage()
 
             const res                   =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.route_import.id_route_import_tempo+"/clients_tempo/doubles/CustomerCode"    , null)
-            console.log(res.data)
 
             if(res.status===200){
 
@@ -364,7 +362,6 @@ export default {
             this.$showLoadingPage()
 
             const res                   =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.route_import.id_route_import_tempo+"/clients_tempo/doubles/CustomerNameE"   , null)
-            console.log(res.data)
 
             if(res.status===200){
 
@@ -379,7 +376,6 @@ export default {
             this.$showLoadingPage()
 
             const res                   =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.route_import.id_route_import_tempo+"/clients_tempo/doubles/Tel"             , null)
-            console.log(res.data)
 
             if(res.status===200){
 
@@ -394,7 +390,6 @@ export default {
             this.$showLoadingPage()
 
             const res                   =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.route_import.id_route_import_tempo+"/clients_tempo/doubles/GPS"             , null)
-            console.log(res.data)
 
             if(res.status===200){
 

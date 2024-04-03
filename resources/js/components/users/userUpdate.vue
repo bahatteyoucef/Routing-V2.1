@@ -87,8 +87,6 @@ export default {
 
     async mounted() {
 
-        console.log(1111)
-
         await this.getData()
     },  
 
@@ -126,8 +124,6 @@ export default {
 
             formData.append("liste_route_import"        , JSON.stringify(this.user.liste_route_import))
 
-            console.log(this.user.liste_route_import)
-
             const res   =   await this.$callApi('post' ,   '/users/'+this.user.id+'/update'    ,   formData)         
 
             // Hide Loading Page
@@ -154,7 +150,6 @@ export default {
         async getUserData() {
 
             const res                   =   await this.$callApi("post"  ,   "/users/"+this.$route.params.id_user+"/show"    ,   null)
-            console.log(res.data)
 
             this.user.nom_original          =   res.data.nom
 
@@ -173,7 +168,6 @@ export default {
         async getComboData() {
 
             const res               =   await this.$callApi("post",       "/route_import/combo",        null)
-            console.log(res.data)
 
             let liste_route_import  =   res.data
 
@@ -187,7 +181,6 @@ export default {
 
         setListeRouteImport() {   
 
-            console.log(this.user.liste_route_import)
         }
     }
 

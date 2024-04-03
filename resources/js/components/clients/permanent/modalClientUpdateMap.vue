@@ -2,7 +2,7 @@
 
     <!-- Modal -->
     <div class="modal fade" id="modalClientUpdateMap" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
 
                 <div class="modal-header">
@@ -13,11 +13,6 @@
                 <div class="modal-body mt-3">
 
                     <form>
-
-                        <div class="mb-3">
-                            <label for="CustomerCode"       class="form-label">CustomerCode (CustomerCode)</label>
-                            <input type="text"              class="form-control"        id="CustomerCode"           v-model="client.CustomerCode">
-                        </div>
 
                         <div class="mb-3">
                             <label for="CustomerNameE"      class="form-label">CustomerNameE (CustomerNameE)</label>
@@ -63,16 +58,16 @@
                             </select>
                         </div>
 
-                        <!--  -->
+                         <!--  -->
 
-                        <div class="mb-3">
+                        <div v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
-                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude">
+                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @change="checkClients()">
                         </div>
 
-                        <div class="mb-3">
+                        <div v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')"   class="mb-3">
                             <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
-                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude">
+                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @change="checkClients()">
                         </div>
 
                         <!--  -->
@@ -191,15 +186,47 @@
                         <!--  -->
 
                         <div class="mb-3">
-                            <label for="facade_image_update_map"    class="form-label">Facade Image (Facade Image)</label>
-                            <input type="file"                  class="form-control"    id="facade_image_update_map"               accept="image/*"    @change="facadeImage()">
-                            <img                                                        id="facade_image_display_update_map"       src=""              class="w-100">
+                            <div v-show="client.CustomerCode   ==  ''"     class="mt-1 p-0">
+                                <div    id="reader_validate_update" class="scanner_reader w-100"></div>
+                            </div>
+
+                            <div v-show="client.CustomerCode   !=  ''"     class="mt-1 p-0">
+                                <div    id="result_validate_update"></div>
+                            </div>
+
+                            <div v-show="client.CustomerCode   !=  ''"     class="mt-1 p-0">
+                                <div    id="customerCode_validate_update_value"     class="text-center">
+                                    <span class="">QR Code (CustomerCode) : {{ client.CustomerCode }}</span>
+                                </div>
+                            </div>
+
+                            <!--  -->
+
+                            <div class="mt-1 mb-1 w-100">
+                                <div class="w-100" id="refresh_client_barcode_validate_update_button">
+                                    <button type="button" class="btn btn-primary w-100"     @click="setBarCodeReader()">Capture QR Code (CustomerCode)</button>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="in_store_image_update_map"  class="form-label">In-Store Image (In-Store Image)</label>
-                            <input type="file"                  class="form-control"    id="in_store_image_update_map"             accept="image/*"    @change="inStoreImage()">
-                            <img                                                        id="in_store_image_display_update_map"     src=""              class="w-100">
+                            <label for="CustomerBarCode_image_validate_update"   class="form-label">QR Code Image</label>
+                            <input type="file"                          class="form-control"        id="CustomerBarCode_image_validate_update"              accept="image/*"    capture     @change="customerBarCodeImage()">
+                            <img                                                                    id="CustomerBarCode_image_validate_display_update"      src=""              class="w-100">
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mb-3">
+                            <label for="facade_image_validate_update"    class="form-label">Facade Image (Facade Image)</label>
+                            <input type="file"                  class="form-control"    id="facade_image_validate_update"               accept="image/*"    @change="facadeImage()">
+                            <img                                                        id="facade_image_validate_display_update"       src=""              class="w-100">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="in_store_image_validate_update"  class="form-label">In-Store Image (In-Store Image)</label>
+                            <input type="file"                  class="form-control"    id="in_store_image_validate_update"             accept="image/*"    @change="inStoreImage()">
+                            <img                                                        id="in_store_image_validate_display_update"     src=""              class="w-100">
                         </div>
 
                         <!--  -->
@@ -210,6 +237,30 @@
                         </div>
 
                         <!--  -->
+
+                        <hr />
+
+                        <h5>Nearby Clients</h5>
+
+                        <hr />
+
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-wrap">CustomerNameE</th>
+                                    <th class="text-wrap">CustomerNameA</th>
+                                    <th class="text-wrap">CustomerType</th>
+                                </tr>
+                            </thead>
+                            
+                            <tbody>
+                                <tr v-for="client in close_clients" :key="client">
+                                    <td class="text-wrap">{{client.CustomerNameE}}</td>
+                                    <td class="text-wrap">{{client.CustomerNameA}}</td>
+                                    <td class="text-wrap">{{client.CustomerType}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
 
                     </form>
 
@@ -222,7 +273,7 @@
 
                     <div class="right-buttons"  style="display: flex; margin-left: auto;">
                         <button type="button"   class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button"   class="btn btn-primary"   @click="sendData()">Confirm</button>
+                        <button type="button"   class="btn btn-primary"                             @click="sendData()"                                                 >Confirm</button>
                     </div>
                 </div>
 
@@ -241,55 +292,83 @@ export default {
     data() {
         return {
 
-
             client      :   {
 
-                // Images   
-                facade_image                    :   '',
-                in_store_image                  :   '',
-                facade_image_original_name      :   '',
-                in_store_image_original_name    :   '',
+                id                                      :   '',
 
-                // Client
-                id                  :   '',
+                // Slide 1
+                CustomerCode                            :   '',
 
-                CustomerCode        :   '',
+                // Slide 2
+                CustomerBarCode_image                   :   '',
+                CustomerBarCode_image_original_name     :   '',
 
-                old_CustomerNameE   :   '',
+                // Slide 3
+                CustomerNameE                           :   '',
+                old_CustomerNameE                       :   '',
 
-                CustomerNameE       :   '',
-                CustomerNameA       :   '',
-                Tel                 :   '',
+                // Slide 4
+                CustomerNameA                           :   '',
 
-                Address             :   '',
-                Neighborhood        :   '',
-                Landmark            :   '',
+                // Slide 5
+                Tel                                     :   '',
 
-                DistrictNo          :   '',
-                DistrictNameE       :   '',
+                // Slide 6
+                Latitude                                :   '',
+                Longitude                               :   '',
 
-                CityNo              :   '',
-                CityNameE           :   '',
+                // Slide 7
+                Address                                 :   '',
 
-                Latitude            :   '',
-                Longitude           :   '',
+                // Slide 8
+                Neighborhood                            :   '',
 
-                // Type
-                CustomerType        :   '',
-                BrandAvailability   :   '',
-                BrandSourcePurchase :   '',
+                // Slide 9
+                Landmark                                :   '',
 
-                // Journey Plan
-                JPlan               :   '',
-                Journee             :   '',
+                // Slide 10
+                DistrictNo                              :   '',
+                DistrictNameE                           :   '',
 
-                                // 
-                status                  :   '',
-                status_original         :   '',
-                nonvalidated_details    :   '', 
+                // Slide 11
+                CityNo                                  :   '',
+                CityNameE                               :   '',
 
-                // Comment
-                comment                 :   ''
+                // Slide 12
+                CustomerType                            :   '',
+
+                // Slide 13
+                BrandAvailability                       :   0,
+
+                // Slide 14
+                BrandSourcePurchase                     :   '',
+
+                // Slide 15
+                JPlan                                   :   '',
+
+                // Slide 16 
+                Journee                                 :   '',
+
+                // Slide 17
+                status                                  :   '',
+                status_original                         :   '',
+                nonvalidated_details                    :   '', 
+
+                // Slide 18
+                facade_image                            :   '',
+                facade_image_original_name              :   '',
+
+                // Slide 19   
+                in_store_image                          :   '',
+                in_store_image_original_name            :   '',
+
+                // Slide 20
+                comment                                 :   '',
+
+                //
+                CustomerBarCode_image_validate_updated           :   false,
+                facade_image_validate_updated                    :   false,
+                in_store_image_validate_updated                  :   false,
             },
 
             willayas                        :   []  ,
@@ -300,10 +379,28 @@ export default {
             liste_journee                   :   []  ,
             liste_type_client               :   []  ,
 
+            //
+
+            all_clients                     :   []  ,
+            close_clients                   :   []  ,
+            min_distance                    :   0.03    ,
+
+            //
+
+            scanner                         :   null
         }
     },
 
     props : ["id_route_import", "modal_source"],
+
+    computed : {
+
+        ...mapGetters({
+            getListeJourneyPlan             :   'journey_plan/getListeJourneyPlan'      ,
+            getListeTypeClient              :   'type_client/getListeTypeClient'        ,  
+            getListeJournee                 :   'journee/getListeJournee'    
+        }),
+    },
 
     mounted() {
 
@@ -311,6 +408,10 @@ export default {
     },  
 
     methods : {
+
+        ...mapActions("client" ,  [
+            "setUpdateClientAction"   ,
+        ]),
 
         //
 
@@ -339,17 +440,23 @@ export default {
             formData.append("CityNameE"                     ,   this.client.CityNameE)
             formData.append("Tel"                           ,   this.client.Tel)
             formData.append("CustomerType"                  ,   this.client.CustomerType)
-
             formData.append("BrandAvailability"             ,   this.client.BrandAvailability)
             formData.append("BrandSourcePurchase"           ,   this.client.BrandSourcePurchase)
 
             formData.append("JPlan"                         ,   this.client.JPlan)
             formData.append("Journee"                       ,   this.client.Journee)
 
-            formData.append("facade_image"                  ,   this.client.facade_image)
-            formData.append("in_store_image"                ,   this.client.in_store_image)
-            formData.append("facade_image_original_name"    ,   this.client.facade_image_original_name)
-            formData.append("in_store_image_original_name"  ,   this.client.in_store_image_original_name)
+            formData.append("CustomerBarCode_image_validate_updated"         ,   this.client.CustomerBarCode_image_validate_updated)
+            formData.append("facade_image_validate_updated"                  ,   this.client.facade_image_validate_updated)
+            formData.append("in_store_image_validate_updated"                ,   this.client.in_store_image_validate_updated)
+
+            formData.append("CustomerBarCode_image"                 ,   this.client.CustomerBarCode_image)
+            formData.append("facade_image"                          ,   this.client.facade_image)
+            formData.append("in_store_image"                        ,   this.client.in_store_image)
+
+            formData.append("CustomerBarCode_image_original_name"   ,   this.client.CustomerBarCode_image_original_name)
+            formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
+            formData.append("in_store_image_original_name"          ,   this.client.in_store_image_original_name)
 
             formData.append("status"                        ,   this.client.status)
             formData.append("nonvalidated_details"          ,   this.client.nonvalidated_details)
@@ -398,8 +505,6 @@ export default {
                 // Send Errors
                 this.$showErrors("Error !", res.data.errors)
 			}            
-
-            //
         },
 
         async deleteData() {
@@ -458,61 +563,136 @@ export default {
 
                 //
 
-                let facade_image_update_map             =   document.getElementById("facade_image_update_map")
-                facade_image_update_map.value           =   ""
+                if(this.scanner) {
 
-                let facade_image_display_update_map     =   document.getElementById("facade_image_display_update_map")
-                facade_image_display_update_map.src     =   ""
+                    this.scanner.clear().then(_ => {
 
-                //
+                    }).catch(error => {
 
-                let in_store_image_update_map           =   document.getElementById("in_store_image_update_map")
-                in_store_image_update_map.value         =   ""
-
-                let in_store_image_display_update_map   =   document.getElementById("in_store_image_display_update_map")
-                in_store_image_display_update_map.src   =   ""
+                    });
+                }
 
                 //
 
-                this.client.facade_image                    =   '',
-                this.client.in_store_image                  =   '',
-                this.client.facade_image_original_name      =   '',
-                this.client.in_store_image_original_name    =   '',
+                let CustomerBarCode_image_validate_update                    =   document.getElementById("CustomerBarCode_image_validate_update")
+                CustomerBarCode_image_validate_update.value                  =   ""
+
+                let CustomerBarCode_image_validate_display_update            =   document.getElementById("CustomerBarCode_image_validate_display_update")
+                CustomerBarCode_image_validate_display_update.src            =   ""
 
                 //
+
+                let facade_image_validate_update                             =   document.getElementById("facade_image_validate_update")
+                facade_image_validate_update.value                           =   ""
+
+                let facade_image_validate_display_update                     =   document.getElementById("facade_image_validate_display_update")
+                facade_image_validate_display_update.src                     =   ""
+
+                //
+
+                let in_store_image_validate_update                           =   document.getElementById("in_store_image_validate_update")
+                in_store_image_validate_update.value                         =   ""
+
+                let in_store_image_validate_display_update                   =   document.getElementById("in_store_image_validate_display_update")
+                in_store_image_validate_display_update.src                   =   ""
+
+                //
+
+                this.client.CustomerBarCode_image                   =   '',
+                this.client.facade_image                            =   '',
+                this.client.in_store_image                          =   '',
+
+                this.client.CustomerBarCode_image_original_name     =   '',
+                this.client.facade_image_original_name              =   '',
+                this.client.in_store_image_original_name            =   '',
+
+                this.client.facade_image_validate_updated                    =   false,
+                this.client.in_store_image_validate_updated                  =   false
+
+                // 
+                this.setUpdateClientAction(null)
 
                 // Client
-                this.client.CustomerCode        =   '',
+                this.client.id                                      =   '',
 
-                this.client.old_CustomerNameE   =   '',
+                // Slide 1
+                this.client.CustomerCode                            =   '',
 
-                this.client.CustomerNameE       =   '',
-                this.client.CustomerNameA       =   '',
-                this.client.Tel                 =   '',
+                // Slide 2
+                this.client.CustomerBarCode_image                   =   '',
+                this.client.CustomerBarCode_image_original_name     =   '',
 
-                this.client.Address             =   '',
-                this.client.Neighborhood        =   '',
-                this.client.Landmark            =   '',
+                // Slide 3
+                this.client.old_CustomerNameE                       =   '',
+                this.client.CustomerNameE                           =   '',
 
-                this.client.DistrictNo          =   '',
-                this.client.DistrictNameE       =   '',
+                // Slide 4
+                this.client.CustomerNameA                           =   '',
 
-                this.client.CityNo              =   '',
-                this.client.CityNameE           =   '',
+                // Slide 5
+                this.client.Tel                                     =   '',
 
-                this.client.Latitude            =   '',
-                this.client.Longitude           =   '',
+                // Slide 6
+                this.client.Latitude                                =   '',
+                this.client.Longitude                               =   '',
 
-                // Type
-                this.client.CustomerType        =   '',
-                this.client.BrandAvailability   =   '',
-                this.client.BrandSourcePurchase =   '',
+                // Slide 7
+                this.client.Address                                 =   '',
 
-                // Journey Plan
-                this.client.JPlan               =   '',
+                // Slide 8
+                this.client.Neighborhood                            =   '',
 
-                this.willayas                   =   []
-                this.cites                      =   []
+                // Slide 9
+                this.client.Landmark                                =   '',
+
+                // Slide 10
+                this.client.DistrictNo                              =   '',
+                this.client.DistrictNameE                           =   '',
+
+                // Slide 11
+                this.client.CityNo                                  =   '',
+                this.client.CityNameE                               =   '',
+
+                // Slide 12
+                this.client.CustomerType                            =   '',
+
+                // Slide 13
+                this.client.BrandAvailability                       =   0,
+
+                // Slide 14
+                this.client.BrandSourcePurchase                     =   '',
+
+                // Slide 15
+                this.client.JPlan                                   =   '',
+
+                // Slide 16 
+                this.client.Journee                                 =   '',
+
+                // Slide 17
+                this.client.status_original                         =   '',
+                this.client.status                                  =   '',
+                this.client.nonvalidated_details                    =   '', 
+
+                // Slide 18
+                this.client.facade_image                            =   '',
+                this.client.facade_image_original_name              =   '',
+
+                // Slide 19   
+                this.client.in_store_image                          =   '',
+                this.client.in_store_image_original_name            =   '',
+                this.client.comment                                 =   ''
+
+                //
+
+                this.willayas                                       =   []  ,
+                this.cites                                          =   []  ,
+
+                this.liste_journey_plan                             =   []  ,
+                this.liste_journee                                  =   []  ,
+                this.liste_type_client                              =   []  ,
+
+                this.all_clients                                    =   []  ,
+                this.close_clients                                  =   []
             });
         },
 
@@ -520,62 +700,76 @@ export default {
 
             this.getClientData(client)  
             this.getComboData()  
+
+            this.checkClients()
         },
 
         async getClientData(client) {
 
-            this.client.id                  =   client.id
+            console.log(client)
 
-            this.client.CustomerCode        =   client.CustomerCode
+            //
 
-            this.client.old_CustomerNameE   =   client.CustomerNameE
+            this.client.id                                      =   client.id
 
-            this.client.CustomerNameE       =   client.CustomerNameE
-            this.client.CustomerNameA       =   client.CustomerNameA
-            this.client.Latitude            =   client.Latitude
-            this.client.Longitude           =   client.Longitude
+            this.client.CustomerCode                            =   client.CustomerCode
 
-            this.client.Address             =   client.Address
-            this.client.Neighborhood        =   client.Neighborhood
-            this.client.Landmark            =   client.Landmark
+            this.client.old_CustomerNameE                       =   client.CustomerNameE
 
-            this.client.DistrictNo          =   client.DistrictNo
+            this.client.CustomerNameE                           =   client.CustomerNameE
+            this.client.CustomerNameA                           =   client.CustomerNameA
+            this.client.Latitude                                =   client.Latitude
+            this.client.Longitude                               =   client.Longitude
 
-            this.client.CityNo              =   client.CityNo
+            this.client.Address                                 =   client.Address
+            this.client.Neighborhood                            =   client.Neighborhood
+            this.client.Landmark                                =   client.Landmark
 
-            this.client.Tel                 =   client.Tel
-
-            this.client.CustomerType        =   client.CustomerType
-            this.client.BrandAvailability   =   client.BrandAvailability
-            this.client.BrandSourcePurchase =   client.BrandSourcePurchase
-
-            this.client.JPlan               =   client.JPlan
-
-            this.client.Journee             =   client.Journee
-
-            this.client.status                  =   client.status
-            this.client.status_original         =   client.status
-            this.client.nonvalidated_details    =   client.nonvalidated_details
-
-            this.client.facade_image                        =   client.facade_image
-            this.client.in_store_image                      =   client.in_store_image
-            this.client.facade_image_original_name          =   client.facade_image_original_name
-            this.client.in_store_image_original_name        =   client.in_store_image_original_name
-
-            // 
-            this.$createFile(client.facade_image_original_name      ,   "facade_image_update_map")
-            this.$createFile(client.in_store_image_original_name    ,   "in_store_image_update_map")
-
-            // 
-            let facade_image_display_update_map     =   document.getElementById("facade_image_display_update_map")
-            let in_store_image_display_update_map   =   document.getElementById("in_store_image_display_update_map")
-
-            this.base64ToImage(this.client.facade_image             ,   facade_image_display_update_map)            
-            this.base64ToImage(this.client.in_store_image           ,   in_store_image_display_update_map)            
-
-            this.setJoursGetData(client)
+            this.client.DistrictNo                              =   client.DistrictNo
+            this.client.DistrictNameE                           =   client.DistrictNameE
 
             await this.getCites()
+
+            this.client.CityNo                                  =   client.CityNo
+            this.client.CityNameE                               =   client.CityNameE
+
+            this.client.Tel                                     =   client.Tel
+
+            this.client.CustomerType                            =   client.CustomerType
+            this.client.BrandAvailability                       =   client.BrandAvailability
+            this.client.BrandSourcePurchase                     =   client.BrandSourcePurchase
+
+            this.client.JPlan                                   =   client.JPlan
+
+            this.client.Journee                                 =   client.Journee
+
+            this.client.status                                  =   client.status
+            this.client.status_original                         =   client.status
+            this.client.nonvalidated_details                    =   client.nonvalidated_details
+
+            this.client.comment                                 =   client.comment
+
+            this.client.CustomerBarCode_image                   =   client.CustomerBarCode_image
+            this.client.facade_image                            =   client.facade_image
+            this.client.in_store_image                          =   client.in_store_image
+
+            this.client.CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name
+            this.client.facade_image_original_name              =   client.facade_image_original_name
+            this.client.in_store_image_original_name            =   client.in_store_image_original_name
+
+            // 
+            this.$createFile(client.CustomerBarCode_image_original_name     ,   "CustomerBarCode_image_validate_update")
+            this.$createFile(client.facade_image_original_name              ,   "facade_image_validate_update")
+            this.$createFile(client.in_store_image_original_name            ,   "in_store_image_validate_update")
+
+            // 
+            let CustomerBarCode_image_validate_display_update    =   document.getElementById("CustomerBarCode_image_validate_display_update")
+            let facade_image_validate_display_update             =   document.getElementById("facade_image_validate_display_update")
+            let in_store_image_validate_display_update           =   document.getElementById("in_store_image_validate_display_update")
+
+            CustomerBarCode_image_validate_display_update.src    =   "/uploads/clients/"+client.id+"/"+client.CustomerBarCode_image
+            facade_image_validate_display_update.src             =   "/uploads/clients/"+client.id+"/"+client.facade_image
+            in_store_image_validate_display_update.src           =   "/uploads/clients/"+client.id+"/"+client.in_store_image
         },
 
         async getComboData() {
@@ -592,178 +786,10 @@ export default {
             const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
             this.cites                      =   res_3.data
 
+            this.client.CityNo              =   ""
+
             // Hide Loading Page
             this.$hideLoadingPage()
-        },
-
-        //
-
-        setJoursGetData(client) {
-
-            const jours         =   document.querySelectorAll(".jours")
-
-            jours.forEach(jour => {
-
-                // Samedi
-                if(jour.id ==   "samedi_checkbox") {
-
-                    if(client.sat   ==  1) {
-
-                        jour.setAttribute('checked', 'true')
-                    }
-                }
-
-                // Dimanche
-                if(jour.id ==   "dimanche_checkbox") {
-
-                    if(client.sun   ==  1) {
-
-                        jour.setAttribute('checked', 'true')
-                    }
-                }
-
-                // Lundi
-                if(jour.id ==   "lundi_checkbox") {
-
-                    if(client.mon   ==  1) {
-
-                        jour.setAttribute('checked', 'true')
-                    }
-                }
-
-                // Mardi
-                if(jour.id ==   "mardi_checkbox") {
-
-                    if(client.tue   ==  1) {
-
-                        jour.setAttribute('checked', 'true')
-                    }
-                }
-
-                // Mercredi
-                if(jour.id ==   "mercredi_checkbox") {
-
-                    if(client.wed   ==  1) {
-
-                        jour.setAttribute('checked', 'true')
-                    }
-                }
-
-                // Jeudi
-                if(jour.id ==   "jeudi_checkbox") {
-
-                    if(client.thu   ==  1) {
-
-                        jour.setAttribute('checked', 'true')
-                    }
-                }
-            });
-        },
-
-        //
-
-        unsetJoursGetData() {
-
-            const jours             =   document.querySelectorAll(".jours")
-
-            jours.forEach(jour => {
-
-                jour.removeAttribute('checked')
-            });
-        
-        },
-
-        //
-
-        setJours() {
-
-            // Samedi
-
-            const samedi_checkbox   =   document.querySelector("#samedi_checkbox")
-            
-            if(samedi_checkbox.checked) {
-
-                this.client.sat         =   1
-            }
-            else {
-
-                this.client.sat         =   0
-            }
-
-            //
-
-            // Dimanche
-
-            const dimanche_checkbox =   document.querySelector("#dimanche_checkbox")
-            
-            if(dimanche_checkbox.checked) {
-
-                this.client.sun         =   1
-            }
-            else {
-
-                this.client.sun         =   1
-            }
-
-            //
-
-            // Lundi
-
-            const lundi_checkbox    =   document.querySelector("#lundi_checkbox")
-            
-            if(lundi_checkbox.checked) {
-
-                this.client.mon         =   1
-            }
-            else {
-
-                this.client.mon         =   1
-            }
-
-            //
-
-            // Mardi
-
-            const mardi_checkbox    =   document.querySelector("#mardi_checkbox")
-            
-            if(mardi_checkbox.checked) {
-
-                this.client.tue         =   1
-            }
-            else {
-
-                this.client.tue         =   0
-            }
-
-            //
-
-            // Mercredi
-
-            const mercredi_checkbox =   document.querySelector("#mercredi_checkbox")
-            
-            if(mercredi_checkbox.checked) {
-
-                this.client.wed         =   1
-            }
-            else {
-
-                this.client.wed         =   0
-            }
-
-            //
-
-            // Jeudi
-
-            const jeudi_checkbox    =   document.querySelector("#jeudi_checkbox")
-            
-            if(jeudi_checkbox.checked) {
-
-                this.client.thu         =   1
-            }
-            else {
-
-                this.client.thu         =   0
-            }
         },
 
         //
@@ -792,25 +818,120 @@ export default {
 
         //
 
+        checkClients() {
+
+            this.close_clients  =   []
+
+            let distance        =   0
+
+            for (let i = 0; i < this.all_clients.length; i++) {
+
+                if(this.all_clients[i].id   !=  this.client.id) {
+
+                    distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
+
+                    if(distance <=  this.min_distance) {
+                    
+                        this.close_clients.push(this.all_clients[i])
+                    }
+                }
+            }
+        },
+
+        getDistance(latitude_1, longitude_1, latitude_2, longitude_2) {
+
+            return this.$map.$setDistanceStraight(latitude_1, longitude_1, latitude_2, longitude_2)
+        },
+
+        //
+
+        async customerBarCodeImage() {
+
+            const CustomerBarCode_image  =   document.getElementById("CustomerBarCode_image_validate_update").files[0];
+
+            console.log(CustomerBarCode_image)
+
+            if(CustomerBarCode_image) {
+
+                this.client.CustomerBarCode_image_validate_updated            =   true
+
+                if(this.$connectedToInternet) {
+
+                    this.client.CustomerBarCode_image_original_name      =   CustomerBarCode_image.name
+                    this.client.CustomerBarCode_image                    =   await this.$compressImage(CustomerBarCode_image)
+
+                    //
+
+                    let CustomerBarCode_image_base64                     =   await this.$imageToBase64(this.client.CustomerBarCode_image)
+
+                    let CustomerBarCode_image_display                    =   document.getElementById("CustomerBarCode_image_validate_display_update")
+                    this.base64ToImage(CustomerBarCode_image_base64, CustomerBarCode_image_display)
+                }
+
+                else {
+
+                    this.client.CustomerBarCode_image_original_name      =   CustomerBarCode_image.name
+                    this.client.CustomerBarCode_image                    =   await this.$compressImage(CustomerBarCode_image)
+
+                    //
+
+                    this.client.CustomerBarCode_image                    =   await this.$imageToBase64(this.client.CustomerBarCode_image)
+
+                    let CustomerBarCode_image_display                    =   document.getElementById("CustomerBarCode_image_validate_display_update")
+                    this.base64ToImage(this.client.CustomerBarCode_image, CustomerBarCode_image_display)
+                }
+            }
+
+            else {
+
+                this.client.CustomerBarCode_image_original_name     =   ""
+                this.client.CustomerBarCode_image                   =   ""
+
+                this.client.CustomerBarCode_image_validate_updated           =   true
+
+                const CustomerBarCode_image_validate_display_update          =   document.getElementById("CustomerBarCode_image_validate_display_update")
+
+                if(CustomerBarCode_image_validate_display_update) {
+
+                    CustomerBarCode_image_validate_display_update.src            =   ""
+                }
+            }
+        },
+
         //
 
         async facadeImage() {
 
-            const facade_image  =   document.getElementById("facade_image_update_map").files[0];
-
-            console.log(facade_image)
+            const facade_image  =   document.getElementById("facade_image_validate_update").files[0];
 
             if(facade_image) {
 
-                console.log(222)
+                this.client.facade_image_validate_updated            =   true
 
                 this.client.facade_image_original_name      =   facade_image.name
-                this.client.facade_image                    =   await this.$imageToBase64(facade_image)
+                this.client.facade_image                    =   await this.$compressImage(facade_image)
 
                 //
 
-                let facade_image_display                    =   document.getElementById("facade_image_display_update_map")
-                this.base64ToImage(this.client.facade_image, facade_image_display)
+                let facade_image_base64                     =   await this.$imageToBase64(this.client.facade_image)
+
+                let facade_image_display                    =   document.getElementById("facade_image_validate_display_update")
+                this.base64ToImage(facade_image_base64, facade_image_display)
+            }
+
+            else {
+
+                this.client.facade_image_original_name      =   ""
+                this.client.facade_image                    =   ""
+
+                this.client.facade_image_validate_updated            =   true
+
+                const facade_image_validate_display_update          =   document.getElementById("facade_image_validate_display_update")
+
+                if(facade_image_validate_display_update) {
+
+                    facade_image_validate_display_update.src            =   ""
+                }
             }
         },
 
@@ -818,17 +939,36 @@ export default {
 
         async inStoreImage() {
 
-            const in_store_image  =   document.getElementById("in_store_image_update_map").files[0];
+            const in_store_image  =   document.getElementById("in_store_image_validate_update").files[0];
 
             if(in_store_image) {
 
+                this.client.in_store_image_validate_updated          =   true
+
                 this.client.in_store_image_original_name    =   in_store_image.name
-                this.client.in_store_image                  =   await this.$imageToBase64(in_store_image)
+                this.client.in_store_image                  =   await this.$compressImage(in_store_image)
                 
                 //
 
-                let in_store_image_display                  =   document.getElementById("in_store_image_display_update_map")
-                this.base64ToImage(this.client.in_store_image, in_store_image_display)
+                let in_store_image_base64                   =   await this.$imageToBase64(this.client.in_store_image)
+
+                let in_store_image_display                  =   document.getElementById("in_store_image_validate_display_update")
+                this.base64ToImage(in_store_image_base64, in_store_image_display)
+            }
+
+            else {
+
+                this.client.in_store_image_original_name    =   ""
+                this.client.in_store_image                  =   ""
+
+                this.client.in_store_image_validate_updated          =   true
+
+                const in_store_image_validate_display_update         =   document.getElementById("in_store_image_validate_display_update")
+
+                if(in_store_image_validate_display_update) {
+
+                    in_store_image_validate_display_update.src           =   ""
+                }
             }
         },
 
@@ -837,7 +977,56 @@ export default {
         base64ToImage(image_base64, image_display_div) {
 
             this.$base64ToImage(image_base64, image_display_div)
-        }
+        },
+
+        //
+
+        async setBarCodeReader() {
+
+            const reader_validate_update    =   document.getElementById('reader_validate_update')
+
+            // 
+            this.client.CustomerCode    =   ""
+
+            if(reader_validate_update) {
+
+                reader_validate_update.style.display        =   "block";
+
+                //
+                this.scanner = new Html5QrcodeScanner('reader_validate_update', {
+
+                    qrbox   : {
+                        width   : 250,
+                        height  : 250,
+                    },
+
+                    fps     : 20
+                });
+
+                try {
+                    await this.scanner.render(this.success, this.error);
+                } catch (error) {
+                    console.error('Error rendering scanner:', error);
+                }
+            }
+        },
+
+        success(result) {
+             
+            // 
+            this.client.CustomerCode    =   result
+
+            this.scanner.clear();
+
+            document.getElementById('reader_validate_update').style.display =   "none"
+            // Removes reader_validate_update element from DOM since no longer needed 
+        },
+
+        error(err) {
+
+            // Prints any errors to the console
+            console.error("");
+        },
     },
 };
 

@@ -11,6 +11,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Fluent;
 use stdClass;
 
 class Client extends Model
@@ -166,6 +167,7 @@ class Client extends Model
             'CustomerCode'          =>  ["required", "max:255"],
             'CustomerNameE'         =>  ["required", "max:255"],
             'CustomerNameA'         =>  ["required", "max:255"],
+            'Tel'                   =>  ["required", "max:255"],
             'Latitude'              =>  ["required", "max:255"],
             'Longitude'             =>  ["required", "max:255"],
             'Address'               =>  ["required", "max:255"],
@@ -173,10 +175,49 @@ class Client extends Model
             'DistrictNameE'         =>  ["required", "max:255"],
             'CityNo'                =>  ["required", "max:255"],
             'CityNameE'             =>  ["required", "max:255"],
-            'Tel'                   =>  ["required", "max:255"],
             'CustomerType'          =>  ["required", "max:255"],
+            'status'                =>  ["required", "max:255"],
         ]);
+
+        $validator->sometimes('nonvalidated_details',  ["required"] , function (Fluent $input) {
     
+            return $input->status    ==  "nonvalidated";
+        });
+
+        //
+
+        $validator->sometimes(['CustomerBarCode_image'],  ["file"] , function (Fluent $input) {
+    
+            return $input->CustomerBarCode_image    !=  "";
+        });
+        
+        $validator->sometimes(['facade_image'],  ["file"] , function (Fluent $input) {
+    
+            return $input->facade_image             !=  "";
+        });
+
+        $validator->sometimes(['in_store_image'],  ["file"] , function (Fluent $input) {
+    
+            return $input->in_store_image           !=  "";
+        });
+
+        //
+
+        $validator->sometimes(['CustomerBarCode_image_original_name'],  ["required"] , function (Fluent $input) {
+    
+            return $input->CustomerBarCode_image    !=  "";
+        });
+
+        $validator->sometimes(['facade_image_original_name'],  ["required"] , function (Fluent $input) {
+    
+            return $input->facade_image             !=  "";
+        });
+
+        $validator->sometimes(['in_store_image_original_name'],  ["required"] , function (Fluent $input) {
+    
+            return $input->in_store_image           !=  "";
+        });
+
         return $validator;
     }
 
@@ -371,6 +412,7 @@ class Client extends Model
             'CustomerCode'          =>  ["required", "max:255"],
             'CustomerNameE'         =>  ["required", "max:255"],
             'CustomerNameA'         =>  ["required", "max:255"],
+            'Tel'                   =>  ["required", "max:255"],
             'Latitude'              =>  ["required", "max:255"],
             'Longitude'             =>  ["required", "max:255"],
             'Address'               =>  ["required", "max:255"],
@@ -378,10 +420,49 @@ class Client extends Model
             'DistrictNameE'         =>  ["required", "max:255"],
             'CityNo'                =>  ["required", "max:255"],
             'CityNameE'             =>  ["required", "max:255"],
-            'Tel'                   =>  ["required", "max:255"],
-            'CustomerType'          =>  ["required", "max:255"]
+            'CustomerType'          =>  ["required", "max:255"],
+            'status'                =>  ["required", "max:255"],
         ]);
+
+        $validator->sometimes('nonvalidated_details',  ["required"] , function (Fluent $input) {
     
+            return $input->status    ==  "nonvalidated";
+        });
+
+        //
+
+        $validator->sometimes(['CustomerBarCode_image'],  ["file"] , function (Fluent $input) {
+    
+            return $input->CustomerBarCode_image    !=  "";
+        });
+        
+        $validator->sometimes(['facade_image'],  ["file"] , function (Fluent $input) {
+    
+            return $input->facade_image             !=  "";
+        });
+
+        $validator->sometimes(['in_store_image'],  ["file"] , function (Fluent $input) {
+    
+            return $input->in_store_image           !=  "";
+        });
+
+        //
+
+        $validator->sometimes(['CustomerBarCode_image_original_name'],  ["required"] , function (Fluent $input) {
+    
+            return $input->CustomerBarCode_image    !=  "";
+        });
+
+        $validator->sometimes(['facade_image_original_name'],  ["required"] , function (Fluent $input) {
+    
+            return $input->facade_image             !=  "";
+        });
+
+        $validator->sometimes(['in_store_image_original_name'],  ["required"] , function (Fluent $input) {
+    
+            return $input->in_store_image           !=  "";
+        });
+
         return $validator;
     }
 
@@ -714,56 +795,80 @@ class Client extends Model
     public static function getDoublesTelClients(int $id_route_import) {
 
         return  DB::table('clients')
+
+                    ->join('users', 'clients.owner', 'users.id')
+
                     ->where('id_route_import', $id_route_import)
-                    ->whereIn('Tel', function ($query) use ($id_route_import) {
+                    ->whereIn('clients.Tel', function ($query) use ($id_route_import) {
                         $query->select('Tel')
                             ->from('clients')
                             ->where('id_route_import', $id_route_import)
                             ->groupBy('Tel')
                             ->havingRaw('COUNT(*) > 1');
                     })
+
+                    ->select('clients.*', 'users.nom as owner_name')
+
                     ->get();
     } 
 
     public static function getDoublesCustomerCodeClients(int $id_route_import) {
 
         return  DB::table('clients')
+
+                    ->join('users', 'clients.owner', 'users.id')
+
                     ->where('id_route_import', $id_route_import)
-                    ->whereIn('CustomerCode', function ($query) use ($id_route_import) {
+                    ->whereIn('clients.CustomerCode', function ($query) use ($id_route_import) {
                         $query->select('CustomerCode')
                             ->from('clients')
                             ->where('id_route_import', $id_route_import)
                             ->groupBy('CustomerCode')
                             ->havingRaw('COUNT(*) > 1');
                     })
+
+                    ->select('clients.*', 'users.nom as owner_name')
+
                     ->get();
     }
 
     public static function getDoublesCustomerNameEClients(int $id_route_import) {
 
         return  DB::table('clients')
+
+                    ->join('users', 'clients.owner', 'users.id')
+
                     ->where('id_route_import', $id_route_import)
-                    ->whereIn('CustomerNameE', function ($query) use ($id_route_import) {
+                    ->whereIn('clients.CustomerNameE', function ($query) use ($id_route_import) {
                         $query->select('CustomerNameE')
                             ->from('clients')
                             ->where('id_route_import', $id_route_import)
                             ->groupBy('CustomerNameE')
                             ->havingRaw('COUNT(*) > 1');
                     })
+
+                    ->select('clients.*', 'users.nom as owner_name')
+
                     ->get();
     }
 
     public static function getDoublesGPSClients(int $id_route_import) {
 
         return  DB::table('clients')
+
+                    ->join('users', 'clients.owner', 'users.id')
+
                     ->where('id_route_import', $id_route_import)
-                    ->whereIn(DB::raw('(Latitude, Longitude)'), function ($query) use ($id_route_import) {
+                    ->whereIn(DB::raw('(clients.Latitude, clients.Longitude)'), function ($query) use ($id_route_import) {
                         $query->select('Latitude', 'Longitude')
                             ->from('clients')
                             ->where('id_route_import', $id_route_import)
                             ->groupBy('Latitude', 'Longitude')
                             ->havingRaw('COUNT(*) > 1');
                     })
+
+                    ->select('clients.*', 'users.nom as owner_name')
+
                     ->get();
     }
 }

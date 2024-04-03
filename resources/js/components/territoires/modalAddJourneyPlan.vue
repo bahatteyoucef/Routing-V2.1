@@ -138,12 +138,9 @@ export default {
 
             formData.append("color"             ,   this.territoire.color)
 
-            console.log(this.territoire.color)
-
             if(this.territoire.type_territoire    ==  '1') {
 
                 const res                       =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/journey_plan/store"   ,   formData)
-                console.log(res.data)
 
                 if(res.status===200){
 
@@ -171,7 +168,6 @@ export default {
             if(this.territoire.type_territoire    ==  '2') {
 
                 const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/journees/store"       ,   formData)
-                console.log(res.data)
 
                 if(res.status===200){
 
@@ -199,7 +195,6 @@ export default {
             if(this.territoire.type_territoire    ==  '3') {
 
                 const res                       =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/user_territories/store"   ,   formData)
-                console.log(res.data)
 
                 if(res.status===200){
 

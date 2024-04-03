@@ -15,11 +15,6 @@
                     <form>
 
                         <div class="mb-3">
-                            <label for="CustomerCode"       class="form-label">CustomerCode (CustomerCode)</label>
-                            <input type="text"              class="form-control"        id="CustomerCode"           v-model="client.CustomerCode">
-                        </div>
-
-                        <div class="mb-3">
                             <label for="CustomerNameE"      class="form-label">CustomerNameE (CustomerNameE)</label>
                             <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE">
                         </div>
@@ -157,6 +152,36 @@
                         <!--  -->
 
                         <div class="mb-3">
+                            <div v-show="client.CustomerCode   ==  ''"     class="mt-1 p-0">
+                                <div    id="reader" class="scanner_reader w-100"></div>
+                            </div>
+
+                            <div v-show="client.CustomerCode   !=  ''"     class="mt-1 p-0">
+                                <div    id="result"></div>
+                            </div>
+
+                            <div v-show="client.CustomerCode   !=  ''"     class="mt-1 p-0">
+                                <div    id="customerCode_value"              class="text-center">
+                                    <span class="">QR Code (CustomerCode) : {{ client.CustomerCode }}</span>
+                                </div>
+                            </div>
+
+                            <!--  -->
+
+                            <div class="mt-1 mb-1 w-100">
+                                <div class="w-100" id="refresh_client_barcode_button">
+                                    <button type="button" class="btn btn-primary w-100"     @click="setBarCodeReader()">Capture QR Code (CustomerCode)</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="CustomerBarCode_image"    class="form-label">QR Code Image</label>
+                            <input type="file"              class="form-control"        id="CustomerBarCode_image"              accept="image/*"    capture     @change="customerBarCodeImage()">
+                            <img                                                        id="CustomerBarCode_image_display"      src=""              class="w-100">
+                        </div>
+
+                        <div class="mb-3">
                             <label for="facade_image_add"   class="form-label">Facade Image (Facade Image)</label>
                             <input type="file"              class="form-control"        id="facade_image_add"           accept="image/*"    @change="facadeImage()">
                             <img                                                        id="facade_image_display_add"       src=""              class="w-100">
@@ -238,51 +263,74 @@ export default {
 
             client      :   {
 
-                // Images   
-                facade_image                    :   '',
-                in_store_image                  :   '',
-                facade_image_original_name      :   '',
-                in_store_image_original_name    :   '',
+                id                                      :   '',
 
-                // Client
-                id              :   '',
+                // Slide 1
+                CustomerCode                            :   '',
 
-                CustomerCode    :   '',
+                // Slide 2
+                CustomerBarCode_image                   :   '',
+                CustomerBarCode_image_original_name     :   '',
 
-                CustomerNameE   :   '',
-                CustomerNameA   :   '',
-                Tel             :   '',
+                // Slide 3
+                CustomerNameE                           :   '',
 
-                Address         :   '',
-                Neighborhood    :   '',
-                Landmark        :   '',
+                // Slide 4
+                CustomerNameA                           :   '',
 
-                DistrictNo      :   '',
-                DistrictNameE   :   '',
+                // Slide 5
+                Tel                                     :   '',
 
-                CityNo          :   '',
-                CityNameE       :   '',
+                // Slide 6
+                Latitude                                :   '',
+                Longitude                               :   '',
 
-                Latitude        :   0,
-                Longitude       :   0,
+                // Slide 7
+                Address                                 :   '',
 
-                // Type
-                CustomerType        :   '',
-                BrandAvailability   :   '',
-                BrandSourcePurchase :   '',
+                // Slide 8
+                Neighborhood                            :   '',
 
-                // Journey Plan
-                JPlan           :   '',
+                // Slide 9
+                Landmark                                :   '',
 
-                // Journee
-                Journee         :   '',
+                // Slide 10
+                DistrictNo                              :   '',
+                DistrictNameE                           :   '',
 
-                // Status
-                status                  :   '',
-                nonvalidated_details    :   '', 
+                // Slide 11
+                CityNo                                  :   '',
+                CityNameE                               :   '',
 
-                // Comment
-                comment                 :   ''
+                // Slide 12
+                CustomerType                            :   '',
+
+                // Slide 13
+                BrandAvailability                       :   0,
+
+                // Slide 14
+                BrandSourcePurchase                     :   '',
+
+                // Slide 15
+                JPlan                                   :   '',
+
+                // Slide 16 
+                Journee                                 :   '',
+
+                // Slide 17
+                status                                  :   '',
+                nonvalidated_details                    :   '', 
+
+                // Slide 18
+                facade_image                            :   '',
+                facade_image_original_name              :   '',
+
+                // Slide 19   
+                in_store_image                          :   '',
+                in_store_image_original_name            :   '',
+
+                // Slide 20
+                comment                                 :   ''
             },
 
             willayas                :   [],
@@ -302,7 +350,11 @@ export default {
 
             //
 
-            start_adding_date               :   ""
+            start_adding_date               :   ""  ,
+
+            //
+
+            scanner                         :   null
         }
     },
 
@@ -368,8 +420,11 @@ export default {
             formData.append("JPlan"                                 ,   this.client.JPlan)
             formData.append("Journee"                               ,   this.client.Journee)
 
+            formData.append("CustomerBarCode_image"                 ,   this.client.CustomerBarCode_image)
             formData.append("facade_image"                          ,   this.client.facade_image)
             formData.append("in_store_image"                        ,   this.client.in_store_image)
+
+            formData.append("CustomerBarCode_image_original_name"   ,   this.client.CustomerBarCode_image_original_name)
             formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
             formData.append("in_store_image_original_name"          ,   this.client.in_store_image_original_name)
 
@@ -425,73 +480,134 @@ export default {
 
                 //
 
-                let facade_image_add             =   document.getElementById("facade_image_add")
-                facade_image_add.value           =   ""
+                if(this.scanner) {
 
-                let facade_image_display_add     =   document.getElementById("facade_image_display_add")
-                facade_image_display_add.src     =   ""
+                    this.scanner.clear().then(_ => {
 
-                //
+                    }).catch(error => {
 
-                let in_store_image_add           =   document.getElementById("in_store_image_add")
-                in_store_image_add.value         =   ""
-
-                let in_store_image_display_add   =   document.getElementById("in_store_image_display_add")
-                in_store_image_display_add.src   =   ""
+                    });
+                }
 
                 //
 
-                this.client.facade_image                    =   '',
-                this.client.in_store_image                  =   '',
-                this.client.facade_image_original_name      =   '',
-                this.client.in_store_image_original_name    =   '',
+                let CustomerBarCode_image               =   document.getElementById("CustomerBarCode_image")
+                CustomerBarCode_image.value             =   ""
+
+                let CustomerBarCode_image_display       =   document.getElementById("CustomerBarCode_image_display")
+                CustomerBarCode_image_display.src       =   ""
+
+                //
+
+                let facade_image_add                    =   document.getElementById("facade_image_add")
+                facade_image_add.value                  =   ""
+
+                let facade_image_display_add            =   document.getElementById("facade_image_display_add")
+                facade_image_display_add.src            =   ""
+
+                //
+
+                let in_store_image_add                  =   document.getElementById("in_store_image_add")
+                in_store_image_add.value                =   ""
+
+                let in_store_image_display_add          =   document.getElementById("in_store_image_display_add")
+                in_store_image_display_add.src          =   ""
+
+                //
 
                 // 
                 this.setAddClientAction(null)
 
-                // Client
-                this.client.CustomerCode    =   '',
+                //  //  //  //  //
 
-                this.client.CustomerNameE   =   '',
-                this.client.CustomerNameA   =   '',
-                this.client.Tel             =   '',
+                this.client.id                                      =   '',
 
-                this.client.Address         =   '',
-                this.client.Neighborhood    =   '',
-                this.client.Landmark        =   '',
+                // Slide 1
+                this.client.CustomerCode                            =   '',
 
-                this.client.DistrictNo      =   '',
-                this.client.DistrictNameE   =   '',
+                // Slide 2
+                this.client.CustomerBarCode_image                   =   '',
+                this.client.CustomerBarCode_image_original_name     =   '',
 
-                this.client.CityNo          =   '',
-                this.client.CityNameE       =   '',
+                // Slide 3
+                this.client.CustomerNameE                           =   '',
 
-                this.client.Latitude        =   '',
-                this.client.Longitude       =   '',
+                // Slide 4
+                this.client.CustomerNameA                           =   '',
 
-                // Type
-                this.client.CustomerType            =   '',
-                this.client.BrandAvailability       =   '',
-                this.client.BrandSourcePurchase     =   '',
+                // Slide 5
+                this.client.Tel                                     =   '',
 
-                // Journee Plan
-                this.client.JPlan           =   '',
+                // Slide 6
+                this.client.Latitude                                =   '',
+                this.client.Longitude                               =   '',
 
-                // Journee
-                this.client.Journee         =   '',
+                // Slide 7
+                this.client.Address                                 =   '',
 
-                this.willayas               =   []
-                this.cites                  =   []
+                // Slide 8
+                this.client.Neighborhood                            =   '',
 
-                // Remove Drawings
-                this.removeDrawings()
+                // Slide 9
+                this.client.Landmark                                =   '',
+
+                // Slide 10
+                this.client.DistrictNo                              =   '',
+                this.client.DistrictNameE                           =   '',
+
+                // Slide 11
+                this.client.CityNo                                  =   '',
+                this.client.CityNameE                               =   '',
+
+                // Slide 12
+                this.client.CustomerType                            =   '',
+
+                // Slide 13
+                this.client.BrandAvailability                       =   0,
+
+                // Slide 14
+                this.client.BrandSourcePurchase                     =   '',
+
+                // Slide 15
+                this.client.JPlan                                   =   '',
+
+                // Slide 16 
+                this.client.Journee                                 =   '',
+
+                // Slide 17
+                this.client.status                                  =   '',
+                this.client.nonvalidated_details                    =   '', 
+
+                // Slide 18
+                this.client.facade_image                            =   '',
+                this.client.facade_image_original_name              =   '',
+
+                // Slide 19   
+                this.client.in_store_image                          =   '',
+                this.client.in_store_image_original_name            =   '',
+                this.client.comment                                 =   ''
+
+                //
+                this.willayas                                       =   []
+                this.cites                                          =   []
+
+                this.liste_journey_plan                             =   []  
+                this.liste_journee                                  =   []  
+                this.liste_type_client                              =   []  
+
+                //
+
+                this.all_clients                                    =   []  
+                this.close_clients                                  =   []  
+
+                //
+
+                this.start_adding_date                              =   ""  
+
+                //
+
+                this.scanner                                        =   null
             });
-        },
-
-        removeDrawings() {
-
-            // Remove Drawings
-            this.$map.$removeDrawings()
         },
 
         //
@@ -536,6 +652,8 @@ export default {
             const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
             this.cites                      =   res_3.data
 
+            this.client.CityNo              =   ""
+
             // Hide Loading Page
             this.$hideLoadingPage()
         },
@@ -566,6 +684,55 @@ export default {
 
         //
 
+        async customerBarCodeImage() {
+
+            const CustomerBarCode_image  =   document.getElementById("CustomerBarCode_image").files[0];
+
+            if(CustomerBarCode_image) {
+
+                if(this.$connectedToInternet) {
+
+                    this.client.CustomerBarCode_image_original_name      =   CustomerBarCode_image.name
+                    this.client.CustomerBarCode_image                    =   await this.$compressImage(CustomerBarCode_image)
+
+                    //
+
+                    let CustomerBarCode_image_base64                     =   await this.$imageToBase64(this.client.CustomerBarCode_image)
+
+                    let CustomerBarCode_image_display                    =   document.getElementById("CustomerBarCode_image_display")
+                    this.base64ToImage(CustomerBarCode_image_base64, CustomerBarCode_image_display)
+                }
+
+                else {
+
+                    this.client.CustomerBarCode_image_original_name      =   CustomerBarCode_image.name
+                    this.client.CustomerBarCode_image                    =   await this.$compressImage(CustomerBarCode_image)
+
+                    //
+
+                    this.client.CustomerBarCode_image                    =   await this.$imageToBase64(this.client.CustomerBarCode_image)
+
+                    let CustomerBarCode_image_display                    =   document.getElementById("CustomerBarCode_image_display")
+                    this.base64ToImage(this.client.CustomerBarCode_image, CustomerBarCode_image_display)
+                }
+            }
+
+            else {
+
+                    this.client.CustomerBarCode_image_original_name     =   ""
+                    this.client.CustomerBarCode_image                   =   ""
+
+                    const CustomerBarCode_image_display                 =   document.getElementById("CustomerBarCode_image_display")
+
+                    if(CustomerBarCode_image_display) {
+
+                        CustomerBarCode_image_display.src                   =   ""
+                    }
+            }
+        },
+
+        //
+
         async facadeImage() {
 
             const facade_image  =   document.getElementById("facade_image_add").files[0];
@@ -581,6 +748,19 @@ export default {
 
                 let facade_image_display                    =   document.getElementById("facade_image_display_add")
                 this.base64ToImage(facade_image_base64, facade_image_display)
+            }
+
+            else {
+
+                    this.client.facade_image_original_name      =   ""
+                    this.client.facade_image                    =   ""
+
+                    const facade_image_display                  =   document.getElementById("facade_image_display")
+
+                    if(facade_image_display) {
+
+                        facade_image_display.src                    =   ""
+                    }
             }
         },
 
@@ -601,6 +781,19 @@ export default {
 
                 let in_store_image_display                  =   document.getElementById("in_store_image_display_add")
                 this.base64ToImage(in_store_image_base64, in_store_image_display)
+            }
+
+            else {
+
+                    this.client.in_store_image_original_name    =   ""
+                    this.client.in_store_image                  =   ""
+
+                    const in_store_image_display                =   document.getElementById("in_store_image_display")
+
+                    if(in_store_image_display) {
+
+                        in_store_image_display.src                  =   ""
+                    }
             }
         },
 
@@ -633,9 +826,56 @@ export default {
         getDistance(latitude_1, longitude_1, latitude_2, longitude_2) {
 
             return this.$map.$setDistanceStraight(latitude_1, longitude_1, latitude_2, longitude_2)
-        }
+        },
 
         //
+
+        async setBarCodeReader() {
+
+            const reader    =   document.getElementById('reader')
+
+            // 
+            this.client.CustomerCode    =   ""
+
+            if(reader) {
+
+                reader.style.display        =   "block";
+
+                //
+                this.scanner = new Html5QrcodeScanner('reader', {
+
+                    qrbox   : {
+                        width   : 250,
+                        height  : 250,
+                    },
+
+                    fps     : 20
+                });
+
+                try {
+                    await this.scanner.render(this.success, this.error);
+                } catch (error) {
+                    console.error('Error rendering scanner:', error);
+                }
+            }
+        },
+
+        success(result) {
+             
+            // 
+            this.client.CustomerCode    =   result
+
+            this.scanner.clear();
+
+            document.getElementById('reader').style.display =   "none"
+            // Removes reader element from DOM since no longer needed 
+        },
+
+        error(err) {
+
+            // Prints any errors to the console
+            console.error("");
+        },
     },
 
     watch : {
@@ -655,6 +895,6 @@ export default {
             this.liste_type_client      =   new_liste_type_client
         }
     }
-
 };
+
 </script>

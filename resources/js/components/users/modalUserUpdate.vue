@@ -179,7 +179,6 @@ export default {
             formData.append("liste_route_import"        , JSON.stringify(this.user.liste_route_import))
 
             const res   =   await this.$callApi('post' ,   '/users/'+this.user.id+'/update'    ,   formData)         
-            console.log(res)
 
             // Hide Loading Page
             this.$hideLoadingPage()
@@ -233,7 +232,6 @@ export default {
         async getUserData(user) {
 
             const res                   =   await this.$callApi("post"  ,   "/users/"+user.id+"/show"    ,   null)
-            console.log(res)
 
             this.user.nom_original          =   res.data.nom
 
