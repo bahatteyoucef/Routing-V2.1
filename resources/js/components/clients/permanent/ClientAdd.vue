@@ -577,6 +577,8 @@ export default {
                 const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
                 this.cites                      =   res_3.data
 
+                this.client.CityNo              =   ""
+
                 // Hide Loading Page
                 this.$hideLoadingPage()
             }
@@ -590,6 +592,8 @@ export default {
                 console.log(willaya)
 
                 this.cites                      =   willaya.cites
+
+                this.client.CityNo              =   ""
 
                 // Hide Loading Page
                 this.$hideLoadingPage()

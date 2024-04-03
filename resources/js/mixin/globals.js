@@ -1140,17 +1140,14 @@ export default {
 
         $checkMarkerInsideUserPolygonsWithoutMap(point_latitude, point_longitude ,polygons_latitude_longitude_array) {
 
-            for (let index = 0; index < polygons_latitude_longitude_array.length; index++) {
+            // Create a point
+            let point   =   L.latLng(point_latitude, point_longitude);
 
-                console.log(JSON.parse(polygons_latitude_longitude_array[index].latlngs))
-                console.log(point_latitude)
-                console.log(point_longitude)
+            //
+            for (let index = 0; index < polygons_latitude_longitude_array.length; index++) {
 
                 // Initialize a polygon using Leaflet
                 let polygon     =   L.polygon(JSON.parse(polygons_latitude_longitude_array[index].latlngs));
-
-                // Create a point
-                let point       =   L.latLng(point_latitude, point_longitude);
 
                 // Check if the point is inside the polygon
                 let isInside    =   polygon.contains(point);
