@@ -10,151 +10,154 @@
                     <headerComponent    v-if="route_import&&($isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice'))"     :title="'List of clients du route import : '+route_import.libelle"      :add_modal="'addClientModal'"  :update_modal="'updateClientModal'"    :add_button="'New Client'"   
                                                                                                                                         :update_button="'Update Client'"                                        />
 
-                    <!-- Table -->
-                    <table  v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')" class="table table-bordered clickable_table" id="route_import_client_index">
-                        <thead>
-                            <tr>
-                                <th class="col-sm-1">Index</th>
-
-                                <th class="col-sm-2">CustomerCode</th>
-                                <th class="col-sm-2">CustomerNameE</th>
-                                <th class="col-sm-2">CustomerNameA</th>
-
-                                <th class="col-sm-2">Latitude</th>
-                                <th class="col-sm-2">Longitude</th>
-
-                                <th class="col-sm-2">Address</th>
-
-                                <!-- <th class="col-sm-1">DistrictNo</th> -->
-                                <th class="col-sm-2">DistrictNameE</th>
-
-                                <!-- <th class="col-sm-1">CityNo</th> -->
-                                <th class="col-sm-2">CityNameE</th>
-
-                                <th class="col-sm-2">Tel</th>
-
-                                <th class="col-sm-1">CustomerType</th>
-
-                                <th class="col-sm-2">JPlan</th>
-
-                                <th class="col-sm-2">Journee</th>
-
-                                <!--  -->
-
-                                <th class="col-sm-2">Owner</th>
-                                <th class="col-sm-2">Created At</th>
-                                <th class="col-sm-2">Status</th>
-
-                            </tr>
-                        </thead>
-
-                        <thead>
-                            <tr class="route_import_client_index_filters">
-
-                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Index"            /></th>
-
-                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
-                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
-                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
-
-                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Latitude"         /></th>
-                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Longitude"        /></th>
-
-                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Address"          /></th>
-
-                                <!-- <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="DistrictNo"       /></th> -->
-                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="DistrictNameE"    /></th>
-
-                                <!-- <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CityNo"           /></th> -->
-                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CityNameE"        /></th>
-
-                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Tel"              /></th>
-
-                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerType"     /></th>
-
-                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="JPlan"            /></th>
-
-                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Journee"          /></th>
-
-                                <!--  -->
-
-                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Owner"            /></th>
-                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Created_At"       /></th>
-                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Status"           /></th>
-                            </tr>
-                        </thead>
-                        
-                        <tbody>
-                            <tr v-for="client, index in clients" :key="client" @click="selectRow(client)" role="button"   :id="'route_import_client_index_'+client.id">
-                                <td>{{index +   1}}</td>
-
-                                <td>{{client.CustomerCode}}</td>
-                                <td>{{client.CustomerNameE}}</td>
-                                <td>{{client.CustomerNameA}}</td>
-
-                                <td>{{client.Latitude}}</td>
-                                <td>{{client.Longitude}}</td>
-
-                                <td>{{client.Address}}</td>
-
-                                <!-- <td>{{client.DistrictNo}}</td> -->
-                                <td>{{client.DistrictNameE}}</td>
-
-                                <!-- <td>{{client.CityNo}}</td> -->
-                                <td>{{client.CityNameE}}</td>
-
-                                <td>{{client.Tel}}</td>
-
-                                <td>{{client.CustomerType}}</td>
-
-                                <td>{{client.JPlan}}</td>
-
-                                <td>{{client.Journee}}</td>
-
-                                <!--  -->
-
-                                <td>{{client.owner_name}}</td>
-                                <td>{{client.created_at}}</td>
-
-                                <td>
-                                    <span v-if="client.status=='nonvalidated'"  href="#" class="badge badge-danger">{{client.status}}</span>
-                                    <span v-if="client.status=='pending'"       href="#" class="badge badge-warning">{{client.status}}</span>
-                                    <span v-if="client.status=='validated'"     href="#" class="badge badge-success">{{client.status}}</span>
-                                </td>
-
-                            </tr>
-                        </tbody>
-                    </table>
-
                     <!--  -->
 
-                    <!-- Table -->
-                    <table v-if="$isRole('FrontOffice')" class="table table-bordered clickable_table" id="route_import_client_index" style="table-layout : fixed">
-                        <thead>
-                            <tr>
-                                <th class="col">Customer</th>
-                                <th class="col">City</th>
-                                <th class="col">Tel</th>
-                            </tr>
-                        </thead>
+                    <div id="route_import_client_index_parent" class="scrollbar scrollbar-deep-blue">
+                        <table class="table route_import_client_index" id="route_import_client_index">
+                            <thead>
+                                <tr>
+                                    <th class="col-sm-1">Index</th>
 
-                        <thead>
-                            <tr class="route_import_client_index_filters">
+                                    <th class="col-sm-2">CustomerCode</th>
 
-                                <th><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
-                                <th><input type="text" class="form-control form-control-sm" placeholder="CityNameE"        /></th>
-                                <th><input type="text" class="form-control form-control-sm" placeholder="Tel"              /></th>
-                            </tr>
-                        </thead>
-                        
-                        <tbody>
-                            <tr v-for="client in clients" :key="client" @click="selectRow(client)" role="button"   :id="'route_import_client_index_'+client.id">
-                                <td style="white-space: break-spaces;">{{client.CustomerNameE}}</td>
-                                <td style="white-space: break-spaces;">{{client.CityNameE}}</td>
-                                <td style="white-space: break-spaces;">{{client.Tel}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                    <th class="col-sm-2">CustomerNameE</th>
+                                    <th class="col-sm-2">CustomerNameA</th>
+
+                                    <th class="col-sm-1">DistrictNo</th>
+                                    <th class="col-sm-2">DistrictNameE</th>
+
+                                    <th class="col-sm-1">CityNo</th>
+                                    <th class="col-sm-2">CityNameE</th>
+
+                                    <th class="col-sm-2">Address</th>
+                                    <th class="col-sm-2">Neighborhood</th>
+                                    <th class="col-sm-2">Landmark</th>
+
+                                    <th class="col-sm-2">Latitude</th>
+                                    <th class="col-sm-2">Longitude</th>
+
+                                    <th class="col-sm-2">Tel</th>
+
+                                    <th class="col-sm-1">CustomerType</th>
+
+                                    <th class="col-sm-2">JPlan</th>
+
+                                    <th class="col-sm-2">Journee</th>
+
+                                    <!--  -->
+
+                                    <th class="col-sm-2">Comment</th>
+                                    <th class="col-sm-2">BrandAvailability</th>
+                                    <th class="col-sm-2">BrandSourcePurchase</th>
+                                    <th class="col-sm-2">Start Adding Time</th>
+                                    <th class="col-sm-2">Adding Duration</th>
+
+                                    <!--  -->
+
+                                    <th class="col-sm-2">Created At</th>
+                                    <th class="col-sm-2">Status</th>
+                                    <th class="col-sm-2">Owner</th>
+                                </tr>
+                            </thead>
+
+                            <thead>
+                                <tr class="route_import_client_index_filters">
+
+                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Index"            /></th>
+
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
+
+                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="DistrictNo"       /></th>
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="DistrictNameE"    /></th>
+
+                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CityNo"           /></th>
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CityNameE"        /></th>
+
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Address"          /></th>
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Neighborhood"     /></th>
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Landmark"         /></th>
+
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Latitude"         /></th>
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Longitude"        /></th>
+
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Tel"              /></th>
+
+                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerType"     /></th>
+
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="JPlan"            /></th>
+
+                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Journee"          /></th>
+
+                                    <!--  -->
+
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Comment"              /></th>
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="BrandAvailability"    /></th>
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="BrandSourcePurchase"  /></th>
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Start Adding Time"    /></th>
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Adding Duration"      /></th>
+
+                                    <!--  -->
+
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Created_At"       /></th>
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Status"           /></th>
+                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Owner"            /></th>
+                                </tr>
+                            </thead>
+                            
+                            <tbody>
+                                <tr v-for="client, index in clients" :key="client" @click="selectRow(client)" role="button"   :id="'route_import_client_index_'+client.id">
+                                    <td>{{index +   1}}</td>
+
+                                    <td>{{client.CustomerCode}}</td>
+                                    <td>{{client.CustomerNameE}}</td>
+                                    <td>{{client.CustomerNameA}}</td>
+
+                                    <td>{{client.DistrictNo}}</td>
+                                    <td>{{client.DistrictNameE}}</td>
+
+                                    <td>{{client.CityNo}}</td>
+                                    <td>{{client.CityNameE}}</td>
+
+                                    <td>{{client.Address}}</td>
+                                    <td>{{client.Neighborhood}}</td>
+                                    <td>{{client.Landmark}}</td>
+
+                                    <td>{{client.Latitude}}</td>
+                                    <td>{{client.Longitude}}</td>
+
+                                    <td>{{client.Tel}}</td>
+
+                                    <td>{{client.CustomerType}}</td>
+
+                                    <td>{{client.JPlan}}</td>
+
+                                    <td>{{client.Journee}}</td>
+
+                                    <!--  -->
+
+                                    <td>{{client.comment}}</td>
+                                    <td>{{client.BrandAvailability}}</td>
+                                    <td>{{client.BrandSourcePurchase}}</td>
+                                    <td>{{client.start_adding_time}}</td>
+                                    <td>{{client.adding_duration}}</td>
+
+                                    <!--  -->
+                                    <td>{{client.created_at}}</td>
+
+                                    <td>
+                                        <span v-if="client.status=='nonvalidated'"  href="#" class="badge badge-danger">{{client.status}}</span>
+                                        <span v-if="client.status=='pending'"       href="#" class="badge badge-warning">{{client.status}}</span>
+                                        <span v-if="client.status=='validated'"     href="#" class="badge badge-success">{{client.status}}</span>
+                                    </td>
+
+                                    <td>{{client.owner_name}}</td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
                 </div>
             </div>
@@ -324,7 +327,7 @@ export default {
 
             try {
 
-                if(this.$isRole("Super Admin")||$isRole('BU Manager')||this.$isRole("BackOffice")) {
+                if(this.$isRole("Super Admin")||this.$isRole('BU Manager')||this.$isRole("BackOffice")) {
 
                     let client      =   { lat : 0, lng : 0 }
 
@@ -341,7 +344,7 @@ export default {
 
             try {
 
-                if(this.$isRole("Super Admin")||$isRole('BU Manager')||this.$isRole("BackOffice")) {
+                if(this.$isRole("Super Admin")||this.$isRole('BU Manager')||this.$isRole("BackOffice")) {
 
                     this.$refs.modalClientUpdate.getData(this.selected_row, this.clients)
                 }
@@ -366,32 +369,42 @@ export default {
             new_client.CustomerNameA    =   client.CustomerNameA
             new_client.Tel              =   client.Tel
 
-            new_client.Address          =   client.Address
-            new_client.DistrictNo       =   client.DistrictNo      
-            new_client.DistrictNameE    =   client.DistrictNameE   
-            new_client.CityNo           =   client.CityNo           
-            new_client.CityNameE        =   client.CityNameE       
-
             new_client.Latitude         =   client.Latitude         
             new_client.Longitude        =   client.Longitude        
 
+            new_client.Address          =   client.Address
+            new_client.Neighborhood     =   client.Neighborhood
+            new_client.Landmark         =   client.Landmark
+
+            new_client.DistrictNo       =   client.DistrictNo      
+            new_client.DistrictNameE    =   client.DistrictNameE 
+
+            new_client.CityNo           =   client.CityNo           
+            new_client.CityNameE        =   client.CityNameE       
+
             new_client.CustomerType     =   client.CustomerType     
 
-            new_client.JPlan            =   client.JPlan            
-            new_client.Journee          =   client.Journee        
+            new_client.BrandAvailability        =   client.BrandAvailability       
+            new_client.BrandSourcePurchase      =   client.BrandSourcePurchase       
 
-            new_client.facade_image                     =   client.facade_image
-            new_client.in_store_image                   =   client.in_store_image
-            new_client.facade_image_original_name       =   client.facade_image_original_name
-            new_client.in_store_image_original_name     =   client.in_store_image_original_name
+            new_client.JPlan                    =   client.JPlan            
+            new_client.Journee                  =   client.Journee        
 
-            new_client.status           =   client.status            
+            new_client.status                   =   client.status            
+            new_client.nonvalidated_details     =   client.nonvalidated_details        
+
+            new_client.comment                  =   client.comment
+
+            new_client.facade_image                         =   client.facade_image            
+            new_client.in_store_image                       =   client.in_store_image        
+            new_client.facade_image_original_name           =   client.facade_image_original_name            
+            new_client.in_store_image_original_name         =   client.in_store_image_original_name        
+            new_client.CustomerBarCode_image                =   client.CustomerBarCode_image            
+            new_client.CustomerBarCode_image_original_name  =   client.CustomerBarCode_image_original_name        
+
             new_client.owner_name       =   this.getUser.nom
             new_client.created_at       =   this.$formatDate(new Date())
-
-            new_client.status                  =   client.status            
-            new_client.nonvalidated_details    =   client.nonvalidated_details        
-
+ 
             this.clients.push(new_client)
 
             //
@@ -412,35 +425,44 @@ export default {
                 
                 if(this.clients[i].id  ==  client.id) {
 
-                    // Update Client
+                    this.clients[i].CustomerCode   =   client.CustomerCode
 
-                    this.clients[i].CustomerCode        =   client.CustomerCode
+                    this.clients[i].CustomerNameE  =   client.CustomerNameE
+                    this.clients[i].CustomerNameA  =   client.CustomerNameA
+                    this.clients[i].Tel            =   client.Tel
 
-                    this.clients[i].CustomerNameE       =   client.CustomerNameE
-                    this.clients[i].CustomerNameA       =   client.CustomerNameA
-                    this.clients[i].Tel                 =   client.Tel
+                    this.clients[i].Latitude       =   client.Latitude         
+                    this.clients[i].Longitude      =   client.Longitude        
 
-                    this.clients[i].Address             =   client.Address
-                    this.clients[i].DistrictNo          =   client.DistrictNo      
-                    this.clients[i].DistrictNameE       =   client.DistrictNameE   
-                    this.clients[i].CityNo              =   client.CityNo           
-                    this.clients[i].CityNameE           =   client.CityNameE       
+                    this.clients[i].Address        =   client.Address
+                    this.clients[i].Neighborhood   =   client.Neighborhood
+                    this.clients[i].Landmark       =   client.Landmark
 
-                    this.clients[i].Latitude            =   client.Latitude         
-                    this.clients[i].Longitude           =   client.Longitude        
+                    this.clients[i].DistrictNo     =   client.DistrictNo      
+                    this.clients[i].DistrictNameE  =   client.DistrictNameE  
 
-                    this.clients[i].CustomerType        =   client.CustomerType     
+                    this.clients[i].CityNo         =   client.CityNo           
+                    this.clients[i].CityNameE      =   client.CityNameE       
 
-                    this.clients[i].JPlan               =   client.JPlan            
-                    this.clients[i].Journee             =   client.Journee        
+                    this.clients[i].CustomerType   =   client.CustomerType     
 
-                    this.clients[i].facade_image                     =   client.facade_image
-                    this.clients[i].in_store_image                   =   client.in_store_image
-                    this.clients[i].facade_image_original_name       =   client.facade_image_original_name
-                    this.clients[i].in_store_image_original_name     =   client.in_store_image_original_name
+                    this.clients[i].BrandAvailability      =   client.BrandAvailability       
+                    this.clients[i].BrandSourcePurchase    =   client.BrandSourcePurchase       
 
-                    this.clients[i].status                  =   client.status            
-                    this.clients[i].nonvalidated_details    =   client.nonvalidated_details        
+                    this.clients[i].JPlan              =   client.JPlan            
+                    this.clients[i].Journee            =   client.Journee        
+
+                    this.clients[i].status                 =   client.status            
+                    this.clients[i].nonvalidated_details   =   client.nonvalidated_details        
+
+                    this.clients[i].comment                =   client.comment        
+
+                    this.clients[i].facade_image                           =   client.facade_image            
+                    this.clients[i].in_store_image                         =   client.in_store_image        
+                    this.clients[i].facade_image_original_name             =   client.facade_image_original_name            
+                    this.clients[i].in_store_image_original_name           =   client.in_store_image_original_name        
+                    this.clients[i].CustomerBarCode_image                  =   client.CustomerBarCode_image            
+                    this.clients[i].CustomerBarCode_image_original_name    =   client.CustomerBarCode_image_original_name        
 
                     break
                 }
@@ -542,3 +564,12 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+
+#route_import_client_index_parent {
+
+    overflow : auto;
+}
+
+</style>

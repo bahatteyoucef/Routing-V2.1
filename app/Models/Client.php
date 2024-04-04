@@ -188,35 +188,20 @@ class Client extends Model
 
         $validator->sometimes(['CustomerBarCode_image'],  ["file"] , function (Fluent $input) {
     
-            return $input->CustomerBarCode_image    !=  "";
+            return $input->CustomerBarCode_image_original_name      !=  "";
         });
         
         $validator->sometimes(['facade_image'],  ["file"] , function (Fluent $input) {
     
-            return $input->facade_image             !=  "";
+            return $input->facade_image_original_name               !=  "";
         });
 
         $validator->sometimes(['in_store_image'],  ["file"] , function (Fluent $input) {
     
-            return $input->in_store_image           !=  "";
+            return $input->in_store_image_original_name             !=  "";
         });
 
         //
-
-        $validator->sometimes(['CustomerBarCode_image_original_name'],  ["required"] , function (Fluent $input) {
-    
-            return $input->CustomerBarCode_image    !=  "";
-        });
-
-        $validator->sometimes(['facade_image_original_name'],  ["required"] , function (Fluent $input) {
-    
-            return $input->facade_image             !=  "";
-        });
-
-        $validator->sometimes(['in_store_image_original_name'],  ["required"] , function (Fluent $input) {
-    
-            return $input->in_store_image           !=  "";
-        });
 
         return $validator;
     }
@@ -433,34 +418,17 @@ class Client extends Model
 
         $validator->sometimes(['CustomerBarCode_image'],  ["file"] , function (Fluent $input) {
     
-            return $input->CustomerBarCode_image    !=  "";
+            return (($input->CustomerBarCode_image_original_name    !=  "")&&($input->CustomerBarCode_image_updated     ==  "true"));
         });
         
         $validator->sometimes(['facade_image'],  ["file"] , function (Fluent $input) {
     
-            return $input->facade_image             !=  "";
+            return (($input->facade_image_original_name             !=  "")&&($input->facade_image_updated              ==  "true"));
         });
 
         $validator->sometimes(['in_store_image'],  ["file"] , function (Fluent $input) {
     
-            return $input->in_store_image           !=  "";
-        });
-
-        //
-
-        $validator->sometimes(['CustomerBarCode_image_original_name'],  ["required"] , function (Fluent $input) {
-    
-            return $input->CustomerBarCode_image    !=  "";
-        });
-
-        $validator->sometimes(['facade_image_original_name'],  ["required"] , function (Fluent $input) {
-    
-            return $input->facade_image             !=  "";
-        });
-
-        $validator->sometimes(['in_store_image_original_name'],  ["required"] , function (Fluent $input) {
-    
-            return $input->in_store_image           !=  "";
+            return (($input->in_store_image_original_name           !=  "")&&($input->in_store_image_updated            ==  "true"));
         });
 
         return $validator;
@@ -522,6 +490,10 @@ class Client extends Model
 
             if($request->get("CustomerBarCode_image_updated")    ==  "true") {
 
+                $old_CustomerBarCode_image  =   $client->CustomerBarCode_image;                             
+
+                //
+
                 if($request->hasFile("CustomerBarCode_image")) {
 
                     $fileName                           =   uniqid().'.'.$request->file("CustomerBarCode_image")->getClientOriginalExtension();
@@ -535,11 +507,26 @@ class Client extends Model
 
                     $client->CustomerBarCode_image      =   "";
                 }
+
+                // Delete Old CustomerBarCode_image
+                if($old_CustomerBarCode_image   !=  "") {
+
+                    $filePath       =   public_path('uploads/clients/'.$client->id.'/'.$old_CustomerBarCode_image);  
+
+                    if (file_exists($filePath)) {
+
+                        unlink($filePath);
+                    }
+                }
             }
 
             //
 
             if($request->get("facade_image_updated")    ==  "true") {
+
+                $old_facade_image  =   $client->facade_image;                             
+
+                //
 
                 if($request->hasFile("facade_image")) {
 
@@ -554,11 +541,26 @@ class Client extends Model
 
                     $client->facade_image       =   "";
                 }
+
+                // Delete Old facade_image
+                if($old_facade_image   !=  "") {
+
+                    $filePath       =   public_path('uploads/clients/'.$client->id.'/'.$old_facade_image);  
+
+                    if (file_exists($filePath)) {
+
+                        unlink($filePath);
+                    }
+                }
             }
 
             //
 
             if($request->get("in_store_image_updated")  ==  "true") {
+
+                $old_in_store_image  =   $client->in_store_image;                             
+
+                //
 
                 if($request->hasFile("in_store_image")) {
 
@@ -572,6 +574,17 @@ class Client extends Model
                 else {
 
                     $client->in_store_image     =   "";
+                }
+
+                // Delete Old in_store_image
+                if($old_in_store_image   !=  "") {
+
+                    $filePath       =   public_path('uploads/clients/'.$client->id.'/'.$old_in_store_image);  
+
+                    if (file_exists($filePath)) {
+
+                        unlink($filePath);
+                    }
                 }
             }
 

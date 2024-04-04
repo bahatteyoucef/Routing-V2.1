@@ -22,56 +22,61 @@
                         <table class="table table-striped datatable_client_double_tel" id="datatable_client_double_tel">
                             <thead>
                                 <tr>
-                                    <th class="col-sm-1">CustomerCode (CustomerCode)</th>
-                                    <th class="col-sm-1">CustomerNameE (CustomerNameE)</th>
-                                    <th class="col-sm-1">CustomerNameA (CustomerNameA)</th>
+                                    <th class="col-sm-2">CustomerCode</th>
 
-                                    <th class="col-sm-2">Latitude (Latitude)</th>
-                                    <th class="col-sm-2">Longitude (Longitude)</th>
+                                    <th class="col-sm-2">CustomerNameE</th>
+                                    <th class="col-sm-2">CustomerNameA</th>
 
-                                    <th class="col-sm-2">Address (Address)</th>
+                                    <th class="col-sm-1">DistrictNo</th>
+                                    <th class="col-sm-2">DistrictNameE</th>
 
-                                    <th class="col-sm-1">DistrictNo (DistrictNo)</th>
-                                    <th class="col-sm-2">DistrictNameE (DistrictNameE)</th>
+                                    <th class="col-sm-1">CityNo</th>
+                                    <th class="col-sm-2">CityNameE</th>
 
-                                    <th class="col-sm-1">CityNo (CityNo)</th>
-                                    <th class="col-sm-2">CityNameE (CityNameE)</th>
+                                    <th class="col-sm-2">Address</th>
+                                    <th class="col-sm-2">Neighborhood</th>
+                                    <th class="col-sm-2">Landmark</th>
 
-                                    <th class="col-sm-2">Phone Number (Tel)</th>
+                                    <th class="col-sm-2">Latitude</th>
+                                    <th class="col-sm-2">Longitude</th>
 
-                                    <th class="col-sm-1">CustomerType (CustomerType)</th>
+                                    <th class="col-sm-2">Tel</th>
 
-                                    <th class="col-sm-2">JPlan (JPlan)</th>
+                                    <th class="col-sm-1">CustomerType</th>
 
-                                    <th class="col-sm-1">WorkDay (Journee)</th>
+                                    <th class="col-sm-2">JPlan</th>
+
+                                    <th class="col-sm-2">Journee</th>
                                 </tr>
                             </thead>
 
                             <thead>
                                 <tr class="datatable_client_double_tel_filters">
 
-                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
-                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
-                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
 
-                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Latitude"         /></th>
-                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Longitude"        /></th>
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="DistrictNo"       /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="DistrictNameE"    /></th>
 
-                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Address"          /></th>
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CityNo"           /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CityNameE"        /></th>
 
-                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="DistrictNo"       /></th>
-                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="DistrictNameE"    /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Address"          /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Neighborhood"     /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Landmark"         /></th>
 
-                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CityNo"           /></th>
-                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CityNameE"        /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Latitude"         /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Longitude"        /></th>
 
-                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Tel"              /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Tel"              /></th>
 
-                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerType"     /></th>
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerType"     /></th>
 
-                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="JPlan"            /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="JPlan"            /></th>
 
-                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Journee"          /></th>
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Journee"          /></th>
                                 </tr>
                             </thead>
 
@@ -81,16 +86,18 @@
                                     <td>{{client.CustomerNameE}}</td>
                                     <td>{{client.CustomerNameA}}</td>
 
-                                    <td>{{client.Latitude}}</td>
-                                    <td>{{client.Longitude}}</td>
-
-                                    <td>{{client.Address}}</td>
-
                                     <td>{{client.DistrictNo}}</td>
                                     <td>{{client.DistrictNameE}}</td>
 
                                     <td>{{client.CityNo}}</td>
                                     <td>{{client.CityNameE}}</td>
+
+                                    <td>{{client.Address}}</td>
+                                    <td>{{client.Neighborhood}}</td>
+                                    <td>{{client.Landmark}}</td>
+
+                                    <td>{{client.Latitude}}</td>
+                                    <td>{{client.Longitude}}</td>
 
                                     <td>{{client.Tel}}</td>
 

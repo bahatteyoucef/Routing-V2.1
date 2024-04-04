@@ -40,6 +40,16 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="Neighborhood"       class="form-label">Neighborhood (Neighborhood)</label>
+                            <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Landmark"           class="form-label">Landmark (Landmark)</label>
+                            <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"></textarea>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="DistrictNo"         class="form-label">DistrictNo (DistrictNo)</label>
                             <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()">
                                 <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
@@ -88,32 +98,6 @@
                             <input type="text"              class="form-control"        id="Journee"           v-model="client.Journee">
                         </div>
 
-                        <!--  -->
-
-                        <!-- <hr />
-
-                        <h5>Nearby Clients</h5>
-
-                        <hr />
-
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th class="col-sm-1">CustomerNameE</th>
-                                    <th class="col-sm-2">Tel</th>
-                                    <th class="col-sm-1">CustomerType</th>
-                                </tr>
-                            </thead>
-                            
-                            <tbody>
-                                <tr v-for="client in close_clients" :key="client">
-                                    <td>{{client.CustomerNameE}}</td>
-                                    <td>{{client.Tel}}</td>
-                                    <td>{{client.CustomerType}}</td>
-                                </tr>
-                            </tbody>
-                        </table> -->
-
                     </form>
 
                 </div>
@@ -147,34 +131,81 @@ export default {
 
             client      :   {
 
-                // Client
-                id                  :   '',
+                id                                      :   '',
 
-                CustomerCode        :   '',
+                // Slide 1
+                CustomerCode                            :   '',
 
-                old_CustomerNameE   :   '',
+                // Slide 2
+                CustomerBarCode_image                   :   '',
+                CustomerBarCode_image_original_name     :   '',
 
-                CustomerNameE       :   '',
-                CustomerNameA       :   '',
-                Tel                 :   '',
+                // Slide 3
+                CustomerNameE                           :   '',
+                old_CustomerNameE                       :   '',
 
-                Address             :   '',
+                // Slide 4
+                CustomerNameA                           :   '',
 
-                DistrictNo          :   '',
-                DistrictNameE       :   '',
+                // Slide 5
+                Tel                                     :   '',
 
-                CityNo              :   '',
-                CityNameE           :   '',
+                // Slide 6
+                Latitude                                :   '',
+                Longitude                               :   '',
 
-                Latitude            :   '',
-                Longitude           :   '',
+                // Slide 7
+                Address                                 :   '',
 
-                // Type
-                CustomerType        :   '',
+                // Slide 8
+                Neighborhood                            :   '',
 
-                // Journey Plan
-                JPlan               :   '',
-                Journee             :   ''
+                // Slide 9
+                Landmark                                :   '',
+
+                // Slide 10
+                DistrictNo                              :   '',
+                DistrictNameE                           :   '',
+
+                // Slide 11
+                CityNo                                  :   '',
+                CityNameE                               :   '',
+
+                // Slide 12
+                CustomerType                            :   '',
+
+                // Slide 13
+                BrandAvailability                       :   0,
+
+                // Slide 14
+                BrandSourcePurchase                     :   '',
+
+                // Slide 15
+                JPlan                                   :   '',
+
+                // Slide 16 
+                Journee                                 :   '',
+
+                // Slide 17
+                status                                  :   '',
+                status_original                         :   '',
+                nonvalidated_details                    :   '', 
+
+                // Slide 18
+                facade_image                            :   '',
+                facade_image_original_name              :   '',
+
+                // Slide 19   
+                in_store_image                          :   '',
+                in_store_image_original_name            :   '',
+
+                // Slide 20
+                comment                                 :   '',
+
+                //
+                CustomerBarCode_image_updated           :   false,
+                facade_image_updated                    :   false,
+                in_store_image_updated                  :   false,
             },
 
             willayas                        :   []  ,
@@ -213,20 +244,26 @@ export default {
 
             let formData = new FormData();
 
-            formData.append("CustomerCode"  ,   this.client.CustomerCode)
-            formData.append("CustomerNameE" ,   this.client.CustomerNameE)
-            formData.append("CustomerNameA" ,   this.client.CustomerNameA)
-            formData.append("Latitude"      ,   this.client.Latitude)
-            formData.append("Longitude"     ,   this.client.Longitude)
-            formData.append("Address"       ,   this.client.Address)
-            formData.append("DistrictNo"    ,   this.client.DistrictNo)
-            formData.append("DistrictNameE" ,   this.client.DistrictNameE)
-            formData.append("CityNo"        ,   this.client.CityNo)
-            formData.append("CityNameE"     ,   this.client.CityNameE)
-            formData.append("Tel"           ,   this.client.Tel)
-            formData.append("CustomerType"  ,   this.client.CustomerType)
-            formData.append("JPlan"         ,   this.client.JPlan)
-            formData.append("Journee"       ,   this.client.Journee)
+            formData.append("CustomerCode"                  ,   this.client.CustomerCode)
+            formData.append("CustomerNameE"                 ,   this.client.CustomerNameE)
+            formData.append("CustomerNameA"                 ,   this.client.CustomerNameA)
+            formData.append("Latitude"                      ,   this.client.Latitude)
+            formData.append("Longitude"                     ,   this.client.Longitude)
+            formData.append("Address"                       ,   this.client.Address)
+            formData.append("Neighborhood"                  ,   this.client.Neighborhood)
+            formData.append("Landmark"                      ,   this.client.Landmark)
+
+            formData.append("DistrictNo"                    ,   this.client.DistrictNo)
+            formData.append("DistrictNameE"                 ,   this.client.DistrictNameE)
+            formData.append("CityNo"                        ,   this.client.CityNo)
+            formData.append("CityNameE"                     ,   this.client.CityNameE)
+            formData.append("Tel"                           ,   this.client.Tel)
+            formData.append("CustomerType"                  ,   this.client.CustomerType)
+            formData.append("BrandAvailability"             ,   this.client.BrandAvailability)
+            formData.append("BrandSourcePurchase"           ,   this.client.BrandSourcePurchase)
+
+            formData.append("JPlan"                         ,   this.client.JPlan)
+            formData.append("Journee"                       ,   this.client.Journee)
 
             const res                   =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.id_route_import_tempo+"/clients_tempo/"+this.client.id+"/update",   formData)
             console.log(res.data)
@@ -324,33 +361,68 @@ export default {
             $(id_modal).on("hidden.bs.modal",   ()  => {
 
                 // Client
-                this.client.CustomerCode        =   '',
+                this.client.id                                      =   '',
 
-                this.client.old_CustomerNameE   =   '',
+                // Slide 1
+                this.client.CustomerCode                            =   '',
 
-                this.client.CustomerNameE       =   '',
-                this.client.CustomerNameA       =   '',
-                this.client.Tel                 =   '',
+                // Slide 3
+                this.client.old_CustomerNameE                       =   '',
+                this.client.CustomerNameE                           =   '',
 
-                this.client.Address             =   '',
+                // Slide 4
+                this.client.CustomerNameA                           =   '',
 
-                this.client.DistrictNo          =   '',
-                this.client.DistrictNameE       =   '',
+                // Slide 5
+                this.client.Tel                                     =   '',
 
-                this.client.CityNo              =   '',
-                this.client.CityNameE           =   '',
+                // Slide 6
+                this.client.Latitude                                =   '',
+                this.client.Longitude                               =   '',
 
-                this.client.Latitude            =   '',
-                this.client.Longitude           =   '',
+                // Slide 7
+                this.client.Address                                 =   '',
 
-                // Type
-                this.client.CustomerType        =   '',
+                // Slide 8
+                this.client.Neighborhood                            =   '',
 
-                // Journey Plan
-                this.client.JPlan               =   '',
+                // Slide 9
+                this.client.Landmark                                =   '',
 
-                this.willayas                   =   []
-                this.cites                      =   []
+                // Slide 10
+                this.client.DistrictNo                              =   '',
+                this.client.DistrictNameE                           =   '',
+
+                // Slide 11
+                this.client.CityNo                                  =   '',
+                this.client.CityNameE                               =   '',
+
+                // Slide 12
+                this.client.CustomerType                            =   '',
+
+                // Slide 13
+                this.client.BrandAvailability                       =   0,
+
+                // Slide 14
+                this.client.BrandSourcePurchase                     =   '',
+
+                // Slide 15
+                this.client.JPlan                                   =   '',
+
+                // Slide 16 
+                this.client.Journee                                 =   '',
+
+                //
+
+                this.willayas                                       =   []  ,
+                this.cites                                          =   []  ,
+
+                this.liste_journey_plan                             =   []  ,
+                this.liste_journee                                  =   []  ,
+                this.liste_type_client                              =   []  ,
+
+                this.all_clients                                    =   []  ,
+                this.close_clients                                  =   []
             });
         },
 
@@ -358,11 +430,11 @@ export default {
 
             this.getClientData(client)  
             this.getComboData()  
-
-            // this.checkClients()
         },
 
         async getClientData(client) {
+
+            console.log(client)
 
             this.client.id                  =   client.id
 
@@ -378,6 +450,8 @@ export default {
             this.client.Address             =   client.Address
             this.client.DistrictNo          =   client.DistrictNo
 
+            await this.getCites()
+
             this.client.CityNo              =   client.CityNo
 
             this.client.Tel                 =   client.Tel
@@ -387,10 +461,6 @@ export default {
             this.client.JPlan               =   client.JPlan
 
             this.client.Journee             =   client.Journee
-
-            this.setJoursGetData(client)
-
-            await this.getCites()
         },
 
         async getComboData() {
@@ -407,178 +477,10 @@ export default {
             const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
             this.cites                      =   res_3.data
 
+            this.client.CityNo              =   ""
+
             // Hide Loading Page
             this.$hideLoadingPage()
-        },
-
-        //
-
-        setJoursGetData(client) {
-
-            const jours         =   document.querySelectorAll(".jours")
-
-            jours.forEach(jour => {
-
-                // Samedi
-                if(jour.id ==   "samedi_checkbox") {
-
-                    if(client.sat   ==  1) {
-
-                        jour.setAttribute('checked', 'true')
-                    }
-                }
-
-                // Dimanche
-                if(jour.id ==   "dimanche_checkbox") {
-
-                    if(client.sun   ==  1) {
-
-                        jour.setAttribute('checked', 'true')
-                    }
-                }
-
-                // Lundi
-                if(jour.id ==   "lundi_checkbox") {
-
-                    if(client.mon   ==  1) {
-
-                        jour.setAttribute('checked', 'true')
-                    }
-                }
-
-                // Mardi
-                if(jour.id ==   "mardi_checkbox") {
-
-                    if(client.tue   ==  1) {
-
-                        jour.setAttribute('checked', 'true')
-                    }
-                }
-
-                // Mercredi
-                if(jour.id ==   "mercredi_checkbox") {
-
-                    if(client.wed   ==  1) {
-
-                        jour.setAttribute('checked', 'true')
-                    }
-                }
-
-                // Jeudi
-                if(jour.id ==   "jeudi_checkbox") {
-
-                    if(client.thu   ==  1) {
-
-                        jour.setAttribute('checked', 'true')
-                    }
-                }
-            });
-        },
-
-        //
-
-        unsetJoursGetData() {
-
-            const jours             =   document.querySelectorAll(".jours")
-
-            jours.forEach(jour => {
-
-                jour.removeAttribute('checked')
-            });
-        
-        },
-
-        //
-
-        setJours() {
-
-            // Samedi
-
-            const samedi_checkbox   =   document.querySelector("#samedi_checkbox")
-            
-            if(samedi_checkbox.checked) {
-
-                this.client.sat         =   1
-            }
-            else {
-
-                this.client.sat         =   0
-            }
-
-            //
-
-            // Dimanche
-
-            const dimanche_checkbox =   document.querySelector("#dimanche_checkbox")
-            
-            if(dimanche_checkbox.checked) {
-
-                this.client.sun         =   1
-            }
-            else {
-
-                this.client.sun         =   1
-            }
-
-            //
-
-            // Lundi
-
-            const lundi_checkbox    =   document.querySelector("#lundi_checkbox")
-            
-            if(lundi_checkbox.checked) {
-
-                this.client.mon         =   1
-            }
-            else {
-
-                this.client.mon         =   1
-            }
-
-            //
-
-            // Mardi
-
-            const mardi_checkbox    =   document.querySelector("#mardi_checkbox")
-            
-            if(mardi_checkbox.checked) {
-
-                this.client.tue         =   1
-            }
-            else {
-
-                this.client.tue         =   0
-            }
-
-            //
-
-            // Mercredi
-
-            const mercredi_checkbox =   document.querySelector("#mercredi_checkbox")
-            
-            if(mercredi_checkbox.checked) {
-
-                this.client.wed         =   1
-            }
-            else {
-
-                this.client.wed         =   0
-            }
-
-            //
-
-            // Jeudi
-
-            const jeudi_checkbox    =   document.querySelector("#jeudi_checkbox")
-            
-            if(jeudi_checkbox.checked) {
-
-                this.client.thu         =   1
-            }
-            else {
-
-                this.client.thu         =   0
-            }
         },
 
         //
@@ -603,33 +505,6 @@ export default {
                     return this.cites[i].CityNameE
                 }                
             }
-        },
-
-        //
-
-        checkClients() {
-
-            this.close_clients  =   []
-
-            let distance        =   0
-
-            for (let i = 0; i < this.all_clients.length; i++) {
-
-                if(this.all_clients[i].id   !=  this.client.id) {
-
-                    distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
-
-                    if(distance <=  this.min_distance) {
-                    
-                        this.close_clients.push(this.all_clients[i])
-                    }
-                }
-            }
-        },
-
-        getDistance(latitude_1, longitude_1, latitude_2, longitude_2) {
-
-            return this.$map.$setDistanceStraight(latitude_1, longitude_1, latitude_2, longitude_2)
         }
     },
 };

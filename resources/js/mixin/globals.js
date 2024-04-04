@@ -1029,8 +1029,8 @@ export default {
 
                     img.onload  = () => {
 
-                        const maxWidth  =   300 // 300; // Maximum width
-                        const maxHeight =   300 // 300; // Maximum height
+                        const maxWidth  =   400 // 400; // Maximum width
+                        const maxHeight =   400 // 400; // Maximum height
 
                         let width       =   img.width;
                         let height      =   img.height;

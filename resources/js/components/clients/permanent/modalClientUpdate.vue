@@ -670,10 +670,7 @@ export default {
             this.getClientData(client)  
             this.getComboData()  
 
-            // if(this.$isRole("FrontOffice")) {
-
-                this.checkClients()
-            // }
+            this.checkClients()
         },
 
         async getClientData(client) {

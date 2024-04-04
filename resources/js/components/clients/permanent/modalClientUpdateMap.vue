@@ -696,7 +696,12 @@ export default {
             });
         },
 
-        getData(client) {
+        async getData(client) {
+
+            const res           =   await this.$callApi("post", "/route_import/"+this.id_route_import+"/clients", null)
+            this.all_clients    =   res.data.clients            
+
+            console.log(this.all_clients)
 
             this.getClientData(client)  
             this.getComboData()  

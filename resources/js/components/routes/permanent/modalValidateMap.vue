@@ -326,7 +326,7 @@ export default {
 
         //
 
-        setModalSourceMap(client, modal_source) {
+        async setModalSourceMap(client, modal_source) {
 
             this.modal_source   =   modal_source
 
