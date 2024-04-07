@@ -14,7 +14,7 @@
                     </div>
 
                     <div class="d-flex flex-row justify-content-center gap-2">
-                        <span class="idd">Raison Social : {{ client.CustomerNameE }}</span>
+                        <span class="idd">Raison Social : {{ client.CustomerNameA }}</span>
                     </div>
 
                     <div class="d-flex flex-row justify-content-center gap-2">
@@ -194,8 +194,3 @@ export default {
 };
 
 </script>
-
-<style>
-
-
-</style>
