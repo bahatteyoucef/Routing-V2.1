@@ -306,6 +306,8 @@
 
             getIsOnline(newValue, oldValue) {
 
+                console.log(newValue)
+
                 this.show_internet_error_page   =   newValue
             }
         }

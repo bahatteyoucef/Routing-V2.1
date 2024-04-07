@@ -277,3 +277,77 @@
 }
 
 /*  */
+
+#details_page .card {
+    width: 350px;
+    background-color: #efefef;
+    border: none;
+    cursor: pointer;
+}
+
+#details_page .facade_image_display_update {
+    height: 210px;
+    width: 210px;
+    border-radius: 50%
+}
+
+#details_page .name {
+    font-size: 22px;
+    font-weight: bold
+}
+
+#details_page .idd {
+    font-size: 14px;
+    font-weight: 600
+}
+
+#details_page .idd1 {
+    font-size: 12px
+}
+
+#details_page .number {
+    font-size: 22px;
+    font-weight: bold
+}
+
+#details_page .follow {
+    font-size: 12px;
+    font-weight: 500;
+    color: #444444
+}
+
+#details_page .btn1 {
+    height: 40px;
+    width: 150px;
+    border: none;
+    background-color: #000;
+    color: #aeaeae;
+    font-size: 15px
+}
+
+#details_page .text span {
+    font-size: 13px;
+    color: #545454;
+    font-weight: 500
+}
+
+#details_page .icons i {
+    font-size: 19px
+}
+
+#details_page hr .new1 {
+    border: 1px solid
+}
+
+#details_page .join {
+    font-size: 14px;
+    color: #a0a0a0;
+    font-weight: bold
+}
+
+#details_page .date {
+    background-color: #ccc
+}
+
+/*  */
+
