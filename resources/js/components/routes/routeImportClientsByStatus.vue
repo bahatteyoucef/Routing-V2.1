@@ -12,7 +12,7 @@
                         </div>
 
                         <div class="col-2 pl-1 pr-1">
-                            <button class="btn primary w-100 m-0"   @click="showMap()"><i class="mdi mdi-map-marker-circle"></i></button>
+                            <button v-if="getIsOnline"              class="btn primary w-100 m-0"   @click="showMap()"><i class="mdi mdi-map-marker-circle"></i></button>
                         </div>
 
                         <div class="col-8 pl-1 pr-1">
@@ -133,7 +133,9 @@ export default {
 
             getAddClient                                :   'client/getAddClient'                               ,
             getUpdateClient                             :   'client/getUpdateClient'                            ,
-            getFilterStatusRouteImportClientsByStatus   :   'client/getFilterStatusRouteImportClientsByStatus'
+            getFilterStatusRouteImportClientsByStatus   :   'client/getFilterStatusRouteImportClientsByStatus'  ,
+
+            getIsOnline                                  :   'internet/getIsOnline'
         }),
     },
 
@@ -186,7 +188,9 @@ export default {
 
             try {
 
-                if(this.$connectedToInternet) {
+                if(this.getIsOnline) {
+
+                    console.log("Server DB route Import By Status")
 
                     this.$showLoadingPage()
 
@@ -211,6 +215,8 @@ export default {
                 }
 
                 else {
+
+                    console.log("local DB route Import By Status")
 
                     this.clients            =   await this.$indexedDB.$getClientsByStatus(this.getUser.id_route_import, this.filter_status)
                     this.clients_filtered   =   this.clients

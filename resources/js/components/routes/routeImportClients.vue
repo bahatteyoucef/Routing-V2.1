@@ -219,7 +219,9 @@ export default {
             getIsAuthentificated    :   'authentification/getIsAuthentificated' ,
 
             getAddClient            :   'client/getAddClient'                   ,
-            getUpdateClient         :   'client/getUpdateClient'                
+            getUpdateClient         :   'client/getUpdateClient'                ,
+
+            getIsOnline             :   'internet/getIsOnline'
         })
     },
 
@@ -260,7 +262,7 @@ export default {
 
             try {
 
-                if(this.$connectedToInternet) {
+                // if(this.getIsOnline) {
 
                     // Destroy DataTable
                     if(this.datatable_route_import_client_index)  {
@@ -287,32 +289,32 @@ export default {
                             this.datatable_route_import_client_index    =   await this.$DataTableCreate("route_import_client_index")
                         }
                     })
-                }
+                // }
 
-                else {
+                // else {
 
                     // Destroy DataTable
-                    if(this.datatable_route_import_client_index)  {
+                    // if(this.datatable_route_import_client_index)  {
 
-                        this.datatable_route_import_client_index.destroy()
-                    }
+                    //     this.datatable_route_import_client_index.destroy()
+                    // }
                 
-                    // Initialisation 
-                    this.clients                                =   [];
+                    // // Initialisation 
+                    // this.clients                                =   [];
 
-                    this.route_import                           =   await this.$indexedDB.$getRouteImport(this.$route.params.id_route_import)
-                    this.clients                                =   this.route_import.clients
+                    // this.route_import                           =   await this.$indexedDB.$getRouteImport(this.$route.params.id_route_import)
+                    // this.clients                                =   this.route_import.clients
 
-                    if(this.$isRole("FrontOffice")) {
+                    // if(this.$isRole("FrontOffice")) {
 
-                        this.datatable_route_import_client_index    =   await this.$DataTableCreateFrontOffice("route_import_client_index")
-                    }
+                    //     this.datatable_route_import_client_index    =   await this.$DataTableCreateFrontOffice("route_import_client_index")
+                    // }
 
-                    else {
+                    // else {
 
-                        this.datatable_route_import_client_index    =   await this.$DataTableCreate("route_import_client_index")
-                    }
-                }
+                    //     this.datatable_route_import_client_index    =   await this.$DataTableCreate("route_import_client_index")
+                    // }
+                // }
             }
 
             catch(e) {

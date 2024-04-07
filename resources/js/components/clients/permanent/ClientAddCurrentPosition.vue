@@ -207,11 +207,11 @@
             <div class="container position-absolute start-0 w-100"          style="bottom: 65px;">
                 <div class="row justify-content-center">
                     <div class="col-6 mt-3">
-                        <button v-if="slideIndex    >   1"                  type="button" class="btn btn-secondary w-100"   @click="plusSlides(-1)">Precedent</button>
+                        <button v-if="((slideIndex    >   1)&&(getIsOnline))"                   type="button" class="btn btn-secondary w-100"   @click="plusSlides(-1)">Precedent</button>
                     </div>
 
                     <div class="col-6 mt-3">
-                        <button v-if="slideIndex    <   total_questions"     type="button" class="btn btn-primary w-100"     @click="plusSlides(1)">Suivant</button>
+                        <button v-if="((slideIndex    <   total_questions)&&(getIsOnline))"     type="button" class="btn btn-primary w-100"     @click="plusSlides(1)">Suivant</button>
                     </div>
                 </div>
             </div>
@@ -219,7 +219,7 @@
             <div class="container position-absolute start-0 w-100 mb-3"    style="bottom: 0px;">
                 <div class="row justify-content-center">
                     <div class="col mt-3">
-                        <button v-if="((slideIndex  ==  total_questions)&&(this.$connectedToInternet))"      type="button" class="btn btn-primary w-100"     @click="sendData()">Confirmer</button>
+                        <button v-if="((slideIndex  ==  total_questions)&&(getIsOnline))"       type="button" class="btn btn-primary w-100"     @click="sendData()">Confirmer</button>
                     </div>
                 </div>
             </div>            
@@ -366,7 +366,11 @@ export default {
 
             //
 
-            getUser                         :   'authentification/getUser'              
+            getUser                         :   'authentification/getUser'              ,
+
+            //
+
+            getIsOnline                     :   'internet/getIsOnline'
         }),
     },
 
@@ -446,7 +450,7 @@ export default {
             formData.append("start_adding_date"                     ,   this.start_adding_date)
             formData.append("finish_adding_date"                    ,   moment(new Date()).format())
 
-            if(this.$connectedToInternet) {
+            if(this.getIsOnline) {
 
                 const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/store",   formData)
 
@@ -525,7 +529,7 @@ export default {
             // Set Start Added
             this.start_adding_date  =   moment(new Date()).format()
 
-            if(this.$connectedToInternet) {
+            if(this.getIsOnline) {
 
                 let position                        =   await this.$currentPosition()
 
@@ -554,7 +558,7 @@ export default {
 
             this.getComboData()  
 
-            if(this.$connectedToInternet) {
+            if(this.getIsOnline) {
 
                 this.checkClients()
             }
@@ -562,7 +566,7 @@ export default {
 
         async getComboData() {
 
-            if(this.$connectedToInternet) {
+            if(this.getIsOnline) {
 
                 const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
                 this.willayas                   =   res_3.data
@@ -576,7 +580,7 @@ export default {
 
         async getCites() {
 
-            if(this.$connectedToInternet) {
+            if(this.getIsOnline) {
 
                 // Show Loading Page
                 this.$showLoadingPage()
@@ -639,7 +643,7 @@ export default {
 
             if(CustomerBarCode_image) {
 
-                if(this.$connectedToInternet) {
+                if(this.getIsOnline) {
 
                     this.client.CustomerBarCode_image_original_name      =   CustomerBarCode_image.name
                     this.client.CustomerBarCode_image                    =   await this.$compressImage(CustomerBarCode_image)
@@ -688,7 +692,7 @@ export default {
 
             if(facade_image) {
 
-                if(this.$connectedToInternet) {
+                if(this.getIsOnline) {
 
                     this.client.facade_image_original_name      =   facade_image.name
                     this.client.facade_image                    =   await this.$compressImage(facade_image)
@@ -737,7 +741,7 @@ export default {
 
             if(in_store_image) {
 
-                if(this.$connectedToInternet) {
+                if(this.getIsOnline) {
 
                     this.client.in_store_image_original_name    =   in_store_image.name
                     this.client.in_store_image                  =   await this.$compressImage(in_store_image)

@@ -173,11 +173,6 @@ app.config.globalProperties.$indexedDB                  =   new IndexedDB()
 
 //
 
-// Internet
-app.config.globalProperties.$connectedToInternet        =   window.navigator.onLine
-
-// 
-
 // Template
 import Header       from    "./template/partials/header.vue";
 import HeaderStore  from    "./template/partials/headerStore.vue";

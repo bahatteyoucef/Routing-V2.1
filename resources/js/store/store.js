@@ -6,6 +6,7 @@ import journey_plan         from "./modules/journey_plan/journey_plan"
 import type_client          from "./modules/type_client/type_client"
 import journee              from "./modules/journee/journee"
 import user_territory       from "./modules/user_territory/user_territory"
+import internet             from "./modules/internet/internet"
 
 const store = createStore({});
 
@@ -15,5 +16,6 @@ store.registerModule("journey_plan"     , journey_plan);
 store.registerModule("type_client"      , type_client);
 store.registerModule("journee"          , journee);
 store.registerModule("user_territory"   , user_territory);
+store.registerModule("internet"         , internet);
 
 export default store ;

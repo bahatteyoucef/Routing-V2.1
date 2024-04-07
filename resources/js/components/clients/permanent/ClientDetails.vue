@@ -32,8 +32,8 @@
 
                 <div class="d-flex mt-3"       style="display: flex; justify-content: space-between;">
                     <div style="display: flex; margin-left: auto;">
-                        <button class="rounded btn1 primary m-1" @click="updateInformations()">Update Informations</button>
-                        <button class="rounded btn1 btn-secondary m-1 text-white" @click="openDirectionsInGoogleMaps()">Itinéraire <i class="mdi mdi-map-marker-radius"></i></button>
+                        <button v-if="getIsOnline"  class="rounded btn1 primary m-1" @click="updateInformations()">Update Informations</button>
+                        <button v-if="getIsOnline"  class="rounded btn1 btn-secondary m-1 text-white" @click="openDirectionsInGoogleMaps()">Itinéraire <i class="mdi mdi-map-marker-radius"></i></button>
                     </div>
                 </div>
 
@@ -102,7 +102,11 @@ export default {
 
             //
 
-            getUser                         :   'authentification/getUser'              
+            getUser                         :   'authentification/getUser'              ,
+
+            //
+
+            getIsOnline                     :   'internet/getIsOnline'
         }),
     },
 
@@ -115,7 +119,7 @@ export default {
 
         async getCustomerData() {
 
-            if(this.$connectedToInternet) {
+            if(this.getIsOnline) {
 
                 const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.$route.params.id_client+"/show" ,   null)
                 console.log(res)
@@ -160,8 +164,6 @@ export default {
                 let client      =   this.getUpdateClient
 
                 this.client     =   client
-
-                console.log(this.client)
             }
         },
 

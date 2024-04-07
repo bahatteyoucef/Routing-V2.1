@@ -399,7 +399,11 @@ export default {
         ...mapGetters({
             getListeJourneyPlan             :   'journey_plan/getListeJourneyPlan'      ,
             getListeTypeClient              :   'type_client/getListeTypeClient'        ,  
-            getListeJournee                 :   'journee/getListeJournee'    
+            getListeJournee                 :   'journee/getListeJournee'               ,
+
+            //
+
+            getIsOnline                     :   'internet/getIsOnline'
         }),
     },
 
@@ -824,7 +828,7 @@ export default {
 
                 this.client.CustomerBarCode_image_updated            =   true
 
-                if(this.$connectedToInternet) {
+                // if(this.getIsOnline) {
 
                     this.client.CustomerBarCode_image_original_name      =   CustomerBarCode_image.name
                     this.client.CustomerBarCode_image                    =   await this.$compressImage(CustomerBarCode_image)
@@ -835,20 +839,20 @@ export default {
 
                     let CustomerBarCode_image_display                    =   document.getElementById("CustomerBarCode_image_display_update")
                     this.base64ToImage(CustomerBarCode_image_base64, CustomerBarCode_image_display)
-                }
+                // }
 
-                else {
+                // else {
 
-                    this.client.CustomerBarCode_image_original_name      =   CustomerBarCode_image.name
-                    this.client.CustomerBarCode_image                    =   await this.$compressImage(CustomerBarCode_image)
+                //     this.client.CustomerBarCode_image_original_name      =   CustomerBarCode_image.name
+                //     this.client.CustomerBarCode_image                    =   await this.$compressImage(CustomerBarCode_image)
 
-                    //
+                //     //
 
-                    this.client.CustomerBarCode_image                    =   await this.$imageToBase64(this.client.CustomerBarCode_image)
+                //     this.client.CustomerBarCode_image                    =   await this.$imageToBase64(this.client.CustomerBarCode_image)
 
-                    let CustomerBarCode_image_display                    =   document.getElementById("CustomerBarCode_image_display_update")
-                    this.base64ToImage(this.client.CustomerBarCode_image, CustomerBarCode_image_display)
-                }
+                //     let CustomerBarCode_image_display                    =   document.getElementById("CustomerBarCode_image_display_update")
+                //     this.base64ToImage(this.client.CustomerBarCode_image, CustomerBarCode_image_display)
+                // }
             }
 
             else {

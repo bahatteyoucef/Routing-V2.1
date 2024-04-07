@@ -172,7 +172,9 @@ export default {
             getIsAuthentificated        :   'authentification/getIsAuthentificated' ,
 
             getAddClient                :   'client/getAddClient'                   ,
-            getUpdateClient             :   'client/getUpdateClient'                
+            getUpdateClient             :   'client/getUpdateClient'                ,
+
+            getIsOnline                 :   'internet/getIsOnline'
         }),
     },
 
@@ -200,7 +202,7 @@ export default {
 
             try {
 
-                if(this.$connectedToInternet) {
+                // if(this.getIsOnline) {
 
                     if((this.$isRole("BackOffice"))||(this.$isRole('BU Manager'))||(this.$isRole("Super Admin"))) {
 
@@ -216,7 +218,7 @@ export default {
                             }
                         })
                     }
-                }
+                // }
             }
 
             catch(e) {
@@ -246,31 +248,40 @@ export default {
 
         async addClient() {
 
-            this.$router.push('/route_import/'+this.getUser.id_route_import+'/clients/add')
+            if(this.getIsOnline) {
+
+                this.$router.push('/route_import/'+this.getUser.id_route_import+'/clients/add')
+            }
         },
 
         async sync() {
 
-            this.$showLoadingPage()
+            if(this.getIsOnline) {
 
-            let res = await this.$indexedDB.$sync()
+                this.$showLoadingPage()
 
-            if(res  ==  200) {
+                let res = await this.$indexedDB.$sync()
 
-                this.$feedbackSuccess("Synchronisation Perfomed !" , "a synchronisation has been performed successfuly!")
+                if(res  ==  200) {
+
+                    this.$feedbackSuccess("Synchronisation Perfomed !" , "a synchronisation has been performed successfuly!")
+                }
+
+                if(res  ==  400) {
+
+                    this.$showErrors("Synchronisation Failed !" , ["all your local data has been failed!"])
+                }
+
+                this.$hideLoadingPage()
             }
-
-            if(res  ==  400) {
-
-                this.$showErrors("Synchronisation Failed !" , ["all your local data has been failed!"])
-            }
-
-            this.$hideLoadingPage()
         },
 
         goToMap() {
 
-            this.$router.push('/route/frontoffice/obs/route_import/'+this.getUser.id_route_import+'/details')
+            if(this.getIsOnline) {
+
+                this.$router.push('/route/frontoffice/obs/route_import/'+this.getUser.id_route_import+'/details')
+            }
         },
 
         showClientsByStatus() {
@@ -280,38 +291,36 @@ export default {
 
         async showProfile() {
 
-            this.$router.push('/users/'+this.getUser.id+'/show')
-        },
+            if(this.getIsOnline) {
 
-        async showNotifications() {
-        
-        },
-
-        async showRemuneration() {
-        
+                this.$router.push('/users/'+this.getUser.id+'/show')
+            }
         },
 
         async logOut() {
 
-            const res   =   await this.$callApi("post", "/logout" , null)
+            if(this.getIsOnline) {
 
-            if(res.status ==  200) {
+                const res   =   await this.$callApi("post", "/logout" , null)
 
-                // Success
-                this.$feedbackSuccess("Logged Out !" , "")
+                if(res.status ==  200) {
 
-                // Update State
-                this.setUserAction({})
-                this.setAccessTokenAction("")
-                this.setIsAuthentificatedAction(false)
+                    // Success
+                    this.$feedbackSuccess("Logged Out !" , "")
 
-                // Router
-                this.$goTo("/login")
-            }
+                    // Update State
+                    this.setUserAction({})
+                    this.setAccessTokenAction("")
+                    this.setIsAuthentificatedAction(false)
 
-            else {
+                    // Router
+                    this.$goTo("/login")
+                }
 
-                this.$showErrors("Error !" , res.errors)
+                else {
+
+                    this.$showErrors("Error !" , res.errors)
+                }
             }
         },
 

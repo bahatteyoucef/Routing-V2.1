@@ -3,6 +3,9 @@
     <!-- Loading -->
     <loading-page></loading-page>
 
+    <!-- No Internet -->
+    <InternetErrorPage v-if="!show_internet_error_page"></InternetErrorPage>
+
     <!-- Login      -->
     <section v-if="component_login">
         <login-page></login-page>
@@ -68,7 +71,9 @@
 
 <script>
 
-    import {mapGetters, mapActions}     from "vuex"
+    import {mapGetters, mapActions}     from    "vuex"
+
+    import InternetErrorPage            from    "./partials/InternetErrorPage.vue"
 
     export default {
 
@@ -89,7 +94,11 @@
 
                 //
 
-                mobile_device               :   false
+                mobile_device               :   false   ,
+
+                //
+
+                show_internet_error_page    :   false
             }
         },
 
@@ -98,7 +107,9 @@
             ...mapGetters({
                 getUser                     :   'authentification/getUser'              ,
                 getAccessToken              :   'authentification/getAccessToken'       ,
-                getIsAuthentificated        :   'authentification/getIsAuthentificated'
+                getIsAuthentificated        :   'authentification/getIsAuthentificated' ,
+
+                getIsOnline                 :   'internet/getIsOnline'                   
             }),
         },
 
@@ -107,7 +118,27 @@
             this.isAuthentificated              =   false
         },
 
+        components : {
+
+            InternetErrorPage : InternetErrorPage
+        },
+
         async mounted() {
+
+            //
+            if(window.navigator.onLine) {
+
+                this.setIsOnlineAction(true)
+            }
+
+            else {
+
+                this.setIsOnlineAction(false)
+            }
+
+            //
+            window.addEventListener('online'    , ()    =>  {this.setIsOnlineAction(true)     });
+            window.addEventListener('offline'   , ()    =>  {this.setIsOnlineAction(false)    });
 
             // 
             this.isAuthentificated      =   await this.checkIfUserIsAuthentificated()
@@ -181,6 +212,10 @@
                 "setIsAuthentificatedAction"    
             ]),
 
+            ...mapActions("internet" ,  [
+                "setIsOnlineAction"
+            ]),
+            
             //
 
             async checkIfUserIsAuthentificated() {
@@ -268,6 +303,11 @@
                     this.isAuthentificated      =   false
                 }
             },
+
+            getIsOnline(newValue, oldValue) {
+
+                this.show_internet_error_page   =   newValue
+            }
         }
     }
 
@@ -288,4 +328,4 @@
 
 </style>
 
-<style src="@vueform/multiselect/themes/default.css"></style>
+<style src="@vueform/multiselect/themes/default.css"></style> 
