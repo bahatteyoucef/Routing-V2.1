@@ -1,7 +1,7 @@
 <template>
     <div style="position : fixed; z-index: 99;" class="p-1">
-        <div class="card p-0" v-show="show_error_card">
-
+        <!-- <div class="card p-0" v-show="show_error_card"> -->
+        <div class="card p-0">
             <div class="card-body p-3">
                 <div class="row">
                     <div class="col-3 d-flex justify-content-center align-items-center">

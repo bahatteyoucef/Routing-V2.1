@@ -11,6 +11,14 @@ let initialRoute  =   true
 
 //  //  //  //  //  //  //  //  //  //  //  //
 
+// Routes that can be used offline i should remove dynamique import from them
+
+import ClientDetails                        from    "./components/clients/permanent/ClientDetails.vue"
+
+import RouteImportClientsByStatus           from    "./components/routes/routeImportClientsByStatus.vue"
+
+//  //  //  //  //  //  //  //  //  //  //  //
+
 const routes = [
 
     // Index
@@ -69,29 +77,11 @@ const routes = [
         component   : () => import('./components/clients/permanent/ClientUpdate.vue')
     },
 
-    // ClientDetails
-    {
-        path        : "/route_import/:id_route_import/clients/:id_client/details",
-        component   : () => import('./components/clients/permanent/ClientDetails.vue')
-    },
-
-    // Route Import Clients
-    {
-        path        : "/route_import/:id_route_import/clients/by_status",
-        component   : () => import('./components/routes/routeImportClientsByStatus.vue')
-    },
-
-    //
-
     // Stats
     {
         path        : "/stats",
         component   : () => import('./components/stats/index.vue')
     },
-
-    //  //  //  //  //  OBS     //  //  //
-
-    //
 
     // Imports Tempo
     {
@@ -115,6 +105,20 @@ const routes = [
     {
         path        : "/route/obs/route_import/:id_route_import/details",
         component   : () => import('./components/routes/permanent/obs/ParRouteImportDetails.vue')
+    },
+
+    //  //  //  //  //  FrontOffice //  //  //  //  //
+
+    // ClientDetails
+    {
+        path        : "/route_import/:id_route_import/clients/:id_client/details",
+        component   : ClientDetails
+    },
+
+    // Route Import Clients
+    {
+        path        : "/route_import/:id_route_import/clients/by_status",
+        component   : RouteImportClientsByStatus
     },
 
     // Imports ParRouteImportFrontOfficeDetails Details
