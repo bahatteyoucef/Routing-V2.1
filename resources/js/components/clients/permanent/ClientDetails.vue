@@ -32,7 +32,7 @@
 
                 <div class="d-flex mt-3"       style="display: flex; justify-content: space-between;">
                     <div style="display: flex; margin-left: auto;">
-                        <button v-if="getIsOnline"  class="rounded btn1 primary m-1" @click="updateInformations()">Update Informations</button>
+                        <button v-if="getIsOnline"  class="rounded btn1 primary m-1" @click="updateInformations()">Update</button>
                         <button v-if="getIsOnline"  class="rounded btn1 btn-secondary m-1 text-white" @click="openDirectionsInGoogleMaps()">Itinéraire <i class="mdi mdi-map-marker-radius"></i></button>
                     </div>
                 </div>
