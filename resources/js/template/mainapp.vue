@@ -215,7 +215,7 @@
             ...mapActions("internet" ,  [
                 "setIsOnlineAction"
             ]),
-            
+
             //
 
             async checkIfUserIsAuthentificated() {

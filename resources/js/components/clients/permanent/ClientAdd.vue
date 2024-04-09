@@ -79,7 +79,9 @@
 
                     <div class="mb-3 mySlides slide_4">
                         <label for="CustomerBarCode_image"    class="form-label">CustomerBarCode Image (CustomerBarCode Image)</label>
-                        <input type="file"              class="form-control"        id="CustomerBarCode_image"              accept="image/*"    capture     @change="customerBarCodeImage()">
+                        <button class="btn btn-secondary w-100" @click="document.getElementById('CustomerBarCode_image').click()">Your text here</button>
+
+                        <input type='file' id="CustomerBarCode_image" style="display:none"  accept="image/*"    capture     @change="customerBarCodeImage()">
                         <img                                                        id="CustomerBarCode_image_display"      src=""              class="w-100">
                     </div>
 

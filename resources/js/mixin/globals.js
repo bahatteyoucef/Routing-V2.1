@@ -1350,6 +1350,13 @@ export default {
 
                 image_element.src       =   ""
             });
+        },
+
+        //
+
+        $clickFile(file_id) {
+
+            document.getElementById(file_id).click()
         }
     }
 }

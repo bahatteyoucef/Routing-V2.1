@@ -35,34 +35,36 @@
 
                         <div class="mt-1 mb-1 w-100">
                             <div class="w-100" id="refresh_client_barcode_button">
-                                <button type="button" class="btn btn-primary w-100"     @click="setBarCodeReader()"     :disabled="client.status    ==  'validated'">Capturer QR Code</button>
+                                <button type="button" class="btn btn-primary w-100"     @click="setBarCodeReader()"     :disabled="client.status_original    ==  'validated'">Capturer QR Code</button>
                             </div>
                         </div>
                     </div>
 
                     <div class="mySlides slide_2">
                         <label for="CustomerBarCode_image_update"   class="form-label">QR Code Image</label>
-                        <input type="file"                          class="form-control"    id="CustomerBarCode_image_update"                   accept="image/*"    capture         @change="customerBarCodeImage()"    :disabled="client.status    ==  'validated'">
+                        <button type="button"                       class="btn btn-secondary w-100 mb-1" @click="$clickFile('CustomerBarCode_image_update')"        :disabled="client.status_original    ==  'validated'"><i class="mdi mdi-camera"></i></button>
+
+                        <input type="file"                          class="form-control"    id="CustomerBarCode_image_update"                   accept="image/*"    capture         @change="customerBarCodeImage()"    :disabled="client.status_original    ==  'validated'"    style="display:none">
                         <img                                                                id="CustomerBarCode_image_display_update"           src=""              class="w-100">
                     </div>
 
                     <div class="mySlides slide_3">
                         <label for="CustomerNameE"      class="form-label">Nom et Prénom de l'Acheteur</label>
-                        <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE"  :disabled="client.status    ==  'validated'">
+                        <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE"  :disabled="client.status_original    ==  'validated'">
                     </div>
 
                     <div class="mySlides slide_4">
                         <label for="CustomerNameA"      class="form-label">Raison Sociale</label>
-                        <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA"  :disabled="client.status    ==  'validated'">
+                        <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA"  :disabled="client.status_original    ==  'validated'">
                     </div>
 
                     <div class="mySlides slide_5">
                         <label for="Tel"                class="form-label">Téléphone</label>
-                        <input type="text"              class="form-control"        id="Tel"                    v-model="client.Tel"            :disabled="client.status    ==  'validated'">
+                        <input type="text"              class="form-control"        id="Tel"                    v-model="client.Tel"            :disabled="client.status_original    ==  'validated'">
                     </div>
 
                     <div class="mySlides slide_6">
-                        <label for="CustomerCode"       class="form-label">Detecter la Position Actuel <button class="btn btn-sm" @click.prevent="showPositionOnMap('show_map')"    :disabled="client.status    ==  'validated'"><i class="mdi mdi-reload"></i></button></label>
+                        <label for="CustomerCode"       class="form-label">Detecter la Position Actuel <button class="btn btn-sm" @click.prevent="showPositionOnMap('show_map')"    :disabled="client.status_original    ==  'validated'"><i class="mdi mdi-reload"></i></button></label>
                         <p class="text-secondary text-small mb-1">Latitude : {{ client.Latitude }}</p>
                         <p class="text-secondary text-small mb-1">Longitude : {{ client.Longitude }}</p>
 
@@ -96,36 +98,36 @@
 
                     <div class="mySlides slide_7">
                         <label for="Address"            class="form-label">Adresse</label>
-                        <input type="text"              class="form-control"        id="Address"                v-model="client.Address"        :disabled="client.status    ==  'validated'">
+                        <input type="text"              class="form-control"        id="Address"                v-model="client.Address"        :disabled="client.status_original    ==  'validated'">
                     </div>
 
                     <div class="mySlides slide_8">
                         <label for="Neighborhood"       class="form-label">Quartier</label>
-                        <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood"   :disabled="client.status    ==  'validated'">
+                        <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood"   :disabled="client.status_original    ==  'validated'">
                     </div>
 
                     <div class="mySlides slide_9">
                         <label for="Landmark"           class="form-label">Point de Repere</label>
-                        <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"       :disabled="client.status    ==  'validated'"></textarea>
+                        <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"       :disabled="client.status_original    ==  'validated'"></textarea>
                     </div>
 
                     <div class="mySlides slide_10">
                         <label for="DistrictNo"         class="form-label">Willaya</label>
-                        <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()"    :disabled="client.status    ==  'validated'">
+                        <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()"    :disabled="client.status_original    ==  'validated'">
                             <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
                         </select>
                     </div>
 
                     <div class="mySlides slide_11">
                         <label for="CityNo"             class="form-label">Commune</label>
-                        <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo"                                 :disabled="client.status    ==  'validated'">
+                        <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo"                                 :disabled="client.status_original    ==  'validated'">
                             <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CITYNO}}- {{cite.CityNameE}}</option>
                         </select>
                     </div>
 
                     <div class="mySlides slide_12">
                         <label for="text"               class="form-label">Type de Magasin</label>
-                        <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType"                     :disabled="client.status    ==  'validated'">
+                        <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType"                     :disabled="client.status_original    ==  'validated'">
                             <option     :value="'Superette'">Superette</option>
                             <option     :value="'Alimentation General'">Alimentation General</option>
                             <option     :value="'Grossiste'">Grossiste</option>
@@ -134,7 +136,7 @@
 
                     <div class="mySlides slide_13">
                         <label for="text"               class="form-label">Disponibilité Produits</label>
-                        <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability"           :disabled="client.status    ==  'validated'">
+                        <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability"           :disabled="client.status_original    ==  'validated'">
                             <option     value=0>No</option>
                             <option     value=1>Yes</option>
                         </select>
@@ -142,7 +144,7 @@
 
                     <div class="mySlides slide_14">
                         <label for="text"               class="form-label">Source d'Achat</label>
-                        <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase"       :disabled="client.status    ==  'validated'">
+                        <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase"       :disabled="client.status_original    ==  'validated'">
                             <option     value="Distribution Direct">Distribution Direct</option>
                             <option     value="Grossiste Fixe">Grossiste Fixe</option>
                             <option     value="Grossiste Mobile">Grossiste Mobile</option>
@@ -153,55 +155,33 @@
 
                     <div class="mySlides slide_15">
                         <label for="JPlan"              class="form-label">Nom de Vendeur</label>
-                        <input type="text"              class="form-control"        id="JPlan"          v-model="client.JPlan"                                          :disabled="client.status    ==  'validated'">
+                        <input type="text"              class="form-control"        id="JPlan"          v-model="client.JPlan"                                          :disabled="client.status_original    ==  'validated'">
                     </div>
 
                     <div class="mySlides slide_16">
                         <label for="Journee"            class="form-label">Journee</label>
-                        <input type="text"              class="form-control"        id="Journee"        v-model="client.Journee"                                        :disabled="client.status    ==  'validated'">
+                        <input type="text"              class="form-control"        id="Journee"        v-model="client.Journee"                                        :disabled="client.status_original    ==  'validated'">
                     </div>
 
                     <div class="mySlides slide_17">
-                        <div v-if="client.status_original   ==  'validated'">
-                            <label for="status"             class="form-label">Status Client</label>
-                            <select                         class="form-select"         id="status"     v-model="client.status"                                         :disabled="client.status    ==  'validated'">
-                                <option value="validated" selected>validé</option>
-                            </select>
-                        </div>
-
-                        <!--  -->
-
-                        <div v-if="((client.status_original   ==  'nonvalidated') || (client.status_original   ==  'pending'))">
-                            <label for="status"             class="form-label">Status Client</label>
-                            <select                         class="form-select"         id="status"     v-model="client.status"                                         :disabled="client.status    ==  'validated'">
-                                <option value="pending" selected>en Attente</option>
-                                <option value="nonvalidated">Refusé</option>
-                            </select>
-
-                            <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
-                                <div class="form-group">
-                                    <label      for="nonvalidated_details" class="form-label">Details Refus</label>
-                                    <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mySlides slide_18">
                         <label for="facade_image_update"    class="form-label">Image Facade</label>
-                        <input type="file"                  class="form-control"    id="facade_image_update"               accept="image/*"    capture  @change="facadeImage()"     :disabled="client.status    ==  'validated'">
+                        <button type="button"               class="btn btn-secondary w-100 mb-1" @click="$clickFile('facade_image_update')"     :disabled="client.status_original    ==  'validated'"><i class="mdi mdi-camera"></i></button>
+
+                        <input type="file"                  class="form-control"    id="facade_image_update"               accept="image/*"     capture  @change="facadeImage()"     :disabled="client.status_original    ==  'validated'"    style="display:none">
                         <img                                                        id="facade_image_display_update"       src=""                       class="w-100">
                     </div>
 
-                    <div class="mySlides slide_19">
+                    <div class="mySlides slide_18">
                         <label for="in_store_image_update"  class="form-label">Image In-Store</label>
-                        <input type="file"                  class="form-control"    id="in_store_image_update"             accept="image/*"    capture  @change="inStoreImage()"    :disabled="client.status    ==  'validated'">
+                        <button type="button"               class="btn btn-secondary w-100 mb-1" @click="$clickFile('in_store_image_update')"   :disabled="client.status_original    ==  'validated'"><i class="mdi mdi-camera"></i></button>
+
+                        <input type="file"                  class="form-control"    id="in_store_image_update"             accept="image/*"     capture  @change="inStoreImage()"    :disabled="client.status_original    ==  'validated'"    style="display:none">
                         <img                                                        id="in_store_image_display_update"     src=""                       class="w-100">
                     </div>
 
-                    <div class="mySlides slide_20">
+                    <div class="mySlides slide_19">
                         <label      for="comment">Commentaire</label>
-                        <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"    :disabled="client.status    ==  'validated'"></textarea>
+                        <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"    :disabled="client.status_original    ==  'validated'"></textarea>
                     </div>
 
                 </div>
@@ -227,7 +207,7 @@
         <div class="container position-absolute start-0 w-100 mb-3"     style="bottom: 0px;">
             <div class="row justify-content-center">
                 <div class="col mt-3">
-                    <button v-if="((slideIndex  ==  total_questions)&&(client.status    !=  'validated')&&(getIsOnline))"      type="button" class="btn btn-primary w-100"     @click="sendData()">Confirmer</button>
+                    <button v-if="((slideIndex  ==  total_questions)&&(client.status_original   !=  'validated')&&(getIsOnline))"      type="button" class="btn btn-primary w-100"     @click="sendData()">Confirmer</button>
                 </div>
             </div>
         </div>            
@@ -295,7 +275,7 @@ export default {
                 Journee             :   '',
 
                 // 
-                status                  :   '',
+                status                  :   'pending',
                 status_original         :   '',
                 nonvalidated_details    :   '', 
 
@@ -331,7 +311,7 @@ export default {
 
             //
 
-            total_questions                 :   20
+            total_questions                 :   19
         }
     },
 
@@ -528,7 +508,7 @@ export default {
                 // Journey Plan
                 this.client.JPlan               =   '',
 
-                this.client.status              =   '',
+                this.client.status              =   'pending',
 
                 this.willayas                   =   []  ,
                 this.cites                      =   []  ,
@@ -624,7 +604,7 @@ export default {
 
                 this.client.Journee                                 =   client.Journee
 
-                this.client.status                                  =   client.status
+                // this.client.status                                  =   client.status
                 this.client.status_original                         =   client.status
                 this.client.nonvalidated_details                    =   client.nonvalidated_details
 
@@ -1505,36 +1485,6 @@ export default {
             // Slide 17
             if(this.slideIndex  ==  17) {
 
-                if(this.client.status !==  "") {
-
-                    if(this.client.status   ==  "nonvalidated") {
-
-                        if(this.client.nonvalidated_details   !==  "") {
-
-                            return true
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    else {
-
-                        return true;
-                    }
-                }
-
-                else {
-
-                    return false
-                }
-            }
-
-            // Slide 18
-            if(this.slideIndex  ==  18) {
-
                 if((this.client.facade_image !==  "")&&(this.client.facade_image_original_name   !==  "")) {
 
                     return true;
@@ -1546,8 +1496,8 @@ export default {
                 }
             }
 
-            // Slide 19
-            if(this.slideIndex  ==  19) {
+            // Slide 18
+            if(this.slideIndex  ==  18) {
 
                 if((this.client.in_store_image !==  "")&&(this.client.in_store_image_original_name   !==  "")) {
 

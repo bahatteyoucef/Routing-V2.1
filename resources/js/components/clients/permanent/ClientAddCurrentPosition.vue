@@ -43,9 +43,11 @@
                     </div>
 
                     <div class="mySlides slide_2">
-                        <label for="CustomerBarCode_image"    class="form-label">QR Code Image</label>
-                        <input type="file"              class="form-control"        id="CustomerBarCode_image"              accept="image/*"    capture     @change="customerBarCodeImage()">
-                        <img                                                        id="CustomerBarCode_image_display"      src=""              class="w-100">
+                        <label for="CustomerBarCode_image"  class="form-label">QR Code Image</label>
+                        <button type="button"               class="btn btn-secondary w-100 mb-1" @click="$clickFile('CustomerBarCode_image')"><i class="mdi mdi-camera"></i></button>
+
+                        <input type='file'                  id="CustomerBarCode_image"              style="display:none"    accept="image/*"    capture     @change="customerBarCodeImage()">
+                        <img                                id="CustomerBarCode_image_display"      src=""                  class="w-100">
                     </div>
 
                     <div class="mySlides slide_3">
@@ -163,33 +165,22 @@
                     </div>
 
                     <div class="mySlides slide_17">
-                        <label for="status"             class="form-label">Status Client</label>
-                        <select                         class="form-select"         id="status"                 v-model="client.status">
-                            <option value="pending" selected>en Attente</option>
-                            <option value="nonvalidated">Refusé</option>
-                        </select>
+                        <label for="facade_image"   class="form-label">Image Facade</label>
+                        <button type="button"       class="btn btn-secondary w-100 mb-1" @click="$clickFile('facade_image')"><i class="mdi mdi-camera"></i></button>
 
-                        <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
-                            <div class="form-group">
-                                <label      for="nonvalidated_details" class="form-label">Details Refus</label>
-                                <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
-                            </div>
-                        </div>
+                        <input type='file'          id="facade_image"           style="display:none"    accept="image/*"    capture     @change="facadeImage()">
+                        <img                        id="facade_image_display"   src=""                  class="w-100">
                     </div>
 
                     <div class="mySlides slide_18">
-                        <label for="facade_image"       class="form-label">Image Facade</label>
-                        <input type="file"              class="form-control"        id="facade_image"               accept="image/*"    capture     @change="facadeImage()">
-                        <img                                                        id="facade_image_display"       src=""                          class="w-100">
+                        <label for="in_store_image" class="form-label">Image In-Store</label>
+                        <button type="button"       class="btn btn-secondary w-100 mb-1" @click="$clickFile('in_store_image')"><i class="mdi mdi-camera"></i></button>
+
+                        <input type='file'          id="in_store_image"             style="display:none"    accept="image/*"    capture     @change="inStoreImage()">
+                        <img                        id="in_store_image_display"     src=""                  class="w-100">
                     </div>
 
                     <div class="mySlides slide_19">
-                        <label for="in_store_image"     class="form-label">Image In-Store</label>
-                        <input type="file"              class="form-control"        id="in_store_image"             accept="image/*"    capture     @change="inStoreImage()">
-                        <img                                                        id="in_store_image_display"     src=""                          class="w-100">
-                    </div>
-
-                    <div class="mySlides slide_20">
                         <label      for="comment">Commentaire</label>
                         <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"></textarea>
                     </div>
@@ -345,7 +336,7 @@ export default {
 
             //
 
-            total_questions                 :   20      ,
+            total_questions                 :   19      ,
 
             //
 
@@ -1176,36 +1167,6 @@ export default {
             // Slide 17
             if(this.slideIndex  ==  17) {
 
-                if(this.client.status !==  "") {
-
-                    if(this.client.status   ==  "nonvalidated") {
-
-                        if(this.client.nonvalidated_details   !==  "") {
-
-                            return true
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    else {
-
-                        return true;
-                    }
-                }
-
-                else {
-
-                    return false
-                }
-            }
-
-            // Slide 18
-            if(this.slideIndex  ==  18) {
-
                 if((this.client.facade_image !==  "")&&(this.client.facade_image_original_name   !==  "")) {
 
                     return true;
@@ -1217,8 +1178,8 @@ export default {
                 }
             }
 
-            // Slide 19
-            if(this.slideIndex  ==  19) {
+            // Slide 18
+            if(this.slideIndex  ==  18) {
 
                 if((this.client.in_store_image !==  "")&&(this.client.in_store_image_original_name   !==  "")) {
 
