@@ -18,7 +18,7 @@
             </div>
         </div>
 
-        <div class="container"  style="height : 58vh; overflow : auto;">
+        <div class="container"  style="height : 60vh; overflow : auto;">
 
             <form>
 
@@ -136,9 +136,12 @@
                     <div class="mySlides slide_12">
                         <label for="text"               class="form-label">Type de Magasin</label>
                         <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType"                     :disabled="client.status_original    ==  'validated'">
-                            <option     :value="'Superette'">Superette</option>
+                            <option     :value="'Hypermarché'">Hypermarché</option>
+                            <option     :value="'Supermarché'">Supermarché</option>
                             <option     :value="'Alimentation General'">Alimentation General</option>
-                            <option     :value="'Grossiste'">Grossiste</option>
+                            <option     :value="'Bureau Tabac'">Bureau Tabac</option>
+                            <option     :value="'Cafétéria'">Cafétéria</option>
+                            <option     :value="'Cosmetique'">Cosmetique</option>
                         </select>
                     </div>
 
@@ -200,7 +203,7 @@
 
         <!--  -->
 
-        <div class="container position-absolute start-0 w-100"          style="bottom: 65px;">
+        <div class="container start-0 w-100"          style="bottom: 65px;">
             <div class="row justify-content-center">
                 <div class="col-6 mt-3">
                     <button v-if="((slideIndex    >   1)&&(getIsOnline))"                   type="button" class="btn btn-secondary w-100"   @click="plusSlides(-1)">Precedent</button>
@@ -212,7 +215,7 @@
             </div>
         </div>
 
-        <div class="container position-absolute start-0 w-100 mb-3"     style="bottom: 0px;">
+        <div class="container start-0 w-100 mb-3"     style="bottom: 0px;">
             <div class="row justify-content-center">
                 <div class="col mt-3">
                     <button v-if="((slideIndex  ==  total_questions)&&(client.status_original   !=  'validated')&&(getIsOnline))"      type="button" class="btn btn-primary w-100"     @click="sendData()">Confirmer</button>
