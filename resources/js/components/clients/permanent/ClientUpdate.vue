@@ -2,7 +2,7 @@
 
     <div class="mt-3">
 
-        <div class="page-header mb-2">
+        <div class="page-header mb-0">
             <div class="container w-100">
                 <h3 class="page-title">
                         Modifier le Client : {{ client.old_CustomerNameE }} 
@@ -10,7 +10,7 @@
             </div>
         </div>
 
-        <div class="page-header mb-2">
+        <div class="page-header mb-0">
             <div class="container w-100">
                 <div v-if="client.status_original   ==  'nonvalidated'">
                     <span class="text-small text-danger">{{ client.nonvalidated_details }}</span>
