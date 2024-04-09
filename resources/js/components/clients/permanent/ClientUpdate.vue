@@ -10,6 +10,14 @@
             </div>
         </div>
 
+        <div class="page-header mb-2">
+            <div class="container w-100">
+                <div v-if="client.status_original   ==  'nonvalidated'">
+                    <span class="text-small text-danger">{{ client.nonvalidated_details }}</span>
+                </div>
+            </div>
+        </div>
+
         <div class="container"  style="height : 58vh; overflow : auto;">
 
             <form>
