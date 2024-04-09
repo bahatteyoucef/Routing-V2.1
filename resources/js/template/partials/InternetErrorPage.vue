@@ -1,5 +1,5 @@
 <template>
-    <div style="position : fixed; z-index: 99;" class="p-1">
+    <div style="position : fixed; z-index: 99;" class="p-1 w-100">
         <!-- <div class="card p-0" v-show="show_error_card"> -->
         <div class="card p-0">
             <div class="card-body p-3">
@@ -9,8 +9,8 @@
                     </div>
 
                     <div class="col-9">
-                        <h5>No Internet Network !</h5>
-                        <span>Please check your network connection</span>
+                        <h6>No Internet Network !</h6>
+                        <span class="text-small">Please check your network connection</span>
                     </div>
                 </div>
             </div>
