@@ -18,6 +18,7 @@
                                 <th class="col-sm-3">Tel</th>
                                 <th class="col-sm-3">Company</th>
                                 <th class="col-sm-3">Type User</th>
+                                <th class="col-sm-3">Password</th>
                             </tr>
                         </thead>
 
@@ -29,6 +30,7 @@
                                 <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Tel"          /></th>
                                 <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Company"      /></th>
                                 <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Type User"    /></th>
+                                <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Password"     /></th>
                             </tr>
                         </thead>
 
@@ -40,6 +42,7 @@
                                 <td>{{user.tel}}</td>
                                 <td>{{user.company}}</td>
                                 <td>{{user.type_user}}</td>
+                                <td>{{user.password_non_hashed}}</td>
                             </tr>
                         </tbody>
                     </table>

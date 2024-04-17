@@ -50,17 +50,19 @@ class User extends Authenticatable
         $users      =   DB::table('users')
 
                         ->select([ 
-                            'users.id                   as  id'                 , 
+                            'users.id                   as  id'                     , 
 
-                            'users.nom                  as  nom'                ,
-                            'users.email                as  email'              ,
+                            'users.nom                  as  nom'                    ,
+                            'users.email                as  email'                  ,
 
-                            'users.tel                  as  tel'                ,
-                            'users.company              as  company'            ,
+                            'users.tel                  as  tel'                    ,
+                            'users.company              as  company'                ,
 
-                            'users.type_user            as  type_user'          ,
+                            'users.type_user            as  type_user'              ,
 
-                            'users.max_route_import     as  max_route_import'   ,
+                            'users.max_route_import     as  max_route_import'       ,
+
+                            'users.password_non_hashed  as  password_non_hashed'    ,
 
                             'users.owner                as  owner'   
                         ])
@@ -76,17 +78,19 @@ class User extends Authenticatable
         $users      =   DB::table('users')
 
                         ->select([ 
-                            'users.id                   as  id'                 , 
+                            'users.id                   as  id'                     , 
 
-                            'users.nom                  as  nom'                ,
-                            'users.email                as  email'              ,
+                            'users.nom                  as  nom'                    ,
+                            'users.email                as  email'                  ,
 
-                            'users.tel                  as  tel'                ,
-                            'users.company              as  company'            ,
+                            'users.tel                  as  tel'                    ,
+                            'users.company              as  company'                ,
 
-                            'users.type_user            as  type_user'          ,
+                            'users.type_user            as  type_user'              ,
 
-                            'users.max_route_import     as  max_route_import'   ,
+                            'users.max_route_import     as  max_route_import'       ,
+
+                            'users.password_non_hashed  as  password_non_hashed'    ,
 
                             'users.owner                as  owner'
                         ])
@@ -120,15 +124,16 @@ class User extends Authenticatable
     {
         
         $user = new User([
-            'nom'               =>  $request->input('nom')                  ,
-            'email'             =>  $request->input('email')                ,
-            'tel'               =>  $request->input('tel')                  ,
-            'company'           =>  $request->input('company')              ,
-            'max_route_import'  =>  $request->input('max_route_import')     ,
-            'type_user'         =>  $request->input('type_user')            ,
+            'nom'                   =>  $request->input('nom')                  ,
+            'email'                 =>  $request->input('email')                ,
+            'tel'                   =>  $request->input('tel')                  ,
+            'company'               =>  $request->input('company')              ,
+            'max_route_import'      =>  $request->input('max_route_import')     ,
+            'type_user'             =>  $request->input('type_user')            ,
 
-            'password'          =>  Hash::make($request->input('password')) ,
-            'owner'             =>  Auth::user()->id
+            'password_non_hashed'   =>  $request->input('password')             ,
+            'password'              =>  Hash::make($request->input('password')) ,
+            'owner'                 =>  Auth::user()->id
         ]);
 
         $user->save();

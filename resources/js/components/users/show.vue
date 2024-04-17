@@ -59,13 +59,13 @@
 
                         <div class="container mt-5">
                             <div class="row justify-content-center">
-                                <div class="col-sm-3 mt-3">
+                                <!-- <div class="col-sm-3 mt-3">
                                     <button type="button" class="btn btn-secondary w-100"       @click="changePassword()">Change Password</button>
-                                </div>
+                                </div> -->
     
-                                <div class="col-sm-3 mt-3">
+                                <!-- <div class="col-sm-3 mt-3">
                                     <button type="button" class="btn btn-primary w-100"         @click="updateInformations()">Update Informations</button>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
 
