@@ -181,7 +181,7 @@ class User extends Authenticatable
 
         if($request->get("type_user")   ==  "FrontOffice") {
 
-            if($request->get("selected_route_import")   !=  null) {
+            if($request->get("selected_route_import")   !=  "null") {
 
                 $route_import           =   new UserRouteImport([
 
@@ -284,7 +284,7 @@ class User extends Authenticatable
 
         if($request->get("type_user")   ==  "FrontOffice") {
 
-            if($request->get("selected_route_import")   !=  null) {
+            if($request->get("selected_route_import")   !=  "null") {
 
                 $route_import           =   new UserRouteImport([
 

@@ -129,18 +129,18 @@ export default {
         return {
 
             user            :   {
-                nom_original            :   '',
+                nom_original            :   ''      ,
 
-                id                      :   '',
-                nom                     :   '',
-                email                   :   '',
-                tel                     :   '',
-                company                 :   '',
-                type_user               :   '',
+                id                      :   ''      ,
+                nom                     :   ''      ,
+                email                   :   ''      ,
+                tel                     :   ''      ,
+                company                 :   ''      ,
+                type_user               :   ''      ,
 
-                max_route_import        :   0 ,
+                max_route_import        :   0       ,
 
-                selected_route_import   :   null,
+                selected_route_import   :   null    ,
                 liste_route_import      :   null
             },
 
@@ -175,7 +175,7 @@ export default {
 
             formData.append("max_route_import"          , this.user.max_route_import)
 
-            formData.append("selected_route_import"     , JSON.stringify(this.user.selected_route_import))
+            formData.append("selected_route_import"     , this.user.selected_route_import)
             formData.append("liste_route_import"        , JSON.stringify(this.user.liste_route_import))
 
             const res   =   await this.$callApi('post' ,   '/users/'+this.user.id+'/update'    ,   formData)         
