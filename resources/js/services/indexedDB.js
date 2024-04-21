@@ -696,8 +696,7 @@ export default class MobileClientIndexedDB {
             this.transaction_deleted_clients            =   this.route_import_db.transaction("deleted_clients", "readwrite")
             this.store_deleted_clients                  =   this.transaction_deleted_clients.objectStore("deleted_clients")
 
-            this.store_deleted_clients.put({...client})
-
+c
             // Verify if he exists in updated clients table
             this.transaction_updated_clients            =   this.route_import_db.transaction("updated_clients", "readwrite")
             this.store_updated_clients                  =   this.transaction_updated_clients.objectStore("updated_clients")
