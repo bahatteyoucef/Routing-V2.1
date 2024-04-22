@@ -18,6 +18,7 @@
 
                 <div class="slideshow-container">
 
+                    <!-- CustomerCode -->
                     <div class="mySlides slide_1">
                         <div v-show="client.CustomerCode   ==  ''"     class="mt-1 p-0">
                             <div    id="reader" class="scanner_reader w-100"></div>
@@ -42,6 +43,7 @@
                         </div>
                     </div>
 
+                    <!-- CustomerBarCode_image -->
                     <div class="mySlides slide_2">
                         <label for="CustomerBarCode_image"  class="form-label">QR Code Image</label>
                         <button type="button"               class="btn btn-secondary w-100 mb-1" @click="$clickFile('CustomerBarCode_image')"><i class="mdi mdi-camera"></i></button>
@@ -50,21 +52,25 @@
                         <img                                id="CustomerBarCode_image_display"      src=""                  class="w-100">
                     </div>
 
+                    <!-- CustomerNameE -->
                     <div class="mySlides slide_3">
                         <label for="CustomerNameE"      class="form-label">Nom et Prénom de l'Acheteur</label>
                         <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE">
                     </div>
 
+                    <!-- CustomerNameA -->
                     <div class="mySlides slide_4">
                         <label for="CustomerNameA"      class="form-label">Raison Sociale</label>
                         <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA">
                     </div>
 
+                    <!-- Tel -->
                     <div class="mySlides slide_5">
                         <label for="Tel"                class="form-label">Téléphone</label>
                         <input type="text"              class="form-control"        id="Tel"                    v-model="client.Tel">
                     </div>
 
+                    <!-- GPS -->
                     <div class="mySlides slide_6">
                         <label for="CustomerCode"       class="form-label">Detecter la Position Actuel <button class="btn btn-sm" @click.prevent="showPositionOnMap('show_map')"><i class="mdi mdi-reload"></i></button></label>
                         <p class="text-secondary text-small mb-1">Latitude : {{ client.Latitude }}</p>
@@ -97,21 +103,25 @@
                         </table>
                     </div>
 
+                    <!-- Adresse -->
                     <div class="mySlides slide_7">
                         <label for="Address"            class="form-label">Adresse</label>
                         <input type="text"              class="form-control"        id="Address"                v-model="client.Address">
                     </div>
 
+                    <!-- Neighborhood -->
                     <div class="mySlides slide_8">
                         <label for="Neighborhood"       class="form-label">Quartier</label>
                         <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood">
                     </div>
 
+                    <!-- Landmark -->
                     <div class="mySlides slide_9">
                         <label for="Landmark"           class="form-label">Point de Repere</label>
                         <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"></textarea>
                     </div>
 
+                    <!-- DistrictNo -->
                     <div class="mySlides slide_10">
                         <label for="DistrictNo"         class="form-label">Willaya</label>
                         <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()">
@@ -119,6 +129,7 @@
                         </select>
                     </div>
 
+                    <!-- CityNo -->
                     <div class="mySlides slide_11">
                         <label for="CityNo"             class="form-label">Commune</label>
                         <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo">
@@ -126,6 +137,7 @@
                         </select>
                     </div>
 
+                    <!-- CustomerType -->
                     <div class="mySlides slide_12">
                         <label for="text"               class="form-label">Type de Magasin</label>
                         <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType">
@@ -138,15 +150,8 @@
                         </select>
                     </div>
 
+                    <!-- BrandSourcePurchase -->
                     <div class="mySlides slide_13">
-                        <label for="text"               class="form-label">Disponibilité Produits</label>
-                        <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability">
-                            <option     value=0>No</option>
-                            <option     value=1>Yes</option>
-                        </select>
-                    </div>
-
-                    <div class="mySlides slide_14">
                         <label for="text"               class="form-label">Source d'Achat</label>
                         <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase">
                             <option     value="Distribution Direct">Distribution Direct</option>
@@ -157,17 +162,20 @@
                         </select>
                     </div>
 
-                    <div class="mySlides slide_15">
+                    <!-- JPlan -->
+                    <div class="mySlides slide_14">
                         <label for="JPlan"              class="form-label">Nom de Vendeur</label>
                         <input type="text"              class="form-control"        id="JPlan"                  v-model="client.JPlan">
                     </div>
                     
-                    <div class="mySlides slide_16">
+                    <!-- Journee -->
+                    <div class="mySlides slide_15">
                         <label for="Journee"            class="form-label">Journee</label>
                         <input type="text"              class="form-control"        id="Journee"                v-model="client.Journee">
                     </div>
 
-                    <div class="mySlides slide_17">
+                    <!-- facade_image -->
+                    <div class="mySlides slide_16">
                         <label for="facade_image"   class="form-label">Image Facade</label>
                         <button type="button"       class="btn btn-secondary w-100 mb-1" @click="$clickFile('facade_image')"><i class="mdi mdi-camera"></i></button>
 
@@ -175,15 +183,28 @@
                         <img                        id="facade_image_display"   src=""                  class="w-100">
                     </div>
 
-                    <div class="mySlides slide_18">
-                        <label for="in_store_image" class="form-label">Image In-Store</label>
-                        <button type="button"       class="btn btn-secondary w-100 mb-1" @click="$clickFile('in_store_image')"><i class="mdi mdi-camera"></i></button>
+                    <!-- BrandAvailability + In-Store Image -->
+                    <div class="mySlides slide_17">
 
-                        <input type='file'          id="in_store_image"             style="display:none"    accept="image/*"    capture     @change="inStoreImage()">
-                        <img                        id="in_store_image_display"     src=""                  class="w-100">
+                        <div class="mb-1">
+                            <label for="text"               class="form-label">Disponibilité Produits</label>
+                            <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability"   @change="brandAvailabilityChanged()">
+                                <option     value=0>No</option>
+                                <option     value=1>Yes</option>
+                            </select>
+                        </div>
+
+                        <div class="mt-1"   v-show="client.BrandAvailability  ==  1">
+                            <label for="in_store_image" class="form-label">Image In-Store</label>
+                            <button type="button"       class="btn btn-secondary w-100 mb-1" @click="$clickFile('in_store_image')"><i class="mdi mdi-camera"></i></button>
+
+                            <input type='file'          id="in_store_image"             style="display:none"    accept="image/*"    capture     @change="inStoreImage()">
+                            <img                        id="in_store_image_display"     src=""                  class="w-100">
+                        </div>
                     </div>
 
-                    <div class="mySlides slide_19">
+                    <!-- Comment -->
+                    <div class="mySlides slide_18">
                         <label      for="comment">Commentaire</label>
                         <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"></textarea>
                     </div>
@@ -339,7 +360,7 @@ export default {
 
             //
 
-            total_questions                 :   19      ,
+            total_questions                 :   18      ,
 
             //
 
@@ -729,6 +750,22 @@ export default {
 
         //
 
+        brandAvailabilityChanged() {
+
+            if((this.client.BrandAvailability   === 0)||(this.client.BrandAvailability  === "0")) {
+
+                this.client.in_store_image_original_name    =   ""
+                this.client.in_store_image                  =   ""
+
+                const in_store_image_display                =   document.getElementById("in_store_image_display")
+
+                if(in_store_image_display) {
+
+                    in_store_image_display.src                  =   ""
+                }
+            }
+        },
+
         async inStoreImage() {
 
             const in_store_image  =   document.getElementById("in_store_image").files[0];
@@ -1114,7 +1151,7 @@ export default {
             // Slide 13
             if(this.slideIndex  ==  13) {
 
-                if(this.client.BrandAvailability !==  "") {
+                if(this.client.BrandSourcePurchase !==  "") {
 
                     return true;
                 }
@@ -1128,7 +1165,7 @@ export default {
             // Slide 14
             if(this.slideIndex  ==  14) {
 
-                if(this.client.BrandSourcePurchase !==  "") {
+                if(this.client.JPlan !==  "") {
 
                     return true;
                 }
@@ -1142,7 +1179,7 @@ export default {
             // Slide 15
             if(this.slideIndex  ==  15) {
 
-                if(this.client.JPlan !==  "") {
+                if(this.client.Journee !==  "") {
 
                     return true;
                 }
@@ -1156,7 +1193,7 @@ export default {
             // Slide 16
             if(this.slideIndex  ==  16) {
 
-                if(this.client.Journee !==  "") {
+                if((this.client.facade_image !==  "")&&(this.client.facade_image_original_name   !==  "")) {
 
                     return true;
                 }
@@ -1170,28 +1207,22 @@ export default {
             // Slide 17
             if(this.slideIndex  ==  17) {
 
-                if((this.client.facade_image !==  "")&&(this.client.facade_image_original_name   !==  "")) {
+                if((this.client.BrandAvailability   === 0)||(this.client.BrandAvailability  === "0")) {
 
-                    return true;
+                    return true
                 }
 
                 else {
 
-                    return false
-                }
-            }
+                    if((this.client.in_store_image !==  "")&&(this.client.in_store_image_original_name   !==  "")) {
 
-            // Slide 18
-            if(this.slideIndex  ==  18) {
+                        return true
+                    }
 
-                if((this.client.in_store_image !==  "")&&(this.client.in_store_image_original_name   !==  "")) {
+                    else {
 
-                    return true;
-                }
-
-                else {
-
-                    return false
+                        return false
+                    }
                 }
             }
 
