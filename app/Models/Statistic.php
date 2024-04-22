@@ -523,6 +523,7 @@ class Statistic extends Model
                                 ->select("users.*")
                                 ->join("users_route_import", "users.id", "users_route_import.id_user")
                                 ->whereIn('users_route_import.id_route_import', $route_links)
+                                ->where('users.type_user', 'FrontOffice')
                                 ->distinct("users.id")
                                 ->get();
 
@@ -593,6 +594,7 @@ class Statistic extends Model
                                 ->select("users.*")
                                 ->join("users_route_import", "users.id", "users_route_import.id_user")
                                 ->whereIn('users_route_import.id_route_import', $route_links)
+                                ->where('users.type_user', 'FrontOffice')
                                 ->distinct("users.id")
                                 ->get();
         //
@@ -685,6 +687,7 @@ class Statistic extends Model
                                 ->select("users.*")
                                 ->join("users_route_import", "users.id", "users_route_import.id_user")
                                 ->whereIn('users_route_import.id_route_import', $route_links)
+                                ->where('users.type_user', 'FrontOffice')
                                 ->distinct("users.id")
                                 ->get();
         //
@@ -793,6 +796,7 @@ class Statistic extends Model
                                 ->select("users.*")
                                 ->join("users_route_import", "users.id", "users_route_import.id_user")
                                 ->whereIn('users_route_import.id_route_import', $route_links)
+                                ->where('users.type_user', 'FrontOffice')
                                 ->distinct("users.id")
                                 ->get();
         //

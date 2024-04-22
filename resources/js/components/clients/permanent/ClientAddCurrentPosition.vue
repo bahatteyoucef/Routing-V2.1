@@ -142,7 +142,7 @@
                         <label for="text"               class="form-label">Type de Magasin</label>
                         <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType">
                             <option     :value="'Hypermarché'">Hypermarché</option>
-                            <option     :value="'Supermarché'">Supermarché</option>
+                            <option     :value="'Supérette'">Supérette</option>
                             <option     :value="'Alimentation General'">Alimentation General</option>
                             <option     :value="'Bureau Tabac'">Bureau Tabac</option>
                             <option     :value="'Cafétéria'">Cafétéria</option>
@@ -174,17 +174,8 @@
                         <input type="text"              class="form-control"        id="Journee"                v-model="client.Journee">
                     </div>
 
-                    <!-- facade_image -->
-                    <div class="mySlides slide_16">
-                        <label for="facade_image"   class="form-label">Image Facade</label>
-                        <button type="button"       class="btn btn-secondary w-100 mb-1" @click="$clickFile('facade_image')"><i class="mdi mdi-camera"></i></button>
-
-                        <input type='file'          id="facade_image"           style="display:none"    accept="image/*"    capture     @change="facadeImage()">
-                        <img                        id="facade_image_display"   src=""                  class="w-100">
-                    </div>
-
                     <!-- BrandAvailability + In-Store Image -->
-                    <div class="mySlides slide_17">
+                    <div class="mySlides slide_16">
 
                         <div class="mb-1">
                             <label for="text"               class="form-label">Disponibilité Produits</label>
@@ -202,6 +193,16 @@
                             <img                        id="in_store_image_display"     src=""                  class="w-100">
                         </div>
                     </div>
+
+                    <!-- facade_image -->
+                    <div class="mySlides slide_17">
+                        <label for="facade_image"   class="form-label">Image Facade</label>
+                        <button type="button"       class="btn btn-secondary w-100 mb-1" @click="$clickFile('facade_image')"><i class="mdi mdi-camera"></i></button>
+
+                        <input type='file'          id="facade_image"           style="display:none"    accept="image/*"    capture     @change="facadeImage()">
+                        <img                        id="facade_image_display"   src=""                  class="w-100">
+                    </div>
+
 
                     <!-- Comment -->
                     <div class="mySlides slide_18">
@@ -1039,8 +1040,7 @@ export default {
             // Slide 5
             if(this.slideIndex  ==  5) {
 
-                if(this.client.Tel !==  "") {
-
+                if((this.client.Tel !== "")&&((this.client.Tel.startsWith('05'))||(this.client.Tel.startsWith('06'))||(this.client.Tel.startsWith('07')))&&(!isNaN(parseInt(this.client.Tel)))&&(this.client.Tel.length == 10)){
                     return true;
                 }
 
@@ -1189,23 +1189,9 @@ export default {
                     return false
                 }
             }
-
+            
             // Slide 16
             if(this.slideIndex  ==  16) {
-
-                if((this.client.facade_image !==  "")&&(this.client.facade_image_original_name   !==  "")) {
-
-                    return true;
-                }
-
-                else {
-
-                    return false
-                }
-            }
-
-            // Slide 17
-            if(this.slideIndex  ==  17) {
 
                 if((this.client.BrandAvailability   === 0)||(this.client.BrandAvailability  === "0")) {
 
@@ -1225,6 +1211,21 @@ export default {
                     }
                 }
             }
+            // Slide 17
+            if(this.slideIndex  ==  17) {
+
+                if((this.client.facade_image !==  "")&&(this.client.facade_image_original_name   !==  "")) {
+
+                    return true;
+                }
+
+                else {
+
+                    return false
+                }
+            }
+
+
 
             return true
         }

@@ -93,7 +93,7 @@
                     formData.append("password"  ,   this.password)
 
                     let response = await this.$callApi('post' ,   '/login'    ,   formData)
-
+                    console.log(response)
                     // Hide Loading Page
                     this.$hideLoadingPage()
 

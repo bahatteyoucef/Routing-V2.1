@@ -133,7 +133,7 @@
                         <label for="text"               class="form-label">CustomerType (CustomerType)</label>
                         <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType">
                             <option     :value="'Hypermarché'">Hypermarché</option>
-                            <option     :value="'Supermarché'">Supermarché</option>
+                            <option     :value="'Supermarché'">Supérette</option>
                             <option     :value="'Alimentation General'">Alimentation General</option>
                             <option     :value="'Bureau Tabac'">Bureau Tabac</option>
                             <option     :value="'Cafétéria'">Cafétéria</option>
