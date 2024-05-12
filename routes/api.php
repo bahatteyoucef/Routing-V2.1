@@ -10,6 +10,7 @@ use App\Http\Controllers\RouteImportTempoController;
 use App\Http\Controllers\StatisticController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserTerritoryController;
+use App\Models\Client;
 use App\Models\ClientTempo;
 use App\Models\JourneyPlan;
 use App\Models\RouteImport;
@@ -220,9 +221,10 @@ Route::middleware('auth:api')->group(function () {
 
     //
 
-    Route::post('/route_import/stats'                                                                   ,   [RouteImportController::class           , 'statsRouteImports'                           ]);
+    Route::post('/route_import/stats'                                                                   ,   [RouteImportController::class           , 'statsRouteImports'                       ]);
 
     //
 
-    Route::post('/statistics/details'                                                                   ,   [StatisticController::class             , 'statsDetails'                                ]);
+    Route::post('/statistics/details'                                                                   ,   [StatisticController::class             , 'statsDetails'                            ]);
+
 });
