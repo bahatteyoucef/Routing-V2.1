@@ -116,12 +116,12 @@ class RouteImport extends Model
 
         if($request->get("new_upload")  ==  "true") {
 
-            $fileName               =   uniqid().'.'.$request->file->getClientOriginalExtension();
+            $fileName                                   =   uniqid().'.'.$request->file->getClientOriginalExtension();
             $request->file->move(public_path('uploads/route_import/'.Auth::user()->id), $fileName);
 
             // 
 
-            $route_import_filename  =   new RouteImportFile();
+            $route_import_filename                      =   new RouteImportFile();
 
             $route_import_filename->id_route_import     =   $route_import->id;
             $route_import_filename->file                =   $fileName;
@@ -398,10 +398,40 @@ class RouteImport extends Model
     public static function deleteData(int $id)
     {
 
-        Client::where("id_route_import", $id)->delete();
+        // Delete Route Import Files and Excel Files
+
+        $route_import_files  =   RouteImportFile::where("id_route_import", $id)->get(); 
+
+        foreach ($route_import_files as $route_import_file) {
+
+            $fileName       =   $route_import_file->file; // Replace with the actual filename
+            RouteImportFile::deleteRouteImportFile($fileName);
+
+            $route_import_file->delete();
+        }
+
+        //
+
+        // Delete Client and Their Images
+
+        $clients    =   Client::where("id_route_import", $id)->get();
+
+        foreach ($clients as $client) {
+
+            $filePath   =   public_path('uploads/clients/'.$client->id);  
+
+            if (File::exists($filePath)) {
+
+                File::deleteDirectory($filePath);
+            }
+
+            $client->delete();
+        }
+
+        //
+
         JourneyPlan::where("id_route_import", $id)->delete();
         Journee::where("id_route_import", $id)->delete();
-        RouteImportFile::where("id_route_import", $id)->delete();
     }
 
     //

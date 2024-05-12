@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Fluent;
 use stdClass;
@@ -277,7 +278,7 @@ class Client extends Model
 
         if($request->hasFile("CustomerBarCode_image")) {
 
-            $fileName                           =   $client->id."_".$client->DistrictNo."_".$client->CityNo."_"."_CUSTOMERCODE_".$client->CustomerCode.'.'.$request->file("CustomerBarCode_image")->getClientOriginalExtension();
+            $fileName                           =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_CUSTOMERCODE_".$client->CustomerCode.'.'.$request->file("CustomerBarCode_image")->getClientOriginalExtension();
 
             $request->file("CustomerBarCode_image")->move(public_path('uploads/clients/'.$client->id), $fileName);
 
@@ -293,7 +294,7 @@ class Client extends Model
 
         if($request->hasFile("facade_image")) {
 
-            $fileName                   =   $client->id."_".$client->DistrictNo."_".$client->CityNo."_"."_FACADE_".$client->CustomerCode.'.'.$request->file("facade_image")->getClientOriginalExtension();
+            $fileName                   =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_FACADE_".$client->CustomerCode.'.'.$request->file("facade_image")->getClientOriginalExtension();
 
             $request->file("facade_image")->move(public_path('uploads/clients/'.$client->id), $fileName);
 
@@ -309,7 +310,7 @@ class Client extends Model
 
         if($request->hasFile("in_store_image")) {
 
-            $fileName                   =   $client->id."_".$client->DistrictNo."_".$client->CityNo."_"."_IN_STORE_".$client->CustomerCode.'.'.$request->file("in_store_image")->getClientOriginalExtension();
+            $fileName                   =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_IN_STORE_".$client->CustomerCode.'.'.$request->file("in_store_image")->getClientOriginalExtension();
 
             $request->file("in_store_image")->move(public_path('uploads/clients/'.$client->id), $fileName);
 
@@ -496,7 +497,7 @@ class Client extends Model
 
                 if($request->hasFile("CustomerBarCode_image")) {
 
-                    $fileName                           =   $client->id."_".$client->DistrictNo."_".$client->CityNo."_"."_CUSTOMERCODE_".$client->CustomerCode.'.'.$request->file("CustomerBarCode_image")->getClientOriginalExtension();
+                    $fileName                           =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_CUSTOMERCODE_".$client->CustomerCode.'.'.$request->file("CustomerBarCode_image")->getClientOriginalExtension();
 
                     $request->file("CustomerBarCode_image")->move(public_path('uploads/clients/'.$client->id), $fileName);
 
@@ -530,7 +531,7 @@ class Client extends Model
 
                 if($request->hasFile("facade_image")) {
 
-                    $fileName                   =   $client->id."_".$client->DistrictNo."_".$client->CityNo."_"."_FACADE_".$client->CustomerCode.'.'.$request->file("facade_image")->getClientOriginalExtension();
+                    $fileName                   =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_FACADE_".$client->CustomerCode.'.'.$request->file("facade_image")->getClientOriginalExtension();
 
                     $request->file("facade_image")->move(public_path('uploads/clients/'.$client->id), $fileName);
 
@@ -564,7 +565,7 @@ class Client extends Model
 
                 if($request->hasFile("in_store_image")) {
 
-                    $fileName                   =   $client->id."_".$client->DistrictNo."_".$client->CityNo."_"."_IN_STORE_".$client->CustomerCode.'.'.$request->file("in_store_image")->getClientOriginalExtension();
+                    $fileName                   =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_IN_STORE_".$client->CustomerCode.'.'.$request->file("in_store_image")->getClientOriginalExtension();
 
                     $request->file("in_store_image")->move(public_path('uploads/clients/'.$client->id), $fileName);
 
@@ -787,6 +788,13 @@ class Client extends Model
     public static function deleteClient(int $id_route_import, int $id) {
 
         $client     =   Client::find($id);
+
+        $directory  =   public_path('uploads/clients/'.$client->id);
+
+        if (File::exists($directory)) {
+
+            File::deleteDirectory($directory);
+        }
 
         $client->delete();
     }

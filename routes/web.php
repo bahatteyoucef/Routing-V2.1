@@ -2,9 +2,6 @@
 
 use App\Http\Controllers\WebController;
 use App\Models\Client;
-use App\Models\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 
 //
@@ -31,9 +28,9 @@ Route::get('/clients/facade_images/update'      ,   function() {
                     $extension                  =   pathinfo($filename_with_extension, PATHINFO_EXTENSION);
 
                     // Attempt to rename the file
-                    if (rename("uploads/clients/".$client->id."/".$client->CustomerBarCode_image, "uploads/clients/".$client->id."/".$client->id."_".$client->DistrictNo."_".$client->CityNo."_"."_CUSTOMERCODE_".$client->CustomerCode.".".$extension)) {
+                    if (rename("uploads/clients/".$client->id."/".$client->CustomerBarCode_image, "uploads/clients/".$client->id."/".$client->DistrictNo."_".$client->CityNo."_".$client->id."_"."_CUSTOMERCODE_".$client->CustomerCode.".".$extension)) {
 
-                        $client->CustomerBarCode_image  =   $client->id."_".$client->DistrictNo."_".$client->CityNo."_"."_CUSTOMERCODE_".$client->CustomerCode.".".$extension;
+                        $client->CustomerBarCode_image  =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_"."_CUSTOMERCODE_".$client->CustomerCode.".".$extension;
                     } 
                 }
             }
@@ -53,9 +50,9 @@ Route::get('/clients/facade_images/update'      ,   function() {
                     $extension                  =   pathinfo($filename_with_extension, PATHINFO_EXTENSION);
 
                     // Attempt to rename the file Facade
-                    if (rename("uploads/clients/".$client->id."/".$client->facade_image         , "uploads/clients/".$client->id."/".$client->id."_".$client->DistrictNo."_".$client->CityNo."_"."_FACADE_".$client->CustomerCode.".".$extension)) {
+                    if (rename("uploads/clients/".$client->id."/".$client->facade_image         , "uploads/clients/".$client->id."/".$client->DistrictNo."_".$client->CityNo."_".$client->id."_"."_FACADE_".$client->CustomerCode.".".$extension)) {
 
-                        $client->facade_image       =   $client->id."_".$client->DistrictNo."_".$client->CityNo."_"."_FACADE_".$client->CustomerCode.".".$extension;
+                        $client->facade_image       =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_"."_FACADE_".$client->CustomerCode.".".$extension;
                     } 
                 }
             }
@@ -75,9 +72,9 @@ Route::get('/clients/facade_images/update'      ,   function() {
                     $extension                  =   pathinfo($filename_with_extension, PATHINFO_EXTENSION);
 
                     // Attempt to rename the file
-                    if (rename("uploads/clients/".$client->id."/".$client->in_store_image       , "uploads/clients/".$client->id."/".$client->id."_".$client->DistrictNo."_".$client->CityNo."_"."_IN_STORE_".$client->CustomerCode.".".$extension)) {
+                    if (rename("uploads/clients/".$client->id."/".$client->in_store_image       , "uploads/clients/".$client->id."/".$client->DistrictNo."_".$client->CityNo."_".$client->id."_"."_IN_STORE_".$client->CustomerCode.".".$extension)) {
 
-                        $client->in_store_image     =   $client->id."_".$client->DistrictNo."_".$client->CityNo."_"."_IN_STORE_".$client->CustomerCode.".".$extension;
+                        $client->in_store_image     =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_"."_IN_STORE_".$client->CustomerCode.".".$extension;
                     } 
                 }
             }
