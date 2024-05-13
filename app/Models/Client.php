@@ -801,6 +801,53 @@ class Client extends Model
 
     //
 
+    public static function clientsExport(Request $request) {
+
+        if($request->get("CustomerType") ==  "All") {
+
+            $clients    =   Client::where("id_route_import", $request->get("id_route_import"))
+                                ->select("clients.*", "users.nom as owner")
+                                ->join("users", "clients.owner", "users.id")
+                                ->orderBy('clients.id', 'desc')
+                                ->get()
+                                ->makeHidden(['id_route_import']);
+        }
+
+        if($request->get("CustomerType") ==  "Validated") {
+
+            $clients    =   Client::where([["CustomerType", "validated"]    , ["id_route_import", $request->get("id_route_import")]])
+                                ->select("clients.*", "users.nom as owner")
+                                ->join("users", "clients.owner", "users.id")
+                                ->orderBy('clients.id', 'desc')
+                                ->get()
+                                ->makeHidden(['id_route_import']);
+        }
+
+        if($request->get("CustomerType") ==  "Pending") {
+
+            $clients    =   Client::where([["CustomerType", "pending"]      , ["id_route_import", $request->get("id_route_import")]])
+                                ->select("clients.*", "users.nom as owner")
+                                ->join("users", "clients.owner", "users.id")
+                                ->orderBy('clients.id', 'desc')
+                                ->get()
+                                ->makeHidden(['id_route_import']);
+        }
+
+        if($request->get("CustomerType") ==  "NonValidated") {
+
+            $clients    =   Client::where([["CustomerType", "nonvalidated"] , ["id_route_import", $request->get("id_route_import")]])
+                                ->select("clients.*", "users.nom as owner")
+                                ->join("users", "clients.owner", "users.id")
+                                ->orderBy('clients.id', 'desc')
+                                ->get()
+                                ->makeHidden(['id_route_import']);
+        }
+
+        return $clients;
+    }
+
+    //
+
     public static function getDoublesClients(int $id_route_import) {
 
         $getDoublant    =   new stdClass();

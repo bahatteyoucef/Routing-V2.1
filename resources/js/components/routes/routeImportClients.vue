@@ -7,11 +7,29 @@
                     <!-- Header -->
                     <headerComponent    v-if="route_import&&($isRole('FrontOffice'))"                           :title="'List of clients du route import : '+route_import.libelle"      />
 
-                    <headerComponent    v-if="route_import&&($isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice'))"     :title="'List of clients du route import : '+route_import.libelle"      :add_modal="'addClientModal'"  :update_modal="'updateClientModal'"    :add_button="'New Client'"   
-                                                                                                                                        :update_button="'Update Client'"                                        />
+                    <headerComponent    v-if="route_import&&($isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice'))"     :title="'List of clients du route import : '+route_import.libelle"  :add_modal="'addClientModal'"           :add_button="'New Client'"   
+                                                                                                                                                                                                            :update_modal="'updateClientModal'"     :update_button="'Update Client'"    />
+                    <!-- Export Data    -->
+                    <div class="row w-75">
+                        <div class="col-6">
+                            <select     class="form-select form-select-sm"      v-model="CustomerType">
+                                <option value="All">All</option>
+                                <option value="Validated">Validated</option>
+                                <option value="Pending">Pending</option>
+                                <option value="NonValidated">NonValidated</option>
+                            </select>
+                        </div>
 
-                    <!--  -->
+                        <div class="col-3">
+                            <button class="btn btn-sm primary w-100" @click="downloadData()">Export Data</button>
+                        </div>
 
+                        <div class="col-3">
+                            <button class="btn btn-sm primary w-100" @click="downloadImages()">Export Images</button>
+                        </div>
+                    </div>
+
+                    <!-- Clients -->
                     <div id="route_import_client_index_parent" class="scrollbar scrollbar-deep-blue">
                         <table class="table route_import_client_index" id="route_import_client_index">
                             <thead>
@@ -199,7 +217,12 @@ export default {
             selected_client                         :   null    ,
             display_modal                           :   false   ,
 
-            selected_row                            :   null
+            selected_row                            :   null    ,
+
+            //
+
+            CustomerType                            :   "All"  ,
+            clients_export                          :   []
         }
     },
 
@@ -262,59 +285,31 @@ export default {
 
             try {
 
-                // if(this.getIsOnline) {
+                // Destroy DataTable
+                if(this.datatable_route_import_client_index)  {
 
-                    // Destroy DataTable
-                    if(this.datatable_route_import_client_index)  {
+                    this.datatable_route_import_client_index.destroy()
+                }
 
-                        this.datatable_route_import_client_index.destroy()
+                // Initialisation 
+                this.clients    =   [];
+
+                this.$callApi("post",   "/route_import/"+this.$route.params.id_route_import+"/clients",     null)
+                .then(async (res)=> {
+
+                    this.route_import   =   res.data.route_import
+                    this.clients        =   res.data.clients
+
+                    if(this.$isRole("FrontOffice")) {
+
+                        this.datatable_route_import_client_index    =   await this.$DataTableCreateFrontOffice("route_import_client_index")
                     }
 
-                    // Initialisation 
-                    this.clients    =   [];
+                    else {
 
-                    this.$callApi("post",   "/route_import/"+this.$route.params.id_route_import+"/clients",     null)
-                    .then(async (res)=> {
-
-                        this.route_import   =   res.data.route_import
-                        this.clients        =   res.data.clients
-
-                        if(this.$isRole("FrontOffice")) {
-
-                            this.datatable_route_import_client_index    =   await this.$DataTableCreateFrontOffice("route_import_client_index")
-                        }
-
-                        else {
-
-                            this.datatable_route_import_client_index    =   await this.$DataTableCreate("route_import_client_index")
-                        }
-                    })
-                // }
-
-                // else {
-
-                    // Destroy DataTable
-                    // if(this.datatable_route_import_client_index)  {
-
-                    //     this.datatable_route_import_client_index.destroy()
-                    // }
-                
-                    // // Initialisation 
-                    // this.clients                                =   [];
-
-                    // this.route_import                           =   await this.$indexedDB.$getRouteImport(this.$route.params.id_route_import)
-                    // this.clients                                =   this.route_import.clients
-
-                    // if(this.$isRole("FrontOffice")) {
-
-                    //     this.datatable_route_import_client_index    =   await this.$DataTableCreateFrontOffice("route_import_client_index")
-                    // }
-
-                    // else {
-
-                    //     this.datatable_route_import_client_index    =   await this.$DataTableCreate("route_import_client_index")
-                    // }
-                // }
+                        this.datatable_route_import_client_index    =   await this.$DataTableCreate("route_import_client_index")
+                    }
+                })
             }
 
             catch(e) {
@@ -357,7 +352,132 @@ export default {
             }
         },
 
-        //
+        //  //  //  //  //
+
+        //  //  //  //  //
+
+        //  //  //  //  //
+
+        async downloadImages() {
+
+            let formData            =   new FormData()
+
+            formData.append("CustomerType"      ,   this.CustomerType)
+            formData.append("id_route_import"   ,   this.$route.params.id_route_import)
+
+            this.$callApiResponse('post', '/route_import/all_data/images', formData, 'blob')
+            .then(response => {
+
+                console.log(response)
+
+                if(response.status  ==  200) {
+
+                    const url   =   window.URL.createObjectURL(new Blob([response.data]));
+                    const link  =   document.createElement('a');
+
+                    link.href   =   url;
+
+                    link.setAttribute('download', this.route_import.libelle+' Images.zip');
+
+                    document.body.appendChild(link);
+
+                    link.click();
+                }
+
+                else {
+
+                    // Send Errors
+                    this.$showErrors("Error !", ["No Images to Download"])
+                }
+
+            }).catch(error => {
+
+                console.error('Error downloading file:', error);
+            });
+        },
+
+        async downloadData() {
+
+            try {
+
+                //
+                this.$showLoadingPage()
+
+                // Initialisation 
+                this.clients_export     =   [];
+
+                let formData            =   new FormData()
+
+                formData.append("CustomerType"      ,   this.CustomerType)
+                formData.append("id_route_import"   ,   this.$route.params.id_route_import)
+
+                this.$callApi("post",   "/route_import/all_data", formData)
+                .then(async (res)=> {
+
+                    console.log(res)
+
+                    this.clients_export  =   res.data.clients;
+
+                    await this.exportToExcel()
+
+                    //
+                    this.$hideLoadingPage()
+                })
+            }
+
+            catch(e) {
+
+                console.log(e)
+            }
+        },
+
+        async exportToExcel() {
+
+            const worksheet     =   XLSX.utils.json_to_sheet(this.clients_export);
+            const workbook      =   XLSX.utils.book_new();
+
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+            const excelBuffer   =   XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+            this.saveExcelFile(excelBuffer, this.route_import.libelle+' Clients.xlsx');
+        },
+
+        saveExcelFile(buffer, filename) {
+
+            const data = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+            if (window.navigator.msSaveOrOpenBlob) {
+            
+                // For IE
+                window.navigator.msSaveOrOpenBlob(data, filename);
+            } 
+
+            else {
+            
+                // For other browsers
+                const a     =   document.createElement('a');
+                const url   =   URL.createObjectURL(data);
+
+                a.href      =   url;
+                a.download  =   filename;
+
+                document.body.appendChild(a);
+
+                a.click();
+
+                setTimeout(() => {
+
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 0);
+            }
+        },
+
+        //  //  //  //  //
+
+        //  //  //  //  //
+
+        //  //  //  //  //
 
         async addClientToDatatable(client) {
 

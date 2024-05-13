@@ -227,4 +227,8 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/statistics/details'                                                                   ,   [StatisticController::class             , 'statsDetails'                            ]);
 
+    //
+
+    Route::post('/route_import/all_data'                                                                ,   [RouteImportController::class           , 'downloadData'                            ]);
+    Route::post('/route_import/all_data/images'                                                         ,   [RouteImportController::class           , 'downloadImages'                          ]);
 });

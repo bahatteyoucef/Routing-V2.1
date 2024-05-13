@@ -52,6 +52,28 @@ export default {
             }
         },
 
+        async $callApiResponse(method, url, dataObj, responseType ){
+            try {
+
+                if(method == "post") {
+
+                    return await axios.post(url, dataObj, {
+                        responseType: responseType
+                    })
+                }
+
+                if(method == "get") {
+
+                    return await axios.get(url, dataObj, {
+                        responseType: responseType
+                    })
+                }
+
+            } catch (e) {
+                return e.response
+            }
+        },
+
         //
 
         $goTo(route) {

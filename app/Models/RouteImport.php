@@ -10,8 +10,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Fluent;
+use stdClass;
+use ZipArchive;
 
 class RouteImport extends Model
 {
@@ -990,5 +993,111 @@ class RouteImport extends Model
         return $route_import_cities;
     }
 
-    //
+    //  //  //  //  //  //  //  //  //
+
+    //  //  //  //  //  //  //  //  //
+
+    //  //  //  //  //  //  //  //  //
+
+    public static function downloadData(Request $request) {
+
+        //
+        $clients         =   Client::clientsExport($request);
+
+        //
+        return $clients;
+    }
+
+    public static function downloadImages(Request $request) {
+       
+        //
+        $route_import   =   RouteImport::find($request->get("id_route_import"));
+
+        //
+        $images     =   [];
+
+        $zip        =   new \ZipArchive;
+        $zipFile    =   $route_import->libelle.' Images.zip';
+
+        //
+        $images                     =   RouteImport::prepareImagesExport($request);
+        $customer_bar_code_images   =   $images->customer_bar_code_images;
+        $in_store_images            =   $images->in_store_images;
+        $facade_images              =   $images->facade_images;
+
+        //
+        if ($zip->open(public_path($zipFile), ZipArchive::CREATE) === TRUE) {
+
+            // CUstomerBarCode Images
+            foreach ($customer_bar_code_images as $image) {
+
+                $pathToFile     =   public_path($image);
+                $name           =   basename($pathToFile);
+                $folderName     =   'CustomerBarCode Images'; // Specify the folder name here
+
+                // Adjust the path to include the folder name
+                $pathInZip      =   $folderName . '/' . $name;
+
+                // Add the file to the zip archive with the adjusted path
+                $zip->addFile($pathToFile, $pathInZip);
+            }
+
+            // In Store Images
+            foreach ($in_store_images as $image) {
+
+                $pathToFile     =   public_path($image);
+                $name           =   basename($pathToFile);
+                $folderName     =   'In Store Images'; // Specify the folder name here
+
+                // Adjust the path to include the folder name
+                $pathInZip      =   $folderName . '/' . $name;
+
+                // Add the file to the zip archive with the adjusted path
+                $zip->addFile($pathToFile, $pathInZip);
+            }
+
+            // Facade Images
+            foreach ($facade_images as $image) {
+
+                $pathToFile     =   public_path($image);
+                $name           =   basename($pathToFile);
+                $folderName     =   'Facade Images'; // Specify the folder name here
+
+                // Adjust the path to include the folder name
+                $pathInZip      =   $folderName . '/' . $name;
+
+                // Add the file to the zip archive with the adjusted path
+                $zip->addFile($pathToFile, $pathInZip);
+            }
+
+            $zip->close();
+        }
+
+        $filePath   =   public_path($zipFile);
+
+        return Response::download($filePath)->deleteFileAfterSend(true);
+    }
+
+    public static function prepareImagesExport(Request $request) {
+
+        //
+        $images                             =   new stdClass();
+        $images->customer_bar_code_images   =   [];
+        $images->in_store_images            =   [];
+        $images->facade_images              =   [];
+
+        //
+        $clients    =   Client::clientsExport($request);
+
+        //
+        foreach ($clients as $client) {
+
+            array_push($images->customer_bar_code_images    , ('/uploads/clients/'.$client->id.'/'.$client->CustomerBarCode_image));
+            array_push($images->in_store_images             , ('/uploads/clients/'.$client->id.'/'.$client->in_store_image));
+            array_push($images->facade_images               , ('/uploads/clients/'.$client->id.'/'.$client->facade_image));
+        }
+
+        //
+        return $images;
+    }
 }

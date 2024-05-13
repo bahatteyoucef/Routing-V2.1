@@ -656,5 +656,43 @@ class RouteImportController extends Controller
         }
     }
 
-    //
+    //  //  //  //  //  //  //  //  //
+
+    //  //  //  //  //  //  //  //  //
+
+    //  //  //  //  //  //  //  //  //
+
+    public function downloadData(Request $request) {
+
+        try {
+
+            $clients    =   RouteImport::downloadData($request);
+
+            return response()->json([
+                'clients'    =>  $clients
+            ],200);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    public function downloadImages(Request $request) {
+
+        try {
+
+            return RouteImport::downloadImages($request);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
 }
