@@ -204,6 +204,17 @@ class Client extends Model
 
         //
 
+        // CustomerBarCode
+        // Pattern for alphanumeric characters, underscores, periods, hyphens, and spaces
+        $pattern    =   "/^[a-zA-Z0-9]+$/";
+
+        if(preg_match($pattern, $request->input("CustomerCode"))    !==     1) {
+
+            throw new Exception("CustomerCode Can Only Contain Letters and Numbers !");
+        }
+
+        //
+
         return $validator;
     }
 
@@ -431,6 +442,19 @@ class Client extends Model
     
             return (($input->in_store_image_original_name           !=  "")&&($input->in_store_image_updated            ==  "true"));
         });
+
+        //
+
+        // CustomerBarCode
+        // Pattern for alphanumeric characters, underscores, periods, hyphens, and spaces
+        $pattern    =   "/^[a-zA-Z0-9]+$/";
+
+        if(preg_match($pattern, $request->input("CustomerCode"))    !==     1) {
+
+            throw new Exception("CustomerCode Can Only Contain Letters and Numbers !");
+        }
+
+        //
 
         return $validator;
     }
@@ -803,7 +827,7 @@ class Client extends Model
 
     public static function clientsExport(Request $request) {
 
-        if($request->get("CustomerType") ==  "All") {
+        if($request->get("status") ==  "All") {
 
             $clients    =   Client::where("id_route_import", $request->get("id_route_import"))
                                 ->select("clients.*", "users.nom as owner")
@@ -813,9 +837,9 @@ class Client extends Model
                                 ->makeHidden(['id_route_import']);
         }
 
-        if($request->get("CustomerType") ==  "Validated") {
+        if($request->get("status") ==  "Validated") {
 
-            $clients    =   Client::where([["CustomerType", "validated"]    , ["id_route_import", $request->get("id_route_import")]])
+            $clients    =   Client::where([["status", "validated"]    , ["id_route_import", $request->get("id_route_import")]])
                                 ->select("clients.*", "users.nom as owner")
                                 ->join("users", "clients.owner", "users.id")
                                 ->orderBy('clients.id', 'desc')
@@ -823,9 +847,9 @@ class Client extends Model
                                 ->makeHidden(['id_route_import']);
         }
 
-        if($request->get("CustomerType") ==  "Pending") {
+        if($request->get("status") ==  "Pending") {
 
-            $clients    =   Client::where([["CustomerType", "pending"]      , ["id_route_import", $request->get("id_route_import")]])
+            $clients    =   Client::where([["status", "pending"]      , ["id_route_import", $request->get("id_route_import")]])
                                 ->select("clients.*", "users.nom as owner")
                                 ->join("users", "clients.owner", "users.id")
                                 ->orderBy('clients.id', 'desc')
@@ -833,9 +857,9 @@ class Client extends Model
                                 ->makeHidden(['id_route_import']);
         }
 
-        if($request->get("CustomerType") ==  "NonValidated") {
+        if($request->get("status") ==  "NonValidated") {
 
-            $clients    =   Client::where([["CustomerType", "nonvalidated"] , ["id_route_import", $request->get("id_route_import")]])
+            $clients    =   Client::where([["status", "nonvalidated"] , ["id_route_import", $request->get("id_route_import")]])
                                 ->select("clients.*", "users.nom as owner")
                                 ->join("users", "clients.owner", "users.id")
                                 ->orderBy('clients.id', 'desc')

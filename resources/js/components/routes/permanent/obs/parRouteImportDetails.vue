@@ -301,6 +301,7 @@
                     <thead>
                         <tr>
                             <th class="col-sm-1">Index</th>
+                            <th class="col-sm-2">Id</th>
 
                             <th class="col-sm-2">CustomerCode</th>
 
@@ -312,6 +313,10 @@
 
                             <th class="col-sm-1">CityNo</th>
                             <th class="col-sm-2">CityNameE</th>
+
+                            <th class="col-sm-2">CustomerBarCode Image</th>
+                            <th class="col-sm-2">In Store Image</th>
+                            <th class="col-sm-2">Facade Image</th>
 
                             <th class="col-sm-2">Address</th>
                             <th class="col-sm-2">Neighborhood</th>
@@ -348,6 +353,7 @@
                         <tr class="datatable_par_route_import_details_filters">
 
                             <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Index"            /></th>
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Id"               /></th>
 
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
@@ -358,6 +364,10 @@
 
                             <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CityNo"           /></th>
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CityNameE"        /></th>
+
+                            <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerBarCode Image"    /></th>
+                            <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="In Store Image"           /></th>
+                            <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Facade Image"             /></th>
 
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Address"          /></th>
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Neighborhood"     /></th>
@@ -393,6 +403,7 @@
                     <tbody>
                         <tr v-for="(client, index) in clients_table_affiche" :key="client" role="button" @click="showModalupdateClient(client)">
                             <td>{{index +   1}}</td>
+                            <td>{{client.id}}</td>
 
                             <td>{{client.CustomerCode}}</td>
                             <td>{{client.CustomerNameE}}</td>
@@ -403,6 +414,10 @@
 
                             <td>{{client.CityNo}}</td>
                             <td>{{client.CityNameE}}</td>
+
+                            <td>{{client.CustomerBarCode_image}}</td>
+                            <td>{{client.in_store_image}}</td>
+                            <td>{{client.facade_image}}</td>
 
                             <td>{{client.Address}}</td>
                             <td>{{client.Neighborhood}}</td>

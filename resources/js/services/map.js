@@ -152,7 +152,20 @@ export default class Map {
         // Add Markers
         for (let i = 0; i < clients.length; i++) {
             
-            if(((clients[i].Latitude != null)&&(clients[i].Longitude != null))&&(!isNaN(clients[i].Latitude)&&(!isNaN(clients[i].Longitude)))) {
+            if(((clients[i].Latitude != null)&&(clients[i].Longitude != null))
+            &&(!isNaN(clients[i].Latitude))&&(!isNaN(clients[i].Longitude))
+            &&(clients[i].Latitude <= 90)&&(clients[i].Latitude >= -90)
+            &&(clients[i].Longitude <= 180)&&(clients[i].Latitude >= -180)) {
+
+                // Add Marker
+                this.$addRouteMarkerMode(clients[i], clients[i].Latitude, clients[i].Longitude, JPID, icon)
+            }
+
+            else {
+
+                clients[i].Latitude   =   0
+                clients[i].Longitude  =   0
+
                 // Add Marker
                 this.$addRouteMarkerMode(clients[i], clients[i].Latitude, clients[i].Longitude, JPID, icon)
             }
@@ -233,7 +246,19 @@ export default class Map {
         // Add Markers
         for (let i = 0; i < clients.length; i++) {
             
-            if(((clients[i].Latitude != null)&&(clients[i].Longitude != null))&&(!isNaN(clients[i].Latitude)&&(!isNaN(clients[i].Longitude)))) {
+            if(((clients[i].Latitude != null)&&(clients[i].Longitude != null))
+            &&(!isNaN(clients[i].Latitude))&&(!isNaN(clients[i].Longitude))
+            &&(clients[i].Latitude <= 90)&&(clients[i].Latitude >= -90)
+            &&(clients[i].Longitude <= 180)&&(clients[i].Latitude >= -180)) {
+
+                // Add Marker
+                this.$addRouteMarker(clients, i, JPID, icon)
+            }
+
+            else {
+
+                clients[i].Latitude   =   0
+                clients[i].Longitude  =   0
 
                 // Add Marker
                 this.$addRouteMarker(clients, i, JPID, icon)

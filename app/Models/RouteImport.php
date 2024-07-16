@@ -1008,16 +1008,18 @@ class RouteImport extends Model
         return $clients;
     }
 
+    //
+
     public static function downloadImages(Request $request) {
-       
-        //
-        $route_import   =   RouteImport::find($request->get("id_route_import"));
 
         //
-        $images     =   [];
+        $route_import               =   RouteImport::find($request->get("id_route_import"));
 
-        $zip        =   new \ZipArchive;
-        $zipFile    =   $route_import->libelle.' Images.zip';
+        //
+        $images                     =   [];
+
+        $zip                        =   new \ZipArchive;
+        $zipFile                    =   $route_import->libelle.' Images.zip';
 
         //
         $images                     =   RouteImport::prepareImagesExport($request);
@@ -1028,10 +1030,11 @@ class RouteImport extends Model
         //
         if ($zip->open(public_path($zipFile), ZipArchive::CREATE) === TRUE) {
 
-            // CUstomerBarCode Images
+            // CustomerBarCode Images
             foreach ($customer_bar_code_images as $image) {
 
                 $pathToFile     =   public_path($image);
+
                 $name           =   basename($pathToFile);
                 $folderName     =   'CustomerBarCode Images'; // Specify the folder name here
 
@@ -1046,6 +1049,7 @@ class RouteImport extends Model
             foreach ($in_store_images as $image) {
 
                 $pathToFile     =   public_path($image);
+
                 $name           =   basename($pathToFile);
                 $folderName     =   'In Store Images'; // Specify the folder name here
 
@@ -1053,13 +1057,14 @@ class RouteImport extends Model
                 $pathInZip      =   $folderName . '/' . $name;
 
                 // Add the file to the zip archive with the adjusted path
-                $zip->addFile($pathToFile, $pathInZip);
+                $zip->addFile($pathToFile, $pathInZip); 
             }
 
             // Facade Images
             foreach ($facade_images as $image) {
 
                 $pathToFile     =   public_path($image);
+
                 $name           =   basename($pathToFile);
                 $folderName     =   'Facade Images'; // Specify the folder name here
 
@@ -1075,7 +1080,7 @@ class RouteImport extends Model
 
         $filePath   =   public_path($zipFile);
 
-        return Response::download($filePath)->deleteFileAfterSend(true);
+        return $filePath;
     }
 
     public static function prepareImagesExport(Request $request) {
@@ -1092,9 +1097,233 @@ class RouteImport extends Model
         //
         foreach ($clients as $client) {
 
-            array_push($images->customer_bar_code_images    , ('/uploads/clients/'.$client->id.'/'.$client->CustomerBarCode_image));
-            array_push($images->in_store_images             , ('/uploads/clients/'.$client->id.'/'.$client->in_store_image));
-            array_push($images->facade_images               , ('/uploads/clients/'.$client->id.'/'.$client->facade_image));
+            if($client->CustomerBarCode_image   !=  "") {
+
+                if(file_exists('uploads/clients/'.$client->id.'/'.$client->CustomerBarCode_image)) {
+
+                    array_push($images->customer_bar_code_images    , ('/uploads/clients/'.$client->id.'/'.$client->CustomerBarCode_image));
+                }
+            }
+
+            if($client->in_store_image          !=  "") {
+
+                if(file_exists('uploads/clients/'.$client->id.'/'.$client->in_store_image)) {
+
+                    array_push($images->in_store_images             , ('/uploads/clients/'.$client->id.'/'.$client->in_store_image));
+                }
+            }
+
+            if($client->facade_image            !=  "") {
+
+                if(file_exists('uploads/clients/'.$client->id.'/'.$client->facade_image)) {
+
+                    array_push($images->facade_images               , ('/uploads/clients/'.$client->id.'/'.$client->facade_image));
+                }
+            }
+        }
+
+        //
+        return $images;
+    }
+
+    //
+
+    public static function downloadCustomerCodeImages(Request $request) {
+
+        //
+        $route_import               =   RouteImport::find($request->get("id_route_import"));
+
+        //
+        $images                     =   [];
+
+        $zip                        =   new \ZipArchive;
+        $zipFile                    =   $route_import->libelle.' Customer Code Images.zip';
+
+        //
+        $images                     =   RouteImport::prepareImagesExport($request);
+        $customer_bar_code_images   =   $images->customer_bar_code_images;
+
+        //
+        if ($zip->open(public_path($zipFile), ZipArchive::CREATE) === TRUE) {
+
+            // CustomerBarCode Images
+            foreach ($customer_bar_code_images as $image) {
+
+                $pathToFile     =   public_path($image);
+
+                $name           =   basename($pathToFile);
+                $folderName     =   'CustomerBarCode Images'; // Specify the folder name here
+
+                // Adjust the path to include the folder name
+                $pathInZip      =   $folderName . '/' . $name;
+
+                // Add the file to the zip archive with the adjusted path
+                $zip->addFile($pathToFile, $pathInZip);
+            }
+
+            $zip->close();
+        }
+
+        $filePath   =   public_path($zipFile);
+
+        return $filePath;
+    }
+
+    public static function prepareCustomerCodeImagesExport(Request $request) {
+
+        //
+        $images                             =   new stdClass();
+        $images->customer_bar_code_images   =   [];
+
+        //
+        $clients    =   Client::clientsExport($request);
+
+        //
+        foreach ($clients as $client) {
+
+            if($client->CustomerBarCode_image   !=  "") {
+
+                if(file_exists('uploads/clients/'.$client->id.'/'.$client->CustomerBarCode_image)) {
+
+                    array_push($images->customer_bar_code_images    , ('/uploads/clients/'.$client->id.'/'.$client->CustomerBarCode_image));
+                }
+            }
+        }
+
+        //
+        return $images;
+    }
+
+    //
+
+    public static function downloadFacadeImages(Request $request) {
+
+        //
+        $route_import               =   RouteImport::find($request->get("id_route_import"));
+
+        //
+        $images                     =   [];
+
+        $zip                        =   new \ZipArchive;
+        $zipFile                    =   $route_import->libelle.' Facade Images.zip';
+
+        //
+        $images                     =   RouteImport::prepareImagesExport($request);
+        $facade_images              =   $images->facade_images;
+
+        //
+        if ($zip->open(public_path($zipFile), ZipArchive::CREATE) === TRUE) {
+
+            // Facade Images
+            foreach ($facade_images as $image) {
+
+                $pathToFile     =   public_path($image);
+
+                $name           =   basename($pathToFile);
+                $folderName     =   'Facade Images'; // Specify the folder name here
+
+                // Adjust the path to include the folder name
+                $pathInZip      =   $folderName . '/' . $name;
+
+                // Add the file to the zip archive with the adjusted path
+                $zip->addFile($pathToFile, $pathInZip);
+            }
+
+            $zip->close();
+        }
+
+        $filePath   =   public_path($zipFile);
+
+        return $filePath;
+    }
+
+    public static function prepareFacadeImagesExport(Request $request) {
+
+        //
+        $images                             =   new stdClass();
+        $images->facade_images              =   [];
+
+        //
+        $clients    =   Client::clientsExport($request);
+
+        //
+        foreach ($clients as $client) {
+
+            if($client->facade_image            !=  "") {
+
+                if(file_exists('uploads/clients/'.$client->id.'/'.$client->facade_image)) {
+
+                    array_push($images->facade_images               , ('/uploads/clients/'.$client->id.'/'.$client->facade_image));
+                }
+            }
+        }
+
+        //
+        return $images;
+    }
+
+    //
+
+    public static function downloadInStoreImages(Request $request) {
+
+        //
+        $route_import               =   RouteImport::find($request->get("id_route_import"));
+
+        //
+        $images                     =   [];
+
+        $zip                        =   new \ZipArchive;
+        $zipFile                    =   $route_import->libelle.' In Store Images.zip';
+
+        //
+        $images                     =   RouteImport::prepareImagesExport($request);
+        $in_store_images            =   $images->in_store_images;
+
+        //
+        if ($zip->open(public_path($zipFile), ZipArchive::CREATE) === TRUE) {
+
+            // In Store Images
+            foreach ($in_store_images as $image) {
+
+                $pathToFile     =   public_path($image);
+
+                $name           =   basename($pathToFile);
+                $folderName     =   'In Store Images'; // Specify the folder name here
+
+                // Adjust the path to include the folder name
+                $pathInZip      =   $folderName . '/' . $name;
+
+                // Add the file to the zip archive with the adjusted path
+                $zip->addFile($pathToFile, $pathInZip); 
+            }
+
+            $zip->close();
+        }
+
+        $filePath   =   public_path($zipFile);
+
+        return $filePath;
+    }
+
+    public static function prepareInStoreImagesExport(Request $request) {
+
+        //
+        $images                             =   new stdClass();
+        $images->in_store_images            =   [];
+
+        //
+        $clients    =   Client::clientsExport($request);
+
+        //
+        foreach ($clients as $client) {
+
+            if($client->in_store_image          !=  "") {
+
+                if(file_exists('uploads/clients/'.$client->id.'/'.$client->in_store_image)) {
+
+                    array_push($images->in_store_images             , ('/uploads/clients/'.$client->id.'/'.$client->in_store_image));
+                }
+            }
         }
 
         //

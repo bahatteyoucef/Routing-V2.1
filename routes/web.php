@@ -5,91 +5,91 @@ use App\Models\Client;
 use Illuminate\Support\Facades\Route;
 
 //
-Route::get('/clients/facade_images/update'      ,   function() {
+// Route::get('/clients/images/update_images'      ,   function() {
 
-    try {
+//     try {
 
-        $clients    =   Client::all();
+//         $clients    =   Client::all();
 
-        foreach ($clients as $client) {
+//         foreach ($clients as $client) {
 
-            // Check if the old file exists
-            if($client->CustomerBarCode_image   !=  "") {
+//             // Check if the old file exists
+//             if($client->CustomerBarCode_image   !=  "") {
 
-                if (file_exists("uploads/clients/".$client->id."/".$client->CustomerBarCode_image)) {
+//                 if (file_exists("uploads/clients/".$client->id."/".$client->CustomerBarCode_image)) {
                     
-                    // Get Extension
-                    $file_path                  =   "/uploads/clients/".$client->id."/".$client->CustomerBarCode_image;
+//                     // Get Extension
+//                     $file_path                  =   "/uploads/clients/".$client->id."/".$client->CustomerBarCode_image;
 
-                    // Get the filename with extension
-                    $filename_with_extension    =   basename($file_path);
+//                     // Get the filename with extension
+//                     $filename_with_extension    =   basename($file_path);
 
-                    // Extract extension using pathinfo()
-                    $extension                  =   pathinfo($filename_with_extension, PATHINFO_EXTENSION);
+//                     // Extract extension using pathinfo()
+//                     $extension                  =   pathinfo($filename_with_extension, PATHINFO_EXTENSION);
 
-                    // Attempt to rename the file
-                    if (rename("uploads/clients/".$client->id."/".$client->CustomerBarCode_image, "uploads/clients/".$client->id."/".$client->DistrictNo."_".$client->CityNo."_".$client->id."_"."_CUSTOMERCODE_".$client->CustomerCode.".".$extension)) {
+//                     // Attempt to rename the file
+//                     if (rename("uploads/clients/".$client->id."/".$client->CustomerBarCode_image, "uploads/clients/".$client->id."/".$client->DistrictNo."_".$client->CityNo."_".$client->id."_"."_CUSTOMERCODE_".$client->CustomerCode.".".$extension)) {
 
-                        $client->CustomerBarCode_image  =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_"."_CUSTOMERCODE_".$client->CustomerCode.".".$extension;
-                    } 
-                }
-            }
+//                         $client->CustomerBarCode_image  =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_"."_CUSTOMERCODE_".$client->CustomerCode.".".$extension;
+//                     } 
+//                 }
+//             }
 
-            // Check if the old file exists
-            if($client->facade_image    !=  "") {
+//             // Check if the old file exists
+//             if($client->facade_image    !=  "") {
 
-                if (file_exists("uploads/clients/".$client->id."/".$client->facade_image)) {
+//                 if (file_exists("uploads/clients/".$client->id."/".$client->facade_image)) {
                     
-                    // Get Extension
-                    $file_path                  =   "/uploads/clients/".$client->id."/".$client->facade_image;
+//                     // Get Extension
+//                     $file_path                  =   "/uploads/clients/".$client->id."/".$client->facade_image;
 
-                    // Get the filename with extension
-                    $filename_with_extension    =   basename($file_path);
+//                     // Get the filename with extension
+//                     $filename_with_extension    =   basename($file_path);
 
-                    // Extract extension using pathinfo()
-                    $extension                  =   pathinfo($filename_with_extension, PATHINFO_EXTENSION);
+//                     // Extract extension using pathinfo()
+//                     $extension                  =   pathinfo($filename_with_extension, PATHINFO_EXTENSION);
 
-                    // Attempt to rename the file Facade
-                    if (rename("uploads/clients/".$client->id."/".$client->facade_image         , "uploads/clients/".$client->id."/".$client->DistrictNo."_".$client->CityNo."_".$client->id."_"."_FACADE_".$client->CustomerCode.".".$extension)) {
+//                     // Attempt to rename the file Facade
+//                     if (rename("uploads/clients/".$client->id."/".$client->facade_image         , "uploads/clients/".$client->id."/".$client->DistrictNo."_".$client->CityNo."_".$client->id."_"."_FACADE_".$client->CustomerCode.".".$extension)) {
 
-                        $client->facade_image       =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_"."_FACADE_".$client->CustomerCode.".".$extension;
-                    } 
-                }
-            }
+//                         $client->facade_image       =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_"."_FACADE_".$client->CustomerCode.".".$extension;
+//                     } 
+//                 }
+//             }
 
-            // Check if the old file exists
-            if($client->in_store_image  !=  "") {
+//             // Check if the old file exists
+//             if($client->in_store_image  !=  "") {
 
-                if (file_exists("uploads/clients/".$client->id."/".$client->in_store_image)) {
+//                 if (file_exists("uploads/clients/".$client->id."/".$client->in_store_image)) {
 
-                    // Get Extension
-                    $file_path                  =   "/uploads/clients/".$client->id."/".$client->in_store_image;
+//                     // Get Extension
+//                     $file_path                  =   "/uploads/clients/".$client->id."/".$client->in_store_image;
 
-                    // Get the filename with extension
-                    $filename_with_extension    =   basename($file_path);
+//                     // Get the filename with extension
+//                     $filename_with_extension    =   basename($file_path);
 
-                    // Extract extension using pathinfo()
-                    $extension                  =   pathinfo($filename_with_extension, PATHINFO_EXTENSION);
+//                     // Extract extension using pathinfo()
+//                     $extension                  =   pathinfo($filename_with_extension, PATHINFO_EXTENSION);
 
-                    // Attempt to rename the file
-                    if (rename("uploads/clients/".$client->id."/".$client->in_store_image       , "uploads/clients/".$client->id."/".$client->DistrictNo."_".$client->CityNo."_".$client->id."_"."_IN_STORE_".$client->CustomerCode.".".$extension)) {
+//                     // Attempt to rename the file
+//                     if (rename("uploads/clients/".$client->id."/".$client->in_store_image       , "uploads/clients/".$client->id."/".$client->DistrictNo."_".$client->CityNo."_".$client->id."_"."_IN_STORE_".$client->CustomerCode.".".$extension)) {
 
-                        $client->in_store_image     =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_"."_IN_STORE_".$client->CustomerCode.".".$extension;
-                    } 
-                }
-            }
+//                         $client->in_store_image     =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_"."_IN_STORE_".$client->CustomerCode.".".$extension;
+//                     } 
+//                 }
+//             }
 
-            $client->save();
-        }
-    }
+//             $client->save();
+//         }
+//     }
 
-    catch(Throwable $erreur) {
+//     catch(Throwable $erreur) {
 
-        return response()->json([
-            'errors'    =>  [$erreur->getMessage()],
-        ],422);
-    }
-});
+//         return response()->json([
+//             'errors'    =>  [$erreur->getMessage()],
+//         ],422);
+//     }
+// });
 
 // If Authentificated
 Route::get('/'      , [WebController::class, "indexPage"])->name('index');

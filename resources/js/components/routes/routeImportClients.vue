@@ -11,8 +11,8 @@
                                                                                                                                                                                                             :update_modal="'updateClientModal'"     :update_button="'Update Client'"    />
                     <!-- Export Data    -->
                     <div class="row w-75">
-                        <div class="col-6">
-                            <select     class="form-select form-select-sm"      v-model="CustomerType">
+                        <div class="col-4">
+                            <select     class="form-select form-select-sm"      v-model="status">
                                 <option value="All">All</option>
                                 <option value="Validated">Validated</option>
                                 <option value="Pending">Pending</option>
@@ -20,12 +20,20 @@
                             </select>
                         </div>
 
-                        <div class="col-3">
+                        <div class="col-2">
                             <button class="btn btn-sm primary w-100" @click="downloadData()">Export Data</button>
                         </div>
 
-                        <div class="col-3">
-                            <button class="btn btn-sm primary w-100" @click="downloadImages()">Export Images</button>
+                        <div class="col-2">
+                            <button class="btn btn-sm primary w-100" @click="downloadCustomerCodeImages()">Export Code Bar Images</button>
+                        </div>
+
+                        <div class="col-2">
+                            <button class="btn btn-sm primary w-100" @click="downloadFacadeImages()">Export Facade Images</button>
+                        </div>
+
+                        <div class="col-2">
+                            <button class="btn btn-sm primary w-100" @click="downloadInStoreImages()">Export In Store Images</button>
                         </div>
                     </div>
 
@@ -36,6 +44,7 @@
                                 <tr>
                                     <th class="col-sm-1">Index</th>
 
+                                    <th class="col-sm-2">Id</th>
                                     <th class="col-sm-2">CustomerCode</th>
 
                                     <th class="col-sm-2">CustomerNameE</th>
@@ -46,6 +55,10 @@
 
                                     <th class="col-sm-1">CityNo</th>
                                     <th class="col-sm-2">CityNameE</th>
+
+                                    <th class="col-sm-2">CustomerBarCode Image</th>
+                                    <th class="col-sm-2">In Store Image</th>
+                                    <th class="col-sm-2">Facade Image</th>
 
                                     <th class="col-sm-2">Address</th>
                                     <th class="col-sm-2">Neighborhood</th>
@@ -82,6 +95,7 @@
                                 <tr class="route_import_client_index_filters">
 
                                     <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Index"            /></th>
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Id"               /></th>
 
                                     <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
                                     <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
@@ -92,6 +106,10 @@
 
                                     <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CityNo"           /></th>
                                     <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CityNameE"        /></th>
+
+                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerBarCode Image"    /></th>
+                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="In Store Image"           /></th>
+                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Facade Image"             /></th>
 
                                     <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Address"          /></th>
                                     <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Neighborhood"     /></th>
@@ -128,6 +146,8 @@
                                 <tr v-for="client, index in clients" :key="client" @click="selectRow(client)" role="button"   :id="'route_import_client_index_'+client.id">
                                     <td>{{index +   1}}</td>
 
+                                    <td>{{client.id}}</td>
+
                                     <td>{{client.CustomerCode}}</td>
                                     <td>{{client.CustomerNameE}}</td>
                                     <td>{{client.CustomerNameA}}</td>
@@ -137,6 +157,10 @@
 
                                     <td>{{client.CityNo}}</td>
                                     <td>{{client.CityNameE}}</td>
+
+                                    <td>{{client.CustomerBarCode_image}}</td>
+                                    <td>{{client.in_store_image}}</td>
+                                    <td>{{client.facade_image}}</td>
 
                                     <td>{{client.Address}}</td>
                                     <td>{{client.Neighborhood}}</td>
@@ -221,7 +245,7 @@ export default {
 
             //
 
-            CustomerType                            :   "All"  ,
+            status                            :   "All"  ,
             clients_export                          :   []
         }
     },
@@ -358,43 +382,172 @@ export default {
 
         //  //  //  //  //
 
-        async downloadImages() {
+        async downloadCustomerCodeImages() {
 
-            let formData            =   new FormData()
+            try {
 
-            formData.append("CustomerType"      ,   this.CustomerType)
-            formData.append("id_route_import"   ,   this.$route.params.id_route_import)
+                //
+                this.$showLoadingPage()
 
-            this.$callApiResponse('post', '/route_import/all_data/images', formData, 'blob')
-            .then(response => {
+                let formData                        =   new FormData()
 
-                console.log(response)
+                formData.append("status"            ,   this.status)
+                formData.append("id_route_import"   ,   this.$route.params.id_route_import)
 
-                if(response.status  ==  200) {
+                this.$callApiResponse('post', '/route_import/all_data/images/customer_code', formData, 'blob')
+                .then(response => {
 
-                    const url   =   window.URL.createObjectURL(new Blob([response.data]));
-                    const link  =   document.createElement('a');
+                    console.log(response)
 
-                    link.href   =   url;
+                    if(response.status  ==  200) {
 
-                    link.setAttribute('download', this.route_import.libelle+' Images.zip');
+                        const url   =   window.URL.createObjectURL(new Blob([response.data]));
+                        const link  =   document.createElement('a');
 
-                    document.body.appendChild(link);
+                        link.href   =   url;
 
-                    link.click();
-                }
+                        link.setAttribute('download', this.route_import.libelle+' Customer Code Images.zip');
 
-                else {
+                        document.body.appendChild(link);
 
-                    // Send Errors
-                    this.$showErrors("Error !", ["No Images to Download"])
-                }
+                        link.click();
 
-            }).catch(error => {
+                        //
+                        this.$hideLoadingPage()
+                    }
 
-                console.error('Error downloading file:', error);
-            });
+                    else {
+
+                        // Send Errors
+                        this.$showErrors("Error !", ["No Images to Download"])
+
+                        //
+                        this.$hideLoadingPage()
+                    }
+
+                }).catch(error => {
+
+                    console.error('Error downloading file:', error);
+                });
+            }
+
+            catch(e) {
+
+                console.log(e)
+            }
         },
+
+        async downloadFacadeImages() {
+
+            try {
+
+                //
+                this.$showLoadingPage()
+
+                let formData                        =   new FormData()
+
+                formData.append("status"            ,   this.status)
+                formData.append("id_route_import"   ,   this.$route.params.id_route_import)
+
+                this.$callApiResponse('post', '/route_import/all_data/images/facade', formData, 'blob')
+                .then(response => {
+
+                    console.log(response)
+
+                    if(response.status  ==  200) {
+
+                        const url   =   window.URL.createObjectURL(new Blob([response.data]));
+                        const link  =   document.createElement('a');
+
+                        link.href   =   url;
+
+                        link.setAttribute('download', this.route_import.libelle+' Facade Images.zip');
+
+                        document.body.appendChild(link);
+
+                        link.click();
+
+                        //
+                        this.$hideLoadingPage()
+                    }
+
+                    else {
+
+                        // Send Errors
+                        this.$showErrors("Error !", ["No Images to Download"])
+
+                        //
+                        this.$hideLoadingPage()
+                    }
+
+                }).catch(error => {
+
+                    console.error('Error downloading file:', error);
+                });
+            }
+
+            catch(e) {
+
+                console.log(e)
+            }
+        },
+
+        async downloadInStoreImages() {
+
+            try {
+
+                //
+                this.$showLoadingPage()
+
+                let formData                        =   new FormData()
+
+                formData.append("status"            ,   this.status)
+                formData.append("id_route_import"   ,   this.$route.params.id_route_import)
+
+                this.$callApiResponse('post', '/route_import/all_data/images/in_store', formData, 'blob')
+                .then(response => {
+
+                    console.log(response)
+
+                    if(response.status  ==  200) {
+
+                        const url   =   window.URL.createObjectURL(new Blob([response.data]));
+                        const link  =   document.createElement('a');
+
+                        link.href   =   url;
+
+                        link.setAttribute('download', this.route_import.libelle+' In Store Images.zip');
+
+                        document.body.appendChild(link);
+
+                        link.click();
+
+                        //
+                        this.$hideLoadingPage()
+                    }
+
+                    else {
+
+                        // Send Errors
+                        this.$showErrors("Error !", ["No Images to Download"])
+
+                        //
+                        this.$hideLoadingPage()
+                    }
+
+                }).catch(error => {
+
+                    console.error('Error downloading file:', error);
+                });
+            }
+
+            catch(e) {
+
+                console.log(e)
+            }
+        },
+
+        //
 
         async downloadData() {
 
@@ -408,7 +561,7 @@ export default {
 
                 let formData            =   new FormData()
 
-                formData.append("CustomerType"      ,   this.CustomerType)
+                formData.append("status"      ,   this.status)
                 formData.append("id_route_import"   ,   this.$route.params.id_route_import)
 
                 this.$callApi("post",   "/route_import/all_data", formData)

@@ -119,18 +119,18 @@ export default {
             });
 
             //
-            const by_tel_availability_report_chart_container           =   document.querySelector("#by_tel_availability_report_chart_container")
-            const totalLabels                                   =   this.by_tel_availability_report_chart.data.labels.length
-            const newWidth                                      =   700 + ((totalLabels - 7) * 90)
-            by_tel_availability_report_chart_container.style.width     =   newWidth+"px"
+            const by_tel_availability_report_chart_container            =   document.querySelector("#by_tel_availability_report_chart_container")
+            const totalLabels                                           =   this.by_tel_availability_report_chart.data.labels.length
+            const newWidth                                              =   700 + ((totalLabels - 7) * 90)
+            by_tel_availability_report_chart_container.style.width      =   newWidth+"px"
 
             //Get Chart Container Width
-            let by_tel_availability_report_chart_scroll                =   document.getElementById("by_tel_availability_report_chart_scroll")
-            let by_tel_availability_report_chart_scroll_width          =   window.getComputedStyle(by_tel_availability_report_chart_scroll).width
+            let by_tel_availability_report_chart_scroll                 =   document.getElementById("by_tel_availability_report_chart_scroll")
+            let by_tel_availability_report_chart_scroll_width           =   window.getComputedStyle(by_tel_availability_report_chart_scroll).width
 
-            if(parseFloat(by_tel_availability_report_chart_scroll_width)   >   parseFloat(by_tel_availability_report_chart_container.style.width)) {
+            if(parseFloat(by_tel_availability_report_chart_scroll_width)    >   parseFloat(by_tel_availability_report_chart_container.style.width)) {
 
-                by_tel_availability_report_chart_container.style.width         =   by_tel_availability_report_chart_scroll_width
+                by_tel_availability_report_chart_container.style.width          =   by_tel_availability_report_chart_scroll_width
             }
         },
 

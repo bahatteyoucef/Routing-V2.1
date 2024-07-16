@@ -231,4 +231,8 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/route_import/all_data'                                                                ,   [RouteImportController::class           , 'downloadData'                            ]);
     Route::post('/route_import/all_data/images'                                                         ,   [RouteImportController::class           , 'downloadImages'                          ]);
+
+    Route::post('/route_import/all_data/images/customer_code'                                           ,   [RouteImportController::class           , 'downloadCustomerCodeImages'              ]);
+    Route::post('/route_import/all_data/images/facade'                                                  ,   [RouteImportController::class           , 'downloadFacadeImages'                    ]);
+    Route::post('/route_import/all_data/images/in_store'                                                ,   [RouteImportController::class           , 'downloadInStoreImages'                   ]);
 });

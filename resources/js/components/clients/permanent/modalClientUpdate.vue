@@ -212,13 +212,13 @@
                             </div>
                         </div>
 
+                        <!--  -->
+
                         <div class="mb-3">
                             <label for="CustomerBarCode_image_update"   class="form-label">QR Code Image</label>
                             <input type="file"                          class="form-control"        id="CustomerBarCode_image_update"              accept="image/*"    capture     @change="customerBarCodeImage()">
                             <img                                                                    id="CustomerBarCode_image_display_update"      src=""              class="w-100">
                         </div>
-
-                        <!--  -->
 
                         <div class="mb-3">
                             <label for="facade_image_update"    class="form-label">Facade Image (Facade Image)</label>

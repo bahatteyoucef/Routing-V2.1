@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
+use Illuminate\Support\Facades\Response;
+
 class RouteImportController extends Controller
 {
     
@@ -685,7 +687,60 @@ class RouteImportController extends Controller
 
         try {
 
-            return RouteImport::downloadImages($request);
+            $filePath   =   RouteImport::downloadImages($request);
+
+            return Response::download($filePath)->deleteFileAfterSend(true);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    public function downloadCustomerCodeImages(Request $request) {
+
+        try {
+
+            $filePath   =   RouteImport::downloadCustomerCodeImages($request);
+
+            return Response::download($filePath)->deleteFileAfterSend(true);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    public function downloadFacadeImages(Request $request) {
+
+        try {
+
+            $filePath   =   RouteImport::downloadFacadeImages($request);
+
+            return Response::download($filePath)->deleteFileAfterSend(true);
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    public function downloadInStoreImages(Request $request) {
+
+        try {
+
+            $filePath   =   RouteImport::downloadInStoreImages($request);
+
+            return Response::download($filePath)->deleteFileAfterSend(true);
         }
 
         catch(Throwable $erreur) {
