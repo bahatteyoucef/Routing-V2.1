@@ -19,6 +19,8 @@ use App\Models\UserTerritory;
 use Exception;
 use Throwable;
 
+use Illuminate\Support\Facades\Validator;
+
 class UserController extends Controller
 {
 
@@ -26,7 +28,22 @@ class UserController extends Controller
 
     public function login(Request $request) {
 
-        if (Auth::attempt($request->all())) {
+        $validator      =   Validator::make($request->all(), [
+            'nom'       =>  'required|alpha_num|max:255',
+            'password'  =>  'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors'    =>  $validator->errors(),
+            ],422);
+        }
+
+        //  //  //
+
+        $credentials    =   $request->only('nom', 'password');
+
+        if (Auth::attempt($credentials)) {
 
             $user           =   Auth::user();
 

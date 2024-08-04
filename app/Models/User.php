@@ -10,6 +10,8 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Validation\Rules;
 
 use Laravel\Passport\HasApiTokens;
 
@@ -104,7 +106,7 @@ class User extends Authenticatable
     {
 
         $validator = Validator::make($request->all(), [
-            'nom'               =>  ["required", "max:255"                                              ],
+            'nom'               =>  ["required", "alpha_num", Rule::unique('users', 'nom')],
             'email'             =>  ["required", Rule::unique('users')  , "email", "max:255"            ],
             'tel'               =>  ["required", "max:255"                                              ],
             'company'           =>  ["required", "max:255"                                              ],
@@ -208,7 +210,7 @@ class User extends Authenticatable
     {
 
         $validator = Validator::make($request->all(), [
-            'nom'               =>  ["required", "max:255"                                              ],
+            'nom'               =>  ["required", "alpha_num", Rule::unique('users', 'username')->ignore($id)],
             'email'             =>  ["required", Rule::unique('users')->ignore($id), "email", "max:255" ],
             'tel'               =>  ["required", "max:255"                                              ],
             'company'           =>  ["required", "max:255"                                              ],
