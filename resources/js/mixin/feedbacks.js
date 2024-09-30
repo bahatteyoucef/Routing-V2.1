@@ -69,7 +69,12 @@ export default {
 
             let list_items          =   ""
 
+            console.log(errors)
+
             Object.keys(errors).forEach(element => {
+
+                console.log(element)
+
                 list_items          =   list_items   +   "<li>"  +   errors[element] +   "</li>"
             });
 

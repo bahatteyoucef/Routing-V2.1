@@ -82,7 +82,7 @@ class UserController extends Controller
 
         return response()->json([
             'header'    =>  "Error !",
-            'errors'    =>  "Wrong username or password !",
+            'errors'    =>  ["Wrong username or password !"],
         ], Response::HTTP_UNAUTHORIZED);
     }
 

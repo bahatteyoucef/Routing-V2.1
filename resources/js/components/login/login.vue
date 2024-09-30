@@ -94,6 +94,7 @@
 
                     let response = await this.$callApi('post' ,   '/login'    ,   formData)
                     console.log(response)
+
                     // Hide Loading Page
                     this.$hideLoadingPage()
 
@@ -123,7 +124,7 @@
                     }
 
                     else {
-                        this.$showErrors("Error !", [response.data.errors])
+                        this.$showErrors("Error !", response.data.errors)
                     }
                 }
 
@@ -149,7 +150,7 @@
                     }
                     
                     else {
-                        this.$showErrors("error", response.errors)
+                        this.$showErrors("error", response.data.errors)
                     }
                 }
                 catch(e) {
