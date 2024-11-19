@@ -49,7 +49,7 @@
                         <button type="button"               class="btn btn-secondary w-100 mb-1" @click="$clickFile('CustomerBarCode_image')"><i class="mdi mdi-camera"></i></button>
 
                         <input type='file'                  id="CustomerBarCode_image"              style="display:none"    accept="image/*"    capture     @change="customerBarCodeImage()">
-                        <img                                id="CustomerBarCode_image_display"      src=""                  class="w-100">
+                        <img                                id="CustomerBarCode_image_display"      src=""                  style="width : 100%; height : auto; display: block; margin : auto">
                     </div>
 
                     <!-- CustomerNameE -->
@@ -190,7 +190,7 @@
                             <button type="button"       class="btn btn-secondary w-100 mb-1" @click="$clickFile('in_store_image')"><i class="mdi mdi-camera"></i></button>
 
                             <input type='file'          id="in_store_image"             style="display:none"    accept="image/*"    capture     @change="inStoreImage()">
-                            <img                        id="in_store_image_display"     src=""                  class="w-100">
+                            <img                        id="in_store_image_display"     src=""                  style="width : 100%; height : auto; display: block; margin : auto">
                         </div>
                     </div>
 
@@ -200,7 +200,7 @@
                         <button type="button"       class="btn btn-secondary w-100 mb-1" @click="$clickFile('facade_image')"><i class="mdi mdi-camera"></i></button>
 
                         <input type='file'          id="facade_image"           style="display:none"    accept="image/*"    capture     @change="facadeImage()">
-                        <img                        id="facade_image_display"   src=""                  class="w-100">
+                        <img                        id="facade_image_display"   src=""                  style="width : 100%; height : auto; display: block; margin : auto">
                     </div>
 
 
@@ -469,6 +469,7 @@ export default {
             if(this.getIsOnline) {
 
                 const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/store",   formData)
+                console.log(res.data)
 
                 if(res.status===200){
 
@@ -657,32 +658,42 @@ export default {
 
             const CustomerBarCode_image  =   document.getElementById("CustomerBarCode_image").files[0];
 
+            console.log(200)
+
             if(CustomerBarCode_image) {
 
                 if(this.getIsOnline) {
 
-                    this.client.CustomerBarCode_image_original_name      =   CustomerBarCode_image.name
-                    this.client.CustomerBarCode_image                    =   await this.$compressImage(CustomerBarCode_image)
+                    this.client.CustomerBarCode_image_original_name     =   CustomerBarCode_image.name
+                    this.client.CustomerBarCode_image                   =   await this.$compressImage(CustomerBarCode_image)
 
                     //
 
-                    let CustomerBarCode_image_base64                     =   await this.$imageToBase64(this.client.CustomerBarCode_image)
+                    // let CustomerBarCode_image_much_compressed           =   await this.$compressImageMuch(this.client.CustomerBarCode_image) 
+                    // let CustomerBarCode_image_base64                    =   await this.$imageToBase64(CustomerBarCode_image_much_compressed)
 
-                    let CustomerBarCode_image_display                    =   document.getElementById("CustomerBarCode_image_display")
-                    this.base64ToImage(CustomerBarCode_image_base64, CustomerBarCode_image_display)
+                    let CustomerBarCode_image_display                   =   document.getElementById("CustomerBarCode_image_display")
+                    // this.base64ToImage(CustomerBarCode_image_base64, CustomerBarCode_image_display)
+
+                    //
+                    this.$displayImage(this.client.CustomerBarCode_image, CustomerBarCode_image_display)
                 }
 
                 else {
 
-                    this.client.CustomerBarCode_image_original_name      =   CustomerBarCode_image.name
-                    this.client.CustomerBarCode_image                    =   await this.$compressImage(CustomerBarCode_image)
+                    this.client.CustomerBarCode_image_original_name     =   CustomerBarCode_image.name
+                    this.client.CustomerBarCode_image                   =   await this.$compressImage(CustomerBarCode_image)
 
                     //
 
-                    this.client.CustomerBarCode_image                    =   await this.$imageToBase64(this.client.CustomerBarCode_image)
+                    // let CustomerBarCode_image_much_compressed           =   await this.$compressImageMuch(this.client.CustomerBarCode_image) 
+                    this.client.CustomerBarCode_image                   =   await this.$imageToBase64(this.client.CustomerBarCode_image)
 
-                    let CustomerBarCode_image_display                    =   document.getElementById("CustomerBarCode_image_display")
-                    this.base64ToImage(this.client.CustomerBarCode_image, CustomerBarCode_image_display)
+                    let CustomerBarCode_image_display                   =   document.getElementById("CustomerBarCode_image_display")
+                    // this.base64ToImage(this.client.CustomerBarCode_image, CustomerBarCode_image_display)
+
+                    //
+                    this.$displayImage(this.client.CustomerBarCode_image, CustomerBarCode_image_display)
                 }
             }
 
@@ -715,10 +726,14 @@ export default {
 
                     //
 
-                    let facade_image_base64                     =   await this.$imageToBase64(this.client.facade_image)
+                    // let facade_image_much_compressed           =   await this.$compressImageMuch(this.client.facade_image) 
+                    // let facade_image_base64                     =   await this.$imageToBase64(facade_image_much_compressed)
 
                     let facade_image_display                    =   document.getElementById("facade_image_display")
-                    this.base64ToImage(facade_image_base64, facade_image_display)
+                    // this.base64ToImage(facade_image_base64, facade_image_display)
+
+                    //
+                    this.$displayImage(this.client.facade_image, facade_image_display)
                 }
 
                 else {
@@ -728,10 +743,14 @@ export default {
 
                     //
 
+                    // let facade_image_much_compressed            =   await this.$compressImageMuch(this.client.facade_image) 
                     this.client.facade_image                    =   await this.$imageToBase64(this.client.facade_image)
 
                     let facade_image_display                    =   document.getElementById("facade_image_display")
-                    this.base64ToImage(this.client.facade_image, facade_image_display)
+                    // this.base64ToImage(this.client.facade_image, facade_image_display)
+
+                    //
+                    this.$displayImage(this.client.facade_image, facade_image_display)
                 }
             }
 
@@ -780,10 +799,14 @@ export default {
                     
                     //
 
-                    let in_store_image_base64                   =   await this.$imageToBase64(this.client.in_store_image)
+                    // let in_store_image_much_compressed          =   await this.$compressImageMuch(this.client.in_store_image) 
+                    // let in_store_image_base64                   =   await this.$imageToBase64(in_store_image_much_compressed)
 
                     let in_store_image_display                  =   document.getElementById("in_store_image_display")
-                    this.base64ToImage(in_store_image_base64, in_store_image_display)
+                    // this.base64ToImage(in_store_image_base64, in_store_image_display)
+
+                    //
+                    this.$displayImage(this.client.in_store_image, in_store_image_display)
                 }
 
                 else {
@@ -793,10 +816,14 @@ export default {
                     
                     //
 
+                    // let in_store_image_much_compressed          =   await this.$compressImageMuch(this.client.in_store_image) 
                     this.client.in_store_image                  =   await this.$imageToBase64(this.client.in_store_image)
 
                     let in_store_image_display                  =   document.getElementById("in_store_image_display")
-                    this.base64ToImage(this.client.in_store_image, in_store_image_display)
+                    // this.base64ToImage(this.client.in_store_image, in_store_image_display)
+
+                    //
+                    this.$displayImage(this.client.in_store_image, in_store_image_display)
                 }
             }
 
@@ -877,16 +904,13 @@ export default {
                 //
                 this.scanner = new Html5QrcodeScanner('reader', {
 
-                    qrbox   : {
-                        width   : 250,
-                        height  : 250,
-                    },
+                    qrbox   : window.innerWidth < 500 ? { width: 200, height: 200 } : { width: 250, height: 250 },
 
-                    fps     : 20,
+                    fps     : navigator.hardwareConcurrency > 4 ? 20 : 10,
 
-                    supportedScanTypes  : [
-                        Html5QrcodeScanType.SCAN_TYPE_CAMERA
-                    ],
+                    // supportedScanTypes  : [
+                    //     Html5QrcodeScanType.SCAN_TYPE_CAMERA
+                    // ],
                 });
 
                 try {

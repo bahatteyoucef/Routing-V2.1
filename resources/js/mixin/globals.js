@@ -1,6 +1,6 @@
-import axios        from 'axios'
+import axios                from 'axios'
 
-import * as XLSX    from 'xlsx';
+import * as XLSX            from 'xlsx';
 
 export default {
 
@@ -307,6 +307,17 @@ export default {
             image.onload = () => {
                 outputElement.src   =   image.src;
             };
+        },
+
+        $displayImage(image, outputElement) {
+
+            const blobUrl = URL.createObjectURL(image); // Create a Blob URL from the image
+
+            // Set the image source to the Blob URL
+            outputElement.src = blobUrl;
+
+            // Revoke the Blob URL when it's no longer needed to free memory
+            outputElement.onload = () => URL.revokeObjectURL(blobUrl);
         },
 
         //
@@ -1022,23 +1033,57 @@ export default {
 
         //
 
-        $variableSize(formData) {
+        $variableSize(variable) {
 
-            // Serialize the FormData object
-            let serializedFormData = JSON.stringify(Object.fromEntries(formData));
+            let serializedVariable;
 
-            // Calculate the size of the serialized string in bytes
-            let byteSize = new Blob([serializedFormData]).size;
+            if (variable instanceof File || variable instanceof Blob) {
+                // If the variable is a File or Blob, use it directly
+                serializedVariable = variable;
+            } else if (typeof variable === 'object') {
+                // If the variable is an object, serialize it to a JSON string
+                serializedVariable = JSON.stringify(variable);
+            } else if (typeof variable === 'string') {
+                // If the variable is a string, use it directly
+                serializedVariable = variable;
+            } else {
+                console.error('Unsupported variable type');
+                return;
+            }
+
+            // Calculate the size in bytes
+            let byteSize = new Blob([serializedVariable]).size;
 
             // Convert bytes to kilobytes
             let kilobyteSize = byteSize / 1024;
 
-            console.log('Size of FormData in KB:', kilobyteSize.toFixed(2), 'KB');
+            console.log('Size in KB:', kilobyteSize.toFixed(2), 'KB');
+            return kilobyteSize.toFixed(2);
         },
 
         //
 
-        $compressImage(file) {
+        async $compressImage(file) {
+
+            const options = {
+                maxWidthOrHeight: 500, // Maximum width or height
+                useWebWorker: true,    // Enable Web Worker for better performance
+                fileType: 'image/jpeg',
+                initialQuality: 0.9,   // Starting quality
+            };
+
+            try {
+                const compressedFile        =   await imageCompression(file, options);
+                const compressedFileToSend  =   new File([compressedFile], file.name, { type: 'image/jpeg' });
+
+                return compressedFileToSend; // Return the compressed file
+            } catch (error) {
+                console.error('Error during image compression:', error);
+                throw error;
+            }
+        },
+
+        $compressImageMuch(file) {
 
             return new Promise((resolve, reject) => {
 
@@ -1051,8 +1096,8 @@ export default {
 
                     img.onload  = () => {
 
-                        const maxWidth  =   800 // 800; // Maximum width
-                        const maxHeight =   800 // 800; // Maximum height
+                        const maxWidth  =   200 // 800; // Maximum width
+                        const maxHeight =   200 // 800; // Maximum height
 
                         let width       =   img.width;
                         let height      =   img.height;
