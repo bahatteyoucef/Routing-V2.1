@@ -908,9 +908,9 @@ export default {
 
                     fps     : navigator.hardwareConcurrency > 4 ? 20 : 10,
 
-                    // supportedScanTypes  : [
-                    //     Html5QrcodeScanType.SCAN_TYPE_CAMERA
-                    // ],
+                    supportedScanTypes  : [
+                        Html5QrcodeScanType.SCAN_TYPE_CAMERA
+                    ],
                 });
 
                 try {
