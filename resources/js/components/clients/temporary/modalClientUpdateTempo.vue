@@ -273,7 +273,6 @@ export default {
             formData.append("Journee"                       ,   this.client.Journee)
 
             const res                   =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.id_route_import_tempo+"/clients_tempo/"+this.client.id+"/update",   formData)
-            console.log(res.data)
 
             if(res.status===200){
 
@@ -440,8 +439,6 @@ export default {
         },
 
         async getClientData(client) {
-
-            console.log(client)
 
             this.client.id                  =   client.id
 

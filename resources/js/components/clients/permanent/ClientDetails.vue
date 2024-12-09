@@ -122,7 +122,6 @@ export default {
             if(this.getIsOnline) {
 
                 const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.$route.params.id_client+"/show" ,   null)
-                console.log(res)
 
                 this.client.id                            =   res.data.id
 

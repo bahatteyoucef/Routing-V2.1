@@ -585,8 +585,6 @@ export default {
                 const res                                           =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.$route.params.id_client+"/show",   null)
                 let client                                          =   res.data
 
-                console.log(client)
-
                 this.client.id                                      =   client.id
 
                 this.client.CustomerCode                            =   client.CustomerCode
@@ -719,7 +717,6 @@ export default {
                 this.$showLoadingPage()
 
                 let willaya                         =   await this.$indexedDB.$getWillaya(this.client.DistrictNo)
-                console.log(willaya)
 
                 if(willaya) {
 
@@ -738,7 +735,6 @@ export default {
         checkUncheck(id) {
 
             const jour  =   document.getElementById(id)
-            console.log(jour)
 
             if(jour.checked) {
 
@@ -958,8 +954,6 @@ export default {
 
                     if(distance <=  this.min_distance) {
                     
-                        console.log(distance)
-
                         this.close_clients.push(this.all_clients[i])
                     }
                 }
@@ -976,8 +970,6 @@ export default {
         async customerBarCodeImage() {
 
             const CustomerBarCode_image  =   document.getElementById("CustomerBarCode_image_update").files[0];
-
-            console.log(CustomerBarCode_image)
 
             if(CustomerBarCode_image) {
 
@@ -1031,8 +1023,6 @@ export default {
         async facadeImage() {
 
             const facade_image  =   document.getElementById("facade_image_update").files[0];
-
-            console.log(facade_image)
 
             if(facade_image) {
 
@@ -1093,7 +1083,6 @@ export default {
                 this.client.in_store_image_updated          =   true
 
                 const in_store_image_display_update         =   document.getElementById("in_store_image_display_update")
-                console.log(in_store_image_display_update)
 
                 if(in_store_image_display_update) {
 
@@ -1168,8 +1157,6 @@ export default {
 
                 let position                =   await this.$currentPosition()
 
-                console.log(position)
-
                 this.client.Latitude        =   position.coords.latitude
                 this.client.Longitude       =   position.coords.longitude
 
@@ -1196,8 +1183,6 @@ export default {
                     const videoDevices  = devices.filter(device => device.kind === 'videoinput');
                     const backCamera    = videoDevices.find(device => device.label.includes('back') || device.label.includes('rear'));
                     
-                    console.log(backCamera)
-
                     if (backCamera) {
 
                         return { exact: backCamera.deviceId };
@@ -1255,8 +1240,6 @@ export default {
 
                 // Validation de la question
                 let validation          =   this.validationQuestion()
-
-                console.log(this.slideIndex)
 
                 if(validation   ==  true)  {
 

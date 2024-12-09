@@ -397,8 +397,6 @@ export default {
                 this.$callApiResponse('post', '/route_import/all_data/images/customer_code', formData, 'blob')
                 .then(response => {
 
-                    console.log(response)
-
                     if(response.status  ==  200) {
 
                         const url   =   window.URL.createObjectURL(new Blob([response.data]));
@@ -452,8 +450,6 @@ export default {
                 this.$callApiResponse('post', '/route_import/all_data/images/facade', formData, 'blob')
                 .then(response => {
 
-                    console.log(response)
-
                     if(response.status  ==  200) {
 
                         const url   =   window.URL.createObjectURL(new Blob([response.data]));
@@ -506,8 +502,6 @@ export default {
 
                 this.$callApiResponse('post', '/route_import/all_data/images/in_store', formData, 'blob')
                 .then(response => {
-
-                    console.log(response)
 
                     if(response.status  ==  200) {
 
@@ -566,8 +560,6 @@ export default {
 
                 this.$callApi("post",   "/route_import/all_data", formData)
                 .then(async (res)=> {
-
-                    console.log(res)
 
                     this.clients_export  =   res.data.clients;
 

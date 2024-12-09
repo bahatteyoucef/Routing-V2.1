@@ -206,8 +206,6 @@ export default {
 
         async setResumeValidateMap() {
 
-            console.log(this.clients_doubles_CustomerCode)
-
             this.getDoublantCustomerCode                     =   this.clients_doubles_CustomerCode
 
             await this.setDataTableCustomerCodeMap()

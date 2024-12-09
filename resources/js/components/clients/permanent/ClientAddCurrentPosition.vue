@@ -478,7 +478,6 @@ export default {
                 if(this.getIsOnline) {
 
                     const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/store",   formData)
-                    console.log(res.data)
 
                     if(res.status===200){
 
@@ -513,15 +512,11 @@ export default {
 
                     let clients    =   await this.$indexedDB.$getAddedClients()
 
-                    console.log(clients)
-
                     let max_local_id    =   0
 
                     if(clients.length > 0) {
 
                         max_local_id    =   parseInt(clients[clients.length - 1].id.match(/(\d+)$/)[1]) + 1
-
-                        console.log(max_local_id)
                     }
 
                     this.client.id                      =   "local_id_"+max_local_id
@@ -569,10 +564,6 @@ export default {
                 this.client.Longitude               =   position.coords.longitude
 
                 this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygonsWithoutMap(this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
-
-                console.log(this.client.Latitude)
-                console.log(this.client.Longitude)
-                console.log(this.point_is_inside_user_polygons)
 
                 //
 
@@ -632,7 +623,6 @@ export default {
                 this.$showLoadingPage()
 
                 let willaya                     =   await this.$indexedDB.$getWillaya(this.client.DistrictNo)
-                console.log(willaya)
 
                 this.cites                      =   willaya.cites
 
@@ -672,8 +662,6 @@ export default {
         async customerBarCodeImage() {
 
             const CustomerBarCode_image  =   document.getElementById("CustomerBarCode_image").files[0];
-
-            console.log(200)
 
             if(CustomerBarCode_image) {
 
@@ -906,8 +894,6 @@ export default {
                     const videoDevices  = devices.filter(device => device.kind === 'videoinput');
                     const backCamera    = videoDevices.find(device => device.label.includes('back') || device.label.includes('rear'));
                     
-                    console.log(backCamera)
-
                     if (backCamera) {
 
                         return { exact: backCamera.deviceId };
@@ -959,8 +945,6 @@ export default {
 
             let position                =   await this.$currentPosition()
 
-            console.log(position)
-
             this.client.Latitude        =   position.coords.latitude
             this.client.Longitude       =   position.coords.longitude
 
@@ -969,8 +953,6 @@ export default {
             let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
 
             this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
-
-            console.log(this.point_is_inside_user_polygons)
         },
 
         //
@@ -982,8 +964,6 @@ export default {
 
                 // Validation de la question
                 let validation          =   this.validationQuestion()
-
-                console.log(this.slideIndex)
 
                 if(validation   ==  true)  {
 

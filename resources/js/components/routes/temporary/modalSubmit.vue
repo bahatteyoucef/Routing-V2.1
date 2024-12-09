@@ -177,7 +177,6 @@ export default {
             }
 
             const res   = await this.$callApi('post'    ,   '/route_import/store'   ,   formData)         
-            console.log(res)
 
             if(res.status===200){
 

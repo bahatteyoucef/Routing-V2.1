@@ -383,8 +383,6 @@ export default {
             await this.$callApi("post",   "/statistics/details",    formData)
             .then(async (res)=> {
 
-                console.log(res)
-
                 //
                 this.$hideLoadingPage()
 

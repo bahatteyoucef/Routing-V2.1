@@ -686,8 +686,6 @@ export default {
 
         async getClientData(client) {
 
-            console.log(client)
-
             //
 
             this.client.id                              =   client.id
@@ -828,8 +826,6 @@ export default {
         async customerBarCodeImage() {
 
             const CustomerBarCode_image  =   document.getElementById("CustomerBarCode_image_update").files[0];
-
-            console.log(CustomerBarCode_image)
 
             if(CustomerBarCode_image) {
 

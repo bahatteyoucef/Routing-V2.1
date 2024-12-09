@@ -712,8 +712,6 @@ export default {
             const res           =   await this.$callApi("post", "/route_import/"+this.id_route_import+"/clients", null)
             this.all_clients    =   res.data.clients            
 
-            console.log(this.all_clients)
-
             this.getClientData(client)  
             this.getComboData()  
 
@@ -721,8 +719,6 @@ export default {
         },
 
         async getClientData(client) {
-
-            console.log(client)
 
             //
 
@@ -864,8 +860,6 @@ export default {
         async customerBarCodeImage() {
 
             const CustomerBarCode_image  =   document.getElementById("CustomerBarCode_image_validate_update").files[0];
-
-            console.log(CustomerBarCode_image)
 
             if(CustomerBarCode_image) {
 

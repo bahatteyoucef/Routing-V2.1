@@ -413,8 +413,6 @@ export default {
 
                     if(b_last_number    ==  null) {
 
-                        console.log(b.JPlan)
-
                         return a.JPlan.localeCompare(b.JPlan)
                     }
 
@@ -908,11 +906,6 @@ export default {
             clients_double.$getDoublantCustomerNameE        =   clients_tempo_double_customer_namee
             clients_double.$getDoublantCustomerCode         =   clients_tempo_double_customer_code
 
-            console.log(clients_tempo_double_tel)
-            console.log(clients_tempo_double_latitude_longitude)
-            console.log(clients_tempo_double_customer_namee)
-            console.log(clients_tempo_double_customer_code)
-
             return clients_double
         },
 
@@ -1057,7 +1050,6 @@ export default {
             // Convert bytes to kilobytes
             let kilobyteSize = byteSize / 1024;
 
-            console.log('Size in KB:', kilobyteSize.toFixed(2), 'KB');
             return kilobyteSize.toFixed(2);
         },
 
@@ -1385,8 +1377,6 @@ export default {
             if(array.length > 0) {
 
                 const keys  =   Object.keys(array[0])
-                console.log(array)
-                console.log(keys)
 
                 for (let index = 0; index < keys.length; index++) {
 

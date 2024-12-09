@@ -188,11 +188,7 @@ export default {
 
             try {
 
-                console.log(this.getIsOnline)
-
                 if(this.getIsOnline) {
-
-                    console.log("Server DB route Import By Status")
 
                     this.$showLoadingPage()
 
@@ -217,8 +213,6 @@ export default {
                 }
 
                 else {
-
-                    console.log("local DB route Import By Status")
 
                     this.clients            =   await this.$indexedDB.$getClientsByStatus(this.getUser.id_route_import, this.filter_status)
                     this.clients_filtered   =   this.clients

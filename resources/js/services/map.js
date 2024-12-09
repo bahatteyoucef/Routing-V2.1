@@ -585,7 +585,6 @@ export default class Map {
 
                 // Add Event Edit
                 territory.on("edit", function(event) {
-                    console.log("red layer edited !");
                 })
 
                 // Add Event Click
@@ -617,7 +616,6 @@ export default class Map {
 
                 // Add Event Edit
                 territory.on("edit", function(event) {
-                    console.log("red layer edited !");
                 })
 
                 // Add Event Click
@@ -716,7 +714,6 @@ export default class Map {
 
                 // Add Event Edit
                 territory_obj.on("edit", function(event) {
-                    console.log("red layer edited !");
                 })
 
                 // Add Event Click
@@ -767,7 +764,6 @@ export default class Map {
 
                 // Add Event Edit
                 territory_obj.on("edit", function(event) {
-                    console.log("red layer edited !");
                 })
 
                 // Add Event Click
@@ -839,7 +835,6 @@ export default class Map {
 
                 // Add Event Edit
                 territory_obj.on("edit", function(event) {
-                    console.log("red layer edited !");
                 })
 
                 // Add Event Click
@@ -1068,7 +1063,6 @@ export default class Map {
 
                     // Add Event
                     layer.on("edit", function(event) {
-                        console.log("blue layer edited !");
                     })
                 }
 
@@ -1080,7 +1074,6 @@ export default class Map {
 
                     // Add Event
                     layer.on("edit", (event)    =>  {
-                        console.log("red layer edited !");
                     })
 
                     // Add Event Click
@@ -1335,8 +1328,6 @@ export default class Map {
     $checkPointInsideUserPolygons(latitude, longitude) {
 
         let point   =   L.marker([latitude, longitude])
-
-        console.log(this.user_territories)
 
         for (let index = 0; index < this.user_territories.length; index++) {
 

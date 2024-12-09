@@ -70,8 +70,6 @@ export default class MobileClientIndexedDB {
 
     async $indexedDB_intialiazeSetDATA() {
 
-        console.log(123)
-
         this.indexedDB      =   window.indexedDB    ||  window.mozIndexedDB ||  window.webkitIndexedDB  ||  window.msIndexedDB  ||  window.shimIndexedDB
 
         if (!this.indexedDB) {
@@ -142,7 +140,6 @@ export default class MobileClientIndexedDB {
             formData.append("deleted_clients"       ,   JSON.stringify(deleted_clients))
 
             const res   = await this.$callApi('post'    ,   '/indexedDB/sync'   ,   formData)         
-            console.log(res)
 
             if(res.status  ==  200) {
 
@@ -183,8 +180,6 @@ export default class MobileClientIndexedDB {
 
     async $getListeRouteImportFromDB() {
 
-        console.log(store.getters[`authentification/getUser`].id_route_import)
-
         // Fill Liste Route Import
         axios.post("/route_import/"+store.getters[`authentification/getUser`].id_route_import+"/indexedDB/show",    null)
         .then((res)=> {
@@ -205,8 +200,6 @@ export default class MobileClientIndexedDB {
                 // Fill Liste Willayas
                 axios.post("/rtm_willayas/rtm_cites/details/indexedDB", null)
                 .then((res)=> {
-
-                    console.log(res)
 
                     // Add to indexedDB
                     this.$setWillayas(res.data)
@@ -251,8 +244,6 @@ export default class MobileClientIndexedDB {
             let liste_route_import                      =   this.store_route_import.openCursor()
 
             results                                     =   await this.$fillListeRouteImport(liste_route_import)
-
-            console.log(results)
 
             this.data_route_import                      =   results
             resolve(results)
@@ -447,8 +438,6 @@ export default class MobileClientIndexedDB {
 
             results                                     =   await this.$fillListeAddedClients(liste_added_clients)
 
-            console.log(results)
-
             this.data_added_clients                     =   results
             resolve(results)
         })     
@@ -466,8 +455,6 @@ export default class MobileClientIndexedDB {
                 if (cursor) {
                     results.push(cursor.value) 
                     cursor.continue();
-
-                    console.log(cursor.value)
                 }
 
                 else {
@@ -531,7 +518,6 @@ export default class MobileClientIndexedDB {
         return new Promise(async (resolve, error) => {
 
             let results     =   await this.$getAddedClients()
-            console.log(results)
 
             resolve(parseInt(results[results.length - 1].id.match(/(\d+)$/)[1]))
         })
@@ -546,8 +532,6 @@ export default class MobileClientIndexedDB {
 
             liste_added_clients.onsuccess =    function (e)    {
                 var cursor = e.target.result;
-
-                console.log(e.target)
 
                 if (cursor) {
 
@@ -567,8 +551,6 @@ export default class MobileClientIndexedDB {
 
                         const regex = /(\d+)$/; // Match one or more digits at the end of the string
                         const matches = maxRecord.id.match(regex);
-
-                        console.log(matches)
 
                         if (matches && matches.length > 1) {
 
@@ -720,14 +702,9 @@ c
 
         let route_import                                =   await this.$getRouteImport(id_route_import)
 
-        console.log(route_import)
-
         for (let i = 0; i < route_import.clients.length; i++) {
 
             if(route_import.clients[i].id   ==  client.id) {
-
-                console.log(route_import.clients[i])
-                console.log(client)
 
                 route_import.clients.splice(1, i)
                 break;

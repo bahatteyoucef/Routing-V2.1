@@ -478,15 +478,11 @@ export default {
 
                 let clients    =   await this.$indexedDB.$getAddedClients()
 
-                console.log(clients)
-
                 let max_local_id    =   0
 
                 if(clients.length > 0) {
 
                     max_local_id    =   parseInt(clients[clients.length - 1].id.match(/(\d+)$/)[1]) + 1
-
-                    console.log(max_local_id)
                 }
 
                 this.client.id                      =   "local_id_"+max_local_id
@@ -562,8 +558,6 @@ export default {
 
             //
             this.point_is_inside_user_polygons  =   this.$map.$checkPointInsideUserPolygons(this.client.Latitude, this.client.Longitude)
-
-            console.log(this.point_is_inside_user_polygons)
         },
 
         async getComboData() {
@@ -602,7 +596,6 @@ export default {
                 this.$showLoadingPage()
 
                 let willaya                     =   await this.$indexedDB.$getWillaya(this.client.DistrictNo)
-                console.log(willaya)
 
                 this.cites                      =   willaya.cites
 

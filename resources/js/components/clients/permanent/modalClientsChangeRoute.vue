@@ -316,7 +316,6 @@ export default {
             formData.append("clients", JSON.stringify(clients))
 
             const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/change_route",   formData)
-            console.log(res)
 
             if(res.status===200){
 
@@ -480,8 +479,6 @@ export default {
 
             // Show Loading Page
             this.$showLoadingPage()
-
-            console.log(clients)
 
             await this.setDataTable(clients)
 
