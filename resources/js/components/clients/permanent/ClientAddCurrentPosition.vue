@@ -121,14 +121,14 @@
                         <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"></textarea>
                     </div>
 
-                    <!-- DistrictNo -->
+                    <!-- DistrictNo --> 
                     <div class="mySlides slide_10">
                         <label for="DistrictNo"         class="form-label">Willaya</label>
-                        <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()">
+                        <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()"    disabled>
                             <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
                         </select>
-                    </div>
-
+                    </div> 
+                   
                     <!-- CityNo -->
                     <div class="mySlides slide_11">
                         <label for="CityNo"             class="form-label">Commune</label>
@@ -141,12 +141,16 @@
                     <div class="mySlides slide_12">
                         <label for="text"               class="form-label">Type de Magasin</label>
                         <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType">
-                            <option     :value="'Hypermarché'">Hypermarché</option>
-                            <option     :value="'Supérette'">Supérette</option>
-                            <option     :value="'Alimentation General'">Alimentation General</option>
-                            <option     :value="'Bureau Tabac'">Bureau Tabac</option>
-                            <option     :value="'Cafétéria'">Cafétéria</option>
-                            <option     :value="'Cosmetique'">Cosmetique</option>
+                                <option     :value="'Alimentation Generale'">Alimentation Generale</option>
+                                <option     :value="'Fast food'">Fast food</option>
+                                <option     :value="'Restaurant'">Restaurant</option>
+                                <option     :value="'Cafétéria'">Cafétéria</option>
+                                <option     :value="'Grossiste'">Grossiste</option>
+                                <option     :value="'Supérette'">Supérette</option>
+                                <option     :value="'Hypermarché'">Hypermarché</option>
+
+                            <!-- <option     :value="'Bureau Tabac'">Bureau Tabac</option>
+                            <option     :value="'Cosmetique'">Cosmetique</option> -->
                         </select>
                     </div>
 
@@ -396,7 +400,11 @@ export default {
         this.slideIndex     =   this.$showSlides(this.slideIndex, this.slideIndex);
 
         //
-        this.client.status  =   "pending"
+        this.client.status      =   "pending"
+
+        //
+        this.client.DistrictNo  =   this.getUser.DistrictNo
+        await this.getCites()
 
         //
         await this.getData()
@@ -421,113 +429,120 @@ export default {
         ]),
 
         async sendData() {
+            if((this.client.facade_image !==  "")&&(this.client.facade_image_original_name   !==  "")) {
 
-            this.$showLoadingPage()
+                this.$showLoadingPage()
 
-            // Set Client
-            this.client.DistrictNameE   =   this.getDistrictNameE(this.client.DistrictNo)
-            this.client.CityNameE       =   this.getCityNameE(this.client.CityNo)
+                // Set Client
+                this.client.DistrictNameE   =   this.getDistrictNameE(this.client.DistrictNo)
+                this.client.CityNameE       =   this.getCityNameE(this.client.CityNo)
 
-            let formData = new FormData();
+                let formData = new FormData();
 
-            formData.append("CustomerCode"                          ,   this.client.CustomerCode)
-            formData.append("CustomerNameE"                         ,   this.client.CustomerNameE)
-            formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
-            formData.append("Latitude"                              ,   this.client.Latitude)
-            formData.append("Longitude"                             ,   this.client.Longitude)
-            formData.append("Address"                               ,   this.client.Address)
-            formData.append("Neighborhood"                          ,   this.client.Neighborhood)
-            formData.append("Landmark"                              ,   this.client.Landmark)
-            formData.append("DistrictNo"                            ,   this.client.DistrictNo)
-            formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
-            formData.append("CityNo"                                ,   this.client.CityNo)
-            formData.append("CityNameE"                             ,   this.client.CityNameE)
-            formData.append("Tel"                                   ,   this.client.Tel)
-            formData.append("CustomerType"                          ,   this.client.CustomerType)
-            formData.append("BrandAvailability"                     ,   this.client.BrandAvailability)
-            formData.append("BrandSourcePurchase"                   ,   this.client.BrandSourcePurchase)
+                formData.append("CustomerCode"                          ,   this.client.CustomerCode)
+                formData.append("CustomerNameE"                         ,   this.client.CustomerNameE)
+                formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
+                formData.append("Latitude"                              ,   this.client.Latitude)
+                formData.append("Longitude"                             ,   this.client.Longitude)
+                formData.append("Address"                               ,   this.client.Address)
+                formData.append("Neighborhood"                          ,   this.client.Neighborhood)
+                formData.append("Landmark"                              ,   this.client.Landmark)
+                formData.append("DistrictNo"                            ,   this.client.DistrictNo)
+                formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
+                formData.append("CityNo"                                ,   this.client.CityNo)
+                formData.append("CityNameE"                             ,   this.client.CityNameE)
+                formData.append("Tel"                                   ,   this.client.Tel)
+                formData.append("CustomerType"                          ,   this.client.CustomerType)
+                formData.append("BrandAvailability"                     ,   this.client.BrandAvailability)
+                formData.append("BrandSourcePurchase"                   ,   this.client.BrandSourcePurchase)
 
-            formData.append("JPlan"                                 ,   this.client.JPlan)
-            formData.append("Journee"                               ,   this.client.Journee)
+                formData.append("JPlan"                                 ,   this.client.JPlan)
+                formData.append("Journee"                               ,   this.client.Journee)
 
-            formData.append("CustomerBarCode_image"                 ,   this.client.CustomerBarCode_image)
-            formData.append("facade_image"                          ,   this.client.facade_image)
-            formData.append("in_store_image"                        ,   this.client.in_store_image)
+                formData.append("CustomerBarCode_image"                 ,   this.client.CustomerBarCode_image)
+                formData.append("facade_image"                          ,   this.client.facade_image)
+                formData.append("in_store_image"                        ,   this.client.in_store_image)
 
-            formData.append("CustomerBarCode_image_original_name"   ,   this.client.CustomerBarCode_image_original_name)
-            formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
-            formData.append("in_store_image_original_name"          ,   this.client.in_store_image_original_name)
+                formData.append("CustomerBarCode_image_original_name"   ,   this.client.CustomerBarCode_image_original_name)
+                formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
+                formData.append("in_store_image_original_name"          ,   this.client.in_store_image_original_name)
 
-            formData.append("status"                                ,   this.client.status)
-            formData.append("nonvalidated_details"                  ,   this.client.nonvalidated_details)
+                formData.append("status"                                ,   this.client.status)
+                formData.append("nonvalidated_details"                  ,   this.client.nonvalidated_details)
 
-            formData.append("comment"                               ,   this.client.comment)
+                formData.append("comment"                               ,   this.client.comment)
 
-            formData.append("start_adding_date"                     ,   this.start_adding_date)
-            formData.append("finish_adding_date"                    ,   moment(new Date()).format())
+                formData.append("start_adding_date"                     ,   this.start_adding_date)
+                formData.append("finish_adding_date"                    ,   moment(new Date()).format())
 
-            if(this.getIsOnline) {
+                if(this.getIsOnline) {
 
-                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/store",   formData)
-                console.log(res.data)
+                    const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/store",   formData)
+                    console.log(res.data)
 
-                if(res.status===200){
+                    if(res.status===200){
 
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
+                        // Hide Loading Page
+                        this.$hideLoadingPage()
 
-                    // Send Client
-                    this.client.id                      =   res.data.client.id
+                        // Send Client
+                        this.client.id                      =   res.data.client.id
+                        this.client.status                  =   this.client.status
+                        this.client.nonvalidated_details    =   this.client.nonvalidated_details
+
+                        // Send Feedback
+                        this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
+
+                        // this.emitter.emit('reSetAdd' , this.client)
+
+                        // 
+                        this.$goBack()
+                    }
+                    
+                    else{
+
+                        // Hide Loading Page
+                        this.$hideLoadingPage()
+
+                        // Send Errors
+                        this.$showErrors("Error !", res.data.errors)
+                    }      
+                }
+
+                else {
+
+                    let clients    =   await this.$indexedDB.$getAddedClients()
+
+                    console.log(clients)
+
+                    let max_local_id    =   0
+
+                    if(clients.length > 0) {
+
+                        max_local_id    =   parseInt(clients[clients.length - 1].id.match(/(\d+)$/)[1]) + 1
+
+                        console.log(max_local_id)
+                    }
+
+                    this.client.id                      =   "local_id_"+max_local_id
                     this.client.status                  =   this.client.status
                     this.client.nonvalidated_details    =   this.client.nonvalidated_details
+                    this.client.id_route_import         =   this.$route.params.id_route_import
 
-                    // Send Feedback
-                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
-
-                    // this.emitter.emit('reSetAdd' , this.client)
-
-                    // 
-                    this.$goBack()
-                }
-                
-                else{
+                    // Add in indexedDB
+                    await this.$indexedDB.$setAddedClients(this.client, this.$route.params.id_route_import)
 
                     // Hide Loading Page
                     this.$hideLoadingPage()
 
-                    // Send Errors
-                    this.$showErrors("Error !", res.data.errors)
-                }      
+                    // Go Back
+                    this.$goBack()
+                }
             }
 
             else {
 
-                let clients    =   await this.$indexedDB.$getAddedClients()
-
-                console.log(clients)
-
-                let max_local_id    =   0
-
-                if(clients.length > 0) {
-
-                    max_local_id    =   parseInt(clients[clients.length - 1].id.match(/(\d+)$/)[1]) + 1
-
-                    console.log(max_local_id)
-                }
-
-                this.client.id                      =   "local_id_"+max_local_id
-                this.client.status                  =   this.client.status
-                this.client.nonvalidated_details    =   this.client.nonvalidated_details
-                this.client.id_route_import         =   this.$route.params.id_route_import
-
-                // Add in indexedDB
-                await this.$indexedDB.$setAddedClients(this.client, this.$route.params.id_route_import)
-
-                // Hide Loading Page
-                this.$hideLoadingPage()
-
-                // Go Back
-                this.$goBack()
+                this.$showErrors("Error !"  ,   ["Veuillez répondre avant de confirmer !"])
             }
         },
 
@@ -908,9 +923,9 @@ export default {
 
                     fps     : navigator.hardwareConcurrency > 4 ? 20 : 10,
 
-                    supportedScanTypes  : [
-                        Html5QrcodeScanType.SCAN_TYPE_CAMERA
-                    ],
+                    // supportedScanTypes  : [
+                    //     Html5QrcodeScanType.SCAN_TYPE_CAMERA
+                    // ],
                 });
 
                 try {

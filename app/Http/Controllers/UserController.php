@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\Rules;
 
 use App\Models\Role;
+use App\Models\RouteImport;
 use App\Models\UserRouteImport;
 use App\Models\UserTerritory;
 use Exception;
@@ -53,16 +54,30 @@ class UserController extends Controller
 
             if($user->type_user ==  "FrontOffice") {
 
-                $route_import   =   UserRouteImport::where('id_user', $user->id)->first();  
+                $user_route_import  =   UserRouteImport::where('id_user', $user->id)->first();  
 
-                if($route_import) {
+                if($user_route_import) {
 
-                    $user->id_route_import  =   $route_import->id_route_import;
+                    $route_import       =   RouteImport::where('id', $user_route_import->id_route_import)->first();  
+
+                    if($user_route_import) {
+
+                        //
+                        $user->id_route_import  =   $route_import->id;
+                        $user->DistrictNo       =   $route_import->District;
+                    }
+
+                    else {
+
+                        $user->id_route_import  =   null;
+                        $user->DistrictNo       =   null;
+                    }
                 }
 
                 else {
 
                     $user->id_route_import  =   null;
+                    $user->DistrictNo       =   null;
                 }
 
                 //

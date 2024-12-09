@@ -138,8 +138,8 @@
         </section>
 
         <!-- Software Version -->
-        <div class="row mt-3" style="position: absolute;bottom : 10px">
-            <span class="text-small text-secondary">Software Version : 2.1</span>
+        <div class="row mt-3" style="position: static">
+            <span class="text-small text-secondary">Software Version : V2.1</span>
         </div>
 
     </div>

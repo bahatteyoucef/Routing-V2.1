@@ -4,15 +4,15 @@
         <!-- Logo -->
         <div class="text-center navbar-brand-wrapper d-flex align-items-top justify-content-center" id="logo_div_parent">
 
-            <div>
+            <!-- <div> -->
               <router-link to="/" aria-current="page" class="navbar-brand brand-logo active router-link-active p-0">
                 <img  :src="'/images/header.png'"     alt="logo" class="mt-2"/>
               </router-link>
 
-              <router-link to="/" aria-current="page"   class="navbar-brand brand-logo-mini active router-link-active p-0" id="mini_logo_custom">
-                <img  :src="'/images/header.png'"     alt="logo" id="mini_logo_custom_image" class="mt-2"/>
+              <router-link to="/" aria-current="page"   class="navbar-brand brand-logo-mini active router-link-active p-0" id="mini_logo_custom" style="margin-top: 5px;">
+                <img  :src="'/images/logo.png'"     alt="logo" id="mini_logo_custom_image" class="mt-2"/>
               </router-link>
-            </div>
+            <!-- </div> -->
 
             <!--  -->
 
@@ -116,7 +116,7 @@
 
                     <li class="m-3 text-secondary">
                         <span  role="button">
-                          software version : 2.1
+                          software version : V2.1
                         </span>
                     </li>
                 </ul>

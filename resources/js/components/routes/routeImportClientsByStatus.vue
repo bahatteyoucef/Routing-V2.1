@@ -261,7 +261,10 @@ export default {
 
                 this.clients_filtered     =   this.clients_filtered.filter((client) => {
 
-                    return client.CustomerNameA.toUpperCase().includes(this.search_by_CustomerNameA_value.toUpperCase())
+                    if(client.CustomerNameA) {
+
+                        return client.CustomerNameA.toUpperCase().includes(this.search_by_CustomerNameA_value.toUpperCase())
+                    }
                 })
             }
 

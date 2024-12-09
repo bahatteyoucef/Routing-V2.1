@@ -132,12 +132,16 @@
                     <div class="mb-3 mySlides slide_13">
                         <label for="text"               class="form-label">CustomerType (CustomerType)</label>
                         <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType">
-                            <option     :value="'Hypermarché'">Hypermarché</option>
-                            <option     :value="'Supermarché'">Supérette</option>
-                            <option     :value="'Alimentation General'">Alimentation General</option>
-                            <option     :value="'Bureau Tabac'">Bureau Tabac</option>
-                            <option     :value="'Cafétéria'">Cafétéria</option>
-                            <option     :value="'Cosmetique'">Cosmetique</option>
+                                <option     :value="'Alimentation Generale'">Alimentation Generale</option>
+                                <option     :value="'Fast food'">Fast food</option>
+                                <option     :value="'Restaurant'">Restaurant</option>
+                                <option     :value="'Cafétéria'">Cafétéria</option>
+                                <option     :value="'Grossiste'">Grossiste</option>
+                                <option     :value="'Supérette'">Supérette</option>
+                                <option     :value="'Hypermarché'">Hypermarché</option>
+
+                            <!-- <option     :value="'Bureau Tabac'">Bureau Tabac</option>
+                            <option     :value="'Cosmetique'">Cosmetique</option> -->
                         </select>
                     </div>
 

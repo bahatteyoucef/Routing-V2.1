@@ -210,7 +210,7 @@ class User extends Authenticatable
     {
 
         $validator = Validator::make($request->all(), [
-            'nom'               =>  ["required", "alpha_num", Rule::unique('users', 'username')->ignore($id)],
+            'nom'               =>  ["required", "alpha_num", Rule::unique('users', 'nom')->ignore($id)],
             'email'             =>  ["required", Rule::unique('users')->ignore($id), "email", "max:255" ],
             'tel'               =>  ["required", "max:255"                                              ],
             'company'           =>  ["required", "max:255"                                              ],
