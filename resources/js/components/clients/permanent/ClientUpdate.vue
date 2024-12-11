@@ -143,9 +143,8 @@
                                 <option     :value="'Grossiste'">Grossiste</option>
                                 <option     :value="'Supérette'">Supérette</option>
                                 <option     :value="'Hypermarché'">Hypermarché</option>
-
-                            <!-- <option     :value="'Bureau Tabac'">Bureau Tabac</option>
-                            <option     :value="'Cosmetique'">Cosmetique</option> -->
+                                <option     :value="'Bureau Tabac'">Bureau Tabac</option>
+                                <option     :value="'Cosmetique'">Cosmetique</option>
                         </select>
                     </div>
 
