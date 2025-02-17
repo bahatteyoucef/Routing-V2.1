@@ -1,8 +1,6 @@
 <template>
-    <div class="content-wrapper" style="padding : 15px;">
-
-        <!-- Super Admin + BU Manager + BackOffice -->
-        <section v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')" class="dashboard">
+    <div v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')" class="content-wrapper" style="padding : 15px;">
+        <section class="dashboard">
 
             <div class="page-header">
 
@@ -23,7 +21,7 @@
                 <div    class="col-md-3 stretch-card grid-margin" 
                         v-for="route_import in liste_route_import" :key="route_import.id">
 
-                    <div class="card bg-gradient-danger card-img-holder text-white">
+                    <div class="card bg-gradient-info card-img-holder text-white">
                         <div class="card-body p-3">
                             <img :src="'/template/images/dashboard/circle.svg'"    class="card-img-absolute"   alt="circle-image" />
 
@@ -47,7 +45,7 @@
                                     </i>
                                 </div>
                             </div>                       
- 
+
                             <h6 class="card-text">ID    : {{route_import.id}}</h6>
                             <h6 class="card-text">label : {{route_import.libelle}}</h6>
 
@@ -61,73 +59,115 @@
             <modalRouteImportDelete  ref="modalRouteImportDelete"></modalRouteImportDelete>
 
         </section>
+    </div>
 
-        <!-- FrontOffice -->
-        <section v-if="$isRole('FrontOffice')"  class="dashboard mt-4"> 
-
+    <div v-if="$isRole('FrontOffice')" class="content-wrapper" style="padding : 5px;">
+        <section class="dashboard mt-4">
             <!-- Header Options -->
             <div class="container">
-                <div class="row d-flex justify-content-start h-100 mt-2">
+                <div class="row justify-content-start h-100 mt-2">
                     <div class="col-10 d-flex align-items-center">
-                        <i class="mdi mdi-dice-1 mr-1 ml-1 fw-bold" style="color : #A25CFF"></i><span class="fw-bold mb-1">{{ getUser.nom }}</span>
+                        <i
+                            class="mdi mdi-dice-1 mr-1 ml-1 fw-bold"
+                            style="color: #D7481F"
+                        ></i
+                        ><span class="fw-bold mb-1">{{ getUser.nom }}</span>
                     </div>
-
-                    <!-- <div class="col-2 d-flex align-items-center pl-1"   role="button"   @click="logOut()">
-                        <i class="mdi mdi-power mr-1 ml-1 fw-bold" style="color : #A25CFF; font-size: 25px;"></i>
-                    </div> -->
                 </div>
             </div>
 
             <!-- Index Options -->
-            <div class="row d-flex justify-content-center h-100 mt-4">
-                <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="addClient()">
-                    <div class="text-center" style="height : 50px">  
-                        <img class="card-img-top" :src="'/images/store.png'" style="height:100%;width:auto">
+            <div class="row justify-content-center h-100 mt-4 align-items-stretch">
+                <div
+                    class="card col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
+                    @click="addClient()"
+                >
+                    <div class="text-center" style="height: 50px">
+                        <img
+                            class="card-img-top"
+                            :src="'/images/front_office_images/store.png'"
+                            style="height: 100%; width: auto"
+                        />
                     </div>
                     <div class="card-body p-0 mt-3">
-                        <p class="card-text font-weight-bold">New</p>
+                        <p class="card-text font-weight-bold">New Client</p>
                     </div>
                 </div>
 
-                <div class="card col-5 m-1 shadow-sm rounded text-center h-25"  @click="showProfile()">
-                    <div class="text-center" style="height : 50px">  
-                        <img class="card-img-top" :src="'/images/profile.png'" style="height:100%;width:auto">
+                <div
+                    class="card col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
+                    @click="showProfile()"
+                >
+                    <div class="text-center" style="height: 50px">
+                        <img
+                            class="card-img-top"
+                            :src="'/images/front_office_images/profile.png'"
+                            style="height: 100%; width: auto"
+                        />
                     </div>
                     <div class="card-body p-0 mt-3">
                         <p class="card-text font-weight-bold">Profile</p>
                     </div>
                 </div>
 
-                <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="goToMap()">
-                    <div class="text-center" style="height : 50px">  
-                        <img class="card-img-top" :src="'/images/map_marker.png'" style="height:100%;width:auto">
+                <div
+                    class="card col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
+                    @click="goToMap()"
+                >
+                    <div class="text-center" style="height: 50px">
+                        <img
+                            class="card-img-top"
+                            :src="'/images/front_office_images/map_marker.png'"
+                            style="height: 100%; width: auto"
+                        />
                     </div>
                     <div class="card-body p-0 mt-3">
                         <p class="card-text font-weight-bold">Map</p>
                     </div>
                 </div>
 
-                <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="showClientsByStatus()">
-                    <div class="text-center" style="height : 50px">  
-                        <img class="card-img-top" :src="'/images/group_clients.png'" style="height:100%;width:auto">
+                <div
+                    class="card col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
+                    @click="showClientsByStatus()"
+                >
+                    <div class="text-center" style="height: 50px">
+                        <img
+                            class="card-img-top"
+                            :src="'/images/front_office_images/group_clients.png'"
+                            style="height: 100%; width: auto"
+                        />
                     </div>
                     <div class="card-body p-0 mt-3">
                         <p class="card-text font-weight-bold">Clients</p>
                     </div>
                 </div>
 
-                <div class="card col-5 m-1 shadow-sm rounded text-center h-25" @click="sync()">
-                    <div class="text-center" style="height : 50px">  
-                        <img class="card-img-top" :src="'/images/sync.png'" style="height:100%;width:auto">
+                <div
+                    class="card col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
+                    @click="sync()"
+                >
+                    <div class="text-center" style="height: 50px">
+                        <img
+                            class="card-img-top"
+                            :src="'/images/front_office_images/sync.png'"
+                            style="height: 100%; width: auto"
+                        />
                     </div>
                     <div class="card-body p-0 mt-3">
                         <p class="card-text font-weight-bold">Sync</p>
                     </div>
                 </div>
-               
-                <div class="card col-5 m-1 shadow-sm rounded text-center h-25"  @click="logOut()">
-                    <div class="text-center" style="height : 50px">  
-                        <img class="card-img-top" :src="'/images/logout.png'" style="height:100%;width:auto">
+
+                <div
+                    class="card col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
+                    @click="logOut()"
+                >
+                    <div class="text-center" style="height: 50px">
+                        <img
+                            class="card-img-top"
+                            :src="'/images/front_office_images/logout.png'"
+                            style="height: 100%; width: auto"
+                        />
                     </div>
                     <div class="card-body p-0 mt-3">
                         <p class="card-text font-weight-bold">Log Out</p>
@@ -137,11 +177,9 @@
 
         </section>
 
-        <!-- Software Version -->
-        <div class="row mt-3" style="position: static">
-            <span class="text-small text-secondary">Software Version : V2.1</span>
+        <div class="row mt-3" style="position: fixed; bottom: 10px;">
+            <span class="text-small" style="color: rgb(215, 72, 31);">Software Version : V2.1</span>
         </div>
-
     </div>
 </template>
 
@@ -329,3 +367,12 @@ export default {
 }
 
 </script>
+
+<style scoped>
+
+.min_card_height {
+
+    min-height: 145px;
+}
+
+</style>

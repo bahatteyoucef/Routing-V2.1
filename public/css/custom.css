@@ -15,7 +15,7 @@
 
 .primary {
     color               :   white       !important;
-    background-color    :   #A25CFF     !important;
+    background-color    :   #D7481F     !important;
 }
 
 .border_primary {
@@ -62,7 +62,7 @@
     height              :   250px;
     width               :   250px;
     border-radius       :   50%;
-    /* background       :   conic-gradient(#7d2ae8 0deg, #ededed 0deg); */
+    /* background       :   conic-gradient(#D7481F 0deg, #ededed 0deg); */
     display             :   flex;
     align-items         :   center;
     justify-content     :   center;
@@ -81,7 +81,7 @@
     position            : relative;
     font-size           : 40px;
     font-weight         : 600;
-    color               : #7d2ae8;
+    color               : #D7481F;
 }
 
 /*  */
@@ -101,8 +101,8 @@
 /*  */
 
 .page-item.active .page-link {
-    background-color    : #A25CFF   !important;
-    border-color        : #A25CFF   !important;
+    background-color    : #D7481F   !important;
+    border-color        : #D7481F   !important;
 }
 
 /*  */
@@ -119,7 +119,7 @@
 
 .mdi_upload_client::before {
     font-size   : 55px          !important; /* Set the desired icon size */
-    color       : #A25CFF     !important; /* Set the desired icon color */
+    color       : #D7481F     !important; /* Set the desired icon color */
 }
 
 /*  */
@@ -158,12 +158,12 @@
 .scrollbar-deep-blue::-webkit-scrollbar-thumb {
     border-radius       : 10px                                  ;
     -webkit-box-shadow  : inset 0 0 6px rgba(0, 0, 0, 0.1)    ;
-    background-image    : -webkit-linear-gradient(330deg, #FFFFFF 0%, #187498 100%) ;
-    background-image    : linear-gradient(120deg, #FFFFFF 0%, #187498 100%)         ;
+    background-image    : -webkit-linear-gradient(330deg, #FFFFFF 0%, #D7481F 100%) ;
+    background-image    : linear-gradient(120deg, #FFFFFF 0%, #D7481F 100%)         ;
 }
 
 .scrollbar-deep-blue {
-    scrollbar-color     : #187498 #FFFFFF    ;
+    scrollbar-color     : #D7481F #FFFFFF    ;
 }
 
 /*  */
@@ -233,7 +233,7 @@
 
 	height              : 7px;
     width               : 7px;
-	background-color    : #A25CFF;
+	background-color    : #D7481F;
 }
 
 .chart_scroll::-webkit-scrollbar-track, .table_scroll::-webkit-scrollbar-track {
@@ -247,7 +247,7 @@
 
 	border-radius       : 10px;
 	-webkit-box-shadow  : inset 0 0 6px rgba(0,0,0,0.3);
-	background-color    : #A25CFF;
+	background-color    : #D7481F;
 }
 
 .bar_chart_container {

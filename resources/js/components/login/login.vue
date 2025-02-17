@@ -1,6 +1,6 @@
 <template>
-    <div class="login_page">
 
+    <div class="login_page">
         <div class="wallpaper_login"></div>
 
         <div class="container">
@@ -8,27 +8,43 @@
 
                 <form>
                     
-                    <div class="col-lg-4 col-md-6 col-sm-8 mx-auto">
+                    <div class="col-sm-6 mx-auto">
                         <div class="card login shadow p-3 mb-5 bg-body rounded">
-
-                            <div class="w-25 align-self-center">
-                                <img :src="'/images/logo.png'" class="card-img-top">
+                            <div class="row justify-content-center">
+                                <div class="col-6">
+                                    <img :src="'/images/custom/logo_buzz.png'" loading="lazy" class="card-img-top">
+                                </div>
                             </div>
 
                             <hr class="m-0 mt-3 mb-3" />
 
                             <div class="card-body text-center pt-0">
                                 <div class="mb-3">
-                                    <h1 class="card-title">Login</h1>
+                                    <h1 class="card-title mb-0 fw-bold">Login</h1>
                                 </div>
 
                                 <div>
                                     <form class="form-group mb-3">
-                                        <input v-model="nom"            type="text"     class="form-control form-control-lg"    placeholder="Name"   >
-                                        <input v-model="password"       type="password" class="form-control form-control-lg"    placeholder="Password">
+                                        <div class="form-row mb-1">
+                                            <div class="form-group col-md-12">
+                                                <label class="label_above_input text-secondary form-label">Username</label>
+                                                <input v-model="nom" type="text" class="form-control form-control-sm"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-row mb-1">
+                                            <div class="form-group col-md-12">
+                                                <label class="label_above_input text-secondary form-label">Password</label>
+                                                <input v-model="password"       type="password" class="form-control form-control-sm">
+                                            </div>
+                                        </div>
+
+                                        <!--  -->
+                                        <!--  -->
+                                        <!--  -->
 
                                         <div class="d-grid gap-2 mb-3 mt-3">
-                                            <button type="button" class="btn btn-outline-dark m-0"  @click="login()">Login</button>
+                                            <button type="button" class="btn primary m-0"  @click="login()">Login</button>
                                         </div>
                                     </form>
                                 </div>
@@ -42,6 +58,7 @@
             </div>
         </div>
     </div>
+
 </template>
 
 <script>
@@ -174,3 +191,20 @@
 
     };
 </script>
+
+<style scoped>
+
+.label_above_input {
+    position    : absolute;
+    top         : -10px;
+    left        : 13px;
+    background  : #fff;
+    font-size   : 13px;
+}
+
+/* Target the label when the input inside the same .form-group is focused */
+.form-group:focus-within > .label_above_input {
+    color: #D7481F !important; /* Use !important to ensure it overrides other styles */
+}
+
+</style>

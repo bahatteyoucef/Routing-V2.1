@@ -6,11 +6,11 @@
 
             <!-- <div> -->
               <router-link to="/" aria-current="page" class="navbar-brand brand-logo active router-link-active p-0">
-                <img  :src="'/images/header.png'"     alt="logo" class="mt-2"/>
+                <img  :src="'/images/custom/header.png'"     alt="logo" class="mt-2"/>
               </router-link>
 
               <router-link to="/" aria-current="page"   class="navbar-brand brand-logo-mini active router-link-active p-0" id="mini_logo_custom" style="margin-top: 5px;">
-                <img  :src="'/images/logo.png'"     alt="logo" id="mini_logo_custom_image" class="mt-2"/>
+                <img  :src="'/images/custom/logo.png'"     alt="logo" id="mini_logo_custom_image" class="mt-2"/>
               </router-link>
             <!-- </div> -->
 
@@ -86,7 +86,7 @@
                 <span id="profileDropdown" role="button" data-bs-toggle="collapse" href="#profile_header_list" aria-haspopup="true" aria-expanded="false" aria-controls="profile_header_list" class="nav-link dropdown-toggle">
 
                     <div class="nav-profile-img mt-1">
-                      <img :src="'/images/profile.jpg'" alt="image"/>
+                      <img :src="'/images/custom/profile.jpg'" alt="image"/>
                       <span class="availability-status online"></span>
                     </div>
 
@@ -102,14 +102,14 @@
 
                     <li role="presentation" class="preview-item mt-1" @click="showProfile()">
                         <span  role="button" class="dropdown-item">
-                          <i class="mdi mdi-account mr-2 text_light_purple"></i>
+                          <i class="mdi mdi-account mr-2 text_light_primary"></i>
                           Profile
                         </span>
                     </li>
 
                     <li role="presentation" class="preview-item mt-1" @click="logOut()">
                         <span  role="button" class="dropdown-item">
-                          <i class="mdi mdi-logout mr-2 text_light_purple"></i>
+                          <i class="mdi mdi-logout mr-2 text_light_primary"></i>
                           Log Out
                         </span>
                     </li>

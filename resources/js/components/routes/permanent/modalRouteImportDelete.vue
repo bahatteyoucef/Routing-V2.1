@@ -14,7 +14,7 @@
                         
                     <div class="row mt-3 justify-content-center">
                         <div class="col-6 align-self-center">
-                            <img :src="'/images/logo.png'" class="card-img-top">
+                            <img :src="'/images/custom/logo.png'" class="card-img-top">
                         </div>
                     </div>
 

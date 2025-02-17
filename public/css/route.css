@@ -262,7 +262,7 @@ path.leaflet-interactive.animate {
 }
 
 #toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner{
-    background      : #A25CFF;
+    background      : #D7481F;
     color           : #fff;
 }
 
@@ -284,12 +284,12 @@ path.leaflet-interactive.animate {
 }
 
 #toggle_div .btn-color-mode-switch input[type="checkbox"]:checked ~ .alert{
-    display         : #A25CFF;
+    display         : #D7481F;
 }
 
 /*mode preview*/
 #toggle_div .dark-preview{
-    background      : #A25CFF;
+    background      : #D7481F;
 }
 
 #toggle_div .dark-preview div.btn-container i.fa-sun-o{

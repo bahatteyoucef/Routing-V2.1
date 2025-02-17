@@ -8,7 +8,7 @@
                     <a href="javascript:void(0);" class="nav-link">
                         <div class="nav-profile-image" id="nav_profile_image">
                             <img
-                                :src="'/images/profile.jpg'"
+                                :src="'/images/custom/profile.jpg'"
                                 alt="profile"
                             />
                         </div>

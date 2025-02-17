@@ -7,7 +7,7 @@
 }
 
 .login_page .wallpaper_login {
-   background     :  url("/images/login_cover.jpg") no-repeat center center;
+   background     :  url("/images/custom/login_cover_3.jpg") no-repeat center center;
    background-size:  cover;
    height         :  100%;
    position       :  absolute;

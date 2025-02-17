@@ -1013,8 +1013,8 @@ export default {
 
                         resolve(position)
                     },
-                
-                    { 
+
+                    {
                         enableHighAccuracy  : true      ,
                         maximumAge          : 100000    ,   // Maximum age of cached position in milliseconds
                         timeout             : 95000         // Maximum time to wait for a new position in milliseconds

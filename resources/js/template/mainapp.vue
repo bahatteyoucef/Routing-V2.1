@@ -33,16 +33,13 @@
 
                 <!-- FrontOffice -->
                 <div v-if="$isRole('FrontOffice')">
+                    <header-store-part></header-store-part>
 
-                    <header-store-part></header-store-part>       
-
-                    <div class="container-fluid page-body-wrapper">
-                        <!-- <div class="main-panel w-100 h-100" id="main_content"> -->
+                    <div class="container-fluid pt-2">
                         <div class="main-panel" id="main_content">
-                            <router-view    :key="$route.path"></router-view>
+                            <router-view :key="$route.path"></router-view>
                         </div>
                     </div>
-
                 </div>
 
             </div>

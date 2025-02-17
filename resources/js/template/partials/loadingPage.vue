@@ -55,7 +55,7 @@ export default {
                 this.progress                           =   progressStartValue
                 this.progress_integer                   =   parseInt(this.progress)
 
-                this.circularProgress.style.background  =   `conic-gradient(#7d2ae8 ${progressStartValue * 3.6}deg, #ededed 0deg)`
+                this.circularProgress.style.background  =   `conic-gradient(#D7481F ${progressStartValue * 3.6}deg, #ededed 0deg)`
 
                 if((this.progress   >=   55)&&(first_part)) {
 
@@ -88,11 +88,11 @@ export default {
                     fourth_part     =   false
                 }
 
-                //
                 if(progressStartValue >= progressEndValue){
 
                     clearInterval(this.progress_animation);
                 }    
+
             }, speed);        
         },
 

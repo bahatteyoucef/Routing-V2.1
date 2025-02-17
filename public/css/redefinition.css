@@ -50,6 +50,17 @@
 
 /*  */
 
+.text_light_primary {
+    color               :   #D7481F !important;
+}
+
+.bg_light_primary {
+    background-color    :   #D7481F !important;
+}
+
+
+/*  */
+
 p {
    line-height    :  1rem;
 }
@@ -75,7 +86,7 @@ p {
 
 .active_item {
 
-    color         :   #A25CFF   !important;
+    color         :   #D7481F   !important;
 }
 
 /*  */
@@ -94,3 +105,117 @@ p {
 }
 
 /*  */
+
+/*  */
+
+input:focus, .form-control:focus {
+    outline         : none !important; /* Removes default focus outline */
+    border          : 2px solid #D7481F !important; /* Change the border color */
+    border-radius   : 4px !important; /* Optional: add some rounded corners */
+    color           : #D7481F !important;
+    box-shadow      : rgba(215, 72, 31, 0.35) 0px 5px 15px !important;
+}
+
+select:focus, .form-select:focus {
+    outline         : none !important; /* Removes default focus outline */
+    border          : 2px solid #D7481F !important; /* Change the border color */
+    border-radius   : 4px !important; /* Optional: add some rounded corners */
+    color           : #D7481F !important;
+    box-shadow      : rgba(215, 72, 31, 0.35) 0px 5px 15px !important;
+}
+
+.text_primary {
+    color           : #D7481F !important;
+}
+
+.btn-primary {
+
+    color           : white !important;
+    background-color: #D7481F !important;
+    border-color    : #D7481F !important;
+    box-shadow      : rgba(215, 72, 31, 0.35) 0px 5px 15px !important; /* Optional: add a glow effect */
+}
+
+.bg-gradient-primary{
+    background      : -webkit-gradient(linear,left top,right top,from(#D7481F),to(#D7481F));
+    background      : linear-gradient(90deg,#D7481F,#D7481F)
+}
+
+.page-title .page-title-icon {
+    -webkit-box-shadow: 0 3px 8.3px .7px rgba(215, 72, 31, 0.35);
+    box-shadow: 0 3px 8.3px .7px rgba(215, 72, 31, 0.35);
+}
+
+/*  */
+
+.form-check-primary.form-check label input[type=checkbox]+.input-helper:before,
+.form-check-primary.form-check label input[type=radio]+.input-helper:before {
+	border-color: #D7481F
+}
+
+.navbar.horizontal-boxed-layout-navbar .navbar-middle .nav-pills .nav-item .nav-link.active {
+	background: -webkit-gradient(linear, left top, right top, from(#D7481F), to(#D7481F));
+	background: linear-gradient(90deg, #D7481F, #D7481F);
+
+	-webkit-box-shadow: 0 3px 8.3px .7px rgba(215, 72, 31, 0.35);
+	box-shadow: 0 3px 8.3px .7px rgba(215, 72, 31, 0.35);
+}
+
+.navbar.horizontal-boxed-layout-navbar .navbar-bottom {
+	background: -webkit-gradient(linear, left top, right top, from(#D7481F), to(#D7481F));
+	background: linear-gradient(90deg, #D7481F, #D7481F);
+
+	-webkit-box-shadow: 0 3px 8.3px .7px rgba(215, 72, 31, 0.35);
+	box-shadow: 0 3px 8.3px .7px rgba(215, 72, 31, 0.35);
+}
+
+.bg-gradient-primary {
+	background: -webkit-gradient(linear, left top, right top, from(#D7481F), to(#D7481F));
+	background: linear-gradient(90deg, #D7481F, #D7481F)
+}
+
+.badge-gradient-primary {
+	background: -webkit-gradient(linear, left top, right top, from(#D7481F), to(#D7481F));
+	background: linear-gradient(90deg, #D7481F, #D7481F);
+}
+
+.btn-outline-primary:active, .btn-outline-primary:focus, .btn-outline-primary:hover {
+	background: -webkit-gradient(linear, left top, right top, from(#D7481F), to(#D7481F));
+	background: linear-gradient(90deg, #D7481F, #D7481F);
+}
+
+.btn-gradient-primary {
+	background: -webkit-gradient(linear, left top, right top, from(#D7481F), to(#D7481F)) !important;
+	background: linear-gradient(90deg, #D7481F, #D7481F) !important;
+}
+
+.btn-gradient-primary:not([disabled]):not(.disabled).active,
+.btn-gradient-primary:not([disabled]):not(.disabled):active,
+.show>.btn-gradient-primary.dropdown-toggle {
+	background: -webkit-gradient(linear, left top, right top, from(#D7481F), to(#D7481F));
+	background: linear-gradient(90deg, #D7481F, #D7481F)
+}
+
+.form-check .form-check-label input[type=checkbox]:checked+.input-helper:before {
+	background: -webkit-gradient(linear, left top, right top, from(#D7481F), to(#D7481F));
+	background: linear-gradient(90deg, #D7481F, #D7481F);
+}
+
+.form-check .form-check-label input[type=radio]:checked+.input-helper:before {
+	background: -webkit-gradient(linear, left top, right top, from(#D7481F), to(#D7481F));
+	background: linear-gradient(90deg, #D7481F, #D7481F);
+}
+
+.form-check-primary.form-check label input[type=checkbox]:checked+.input-helper:before,
+.form-check-primary.form-check label input[type=radio]:checked+.input-helper:before {
+	background: -webkit-gradient(linear, left top, right top, from(#D7481F), to(#D7481F));
+	background: linear-gradient(90deg, #D7481F, #D7481F)
+}
+
+.gradient-bullet-list li:nth-child(5):before {
+	background: -webkit-gradient(linear, left top, right top, from(#D7481F), to(#D7481F));
+	background: linear-gradient(90deg, #D7481F, #D7481F)
+}
+
+/*  */
+
