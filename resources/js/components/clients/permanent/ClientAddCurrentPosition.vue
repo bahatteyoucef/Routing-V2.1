@@ -3,34 +3,35 @@
     <div class="mt-3">
 
         <div class="page-header mb-2">
-
             <div class="container w-100">
-                <h3 class="page-title">
+                <h6 class="text-center mb-0">
                     Ajouter un Nouveau Client
-                </h3>
+                </h6>
             </div>
-
         </div>
 
+        <hr />
+
         <div class="container"  style="height : 60vh; overflow : auto;">
-
             <form>
-
                 <div class="slideshow-container">
 
                     <!-- CustomerCode -->
-                    <div class="mySlides slide_1">
-                        <div v-show="client.CustomerCode   ==  ''"     class="mt-1 p-0">
-                            <div    id="reader" class="scanner_reader w-100"></div>
-                        </div>
+                    <div class="mySlides slide_1 mt-3">
+                        <div>
+                            <label for="CustomerBarCode_image"  class="form-label fw-bold">Code-Barre</label>
+                            <div v-show="client.CustomerCode   ==  ''"     class="mt-1 p-0">
+                                <div    id="reader" class="scanner_reader w-100"></div>
+                            </div>
 
-                        <div v-show="client.CustomerCode   !=  ''"     class="mt-1 p-0">
-                            <div    id="result"></div>
-                        </div>
+                            <div v-show="client.CustomerCode   !=  ''"     class="mt-1 p-0">
+                                <div    id="result"></div>
+                            </div>
 
-                        <div v-show="client.CustomerCode   !=  ''"     class="mt-1 p-0">
-                            <div    id="customerCode_value"              class="text-center">
-                                <span class="">QR Code : {{ client.CustomerCode }}</span>
+                            <div v-show="client.CustomerCode   !=  ''"     class="mt-1 p-0">
+                                <div    id="customerCode_value"              class="text-center">
+                                    <span class="">Code-Barre : {{ client.CustomerCode }}</span>
+                                </div>
                             </div>
                         </div>
 
@@ -38,179 +39,376 @@
 
                         <div class="mt-1 mb-1 w-100">
                             <div class="w-100" id="refresh_client_barcode_button">
-                                <button type="button" class="btn btn-primary w-100"     @click="setBarCodeReader()">Capturer QR Code</button>
+                                <button type="button" class="btn btn-primary w-100"     @click="setBarCodeReader()">Capturer Code-Barre</button>
                             </div>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li class="mt-3">Cliquez sur le bouton <button type="button" class="btn btn-primary p-1" style="font-size : 11px">Capturer Code-Barre</button> pour scanner le code-barre à l'aide de la caméra de votre téléphone.</li>
+                            </ul>
                         </div>
                     </div>
 
                     <!-- CustomerBarCode_image -->
                     <div class="mySlides slide_2">
-                        <label for="CustomerBarCode_image"  class="form-label">QR Code Image</label>
-                        <button type="button"               class="btn btn-secondary w-100 mb-1" @click="$clickFile('CustomerBarCode_image')"><i class="mdi mdi-camera"></i></button>
+                        <div>
+                            <label for="CustomerBarCode_image"  class="form-label">Code-Barre Image</label>
+                            <button type="button"               class="btn btn-secondary w-100 mb-1" @click="$clickFile('CustomerBarCode_image')"><i class="mdi mdi-camera"></i></button>
 
-                        <input type='file'                  id="CustomerBarCode_image"              style="display:none"    accept="image/*"    capture     @change="customerBarCodeImage()">
-                        <img                                id="CustomerBarCode_image_display"      src=""                  style="width : 100%; height : auto; display: block; margin : auto">
+                            <input type='file'                  id="CustomerBarCode_image"              style="display:none"    accept="image/*"    capture     @change="customerBarCodeImage()">
+                            <img                                id="CustomerBarCode_image_display"      src=""                  style="width : 100%; height : auto; display: block; margin : auto">
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li class="mt-3">Cliquez sur le bouton <button type="button" class="btn btn-secondary p-1" style="font-size : 11px"><i class="mdi mdi-camera"></i></button> pour ajouter la photo du "code-barre".</li>
+                            </ul>
+                        </div>
                     </div>
 
                     <!-- CustomerNameE -->
-                    <div class="mySlides slide_3">
-                        <label for="CustomerNameE"      class="form-label">Nom et Prénom de l'Acheteur</label>
-                        <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE">
+                    <div class="mySlides slide_3 mt-3">
+                        <div>
+                            <label for="CustomerNameE"      class="form-label fw-bold">Nom et Prénom de l'Acheteur</label>
+                            <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE">
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Saisissez le nom et prénom du client en <span class="fw-bold">MAJISCULE</span> (exemple : <span class="fw-bold">BAKHNACH IMAD</span>).</li>
+                            </ul>
+                        </div>
                     </div>
 
                     <!-- CustomerNameA -->
-                    <div class="mySlides slide_4">
-                        <label for="CustomerNameA"      class="form-label">Raison Sociale</label>
-                        <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA">
+                    <div class="mySlides slide_4 mt-3">
+                        <div>
+                            <label for="CustomerNameA"      class="form-label fw-bold">Raison Sociale</label>
+                            <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA">
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Saisissez le nom du magasin en <span class="fw-bold">MAJISCULE</span>, généralement affiché sur sa façade (exemple : <span class="fw-bold">SUPERETTE ESSALEM</span>).</li>
+                            </ul>
+                        </div>
                     </div>
 
                     <!-- Tel -->
-                    <div class="mySlides slide_5">
-                        <label for="Tel"                class="form-label">Téléphone</label>
-                        <input type="text"              class="form-control"        id="Tel"                    v-model="client.Tel">
+                    <div class="mySlides slide_5 mt-3">
+                        <div>
+                            <label for="Tel"                class="form-label fw-bold">Téléphone</label>
+                            <input type="text"              class="form-control"        id="Tel"                    v-model="client.Tel">
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Saisissez le numéro de téléphone du client au format correct (10 chiffres, commençant par 0) (exemple : <span class="fw-bold">0654123487</span>).</li>
+                            </ul>
+                        </div>
                     </div>
 
                     <!-- GPS -->
-                    <div class="mySlides slide_6">
-                        <label for="CustomerCode"       class="form-label">Detecter la Position Actuel <button class="btn btn-sm" @click.prevent="showPositionOnMap('show_map')"><i class="mdi mdi-reload"></i></button></label>
-                        <p class="text-secondary text-small mb-1">Latitude : {{ client.Latitude }}</p>
-                        <p class="text-secondary text-small mb-1">Longitude : {{ client.Longitude }}</p>
+                    <div class="mySlides slide_6 mt-3">
+                        <div>
+                            <label for="CustomerCode"       class="form-label fw-bold">Detecter la Position Actuel <button class="btn btn-sm" @click.prevent="showPositionOnMap('show_map')"><i class="mdi mdi-reload"></i></button></label>
+                            <p class="text-secondary text-small mb-1">Latitude : {{ client.Latitude }}</p>
+                            <p class="text-secondary text-small mb-1">Longitude : {{ client.Longitude }}</p>
 
-                        <div id="show_map" style="width: 100%; height: 200px;"></div>
+                            <div id="show_map" style="width: 100%; height: 200px;"></div>
 
-                        <hr />
+                            <hr />
 
-                        <h5>Clients a Proximité</h5>
+                            <h5>Clients a Proximité</h5>
 
-                        <hr />
+                            <hr />
 
-                        <table class="table table-bordered mt-1">
-                            <thead>
-                                <tr>
-                                    <th class="text-wrap">Acheteur</th>
-                                    <th class="text-wrap">Raison Social</th>
-                                    <th class="text-wrap">Type</th>
-                                </tr>
-                            </thead>
-                            
-                            <tbody>
-                                <tr v-for="client in close_clients" :key="client">
-                                    <td class="text-wrap">{{client.CustomerNameE}}</td>
-                                    <td class="text-wrap">{{client.CustomerNameA}}</td>
-                                    <td class="text-wrap">{{client.CustomerType}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                            <table class="table table-bordered mt-1">
+                                <thead>
+                                    <tr>
+                                        <th class="text-wrap">Acheteur</th>
+                                        <th class="text-wrap">Raison Social</th>
+                                        <th class="text-wrap">Type</th>
+                                    </tr>
+                                </thead>
+                                
+                                <tbody>
+                                    <tr v-for="client in close_clients" :key="client">
+                                        <td class="text-wrap">{{client.CustomerNameE}}</td>
+                                        <td class="text-wrap">{{client.CustomerNameA}}</td>
+                                        <td class="text-wrap">{{client.CustomerType}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Vérifiez si votre position GPS est correcte. Si ce n'est pas le cas, cliquez sur <i class="mdi mdi-reload"></i> pour l'actualiser.</li>
+                                <li>Le tableau affiche la liste des clients proches de votre position actuelle.</li>
+                            </ul>
+                        </div>
                     </div>
 
                     <!-- Adresse -->
-                    <div class="mySlides slide_7">
-                        <label for="Address"            class="form-label">Adresse</label>
-                        <input type="text"              class="form-control"        id="Address"                v-model="client.Address">
+                    <div class="mySlides slide_7 mt-3">
+                        <div>
+                            <label for="Address"            class="form-label fw-bold">Adresse</label>
+                            <input type="text"              class="form-control"        id="Address"                v-model="client.Address">
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Saisissez l'adresse du magasin (exemple : <span class=fw-bold>Rue Mohamed Belouizdad - Alger Centre</span>).</li>
+                            </ul>
+                        </div>
                     </div>
 
                     <!-- Neighborhood -->
-                    <div class="mySlides slide_8">
-                        <label for="Neighborhood"       class="form-label">Quartier</label>
-                        <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood">
+                    <div class="mySlides slide_8 mt-3">
+                        <div>
+                            <label for="Neighborhood"       class="form-label fw-bold">Quartier</label>
+                            <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood">
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Saisissez le nom du quartier du magasin (exemple : <span class="fw-bold">Belcourt</span>).</li>
+                            </ul>
+                        </div>
                     </div>
 
                     <!-- Landmark -->
-                    <div class="mySlides slide_9">
-                        <label for="Landmark"           class="form-label">Point de Repere</label>
-                        <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"></textarea>
+                    <div class="mySlides slide_9 mt-3">
+                        <div>
+                            <label for="Landmark"           class="form-label fw-bold">Point de Repere</label>
+                            <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"></textarea>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Saisissez un point de repère pour le client (exemple : <span class="fw-bold">à côté de la Grande Poste</span>).</li>
+                            </ul>
+                        </div>
                     </div>
 
                     <!-- DistrictNo --> 
-                    <div class="mySlides slide_10">
-                        <label for="DistrictNo"         class="form-label">Willaya</label>
-                        <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()"    disabled>
-                            <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
-                        </select>
-                    </div> 
-                   
-                    <!-- CityNo -->
-                    <div class="mySlides slide_11">
-                        <label for="CityNo"             class="form-label">Commune</label>
-                        <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo">
-                            <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CITYNO}}- {{cite.CityNameE}}</option>
-                        </select>
-                    </div>
-
-                    <!-- CustomerType -->
-                    <div class="mySlides slide_12">
-                        <label for="text"               class="form-label">Type de Magasin</label>
-                        <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType">
-                                <option     :value="'Alimentation Generale'">Alimentation Generale</option>
-                                <option     :value="'Fast food'">Fast food</option>
-                                <option     :value="'Restaurant'">Restaurant</option>
-                                <option     :value="'Cafétéria'">Cafétéria</option>
-                                <option     :value="'Grossiste'">Grossiste</option>
-                                <option     :value="'Supérette'">Supérette</option>
-                                <option     :value="'Hypermarché'">Hypermarché</option>
-                                <option     :value="'Bureau Tabac'">Bureau Tabac</option>
-                                <option     :value="'Cosmetique'">Cosmetique</option>
-                        </select>
-                    </div>
-
-                    <!-- BrandSourcePurchase -->
-                    <div class="mySlides slide_13">
-                        <label for="text"               class="form-label">Source d'Achat</label>
-                        <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase">
-                            <option     value="Distribution Direct">Distribution Direct</option>
-                            <option     value="Grossiste Fixe">Grossiste Fixe</option>
-                            <option     value="Grossiste Mobile">Grossiste Mobile</option>
-                            <option     value="Multi Source">Multi Source</option>
-                            <option     value="Pas d'achat">Pas d'achat</option>
-                        </select>
-                    </div>
-
-                    <!-- JPlan -->
-                    <div class="mySlides slide_14">
-                        <label for="JPlan"              class="form-label">Nom de Vendeur</label>
-                        <input type="text"              class="form-control"        id="JPlan"                  v-model="client.JPlan">
-                    </div>
-                    
-                    <!-- Journee -->
-                    <div class="mySlides slide_15">
-                        <label for="Journee"            class="form-label">Journee</label>
-                        <input type="text"              class="form-control"        id="Journee"                v-model="client.Journee">
-                    </div>
-
-                    <!-- BrandAvailability + In-Store Image -->
-                    <div class="mySlides slide_16">
-
-                        <div class="mb-1">
-                            <label for="text"               class="form-label">Disponibilité Produits</label>
-                            <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability"   @change="brandAvailabilityChanged()">
-                                <option     value=0>No</option>
-                                <option     value=1>Yes</option>
+                    <div class="mySlides slide_10 mt-3">
+                        <div>
+                            <label for="DistrictNo"         class="form-label fw-bold">Willaya</label>
+                            <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()"    disabled>
+                                <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
                             </select>
                         </div>
 
-                        <div class="mt-1"   v-show="client.BrandAvailability  ==  1">
-                            <label for="in_store_image" class="form-label">Image In-Store</label>
-                            <button type="button"       class="btn btn-secondary w-100 mb-1" @click="$clickFile('in_store_image')"><i class="mdi mdi-camera"></i></button>
+                        <!--  -->
 
-                            <input type='file'          id="in_store_image"             style="display:none"    accept="image/*"    capture     @change="inStoreImage()">
-                            <img                        id="in_store_image_display"     src=""                  style="width : 100%; height : auto; display: block; margin : auto">
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>La willaya où se situe le magasin du client est sélectionnée automatiquement (exemple : <span class="fw-bold">Alger</span>).</li>
+                            </ul>
+                        </div>
+                    </div>
+                   
+                    <!-- CityNo -->
+                    <div class="mySlides slide_11 mt-3">
+                        <div>
+                            <label for="CityNo"             class="form-label fw-bold">Commune</label>
+                            <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo">
+                                <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CITYNO}}- {{cite.CityNameE}}</option>
+                            </select>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Saisissez la commune où se situe le magasin (exemple : <span class="fw-bold">Saoula</span>).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- CustomerType -->
+                    <div class="mySlides slide_12 mt-3">
+                        <div>
+                            <label for="text"               class="form-label fw-bold">Type de Magasin</label>
+                            <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType">
+                                    <option     :value="'Alimentation Generale'">Alimentation Generale</option>
+                                    <option     :value="'Fast food'">Fast food</option>
+                                    <option     :value="'Restaurant'">Restaurant</option>
+                                    <option     :value="'Cafétéria'">Cafétéria</option>
+                                    <option     :value="'Grossiste'">Grossiste</option>
+                                    <option     :value="'Supérette'">Supérette</option>
+                                    <option     :value="'Hypermarché'">Hypermarché</option>
+                                    <option     :value="'Bureau Tabac'">Bureau Tabac</option>
+                                    <option     :value="'Cosmetique'">Cosmetique</option>
+                            </select>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Selectionnez le type de magasin (exemple : <span class="fw-bold">Alimentation Générale</span>).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- BrandSourcePurchase -->
+                    <div class="mySlides slide_13 mt-3">
+                        <div>
+                            <label for="text"               class="form-label fw-bold">Source d'Achat</label>
+                            <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase">
+                                <option     value="Distribution Direct">Distribution Direct</option>
+                                <option     value="Distribution Indirect">Distribution Indirect</option>
+                                <option     value="Pas d'achat">Pas d'achat</option>
+                            </select>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Selectionnez la source d'achat du client.
+
+                                    <ul class="pt-3">
+                                        <li><span class="fw-bold">Distribution directe</span> : Achat directement auprès du distributeur.</li>
+                                        <li><span class="fw-bold">Distribution indirecte</span> : Achat auprès d'un grossiste ou de vendeurs mobiles.</li>
+                                        <li><span class="fw-bold">Pas d'achat</span> : Le produit n'est pas disponible dans le magasin et le client ne l'achète pas.</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- JPlan -->
+                    <div class="mySlides slide_14 mt-3">
+                        <div>
+                            <label for="JPlan"              class="form-label fw-bold">Nom de Vendeur</label>
+                            <input type="text"              class="form-control"        id="JPlan"                  v-model="client.JPlan">
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Saisissez le nom du vendeur habituel qui visite le magasin, en <span class="fw-bold">MAJISCULE</span> (exemple : <span class="fw-bold">BOULEKRINAT Omar</span>).</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Journee -->
+                    <div class="mySlides slide_15 mt-3">
+                        <div>
+                            <label for="Journee"            class="form-label fw-bold">Journee</label>
+
+                            <select                         class="form-select"         id="Journee"                 v-model="client.Journee">
+                                <option     :value="'Samedi 1 (Jour 1)'">Samedi 1 (Jour 1)</option>
+                                <option     :value="'Dimanche 1 (Jour 2)'">Dimanche 1 (Jour 2)</option>
+                                <option     :value="'Lundi 1 (Jour 3)'">Lundi 1 (Jour 3)</option>
+                                <option     :value="'Mardi 1 (Jour 4)'">Mardi 1 (Jour 4)</option>
+                                <option     :value="'Mercredi 1 (Jour 5)'">Mercredi 1 (Jour 5)</option>
+                                <option     :value="'Jeudi 1 (Jour 6)'">Jeudi 1 (Jour 6)</option>
+                                <option     :value="'Samedi 2 (Jour 7)'">Samedi 2 (Jour 7)</option>
+                                <option     :value="'Dimanche 2 (Jour 8)'">Dimanche 2 (Jour 8)</option>
+                                <option     :value="'Lundi 2 (Jour 9)'">Lundi 2 (Jour 9)</option>
+                                <option     :value="'Mardi 2 (Jour 10)'">Mardi 2 (Jour 10)</option>
+                                <option     :value="'Mercredi 2 (Jour 11)'">Mercredi 2 (Jour 11)</option>
+                                <option     :value="'Jeudi 2 (Jour 12)'">Jeudi 2 (Jour 12)</option>
+                            </select>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Selectionnez la journée de visite du client (exemple : <span class="fw-bold">Samedi 1 (Jour 1)</span>).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- BrandAvailability + In-Store Image -->
+                    <div class="mySlides slide_16 mt-3">
+                        <div>
+                            <div class="mb-1">
+                                <label for="text"               class="form-label fw-bold">Disponibilité Produits</label>
+                                <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability"   @change="brandAvailabilityChanged()">
+                                    <option     value=0>Non</option>
+                                    <option     value=1>Oui</option>
+                                </select>
+                            </div>
+
+                            <div class="mt-1"   v-show="client.BrandAvailability  ==  1">
+                                <label for="in_store_image" class="form-label fw-bold">Image In-Store</label>
+                                <button type="button"       class="btn btn-secondary w-100 mb-1" @click="$clickFile('in_store_image')"><i class="mdi mdi-camera"></i></button>
+
+                                <input type='file'          id="in_store_image"             style="display:none"    accept="image/*"    capture     @change="inStoreImage()">
+                                <img                        id="in_store_image_display"     src=""                  style="width : 100%; height : auto; display: block; margin : auto">
+                            </div>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Sélectionnez si le produit est disponible ou non (exemple : <span class="fw-bold">Oui</span>).</li>
+                                <li>Si le produit est disponible, veuillez prendre une photo du rayon où le produit est placé dans le magasin en cliquant sur le bouton <button type="button" class="btn btn-secondary p-1" style="font-size : 11px"><i class="mdi mdi-camera"></i></button></li>
+                            </ul>
                         </div>
                     </div>
 
                     <!-- facade_image -->
-                    <div class="mySlides slide_17">
-                        <label for="facade_image"   class="form-label">Image Facade</label>
-                        <button type="button"       class="btn btn-secondary w-100 mb-1" @click="$clickFile('facade_image')"><i class="mdi mdi-camera"></i></button>
+                    <div class="mySlides slide_17 mt-3">
+                        <div>
+                            <label for="facade_image"   class="form-label fw-bold">Image Facade</label>
+                            <button type="button"       class="btn btn-secondary w-100 mb-1" @click="$clickFile('facade_image')"><i class="mdi mdi-camera"></i></button>
 
-                        <input type='file'          id="facade_image"           style="display:none"    accept="image/*"    capture     @change="facadeImage()">
-                        <img                        id="facade_image_display"   src=""                  style="width : 100%; height : auto; display: block; margin : auto">
+                            <input type='file'          id="facade_image"           style="display:none"    accept="image/*"    capture     @change="facadeImage()">
+                            <img                        id="facade_image_display"   src=""                  style="width : 100%; height : auto; display: block; margin : auto">
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Prenez une photo bien cadrée de la façade du magasin en cliquant sur le bouton <button type="button" class="btn btn-secondary p-1" style="font-size : 11px"><i class="mdi mdi-camera"></i></button></li>
+                            </ul>
+                        </div>
                     </div>
 
-
                     <!-- Comment -->
-                    <div class="mySlides slide_18">
-                        <label      for="comment">Commentaire</label>
-                        <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"></textarea>
+                    <div class="mySlides slide_18 mt-3">
+                        <div>
+                            <label      for="comment" class="form-label fw-bold">Commentaire</label>
+                            <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"></textarea>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Ajoutez un commentaire si vous souhaitez préciser quelque chose (exemple : <span class="fw-bold">Le magasin sera en rénovation à partir de demain, retour prévu dans deux semaines.</span>).</li>
+                            </ul>
+                        </div>
                     </div>
 
                 </div>
@@ -340,9 +538,9 @@ export default {
 
             //
 
-            liste_journey_plan              :   []  ,
-            liste_journee                   :   []  ,
-            liste_type_client               :   []  ,
+            liste_journey_plan              :   []      ,
+            liste_journee                   :   []      ,
+            liste_type_client               :   []      ,
 
             //
 
@@ -971,7 +1169,7 @@ export default {
 
                 else {
 
-                    this.$showErrors("Error !"  ,   ["Veuillez répondre avant de passer à la question suivante !"])
+                    this.$showErrors("Error !"  ,   ["Veuillez répondre en respectant les conditions des questions avant de passer à la page suivante !"])
                     return false;
                 }
                 //
@@ -1030,7 +1228,7 @@ export default {
             // Slide 3
             if(this.slideIndex  ==  3) {
 
-                if(this.client.CustomerNameE !==  "") {
+                if((this.client.CustomerNameE !== "")&&(this.$isUppercase(this.client.CustomerNameE))) {
 
                     return true;
                 }
@@ -1044,7 +1242,7 @@ export default {
             // Slide 4
             if(this.slideIndex  ==  4) {
 
-                if(this.client.CustomerNameA !==  "") {
+                if((this.client.CustomerNameA !== "")&&(this.$isUppercase(this.client.CustomerNameA))) {
 
                     return true;
                 }
@@ -1183,7 +1381,7 @@ export default {
             // Slide 14
             if(this.slideIndex  ==  14) {
 
-                if(this.client.JPlan !==  "") {
+                if((this.client.JPlan !== "")&&(this.$isUppercase(this.client.JPlan))) {
 
                     return true;
                 }
@@ -1207,7 +1405,7 @@ export default {
                     return false
                 }
             }
-            
+
             // Slide 16
             if(this.slideIndex  ==  16) {
 
@@ -1229,6 +1427,7 @@ export default {
                     }
                 }
             }
+
             // Slide 17
             if(this.slideIndex  ==  17) {
 
@@ -1242,8 +1441,6 @@ export default {
                     return false
                 }
             }
-
-
 
             return true
         }

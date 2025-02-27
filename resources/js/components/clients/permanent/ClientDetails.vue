@@ -1,16 +1,14 @@
 <template>
 
-    <div id="details_page"  class="mt-4 mb-4 d-flex justify-content-center">
-
-        <div class="card p-4">
-
+    <div class="content-wrapper" style="padding : 5px;">
+        <section class="mt-4">
             <div class="image d-flex flex-column justify-content-center align-items-center">
 
                 <img    id="facade_image_display_update"    :src="'/uploads/clients/'+client.id+'/'+client.facade_image"  class="w-100">
 
                 <div class="mt-3">
                     <div class="d-flex flex-row justify-content-center gap-2">
-                        <span class="idd">QR Code : {{ client.CustomerCode }}</span>
+                        <span class="idd">Code-Barre : {{ client.CustomerCode }}</span>
                     </div>
 
                     <div class="d-flex flex-row justify-content-center gap-2">
@@ -30,16 +28,22 @@
                     </div>
                 </div>
 
-                <div class="d-flex mt-3"       style="display: flex; justify-content: space-between;">
-                    <div style="display: flex; margin-left: auto;">
-                        <button v-if="getIsOnline"  class="rounded btn1 primary m-1" @click="updateInformations()">Update</button>
-                        <button v-if="getIsOnline"  class="rounded btn1 btn-secondary m-1 text-white" @click="openDirectionsInGoogleMaps()">Itinéraire <i class="mdi mdi-map-marker-radius"></i></button>
+                <div class="mt-5 p-0 w-100 text-center">
+                    <div v-if="getIsOnline" class="text-center m-1 p-0">
+                        <button class="rounded btn primary text-white w-100 p-1" @click="updateInformations()">Modifier <i class="mdi mdi-pencil-box-outline"></i></button>
+                    </div>
+
+                    <div v-if="getIsOnline" class="text-center m-1 p-0">
+                        <button class="rounded btn btn-secondary text-white w-100 p-1" @click="openDirectionsInGoogleMaps()">Itinéraire <i class="mdi mdi-map-marker-circle"></i></button>
+                    </div>
+
+                    <div v-if="((getIsOnline)&&(client.status != 'validated'))" class="text-center m-1 p-0">
+                        <button class="rounded btn btn-danger text-white w-100 p-1" @click="deleteClient()">Supprimer <i class="mdi mdi-delete"></i></button>
                     </div>
                 </div>
 
             </div>
-        </div>
-
+        </section>
     </div>
 
 </template>
@@ -132,13 +136,13 @@ export default {
 
                 this.client.RegionNo                      =   res.data.RegionNo
                 this.client.DistrictNo                    =   res.data.DistrictNo
-                this.client.DistrictNo                        =   res.data.DistrictNo
+                this.client.DistrictNo                    =   res.data.DistrictNo
                 this.client.CityNo                        =   res.data.CityNo
                 this.client.Address                       =   res.data.Address
 
                 this.client.AddressA                      =   res.data.AddressA                 
                 this.client.CityNameE                     =   res.data.CityNameE
-                this.client.DistrictNameE                     =   res.data.DistrictNameE
+                this.client.DistrictNameE                 =   res.data.DistrictNameE
 
                 this.client.Tel                           =   res.data.Tel
 
@@ -180,8 +184,8 @@ export default {
             const user_latitude         =   current_position.coords.latitude
             const user_longitude        =   current_position.coords.longitude
 
-            const client_latitude     =   this.client.Latitude;
-            const client_longitude    =   this.client.Longitude;
+            const client_latitude       =   this.client.Latitude;
+            const client_longitude      =   this.client.Longitude;
 
             // Construct the URL for Google Maps directions
             const url = `https://www.google.com/maps/dir/?api=1&origin=${user_latitude},${user_longitude}&destination=${client_latitude},${client_longitude}`;
@@ -189,6 +193,41 @@ export default {
             // Open the URL in a new window or tab to trigger the Google Maps app if available
             window.open(url, '_system');
         },
+
+        //
+
+        async deleteClient() {
+
+            let res =   await this.$customMessages("Suppression d'un client", "Voulez-vous supprimer le client "+this.client.CustomerCode+" ?", "warning", "Oui", "Non", "delete_client_details_clients", "")
+
+            if(res) {
+
+                this.$showLoadingPage()
+
+                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/delete",   null)
+
+                if(res.status===200){
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    // Send Feedback
+                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
+
+                    //
+                    this.$goBack()
+                }
+                
+                else{
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
+
+                    // Send Errors
+                    this.$showErrors("Error !", res.data.errors)
+                }
+            }
+        }
     }
 };
 

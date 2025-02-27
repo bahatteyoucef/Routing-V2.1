@@ -1,5 +1,3 @@
-import axios from 'axios'
-
 export default {
 
     methods: {
@@ -77,6 +75,35 @@ export default {
             validation_errors       =   list_items   +   "</ul>"
             
             this.$feedbackError(message   ,   validation_errors)
+        },
+
+        //
+
+        $customMessages(title, text, icon, confirmButtonText, cancelButtonText) {
+
+            return new Promise((resolve) => {
+                this.$swal.fire({
+                    title: title,
+                    text: text,
+                    icon: icon,
+                    didRender: () => {
+                        // Remove the `swal2-icon-content` element
+                        const iconContent = document.querySelector('.swal2-icon-content');
+                        if (iconContent) {
+                            iconContent.remove();
+                        }
+                    },
+                    showCancelButton: cancelButtonText !== "",
+                    confirmButtonText: confirmButtonText,
+                    cancelButtonText: cancelButtonText,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        resolve(true);
+                    } else {
+                        resolve(false);
+                    }
+                });
+            });
         },
     },   
 }

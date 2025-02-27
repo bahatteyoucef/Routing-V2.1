@@ -278,8 +278,11 @@
 
 /*  */
 
+#details_page {
+    height: 90%;
+}
+
 #details_page .card {
-    width: 350px;
     background-color: #efefef;
     border: none;
     cursor: pointer;

@@ -1414,6 +1414,13 @@ export default {
         $clickFile(file_id) {
 
             document.getElementById(file_id).click()
+        },
+
+        //
+
+        $isUppercase(str) {
+
+            return str === str.toUpperCase() && /^[A-ZÀ-Ÿ]+$/.test(str);
         }
     }
 }
