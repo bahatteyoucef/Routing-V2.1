@@ -132,7 +132,7 @@ export default {
 
                             //
 
-                            this.checkFileFormat()
+                            this.checkFileFormatAndValidateData()
 
                             if(this.rdy_send) {
 
@@ -183,13 +183,13 @@ export default {
 
         //
 
-        checkFileFormat() {
+        checkFileFormatAndValidateData() {
 
             let errors  =   []
 
             if(this.clients.length  >   0) {
 
-                let columns =   Object.keys(this.clients[0])
+                let columns                 =   Object.keys(this.clients[0])
 
                 let CustomerCode_existe     =   columns.includes("CustomerCode")
                 let CustomerNameE_existe    =   columns.includes("CustomerNameE")
@@ -286,7 +286,7 @@ export default {
 
                 else {
 
-                    this.rdy_send   =   true
+                    this.rdy_send   =   this.validateData()
                 }
             }
 
@@ -297,6 +297,28 @@ export default {
                 this.rdy_send   =   true
             }
         },
+
+        validateData() {
+
+            for (let index = 0; index < this.clients.length; index++) {
+             
+                if (!this.clients[index].CustomerCode) {
+
+                    this.$showErrors("Error !", [this.clients[index].CustomerNameE+" CustomerCode est vide"])
+                    return false;
+                }
+
+                if(!this.$isValidForFileName(this.clients[index].CustomerCode)) {
+
+                    this.$showErrors("Error !", [this.clients[index].CustomerNameE+" CustomerCode contient des caractères interdits"])
+                    return false;
+                }
+            }
+
+            return true;
+        },
+
+        //
 
         setLatitudeLongitudeStandard() {
 

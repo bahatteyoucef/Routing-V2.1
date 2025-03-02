@@ -74,6 +74,15 @@ class ClientTempoController extends Controller
             DB::beginTransaction();
             //
 
+            // validate
+            $validator  =   ClientTempo::validateUpdate($request);
+            
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors'    =>  $validator->errors(),
+                ],422);
+            }
+
             // store 
             ClientTempo::updateClient($request, $id_route_import_tempo, $id);
 

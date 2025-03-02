@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use stdClass;
 
 class ClientTempo extends Model
@@ -46,8 +47,16 @@ class ClientTempo extends Model
 
         foreach ($clients as $client_elem) {
 
-            // Client
+            //
+            if (empty($client_elem->CustomerCode)) {
+                throw new Exception("Le champ CustomerCode est vide.");
+            }
 
+            if (preg_match('/[\/\\\\:*?"<>|& ]/', $client_elem->CustomerCode)) {
+                throw new Exception("Le champ CustomerCode contient des caractères interdits : ".$client_elem->CustomerCode);
+            }
+
+            // Client
             $client         =   new ClientTempo([
                 'CustomerCode'              =>  $client_elem->CustomerCode          ,
                 'CustomerNameE'             =>  $client_elem->CustomerNameE         ,
@@ -96,6 +105,24 @@ class ClientTempo extends Model
         }
     }
 
+    //
+
+    public static function validateUpdate(Request $request) 
+    {
+
+        $validator = Validator::make($request->all(), [
+            'CustomerCode'          =>  ["required", "max:255", function ($attribute, $value, $fail) {
+                if (preg_match('/[\/\\\\:*?"<>|& ]/', $value)) {
+                    $fail("Le champ $attribute contient des caractères interdits.");
+                }
+            }],
+        ]);
+
+        //
+
+        return $validator;
+    }
+
     public static function updateClient(Request $request, int $id_route_import_tempo, int $id) {
 
         $client                             =   ClientTempo::find($id);
@@ -141,6 +168,8 @@ class ClientTempo extends Model
         $client->save();
 
     }
+
+    //
 
     public static function deleteClient(int $id_route_import_tempo, int $id) {
 

@@ -16,7 +16,7 @@
 
                         <div class="mb-3">
                             <label for="CustomerCode"       class="form-label">CustomerCode (CustomerCode)</label>
-                            <input type="text"              class="form-control"        id="CustomerCode"           v-model="client.CustomerCode">
+                            <input type="text"              class="form-control"        id="CustomerCode"           v-model="client.CustomerCode"   @input="validateCustomerCode()">
                         </div>
 
                         <div class="mb-3">
@@ -507,6 +507,24 @@ export default {
 
                     return this.cites[i].CityNameE
                 }                
+            }
+        },
+
+        //
+
+        validateCustomerCode() {
+
+            if(this.$isValidForFileName(this.client.CustomerCode)) {
+
+                // 
+                this.client.CustomerCode    =   this.client.CustomerCode
+            }
+
+            else {
+
+                // 
+                this.client.CustomerCode    =   this.client.CustomerCode.slice(0, -1);
+                this.$showErrors("Error !"  ,   ["Votre code-barres contient des caractères interdits : / \ : * ? \" < > | &; (espace)"])
             }
         }
     },

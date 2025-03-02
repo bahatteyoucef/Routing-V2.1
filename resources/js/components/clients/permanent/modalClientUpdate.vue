@@ -989,7 +989,18 @@ export default {
         success(result) {
              
             // 
-            this.client.CustomerCode    =   result
+            if(this.$isValidForFileName(result)) {
+
+                // 
+                this.client.CustomerCode    =   result
+            }
+
+            else {
+
+                // 
+                this.client.CustomerCode    =   ""
+                this.$showErrors("Error !"  ,   ["Votre code-barres contient des caractères interdits : / \ : * ? \" < > | &; (espace)"])
+            }
 
             this.scanner.clear();
 

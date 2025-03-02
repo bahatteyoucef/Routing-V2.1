@@ -58,7 +58,7 @@
                                 </div>
 
                                 <div class="col-1">
-                                    <button class="btn btn-primary btn-block"   data-bs-toggle="modal" :data-bs-target="'#modalValidateCustomerCode'"   @click="validateCustomerCode()">Validate</button>
+                                    <button class="btn btn-primary btn-block"                                                                           @click="validateCustomerCode()">Validate</button>
                                 </div>
 
                                 <div class="col-1">
@@ -80,7 +80,7 @@
                                 </div>
 
                                 <div class="col-1">
-                                    <button class="btn btn-primary btn-block"   data-bs-toggle="modal" :data-bs-target="'#modalValidateCustomerNameE'"  @click="validateCustomerNameE()">Validate</button>
+                                    <button class="btn btn-primary btn-block"                                                                           @click="validateCustomerNameE()">Validate</button>
                                 </div>
 
                                 <div class="col-1">
@@ -102,7 +102,7 @@
                                 </div>
 
                                 <div class="col-1">
-                                    <button class="btn btn-primary btn-block"   data-bs-toggle="modal" :data-bs-target="'#modalValidateTel'"            @click="validateTel()">Validate</button>
+                                    <button class="btn btn-primary btn-block"                                                                           @click="validateTel()">Validate</button>
                                 </div>
 
                                 <div class="col-1">
@@ -124,7 +124,7 @@
                                 </div>
 
                                 <div class="col-1">
-                                    <button class="btn btn-primary btn-block"   data-bs-toggle="modal" :data-bs-target="'#modalValidateGPS'"            @click="validateGPS()">Validate</button>
+                                    <button class="btn btn-primary btn-block"                                                                           @click="validateGPS()">Validate</button>
                                 </div>
 
                                 <div class="col-1">
@@ -403,20 +403,32 @@ export default {
 
         async validateCustomerCode() {
 
+            var modalValidateCustomerCode   =   new Modal(document.getElementById("modalValidateCustomerCode"));
+            modalValidateCustomerCode.show();
+
             await this.$refs.modalValidateCustomerCode.setResumeValidate()
         },
 
         async validateCustomerNameE() {
+
+            var modalValidateCustomerNameE  =   new Modal(document.getElementById("modalValidateCustomerNameE"));
+            modalValidateCustomerNameE.show();
 
             await this.$refs.modalValidateCustomerNameE.setResumeValidate()
         },
 
         async validateGPS() {
 
+            var modalValidateGPS            =   new Modal(document.getElementById("modalValidateGPS"));
+            modalValidateGPS.show();
+
             await this.$refs.modalValidateGPS.setResumeValidate()
         },
 
         async validateTel() {
+
+            var modalValidateTel            =   new Modal(document.getElementById("modalValidateTel"));
+            modalValidateTel.show();
 
             await this.$refs.modalValidateTel.setResumeValidate()
         },

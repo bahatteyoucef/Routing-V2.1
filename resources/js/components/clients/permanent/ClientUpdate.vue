@@ -54,6 +54,7 @@
                         <div class="mt-5">
                             <ul class="pl-3">
                                 <li class="mt-3">Cliquez sur le bouton <button type="button" class="btn btn-primary p-1" style="font-size : 11px">Capturer Code-Barre</button> pour scanner le code-barre à l'aide de la caméra de votre téléphone.</li>
+                                <li class="mt-3">🚨 Attention : Veuillez ne pas scanner de code-barres contenant les caractères suivants :<span class="restricted-chars">>/ \ : * ? " &lt; &gt; | &amp; (espace)</span></li>
                             </ul>
                         </div>
                     </div>
@@ -1391,16 +1392,13 @@ export default {
                 //
                 this.scanner = new Html5QrcodeScanner('reader', {
 
-                    qrbox   : {
-                        width   : 250,
-                        height  : 250,
-                    },
+                    qrbox   : window.innerWidth < 500 ? { width: 200, height: 200 } : { width: 250, height: 250 },
 
-                    fps     : 20,
+                    fps     : navigator.hardwareConcurrency > 4 ? 20 : 10,
 
-                    supportedScanTypes  : [
-                        Html5QrcodeScanType.SCAN_TYPE_CAMERA
-                    ],
+                    // supportedScanTypes  : [
+                    //     Html5QrcodeScanType.SCAN_TYPE_CAMERA
+                    // ],
                 });
 
                 try {
@@ -1414,8 +1412,20 @@ export default {
         success(result) {
              
             // 
-            this.client.CustomerCode    =   result
+            if(this.$isValidForFileName(result)) {
 
+                // 
+                this.client.CustomerCode    =   result
+            }
+
+            else {
+
+                // 
+                this.client.CustomerCode    =   ""
+                this.$showErrors("Error !"  ,   ["Votre code-barres contient des caractères interdits : / \ : * ? \" < > | &; (espace)"])
+            }
+
+            //
             this.scanner.clear();
 
             document.getElementById('reader').style.display =   "none"

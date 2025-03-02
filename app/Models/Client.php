@@ -165,7 +165,11 @@ class Client extends Model
     {
 
         $validator = Validator::make($request->all(), [
-            'CustomerCode'          =>  ["required", "max:255"],
+            'CustomerCode'          =>  ["required", "max:255", function ($attribute, $value, $fail) {
+                if (preg_match('/[\/\\\\:*?"<>|& ]/', $value)) {
+                    $fail("Le champ $attribute contient des caractères interdits.");
+                }
+            }],
             'CustomerNameE'         =>  ["required", "max:255"],
             'CustomerNameA'         =>  ["required", "max:255"],
             'Tel'                   =>  ["required", "max:255"],
@@ -201,17 +205,6 @@ class Client extends Model
     
             return $input->in_store_image_original_name             !=  "";
         });
-
-        //
-
-        // CustomerBarCode
-        // Pattern for alphanumeric characters, underscores, periods, hyphens, and spaces
-        $pattern    =   "/^[a-zA-Z0-9]+$/";
-
-        if(preg_match($pattern, $request->input("CustomerCode"))    !==     1) {
-
-            throw new Exception("CustomerCode Can Only Contain Letters and Numbers !");
-        }
 
         //
 
@@ -406,7 +399,11 @@ class Client extends Model
     {
 
         $validator = Validator::make($request->all(), [
-            'CustomerCode'          =>  ["required", "max:255"],
+            'CustomerCode'          =>  ["required", "max:255", function ($attribute, $value, $fail) {
+                if (preg_match('/[\/\\\\:*?"<>|& ]/', $value)) {
+                    $fail("Le champ $attribute contient des caractères interdits.");
+                }
+            }],
             'CustomerNameE'         =>  ["required", "max:255"],
             'CustomerNameA'         =>  ["required", "max:255"],
             'Tel'                   =>  ["required", "max:255"],
@@ -442,17 +439,6 @@ class Client extends Model
     
             return (($input->in_store_image_original_name           !=  "")&&($input->in_store_image_updated            ==  "true"));
         });
-
-        //
-
-        // CustomerBarCode
-        // Pattern for alphanumeric characters, underscores, periods, hyphens, and spaces
-        $pattern    =   "/^[a-zA-Z0-9]+$/";
-
-        if(preg_match($pattern, $request->input("CustomerCode"))    !==     1) {
-
-            throw new Exception("CustomerCode Can Only Contain Letters and Numbers !");
-        }
 
         //
 

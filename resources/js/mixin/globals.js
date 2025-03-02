@@ -1420,7 +1420,17 @@ export default {
 
         $isUppercase(str) {
 
-            return str === str.toUpperCase() && /^[A-ZÀ-Ÿ]+$/.test(str);
+            return [...str].every(char => {
+                return !/[a-zA-ZÀ-ÿ]/.test(char) || char === char.toUpperCase();
+            });
+        },
+
+        //
+
+        $isValidForFileName(string) {
+
+            // Define a regex pattern to allow only safe characters
+            return !(/[\/\\:*?"<>|& ]/.test(string));
         }
     }
 }

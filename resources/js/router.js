@@ -65,12 +65,6 @@ const routes = [
         component   : () => import('./components/clients/permanent/ClientAddCurrentPosition.vue')
     },
 
-    // ClientsAdd
-    {
-        path        : "/route_import/:id_route_import/clients/add/:latitude/:longitude",
-        component   : () => import('./components/clients/permanent/ClientAdd.vue')
-    },
-
     // ClientsUpdate
     {
         path        : "/route_import/:id_route_import/clients/:id_client/update",
