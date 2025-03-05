@@ -248,15 +248,19 @@
                         <div>
                             <label for="text"               class="form-label fw-bold">Type de Magasin</label>
                             <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType"                     :disabled="client.status_original    ==  'validated'">
-                                    <option     :value="'Alimentation Generale'">Alimentation Generale</option>
-                                    <option     :value="'Fast food'">Fast food</option>
-                                    <option     :value="'Restaurant'">Restaurant</option>
-                                    <option     :value="'Cafétéria'">Cafétéria</option>
-                                    <option     :value="'Grossiste'">Grossiste</option>
-                                    <option     :value="'Supérette'">Supérette</option>
-                                    <option     :value="'Hypermarché'">Hypermarché</option>
-                                    <option     :value="'Bureau Tabac'">Bureau Tabac</option>
-                                    <option     :value="'Cosmetique'">Cosmetique</option>
+                                <option     :value="'Hypermarché'">Hypermarché</option>
+                                <option     :value="'Supérette'">Supérette</option>
+                                <option     :value="'Alimentation Generale'">Alimentation Generale</option>
+                                <option     :value="'Grossiste'">Grossiste</option>
+
+                                <option     :value="'Hôtel'">Hôtel</option>
+                                <option     :value="'Fast food'">Fast food</option>
+                                <option     :value="'Restaurant'">Restaurant</option>
+
+                                <option     :value="'Cafétéria'">Cafétéria</option>
+
+                                <option     :value="'Bureau Tabac'">Bureau Tabac</option>
+                                <option     :value="'Cosmetique'">Cosmetique</option>
                             </select>
                         </div>
 
