@@ -277,7 +277,7 @@ export default {
 
                                     if(!existe_in_finale) {
 
-                                        clients_neighbours[clients_neighbours_index].JPlan  =   "Route "    +   Route
+                                        clients_neighbours[clients_neighbours_index].JPlan  =   "ROUTE "    +   Route
 
                                         clients_par_route.push(clients_neighbours[clients_neighbours_index])
                                         clients_ajoutes.push(clients_neighbours[clients_neighbours_index])
@@ -306,7 +306,7 @@ export default {
 
                                         if(!existe_in_finale) {
 
-                                            clients_neighbours[clients_neighbours_index].JPlan  =   "Route "    +   Route
+                                            clients_neighbours[clients_neighbours_index].JPlan  =   "ROUTE "    +   Route
 
                                             clients_par_route.push(clients_neighbours[clients_neighbours_index])
                                             clients_ajoutes.push(clients_neighbours[clients_neighbours_index])
@@ -330,7 +330,7 @@ export default {
 
                             //
 
-                            clients[j].JPlan    =   "Route "    +   Route
+                            clients[j].JPlan    =   "ROUTE "    +   Route
 
                             clients_par_route.push(clients[j])
                             clients_ajoutes.push(clients[j])

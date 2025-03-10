@@ -60,8 +60,8 @@ class Client extends Model
 
             $client         =   new Client([
                 'CustomerCode'          =>  $client_elem->CustomerCode              ,
-                'CustomerNameE'         =>  $client_elem->CustomerNameE             ,
-                'CustomerNameA'         =>  $client_elem->CustomerNameA             ,
+                'CustomerNameE'         =>  mb_strtoupper($client_elem->CustomerNameE, 'UTF-8') ,
+                'CustomerNameA'         =>  mb_strtoupper($client_elem->CustomerNameA. 'UTF-8') ,
                 'Latitude'              =>  $client_elem->Latitude                  ,
                 'Longitude'             =>  $client_elem->Longitude                 ,
                 'Address'               =>  $client_elem->Address                   ,
@@ -90,7 +90,7 @@ class Client extends Model
 
             if($client_elem->JPlan      !=  null) {
     
-                $client->JPlan              =   $client_elem->JPlan;
+                $client->JPlan              =   mb_strtoupper($client_elem->JPlan, 'UTF-8');
             }
 
             else {
@@ -146,7 +146,7 @@ class Client extends Model
             // Set JPlan
             if(isset($client_elem->JPlan)) {
 
-                $client->JPlan          =   $client_elem->JPlan;
+                $client->JPlan          =   mb_strtoupper($client_elem->JPlan, 'UTF-8');
             }
 
             // Set Journee
@@ -155,7 +155,35 @@ class Client extends Model
                 $client->Journee        =   $client_elem->Journee;
             }
 
+            // Set Status
+            if(isset($client_elem->status)) {
+
+                $client->status         =   $client_elem->status;
+            }
+
             $client->save();
+        }
+    }
+
+    public static function deleteClients(Request $request, int $id_route_import) {
+
+        $liste_clients_ids  =   json_decode($request->get("clients"), true);
+
+        //
+        if (!empty($liste_clients_ids)) {
+
+            $clients        =   Client::whereIn('id', $liste_clients_ids)->get(); // Fetch clients first
+
+            foreach ($clients as $client) {
+
+                $directory = public_path('uploads/clients/' . $client->id);
+
+                if (File::exists($directory)) {
+                    File::deleteDirectory($directory); // Delete the entire directory
+                }
+
+                $client->delete(); // Delete client record
+            }
         }
     }
 
@@ -226,8 +254,8 @@ class Client extends Model
         //
         $client     =   new Client([
             'CustomerCode'                  =>  $request->input("CustomerCode")                 ,
-            'CustomerNameE'                 =>  $request->input("CustomerNameE")                ,
-            'CustomerNameA'                 =>  $request->input("CustomerNameA")                ,
+            'CustomerNameE'                 =>  mb_strtoupper($request->input("CustomerNameE"), 'UTF-8')    ,
+            'CustomerNameA'                 =>  mb_strtoupper($request->input("CustomerNameA"), 'UTF-8')    ,
             'Latitude'                      =>  $request->input("Latitude")                     ,
             'Longitude'                     =>  $request->input("Longitude")                    ,
             'Address'                       =>  $request->input("Address")                      ,
@@ -258,7 +286,7 @@ class Client extends Model
 
         if($request->input("JPlan") !=  null) {
 
-            $client->JPlan      =   $request->input("JPlan");
+            $client->JPlan      =   mb_strtoupper($request->input("JPlan"), 'UTF-8');
         }
 
         else {
@@ -451,9 +479,9 @@ class Client extends Model
 
         if($client) {
 
-            $client->CustomerCode                   =   $request->get("CustomerCode")           ;
-            $client->CustomerNameE                  =   $request->get("CustomerNameE")          ;
-            $client->CustomerNameA                  =   $request->get("CustomerNameA")          ;
+            $client->CustomerCode                   =   $request->get("CustomerCode")               ;
+            $client->CustomerNameE                  =   mb_strtoupper($request->get("CustomerNameE"), 'UTF-8')  ;
+            $client->CustomerNameA                  =   mb_strtoupper($request->get("CustomerNameA"), 'UTF-8')  ;
             $client->Latitude                       =   $request->get("Latitude")               ;
             $client->Longitude                      =   $request->get("Longitude")              ;
             $client->Address                        =   $request->get("Address")                ;
@@ -477,7 +505,7 @@ class Client extends Model
 
             if($request->input("JPlan") !=  null) {
 
-                $client->JPlan      =   $request->input("JPlan");
+                $client->JPlan      =   mb_strtoupper($request->input("JPlan"), 'UTF-8');
             }
 
             else {
@@ -717,7 +745,7 @@ class Client extends Model
 
             if($client_tempo->JPlan     !=  null) {
     
-                $client->JPlan                      =   $client_tempo->JPlan;
+                $client->JPlan                      =   mb_strtoupper($client_tempo->JPlan, 'UTF-8');
             }
 
             else {
@@ -752,8 +780,8 @@ class Client extends Model
             $client                             =   Client::find($client_tempo->id);
 
             $client->CustomerCode               =   $client_tempo->CustomerCode;
-            $client->CustomerNameE              =   $client_tempo->CustomerNameE;
-            $client->CustomerNameA              =   $client_tempo->CustomerNameA;
+            $client->CustomerNameE              =   mb_strtoupper($client_tempo->CustomerNameE, 'UTF-8');
+            $client->CustomerNameA              =   mb_strtoupper($client_tempo->CustomerNameA, 'UTF-8');
             $client->Latitude                   =   $client_tempo->Latitude;
             $client->Longitude                  =   $client_tempo->Longitude;
             $client->Address                    =   $client_tempo->Address;
@@ -771,7 +799,7 @@ class Client extends Model
 
             if($client_tempo->JPlan     !=  null) {
     
-                $client->JPlan                      =   $client_tempo->JPlan;
+                $client->JPlan                      =   mb_strtoupper($client_tempo->JPlan, 'UTF-8');
             }
 
             else {

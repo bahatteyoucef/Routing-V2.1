@@ -123,7 +123,21 @@
 
                         <div class="mb-3">
                             <label for="Journee"            class="form-label">WorkDay (Journee)</label>
-                            <input type="text"              class="form-control"        id="Journee"           v-model="client.Journee">
+
+                            <select                         class="form-select"         id="Journee"                 v-model="client.Journee">
+                                <option     :value="'Jour 1'">Samedi 1 (Jour 1)</option>
+                                <option     :value="'Jour 2'">Dimanche 1 (Jour 2)</option>
+                                <option     :value="'Jour 3'">Lundi 1 (Jour 3)</option>
+                                <option     :value="'Jour 4'">Mardi 1 (Jour 4)</option>
+                                <option     :value="'Jour 5'">Mercredi 1 (Jour 5)</option>
+                                <option     :value="'Jour 6'">Jeudi 1 (Jour 6)</option>
+                                <option     :value="'Jour 7'">Samedi 2 (Jour 7)</option>
+                                <option     :value="'Jour 8'">Dimanche 2 (Jour 8)</option>
+                                <option     :value="'Jour 9'">Lundi 2 (Jour 9)</option>
+                                <option     :value="'Jour 10'">Mardi 2 (Jour 10)</option>
+                                <option     :value="'Jour 11'">Mercredi 2 (Jour 11)</option>
+                                <option     :value="'Jour 12'">Jeudi 2 (Jour 12)</option>
+                            </select>
                         </div>
 
                         <!--  -->

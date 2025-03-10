@@ -216,7 +216,7 @@
                     <div class="mySlides slide_10 mt-3">
                         <div>
                             <label for="DistrictNo"         class="form-label fw-bold">Willaya</label>
-                            <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()"    disabled>
+                            <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     disabled>
                                 <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
                             </select>
                         </div>
@@ -327,18 +327,18 @@
                             <label for="Journee"            class="form-label fw-bold">Journee</label>
 
                             <select                         class="form-select"         id="Journee"                 v-model="client.Journee">
-                                <option     :value="'Samedi 1 (Jour 1)'">Samedi 1 (Jour 1)</option>
-                                <option     :value="'Dimanche 1 (Jour 2)'">Dimanche 1 (Jour 2)</option>
-                                <option     :value="'Lundi 1 (Jour 3)'">Lundi 1 (Jour 3)</option>
-                                <option     :value="'Mardi 1 (Jour 4)'">Mardi 1 (Jour 4)</option>
-                                <option     :value="'Mercredi 1 (Jour 5)'">Mercredi 1 (Jour 5)</option>
-                                <option     :value="'Jeudi 1 (Jour 6)'">Jeudi 1 (Jour 6)</option>
-                                <option     :value="'Samedi 2 (Jour 7)'">Samedi 2 (Jour 7)</option>
-                                <option     :value="'Dimanche 2 (Jour 8)'">Dimanche 2 (Jour 8)</option>
-                                <option     :value="'Lundi 2 (Jour 9)'">Lundi 2 (Jour 9)</option>
-                                <option     :value="'Mardi 2 (Jour 10)'">Mardi 2 (Jour 10)</option>
-                                <option     :value="'Mercredi 2 (Jour 11)'">Mercredi 2 (Jour 11)</option>
-                                <option     :value="'Jeudi 2 (Jour 12)'">Jeudi 2 (Jour 12)</option>
+                                <option     :value="'Jour 1'">Samedi 1 (Jour 1)</option>
+                                <option     :value="'Jour 2'">Dimanche 1 (Jour 2)</option>
+                                <option     :value="'Jour 3'">Lundi 1 (Jour 3)</option>
+                                <option     :value="'Jour 4'">Mardi 1 (Jour 4)</option>
+                                <option     :value="'Jour 5'">Mercredi 1 (Jour 5)</option>
+                                <option     :value="'Jour 6'">Jeudi 1 (Jour 6)</option>
+                                <option     :value="'Jour 7'">Samedi 2 (Jour 7)</option>
+                                <option     :value="'Jour 8'">Dimanche 2 (Jour 8)</option>
+                                <option     :value="'Jour 9'">Lundi 2 (Jour 9)</option>
+                                <option     :value="'Jour 10'">Mardi 2 (Jour 10)</option>
+                                <option     :value="'Jour 11'">Mercredi 2 (Jour 11)</option>
+                                <option     :value="'Jour 12'">Jeudi 2 (Jour 12)</option>
                             </select>
                         </div>
 
@@ -636,7 +636,7 @@ export default {
                 this.$showLoadingPage()
 
                 // Set Client
-                this.client.DistrictNameE   =   this.getDistrictNameE(this.client.DistrictNo)
+                this.client.DistrictNameE   =   this.getDistrictNameE(this.getUser.DistrictNo)
                 this.client.CityNameE       =   this.getCityNameE(this.client.CityNo)
 
                 let formData = new FormData();
@@ -649,7 +649,7 @@ export default {
                 formData.append("Address"                               ,   this.client.Address)
                 formData.append("Neighborhood"                          ,   this.client.Neighborhood)
                 formData.append("Landmark"                              ,   this.client.Landmark)
-                formData.append("DistrictNo"                            ,   this.client.DistrictNo)
+                formData.append("DistrictNo"                            ,   this.getUser.DistrictNo)
                 formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
                 formData.append("CityNo"                                ,   this.client.CityNo)
                 formData.append("CityNameE"                             ,   this.client.CityNameE)
@@ -810,7 +810,7 @@ export default {
                 // Show Loading Page
                 this.$showLoadingPage()
 
-                const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
+                const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.getUser.DistrictNo+"/rtm_cites"         ,   null)
                 this.cites                      =   res_3.data
 
                 this.client.CityNo              =   ""
@@ -824,7 +824,7 @@ export default {
                 // Show Loading Page
                 this.$showLoadingPage()
 
-                let willaya                     =   await this.$indexedDB.$getWillaya(this.client.DistrictNo)
+                let willaya                     =   await this.$indexedDB.$getWillaya(this.getUser.DistrictNo)
 
                 this.cites                      =   willaya.cites
 
@@ -1284,7 +1284,7 @@ export default {
             // Slide 6
             if(this.slideIndex  ==  6) {
 
-                if((this.client.Latitude !==  "")&&(this.client.Longitude !==  "")) {
+                if((this.client.Latitude !==  "")&&(this.client.Longitude !==  "")&&(parseFloat(this.client.Latitude) >  0)&&(parseFloat(this.client.Longitude) >  0)) {
 
                     return true;
                 }
@@ -1340,7 +1340,7 @@ export default {
             // Slide 10
             if(this.slideIndex  ==  10) {
 
-                if(this.client.DistrictNo !==  "") {
+                if(this.getUser.DistrictNo !==  "") {
 
                     return true;
                 }

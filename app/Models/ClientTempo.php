@@ -58,23 +58,23 @@ class ClientTempo extends Model
 
             // Client
             $client         =   new ClientTempo([
-                'CustomerCode'              =>  $client_elem->CustomerCode          ,
-                'CustomerNameE'             =>  $client_elem->CustomerNameE         ,
-                'CustomerNameA'             =>  $client_elem->CustomerNameA         ,
-                'Latitude'                  =>  $client_elem->Latitude              ,
-                'Longitude'                 =>  $client_elem->Longitude             ,
-                'Address'                   =>  $client_elem->Address               ,
-                'DistrictNo'                =>  $client_elem->DistrictNo            ,
-                'DistrictNameE'             =>  $client_elem->DistrictNameE         ,
-                'CityNo'                    =>  $client_elem->CityNo                ,
-                'CityNameE'                 =>  $client_elem->CityNameE             ,
-                'Tel'                       =>  $client_elem->Tel                   ,
-                'CustomerType'              =>  $client_elem->CustomerType          ,
+                'CustomerCode'              =>  $client_elem->CustomerCode              ,
+                'CustomerNameE'             =>  mb_strtoupper($client_elem->CustomerNameE, 'UTF-8') ,
+                'CustomerNameA'             =>  mb_strtoupper($client_elem->CustomerNameA, 'UTF-8') ,
+                'Latitude'                  =>  $client_elem->Latitude                  ,
+                'Longitude'                 =>  $client_elem->Longitude                 ,
+                'Address'                   =>  $client_elem->Address                   ,
+                'DistrictNo'                =>  $client_elem->DistrictNo                ,
+                'DistrictNameE'             =>  $client_elem->DistrictNameE             ,
+                'CityNo'                    =>  $client_elem->CityNo                    ,
+                'CityNameE'                 =>  $client_elem->CityNameE                 ,
+                'Tel'                       =>  $client_elem->Tel                       ,
+                'CustomerType'              =>  $client_elem->CustomerType              ,
 
-                'Neighborhood'              =>  $client_elem->Neighborhood          ,
-                'Landmark'                  =>  $client_elem->Landmark              ,
-                'BrandAvailability'         =>  0                                   ,
-                'BrandSourcePurchase'       =>  ""                                  ,
+                'Neighborhood'              =>  $client_elem->Neighborhood              ,
+                'Landmark'                  =>  $client_elem->Landmark                  ,
+                'BrandAvailability'         =>  0                                       ,
+                'BrandSourcePurchase'       =>  ""                                      ,
 
                 'id_route_import_tempo'     =>  $id_route_import_tempo  ,
                 'owner'                     =>  Auth::user()->id
@@ -82,7 +82,7 @@ class ClientTempo extends Model
 
             if($client_elem->JPlan      !=  null) {
 
-                $client->JPlan                  =   $client_elem->JPlan;
+                $client->JPlan                  =   mb_strtoupper($client_elem->JPlan, 'UTF-8');
             }
 
             else {
@@ -128,8 +128,8 @@ class ClientTempo extends Model
         $client                             =   ClientTempo::find($id);
 
         $client->CustomerCode               =   $request->get("CustomerCode");
-        $client->CustomerNameE              =   $request->get("CustomerNameE");
-        $client->CustomerNameA              =   $request->get("CustomerNameA");
+        $client->CustomerNameE              =   mb_strtoupper($request->get("CustomerNameE"), 'UTF-8');
+        $client->CustomerNameA              =   mb_strtoupper($request->get("CustomerNameA"), 'UTF-8');
         $client->Latitude                   =   $request->get("Latitude");
         $client->Longitude                  =   $request->get("Longitude");
         $client->Address                    =   $request->get("Address");
@@ -147,7 +147,7 @@ class ClientTempo extends Model
 
         if($request->get("JPlan")   !=  null) {
 
-            $client->JPlan              =   $request->get("JPlan");
+            $client->JPlan              =   mb_strtoupper($request->get("JPlan"), 'UTF-8');
         }
 
         else {
@@ -194,8 +194,8 @@ class ClientTempo extends Model
             $client                             =   ClientTempo::find($client_tempo->id);
 
             $client->CustomerCode               =   $client_tempo->CustomerCode;
-            $client->CustomerNameE              =   $client_tempo->CustomerNameE;
-            $client->CustomerNameA              =   $client_tempo->CustomerNameA;
+            $client->CustomerNameE              =   mb_strtoupper($client_tempo->CustomerNameE, 'UTF-8');
+            $client->CustomerNameA              =   mb_strtoupper($client_tempo->CustomerNameA, 'UTF-8');
             $client->Latitude                   =   $client_tempo->Latitude;
             $client->Longitude                  =   $client_tempo->Longitude;
             $client->Address                    =   $client_tempo->Address;
@@ -215,7 +215,7 @@ class ClientTempo extends Model
 
             if($client_tempo->JPlan     !=  null) {
 
-                $client->JPlan                  =   $client_tempo->JPlan;
+                $client->JPlan                  =   mb_strtoupper($client_tempo->JPlan, 'UTF-8');
             }
 
             else {
@@ -251,7 +251,7 @@ class ClientTempo extends Model
 
             if($client_tempo->JPlan     !=  null) {
 
-                $client->JPlan                  =   $client_tempo->JPlan;
+                $client->JPlan                  =   mb_strtoupper($client_tempo->JPlan, 'UTF-8');
             }
 
             else {

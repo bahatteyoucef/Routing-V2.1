@@ -306,6 +306,42 @@ class ClientController extends Controller
 
     //
 
+    public function deleteClients(Request $request, int $id_route_import)
+    {
+
+        try {
+
+            //
+            DB::beginTransaction();
+            //
+
+            // delete 
+            Client::deleteClients($request, $id_route_import);
+
+            //
+            DB::commit();
+            //
+
+            return response()->json([
+                "header"            =>  "Clients Deleted !"                                      ,
+                "message"           =>  "a group of clients has been deleted successfully !"
+            ]);
+        }
+
+        catch(Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    //
+
     public function getDoublesClients(int $id_route_import) {
 
         try {

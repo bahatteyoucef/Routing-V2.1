@@ -50,6 +50,16 @@
                                 </div>
                             </div>
 
+                            <!-- Status                             -->
+                            <div class="col">
+                                <label for="status"             class="form-label">Status</label>
+                                <select                         class="form-select"         id="status"                         v-model="status">
+                                    <option value="validated" selected>validated</option>
+                                    <option value="pending">pending</option>
+                                    <option value="nonvalidated">nonvalidated</option>
+                                </select>
+                            </div>
+
                             <!-- JPlan                              -->
                             <div class="col">
                                 <div class="mb-3">
@@ -62,7 +72,21 @@
                             <div class="col">
                                 <div class="mb-3">
                                     <label for="Journee"            class="form-label">WorkDay (Journee)</label>
-                                    <input type="text"              class="form-control"        id="Journee"                    v-model="Journee">
+
+                                    <select                         class="form-select"         id="Journee"                 v-model="Journee">
+                                        <option     :value="'Jour 1'">Samedi 1 (Jour 1)</option>
+                                        <option     :value="'Jour 2'">Dimanche 1 (Jour 2)</option>
+                                        <option     :value="'Jour 3'">Lundi 1 (Jour 3)</option>
+                                        <option     :value="'Jour 4'">Mardi 1 (Jour 4)</option>
+                                        <option     :value="'Jour 5'">Mercredi 1 (Jour 5)</option>
+                                        <option     :value="'Jour 6'">Jeudi 1 (Jour 6)</option>
+                                        <option     :value="'Jour 7'">Samedi 2 (Jour 7)</option>
+                                        <option     :value="'Jour 8'">Dimanche 2 (Jour 8)</option>
+                                        <option     :value="'Jour 9'">Lundi 2 (Jour 9)</option>
+                                        <option     :value="'Jour 10'">Mardi 2 (Jour 10)</option>
+                                        <option     :value="'Jour 11'">Mercredi 2 (Jour 11)</option>
+                                        <option     :value="'Jour 12'">Jeudi 2 (Jour 12)</option>
+                                    </select>
                                 </div>
                             </div>
 
@@ -79,14 +103,11 @@
                                     </div>
                                 </th>
                                 <th class="col-sm-1">Index</th>
+
                                 <th class="col-sm-1">CustomerCode</th>
+
                                 <th class="col-sm-1">CustomerNameE</th>
                                 <th class="col-sm-1">CustomerNameA</th>
-
-                                <th class="col-sm-2">Latitude</th>
-                                <th class="col-sm-2">Longitude</th>
-
-                                <th class="col-sm-2">Address</th>
 
                                 <th class="col-sm-1">DistrictNo</th>
                                 <th class="col-sm-2">DistrictNameE</th>
@@ -94,13 +115,23 @@
                                 <th class="col-sm-1">CityNo</th>
                                 <th class="col-sm-2">CityNameE</th>
 
+                                <th class="col-sm-2">Address</th>
+
+                                <th class="col-sm-2">Latitude</th>
+                                <th class="col-sm-2">Longitude</th>
+
                                 <th class="col-sm-2">Tel</th>
 
                                 <th class="col-sm-1">CustomerType</th>
 
                                 <th class="col-sm-2">JPlan</th>
-
                                 <th class="col-sm-1">Journee</th>
+
+                                <!--  -->
+
+                                <th class="col-sm-2">Created At</th>
+                                <th class="col-sm-2">Status</th>
+                                <th class="col-sm-2">Owner</th>
                             </tr>
                         </thead>
 
@@ -108,21 +139,24 @@
                             <tr class="datatable_client_change_route_filters">
 
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder=""                 /></th>
+
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Index"            /></th>
+
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
+
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
-
-                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Latitude"         /></th>
-                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Longitude"        /></th>
-
-                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Address"          /></th>
 
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="DistrictNo"       /></th>
                                 <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="DistrictNameE"    /></th>
 
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CityNo"           /></th>
                                 <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CityNameE"        /></th>
+
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Address"          /></th>
+
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Latitude"         /></th>
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Longitude"        /></th>
 
                                 <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Tel"              /></th>
 
@@ -131,6 +165,10 @@
                                 <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="JPlan"            /></th>
 
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Journee"          /></th>
+
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Created At"       /></th>
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Status"           /></th>
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Owner"            /></th>
                             </tr>
                         </thead>
 
@@ -142,15 +180,11 @@
                                     </div>
                                 </td>
                                 <td>{{index + 1}}</td>
+
                                 <td>{{client.CustomerCode}}</td>
 
                                 <td>{{client.CustomerNameE}}</td>
                                 <td>{{client.CustomerNameA}}</td>
-
-                                <td>{{client.Latitude}}</td>
-                                <td>{{client.Longitude}}</td>
-
-                                <td>{{client.Address}}</td>
 
                                 <td>{{client.DistrictNo}}</td>
                                 <td>{{client.DistrictNameE}}</td>
@@ -158,13 +192,27 @@
                                 <td>{{client.CityNo}}</td>
                                 <td>{{client.CityNameE}}</td>
 
+                                <td>{{client.Address}}</td>
+
+                                <td>{{client.Latitude}}</td>
+                                <td>{{client.Longitude}}</td>
+
                                 <td>{{client.Tel}}</td>
 
                                 <td>{{client.CustomerType}}</td>
 
                                 <td>{{client.JPlan}}</td>
-
                                 <td>{{client.Journee}}</td>
+
+                                <td>{{client.created_at}}</td>
+
+                                <td>
+                                    <span v-if="client.status=='nonvalidated'"  href="#" class="badge badge-danger">{{client.status}}</span>
+                                    <span v-if="client.status=='pending'"       href="#" class="badge badge-warning">{{client.status}}</span>
+                                    <span v-if="client.status=='validated'"     href="#" class="badge badge-success">{{client.status}}</span>
+                                </td>
+
+                                <td>{{client.owner_name}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -172,8 +220,12 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary"   @click="sendData()">Confirm</button>
+                    <button type="button" class="btn btn-danger"    @click="deleteClients()">Delete</button>
+
+                    <div class="right-buttons"  style="display: flex; margin-left: auto;">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary"   @click="sendData()">Confirm</button>
+                    </div>
                 </div>
 
             </div>
@@ -184,6 +236,7 @@
 
 <script>
 
+import { nextTick } from "vue";
 import {mapGetters, mapActions} from    "vuex"
 
 export default {
@@ -200,6 +253,7 @@ export default {
             JPlan                           :   ""  ,
             Journee                         :   ""  ,
             owner                           :   ""  ,
+            status                          :   ""  ,
 
             //
 
@@ -258,6 +312,12 @@ export default {
                 this.clients        =   [...clients]
                     
                 this.datatable_client_change_route  =   await this.$DataTableCreate("datatable_client_change_route")
+
+                //
+                await nextTick()
+
+                //
+                this.checkAll();
             }
 
             catch(e) {
@@ -307,6 +367,12 @@ export default {
 
                     clients_copy[i].Journee         =   this.Journee
                 }
+
+                // Set Status
+                if(this.status          !=  "") {
+
+                    clients_copy[i].status          =   this.status
+                }
             }
 
             let clients     =   this.clientMapRightProperties(clients_copy) 
@@ -327,6 +393,49 @@ export default {
 
                 // Send Client
                 this.emitter.emit('reSetChangeRoute' , clients_copy)
+
+                // Close Modal
+                this.$hideModal("clientsChangeRouteModal")
+            }
+            
+            else{
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
+			}
+        },
+
+        async deleteClients() {
+
+            this.$showLoadingPage()
+
+            let formData                =   new FormData()
+
+            let clients_ids_copy        =   [...this.clients].map(client => client.id)
+
+            //
+
+            formData.append("clients", JSON.stringify(clients_ids_copy))
+
+            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/delete",   formData)
+
+            if(res.status===200){
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+
+                // Send Feedback
+                this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
+
+                //
+                let clients_copy            =   [...this.clients].map(client => { return { id : client.id }})  
+                console.log(clients_copy)
+
+                // Send Client
+                this.emitter.emit('reSetChangeRouteDelete' , clients_copy)
 
                 // Close Modal
                 this.$hideModal("clientsChangeRouteModal")
@@ -433,23 +542,24 @@ export default {
                 // 
                 this.setClientsChangeRouteAction(null)
 
-                this.DistrictNo                      =  ''
-                this.CityNo                          =  ''
-                this.JPlan                           =  ''
-                this.Journee                         =  ''
-                this.owner                           =  ''
+                this.DistrictNo                     =   ''
+                this.CityNo                         =   ''
+                this.JPlan                          =   ''
+                this.Journee                        =   ''
+                this.owner                          =   ''
+                this.status                         =   ''
 
                 //
 
-                this.liste_journey_plan              =   []  
-                this.liste_journee                   =   []  
-                this.liste_type_client               =   []  
+                this.liste_journey_plan             =   []  
+                this.liste_journee                  =   []  
+                this.liste_type_client              =   []  
 
                 //
 
-                this.districts                       =   []  
-                this.cites                           =   []  
-                this.users                           =   []  
+                this.districts                      =   []  
+                this.cites                          =   []  
+                this.users                          =   []  
 
                 //
 
@@ -564,484 +674,19 @@ export default {
 
         clientMapRightProperties(clients) {
 
-            if(this.owner   ==  "") {
-
-                if(this.DistrictNo  ==  "") {
-
-                    if(this.CityNo      ==  "") {
-
-                        if(this.JPlan       ==  "") {
-
-                            if(this.Journee     ==  "") {
-
-                                return []
-                            }
-
-                            else {
-
-                                return  clients.map(obj => { 
-                                        return {    id          :   obj.id          ,   
-                                                    Journee     :   obj.Journee     };});
-                            }
-                        }
-
-                        else {
-
-                            if(this.Journee     ==  "") {
-
-                                return  clients.map(obj => { 
-                                        return {    id          :   obj.id          ,   
-                                                    JPlan       :   obj.JPlan       };});
-                            }
-
-                            else {
-
-                                return  clients.map(obj => { 
-                                        return {    id          :   obj.id          , 
-
-                                                    JPlan       :   obj.JPlan       ,   
-                                                    Journee     :   obj.Journee     };});
-                            }
-                        }
+            const fields = ['owner', 'owner_name', 'DistrictNo', 'DistrictNameE', 'CityNo', 'CityNameE', 'JPlan', 'Journee', 'status'];
+            
+            return clients.map(obj => {
+                let result = { id: obj.id };
+                
+                fields.forEach(field => {
+                    if (this[field] !== "") {
+                        result[field] = obj[field];
                     }
-
-                    else {
-
-                        if(this.JPlan       ==  "") {
-
-                            if(this.Journee     ==  "") {
-
-                                return  clients.map(obj => { 
-                                        return {    id          :   obj.id          ,   
-
-                                                    CityNo      :   obj.CityNo      ,
-                                                    CityNameE   :   obj.CityNameE   };});
-                            }
-
-                            else {
-
-                                return  clients.map(obj => { 
-                                        return {    id          :   obj.id          ,   
-
-                                                    CityNo      :   obj.CityNo      ,
-                                                    CityNameE   :   obj.CityNameE   ,
-
-                                                    Journee     :   obj.Journee     };});
-                            }
-                        }
-
-                        else {
-
-                            if(this.Journee     ==  "") {
-
-                                return  clients.map(obj => { 
-                                        return {    id          :   obj.id          , 
-
-                                                    CityNo      :   obj.CityNo      ,
-                                                    CityNameE   :   obj.CityNameE   ,
-
-                                                    JPlan       :   obj.JPlan       };});
-                            }
-
-                            else {
-
-                                return  clients.map(obj => { 
-                                        return {    id          :   obj.id          , 
-
-                                                    CityNo      :   obj.CityNo      ,
-                                                    CityNameE   :   obj.CityNameE   ,
-
-                                                    JPlan       :   obj.JPlan       ,   
-                                                    Journee     :   obj.Journee     };});
-                            }
-                        }
-                    }
-                }  
-
-                else {
-
-                    if(this.CityNo      ==  "") {
-
-                        if(this.JPlan       ==  "") {
-
-                            if(this.Journee     ==  "") {
-
-                                return clients.map(obj => { 
-                                        return {    id              :   obj.id              ,  
-
-                                                    DistrictNo      :   obj.DistrictNo      ,
-                                                    DistrictNameE   :   obj.DistrictNameE   };});
-                            }
-
-                            else {
-
-                                return  clients.map(obj => { 
-                                        return {    id              :   obj.id              ,  
-
-                                                    DistrictNo      :   obj.DistrictNo      ,
-                                                    DistrictNameE   :   obj.DistrictNameE   ,
-
-                                                    Journee         :   obj.Journee         };});
-                            }
-                        }
-
-                        else {
-
-                            if(this.Journee     ==  "") {
-
-                                return  clients.map(obj => { 
-                                        return {    id              :   obj.id              ,  
-
-                                                    DistrictNo      :   obj.DistrictNo      ,
-                                                    DistrictNameE   :   obj.DistrictNameE   ,
-
-                                                    JPlan           :   obj.JPlan           };});
-                            }
-
-                            else {
-
-                                return  clients.map(obj => { 
-                                        return {    id              :   obj.id              , 
-
-                                                    DistrictNo      :   obj.DistrictNo      ,
-                                                    DistrictNameE   :   obj.DistrictNameE   ,
-
-                                                    JPlan           :   obj.JPlan           ,   
-                                                    Journee         :   obj.Journee         };});
-                            }
-                        }
-                    }
-
-                    else {
-
-                        if(this.JPlan       ==  "") {
-
-                            if(this.Journee     ==  "") {
-
-                                return  clients.map(obj => { 
-                                        return {    id              :   obj.id              ,  
-
-                                                    DistrictNo      :   obj.DistrictNo      ,
-                                                    DistrictNameE   :   obj.DistrictNameE   ,
-
-                                                    CityNo          :   obj.CityNo          ,
-                                                    CityNameE       :   obj.CityNameE       };});
-                            }
-
-                            else {
-
-                                return  clients.map(obj => { 
-                                        return {    id              :   obj.id              ,  
-
-                                                    DistrictNo      :   obj.DistrictNo      ,
-                                                    DistrictNameE   :   obj.DistrictNameE   ,
-
-                                                    CityNo          :   obj.CityNo          , 
-                                                    CityNameE       :   obj.CityNameE       ,
-
-                                                    Journee         :   obj.Journee         };});
-                            }
-                        }
-
-                        else {
-
-                            if(this.Journee     ==  "") {
-
-                                return  clients.map(obj => { 
-                                        return {    id              :   obj.id              , 
-
-                                                    DistrictNo      :   obj.DistrictNo      ,
-                                                    DistrictNameE   :   obj.DistrictNameE   ,
-
-                                                    CityNo          :   obj.CityNo          , 
-                                                    CityNameE       :   obj.CityNameE       ,
-
-                                                    JPlan           :   obj.JPlan           };});
-                            }
-
-                            else {
-
-                                return  clients.map(obj => { 
-                                        return {    id              :   obj.id              , 
-
-                                                    DistrictNo      :   obj.DistrictNo      ,
-                                                    DistrictNameE   :   obj.DistrictNameE   ,
-
-                                                    CityNo          :   obj.CityNo          , 
-                                                    CityNameE       :   obj.CityNameE       ,
-
-                                                    JPlan           :   obj.JPlan           ,   
-                                                    Journee         :   obj.Journee         };});
-                            }
-                        }
-                    }
-                }
-            }
-
-            else {
-
-                if(this.DistrictNo  ==  "") {
-
-                    if(this.CityNo      ==  "") {
-
-                        if(this.JPlan       ==  "") {
-
-                            if(this.Journee     ==  "") {
-
-                                return  clients.map(obj => { 
-                                        return {    id          :   obj.id          ,
-
-                                                    owner       :   obj.owner       ,
-                                                    owner_name  :   obj.owner_name  };});
-                            }
-
-                            else {
-
-                                return  clients.map(obj => { 
-                                        return {    id          :   obj.id          ,
-
-                                                    owner       :   obj.owner       ,
-                                                    owner_name  :   obj.owner_name  ,
-
-                                                    Journee     :   obj.Journee     };});
-                            }
-                        }
-
-                        else {
-
-                            if(this.Journee     ==  "") {
-
-                                return  clients.map(obj => { 
-                                        return {    id          :   obj.id          ,  
-
-                                                    owner       :   obj.owner       ,
-                                                    owner_name  :   obj.owner_name  ,
-
-                                                    JPlan       :   obj.JPlan       };});
-                            }
-
-                            else {
-
-                                return  clients.map(obj => { 
-                                        return {    id          :   obj.id          , 
-
-                                                    owner       :   obj.owner       ,
-                                                    owner_name  :   obj.owner_name  ,
-
-                                                    JPlan       :   obj.JPlan       ,   
-                                                    Journee     :   obj.Journee     };});
-                            }
-                        }
-                    }
-
-                    else {
-
-                        if(this.JPlan       ==  "") {
-
-                            if(this.Journee     ==  "") {
-
-                                return  clients.map(obj => { 
-                                        return {    id          :   obj.id          ,  
-
-                                                    owner       :   obj.owner       ,
-                                                    owner_name  :   obj.owner_name  ,
-
-                                                    CityNo      :   obj.CityNo      ,
-                                                    CityNameE   :   obj.CityNameE   };});
-                            }
-
-                            else {
-
-                                return  clients.map(obj => { 
-                                        return {    id          :   obj.id          ,
-
-                                                    owner       :   obj.owner       ,
-                                                    owner_name  :   obj.owner_name  ,
-
-                                                    CityNo      :   obj.CityNo      ,
-                                                    CityNameE   :   obj.CityNameE   ,
-
-                                                    Journee     :   obj.Journee     };});
-                            }
-                        }
-
-                        else {
-
-                            if(this.Journee     ==  "") {
-
-                                return  clients.map(obj => { 
-                                        return {    id          :   obj.id          , 
-
-                                                    owner       :   obj.owner       ,
-                                                    owner_name  :   obj.owner_name  ,
-
-                                                    CityNo      :   obj.CityNo      ,
-                                                    CityNameE   :   obj.CityNameE   ,
-
-                                                    JPlan       :   obj.JPlan       };});
-                            }
-
-                            else {
-
-                                return  clients.map(obj => { 
-                                        return {    id          :   obj.id          , 
-
-                                                    owner       :   obj.owner       ,
-                                                    owner_name  :   obj.owner_name  ,
-
-                                                    CityNo      :   obj.CityNo      ,
-                                                    CityNameE   :   obj.CityNameE   ,
-
-                                                    JPlan       :   obj.JPlan       ,   
-                                                    Journee     :   obj.Journee     };});
-                            }
-                        }
-                    }
-                }  
-
-                else {
-
-                    if(this.CityNo      ==  "") {
-
-                        if(this.JPlan       ==  "") {
-
-                            if(this.Journee     ==  "") {
-
-                                return clients.map(obj => { 
-                                        return {    id              :   obj.id              ,  
-
-                                                    owner           :   obj.owner           ,
-                                                    owner_name      :   obj.owner_name      ,
-
-                                                    DistrictNo      :   obj.DistrictNo      ,
-                                                    DistrictNameE   :   obj.DistrictNameE   };});
-                            }
-
-                            else {
-
-                                return  clients.map(obj => { 
-                                        return {    id              :   obj.id              ,  
-
-                                                    owner           :   obj.owner           ,
-                                                    owner_name      :   obj.owner_name      ,
-
-                                                    DistrictNo      :   obj.DistrictNo      ,
-                                                    DistrictNameE   :   obj.DistrictNameE   ,
-
-                                                    Journee         :   obj.Journee         };});
-                            }
-                        }
-
-                        else {
-
-                            if(this.Journee     ==  "") {
-
-                                return  clients.map(obj => { 
-                                        return {    id              :   obj.id              ,  
-
-                                                    owner           :   obj.owner           ,
-                                                    owner_name      :   obj.owner_name      ,
-
-                                                    DistrictNo      :   obj.DistrictNo      ,
-                                                    DistrictNameE   :   obj.DistrictNameE   ,
-
-                                                    JPlan           :   obj.JPlan           };});
-                            }
-
-                            else {
-
-                                return  clients.map(obj => { 
-                                        return {    id              :   obj.id              , 
-
-                                                    owner           :   obj.owner           ,
-                                                    owner_name      :   obj.owner_name      ,
-
-                                                    DistrictNo      :   obj.DistrictNo      ,
-                                                    DistrictNameE   :   obj.DistrictNameE   ,
-
-                                                    JPlan           :   obj.JPlan           ,   
-                                                    Journee         :   obj.Journee         };});
-                            }
-                        }
-                    }
-
-                    else {
-
-                        if(this.JPlan       ==  "") {
-
-                            if(this.Journee     ==  "") {
-
-                                return  clients.map(obj => { 
-                                        return {    id              :   obj.id              ,  
-
-                                                    owner           :   obj.owner           ,
-                                                    owner_name      :   obj.owner_name      ,
-
-                                                    DistrictNo      :   obj.DistrictNo      ,
-                                                    DistrictNameE   :   obj.DistrictNameE   ,
-
-                                                    CityNo          :   obj.CityNo          ,
-                                                    CityNameE       :   obj.CityNameE       };});
-                            }
-
-                            else {
-
-                                return  clients.map(obj => { 
-                                        return {    id              :   obj.id              ,  
-
-                                                    owner           :   obj.owner           ,
-                                                    owner_name      :   obj.owner_name      ,
-
-                                                    DistrictNo      :   obj.DistrictNo      ,
-                                                    DistrictNameE   :   obj.DistrictNameE   ,
-
-                                                    CityNo          :   obj.CityNo          , 
-                                                    CityNameE       :   obj.CityNameE       ,
-
-                                                    Journee         :   obj.Journee         };});
-                            }
-                        }
-
-                        else {
-
-                            if(this.Journee     ==  "") {
-
-                                return  clients.map(obj => { 
-                                        return {    id              :   obj.id              , 
-
-                                                    owner           :   obj.owner           ,
-                                                    owner_name      :   obj.owner_name      ,
-
-                                                    DistrictNo      :   obj.DistrictNo      ,
-                                                    DistrictNameE   :   obj.DistrictNameE   ,
-
-                                                    CityNo          :   obj.CityNo          , 
-                                                    CityNameE       :   obj.CityNameE       ,
-
-                                                    JPlan           :   obj.JPlan           };});
-                            }
-
-                            else {
-
-                                return  clients.map(obj => { 
-                                        return {    id              :   obj.id              , 
-
-                                                    owner           :   obj.owner           ,
-                                                    owner_name      :   obj.owner_name      ,
-
-                                                    DistrictNo      :   obj.DistrictNo      ,
-                                                    DistrictNameE   :   obj.DistrictNameE   ,
-
-                                                    CityNo          :   obj.CityNo          , 
-                                                    CityNameE       :   obj.CityNameE       ,
-
-                                                    JPlan           :   obj.JPlan           ,   
-                                                    Journee         :   obj.Journee         };});
-                            }
-                        }
-                    }
-                }
-            }
+                });
+                
+                return result;
+            });
         }
     },
 

@@ -204,6 +204,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/route_import/{id_route_import}/clients/{id}/delete'                                   ,   [ClientController::class                , 'deleteClient'                            ]);
 
     Route::post('/route_import/{id_route_import}/clients/change_route'                                  ,   [ClientController::class                , 'changeRouteClients'                      ]);
+    Route::post('/route_import/{id_route_import}/clients/delete'                                        ,   [ClientController::class                , 'deleteClients'                           ]);
+
     Route::post('/route_import/{id_route_import}/clients/update'                                        ,   [ClientController::class                , 'updateClients'                           ]);
     Route::post('/clients/resume/update'                                                                ,   [ClientController::class                , 'updateResumeClients'                     ]);
 

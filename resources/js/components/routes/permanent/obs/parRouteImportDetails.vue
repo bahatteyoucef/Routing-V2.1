@@ -639,6 +639,13 @@ export default {
             this.removeDrawings()
         })
 
+        this.emitter.on('reSetChangeRouteDelete'  , async (clients)    =>  {
+
+            this.changeRouteClientsJSONDelete(clients)
+
+            this.removeDrawings()
+        })
+
         this.emitter.on('reSetClientsDecoupeByJourneeMap' , (clients)  =>  {
 
             this.route_import.clients   =   clients
@@ -1983,7 +1990,29 @@ export default {
                             this.route_import.clients[j].Journee        =   clients[i].Journee        
                         }
 
+                        if(clients[i].status       !=  "") {
+
+                            this.route_import.clients[j].status        =   clients[i].status        
+                        }
+
                         break
+                    }
+                }
+            }
+
+            // ReAffiche
+            this.reAfficherClientsAndMarkers()
+        },
+
+        changeRouteClientsJSONDelete(clients) {
+
+            for (let i = this.route_import.clients.length - 1; i >= 0; i--) {
+                for (let j = 0; j < clients.length; j++) {
+
+                    if (this.route_import.clients[i].id === clients[j].id) {
+
+                        this.route_import.clients.splice(i, 1);
+                        break; // Stop checking once a match is found
                     }
                 }
             }
