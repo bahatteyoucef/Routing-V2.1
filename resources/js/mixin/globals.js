@@ -999,29 +999,47 @@ export default {
 
         $currentPosition() {
 
-            return new Promise((resolve, reject) => {
+            let maxRetries  =   5
+            let attempts    =   0
 
-                navigator.geolocation.getCurrentPosition(
+            return new Promise((resolve) => {
+                if (!navigator.geolocation) {
+                    resolve({ success: false, error: "Geolocation is not supported by this browser" });
+                    return;
+                }
 
-                    (position) => {
-                        resolve(position); // Resolve the promise with the position
-                    },
+                const attemptPosition = () => {
 
-                    (error) => {
-            
-                        let position    =   { coords : { latitude : 0, longitude : 0}}
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
 
-                        resolve(position)
-                    },
+                        const accuracy  =   position.coords.accuracy;
 
-                    {
-                        enableHighAccuracy  : true      ,
-                        maximumAge          : 100000    ,   // Maximum age of cached position in milliseconds
-                        timeout             : 95000         // Maximum time to wait for a new position in milliseconds
-                    }
-                );
+                            console.log(accuracy)
+
+                            if (Math.ceil(accuracy) <= 10) {
+                                resolve({ success: true, position });
+                            } else if (attempts >= maxRetries) {
+                                resolve({ success: false, error: "Maximum retries reached, accuracy insufficient." });
+                            } else {
+                                attempts++;
+                                attemptPosition(); // Retry
+                            }
+                        },
+                        (error) => {
+                            console.error(`Geolocation error: ${error.message}`);
+                            resolve({ success: false, error });
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            maximumAge: 0,
+                            timeout: 2000,
+                        }
+                    );
+                };
+
+                attemptPosition(); // Start
             });
-
         },
 
         //

@@ -224,7 +224,7 @@ export default class MobileClientIndexedDB {
             clients_tempo                           =   liste_route_import[i].clients.map((client) => ({ ...client }));
 
             // fetch only clients who are inside the polygon
-            clients                                 =   Globals.methods.$checkIfClientsInsideTheZone(clients_tempo, store.getters[`authentification/getUser`].user_territories)
+            clients                                 =   clients_tempo // Globals.methods.$checkIfClientsInsideTheZone(clients_tempo, store.getters[`authentification/getUser`].user_territories)
 
             //
             this.store_route_import.put({ "id" : liste_route_import[i].id, "libelle" : liste_route_import[i].libelle, "owner" : liste_route_import[i].owner, "clients" : clients})

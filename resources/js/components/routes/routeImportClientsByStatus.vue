@@ -199,7 +199,7 @@ export default {
                     this.$callApi("post",   "/route_import/"+this.getUser.id_route_import+"/clients/by_status",     formData).then(async (res)=> { 
                         
                         //
-                        let clients             =   this.$checkIfClientsInsideTheZone(res.data, this.getUser.user_territories)
+                        let clients             =   res.data // this.$checkIfClientsInsideTheZone(res.data, this.getUser.user_territories)
 
                         this.clients            =   clients
                         this.clients_filtered   =   this.clients

@@ -80,6 +80,9 @@
                                 <option     :value="'Alimentation Generale'">Alimentation Generale</option>
                                 <option     :value="'Grossiste'">Grossiste</option>
 
+                                <option     :value="'LARGE GROCERY'">LARGE GROCERY</option>
+                                <option     :value="'SMALL GROCERY'">SMALL GROCERY</option>
+
                                 <option     :value="'Hôtel'">Hôtel</option>
                                 <option     :value="'Fast food'">Fast food</option>
                                 <option     :value="'Restaurant'">Restaurant</option>

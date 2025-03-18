@@ -1,5 +1,7 @@
 <template>
 
+    <GPSErrorComponent v-show="show_gps_error"></GPSErrorComponent>
+
     <div class="mt-3">
 
         <div class="page-header mb-2">
@@ -54,7 +56,7 @@
                     </div>
 
                     <!-- CustomerBarCode_image -->
-                    <div class="mySlides slide_2">
+                    <div class="mySlides slide_2 mt-3">
                         <div>
                             <label for="CustomerBarCode_image"  class="form-label">Code-Barre Image</label>
                             <button type="button"               class="btn btn-secondary w-100 mb-1" @click="$clickFile('CustomerBarCode_image')"><i class="mdi mdi-camera"></i></button>
@@ -120,8 +122,263 @@
                         </div>
                     </div>
 
-                    <!-- GPS -->
+                    <!-- Adresse -->
                     <div class="mySlides slide_6 mt-3">
+                        <div>
+                            <label for="Address"            class="form-label fw-bold">Adresse</label>
+                            <input type="text"              class="form-control"        id="Address"                v-model="client.Address">
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Saisissez l'adresse du magasin (exemple : <span class=fw-bold>Rue Mohamed Belouizdad - Alger Centre</span>).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Neighborhood -->
+                    <div class="mySlides slide_7 mt-3">
+                        <div>
+                            <label for="Neighborhood"       class="form-label fw-bold">Quartier</label>
+                            <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood">
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Saisissez le nom du quartier du magasin (exemple : <span class="fw-bold">Belcourt</span>).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Landmark -->
+                    <div class="mySlides slide_8 mt-3">
+                        <div>
+                            <label for="Landmark"           class="form-label fw-bold">Point de Repere</label>
+                            <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"></textarea>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Saisissez un point de repère pour le client (exemple : <span class="fw-bold">à côté de la Grande Poste</span>).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- DistrictNo --> 
+                    <div class="mySlides slide_9 mt-3">
+                        <div>
+                            <label for="DistrictNo"         class="form-label fw-bold">Willaya</label>
+                            <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     disabled>
+                                <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
+                            </select>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>La willaya où se situe le magasin du client est sélectionnée automatiquement (exemple : <span class="fw-bold">Alger</span>).</li>
+                            </ul>
+                        </div>
+                    </div>
+                   
+                    <!-- CityNo -->
+                    <div class="mySlides slide_10 mt-3">
+                        <div>
+                            <label for="CityNo"             class="form-label fw-bold">Commune</label>
+                            <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo">
+                                <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CITYNO}}- {{cite.CityNameE}}</option>
+                            </select>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Saisissez la commune où se situe le magasin (exemple : <span class="fw-bold">Saoula</span>).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- CustomerType -->
+                    <div class="mySlides slide_11 mt-3">
+                        <div>
+                            <label for="text"               class="form-label fw-bold">Type de Magasin</label>
+                            <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType">
+                                <option     :value="'Hypermarché'">Hypermarché</option>
+                                <option     :value="'Supérette'">Supérette</option>
+                                <option     :value="'Alimentation Generale'">Alimentation Generale</option>
+                                <option     :value="'Grossiste'">Grossiste</option>
+
+                                <option     :value="'LARGE GROCERY'">LARGE GROCERY</option>
+                                <option     :value="'SMALL GROCERY'">SMALL GROCERY</option>
+
+                                <option     :value="'Hôtel'">Hôtel</option>
+                                <option     :value="'Fast food'">Fast food</option>
+                                <option     :value="'Restaurant'">Restaurant</option>
+
+                                <option     :value="'Cafétéria'">Cafétéria</option>
+
+                                <option     :value="'Bureau Tabac'">Bureau Tabac</option>
+                                <option     :value="'Cosmetique'">Cosmetique</option>
+                            </select>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Selectionnez le type de magasin (exemple : <span class="fw-bold">Alimentation Générale</span>).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- BrandSourcePurchase -->
+                    <div class="mySlides slide_12 mt-3">
+                        <div>
+                            <label for="text"               class="form-label fw-bold">Source d'Achat</label>
+                            <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase">
+                                <option     value="Distribution Direct">Distribution Direct</option>
+                                <option     value="Distribution Indirect">Distribution Indirect</option>
+                                <option     value="Pas d'achat">Pas d'achat</option>
+                            </select>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Selectionnez la source d'achat du client.
+
+                                    <ul class="pt-3">
+                                        <li><span class="fw-bold">Distribution directe</span> : Achat directement auprès du distributeur.</li>
+                                        <li><span class="fw-bold">Distribution indirecte</span> : Achat auprès d'un grossiste ou de vendeurs mobiles.</li>
+                                        <li><span class="fw-bold">Pas d'achat</span> : Le produit n'est pas disponible dans le magasin et le client ne l'achète pas.</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- JPlan -->
+                    <div class="mySlides slide_13 mt-3">
+                        <div>
+                            <label for="JPlan"              class="form-label fw-bold">Nom de Vendeur</label>
+                            <input type="text"              class="form-control"        id="JPlan"                  v-model="client.JPlan">
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Saisissez le nom du vendeur habituel qui visite le magasin, en <span class="fw-bold">MAJISCULE</span> (exemple : <span class="fw-bold">BOULEKRINAT Omar</span>).</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Journee -->
+                    <div class="mySlides slide_14 mt-3">
+                        <div>
+                            <label for="Journee"            class="form-label fw-bold">Journee</label>
+
+                            <select                         class="form-select"         id="Journee"                 v-model="client.Journee">
+                                <option     :value="'Jour 1'">Samedi 1 (Jour 1)</option>
+                                <option     :value="'Jour 2'">Dimanche 1 (Jour 2)</option>
+                                <option     :value="'Jour 3'">Lundi 1 (Jour 3)</option>
+                                <option     :value="'Jour 4'">Mardi 1 (Jour 4)</option>
+                                <option     :value="'Jour 5'">Mercredi 1 (Jour 5)</option>
+                                <option     :value="'Jour 6'">Jeudi 1 (Jour 6)</option>
+                                <option     :value="'Jour 7'">Samedi 2 (Jour 7)</option>
+                                <option     :value="'Jour 8'">Dimanche 2 (Jour 8)</option>
+                                <option     :value="'Jour 9'">Lundi 2 (Jour 9)</option>
+                                <option     :value="'Jour 10'">Mardi 2 (Jour 10)</option>
+                                <option     :value="'Jour 11'">Mercredi 2 (Jour 11)</option>
+                                <option     :value="'Jour 12'">Jeudi 2 (Jour 12)</option>
+                            </select>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Selectionnez la journée de visite du client (exemple : <span class="fw-bold">Samedi 1 (Jour 1)</span>).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- BrandAvailability + In-Store Image -->
+                    <div class="mySlides slide_15 mt-3">
+                        <div>
+                            <div class="mb-1">
+                                <label for="text"               class="form-label fw-bold">Disponibilité Produits</label>
+                                <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability"   @change="brandAvailabilityChanged()">
+                                    <option     value=0>Non</option>
+                                    <option     value=1>Oui</option>
+                                </select>
+                            </div>
+
+                            <div class="mt-1"   v-show="client.BrandAvailability  ==  1">
+                                <label for="in_store_image" class="form-label fw-bold">Image In-Store</label>
+                                <button type="button"       class="btn btn-secondary w-100 mb-1" @click="$clickFile('in_store_image')"><i class="mdi mdi-camera"></i></button>
+
+                                <input type='file'          id="in_store_image"             style="display:none"    accept="image/*"    capture     @change="inStoreImage()">
+                                <img                        id="in_store_image_display"     src=""                  style="width : 100%; height : auto; display: block; margin : auto">
+                            </div>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Sélectionnez si le produit est disponible ou non (exemple : <span class="fw-bold">Oui</span>).</li>
+                                <li>Si le produit est disponible, veuillez prendre une photo du rayon où le produit est placé dans le magasin en cliquant sur le bouton <button type="button" class="btn btn-secondary p-1" style="font-size : 11px"><i class="mdi mdi-camera"></i></button></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Comment -->
+                    <div class="mySlides slide_16 mt-3">
+                        <div>
+                            <label      for="comment" class="form-label fw-bold">Commentaire</label>
+                            <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"></textarea>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Ajoutez un commentaire si vous souhaitez préciser quelque chose (exemple : <span class="fw-bold">Le magasin sera en rénovation à partir de demain, retour prévu dans deux semaines.</span>).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- facade_image -->
+                    <div class="mySlides slide_17 mt-3">
+                        <div>
+                            <label for="facade_image"   class="form-label fw-bold">Image Facade</label>
+                            <button type="button"       class="btn btn-secondary w-100 mb-1" @click="$clickFile('facade_image')"><i class="mdi mdi-camera"></i></button>
+
+                            <input type='file'          id="facade_image"           style="display:none"    accept="image/*"    capture     @change="facadeImage()">
+                            <img                        id="facade_image_display"   src=""                  style="width : 100%; height : auto; display: block; margin : auto">
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Prenez une photo bien cadrée de la façade du magasin en cliquant sur le bouton <button type="button" class="btn btn-secondary p-1" style="font-size : 11px"><i class="mdi mdi-camera"></i></button></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- GPS -->
+                    <div class="mySlides slide_18 mt-3">
                         <div>
                             <label for="CustomerCode"       class="form-label fw-bold">Detecter la Position Actuel <button class="btn btn-sm" @click.prevent="showPositionOnMap('show_map')"><i class="mdi mdi-reload"></i></button></label>
                             <p class="text-secondary text-small mb-1">Latitude : {{ client.Latitude }}</p>
@@ -160,258 +417,6 @@
                             <ul class="pl-3">
                                 <li>Vérifiez si votre position GPS est correcte. Si ce n'est pas le cas, cliquez sur <i class="mdi mdi-reload"></i> pour l'actualiser.</li>
                                 <li>Le tableau affiche la liste des clients proches de votre position actuelle.</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Adresse -->
-                    <div class="mySlides slide_7 mt-3">
-                        <div>
-                            <label for="Address"            class="form-label fw-bold">Adresse</label>
-                            <input type="text"              class="form-control"        id="Address"                v-model="client.Address">
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Saisissez l'adresse du magasin (exemple : <span class=fw-bold>Rue Mohamed Belouizdad - Alger Centre</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Neighborhood -->
-                    <div class="mySlides slide_8 mt-3">
-                        <div>
-                            <label for="Neighborhood"       class="form-label fw-bold">Quartier</label>
-                            <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood">
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Saisissez le nom du quartier du magasin (exemple : <span class="fw-bold">Belcourt</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Landmark -->
-                    <div class="mySlides slide_9 mt-3">
-                        <div>
-                            <label for="Landmark"           class="form-label fw-bold">Point de Repere</label>
-                            <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"></textarea>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Saisissez un point de repère pour le client (exemple : <span class="fw-bold">à côté de la Grande Poste</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- DistrictNo --> 
-                    <div class="mySlides slide_10 mt-3">
-                        <div>
-                            <label for="DistrictNo"         class="form-label fw-bold">Willaya</label>
-                            <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     disabled>
-                                <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
-                            </select>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>La willaya où se situe le magasin du client est sélectionnée automatiquement (exemple : <span class="fw-bold">Alger</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-                   
-                    <!-- CityNo -->
-                    <div class="mySlides slide_11 mt-3">
-                        <div>
-                            <label for="CityNo"             class="form-label fw-bold">Commune</label>
-                            <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo">
-                                <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CITYNO}}- {{cite.CityNameE}}</option>
-                            </select>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Saisissez la commune où se situe le magasin (exemple : <span class="fw-bold">Saoula</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- CustomerType -->
-                    <div class="mySlides slide_12 mt-3">
-                        <div>
-                            <label for="text"               class="form-label fw-bold">Type de Magasin</label>
-                            <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType">
-                                <option     :value="'Hypermarché'">Hypermarché</option>
-                                <option     :value="'Supérette'">Supérette</option>
-                                <option     :value="'Alimentation Generale'">Alimentation Generale</option>
-                                <option     :value="'Grossiste'">Grossiste</option>
-
-                                <option     :value="'Hôtel'">Hôtel</option>
-                                <option     :value="'Fast food'">Fast food</option>
-                                <option     :value="'Restaurant'">Restaurant</option>
-
-                                <option     :value="'Cafétéria'">Cafétéria</option>
-
-                                <option     :value="'Bureau Tabac'">Bureau Tabac</option>
-                                <option     :value="'Cosmetique'">Cosmetique</option>
-                            </select>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Selectionnez le type de magasin (exemple : <span class="fw-bold">Alimentation Générale</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- BrandSourcePurchase -->
-                    <div class="mySlides slide_13 mt-3">
-                        <div>
-                            <label for="text"               class="form-label fw-bold">Source d'Achat</label>
-                            <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase">
-                                <option     value="Distribution Direct">Distribution Direct</option>
-                                <option     value="Distribution Indirect">Distribution Indirect</option>
-                                <option     value="Pas d'achat">Pas d'achat</option>
-                            </select>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Selectionnez la source d'achat du client.
-
-                                    <ul class="pt-3">
-                                        <li><span class="fw-bold">Distribution directe</span> : Achat directement auprès du distributeur.</li>
-                                        <li><span class="fw-bold">Distribution indirecte</span> : Achat auprès d'un grossiste ou de vendeurs mobiles.</li>
-                                        <li><span class="fw-bold">Pas d'achat</span> : Le produit n'est pas disponible dans le magasin et le client ne l'achète pas.</li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- JPlan -->
-                    <div class="mySlides slide_14 mt-3">
-                        <div>
-                            <label for="JPlan"              class="form-label fw-bold">Nom de Vendeur</label>
-                            <input type="text"              class="form-control"        id="JPlan"                  v-model="client.JPlan">
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Saisissez le nom du vendeur habituel qui visite le magasin, en <span class="fw-bold">MAJISCULE</span> (exemple : <span class="fw-bold">BOULEKRINAT Omar</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <!-- Journee -->
-                    <div class="mySlides slide_15 mt-3">
-                        <div>
-                            <label for="Journee"            class="form-label fw-bold">Journee</label>
-
-                            <select                         class="form-select"         id="Journee"                 v-model="client.Journee">
-                                <option     :value="'Jour 1'">Samedi 1 (Jour 1)</option>
-                                <option     :value="'Jour 2'">Dimanche 1 (Jour 2)</option>
-                                <option     :value="'Jour 3'">Lundi 1 (Jour 3)</option>
-                                <option     :value="'Jour 4'">Mardi 1 (Jour 4)</option>
-                                <option     :value="'Jour 5'">Mercredi 1 (Jour 5)</option>
-                                <option     :value="'Jour 6'">Jeudi 1 (Jour 6)</option>
-                                <option     :value="'Jour 7'">Samedi 2 (Jour 7)</option>
-                                <option     :value="'Jour 8'">Dimanche 2 (Jour 8)</option>
-                                <option     :value="'Jour 9'">Lundi 2 (Jour 9)</option>
-                                <option     :value="'Jour 10'">Mardi 2 (Jour 10)</option>
-                                <option     :value="'Jour 11'">Mercredi 2 (Jour 11)</option>
-                                <option     :value="'Jour 12'">Jeudi 2 (Jour 12)</option>
-                            </select>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Selectionnez la journée de visite du client (exemple : <span class="fw-bold">Samedi 1 (Jour 1)</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- BrandAvailability + In-Store Image -->
-                    <div class="mySlides slide_16 mt-3">
-                        <div>
-                            <div class="mb-1">
-                                <label for="text"               class="form-label fw-bold">Disponibilité Produits</label>
-                                <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability"   @change="brandAvailabilityChanged()">
-                                    <option     value=0>Non</option>
-                                    <option     value=1>Oui</option>
-                                </select>
-                            </div>
-
-                            <div class="mt-1"   v-show="client.BrandAvailability  ==  1">
-                                <label for="in_store_image" class="form-label fw-bold">Image In-Store</label>
-                                <button type="button"       class="btn btn-secondary w-100 mb-1" @click="$clickFile('in_store_image')"><i class="mdi mdi-camera"></i></button>
-
-                                <input type='file'          id="in_store_image"             style="display:none"    accept="image/*"    capture     @change="inStoreImage()">
-                                <img                        id="in_store_image_display"     src=""                  style="width : 100%; height : auto; display: block; margin : auto">
-                            </div>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Sélectionnez si le produit est disponible ou non (exemple : <span class="fw-bold">Oui</span>).</li>
-                                <li>Si le produit est disponible, veuillez prendre une photo du rayon où le produit est placé dans le magasin en cliquant sur le bouton <button type="button" class="btn btn-secondary p-1" style="font-size : 11px"><i class="mdi mdi-camera"></i></button></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- facade_image -->
-                    <div class="mySlides slide_17 mt-3">
-                        <div>
-                            <label for="facade_image"   class="form-label fw-bold">Image Facade</label>
-                            <button type="button"       class="btn btn-secondary w-100 mb-1" @click="$clickFile('facade_image')"><i class="mdi mdi-camera"></i></button>
-
-                            <input type='file'          id="facade_image"           style="display:none"    accept="image/*"    capture     @change="facadeImage()">
-                            <img                        id="facade_image_display"   src=""                  style="width : 100%; height : auto; display: block; margin : auto">
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Prenez une photo bien cadrée de la façade du magasin en cliquant sur le bouton <button type="button" class="btn btn-secondary p-1" style="font-size : 11px"><i class="mdi mdi-camera"></i></button></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Comment -->
-                    <div class="mySlides slide_18 mt-3">
-                        <div>
-                            <label      for="comment" class="form-label fw-bold">Commentaire</label>
-                            <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"></textarea>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Ajoutez un commentaire si vous souhaitez préciser quelque chose (exemple : <span class="fw-bold">Le magasin sera en rénovation à partir de demain, retour prévu dans deux semaines.</span>).</li>
                             </ul>
                         </div>
                     </div>
@@ -455,6 +460,10 @@
 <script>
 
 import {mapGetters, mapActions} from    "vuex"
+
+//
+
+import GPSErrorComponent        from    "../../../template/partials/GPSErrorComponent.vue"
 
 //
 
@@ -559,7 +568,7 @@ export default {
 
             //
 
-            point_is_inside_user_polygons   :   false   ,
+            point_is_inside_user_polygons   :   true    ,
 
             //
 
@@ -571,7 +580,12 @@ export default {
 
             //
 
-            start_adding_date               :   ""
+            start_adding_date               :   ""      ,
+
+            //
+            check_gps_clicked               :   false   ,
+            show_gps_error                  :   false   ,
+            watchGPS                        :   null
         }
     },
 
@@ -596,10 +610,15 @@ export default {
         }),
     },
 
+    components : {
+
+        GPSErrorComponent   :   GPSErrorComponent
+    },
+
     async mounted() {
 
         //
-        this.slideIndex     =   this.$showSlides(this.slideIndex, this.slideIndex);
+        this.slideIndex         =   this.$showSlides(this.slideIndex, this.slideIndex);
 
         //
         this.client.status      =   "pending"
@@ -610,6 +629,9 @@ export default {
 
         //
         await this.getData()
+
+        //
+        // await this.checkInsidePolygon()
     }, 
 
     beforeUnmount() {
@@ -622,6 +644,10 @@ export default {
 
             });
         }
+
+        if (this.watchGPS !== null) {
+            navigator.geolocation.clearWatch(this.watchGPS);
+        }
     },
 
     methods : {
@@ -631,7 +657,11 @@ export default {
         ]),
 
         async sendData() {
-            if((this.client.facade_image !==  "")&&(this.client.facade_image_original_name   !==  "")) {
+
+            // Validation de la question
+            let validation          =   this.validationQuestion()
+
+            if(validation   ==  true)  {
 
                 this.$showLoadingPage()
 
@@ -739,7 +769,7 @@ export default {
 
             else {
 
-                this.$showErrors("Error !"  ,   ["Veuillez répondre avant de confirmer !"])
+                this.$showErrors("Error !"  ,   ["Veuillez répondre en respectant les conditions des questions avant de valider !"])
             }
         },
 
@@ -759,15 +789,6 @@ export default {
             this.start_adding_date  =   moment(new Date()).format()
 
             if(this.getIsOnline) {
-
-                let position                        =   await this.$currentPosition()
-
-                this.client.Latitude                =   position.coords.latitude
-                this.client.Longitude               =   position.coords.longitude
-
-                this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygonsWithoutMap(this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
-
-                //
 
                 const res                           =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.$route.params.id_route_import+"/details",   null)
                 this.all_clients                    =   res.data.route_import.data
@@ -1151,23 +1172,178 @@ export default {
             console.error("");
         },
 
-        //
+        //  //  //
+
+        async checkInsidePolygon() {
+
+            let response                        =   await this.$currentPosition()
+
+            if(response.success) {
+
+                //
+                this.show_gps_error                 =   false
+
+                //
+                this.client.Latitude                =   response.position.coords.latitude
+                this.client.Longitude               =   response.position.coords.longitude
+
+                //
+                // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygonsWithoutMap(this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
+                this.point_is_inside_user_polygons  =   true
+            }
+
+            else {
+
+                //
+                this.show_gps_error                 =   true
+
+                //
+                this.client.Latitude                =   0
+                this.client.Longitude               =   0
+
+                //
+                await this.$nextTick()
+
+                //
+                this.point_is_inside_user_polygons  =   false
+
+                //
+                this.$customMessages("GPS Error", "Vérifiez si votre GPS est activée", "error", "OK", "", "", "")
+
+                //
+                await this.checkGPS()
+            }
+        },
 
         async showPositionOnMap(map_id) {
 
-            let position                =   await this.$currentPosition()
+            if(!this.check_gps_clicked) {
 
-            this.client.Latitude        =   position.coords.latitude
-            this.client.Longitude       =   position.coords.longitude
+                this.check_gps_clicked              =   true
 
-            //
+                //
+                this.point_is_inside_user_polygons  =   false
 
-            let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
+                //
+                let response                        =   await this.$currentPosition()
+                console.log(response)
 
-            this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
+                if(response.success) {
+
+                    //
+                    this.show_gps_error                 =   false
+
+                    //
+                    this.client.Latitude                =   response.position.coords.latitude
+                    this.client.Longitude               =   response.position.coords.longitude
+
+                    //
+                    let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
+
+                    //
+                    // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
+                    this.point_is_inside_user_polygons  =   true
+
+                    // Send Feedback
+                    this.$feedbackSuccess('Success !'   ,   'Le GPS a été pris avec succès ')
+
+                    //
+                    this.check_gps_clicked              =   false
+                }
+
+                else {
+
+                    //
+                    this.show_gps_error                 =   true
+
+                    //
+                    this.client.Latitude                =   0
+                    this.client.Longitude               =   0
+
+                    //
+                    await this.$nextTick()
+
+                    //
+                    let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
+
+                    //
+                    // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
+                    this.point_is_inside_user_polygons  =   false
+
+                    //
+                    this.$customMessages("GPS Error", "Vérifiez si votre GPS est activée", "error", "OK", "", "", "")
+
+                    //
+                    await this.checkGPS(map_id)
+
+                    //
+                    this.check_gps_clicked              =   false
+                }
+            }
         },
 
-        //
+        async checkGPS(map_id) {
+
+            this.watchGPS   =   navigator.geolocation.watchPosition(
+                async (pos) => {
+                    const accuracy  =   pos.coords.accuracy;
+
+                    console.log(accuracy)
+
+                    //
+                    if (Math.ceil(accuracy) <= 10) {
+
+                        this.show_gps_error     =   false
+
+                        //
+                        this.client.Latitude    =   pos.coords.latitude
+                        this.client.Longitude   =   pos.coords.longitude
+
+                        if(map_id) {
+
+                            //
+                            await this.$nextTick()
+
+                            //
+                            let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
+
+                            //
+                            // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
+                            this.point_is_inside_user_polygons  =   true
+
+                            // Send Feedback
+                            this.$feedbackSuccess('Success !'   ,   'Le GPS a été pris avec succès ')
+                        }
+
+                        else {
+
+                            //
+                            await this.$nextTick()
+
+                            //
+                            // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygonsWithoutMap(this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
+                            this.point_is_inside_user_polygons  =   true
+
+                            // Send Feedback
+                            this.$feedbackSuccess('Success !'   ,   'Le GPS a été pris avec succès ')
+                        }
+
+                        //
+                        navigator.geolocation.clearWatch(this.watchGPS); // Stop watching
+                    }
+                },
+                (err) => {
+                    this.show_gps_error     =   true;
+                },
+                {
+                    enableHighAccuracy: true,   // Use high-accuracy mode
+                    maximumAge: 0,              // No cached data
+                    timeout: 2000,              // Timeout for location retrieval
+                }
+            );
+        },
+
+        //  //  //
 
         plusSlides(current_slide) {
 
@@ -1190,7 +1366,9 @@ export default {
                 //
 
                 // Verifier Si La Question GPS
-                if(this.slideIndex  ==  6) {
+                if(this.slideIndex  ==  18) {
+
+                    this.point_is_inside_user_polygons  =   false
 
                     this.showPositionOnMap("show_map")
                 }
@@ -1284,7 +1462,7 @@ export default {
             // Slide 6
             if(this.slideIndex  ==  6) {
 
-                if((this.client.Latitude !==  "")&&(this.client.Longitude !==  "")&&(parseFloat(this.client.Latitude) >  0)&&(parseFloat(this.client.Longitude) >  0)) {
+                if(this.client.Address !==  "") {
 
                     return true;
                 }
@@ -1298,7 +1476,7 @@ export default {
             // Slide 7
             if(this.slideIndex  ==  7) {
 
-                if(this.client.Address !==  "") {
+                if(this.client.Neighborhood !==  "") {
 
                     return true;
                 }
@@ -1312,7 +1490,7 @@ export default {
             // Slide 8
             if(this.slideIndex  ==  8) {
 
-                if(this.client.Neighborhood !==  "") {
+                if(this.client.Landmark !==  "") {
 
                     return true;
                 }
@@ -1326,7 +1504,7 @@ export default {
             // Slide 9
             if(this.slideIndex  ==  9) {
 
-                if(this.client.Landmark !==  "") {
+                if(this.getUser.DistrictNo !==  "") {
 
                     return true;
                 }
@@ -1340,7 +1518,7 @@ export default {
             // Slide 10
             if(this.slideIndex  ==  10) {
 
-                if(this.getUser.DistrictNo !==  "") {
+                if(this.client.CityNo !==  "") {
 
                     return true;
                 }
@@ -1354,7 +1532,7 @@ export default {
             // Slide 11
             if(this.slideIndex  ==  11) {
 
-                if(this.client.CityNo !==  "") {
+                if(this.client.CustomerType !==  "") {
 
                     return true;
                 }
@@ -1368,7 +1546,7 @@ export default {
             // Slide 12
             if(this.slideIndex  ==  12) {
 
-                if(this.client.CustomerType !==  "") {
+                if(this.client.BrandSourcePurchase !==  "") {
 
                     return true;
                 }
@@ -1382,7 +1560,7 @@ export default {
             // Slide 13
             if(this.slideIndex  ==  13) {
 
-                if(this.client.BrandSourcePurchase !==  "") {
+                if((this.client.JPlan !== "")&&(this.$isUppercase(this.client.JPlan))) {
 
                     return true;
                 }
@@ -1396,7 +1574,7 @@ export default {
             // Slide 14
             if(this.slideIndex  ==  14) {
 
-                if((this.client.JPlan !== "")&&(this.$isUppercase(this.client.JPlan))) {
+                if(this.client.Journee !==  "") {
 
                     return true;
                 }
@@ -1409,20 +1587,6 @@ export default {
 
             // Slide 15
             if(this.slideIndex  ==  15) {
-
-                if(this.client.Journee !==  "") {
-
-                    return true;
-                }
-
-                else {
-
-                    return false
-                }
-            }
-
-            // Slide 16
-            if(this.slideIndex  ==  16) {
 
                 if((this.client.BrandAvailability   === 0)||(this.client.BrandAvailability  === "0")) {
 
@@ -1447,6 +1611,20 @@ export default {
             if(this.slideIndex  ==  17) {
 
                 if((this.client.facade_image !==  "")&&(this.client.facade_image_original_name   !==  "")) {
+
+                    return true;
+                }
+
+                else {
+
+                    return false
+                }
+            }
+
+            // Slide 18
+            if(this.slideIndex  ==  18) {
+
+                if((this.client.Latitude !==  "")&&(this.client.Longitude !==  "")&&(parseFloat(this.client.Latitude) >  0)&&(parseFloat(this.client.Longitude) >  0)) {
 
                     return true;
                 }
