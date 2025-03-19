@@ -1624,7 +1624,7 @@ export default {
             // Slide 18
             if(this.slideIndex  ==  18) {
 
-                if((this.client.Latitude !==  "")&&(this.client.Longitude !==  "")&&(parseFloat(this.client.Latitude) >  0)&&(parseFloat(this.client.Longitude) >  0)) {
+                if((this.client.Latitude !==  "")&&(this.client.Longitude !==  "")&&((Math.abs(parseFloat(this.client.Latitude)) >  0)||(Math.abs(parseFloat(this.client.Longitude)) >  0))) {
 
                     return true;
                 }
