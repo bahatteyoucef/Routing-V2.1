@@ -2121,19 +2121,27 @@ export default {
 
             try {
             
+                let response     =   await this.$currentPosition(this.getUser.accuracy)
 
-                let position     =   await this.$currentPosition()
+                if(response.success) {
 
-                let client      =   { lat : 0, lng : 0 }
+                    let client      =   { lat : 0, lng : 0 }
 
-                client.lat      =   position.coords.latitude
-                client.lng      =   position.coords.longitude
+                    client.lat      =   response.position.coords.latitude
+                    client.lng      =   response.position.coords.longitude
 
-                // ShowModal
-                var addModal    =   new Modal(document.getElementById("addClientModal"));
-                addModal.show();
+                    // ShowModal
+                    var addModal    =   new Modal(document.getElementById("addClientModal"));
+                    addModal.show();
 
-                this.addClient(client)
+                    this.addClient(client)
+                }
+
+                else {
+
+                    //
+                    this.$customMessages("GPS Error", "Vérifiez si votre GPS est activée", "error", "OK", "", "", "")
+                }
             }
 
             catch(e) {

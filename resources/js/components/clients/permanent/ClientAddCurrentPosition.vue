@@ -802,12 +802,7 @@ export default {
 
             //
 
-            this.getComboData()  
-
-            if(this.getIsOnline) {
-
-                this.checkClients()
-            }
+            this.getComboData()
         },
 
         async getComboData() {
@@ -1176,7 +1171,7 @@ export default {
 
         async checkInsidePolygon() {
 
-            let response                        =   await this.$currentPosition()
+            let response                        =   await this.$currentPosition(this.getUser.accuracy)
 
             if(response.success) {
 
@@ -1186,6 +1181,9 @@ export default {
                 //
                 this.client.Latitude                =   response.position.coords.latitude
                 this.client.Longitude               =   response.position.coords.longitude
+
+                //
+                this.checkClients()
 
                 //
                 // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygonsWithoutMap(this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
@@ -1203,6 +1201,9 @@ export default {
 
                 //
                 await this.$nextTick()
+
+                //
+                this.checkClients()
 
                 //
                 this.point_is_inside_user_polygons  =   false
@@ -1225,7 +1226,7 @@ export default {
                 this.point_is_inside_user_polygons  =   false
 
                 //
-                let response                        =   await this.$currentPosition()
+                let response                        =   await this.$currentPosition(this.getUser.accuracy)
                 console.log(response)
 
                 if(response.success) {
@@ -1239,6 +1240,9 @@ export default {
 
                     //
                     let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
+
+                    //
+                    this.checkClients()
 
                     //
                     // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
@@ -1267,6 +1271,9 @@ export default {
                     let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
 
                     //
+                    this.checkClients()
+
+                    //
                     // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
                     this.point_is_inside_user_polygons  =   false
 
@@ -1291,7 +1298,7 @@ export default {
                     console.log(accuracy)
 
                     //
-                    if (Math.ceil(accuracy) <= 10) {
+                    if (Math.ceil(accuracy) <= this.getUser.accuracy) {
 
                         this.show_gps_error     =   false
 
@@ -1308,6 +1315,9 @@ export default {
                             let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
 
                             //
+                            this.checkClients()
+
+                            //
                             // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
                             this.point_is_inside_user_polygons  =   true
 
@@ -1319,6 +1329,9 @@ export default {
 
                             //
                             await this.$nextTick()
+
+                            //
+                            this.checkClients()
 
                             //
                             // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygonsWithoutMap(this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
@@ -1624,7 +1637,8 @@ export default {
             // Slide 18
             if(this.slideIndex  ==  18) {
 
-                if((this.client.Latitude !==  "")&&(this.client.Longitude !==  "")&&((Math.abs(parseFloat(this.client.Latitude)) >  0)||(Math.abs(parseFloat(this.client.Longitude)) >  0))) {
+                if( ((!isNaN(this.client.Latitude)) &&(this.client.Latitude     !== "") &&(isFinite(Number(this.client.Latitude))))   &&
+                    ((!isNaN(this.client.Longitude))&&(this.client.Longitude    !== "") &&(isFinite(Number(this.client.Longitude))))   ) {
 
                     return true;
                 }

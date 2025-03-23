@@ -942,6 +942,8 @@ class RouteImport extends Model
 
                             'users.type_user                        as  type_user'          ,
 
+                            'users.accuracy                         as  accuracy'           ,
+
                             'users.max_route_import                 as  max_route_import'   ,
 
                             //

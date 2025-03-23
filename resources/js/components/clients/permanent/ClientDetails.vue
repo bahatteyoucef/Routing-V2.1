@@ -179,19 +179,31 @@ export default {
 
         async openDirectionsInGoogleMaps() {
 
-            const current_position      =   await this.$currentPosition()
+            const response      =   await this.$currentPosition(this.getUser.accuracy)
 
-            const user_latitude         =   current_position.coords.latitude
-            const user_longitude        =   current_position.coords.longitude
+            console.log(this.getUser.accuracy)
+            console.log(response)
 
-            const client_latitude       =   this.client.Latitude;
-            const client_longitude      =   this.client.Longitude;
+            if(response.success) {
 
-            // Construct the URL for Google Maps directions
-            const url = `https://www.google.com/maps/dir/?api=1&origin=${user_latitude},${user_longitude}&destination=${client_latitude},${client_longitude}`;
+                const user_latitude         =   response.position.coords.latitude
+                const user_longitude        =   response.position.coords.longitude
 
-            // Open the URL in a new window or tab to trigger the Google Maps app if available
-            window.open(url, '_system');
+                const client_latitude       =   this.client.Latitude;
+                const client_longitude      =   this.client.Longitude;
+
+                // Construct the URL for Google Maps directions
+                const url = `https://www.google.com/maps/dir/?api=1&origin=${user_latitude},${user_longitude}&destination=${client_latitude},${client_longitude}`;
+
+                // Open the URL in a new window or tab to trigger the Google Maps app if available
+                window.open(url, '_system');
+            }
+
+            else {
+
+                //
+                this.$customMessages("GPS Error", "Vérifiez si votre GPS est activée", "error", "OK", "", "", "")
+            }
         },
 
         //

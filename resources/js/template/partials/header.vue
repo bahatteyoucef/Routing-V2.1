@@ -329,9 +329,18 @@ export default {
 
         async addClient() {
 
-          let position     =   await this.$currentPosition()
+          let response     =   await this.$currentPosition(this.getUser.accuracy)
 
-          this.$router.push('/route_import/'+this.getUser.id_route_import+'/clients/add/'+position.coords.latitude+'/'+position.coords.longitude)
+          if(response.success) {
+
+            this.$router.push('/route_import/'+this.getUser.id_route_import+'/clients/add/'+response.position.coords.latitude+'/'+response.position.coords.longitude)
+          }
+
+          else {
+
+            //
+            this.$customMessages("GPS Error", "Vérifiez si votre GPS est activée", "error", "OK", "", "", "")
+          }
         },
 
         async updateClient() {

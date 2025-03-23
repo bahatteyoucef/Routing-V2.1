@@ -997,7 +997,7 @@ export default {
 
         //
 
-        $currentPosition() {
+        $currentPosition(accuracy_max) {
 
             let maxRetries  =   5
             let attempts    =   0
@@ -1016,8 +1016,10 @@ export default {
                         const accuracy  =   position.coords.accuracy;
 
                             console.log(accuracy)
+                            console.log(accuracy_max)
+                            console.log(Math.ceil(accuracy) <= accuracy_max)
 
-                            if (Math.ceil(accuracy) <= 10) {
+                            if (Math.ceil(accuracy) <= accuracy_max) {
                                 resolve({ success: true, position });
                             } else if (attempts >= maxRetries) {
                                 resolve({ success: false, error: "Maximum retries reached, accuracy insufficient." });
@@ -1246,7 +1248,7 @@ export default {
             for (let index = 0; index < clients.length; index++) {
 
                 //
-                let point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygonsWithoutMap(clients[index].Latitude, clients[index].Longitude, user_territories)
+                let point_is_inside_user_polygons  =   true; //this.$checkMarkerInsideUserPolygonsWithoutMap(clients[index].Latitude, clients[index].Longitude, user_territories)
 
                 //
                 if(point_is_inside_user_polygons) {

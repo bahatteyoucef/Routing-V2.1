@@ -51,27 +51,29 @@
 
                         <div class="mb-3"   v-if="(user.type_user  ==  'BackOffice')||(user.type_user  ==  'BU Manager')">
 
-                            <label for="Route Imports"               class="form-label">Route Imports</label>
+                            <div class="mb-3">
+                                <label for="Route Imports"               class="form-label">Route Imports</label>
 
-                            <Multiselect
-                                @select             =   "setListeRouteImport()"
-                                @deselect           =   "setListeRouteImport()"
-                                @clear              =   "setListeRouteImport()"
+                                <Multiselect
+                                    @select             =   "setListeRouteImport()"
+                                    @deselect           =   "setListeRouteImport()"
+                                    @clear              =   "setListeRouteImport()"
 
-                                v-model             =   "user.liste_route_import"
-                                :options            =   "liste_route_import"
-                                mode                =   "tags" 
-                                placeholder         =   "Select Maps"
-                                class               =   "mt-1"
+                                    v-model             =   "user.liste_route_import"
+                                    :options            =   "liste_route_import"
+                                    mode                =   "tags" 
+                                    placeholder         =   "Select Maps"
+                                    class               =   "mt-1"
 
-                                :close-on-select    =   "false"
-                                :searchable         =   "true"
-                                :create-option      =   "true"
+                                    :close-on-select    =   "false"
+                                    :searchable         =   "true"
+                                    :create-option      =   "true"
 
-                                :canDeselect        =   "true"
-                                :canClear           =   "true"
-                                :allowAbsent        =   "false"
-                            />
+                                    :canDeselect        =   "true"
+                                    :canClear           =   "true"
+                                    :allowAbsent        =   "false"
+                                />
+                            </div>
 
                         </div>
 
@@ -79,27 +81,34 @@
 
                         <div class="mb-3"   v-if="user.type_user    ==  'FrontOffice'">
 
-                            <label for="Route Imports"               class="form-label">Route Imports</label>
+                            <div class="mb-3">
+                                <label for="accuracy"       class="form-label">Accuracy</label>
+                                <input type="number"        class="form-control"        id="accuracy"                       v-model="user.accuracy">
+                            </div>
 
-                            <Multiselect
-                                @select             =   "setListeRouteImport()"
-                                @deselect           =   "setListeRouteImport()"
-                                @clear              =   "setListeRouteImport()"
+                            <div class="mb-3">
+                                <label for="Route Imports"               class="form-label">Route Imports</label>
 
-                                v-model             =   "user.selected_route_import"
-                                :options            =   "liste_route_import"
-                                mode                =   "single" 
-                                placeholder         =   "Select Map"
-                                class               =   "mt-1"
+                                <Multiselect
+                                    @select             =   "setListeRouteImport()"
+                                    @deselect           =   "setListeRouteImport()"
+                                    @clear              =   "setListeRouteImport()"
 
-                                :close-on-select    =   "false"
-                                :searchable         =   "true"
-                                :create-option      =   "true"
+                                    v-model             =   "user.selected_route_import"
+                                    :options            =   "liste_route_import"
+                                    mode                =   "single" 
+                                    placeholder         =   "Select Map"
+                                    class               =   "mt-1"
 
-                                :canDeselect        =   "true"
-                                :canClear           =   "true"
-                                :allowAbsent        =   "false"
-                            />
+                                    :close-on-select    =   "false"
+                                    :searchable         =   "true"
+                                    :create-option      =   "true"
+
+                                    :canDeselect        =   "true"
+                                    :canClear           =   "true"
+                                    :allowAbsent        =   "false"
+                                />
+                            </div>
 
                         </div>
 
@@ -138,6 +147,7 @@ export default {
                 company                 :   ''      ,
                 type_user               :   ''      ,
 
+                accuracy                :   0       ,
                 max_route_import        :   0       ,
 
                 selected_route_import   :   null    ,
@@ -173,6 +183,7 @@ export default {
             formData.append("company"                   , this.user.company)
             formData.append("type_user"                 , this.user.type_user)
 
+            formData.append("accuracy"                  , this.user.accuracy)
             formData.append("max_route_import"          , this.user.max_route_import)
 
             formData.append("selected_route_import"     , this.user.selected_route_import)
@@ -214,6 +225,7 @@ export default {
                 this.user.company                   =   ''
                 this.user.type_user                 =   ''
 
+                this.user.accuracy                  =   0
                 this.user.max_route_import          =   0
 
                 this.user.selected_route_import     =   null
@@ -242,6 +254,7 @@ export default {
             this.user.company               =   res.data.company    
             this.user.type_user             =   res.data.type_user        
 
+            this.user.accuracy              =   res.data.accuracy
             this.user.max_route_import      =   res.data.max_route_import        
 
             if((this.user.type_user  ==  "BackOffice")||(this.user.type_user  ==  "BU Manager")) {

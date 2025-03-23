@@ -62,6 +62,8 @@ class User extends Authenticatable
 
                             'users.type_user            as  type_user'              ,
 
+                            'users.accuracy             as  accuracy'               ,
+
                             'users.max_route_import     as  max_route_import'       ,
 
                             'users.password_non_hashed  as  password_non_hashed'    ,
@@ -89,6 +91,8 @@ class User extends Authenticatable
                             'users.company              as  company'                ,
 
                             'users.type_user            as  type_user'              ,
+
+                            'users.accuracy             as  accuracy'               ,
 
                             'users.max_route_import     as  max_route_import'       ,
 
@@ -118,7 +122,13 @@ class User extends Authenticatable
     
             return ($input->type_user    ==  "BU Manager")||($input->type_user    ==  "BackOffice");
         });
+
+        $validator->sometimes('accuracy',  ["required", "numeric", "min:0"] , function (Fluent $input) {
     
+            return ($input->type_user    ==  "FrontOffice");
+        });
+
+        //
         return $validator;
     }
 
@@ -130,7 +140,6 @@ class User extends Authenticatable
             'email'                 =>  $request->input('email')                ,
             'tel'                   =>  $request->input('tel')                  ,
             'company'               =>  $request->input('company')              ,
-            'max_route_import'      =>  $request->input('max_route_import')     ,
             'type_user'             =>  $request->input('type_user')            ,
 
             'password_non_hashed'   =>  $request->input('password')             ,
@@ -162,6 +171,10 @@ class User extends Authenticatable
 
             $BUManagerRole = Role::findByName('BU Manager');
             $user->assignRole($BUManagerRole);
+
+            //
+            $user->max_route_import     =   $request->input('max_route_import');
+            $user->save();
         }
 
         if($request->get("type_user")   ==  "BackOffice") {
@@ -201,6 +214,10 @@ class User extends Authenticatable
 
             $FrontOfficeRole = Role::findByName('FrontOffice');
             $user->assignRole($FrontOfficeRole);
+
+            //
+            $user->accuracy     =   $request->input('accuracy');
+            $user->save();
         }
 
         //
@@ -221,6 +238,11 @@ class User extends Authenticatable
     
             return ($input->type_user    ==  "BU Manager")||($input->type_user    ==  "BackOffice");
         });
+
+        $validator->sometimes('accuracy',  ["required", "numeric", "min:0"] , function (Fluent $input) {
+    
+            return ($input->type_user    ==  "FrontOffice");
+        });
     
         return $validator;
     }
@@ -234,7 +256,6 @@ class User extends Authenticatable
         $user->email                =   $request->input('email');
         $user->tel                  =   $request->input('tel');
         $user->company              =   $request->input('company');
-        $user->max_route_import     =   $request->input('max_route_import');
         $user->type_user            =   $request->input('type_user');
 
         $user->save();
@@ -265,6 +286,10 @@ class User extends Authenticatable
 
             //
             $user->syncRoles(['BU Manager']);
+
+            //
+            $user->max_route_import     =   $request->input('max_route_import');
+            $user->save();
         }
 
         if($request->get("type_user")   ==  "BackOffice") {
@@ -303,10 +328,12 @@ class User extends Authenticatable
             }
 
             $user->syncRoles(['FrontOffice']);
-        }
 
-        //
-    }       
+            //
+            $user->accuracy     =   $request->input('accuracy');
+            $user->save();
+        }
+    }
 
     public static function showUser(int $id) 
     {

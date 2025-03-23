@@ -98,7 +98,7 @@
                         <div>
                             <label for="CustomerNameA"      class="form-label fw-bold">Raison Sociale</label>
                             <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA"  :disabled="client.status_original    ==  'validated'">
-                        </div>                    
+                        </div>
 
                         <!--  -->
 
@@ -280,7 +280,7 @@
                         <div>
                             <label for="Journee"            class="form-label fw-bold">Journee</label>
 
-                            <select                         class="form-select"         id="Journee"                 v-model="client.Journee"       :disabled="client.status_original    ==  'validated'">
+                            <select                         class="form-select"         id="Journee"    v-model="client.Journee"    :disabled="client.status_original    ==  'validated'">
                                 <option     :value="'Jour 1'">Samedi 1 (Jour 1)</option>
                                 <option     :value="'Jour 2'">Dimanche 1 (Jour 2)</option>
                                 <option     :value="'Jour 3'">Lundi 1 (Jour 3)</option>
@@ -817,12 +817,7 @@ export default {
             //
 
             await this.getClientData()  
-            await this.getComboData()  
-
-            if(this.getIsOnline) {
-
-                this.checkClients()
-            }
+            await this.getComboData()
         },
 
         async getClientData() {
@@ -895,6 +890,9 @@ export default {
                 in_store_image_display_update.src           =   "/uploads/clients/"+client.id+"/"+client.in_store_image
                 
                 this.setJoursGetData(client)
+
+                //
+                this.checkClients()
             }
 
             else {
@@ -1401,7 +1399,7 @@ export default {
 
         async checkInsidePolygon() {
 
-            let response                        =   await this.$currentPosition()
+            let response                        =   await this.$currentPosition(this.getUser.accuracy)
 
             if(response.success) {
 
@@ -1442,7 +1440,7 @@ export default {
                 this.point_is_inside_user_polygons  =   false
 
                 //
-                let response                        =   await this.$currentPosition()
+                let response                        =   await this.$currentPosition(this.getUser.accuracy)
 
                 if(response.success) {
 
@@ -1460,6 +1458,9 @@ export default {
                     let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
 
                     //
+                    this.checkClients()
+
+                    //
                     // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
                     this.point_is_inside_user_polygons  =   true
 
@@ -1468,6 +1469,9 @@ export default {
 
                     //
                     this.check_gps_clicked              =   false
+
+                    //
+                    this.checkClients()
                 }
 
                 else {
@@ -1484,6 +1488,9 @@ export default {
 
                     //
                     let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
+
+                    //
+                    this.checkClients()
 
                     //
                     // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
@@ -1507,7 +1514,7 @@ export default {
                 async (pos) => {
                     const accuracy  =   pos.coords.accuracy;
                     
-                    if (Math.ceil(accuracy) <= 10) {
+                    if (Math.ceil(accuracy) <= this.getUser.accuracy) {
 
                         this.show_gps_error     =   false
 
@@ -1522,6 +1529,9 @@ export default {
 
                             //
                             let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
+
+                            //
+                            this.checkClients()
 
                             //
                             // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
@@ -1639,7 +1649,7 @@ export default {
 
                 else {
 
-                    this.$showErrors("Error !"  ,   ["Veuillez répondre avant de passer à la question suivante !"])
+                    this.$showErrors("Error !"  ,   ["Veuillez répondre en respectant les conditions des questions avant de passer à la page suivante !"])
                     return false;
                 }
                 //
@@ -1906,7 +1916,8 @@ export default {
             // Slide 18
             if(this.slideIndex  ==  18) {
 
-                if((this.client.Latitude !==  "")&&(this.client.Longitude !==  "")&&((Math.abs(parseFloat(this.client.Latitude)) >  0)||(Math.abs(parseFloat(this.client.Longitude)) >  0))) {
+                if( ((!isNaN(this.client.Latitude)) &&(this.client.Latitude     !== "") &&(isFinite(Number(this.client.Latitude))))   &&
+                    ((!isNaN(this.client.Longitude))&&(this.client.Longitude    !== "") &&(isFinite(Number(this.client.Longitude))))   ) {
 
                     return true;
                 }
