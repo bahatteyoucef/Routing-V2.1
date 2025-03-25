@@ -369,7 +369,7 @@
 
                     <div class="mySlides slide_18 mt-3">
                         <div>
-                            <label for="CustomerCode"       class="form-label fw-bold">Detecter la Position Actuel <button class="btn btn-sm" @click.prevent="showPositionOnMap('show_map')"    :disabled="client.status_original    ==  'validated'"><i class="mdi mdi-reload"></i></button></label>
+                            <label for="CustomerCode"       class="form-label fw-bold">Detecter la Position Actuel <button class="btn btn-sm" @click.prevent="showPositionOnMap('show_map')"    :disabled="((client.status_original    ==  'validated')||(check_gps_clicked))"><i class="mdi mdi-reload"></i></button></label>
                             <p class="text-secondary text-small mb-1">Latitude : {{ client.Latitude }}</p>
                             <p class="text-secondary text-small mb-1">Longitude : {{ client.Longitude }}</p>
 
@@ -590,8 +590,9 @@ export default {
             });
         }
 
-        if (this.watchGPS !== null) {
+        if (this.watchGPS) {
             navigator.geolocation.clearWatch(this.watchGPS);
+            this.watchGPS = null; // Reset the variable to null after clearing
         }
     },
 
@@ -1426,7 +1427,7 @@ export default {
                 this.$customMessages("GPS Error", "Vérifiez si votre GPS est activée", "error", "OK", "", "", "")
 
                 //
-                await this.checkGPS()
+                this.checkGPS()
             }
         },
 
@@ -1469,9 +1470,6 @@ export default {
 
                     //
                     this.check_gps_clicked              =   false
-
-                    //
-                    this.checkClients()
                 }
 
                 else {
@@ -1500,20 +1498,22 @@ export default {
                     this.$customMessages("GPS Error", "Vérifiez si votre GPS est activée", "error", "OK", "", "", "")
 
                     //
-                    await this.checkGPS(map_id)
-
-                    //
-                    this.check_gps_clicked              =   false
+                    this.checkGPS(map_id)
                 }
             }
         },
 
-        async checkGPS(map_id) {
+        checkGPS(map_id) {
+
+            if (this.watchGPS) return;
 
             this.watchGPS   =   navigator.geolocation.watchPosition(
                 async (pos) => {
                     const accuracy  =   pos.coords.accuracy;
                     
+                    console.log(accuracy)
+
+                    //
                     if (Math.ceil(accuracy) <= this.getUser.accuracy) {
 
                         this.show_gps_error     =   false
@@ -1543,6 +1543,10 @@ export default {
 
                         //
                         navigator.geolocation.clearWatch(this.watchGPS); // Stop watching
+                        this.watchGPS = null; // Reset watcher
+
+                        //
+                        this.check_gps_clicked              =   false
                     }
                 },
                 (err) => {
@@ -1551,7 +1555,7 @@ export default {
                 {
                     enableHighAccuracy: true,   // Use high-accuracy mode
                     maximumAge: 0,              // No cached data
-                    timeout: 2000,              // Timeout for location retrieval
+                    timeout: 10000,              // Timeout for location retrieval
                 }
             );
         },

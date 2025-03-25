@@ -999,8 +999,8 @@ export default {
 
         $currentPosition(accuracy_max) {
 
-            let maxRetries  =   5
-            let attempts    =   0
+            let maxRetries  =   10;
+            let attempts    =   0;
 
             return new Promise((resolve) => {
                 if (!navigator.geolocation) {
@@ -1009,15 +1009,13 @@ export default {
                 }
 
                 const attemptPosition = () => {
-
                     navigator.geolocation.getCurrentPosition(
                         (position) => {
-
-                        const accuracy  =   position.coords.accuracy;
-
-                            console.log(accuracy)
-                            console.log(accuracy_max)
-                            console.log(Math.ceil(accuracy) <= accuracy_max)
+                            const accuracy = position.coords.accuracy;
+                            console.log(accuracy);
+                            console.log(accuracy_max);
+                            console.log(Math.ceil(accuracy) <= accuracy_max);
+                            console.log(attempts);
 
                             if (Math.ceil(accuracy) <= accuracy_max) {
                                 resolve({ success: true, position });
@@ -1030,12 +1028,17 @@ export default {
                         },
                         (error) => {
                             console.error(`Geolocation error: ${error.message}`);
-                            resolve({ success: false, error });
+                            if (attempts >= maxRetries) {
+                                resolve({ success: false, error });
+                            } else {
+                                attempts++;
+                                attemptPosition(); // Retry on error
+                            }
                         },
                         {
                             enableHighAccuracy: true,
                             maximumAge: 0,
-                            timeout: 2000,
+                            timeout: 10000,
                         }
                     );
                 };
