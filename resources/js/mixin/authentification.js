@@ -39,6 +39,7 @@ export default {
             if(this.$findRoleIndex("Super Admin")   !== -1)     return "Super Admin"
             if(this.$findRoleIndex("BU Manager")    !== -1)     return "BU Manager"
             if(this.$findRoleIndex("BackOffice")    !== -1)     return "BackOffice"
+            if(this.$findRoleIndex("Viewer")        !== -1)     return "Viewer"
             if(this.$findRoleIndex("FrontOffice")   !== -1)     return "FrontOffice"
         },
 

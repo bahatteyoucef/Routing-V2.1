@@ -65,7 +65,6 @@ class RouteImport extends Model
 
     public static function indexRouteImports()
     {
-
         $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
 
         return $liste_route_import;

@@ -39,6 +39,7 @@
                                 <option v-if="$isRole('Super Admin')" value="BU Manager">BU Manager</option>
                                 <option value="BackOffice">BackOffice</option>
                                 <option value="FrontOffice">FrontOffice</option>
+                                <option value="Viewer">Viewer</option>
                             </select>
                         </div>
 
@@ -49,7 +50,7 @@
 
                         <!--  -->
 
-                        <div class="mb-3"   v-if="(user.type_user  ==  'BackOffice')||(user.type_user  ==  'BU Manager')">
+                        <div class="mb-3"   v-if="(user.type_user  ==  'Viewer')||(user.type_user  ==  'BackOffice')||(user.type_user  ==  'BU Manager')">
 
                             <div class="mb-3">
                                 <label for="Route Imports"               class="form-label">Route Imports</label>
@@ -257,7 +258,7 @@ export default {
             this.user.accuracy              =   res.data.accuracy
             this.user.max_route_import      =   res.data.max_route_import        
 
-            if((this.user.type_user  ==  "BackOffice")||(this.user.type_user  ==  "BU Manager")) {
+            if((this.user.type_user  ==  "Viewer")||(this.user.type_user  ==  "BackOffice")||(this.user.type_user  ==  "BU Manager")) {
 
                 this.user.liste_route_import        =   res.data.liste_route_import
             }

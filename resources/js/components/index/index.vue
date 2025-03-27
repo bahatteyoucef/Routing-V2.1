@@ -1,5 +1,5 @@
 <template>
-    <div v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')" class="content-wrapper" style="padding : 15px;">
+    <div v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')||$isRole('Viewer')" class="content-wrapper" style="padding : 15px;">
         <section class="dashboard">
 
             <div class="page-header">
@@ -40,7 +40,7 @@
                                     </i>
                                 </div>
 
-                                <div class="col-1 p-0">
+                                <div class="col-1 p-0"  v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')">
                                     <i class="mdi mdi-account-multiple mdi-24px p-1" role="button"                                                              @click="getClients(route_import.id)">
                                     </i>
                                 </div>
@@ -240,23 +240,16 @@ export default {
 
             try {
 
-                // if(this.getIsOnline) {
+                if((this.$isRole("BackOffice"))||(this.$isRole('BU Manager'))||(this.$isRole("Super Admin"))||(this.$isRole('Viewer'))) {
 
-                    if((this.$isRole("BackOffice"))||(this.$isRole('BU Manager'))||(this.$isRole("Super Admin"))) {
+                    this.$callApi("post",    "/route_import/index",     null)
+                    .then((res)=> {
 
-                        this.$callApi("post",    "/route_import/index",     null)
-                        .then((res)=> {
+                        console.log(res)
 
-                            this.liste_route_import     =   res.data
-
-                            if(this.$isRole("FrontOffice")) {
-
-                                // Add to indexedDB
-                                this.$indexedDB.$setListeRouteImport(this.liste_route_import)
-                            }
-                        })
-                    }
-                // }
+                        this.liste_route_import     =   res.data
+                    })
+                }
             }
 
             catch(e) {

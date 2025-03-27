@@ -120,7 +120,7 @@ class User extends Authenticatable
 
         $validator->sometimes('max_route_import',  ["required", "integer"] , function (Fluent $input) {
     
-            return ($input->type_user    ==  "BU Manager")||($input->type_user    ==  "BackOffice");
+            return ($input->type_user    ==  "BU Manager");
         });
 
         $validator->sometimes('accuracy',  ["required", "numeric", "min:0"] , function (Fluent $input) {
@@ -199,6 +199,28 @@ class User extends Authenticatable
             $user->assignRole($BackOfficeRole);
         }
 
+        if($request->get("type_user")   ==  "Viewer") {
+
+            $liste_route_import     =   json_decode($request->get("liste_route_import"));
+
+            if($liste_route_import  !=  null) {
+
+                foreach ($liste_route_import as $route_import_elem) {
+
+                    $route_import           =   new UserRouteImport([
+
+                        'id_user'           =>  $user->id           ,
+                        'id_route_import'   =>  $route_import_elem
+                    ]);
+
+                    $route_import->save();
+                } 
+            }
+
+            $ViewerRole = Role::findByName('Viewer');
+            $user->assignRole($ViewerRole);
+        }
+
         if($request->get("type_user")   ==  "FrontOffice") {
 
             if($request->get("selected_route_import")   !=  "null") {
@@ -236,7 +258,7 @@ class User extends Authenticatable
 
         $validator->sometimes('max_route_import',  ["required", "integer"] , function (Fluent $input) {
     
-            return ($input->type_user    ==  "BU Manager")||($input->type_user    ==  "BackOffice");
+            return ($input->type_user    ==  "BU Manager");
         });
 
         $validator->sometimes('accuracy',  ["required", "numeric", "min:0"] , function (Fluent $input) {
@@ -314,6 +336,28 @@ class User extends Authenticatable
             $user->syncRoles(['BackOffice']);
         }
 
+        if($request->get("type_user")   ==  "Viewer") {
+
+            $liste_route_import     =   json_decode($request->get("liste_route_import"));
+
+            if($liste_route_import  !=  null) {
+
+                foreach ($liste_route_import as $route_import_elem) {
+                    
+                    $route_import           =   new UserRouteImport([
+
+                        'id_user'           =>  $user->id               ,
+                        'id_route_import'   =>  $route_import_elem
+                    ]);
+
+                    $route_import->save();
+                }
+            }
+
+            //
+            $user->syncRoles(['Viewer']);
+        }
+
         if($request->get("type_user")   ==  "FrontOffice") {
 
             if($request->get("selected_route_import")   !=  "null") {
@@ -378,9 +422,20 @@ class User extends Authenticatable
 
                 else {
 
-                    if(Auth::user()->hasRole("FrontOffice")) {
+                    if(Auth::user()->hasRole("Viewer")) {
 
-                        return [];
+                        $users->filter(function ($user, $key) {
+
+                            return [];
+                        });
+                    }
+
+                    else {
+
+                        if(Auth::user()->hasRole("FrontOffice")) {
+
+                            return [];
+                        }
                     }
                 }
             }
@@ -440,7 +495,7 @@ class User extends Authenticatable
 
                 else {
 
-                    if(Auth::user()->hasRole("FrontOffice")) {
+                    if(Auth::user()->hasRole("Viewer")) {
 
                         foreach ($liste_route_import as $route_import) {
 
@@ -457,6 +512,28 @@ class User extends Authenticatable
                         }
 
                         return $liste_route_import_final;
+                    }
+
+                    else {
+
+                        if(Auth::user()->hasRole("FrontOffice")) {
+
+                            foreach ($liste_route_import as $route_import) {
+
+                                # code...
+                                $liste_user_route_import            =   UserRouteImport::where('id_user', Auth::user()->id)->get();
+
+                                foreach ($liste_user_route_import as $user_route_import) {
+
+                                    if($user_route_import->id_route_import  ==  $route_import->id) {
+
+                                        array_push($liste_route_import_final, $route_import);
+                                    }
+                                }
+                            }
+
+                            return $liste_route_import_final;
+                        }
                     }
                 }
             }

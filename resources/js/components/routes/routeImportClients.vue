@@ -5,9 +5,7 @@
                 <div class="card-body p-0 pt-5">
 
                     <!-- Header -->
-                    <headerComponent    v-if="route_import&&($isRole('FrontOffice'))"                           :title="'List of clients du route import : '+route_import.libelle"      />
-
-                    <headerComponent    v-if="route_import&&($isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice'))"     :title="'List of clients du route import : '+route_import.libelle"  :add_modal="'addClientModal'"           :add_button="'New Client'"   
+                    <headerComponent    v-if="route_import&&($isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')||$isRole('Viewer'))"     :title="'List of clients du route import : '+route_import.libelle"  :add_modal="'addClientModal'"           :add_button="'New Client'"   
                                                                                                                                                                                                             :update_modal="'updateClientModal'"     :update_button="'Update Client'"    />
                     <!-- Export Data    -->
                     <div class="row w-75">
@@ -324,15 +322,7 @@ export default {
                     this.route_import   =   res.data.route_import
                     this.clients        =   res.data.clients
 
-                    if(this.$isRole("FrontOffice")) {
-
-                        this.datatable_route_import_client_index    =   await this.$DataTableCreateFrontOffice("route_import_client_index")
-                    }
-
-                    else {
-
-                        this.datatable_route_import_client_index    =   await this.$DataTableCreate("route_import_client_index")
-                    }
+                    this.datatable_route_import_client_index    =   await this.$DataTableCreate("route_import_client_index")
                 })
             }
 
@@ -348,7 +338,7 @@ export default {
 
             try {
 
-                if(this.$isRole("Super Admin")||this.$isRole('BU Manager')||this.$isRole("BackOffice")) {
+                if(this.$isRole("Super Admin")||this.$isRole('BU Manager')||this.$isRole("BackOffice")||this.$isRole('Viewer')) {
 
                     let client      =   { lat : 0, lng : 0 }
 
@@ -365,7 +355,7 @@ export default {
 
             try {
 
-                if(this.$isRole("Super Admin")||this.$isRole('BU Manager')||this.$isRole("BackOffice")) {
+                if(this.$isRole("Super Admin")||this.$isRole('BU Manager')||this.$isRole("BackOffice")||this.$isRole('Viewer')) {
 
                     this.$refs.modalClientUpdate.getData(this.selected_row, this.clients)
                 }

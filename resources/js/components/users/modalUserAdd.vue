@@ -40,6 +40,7 @@
                                 <option v-if="$isRole('Super Admin')" value="BU Manager">BU Manager</option>
                                 <option value="BackOffice">BackOffice</option>
                                 <option value="FrontOffice">FrontOffice</option>
+                                <option value="Viewer">Viewer</option>
                             </select>
                         </div>
 
@@ -50,7 +51,7 @@
 
                         <!--  -->
 
-                        <div v-if="(user.type_user  ==  'BackOffice')||(user.type_user  ==  'BU Manager')">
+                        <div v-if="(user.type_user  ==  'Viewer')||(user.type_user  ==  'BackOffice')||(user.type_user  ==  'BU Manager')">
 
                             <div class="mb-3">
                                 <label for="Route Imports"               class="form-label">Route Imports</label>

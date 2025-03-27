@@ -16,65 +16,65 @@
 
                         <div class="mb-3">
                             <label for="CustomerNameE"      class="form-label">CustomerNameE (CustomerNameE)</label>
-                            <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE">
+                            <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE"                          :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                         </div>
 
                         <div class="mb-3">
                             <label for="CustomerNameA"      class="form-label">CustomerNameA (CustomerNameA)</label>
-                            <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA">
+                            <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA"                          :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                         </div>
 
                         <div class="mb-3">
                             <label for="Tel"                class="form-label">Phone Number (Tel)</label>
-                            <input type="text"              class="form-control"        id="Tel"                    v-model="client.Tel">
+                            <input type="text"              class="form-control"        id="Tel"                    v-model="client.Tel"                                    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                         </div>
 
                         <div class="mb-3">
                             <label for="Address"            class="form-label">Address (Address)</label>
-                            <input type="text"              class="form-control"        id="Address"                v-model="client.Address">
+                            <input type="text"              class="form-control"        id="Address"                v-model="client.Address"                                :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                         </div>
 
                         <div class="mb-3">
                             <label for="Neighborhood"       class="form-label">Neighborhood (Neighborhood)</label>
-                            <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood">
+                            <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood"                           :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                         </div>
 
                         <div class="mb-3">
                             <label for="Landmark"           class="form-label">Landmark (Landmark)</label>
-                            <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"></textarea>
+                            <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"                               :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
                         </div>
 
                         <div class="mb-3">
                             <label for="DistrictNo"         class="form-label">DistrictNo (DistrictNo)</label>
-                            <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()">
+                            <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                 <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
                             </select>
                         </div>
 
                         <div class="mb-3">
                             <label for="CityNo"             class="form-label">CityNo (CityNo)</label>
-                            <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo">
+                            <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo"                                 :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                 <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CITYNO}}- {{cite.CityNameE}}</option>
                             </select>
                         </div>
 
-                         <!--  -->
+                        <!--  -->
 
-                        <div v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')"   class="mb-3">
+                        <div class="mb-3">
                             <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
-                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @change="checkClients()">
+                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @change="checkClients()"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                         </div>
 
-                        <div v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')"   class="mb-3">
+                        <div class="mb-3">
                             <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
-                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @change="checkClients()">
+                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @change="checkClients()"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                         </div>
 
                         <!--  -->
 
                         <div class="mb-3">
                             <label for="text"               class="form-label">CustomerType (CustomerType)</label>
-                            <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType">
+                            <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType"                     :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                 <option     :value="'Hypermarché'">Hypermarché</option>
                                 <option     :value="'Supérette'">Supérette</option>
                                 <option     :value="'Alimentation Generale'">Alimentation Generale</option>
@@ -98,7 +98,7 @@
 
                         <div class="mb-3">
                             <label for="text"               class="form-label">BrandAvailability (BrandAvailability)</label>
-                            <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability">
+                            <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability"       :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                 <option     value="0">No</option>
                                 <option     value="1">Yes</option>
                             </select>
@@ -106,11 +106,9 @@
 
                         <div class="mb-3">
                             <label for="text"               class="form-label">BrandSourcePurchase (BrandSourcePurchase)</label>
-                            <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase">
+                            <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                 <option     value="Distribution Direct">Distribution Direct</option>
-                                <option     value="Grossiste Fixe">Grossiste Fixe</option>
-                                <option     value="Grossiste Mobile">Grossiste Mobile</option>
-                                <option     value="Multi Source">Multi Source</option>
+                                <option     value="Distribution Indirect">Distribution Indirect</option>
                                 <option     value="Pas d'achat">Pas d'achat</option>
                             </select>
                         </div>
@@ -119,14 +117,14 @@
 
                         <div class="mb-3">
                             <label for="JPlan"              class="form-label">JPlan (JPlan)</label>
-                            <input type="text"              class="form-control"        id="JPlan"           v-model="client.JPlan">
+                            <input type="text"              class="form-control"        id="JPlan"                  v-model="client.JPlan"                      :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                         </div>
 
                         <!--  -->
 
                         <div class="mb-3">
                             <label for="Journee"            class="form-label">WorkDay (Journee)</label>
-                            <select                         class="form-select"         id="Journee"                 v-model="client.Journee">
+                            <select                         class="form-select"         id="Journee"                v-model="client.Journee"                    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                 <option     :value="'Jour 1'">Samedi 1 (Jour 1)</option>
                                 <option     :value="'Jour 2'">Dimanche 1 (Jour 2)</option>
                                 <option     :value="'Jour 3'">Lundi 1 (Jour 3)</option>
@@ -145,9 +143,9 @@
                         <!--  -->
 
                         <div v-if="client.status_original   ==  'validated'">
-                            <div v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')" class="mb-3">
+                            <div class="mb-3">
                                 <label for="status"             class="form-label">Status</label>
-                                <select                         class="form-select"         id="status"                 v-model="client.status">
+                                <select                         class="form-select"         id="status"                 v-model="client.status"                 :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                     <option value="validated" selected>validated</option>
                                     <option value="nonvalidated" selected>nonvalidated</option>
                                 </select>
@@ -155,31 +153,16 @@
                                 <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
                                     <div class="form-group">
                                         <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
-                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div v-if="$isRole('FrontOffice')" class="mb-3">
-                                <label for="status"             class="form-label">Status</label>
-                                <select                         class="form-select"         id="status"                 v-model="client.status">
-                                    <option value="validated" selected>validated</option>
-                                    <option value="nonvalidated">nonvalidated</option>
-                                </select>
-
-                                <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
-                                    <div class="form-group">
-                                        <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
-                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
+                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <div v-if="((client.status_original   ==  'nonvalidated') || (client.status_original   ==  'pending'))">
-                            <div v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')" class="mb-3">
+                            <div class="mb-3">
                                 <label for="status"             class="form-label">Status</label>
-                                <select                         class="form-select"         id="status"                 v-model="client.status">
+                                <select                         class="form-select"         id="status"                 v-model="client.status"                 :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                     <option value="validated" selected>validated</option>
                                     <option value="pending">pending</option>
                                     <option value="nonvalidated" selected>nonvalidated</option>
@@ -188,22 +171,7 @@
                                 <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
                                     <div class="form-group">
                                         <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
-                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div v-if="$isRole('FrontOffice')" class="mb-3">
-                                <label for="status"             class="form-label">Status</label>
-                                <select                         class="form-select"         id="status"                 v-model="client.status">
-                                    <option value="pending" selected>pending</option>
-                                    <option value="nonvalidated">nonvalidated</option>
-                                </select>
-
-                                <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
-                                    <div class="form-group">
-                                        <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
-                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
+                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -230,7 +198,7 @@
 
                             <div class="mt-1 mb-1 w-100">
                                 <div class="w-100" id="refresh_client_barcode_button">
-                                    <button type="button" class="btn btn-primary w-100"     @click="setBarCodeReader()">Capture QR Code (CustomerCode)</button>
+                                    <button type="button" class="btn btn-primary w-100"     @click="setBarCodeReader()"     :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">Capture QR Code (CustomerCode)</button>
                                 </div>
                             </div>
                         </div>
@@ -239,19 +207,19 @@
 
                         <div class="mb-3">
                             <label for="CustomerBarCode_image_update"   class="form-label">QR Code Image</label>
-                            <input type="file"                          class="form-control"        id="CustomerBarCode_image_update"              accept="image/*"    capture     @change="customerBarCodeImage()">
+                            <input type="file"                          class="form-control"        id="CustomerBarCode_image_update"              accept="image/*"    capture     @change="customerBarCodeImage()"     :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                             <img                                                                    id="CustomerBarCode_image_display_update"      src=""              class="w-100">
                         </div>
 
                         <div class="mb-3">
                             <label for="facade_image_update"    class="form-label">Facade Image (Facade Image)</label>
-                            <input type="file"                  class="form-control"    id="facade_image_update"               accept="image/*"    @change="facadeImage()">
+                            <input type="file"                  class="form-control"    id="facade_image_update"               accept="image/*"    @change="facadeImage()"                                              :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                             <img                                                        id="facade_image_display_update"       src=""              class="w-100">
                         </div>
 
                         <div class="mb-3">
                             <label for="in_store_image_update"  class="form-label">In-Store Image (In-Store Image)</label>
-                            <input type="file"                  class="form-control"    id="in_store_image_update"             accept="image/*"    @change="inStoreImage()">
+                            <input type="file"                  class="form-control"    id="in_store_image_update"             accept="image/*"    @change="inStoreImage()"                                             :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                             <img                                                        id="in_store_image_display_update"     src=""              class="w-100">
                         </div>
 
@@ -259,7 +227,7 @@
 
                         <div class="mb-3">
                             <label      for="comment">Comment</label>
-                            <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"></textarea>
+                            <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
                         </div>
 
                         <!--  -->
@@ -294,7 +262,7 @@
 
                 </div>
 
-                <div class="modal-footer"       style="display: flex; justify-content: space-between;">
+                <div v-if="((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"   class="modal-footer"    style="display: flex; justify-content: space-between;">
                     <div class="left-buttons"   style="display: flex;">
                         <button type="button"   class="btn btn-danger float-left" @click="deleteData()">Delete</button>
                     </div>

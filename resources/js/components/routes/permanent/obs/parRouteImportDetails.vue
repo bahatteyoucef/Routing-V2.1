@@ -20,7 +20,7 @@
                 <div class="row">
 
                     <!-- Map Info -->
-                    <div v-if="(($isRole('Super Admin'))||($isRole('BU Manager'))||($isRole('BackOffice')))" class="col p-0">
+                    <div v-if="(($isRole('Super Admin'))||($isRole('BU Manager'))||($isRole('BackOffice'))||($isRole('Viewer')))" class="col p-0">
                         <div class="map_top_infos_div">
                             <table class="table table-borderless">
 
@@ -50,21 +50,7 @@
                     </div>
 
                     <!-- Toggle -->
-                    <div v-if="(($isRole('Super Admin'))||($isRole('BU Manager'))||($isRole('BackOffice')))" class="col p-0 ml-1">
-                        <div id="toggle_div">
-
-                            <div class="btn-container" id="marker_cluster_mode_div">
-                                <label class="switch btn-color-mode-switch">
-                                    <input type="checkbox" name="marker_cluster_mode" id="marker_cluster_mode" @change="switchMarkerClusterMode()">
-                                    <label for="marker_cluster_mode" data-on="Marker" data-off="Cluster" class="btn-color-mode-switch-inner"></label>
-                                </label>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <!--  -->
-                    <div v-if="$isRole('FrontOffice')" class="col p-0 ml-1">
+                    <div v-if="(($isRole('Super Admin'))||($isRole('BU Manager'))||($isRole('BackOffice'))||($isRole('Viewer')))" class="col p-0 ml-1">
                         <div id="toggle_div">
 
                             <div class="btn-container" id="marker_cluster_mode_div">
@@ -142,9 +128,11 @@
                             <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showUserBDTerritories()">User Territories</button>
                         </div>
 
-                        <div v-if="$isRole('FrontOffice')" class="col-5">
-                            <button class="btn primary w-100 m-0 mt-1"                                                                  @click="showCurrentPosition()">Position</button>
-                            <button class="btn primary w-100 m-0 mt-1"                                                                  @click="addClientFront()">Add Client</button>
+                        <!--  -->
+
+                        <div v-if="($isRole('Viewer'))" class="col-5">
+                            <button class="btn primary w-100 m-0 mt-1"                                                                  @click="focuseMarkers()">Focus</button>
+                            <button class="btn primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#modalResume'"         @click="showResume()">Resume</button>
                         </div>
 
                         <!--  -->

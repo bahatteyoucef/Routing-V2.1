@@ -58,14 +58,14 @@
                             </select>
                         </div>
 
-                         <!--  -->
+                        <!--  -->
 
-                        <div v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')"   class="mb-3">
+                        <div class="mb-3">
                             <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
                             <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @change="checkClients()">
                         </div>
 
-                        <div v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')"   class="mb-3">
+                        <div class="mb-3">
                             <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
                             <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @change="checkClients()">
                         </div>
@@ -108,9 +108,7 @@
                             <label for="text"               class="form-label">BrandSourcePurchase (BrandSourcePurchase)</label>
                             <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase">
                                 <option     value="Distribution Direct">Distribution Direct</option>
-                                <option     value="Grossiste Fixe">Grossiste Fixe</option>
-                                <option     value="Grossiste Mobile">Grossiste Mobile</option>
-                                <option     value="Multi Source">Multi Source</option>
+                                <option     value="Distribution Indirect">Distribution Indirect</option>
                                 <option     value="Pas d'achat">Pas d'achat</option>
                             </select>
                         </div>
@@ -146,26 +144,11 @@
                         <!--  -->
 
                         <div v-if="client.status_original   ==  'validated'">
-                            <div v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')" class="mb-3">
+                            <div class="mb-3">
                                 <label for="status"             class="form-label">Status</label>
                                 <select                         class="form-select"         id="status"                 v-model="client.status">
                                     <option value="validated" selected>validated</option>
                                     <option value="nonvalidated" selected>nonvalidated</option>
-                                </select>
-
-                                <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
-                                    <div class="form-group">
-                                        <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
-                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div v-if="$isRole('FrontOffice')" class="mb-3">
-                                <label for="status"             class="form-label">Status</label>
-                                <select                         class="form-select"         id="status"                 v-model="client.status">
-                                    <option value="validated" selected>validated</option>
-                                    <option value="nonvalidated">nonvalidated</option>
                                 </select>
 
                                 <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
@@ -178,27 +161,12 @@
                         </div>
 
                         <div v-if="((client.status_original   ==  'nonvalidated') || (client.status_original   ==  'pending'))">
-                            <div v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')" class="mb-3">
+                            <div class="mb-3">
                                 <label for="status"             class="form-label">Status</label>
                                 <select                         class="form-select"         id="status"                 v-model="client.status">
                                     <option value="validated" selected>validated</option>
                                     <option value="pending">pending</option>
                                     <option value="nonvalidated" selected>nonvalidated</option>
-                                </select>
-
-                                <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
-                                    <div class="form-group">
-                                        <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
-                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div v-if="$isRole('FrontOffice')" class="mb-3">
-                                <label for="status"             class="form-label">Status</label>
-                                <select                         class="form-select"         id="status"                 v-model="client.status">
-                                    <option value="pending" selected>pending</option>
-                                    <option value="nonvalidated">nonvalidated</option>
                                 </select>
 
                                 <div v-if="client.status    ==  'nonvalidated'" class="mt-3">

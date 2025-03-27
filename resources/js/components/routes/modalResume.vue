@@ -12,7 +12,7 @@
 
                 <div class="modal-body mt-3 table-responsive">
 
-                    <div class="row">
+                    <div v-if="(($isRole('Super Admin'))||($isRole('BU Manager'))||($isRole('BackOffice')))"    class="row">
                         <div class="col-sm-11">
                             <input type="number" class="form-control" placeholder="number of routes"    v-model="nomber_routes"/>
                         </div>
@@ -22,7 +22,7 @@
                         </div>
                     </div>
 
-                    <hr />
+                    <hr v-if="(($isRole('Super Admin'))||($isRole('BU Manager'))||($isRole('BackOffice')))" />
 
                     <div class="mt-5">
 
@@ -94,7 +94,7 @@
                 </div>
 
                 <!-- Footer -->
-                <div class="modal-footer">
+                <div v-if="((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))" class="modal-footer">
                     <button type="button" class="btn btn-primary"   @click="valider()">Confirm</button>
                 </div>
 
@@ -122,7 +122,7 @@ export default {
 
             clients                     :   []      ,
 
-            clients_changed_routes             :   []
+            clients_changed_routes      :   []
         }
     },
 
@@ -1058,29 +1058,31 @@ export default {
                 OptionsDiv.classList.add("row")
                 OptionsDiv.classList.add("justify-content-center")
 
-                var OptionsInput                                =   document.createElement("input")
-                OptionsInput.setAttribute("type", "number")
-                OptionsInput.setAttribute("id"  , "route_"+key)
-                OptionsInput.setAttribute("placeholder" ,   "number of workdays ...")
+                if((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice'))) {
 
-                OptionsInput.classList.add("form-control")
-                OptionsInput.classList.add("w-75")
+                    var OptionsInput                                =   document.createElement("input")
+                    OptionsInput.setAttribute("type", "number")
+                    OptionsInput.setAttribute("id"  , "route_"+key)
+                    OptionsInput.setAttribute("placeholder" ,   "number of workdays ...")
 
-                var OptionsButton                               =   document.createElement("button")
-                OptionsButton.setAttribute("type", "button")
-                OptionsButton.classList.add("btn-primary")
-                OptionsButton.classList.add("btn")
-                OptionsButton.classList.add("mt-1")
-                OptionsButton.classList.add("w-75")
+                    OptionsInput.classList.add("form-control")
+                    OptionsInput.classList.add("w-75")
 
-                OptionsButton.textContent                       =   "Divide"
+                    var OptionsButton                               =   document.createElement("button")
+                    OptionsButton.setAttribute("type", "button")
+                    OptionsButton.classList.add("btn-primary")
+                    OptionsButton.classList.add("btn")
+                    OptionsButton.classList.add("mt-1")
+                    OptionsButton.classList.add("w-75")
 
-                //
+                    OptionsButton.textContent                       =   "Divide"
 
-                OptionsButton.addEventListener("click", ()  =>  {this.decouperClients(key)})
+                    //
+                    OptionsButton.addEventListener("click", ()  =>  {this.decouperClients(key)})
+                    OptionsDiv.appendChild(OptionsInput)
+                    OptionsDiv.appendChild(OptionsButton)
+                }
 
-                OptionsDiv.appendChild(OptionsInput)
-                OptionsDiv.appendChild(OptionsButton)
                 OptionsCell.appendChild(OptionsDiv)
                 customerJourneyPlanRow.appendChild(OptionsCell)
 
