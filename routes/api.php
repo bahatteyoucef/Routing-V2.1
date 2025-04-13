@@ -82,6 +82,15 @@ Route::middleware('auth:api')->group(function () {
         return $willayas;
     });
 
+    Route::post('/route_import/{id_route_import}/districts'  ,   function($id_route_import)  { 
+
+        return  DB::table("RTM_Willaya")
+                    ->join("route_import_districts" , "RTM_Willaya.DistrictNo"          , "route_import_districts.DistrictNo")
+                    ->where('route_import_districts.id_route_import', $id_route_import)
+                    ->orderByRaw('CAST(RTM_Willaya.DistrictNo AS SIGNED INTEGER)')
+                    ->get();
+    });
+
     Route::post('/rtm_willayas'                             ,   function()  { 
 
         return DB::table("RTM_Willaya")->orderByRaw('CAST(DistrictNo AS SIGNED INTEGER)')->get();

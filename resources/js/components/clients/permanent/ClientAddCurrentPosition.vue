@@ -174,7 +174,7 @@
                     <div class="mySlides slide_9 mt-3">
                         <div>
                             <label for="DistrictNo"         class="form-label fw-bold">Willaya</label>
-                            <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     disabled>
+                            <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()">
                                 <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
                             </select>
                         </div>
@@ -380,7 +380,7 @@
                     <!-- GPS -->
                     <div class="mySlides slide_18 mt-3">
                         <div>
-                            <label for="CustomerCode"       class="form-label fw-bold">Detecter la Position Actuel <button class="btn btn-sm" @click.prevent="showPositionOnMap('show_map')"    :disabled="check_gps_clicked"><i class="mdi mdi-reload"></i></button></label>
+                            <label for="CustomerCode"       class="form-label fw-bold">Detecter la Position Actuel <button class="btn btn-sm" @click.prevent="showPositionOnMap('show_map')" :disabled="check_gps_clicked"><i class="mdi mdi-reload"></i></button></label>
                             <p class="text-secondary text-small mb-1">Latitude : {{ client.Latitude }}</p>
                             <p class="text-secondary text-small mb-1">Longitude : {{ client.Longitude }}</p>
 
@@ -547,8 +547,8 @@ export default {
                 comment                                 :   ''
             },
 
-            willayas                :   [],
-            cites                   :   [],
+            willayas                        :   [],
+            cites                           :   [],
 
             //
 
@@ -624,10 +624,6 @@ export default {
         this.client.status      =   "pending"
 
         //
-        this.client.DistrictNo  =   this.getUser.DistrictNo
-        await this.getCites()
-
-        //
         await this.getData()
 
         //
@@ -667,7 +663,7 @@ export default {
                 this.$showLoadingPage()
 
                 // Set Client
-                this.client.DistrictNameE   =   this.getDistrictNameE(this.getUser.DistrictNo)
+                this.client.DistrictNameE   =   this.getDistrictNameE(this.client.DistrictNo)
                 this.client.CityNameE       =   this.getCityNameE(this.client.CityNo)
 
                 let formData = new FormData();
@@ -680,7 +676,7 @@ export default {
                 formData.append("Address"                               ,   this.client.Address)
                 formData.append("Neighborhood"                          ,   this.client.Neighborhood)
                 formData.append("Landmark"                              ,   this.client.Landmark)
-                formData.append("DistrictNo"                            ,   this.getUser.DistrictNo)
+                formData.append("DistrictNo"                            ,   this.client.DistrictNo)
                 formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
                 formData.append("CityNo"                                ,   this.client.CityNo)
                 formData.append("CityNameE"                             ,   this.client.CityNameE)
@@ -810,8 +806,10 @@ export default {
 
             if(this.getIsOnline) {
 
-                const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
+                const res_3                     =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/districts"         ,   null)
                 this.willayas                   =   res_3.data
+
+                console.log(res_3.data)
             }
 
             else {
@@ -827,7 +825,7 @@ export default {
                 // Show Loading Page
                 this.$showLoadingPage()
 
-                const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.getUser.DistrictNo+"/rtm_cites"         ,   null)
+                const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
                 this.cites                      =   res_3.data
 
                 this.client.CityNo              =   ""
@@ -841,7 +839,7 @@ export default {
                 // Show Loading Page
                 this.$showLoadingPage()
 
-                let willaya                     =   await this.$indexedDB.$getWillaya(this.getUser.DistrictNo)
+                let willaya                     =   await this.$indexedDB.$getWillaya(this.client.DistrictNo)
 
                 this.cites                      =   willaya.cites
 
@@ -1521,7 +1519,7 @@ export default {
             // Slide 9
             if(this.slideIndex  ==  9) {
 
-                if(this.getUser.DistrictNo !==  "") {
+                if(this.client.DistrictNo !==  "") {
 
                     return true;
                 }

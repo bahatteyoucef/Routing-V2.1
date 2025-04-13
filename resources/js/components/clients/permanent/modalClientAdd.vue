@@ -15,44 +15,44 @@
                     <form>
 
                         <div class="mb-3">
-                            <label for="CustomerNameE"      class="form-label">CustomerNameE (CustomerNameE)</label>
+                            <label for="CustomerNameE"      class="form-label">Nom et Prénom de l'Acheteur</label>
                             <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE">
                         </div>
 
                         <div class="mb-3">
-                            <label for="CustomerNameA"      class="form-label">CustomerNameA (CustomerNameA)</label>
+                            <label for="CustomerNameA"      class="form-label">Raison Sociale</label>
                             <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA">
                         </div>
 
                         <div class="mb-3">
-                            <label for="Tel"                class="form-label">Phone Number (Tel)</label>
+                            <label for="Tel"                class="form-label">Téléphone</label>
                             <input type="text"              class="form-control"        id="Tel"                    v-model="client.Tel">
                         </div>
 
                         <div class="mb-3">
-                            <label for="Address"            class="form-label">Address (Address)</label>
+                            <label for="Address"            class="form-label">Adresse</label>
                             <input type="text"              class="form-control"        id="Address"                v-model="client.Address">
                         </div>
 
                         <div class="mb-3">
-                            <label for="Neighborhood"       class="form-label">Neighborhood (Neighborhood)</label>
+                            <label for="Neighborhood"       class="form-label">Quartier</label>
                             <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood">
                         </div>
 
                         <div class="mb-3">
-                            <label for="Landmark"           class="form-label">Landmark (Landmark)</label>
+                            <label for="Landmark"           class="form-label">Point de Repere</label>
                             <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"></textarea>
                         </div>
 
                         <div class="mb-3">
-                            <label for="DistrictNo"         class="form-label">DistrictNo (DistrictNo)</label>
+                            <label for="DistrictNo"         class="form-label">Willaya</label>
                             <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()">
                                 <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
                             </select>
                         </div>
 
                         <div class="mb-3">
-                            <label for="CityNo"             class="form-label">CityNo (CityNo)</label>
+                            <label for="CityNo"             class="form-label">Commune</label>
                             <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo">
                                 <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CITYNO}}- {{cite.CityNameE}}</option>
                             </select>
@@ -61,19 +61,19 @@
                         <!--  -->
                          
                         <div class="mb-3">
-                            <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
+                            <label for="Latitude"           class="form-label">Latitude</label>
                             <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @change="checkClients()">
                         </div>
 
                         <div class="mb-3">
-                            <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
+                            <label for="Longitude"          class="form-label">Longitude</label>
                             <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @change="checkClients()">
                         </div>
 
                         <!--  -->
 
                         <div class="mb-3">
-                            <label for="text"               class="form-label">CustomerType (CustomerType)</label>
+                            <label for="text"               class="form-label">Type de Magasin</label>
                             <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType">
                                 <option     :value="'Hypermarché'">Hypermarché</option>
                                 <option     :value="'Supérette'">Supérette</option>
@@ -97,7 +97,7 @@
                         <!--  -->
 
                         <div class="mb-3">
-                            <label for="text"               class="form-label">BrandAvailability (BrandAvailability)</label>
+                            <label for="text"               class="form-label">Disponibilité Produits</label>
                             <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability">
                                 <option     value="0">No</option>
                                 <option     value="1">Yes</option>
@@ -105,7 +105,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="text"               class="form-label">BrandSourcePurchase (BrandSourcePurchase)</label>
+                            <label for="text"               class="form-label">Source d'Achat</label>
                             <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase">
                                 <option     value="Distribution Direct">Distribution Direct</option>
                                 <option     value="Distribution Indirect">Distribution Indirect</option>
@@ -116,14 +116,14 @@
                         <!--  -->
 
                         <div class="mb-3">
-                            <label for="JPlan"              class="form-label">JPlan (JPlan)</label>
+                            <label for="JPlan"              class="form-label">Nom de Vendeur</label>
                             <input type="text"              class="form-control"        id="JPlan"                  v-model="client.JPlan">
                         </div>
 
                         <!--  -->
                         
                         <div class="mb-3">
-                            <label for="Journee"            class="form-label">WorkDay (Journee)</label>
+                            <label for="Journee"            class="form-label">Journee</label>
 
                             <select                         class="form-select"         id="Journee"                 v-model="client.Journee">
                                 <option     :value="'Jour 1'">Samedi 1 (Jour 1)</option>
@@ -172,7 +172,7 @@
 
                             <div v-show="client.CustomerCode   !=  ''"     class="mt-1 p-0">
                                 <div    id="customerCode_value"              class="text-center">
-                                    <span class="">QR Code (CustomerCode) : {{ client.CustomerCode }}</span>
+                                    <span class="">Code-Barre : {{ client.CustomerCode }}</span>
                                 </div>
                             </div>
 
@@ -180,25 +180,25 @@
 
                             <div class="mt-1 mb-1 w-100">
                                 <div class="w-100" id="refresh_client_barcode_button">
-                                    <button type="button" class="btn btn-primary w-100"     @click="setBarCodeReader()">Capture QR Code (CustomerCode)</button>
+                                    <button type="button" class="btn btn-primary w-100"     @click="setBarCodeReader()">Capturer Code-Barre</button>
                                 </div>
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="CustomerBarCode_image"    class="form-label">QR Code Image</label>
+                            <label for="CustomerBarCode_image"    class="form-label">Image Code-Barre</label>
                             <input type="file"              class="form-control"        id="CustomerBarCode_image"              accept="image/*"    capture     @change="customerBarCodeImage()">
                             <img                                                        id="CustomerBarCode_image_display"      src=""              class="w-100">
                         </div>
 
                         <div class="mb-3">
-                            <label for="facade_image_add"   class="form-label">Facade Image (Facade Image)</label>
+                            <label for="facade_image_add"   class="form-label">Image Facade</label>
                             <input type="file"              class="form-control"        id="facade_image_add"           accept="image/*"    @change="facadeImage()">
                             <img                                                        id="facade_image_display_add"       src=""              class="w-100">
                         </div>
 
                         <div class="mb-3">
-                            <label for="in_store_image_add" class="form-label">In-Store Image (In-Store Image)</label>
+                            <label for="in_store_image_add" class="form-label">Image In-Store</label>
                             <input type="file"              class="form-control"        id="in_store_image_add"             accept="image/*"    @change="inStoreImage()">
                             <img                                                        id="in_store_image_display_add"     src=""              class="w-100">
                         </div>
@@ -206,7 +206,7 @@
                         <!--  -->
 
                         <div class="mb-3">
-                            <label      for="comment">Comment</label>
+                            <label      for="comment">Commentaire</label>
                             <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"></textarea>
                         </div>
 

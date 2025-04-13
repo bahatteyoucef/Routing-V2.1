@@ -66,12 +66,10 @@ export default {
 
                 RegionNo                        : '',
                 DistrictNo                      : '',
-                DistrictNo                          : '',
                 CityNo                          : '',
                 Address                         : '',
 
                 DistrictNameE                   : '',
-                DistrictNameE                       : '',
                 CityNameE                       : '',
                 AddressA                        : '',
 
@@ -135,7 +133,6 @@ export default {
                 this.client.CustomerNameA                 =   res.data.CustomerNameA                              
 
                 this.client.RegionNo                      =   res.data.RegionNo
-                this.client.DistrictNo                    =   res.data.DistrictNo
                 this.client.DistrictNo                    =   res.data.DistrictNo
                 this.client.CityNo                        =   res.data.CityNo
                 this.client.Address                       =   res.data.Address

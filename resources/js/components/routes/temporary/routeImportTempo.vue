@@ -37,8 +37,10 @@
                             </div>
 
                             <div class="col-4">
-                                <label for="District"       class="form-label">District</label>
-                                <input type="text"          class="form-control"        id="District"       v-model="route_import.District"     disabled="disabled">
+                                <label for="districts"       class="form-label">districts</label>
+                                <ul>
+                                    <li class="list-item" v-for="district in route_import.districts" :key="district">{{ district.DistrictNo }}- {{ district.DistrictNameE }}</li>
+                                </ul>
                             </div>
                         </form>
 
@@ -182,7 +184,7 @@ export default {
             route_import    : {
 
                 libelle                     :   "",
-                District                    :   "",
+                districts                   :   [],
                 file                        :   "",
                 file_original_name          :   "",
 
@@ -277,9 +279,9 @@ export default {
                         this.route_import.libelle                                   =   res.data.libelle
                     }
 
-                    if(typeof res.data.District             !=  "undefined") {
+                    if(typeof res.data.districts             !=  "undefined") {
 
-                        this.route_import.District                                  =   res.data.District
+                        this.route_import.districts                                 =   res.data.districts
                     }
 
                     if(typeof res.data.file                 !=  "undefined") {

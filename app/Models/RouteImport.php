@@ -65,6 +65,7 @@ class RouteImport extends Model
 
     public static function indexRouteImports()
     {
+
         $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
 
         return $liste_route_import;
@@ -87,7 +88,7 @@ class RouteImport extends Model
 
         $validator = Validator::make($request->all(), [
             'libelle'                   =>  ["required", "max:255"                  ],
-            'District'                  =>  ["required"                             ],
+            'districts'                 =>  ["required"                             ],
             'new_upload'                =>  ["required"                             ],
             'data'                      =>  ["required", "json"                     ]
         ]);
@@ -110,7 +111,6 @@ class RouteImport extends Model
 
         $route_import   =   new RouteImport([
             'libelle'       =>  $request->input('libelle')  ,
-            'District'      =>  $request->input('District') ,
             'owner'         =>  Auth::user()->id
         ]);
 
@@ -168,6 +168,23 @@ class RouteImport extends Model
         }
 
         $route_import->save();
+
+        //  //  //  //  //
+
+        $districts      =   json_decode($request->get("districts"));   
+
+        foreach ($districts as $district) {
+
+            $route_import_district  =   new RouteImportDistrict([
+                'DistrictNo'            =>  $district           ,
+                'id_route_import'       =>  $route_import->id   ,
+                'owner'                 =>  Auth::user()->id
+            ]);
+
+            $route_import_district->save();
+        }
+
+        //  //  //  //  //
 
         // Store Data
         RouteImport::storeData($request, $route_import->id);
@@ -420,18 +437,19 @@ class RouteImport extends Model
 
         foreach ($clients as $client) {
 
-            $filePath   =   public_path('uploads/clients/'.$client->id);  
+            // $filePath   =   public_path('uploads/clients/'.$client->id);  
 
-            if (File::exists($filePath)) {
+            // if (File::exists($filePath)) {
 
-                File::deleteDirectory($filePath);
-            }
+            //     File::deleteDirectory($filePath);
+            // }
 
             $client->delete();
         }
 
         //
 
+        RouteImportDistrict::where("id_route_import", $id)->get();
         JourneyPlan::where("id_route_import", $id)->delete();
         Journee::where("id_route_import", $id)->delete();
     }

@@ -15,6 +15,7 @@ use Illuminate\Validation\Rules;
 
 use App\Models\Role;
 use App\Models\RouteImport;
+use App\Models\RouteImportDistrict;
 use App\Models\UserRouteImport;
 use App\Models\UserTerritory;
 use Exception;
@@ -64,20 +65,20 @@ class UserController extends Controller
 
                         //
                         $user->id_route_import  =   $route_import->id;
-                        $user->DistrictNo       =   $route_import->District;
+                        $user->districts        =   RouteImportDistrict::where('id_route_import', $user_route_import->id_route_import)->pluck('DistrictNo');
                     }
 
                     else {
 
                         $user->id_route_import  =   null;
-                        $user->DistrictNo       =   null;
+                        $user->districts        =   [];
                     }
                 }
 
                 else {
 
                     $user->id_route_import  =   null;
-                    $user->DistrictNo       =   null;
+                    $user->districts        =   [];
                 }
 
                 //

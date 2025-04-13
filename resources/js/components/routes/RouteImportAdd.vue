@@ -29,10 +29,20 @@
                             </div>
 
                             <div class="col-3">
-                                <label for="District"       class="form-label">District</label>
-                                <select                     class="form-select"     id="District"   v-model="route_import.District">
-                                    <option v-for="district in districts" :key="district.DistrictNo" :value="district.DistrictNo">{{district.DistrictNo}}- {{district.DistrictNameE}}</option>
-                                </select>
+                                <label for="Districts"      class="form-label">Districts</label>
+
+                                <!-- Journey Plan   -->
+                                <Multiselect
+                                    v-model             =   "route_import.districts"
+                                    :options            =   "districts"
+                                    mode                =   "tags"
+                                    placeholder         =   "Select Districts"
+
+                                    :close-on-select    =   "false"
+                                    :searchable         =   "true"
+                                    :create-option      =   "true"
+                                />
+                                <!--                -->
                             </div>
 
                             <div class="col-2 mt-auto">
@@ -49,9 +59,16 @@
 
 <script>
 
-import * as XLSX from "xlsx";
+import * as XLSX    from "xlsx";
+
+import Multiselect  from "@vueform/multiselect"
 
 export default {
+
+    components : {
+
+        Multiselect
+    },
 
     data() {
 
@@ -62,7 +79,7 @@ export default {
                 libelle                     :   "",
                 file                        :   "",
                 file_original_name          :   "",
-                District                    :   "",
+                districts                   :   [],
 
                 id_route_import_tempo       :   null,
                 file_route_import_tempo     :   null,
@@ -75,9 +92,9 @@ export default {
 
             clients                             :   ""      ,
 
+            districts_full                      :   []      ,
             districts                           :   []
         }
-
     },
 
     async mounted() {
@@ -176,9 +193,14 @@ export default {
 
         async getComboData() {
 
-            const res       =   await this.$callApi("post",     "/rtm_willayas",    null)
+            const res           =   await this.$callApi("post",     "/rtm_willayas",    null)
 
-            this.districts  =   res.data
+            this.districts_full =   res.data
+
+            for (let index = 0; index < this.districts_full.length; index++) {
+
+                this.districts.push({ value : this.districts_full[index].DistrictNo, label : this.districts_full[index].DistrictNo  +   '- '    +   this.districts_full[index].DistrictNameE })      
+            }
         },
 
         //
@@ -466,7 +488,7 @@ export default {
                 let formData = new FormData();
 
                 formData.append("libelle"   ,   this.route_import.libelle)
-                formData.append("District"  ,   this.route_import.District)
+                formData.append("districts" ,   JSON.stringify(this.route_import.districts))
                 formData.append("file"      ,   this.route_import.file)
                 formData.append("data"      ,   JSON.stringify(this.clients))
 

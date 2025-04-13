@@ -176,11 +176,11 @@ class Client extends Model
 
             foreach ($clients as $client) {
 
-                $directory = public_path('uploads/clients/' . $client->id);
+                // $directory = public_path('uploads/clients/' . $client->id);
 
-                if (File::exists($directory)) {
-                    File::deleteDirectory($directory); // Delete the entire directory
-                }
+                // if (File::exists($directory)) {
+                //     File::deleteDirectory($directory); // Delete the entire directory
+                // }
 
                 $client->delete(); // Delete client record
             }
@@ -479,7 +479,7 @@ class Client extends Model
 
         if($client) {
 
-            $client->CustomerCode                   =   $request->get("CustomerCode")               ;
+            $client->CustomerCode                   =   $request->get("CustomerCode")           ;
             $client->CustomerNameE                  =   mb_strtoupper($request->get("CustomerNameE"), 'UTF-8')  ;
             $client->CustomerNameA                  =   mb_strtoupper($request->get("CustomerNameA"), 'UTF-8')  ;
             $client->Latitude                       =   $request->get("Latitude")               ;
@@ -827,12 +827,12 @@ class Client extends Model
 
         $client     =   Client::find($id);
 
-        $directory  =   public_path('uploads/clients/'.$client->id);
+        // $directory  =   public_path('uploads/clients/'.$client->id);
 
-        if (File::exists($directory)) {
+        // if (File::exists($directory)) {
 
-            File::deleteDirectory($directory);
-        }
+        //     File::deleteDirectory($directory);
+        // }
 
         $client->delete();
     }

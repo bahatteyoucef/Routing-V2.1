@@ -97,10 +97,10 @@ class Statistic extends Model
         $route_links                =   json_decode($request->get("route_links"));
                 
         //
-        $cities                     =   DB::table("route_import")
+        $cities                     =   DB::table("RTM_City")
                                             ->select("RTM_City.*"   , "RTM_City.CITYNO as CityNo")
-                                            ->join("RTM_City"       , "route_import.District"  , "RTM_City.DistrictNo")
-                                            ->whereIn('route_import.id', $route_links)
+                                            ->join("route_import_districts"       , "RTM_City.DistrictNo"  , "route_import_districts.DistrictNo")
+                                            ->whereIn('route_import_districts.id_route_import', $route_links)
                                             ->distinct("RTM_City.CITYNO")
                                             ->get();
 
@@ -945,15 +945,11 @@ class Statistic extends Model
         //
 
         //
-        $cities         =   DB::table("route_import")
+        $cities         =   DB::table("RTM_City")
                                 ->select("RTM_City.*"   , "RTM_City.CITYNO as CityNo")
-
-                                ->join("RTM_City"       , "route_import.District"  , "RTM_City.DistrictNo")
-
-                                ->whereIn('route_import.id', $route_links)
-
+                                ->join("route_import_districts"       , "RTM_City.DistrictNo"  , "route_import_districts.DistrictNo")
+                                ->whereIn('route_import_districts.id_route_import', $route_links)
                                 ->distinct("RTM_City.CITYNO")
-
                                 ->get();
 
         //

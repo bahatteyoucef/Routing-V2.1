@@ -157,7 +157,9 @@ export default {
             let formData = new FormData();
 
             formData.append("libelle"   ,   this.$parent.route_import.libelle)
-            formData.append("District"  ,   this.$parent.route_import.District)
+
+            let districts               =   this.$parent.route_import.districts.map(district => district.DistrictNo)
+            formData.append("districts" ,   JSON.stringify(districts))
 
             if(this.$parent.route_import.new_upload ==  true) {
 

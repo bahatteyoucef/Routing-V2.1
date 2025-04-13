@@ -172,7 +172,7 @@
                     <div class="mySlides slide_9 mt-3">
                         <div>
                             <label for="DistrictNo"         class="form-label fw-bold">Willaya</label>
-                            <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     disabled>
+                            <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()">
                                 <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
                             </select>
                         </div>
@@ -489,7 +489,6 @@ export default {
                 Neighborhood        :   '',
                 Landmark            :   '',
 
-                DistrictNo_original :   '',
                 DistrictNo          :   '',
                 DistrictNameE       :   '',
 
@@ -628,7 +627,7 @@ export default {
                 if(typeof this.willayas != "undefined") {
 
                     // Set Client
-                    this.client.DistrictNameE   =   this.getDistrictNameE(this.client.DistrictNo_original)
+                    this.client.DistrictNameE   =   this.getDistrictNameE(this.client.DistrictNo)
                 }
 
                 if(typeof this.cites != "undefined") {
@@ -649,7 +648,7 @@ export default {
                 formData.append("Neighborhood"                          ,   this.client.Neighborhood)
                 formData.append("Landmark"                              ,   this.client.Landmark)
 
-                formData.append("DistrictNo"                            ,   this.client.DistrictNo_original)
+                formData.append("DistrictNo"                            ,   this.client.DistrictNo)
                 formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
                 formData.append("CityNo"                                ,   this.client.CityNo)
                 formData.append("CityNameE"                             ,   this.client.CityNameE)
@@ -754,7 +753,6 @@ export default {
                 this.client.Neighborhood        =   '',
                 this.client.Landmark            =   '',
 
-                this.client.DistrictNo_original =   '',
                 this.client.DistrictNo          =   '',
                 this.client.DistrictNameE       =   '',
 
@@ -843,7 +841,6 @@ export default {
                 this.client.Neighborhood                            =   client.Neighborhood
                 this.client.Landmark                                =   client.Landmark
 
-                this.client.DistrictNo_original                     =   client.DistrictNo
                 this.client.DistrictNo                              =   client.DistrictNo
                 this.client.DistrictNameE                           =   client.DistrictNameE
 
@@ -932,7 +929,7 @@ export default {
 
             if(this.getIsOnline) {
 
-                const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
+                const res_3                     =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/districts" ,   null)
                 this.willayas                   =   res_3.data
             }
 
@@ -949,7 +946,7 @@ export default {
                 // Show Loading Page
                 this.$showLoadingPage()
 
-                const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo_original+"/rtm_cites"         ,   null)
+                const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
                 this.cites                      =   res_3.data
 
                 this.client.CityNo              =   ""
@@ -963,7 +960,7 @@ export default {
                 // Show Loading Page
                 this.$showLoadingPage()
 
-                let willaya                         =   await this.$indexedDB.$getWillaya(this.client.DistrictNo_original)
+                let willaya                         =   await this.$indexedDB.$getWillaya(this.client.DistrictNo)
 
                 if(willaya) {
 
@@ -1499,6 +1496,9 @@ export default {
 
                     //
                     this.checkGPS(map_id)
+
+                    //
+                    this.check_gps_clicked              =   false
                 }
             }
         },
@@ -1800,7 +1800,7 @@ export default {
             // Slide 9
             if(this.slideIndex  ==  9) {
 
-                if(this.client.DistrictNo_original !==  "") {
+                if(this.client.DistrictNo !==  "") {
 
                     return true;
                 }
