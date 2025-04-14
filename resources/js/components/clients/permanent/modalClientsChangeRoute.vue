@@ -57,6 +57,7 @@
                                     <option value="validated" selected>validated</option>
                                     <option value="pending">pending</option>
                                     <option value="nonvalidated">nonvalidated</option>
+                                    <option value="visible">visible</option>
                                 </select>
                             </div>
 
@@ -210,6 +211,7 @@
                                     <span v-if="client.status=='nonvalidated'"  href="#" class="badge badge-danger">{{client.status}}</span>
                                     <span v-if="client.status=='pending'"       href="#" class="badge badge-warning">{{client.status}}</span>
                                     <span v-if="client.status=='validated'"     href="#" class="badge badge-success">{{client.status}}</span>
+                                    <span v-if="client.status=='visible'"       href="#" class="badge badge-info">{{client.status}}</span>
                                 </td>
 
                                 <td>{{client.owner_name}}</td>

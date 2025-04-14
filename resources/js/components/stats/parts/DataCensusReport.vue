@@ -91,6 +91,7 @@
                             <span v-if="row.status=='nonvalidated'"  href="#" class="badge badge-danger">{{row.status}}</span>
                             <span v-if="row.status=='pending'"       href="#" class="badge badge-warning">{{row.status}}</span>
                             <span v-if="row.status=='validated'"     href="#" class="badge badge-success">{{row.status}}</span>
+                            <span v-if="row.status=='visible'"       href="#" class="badge badge-info">{{row.status}}</span>
                         </td>
 
                         <td>{{ row.CustomerType }}</td>

@@ -82,7 +82,7 @@ class Client extends Model
                 'comment'               =>  ""                                      ,
 
                 'id_route_import'       =>  $id_route_import                        ,
-                'status'                =>  "nonvalidated"                          ,
+                'status'                =>  "visible"                               ,
                 'nonvalidated_details'  =>  ""                                      ,
                 'created_at'            =>  1,
                 'owner'                 =>  Auth::user()->id
@@ -470,6 +470,8 @@ class Client extends Model
 
         //
 
+        //
+
         return $validator;
     }
 
@@ -500,6 +502,11 @@ class Client extends Model
             $client->comment                        =   $request->input("comment")              ;
 
             $client->id_route_import                =   $id_route_import                        ;
+
+            if(Auth::user()->hasRole('FrontOffice')) {
+
+                $client->owner                          =   Auth::user()->id                    ;
+            }
 
             //
 
@@ -687,6 +694,7 @@ class Client extends Model
                 $client->nonvalidated_details      =   "";
             }
 
+            //
             $client->save();
         }
 
@@ -727,6 +735,8 @@ class Client extends Model
         if($client) {
 
             $client->status         =   "validated";
+            $client->owner          =   Auth::user()->id;
+
             $client->save();
         }
     }
@@ -763,6 +773,9 @@ class Client extends Model
                 $client->Journee                    =   "";
             }
 
+            //
+            $client->owner  =   Auth::user()->id;
+
             $client->save();
         }
     }
@@ -796,6 +809,8 @@ class Client extends Model
             $client->Landmark                   =   $client_tempo->Landmark;
             $client->BrandAvailability          =   $client_tempo->BrandAvailability;
             $client->BrandSourcePurchase        =   $client_tempo->BrandSourcePurchase;
+
+            $client->owner                      =   $client_tempo->owner;
 
             if($client_tempo->JPlan     !=  null) {
     
@@ -874,6 +889,16 @@ class Client extends Model
         if($request->get("status") ==  "NonValidated") {
 
             $clients    =   Client::where([["status", "nonvalidated"] , ["id_route_import", $request->get("id_route_import")]])
+                                ->select("clients.*", "users.nom as owner")
+                                ->join("users", "clients.owner", "users.id")
+                                ->orderBy('clients.id', 'desc')
+                                ->get()
+                                ->makeHidden(['id_route_import']);
+        }
+
+        if($request->get("status") ==  "Visible") {
+
+            $clients    =   Client::where([["status", "visible"]    , ["id_route_import", $request->get("id_route_import")]])
                                 ->select("clients.*", "users.nom as owner")
                                 ->join("users", "clients.owner", "users.id")
                                 ->orderBy('clients.id', 'desc')

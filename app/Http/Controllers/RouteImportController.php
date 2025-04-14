@@ -457,12 +457,12 @@ class RouteImportController extends Controller
 
     //
 
-    public function obsDetailsRouteImportByOwner(int $id)
+    public function obsDetailsRouteImportFrontOffice(int $id)
     {
 
         try {
 
-            $route_import       =   RouteImport::obsDetailsRouteImportByOwner($id);
+            $route_import       =   RouteImport::obsDetailsRouteImportFrontOffice($id);
             // $willayas           =   RTMWillaya::index();
 
             return response()->json([

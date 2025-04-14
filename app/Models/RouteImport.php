@@ -510,13 +510,22 @@ class RouteImport extends Model
         return $route_import;
     }
 
-    public static function obsDetailsRouteImportByOwner(string $id)
+    public static function obsDetailsRouteImportFrontOffice(string $id)
     {
 
         $route_import           =   RouteImport::find($id);
 
-        $route_import->data     =   Client::where([["id_route_import", $id], ["clients.owner", Auth::user()->id]])->join('users', 'clients.owner', '=', 'users.id')->select('clients.*', 'users.nom as owner_name')->get();   
+        $route_import->data     =   Client::query()
+                                        ->where('clients.id_route_import', $id)
+                                        ->where(function($q) {
+                                            $q->where('clients.owner'   , Auth::user()->id)
+                                            ->orWhere('clients.status'  , 'visible');
+                                        })
+                                        ->join('users', 'clients.owner', '=', 'users.id')
+                                        ->select('clients.*', 'users.nom as owner_name')
+                                        ->get();
 
+        //
         return $route_import;
     }
 
@@ -982,15 +991,19 @@ class RouteImport extends Model
 
     public static function clientsByStatus(Request $request, int $id_route_import) {
 
-        $clients        =   Client::where([
-                                ["clients.id_route_import"  ,   $id_route_import],
-                                ["clients.owner"            ,   Auth::user()->id],
-                                ["clients.status"           ,   $request->get("status")]
-                                ])
+        $clients        =   Client::query()
+                                ->where('clients.id_route_import'   , $id_route_import)
+                                ->where('clients.status'            , $request->get('status'))
+                                ->when(
+                                    $request->get('status') !== 'visible',
+                                    fn($q) => $q->where('clients.owner', Auth::id()),       // if true
+                                    fn($q) => $q                                            // if false
+                                )
                                 ->join('users', 'clients.owner', '=', 'users.id')
                                 ->select('clients.*', 'users.nom as owner_name')
                                 ->get();
 
+        //
         return $clients;
     }
 

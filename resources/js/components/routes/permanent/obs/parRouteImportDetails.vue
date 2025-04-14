@@ -437,6 +437,7 @@
                                 <span v-if="client.status=='nonvalidated'"  href="#" class="badge badge-danger">{{client.status}}</span>
                                 <span v-if="client.status=='pending'"       href="#" class="badge badge-warning">{{client.status}}</span>
                                 <span v-if="client.status=='validated'"     href="#" class="badge badge-success">{{client.status}}</span>
+                                <span v-if="client.status=='visible'"       href="#" class="badge badge-info">{{client.status}}</span>
                             </td>
 
                             <td>{{client.owner_name}}</td>

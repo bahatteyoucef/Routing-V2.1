@@ -20,6 +20,7 @@
                                 <option     :value="'validated'">Validé</option>
                                 <option     :value="'pending'">en Attente</option>
                                 <option     :value="'nonvalidated'">Refusé</option>
+                                <option     :value="'visible'">Visible</option>
                             </select>
                         </div>
                     </div>
@@ -75,6 +76,10 @@
 
                                     <div v-if="client.status    ==  'nonvalidated'"     class="badge badge-danger mt-1 mb-1">
                                         Refusé
+                                    </div>
+
+                                    <div v-if="client.status    ==  'visible'"          class="badge badge-info mt-1 mb-1">
+                                        Visible
                                     </div>
                                 </div>
 

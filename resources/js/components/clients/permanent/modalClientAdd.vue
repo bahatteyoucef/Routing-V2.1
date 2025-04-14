@@ -149,6 +149,7 @@
                                 <option value="validated" selected>validated</option>
                                 <option value="pending">pending</option>
                                 <option value="nonvalidated">nonvalidated</option>
+                                <option value="visible">visible</option>
                             </select>
 
                             <div v-if="client.status    ==  'nonvalidated'" class="mt-3">

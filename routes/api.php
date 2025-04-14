@@ -219,7 +219,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/clients/resume/update'                                                                ,   [ClientController::class                , 'updateResumeClients'                     ]);
 
     Route::post('/route/obs/route_import/{id}/details'                                                  ,   [RouteImportController::class           , 'obsDetailsRouteImport'                   ]);
-    Route::post('/route/obs/route_import/{id}/details/by_owner'                                         ,   [RouteImportController::class           , 'obsDetailsRouteImportByOwner'            ]);
+    Route::post('/route/obs/route_import/{id}/details/for_front_office'                                 ,   [RouteImportController::class           , 'obsDetailsRouteImportFrontOffice'        ]);
 
     //
 

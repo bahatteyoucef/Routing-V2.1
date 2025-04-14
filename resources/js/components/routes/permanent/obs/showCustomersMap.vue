@@ -176,6 +176,7 @@
                                 <span v-if="client.status=='nonvalidated'"  href="#" class="badge badge-danger">{{client.status}}</span>
                                 <span v-if="client.status=='pending'"       href="#" class="badge badge-warning">{{client.status}}</span>
                                 <span v-if="client.status=='validated'"     href="#" class="badge badge-success">{{client.status}}</span>
+                                <span v-if="client.status=='visible'"       href="#" class="badge badge-info">{{client.status}}</span>
                             </td>
 
                         </tr>
@@ -274,10 +275,11 @@ export default {
                 lng :   0
             },
 
-            clients_non_owner               :   [],
+            // clients_non_owner               :   [],
             clients_owner_validated         :   [],
             clients_owner_pending           :   [],
-            clients_owner_non_validated     :   []
+            clients_owner_non_validated     :   [],
+            clients_owner_visible           :   []
         }
     },  
 
@@ -1516,31 +1518,34 @@ export default {
 
             this.setClientsArrays()
 
-            this.$map.$setRouteMarkers(this.clients_non_owner               , 1, "#000000")
+            // this.$map.$setRouteMarkers(this.clients_non_owner               , 1, "#000000")
 
             this.$map.$setRouteMarkers(this.clients_owner_validated         , 2, "#0F9D58")
 
             this.$map.$setRouteMarkers(this.clients_owner_pending           , 3, "#F57C00")
 
             this.$map.$setRouteMarkers(this.clients_owner_non_validated     , 4, "#F70000")
+
+            this.$map.$setRouteMarkers(this.clients_owner_visible           , 5, "#0288D1")
         },
 
         setClientsArrays() {
 
-            this.clients_non_owner               =   []
+            // this.clients_non_owner               =   []
             this.clients_owner_validated         =   []
             this.clients_owner_pending           =   []
             this.clients_owner_non_validated     =   []
+            this.clients_owner_visible           =   []
 
             for (let i = 0; i < this.route_import.clients.length; i++) {
 
                 // Black
-                if(this.route_import.clients[i].owner   !=  this.getUser.id) {
+                // if(this.route_import.clients[i].owner   !=  this.getUser.id) {
 
-                    this.clients_non_owner.push(this.route_import.clients[i])
-                }
+                //     this.clients_non_owner.push(this.route_import.clients[i])
+                // }
 
-                else {
+                // else {
 
                     if(this.route_import.clients[i].status == "validated") {
 
@@ -1560,9 +1565,17 @@ export default {
 
                                 this.clients_owner_non_validated.push(this.route_import.clients[i])
                             }
+
+                            else {
+
+                                if(this.route_import.clients[i].status == "visible") {
+
+                                    this.clients_owner_visible.push(this.route_import.clients[i])
+                                }
+                            }
                         }
                     }
-                }
+                // }
             }
         },        
 

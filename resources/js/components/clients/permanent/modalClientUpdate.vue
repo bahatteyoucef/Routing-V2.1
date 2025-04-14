@@ -142,12 +142,14 @@
 
                         <!--  -->
 
+                        <!-- 
                         <div v-if="client.status_original   ==  'validated'">
                             <div class="mb-3">
                                 <label for="status"             class="form-label">Status</label>
                                 <select                         class="form-select"         id="status"                 v-model="client.status"                 :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                     <option value="validated" selected>validated</option>
-                                    <option value="nonvalidated" selected>nonvalidated</option>
+                                    <option value="nonvalidated">nonvalidated</option>
+                                    <option value="visible">visible</option>
                                 </select>
 
                                 <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
@@ -158,24 +160,26 @@
                                 </div>
                             </div>
                         </div>
+                        -->
 
-                        <div v-if="((client.status_original   ==  'nonvalidated') || (client.status_original   ==  'pending'))">
-                            <div class="mb-3">
-                                <label for="status"             class="form-label">Status</label>
-                                <select                         class="form-select"         id="status"                 v-model="client.status"                 :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                    <option value="validated" selected>validated</option>
-                                    <option value="pending">pending</option>
-                                    <option value="nonvalidated" selected>nonvalidated</option>
-                                </select>
+                        <!-- <div> -->
+                        <div class="mb-3">
+                            <label for="status"             class="form-label">Status</label>
+                            <select                         class="form-select"         id="status"                 v-model="client.status"                 :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                <option value="validated" selected>validated</option>
+                                <option value="pending">pending</option>
+                                <option value="nonvalidated">nonvalidated</option>
+                                <option value="visible">visible</option>
+                            </select>
 
-                                <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
-                                    <div class="form-group">
-                                        <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
-                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
-                                    </div>
+                            <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
+                                <div class="form-group">
+                                    <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
+                                    <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
                                 </div>
                             </div>
                         </div>
+                        <!-- </div> -->
 
                         <!--  -->
 
