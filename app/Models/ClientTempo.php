@@ -59,6 +59,7 @@ class ClientTempo extends Model
             // Client
             $client         =   new ClientTempo([
                 'CustomerCode'              =>  $client_elem->CustomerCode              ,
+                'OpenCustomer'              =>  $client_elem->OpenCustomer              ,
                 'CustomerNameE'             =>  mb_strtoupper($client_elem->CustomerNameE, 'UTF-8') ,
                 'CustomerNameA'             =>  mb_strtoupper($client_elem->CustomerNameA, 'UTF-8') ,
                 'Latitude'                  =>  $client_elem->Latitude                  ,
@@ -128,6 +129,7 @@ class ClientTempo extends Model
         $client                             =   ClientTempo::find($id);
 
         $client->CustomerCode               =   $request->get("CustomerCode");
+        $client->OpenCustomer               =   $request->get("OpenCustomer");
         $client->CustomerNameE              =   mb_strtoupper($request->get("CustomerNameE"), 'UTF-8');
         $client->CustomerNameA              =   mb_strtoupper($request->get("CustomerNameA"), 'UTF-8');
         $client->Latitude                   =   $request->get("Latitude");
@@ -194,6 +196,7 @@ class ClientTempo extends Model
             $client                             =   ClientTempo::find($client_tempo->id);
 
             $client->CustomerCode               =   $client_tempo->CustomerCode;
+            $client->OpenCustomer               =   $client_tempo->OpenCustomer;
             $client->CustomerNameE              =   mb_strtoupper($client_tempo->CustomerNameE, 'UTF-8');
             $client->CustomerNameA              =   mb_strtoupper($client_tempo->CustomerNameA, 'UTF-8');
             $client->Latitude                   =   $client_tempo->Latitude;

@@ -183,10 +183,10 @@
       <!--                -->
 
       <!-- ByTelAvailability    -->
-      <div class="row h-equal p-0 m-0">
+      <!-- <div class="row h-equal p-0 m-0"> -->
 
         <!--  ByTelAvailabilityReport -->
-        <div class="col-12 p-2">
+        <!-- <div class="col-12 p-2">
           <div class="card h-100" v-if="show_by_tel_availability_report_content">
             <div class="card-body p-0">
               <div class="report_div" id="by_tel_availability_report">
@@ -194,9 +194,9 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
 
-      </div>
+      <!-- </div> -->
       <!--                      -->
 
       <!-- ByCityReport         -->
@@ -428,12 +428,12 @@ export default {
                             this.emitter.on('show_daily_report_content_ready' , () =>  {
 
                                 //
-                                this.by_tel_availability_report_chart_data        =   res.data.stats_details.by_tel_availability_report_chart_data
-                                this.by_tel_availability_report_table_data        =   res.data.stats_details.by_tel_availability_report_table_data
+                                // this.by_tel_availability_report_chart_data        =   res.data.stats_details.by_tel_availability_report_chart_data
+                                // this.by_tel_availability_report_table_data        =   res.data.stats_details.by_tel_availability_report_table_data
 
-                                this.show_by_tel_availability_report_content      =   true
+                                // this.show_by_tel_availability_report_content      =   true
 
-                                this.emitter.on('show_by_tel_availability_report_content_ready' , () =>  {
+                                // this.emitter.on('show_by_tel_availability_report_content_ready' , () =>  {
 
                                     //
                                     // this.by_city_report_chart_data                    =   res.data.stats_details.by_city_report_chart_data
@@ -454,7 +454,7 @@ export default {
                                             this.show_export_data_button  =   true
                                         })
                                     })
-                                })
+                                // })
                             })
                         })
                     })
@@ -487,7 +487,7 @@ export default {
         this.exportByBrandSourcePurchaseReport()
         this.exportByBrandAvailabilityReport()
         this.exportDailyReport()
-        this.exportByTelAvailabilityReport()
+        // this.exportByTelAvailabilityReport()
         this.exportByCityReport()
         this.exportDataCensusReport()
 

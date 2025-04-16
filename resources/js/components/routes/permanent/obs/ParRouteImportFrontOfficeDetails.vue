@@ -2061,7 +2061,7 @@ export default {
 
             if(newValue != null) {
                 
-                this.$router.push('/route_import/'+this.$route.params.id_route_import+'/clients/'+newValue.id+'/update')
+                this.$router.push('/route_import/'+this.$route.params.id_route_import+'/clients/'+newValue.id+'/details')
 
                 // Send DATA To Modal
                 // this.updateClient(newValue)
