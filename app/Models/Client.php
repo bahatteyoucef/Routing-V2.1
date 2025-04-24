@@ -194,15 +194,15 @@ class Client extends Model
     {
 
         $validator = Validator::make($request->all(), [
-            'CustomerCode'          =>  ["required", "max:255", function ($attribute, $value, $fail) {
+            'OpenCustomer'          =>  ["required", "max:255"],
+            'CustomerCode'          =>  ["required_if:OpenCustomer,1", "max:255", function ($attribute, $value, $fail) {
                 if (preg_match('/[\/\\\\:*?"<>|& ]/', $value)) {
                     $fail("Le champ $attribute contient des caractères interdits.");
                 }
             }],
-            'OpenCustomer'          =>  ["required", "max:255"],
-            'CustomerNameE'         =>  ["required", "max:255"],
+            'CustomerNameE'         =>  ["required_if:OpenCustomer,1", "max:255"],
             'CustomerNameA'         =>  ["required", "max:255"],
-            'Tel'                   =>  ["required", "max:255"],
+            'Tel'                   =>  ["required_if:OpenCustomer,1", "max:255"],
             'Latitude'              =>  ["required", "max:255"],
             'Longitude'             =>  ["required", "max:255"],
             'Address'               =>  ["required", "max:255"],
@@ -255,29 +255,29 @@ class Client extends Model
 
         //
         $client     =   new Client([
-            'CustomerCode'                  =>  $request->input("CustomerCode")                 ,
-            'OpenCustomer'                  =>  $request->input("OpenCustomer")                 ,
-            'CustomerNameE'                 =>  mb_strtoupper($request->input("CustomerNameE"), 'UTF-8')    ,
-            'CustomerNameA'                 =>  mb_strtoupper($request->input("CustomerNameA"), 'UTF-8')    ,
-            'Latitude'                      =>  $request->input("Latitude")                     ,
-            'Longitude'                     =>  $request->input("Longitude")                    ,
-            'Address'                       =>  $request->input("Address")                      ,
-            'DistrictNo'                    =>  $request->input("DistrictNo")                   ,
-            'DistrictNameE'                 =>  $request->input("DistrictNameE")                ,
-            'CityNo'                        =>  $request->input("CityNo")                       ,
-            'CityNameE'                     =>  $request->input("CityNameE")                    ,
-            'Tel'                           =>  $request->input("Tel")                          ,
-            'CustomerType'                  =>  $request->input("CustomerType")                 ,
+            'CustomerCode'                  =>  $request->input("CustomerCode")                             ?? ''   ,
+            'OpenCustomer'                  =>  $request->input("OpenCustomer")                             ?? ''   ,
+            'CustomerNameE'                 =>  mb_strtoupper($request->input("CustomerNameE"), 'UTF-8')    ?? ''   ,
+            'CustomerNameA'                 =>  mb_strtoupper($request->input("CustomerNameA"), 'UTF-8')    ?? ''   ,
+            'Latitude'                      =>  $request->input("Latitude")                                 ?? ''   ,
+            'Longitude'                     =>  $request->input("Longitude")                                ?? ''   ,
+            'Address'                       =>  $request->input("Address")                                  ?? ''   ,
+            'DistrictNo'                    =>  $request->input("DistrictNo")                               ?? ''   ,
+            'DistrictNameE'                 =>  $request->input("DistrictNameE")                            ?? ''   ,
+            'CityNo'                        =>  $request->input("CityNo")                                   ?? ''   ,
+            'CityNameE'                     =>  $request->input("CityNameE")                                ?? ''   ,
+            'Tel'                           =>  $request->input("Tel")                                      ?? ''   ,
+            'CustomerType'                  =>  $request->input("CustomerType")                             ?? ''   ,
 
-            'Neighborhood'                  =>  $request->input("Neighborhood")                 ,
-            'Landmark'                      =>  $request->input("Landmark")                     ,
-            'BrandAvailability'             =>  $request->input("BrandAvailability")            ,
-            'BrandSourcePurchase'           =>  $request->input("BrandSourcePurchase")          ,
+            'Neighborhood'                  =>  $request->input("Neighborhood")                             ?? ''   ,
+            'Landmark'                      =>  $request->input("Landmark")                                 ?? ''   ,
+            'BrandAvailability'             =>  $request->input("BrandAvailability")                        ?? ''   ,
+            'BrandSourcePurchase'           =>  $request->input("BrandSourcePurchase")                      ?? ''   ,
 
-            'start_adding_time'             =>  $start_adding_time                              ,
-            'adding_duration'               =>  $adding_duration                                ,
-            'comment'                       =>  $request->input("comment")                      ,
+            'comment'                       =>  $request->input("comment")                                  ?? ''   ,
 
+            'start_adding_time'             =>  $start_adding_time                                                  ,
+            'adding_duration'               =>  $adding_duration                                                    ,
             'id_route_import'               =>  $id_route_import                                ,  
 
             'owner'                         =>  Auth::user()->id
@@ -430,15 +430,15 @@ class Client extends Model
     {
 
         $validator = Validator::make($request->all(), [
-            'CustomerCode'          =>  ["required", "max:255", function ($attribute, $value, $fail) {
+            'OpenCustomer'          =>  ["required", "max:255"],
+            'CustomerCode'          =>  ["required_if:OpenCustomer,1", "max:255", function ($attribute, $value, $fail) {
                 if (preg_match('/[\/\\\\:*?"<>|& ]/', $value)) {
                     $fail("Le champ $attribute contient des caractères interdits.");
                 }
             }],
-            'OpenCustomer'          =>  ["required", "max:255"],
-            'CustomerNameE'         =>  ["required", "max:255"],
+            'CustomerNameE'         =>  ["required_if:OpenCustomer,1", "max:255"],
             'CustomerNameA'         =>  ["required", "max:255"],
-            'Tel'                   =>  ["required", "max:255"],
+            'Tel'                   =>  ["required_if:OpenCustomer,1", "max:255"],
             'Latitude'              =>  ["required", "max:255"],
             'Longitude'             =>  ["required", "max:255"],
             'Address'               =>  ["required", "max:255"],
@@ -489,26 +489,26 @@ class Client extends Model
                 throw new Exception("Unauthorized", 403);
             }
 
-            $client->CustomerCode                   =   $request->get("CustomerCode")           ;
-            $client->OpenCustomer                   =   $request->get("OpenCustomer")           ;
-            $client->CustomerNameE                  =   mb_strtoupper($request->get("CustomerNameE"), 'UTF-8')  ;
-            $client->CustomerNameA                  =   mb_strtoupper($request->get("CustomerNameA"), 'UTF-8')  ;
-            $client->Latitude                       =   $request->get("Latitude")               ;
-            $client->Longitude                      =   $request->get("Longitude")              ;
-            $client->Address                        =   $request->get("Address")                ;
-            $client->DistrictNo                     =   $request->get("DistrictNo")             ;
-            $client->DistrictNameE                  =   $request->get("DistrictNameE")          ;
-            $client->CityNo                         =   $request->get("CityNo")                 ;
-            $client->CityNameE                      =   $request->get("CityNameE")              ;
-            $client->Tel                            =   $request->get("Tel")                    ;
-            $client->CustomerType                   =   $request->get("CustomerType")           ;
+            $client->CustomerCode                   =   $request->get("CustomerCode")                           ?? ''   ;
+            $client->OpenCustomer                   =   $request->get("OpenCustomer")                           ?? ''   ;
+            $client->CustomerNameE                  =   mb_strtoupper($request->get("CustomerNameE"), 'UTF-8')  ?? ''   ;
+            $client->CustomerNameA                  =   mb_strtoupper($request->get("CustomerNameA"), 'UTF-8')  ?? ''   ;
+            $client->Latitude                       =   $request->get("Latitude")                               ?? ''   ;
+            $client->Longitude                      =   $request->get("Longitude")                              ?? ''   ;
+            $client->Address                        =   $request->get("Address")                                ?? ''   ;
+            $client->DistrictNo                     =   $request->get("DistrictNo")                             ?? ''   ;
+            $client->DistrictNameE                  =   $request->get("DistrictNameE")                          ?? ''   ;
+            $client->CityNo                         =   $request->get("CityNo")                                 ?? ''   ;
+            $client->CityNameE                      =   $request->get("CityNameE")                              ?? ''   ;
+            $client->Tel                            =   $request->get("Tel")                                    ?? ''   ;
+            $client->CustomerType                   =   $request->get("CustomerType")                           ?? ''   ;
 
-            $client->Neighborhood                   =   $request->get("Neighborhood")           ;
-            $client->Landmark                       =   $request->get("Landmark")               ;
-            $client->BrandAvailability              =   $request->get("BrandAvailability")      ;
-            $client->BrandSourcePurchase            =   $request->get("BrandSourcePurchase")    ;
+            $client->Neighborhood                   =   $request->get("Neighborhood")                           ?? ''   ;
+            $client->Landmark                       =   $request->get("Landmark")                               ?? ''   ;
+            $client->BrandAvailability              =   $request->get("BrandAvailability")                      ?? ''   ;
+            $client->BrandSourcePurchase            =   $request->get("BrandSourcePurchase")                    ?? ''   ;
 
-            $client->comment                        =   $request->input("comment")              ;
+            $client->comment                        =   $request->input("comment")                              ?? ''   ;
 
             $client->id_route_import                =   $id_route_import                        ;
 
@@ -978,7 +978,6 @@ class Client extends Model
                     })
 
                     ->select('clients.*', 'users.nom as owner_name')
-
                     ->get();
     }
 

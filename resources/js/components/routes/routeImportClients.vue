@@ -43,6 +43,8 @@
                                     <th class="col-sm-1">Index</th>
 
                                     <th class="col-sm-2">Id</th>
+
+                                    <th class="col-sm-2">OpenCustomer</th>
                                     <th class="col-sm-2">CustomerCode</th>
 
                                     <th class="col-sm-2">CustomerNameE</th>
@@ -95,7 +97,9 @@
                                     <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Index"            /></th>
                                     <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Id"               /></th>
 
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="OpenCustomer"     /></th>
                                     <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
+
                                     <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
                                     <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
 
@@ -146,6 +150,7 @@
 
                                     <td>{{client.id}}</td>
 
+                                    <td>{{client.OpenCustomer}}</td>
                                     <td>{{client.CustomerCode}}</td>
                                     <td>{{client.CustomerNameE}}</td>
                                     <td>{{client.CustomerNameA}}</td>
@@ -621,6 +626,10 @@ export default {
 
             // Add Client
             new_client.id               =   client.id
+
+            new_client.id_route_import  =   client.id_route_import
+
+            new_client.OpenCustomer     =   client.OpenCustomer
             new_client.CustomerCode     =   client.CustomerCode
 
             new_client.CustomerNameE    =   client.CustomerNameE
@@ -683,26 +692,27 @@ export default {
                 
                 if(this.clients[i].id  ==  client.id) {
 
-                    this.clients[i].CustomerCode   =   client.CustomerCode
+                    this.clients[i].OpenCustomer    =   client.OpenCustomer
+                    this.clients[i].CustomerCode    =   client.CustomerCode
 
-                    this.clients[i].CustomerNameE  =   client.CustomerNameE
-                    this.clients[i].CustomerNameA  =   client.CustomerNameA
-                    this.clients[i].Tel            =   client.Tel
+                    this.clients[i].CustomerNameE   =   client.CustomerNameE
+                    this.clients[i].CustomerNameA   =   client.CustomerNameA
+                    this.clients[i].Tel             =   client.Tel
 
-                    this.clients[i].Latitude       =   client.Latitude         
-                    this.clients[i].Longitude      =   client.Longitude        
+                    this.clients[i].Latitude        =   client.Latitude         
+                    this.clients[i].Longitude       =   client.Longitude        
 
-                    this.clients[i].Address        =   client.Address
-                    this.clients[i].Neighborhood   =   client.Neighborhood
-                    this.clients[i].Landmark       =   client.Landmark
+                    this.clients[i].Address         =   client.Address
+                    this.clients[i].Neighborhood    =   client.Neighborhood
+                    this.clients[i].Landmark        =   client.Landmark
 
-                    this.clients[i].DistrictNo     =   client.DistrictNo      
-                    this.clients[i].DistrictNameE  =   client.DistrictNameE  
+                    this.clients[i].DistrictNo      =   client.DistrictNo      
+                    this.clients[i].DistrictNameE   =   client.DistrictNameE  
 
-                    this.clients[i].CityNo         =   client.CityNo           
-                    this.clients[i].CityNameE      =   client.CityNameE       
+                    this.clients[i].CityNo          =   client.CityNo           
+                    this.clients[i].CityNameE       =   client.CityNameE       
 
-                    this.clients[i].CustomerType   =   client.CustomerType     
+                    this.clients[i].CustomerType    =   client.CustomerType     
 
                     this.clients[i].BrandAvailability      =   client.BrandAvailability       
                     this.clients[i].BrandSourcePurchase    =   client.BrandSourcePurchase       

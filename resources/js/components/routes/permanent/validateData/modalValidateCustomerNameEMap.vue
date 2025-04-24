@@ -24,6 +24,7 @@
                                 <tr>
                                     <th class="col-sm-1">Index</th>
 
+                                    <th class="col-sm-2">OpenCustomer</th>
                                     <th class="col-sm-2">CustomerCode</th>
 
                                     <th class="col-sm-2">CustomerNameE</th>
@@ -71,7 +72,9 @@
 
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Index"            /></th>
 
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="OpenCustomer"     /></th>
                                 <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
+
                                 <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
                                 <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
 
@@ -116,6 +119,7 @@
                                 <tr v-for="(client, index) in getDoublantCustomerNameE" :key="client" role="button" @click="updateElementMap(client)">
                                     <td>{{index +   1}}</td>
 
+                                    <td>{{client.OpenCustomer}}</td>
                                     <td>{{client.CustomerCode}}</td>
                                     <td>{{client.CustomerNameE}}</td>
                                     <td>{{client.CustomerNameA}}</td>
@@ -265,6 +269,7 @@ export default {
 
                 if(this.getDoublantCustomerNameE[i].id    ==  client.id) {
 
+                    this.getDoublantCustomerNameE[i].OpenCustomer       =   client.OpenCustomer
                     this.getDoublantCustomerNameE[i].CustomerCode       =   client.CustomerCode
                     this.getDoublantCustomerNameE[i].CustomerNameE      =   client.CustomerNameE
                     this.getDoublantCustomerNameE[i].CustomerNameA      =   client.CustomerNameA

@@ -13,47 +13,54 @@
                 <div class="modal-body mt-3">
 
                     <form>
+                        <div v-if="client.OpenCustomer  ==  1" class="mb-3">
+                            <label for="text"               class="form-label fw-bold">Client Ouvert</label>
+                            <select                         class="form-select"         id="OpenCustomer"           v-model="client.OpenCustomer"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                <option     value=0>Non</option>
+                                <option     value=1>Oui</option>
+                            </select>
+                        </div>
 
-                        <div class="mb-3">
+                        <div v-if="client.OpenCustomer  ==  1" class="mb-3">
                             <label for="CustomerNameE"      class="form-label">Nom et Prénom de l'Acheteur</label>
-                            <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE">
+                            <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE"  :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                         </div>
 
                         <div class="mb-3">
                             <label for="CustomerNameA"      class="form-label">Raison Sociale</label>
-                            <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA">
+                            <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA"  :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                         </div>
 
-                        <div class="mb-3">
+                        <div v-if="client.OpenCustomer  ==  1" class="mb-3">
                             <label for="Tel"                class="form-label">Téléphone</label>
-                            <input type="text"              class="form-control"        id="Tel"                    v-model="client.Tel">
+                            <input type="text"              class="form-control"        id="Tel"                    v-model="client.Tel"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                         </div>
 
                         <div class="mb-3">
                             <label for="Address"            class="form-label">Adresse</label>
-                            <input type="text"              class="form-control"        id="Address"                v-model="client.Address">
+                            <input type="text"              class="form-control"        id="Address"                v-model="client.Address"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                         </div>
 
                         <div class="mb-3">
                             <label for="Neighborhood"       class="form-label">Quartier</label>
-                            <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood">
+                            <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                         </div>
 
                         <div class="mb-3">
                             <label for="Landmark"           class="form-label">Point de Repere</label>
-                            <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"></textarea>
+                            <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
                         </div>
 
                         <div class="mb-3">
                             <label for="DistrictNo"         class="form-label">Willaya</label>
-                            <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()">
+                            <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                 <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
                             </select>
                         </div>
 
                         <div class="mb-3">
                             <label for="CityNo"             class="form-label">Commune</label>
-                            <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo">
+                            <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo" :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                 <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CITYNO}}- {{cite.CityNameE}}</option>
                             </select>
                         </div>
@@ -62,19 +69,19 @@
 
                         <div class="mb-3">
                             <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
-                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @change="checkClients()">
+                            <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   @change="checkClients()"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                         </div>
 
                         <div class="mb-3">
                             <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
-                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @change="checkClients()">
+                            <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  @change="checkClients()"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                         </div>
 
                         <!--  -->
 
                         <div class="mb-3">
                             <label for="text"               class="form-label">Type de Magasin</label>
-                            <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType">
+                            <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType"     :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                 <option     :value="'Hypermarché'">Hypermarché</option>
                                 <option     :value="'Supérette'">Supérette</option>
                                 <option     :value="'Alimentation Generale'">Alimentation Generale</option>
@@ -96,17 +103,17 @@
 
                         <!--  -->
 
-                        <div class="mb-3">
+                        <div v-if="client.OpenCustomer  ==  1" class="mb-3">
                             <label for="text"               class="form-label">Disponibilité Produits</label>
-                            <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability">
+                            <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                 <option     value="0">No</option>
                                 <option     value="1">Yes</option>
                             </select>
                         </div>
 
-                        <div class="mb-3">
+                        <div v-if="client.OpenCustomer  ==  1" class="mb-3">
                             <label for="text"               class="form-label">Source d'Achat</label>
-                            <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase">
+                            <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                 <option     value="Distribution Direct">Distribution Direct</option>
                                 <option     value="Distribution Indirect">Distribution Indirect</option>
                                 <option     value="Pas d'achat">Pas d'achat</option>
@@ -117,7 +124,7 @@
 
                         <div class="mb-3">
                             <label for="JPlan"              class="form-label">Nom de Vendeur</label>
-                            <input type="text"              class="form-control"        id="JPlan"           v-model="client.JPlan">
+                            <input type="text"              class="form-control"        id="JPlan"           v-model="client.JPlan"     :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                         </div>
 
                         <!--  -->
@@ -125,7 +132,7 @@
                         <div class="mb-3">
                             <label for="Journee"            class="form-label">Journee</label>
 
-                            <select                         class="form-select"         id="Journee"                 v-model="client.Journee">
+                            <select                         class="form-select"         id="Journee"                 v-model="client.Journee"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                 <option     :value="'Jour 1'">Samedi 1 (Jour 1)</option>
                                 <option     :value="'Jour 2'">Dimanche 1 (Jour 2)</option>
                                 <option     :value="'Jour 3'">Lundi 1 (Jour 3)</option>
@@ -147,7 +154,7 @@
                         <div v-if="client.status_original   ==  'validated'">
                             <div class="mb-3">
                                 <label for="status"             class="form-label">Status</label>
-                                <select                         class="form-select"         id="status"                 v-model="client.status">
+                                <select                         class="form-select"         id="status"                 v-model="client.status"     :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                     <option value="validated" selected>validated</option>
                                     <option value="nonvalidated">nonvalidated</option>
                                     <option value="visible">visible</option>
@@ -156,7 +163,7 @@
                                 <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
                                     <div class="form-group">
                                         <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
-                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
+                                        <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -166,7 +173,7 @@
                         <!-- <div> -->
                         <div class="mb-3">
                             <label for="status"             class="form-label">Status</label>
-                            <select                         class="form-select"         id="status"                 v-model="client.status">
+                            <select                         class="form-select"         id="status"                 v-model="client.status" :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                 <option value="validated" selected>validated</option>
                                 <option value="pending">pending</option>
                                 <option value="nonvalidated">nonvalidated</option>
@@ -176,7 +183,7 @@
                             <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
                                 <div class="form-group">
                                     <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
-                                    <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"></textarea>
+                                    <textarea   class="form-control" id="nonvalidated_details" rows="3"             v-model="client.nonvalidated_details"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -184,7 +191,7 @@
 
                         <!--  -->
 
-                        <div class="mb-3">
+                        <div v-if="client.OpenCustomer  ==  1" class="mb-3">
                             <div v-show="client.CustomerCode   ==  ''"     class="mt-1 p-0">
                                 <div    id="reader_validate_update" class="scanner_reader w-100"></div>
                             </div>
@@ -208,7 +215,7 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
+                        <div v-if="client.OpenCustomer  ==  1" class="mb-3">
                             <label for="CustomerBarCode_image_validate_update"   class="form-label">Image Code-Barre</label>
                             <input type="file"                          class="form-control"        id="CustomerBarCode_image_validate_update"              accept="image/*"    capture     @change="customerBarCodeImage()">
                             <img                                                                    id="CustomerBarCode_image_validate_display_update"      src=""              class="w-100">
@@ -222,7 +229,7 @@
                             <img                                                        id="facade_image_validate_display_update"       src=""              class="w-100">
                         </div>
 
-                        <div class="mb-3">
+                        <div v-if="client.OpenCustomer  ==  1" class="mb-3">
                             <label for="in_store_image_validate_update"  class="form-label">Image In-Store</label>
                             <input type="file"                  class="form-control"    id="in_store_image_validate_update"             accept="image/*"    @change="inStoreImage()">
                             <img                                                        id="in_store_image_validate_display_update"     src=""              class="w-100">
@@ -265,7 +272,7 @@
 
                 </div>
 
-                <div class="modal-footer"       style="display: flex; justify-content: space-between;">
+                <div v-if="((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"   class="modal-footer"    style="display: flex; justify-content: space-between;">
                     <div class="left-buttons"   style="display: flex;">
                         <button type="button"   class="btn btn-danger float-left" @click="deleteData()">Delete</button>
                     </div>
@@ -294,6 +301,9 @@ export default {
             client      :   {
 
                 id                                      :   '',
+
+                //
+                OpenCustomer                            :   '',
 
                 // Slide 1
                 CustomerCode                            :   '',
@@ -428,43 +438,87 @@ export default {
 
             let formData = new FormData();
 
-            formData.append("CustomerCode"                  ,   this.client.CustomerCode)
-            formData.append("CustomerNameE"                 ,   this.client.CustomerNameE)
-            formData.append("CustomerNameA"                 ,   this.client.CustomerNameA)
-            formData.append("Latitude"                      ,   this.client.Latitude)
-            formData.append("Longitude"                     ,   this.client.Longitude)
-            formData.append("Address"                       ,   this.client.Address)
-            formData.append("Neighborhood"                  ,   this.client.Neighborhood)
-            formData.append("Landmark"                      ,   this.client.Landmark)
+            if(this.client.OpenCustomer ==  1) {
+                formData.append("OpenCustomer"                  ,   this.client.OpenCustomer)
+                formData.append("CustomerCode"                  ,   this.client.CustomerCode)
+                formData.append("CustomerNameE"                 ,   this.client.CustomerNameE)
+                formData.append("CustomerNameA"                 ,   this.client.CustomerNameA)
+                formData.append("Latitude"                      ,   this.client.Latitude)
+                formData.append("Longitude"                     ,   this.client.Longitude)
+                formData.append("Address"                       ,   this.client.Address)
+                formData.append("Neighborhood"                  ,   this.client.Neighborhood)
+                formData.append("Landmark"                      ,   this.client.Landmark)
 
-            formData.append("DistrictNo"                    ,   this.client.DistrictNo)
-            formData.append("DistrictNameE"                 ,   this.client.DistrictNameE)
-            formData.append("CityNo"                        ,   this.client.CityNo)
-            formData.append("CityNameE"                     ,   this.client.CityNameE)
-            formData.append("Tel"                           ,   this.client.Tel)
-            formData.append("CustomerType"                  ,   this.client.CustomerType)
-            formData.append("BrandAvailability"             ,   this.client.BrandAvailability)
-            formData.append("BrandSourcePurchase"           ,   this.client.BrandSourcePurchase)
+                formData.append("DistrictNo"                    ,   this.client.DistrictNo)
+                formData.append("DistrictNameE"                 ,   this.client.DistrictNameE)
+                formData.append("CityNo"                        ,   this.client.CityNo)
+                formData.append("CityNameE"                     ,   this.client.CityNameE)
+                formData.append("Tel"                           ,   this.client.Tel)
+                formData.append("CustomerType"                  ,   this.client.CustomerType)
+                formData.append("BrandAvailability"             ,   this.client.BrandAvailability)
+                formData.append("BrandSourcePurchase"           ,   this.client.BrandSourcePurchase)
 
-            formData.append("JPlan"                         ,   this.client.JPlan)
-            formData.append("Journee"                       ,   this.client.Journee)
+                formData.append("JPlan"                         ,   this.client.JPlan)
+                formData.append("Journee"                       ,   this.client.Journee)
 
-            formData.append("CustomerBarCode_image_validate_updated"         ,   this.client.CustomerBarCode_image_validate_updated)
-            formData.append("facade_image_validate_updated"                  ,   this.client.facade_image_validate_updated)
-            formData.append("in_store_image_validate_updated"                ,   this.client.in_store_image_validate_updated)
+                formData.append("CustomerBarCode_image_validate_updated"         ,   this.client.CustomerBarCode_image_validate_updated)
+                formData.append("facade_image_validate_updated"                  ,   this.client.facade_image_validate_updated)
+                formData.append("in_store_image_validate_updated"                ,   this.client.in_store_image_validate_updated)
 
-            formData.append("CustomerBarCode_image"                 ,   this.client.CustomerBarCode_image)
-            formData.append("facade_image"                          ,   this.client.facade_image)
-            formData.append("in_store_image"                        ,   this.client.in_store_image)
+                formData.append("CustomerBarCode_image"                 ,   this.client.CustomerBarCode_image)
+                formData.append("facade_image"                          ,   this.client.facade_image)
+                formData.append("in_store_image"                        ,   this.client.in_store_image)
 
-            formData.append("CustomerBarCode_image_original_name"   ,   this.client.CustomerBarCode_image_original_name)
-            formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
-            formData.append("in_store_image_original_name"          ,   this.client.in_store_image_original_name)
+                formData.append("CustomerBarCode_image_original_name"   ,   this.client.CustomerBarCode_image_original_name)
+                formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
+                formData.append("in_store_image_original_name"          ,   this.client.in_store_image_original_name)
 
-            formData.append("status"                        ,   this.client.status)
-            formData.append("nonvalidated_details"          ,   this.client.nonvalidated_details)
+                formData.append("status"                        ,   this.client.status)
+                formData.append("nonvalidated_details"          ,   this.client.nonvalidated_details)
 
-            formData.append("comment"                       ,   this.client.comment)
+                formData.append("comment"                       ,   this.client.comment)
+            }
+
+            else {
+                formData.append("OpenCustomer"                  ,   this.client.OpenCustomer)
+                formData.append("CustomerCode"                  ,   '')
+                formData.append("CustomerNameE"                 ,   '')
+                formData.append("CustomerNameA"                 ,   this.client.CustomerNameA)
+                formData.append("Latitude"                      ,   this.client.Latitude)
+                formData.append("Longitude"                     ,   this.client.Longitude)
+                formData.append("Address"                       ,   this.client.Address)
+                formData.append("Neighborhood"                  ,   this.client.Neighborhood)
+                formData.append("Landmark"                      ,   this.client.Landmark)
+
+                formData.append("DistrictNo"                    ,   this.client.DistrictNo)
+                formData.append("DistrictNameE"                 ,   this.client.DistrictNameE)
+                formData.append("CityNo"                        ,   this.client.CityNo)
+                formData.append("CityNameE"                     ,   this.client.CityNameE)
+                formData.append("Tel"                           ,   '')
+                formData.append("CustomerType"                  ,   this.client.CustomerType)
+                formData.append("BrandAvailability"             ,   0)
+                formData.append("BrandSourcePurchase"           ,   '')
+
+                formData.append("JPlan"                         ,   this.client.JPlan)
+                formData.append("Journee"                       ,   this.client.Journee)
+
+                formData.append("CustomerBarCode_image_validate_updated"         ,   true)
+                formData.append("facade_image_validate_updated"                  ,   this.client.facade_image_validate_updated)
+                formData.append("in_store_image_validate_updated"                ,   true)
+
+                formData.append("CustomerBarCode_image"                 ,   '')
+                formData.append("facade_image"                          ,   this.client.facade_image)
+                formData.append("in_store_image"                        ,   '')
+
+                formData.append("CustomerBarCode_image_original_name"   ,   '')
+                formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
+                formData.append("in_store_image_original_name"          ,   '')
+
+                formData.append("status"                        ,   this.client.status)
+                formData.append("nonvalidated_details"          ,   this.client.nonvalidated_details)
+
+                formData.append("comment"                       ,   this.client.comment)
+            }
 
             const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/update",   formData)
 
@@ -577,27 +631,39 @@ export default {
 
                 //
 
-                let CustomerBarCode_image_validate_update                    =   document.getElementById("CustomerBarCode_image_validate_update")
-                CustomerBarCode_image_validate_update.value                  =   ""
+                let CustomerBarCode_image_validate_update               =   document.getElementById("CustomerBarCode_image_validate_update")
+                if(CustomerBarCode_image_validate_update) {
+                    CustomerBarCode_image_validate_update.value             =   ""
+                }
 
-                let CustomerBarCode_image_validate_display_update            =   document.getElementById("CustomerBarCode_image_validate_display_update")
-                CustomerBarCode_image_validate_display_update.src            =   ""
-
-                //
-
-                let facade_image_validate_update                             =   document.getElementById("facade_image_validate_update")
-                facade_image_validate_update.value                           =   ""
-
-                let facade_image_validate_display_update                     =   document.getElementById("facade_image_validate_display_update")
-                facade_image_validate_display_update.src                     =   ""
+                let CustomerBarCode_image_validate_display_update       =   document.getElementById("CustomerBarCode_image_validate_display_update")
+                if(CustomerBarCode_image_validate_display_update) {
+                    CustomerBarCode_image_validate_display_update.src       =   ""
+                }
 
                 //
 
-                let in_store_image_validate_update                           =   document.getElementById("in_store_image_validate_update")
-                in_store_image_validate_update.value                         =   ""
+                let facade_image_validate_update                        =   document.getElementById("facade_image_validate_update")
+                if(facade_image_validate_update) {
+                    facade_image_validate_update.value                      =   ""
+                }
 
-                let in_store_image_validate_display_update                   =   document.getElementById("in_store_image_validate_display_update")
-                in_store_image_validate_display_update.src                   =   ""
+                let facade_image_validate_display_update                =   document.getElementById("facade_image_validate_display_update")
+                if(facade_image_validate_display_update) {
+                    facade_image_validate_display_update.src                =   ""
+                }
+
+                //
+
+                let in_store_image_validate_update                      =   document.getElementById("in_store_image_validate_update")
+                if(in_store_image_validate_update) {
+                    in_store_image_validate_update.value                    =   ""
+                }
+
+                let in_store_image_validate_display_update              =   document.getElementById("in_store_image_validate_display_update")
+                if(in_store_image_validate_display_update) {
+                    in_store_image_validate_display_update.src              =   ""
+                }
 
                 //
 
@@ -617,6 +683,9 @@ export default {
 
                 // Client
                 this.client.id                                      =   '',
+
+                // Slide 1
+                this.client.OpenCustomer                            =   '',
 
                 // Slide 1
                 this.client.CustomerCode                            =   '',
@@ -716,6 +785,8 @@ export default {
 
             this.client.id                                      =   client.id
 
+            this.client.OpenCustomer                            =   client.OpenCustomer
+
             this.client.CustomerCode                            =   client.CustomerCode
 
             this.client.old_CustomerNameE                       =   client.CustomerNameE
@@ -762,18 +833,24 @@ export default {
             this.client.in_store_image_original_name            =   client.in_store_image_original_name
 
             // 
-            this.$createFile(client.CustomerBarCode_image_original_name     ,   "CustomerBarCode_image_validate_update")
-            this.$createFile(client.facade_image_original_name              ,   "facade_image_validate_update")
-            this.$createFile(client.in_store_image_original_name            ,   "in_store_image_validate_update")
 
-            // 
-            let CustomerBarCode_image_validate_display_update    =   document.getElementById("CustomerBarCode_image_validate_display_update")
-            let facade_image_validate_display_update             =   document.getElementById("facade_image_validate_display_update")
-            let in_store_image_validate_display_update           =   document.getElementById("in_store_image_validate_display_update")
+            if((this.client.CustomerBarCode_image_original_name)&&(this.client.OpenCustomer  === '1')) {
+                this.$createFile(client.CustomerBarCode_image_original_name     ,   "CustomerBarCode_image_validate_update")
+                let CustomerBarCode_image_validate_display_update               =   document.getElementById("CustomerBarCode_image_validate_display_update")
+                CustomerBarCode_image_validate_display_update.src               =   "/uploads/clients/"+client.id+"/"+client.CustomerBarCode_image
+            }
 
-            CustomerBarCode_image_validate_display_update.src    =   "/uploads/clients/"+client.id+"/"+client.CustomerBarCode_image
-            facade_image_validate_display_update.src             =   "/uploads/clients/"+client.id+"/"+client.facade_image
-            in_store_image_validate_display_update.src           =   "/uploads/clients/"+client.id+"/"+client.in_store_image
+            if(this.client.facade_image_original_name) {
+                this.$createFile(client.facade_image_original_name              ,   "facade_image_validate_update")
+                let facade_image_validate_display_update                        =   document.getElementById("facade_image_validate_display_update")
+                facade_image_validate_display_update.src                        =   "/uploads/clients/"+client.id+"/"+client.facade_image
+            }
+
+            if((this.client.in_store_image_original_name)&&(this.client.OpenCustomer  === '1')) {
+                this.$createFile(client.in_store_image_original_name            ,   "in_store_image_validate_update")
+                let in_store_image_validate_display_update                      =   document.getElementById("in_store_image_validate_display_update")
+                in_store_image_validate_display_update.src                      =   "/uploads/clients/"+client.id+"/"+client.in_store_image
+            }
         },
 
         async getComboData() {

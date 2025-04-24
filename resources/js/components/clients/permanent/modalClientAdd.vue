@@ -15,6 +15,14 @@
                     <form>
 
                         <div class="mb-3">
+                            <label for="OpenCustomer"      class="form-label">Client Ouvert</label>
+                            <select                         class="form-select"         id="OpenCustomer"           v-model="client.OpenCustomer">
+                                <option     value=0>Non</option>
+                                <option     value=1>Oui</option>
+                            </select>
+                        </div>
+
+                        <div v-if="client.OpenCustomer  ==  1"  class="mb-3">
                             <label for="CustomerNameE"      class="form-label">Nom et Prénom de l'Acheteur</label>
                             <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE">
                         </div>
@@ -24,7 +32,7 @@
                             <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA">
                         </div>
 
-                        <div class="mb-3">
+                        <div v-if="client.OpenCustomer  ==  1"  class="mb-3">
                             <label for="Tel"                class="form-label">Téléphone</label>
                             <input type="text"              class="form-control"        id="Tel"                    v-model="client.Tel">
                         </div>
@@ -96,7 +104,7 @@
 
                         <!--  -->
 
-                        <div class="mb-3">
+                        <div v-if="client.OpenCustomer  ==  1"  class="mb-3">
                             <label for="text"               class="form-label">Disponibilité Produits</label>
                             <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability">
                                 <option     value="0">No</option>
@@ -104,7 +112,7 @@
                             </select>
                         </div>
 
-                        <div class="mb-3">
+                        <div v-if="client.OpenCustomer  ==  1"  class="mb-3">
                             <label for="text"               class="form-label">Source d'Achat</label>
                             <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase">
                                 <option     value="Distribution Direct">Distribution Direct</option>
@@ -162,7 +170,7 @@
 
                         <!--  -->
 
-                        <div class="mb-3">
+                        <div v-if="client.OpenCustomer  ==  1"  class="mb-3">
                             <div v-show="client.CustomerCode   ==  ''"     class="mt-1 p-0">
                                 <div    id="reader" class="scanner_reader w-100"></div>
                             </div>
@@ -186,7 +194,7 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
+                        <div v-if="client.OpenCustomer  ==  1"  class="mb-3">
                             <label for="CustomerBarCode_image"    class="form-label">Image Code-Barre</label>
                             <input type="file"              class="form-control"        id="CustomerBarCode_image"              accept="image/*"    capture     @change="customerBarCodeImage()">
                             <img                                                        id="CustomerBarCode_image_display"      src=""              class="w-100">
@@ -198,7 +206,7 @@
                             <img                                                        id="facade_image_display_add"       src=""              class="w-100">
                         </div>
 
-                        <div class="mb-3">
+                        <div v-if="client.OpenCustomer  ==  1"  class="mb-3">
                             <label for="in_store_image_add" class="form-label">Image In-Store</label>
                             <input type="file"              class="form-control"        id="in_store_image_add"             accept="image/*"    @change="inStoreImage()">
                             <img                                                        id="in_store_image_display_add"     src=""              class="w-100">
@@ -274,6 +282,9 @@ export default {
             client      :   {
 
                 id                                      :   '',
+
+                // Slide 0
+                OpenCustomer                            :   '',
 
                 // Slide 1
                 CustomerCode                            :   '',
@@ -404,47 +415,89 @@ export default {
 
             let formData = new FormData();
 
-            formData.append("CustomerCode"                          ,   this.client.CustomerCode)
-            formData.append("CustomerNameE"                         ,   this.client.CustomerNameE)
-            formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
-            formData.append("Latitude"                              ,   this.client.Latitude)
-            formData.append("Longitude"                             ,   this.client.Longitude)
-            formData.append("Address"                               ,   this.client.Address)
-            formData.append("Neighborhood"                          ,   this.client.Neighborhood)
-            formData.append("Landmark"                              ,   this.client.Landmark)
+            if(this.client.OpenCustomer ==  1) {
+                formData.append("OpenCustomer"                          ,   this.client.OpenCustomer)
+                formData.append("CustomerCode"                          ,   this.client.CustomerCode)
+                formData.append("CustomerNameE"                         ,   this.client.CustomerNameE)
+                formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
+                formData.append("Latitude"                              ,   this.client.Latitude)
+                formData.append("Longitude"                             ,   this.client.Longitude)
+                formData.append("Address"                               ,   this.client.Address)
+                formData.append("Neighborhood"                          ,   this.client.Neighborhood)
+                formData.append("Landmark"                              ,   this.client.Landmark)
 
-            formData.append("DistrictNo"                            ,   this.client.DistrictNo)
-            formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
-            formData.append("CityNo"                                ,   this.client.CityNo)
-            formData.append("CityNameE"                             ,   this.client.CityNameE)
-            formData.append("Tel"                                   ,   this.client.Tel)
-            formData.append("CustomerType"                          ,   this.client.CustomerType)
+                formData.append("DistrictNo"                            ,   this.client.DistrictNo)
+                formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
+                formData.append("CityNo"                                ,   this.client.CityNo)
+                formData.append("CityNameE"                             ,   this.client.CityNameE)
+                formData.append("Tel"                                   ,   this.client.Tel)
+                formData.append("CustomerType"                          ,   this.client.CustomerType)
 
-            formData.append("BrandAvailability"                     ,   this.client.BrandAvailability)
-            formData.append("BrandSourcePurchase"                   ,   this.client.BrandSourcePurchase)
+                formData.append("BrandAvailability"                     ,   this.client.BrandAvailability)
+                formData.append("BrandSourcePurchase"                   ,   this.client.BrandSourcePurchase)
 
-            formData.append("JPlan"                                 ,   this.client.JPlan)
-            formData.append("Journee"                               ,   this.client.Journee)
+                formData.append("JPlan"                                 ,   this.client.JPlan)
+                formData.append("Journee"                               ,   this.client.Journee)
 
-            formData.append("CustomerBarCode_image"                 ,   this.client.CustomerBarCode_image)
-            formData.append("facade_image"                          ,   this.client.facade_image)
-            formData.append("in_store_image"                        ,   this.client.in_store_image)
+                formData.append("CustomerBarCode_image"                 ,   this.client.CustomerBarCode_image)
+                formData.append("facade_image"                          ,   this.client.facade_image)
+                formData.append("in_store_image"                        ,   this.client.in_store_image)
 
-            formData.append("CustomerBarCode_image_original_name"   ,   this.client.CustomerBarCode_image_original_name)
-            formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
-            formData.append("in_store_image_original_name"          ,   this.client.in_store_image_original_name)
+                formData.append("CustomerBarCode_image_original_name"   ,   this.client.CustomerBarCode_image_original_name)
+                formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
+                formData.append("in_store_image_original_name"          ,   this.client.in_store_image_original_name)
 
-            formData.append("status"                                ,   this.client.status)
-            formData.append("nonvalidated_details"                  ,   this.client.nonvalidated_details)
+                formData.append("status"                                ,   this.client.status)
+                formData.append("nonvalidated_details"                  ,   this.client.nonvalidated_details)
 
-            formData.append("comment"                               ,   this.client.comment)
+                formData.append("comment"                               ,   this.client.comment)
 
-            formData.append("start_adding_date"                     ,   this.start_adding_date)
-            formData.append("finish_adding_date"                    ,   moment(new Date()).format())
+                formData.append("start_adding_date"                     ,   this.start_adding_date)
+                formData.append("finish_adding_date"                    ,   moment(new Date()).format())
+            }
 
-            //
+            else {
+                formData.append("OpenCustomer"                          ,   this.client.OpenCustomer)
+                formData.append("CustomerCode"                          ,   '')
+                formData.append("CustomerNameE"                         ,   '')
+                formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
+                formData.append("Latitude"                              ,   this.client.Latitude)
+                formData.append("Longitude"                             ,   this.client.Longitude)
+                formData.append("Address"                               ,   this.client.Address)
+                formData.append("Neighborhood"                          ,   this.client.Neighborhood)
+                formData.append("Landmark"                              ,   this.client.Landmark)
 
-            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/store",   formData)
+                formData.append("DistrictNo"                            ,   this.client.DistrictNo)
+                formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
+                formData.append("CityNo"                                ,   this.client.CityNo)
+                formData.append("CityNameE"                             ,   this.client.CityNameE)
+                formData.append("Tel"                                   ,   '')
+                formData.append("CustomerType"                          ,   this.client.CustomerType)
+
+                formData.append("BrandAvailability"                     ,   0)
+                formData.append("BrandSourcePurchase"                   ,   '')
+
+                formData.append("JPlan"                                 ,   this.client.JPlan)
+                formData.append("Journee"                               ,   this.client.Journee)
+
+                formData.append("CustomerBarCode_image"                 ,   '')
+                formData.append("facade_image"                          ,   this.client.facade_image)
+                formData.append("in_store_image"                        ,   '')
+
+                formData.append("CustomerBarCode_image_original_name"   ,   '')
+                formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
+                formData.append("in_store_image_original_name"          ,   '')
+
+                formData.append("status"                                ,   this.client.status)
+                formData.append("nonvalidated_details"                  ,   this.client.nonvalidated_details)
+
+                formData.append("comment"                               ,   this.client.comment)
+
+                formData.append("start_adding_date"                     ,   this.start_adding_date)
+                formData.append("finish_adding_date"                    ,   moment(new Date()).format())
+            }
+
+            const res   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/store",   formData)
 
             if(res.status===200){
 
@@ -497,26 +550,38 @@ export default {
                 //
 
                 let CustomerBarCode_image               =   document.getElementById("CustomerBarCode_image")
-                CustomerBarCode_image.value             =   ""
+                if(CustomerBarCode_image) {
+                    CustomerBarCode_image.value             =   ""
+                }
 
                 let CustomerBarCode_image_display       =   document.getElementById("CustomerBarCode_image_display")
-                CustomerBarCode_image_display.src       =   ""
+                if(CustomerBarCode_image_display) {
+                    CustomerBarCode_image_display.src       =   ""
+                }
 
                 //
 
                 let facade_image_add                    =   document.getElementById("facade_image_add")
-                facade_image_add.value                  =   ""
+                if(facade_image_add) {
+                    facade_image_add.value                  =   ""
+                }
 
                 let facade_image_display_add            =   document.getElementById("facade_image_display_add")
-                facade_image_display_add.src            =   ""
+                if(facade_image_display_add) {
+                    facade_image_display_add.src            =   ""
+                }
 
                 //
 
                 let in_store_image_add                  =   document.getElementById("in_store_image_add")
-                in_store_image_add.value                =   ""
+                if(in_store_image_add) {
+                    in_store_image_add.value                =   ""
+                }
 
                 let in_store_image_display_add          =   document.getElementById("in_store_image_display_add")
-                in_store_image_display_add.src          =   ""
+                if(in_store_image_display_add) {
+                    in_store_image_display_add.src          =   ""
+                }
 
                 //
 
@@ -526,6 +591,9 @@ export default {
                 //  //  //  //  //
 
                 this.client.id                                      =   '',
+
+                //
+                this.client.OpenCustomer                            =   '',
 
                 // Slide 1
                 this.client.CustomerCode                            =   '',

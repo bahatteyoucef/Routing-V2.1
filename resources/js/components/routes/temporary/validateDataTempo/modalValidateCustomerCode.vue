@@ -22,6 +22,7 @@
                         <table class="table table-striped datatable_client_double_customercode" id="datatable_client_double_customercode">
                             <thead>
                                 <tr>
+                                    <th class="col-sm-2">OpenCustomer</th>
                                     <th class="col-sm-2">CustomerCode</th>
 
                                     <th class="col-sm-2">CustomerNameE</th>
@@ -52,6 +53,7 @@
 
                             <thead>
                                 <tr class="datatable_client_double_customercode_filters">
+                                    <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="OpenCustomer"     /></th>
                                     <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
                                     <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
                                     <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
@@ -81,6 +83,7 @@
 
                             <tbody>
                                 <tr v-for="client in getDoublantCustomerCode" :key="client.id" @click="updateElementTempo(client)" role="button">
+                                    <td>{{client.OpenCustomer}}</td>
                                     <td>{{client.CustomerCode}}</td>
                                     <td>{{client.CustomerNameE}}</td>
                                     <td>{{client.CustomerNameA}}</td>
@@ -202,7 +205,7 @@ export default {
             for (let i = 0; i < this.getDoublantCustomerCode.length; i++) {
 
                 if(this.getDoublantCustomerCode[i].id    ==  client.id) {
-
+                    this.getDoublantCustomerCode[i].OpenCustomer        =   client.OpenCustomer
                     this.getDoublantCustomerCode[i].CustomerCode        =   client.CustomerCode
                     this.getDoublantCustomerCode[i].CustomerNameE       =   client.CustomerNameE
                     this.getDoublantCustomerCode[i].CustomerNameA       =   client.CustomerNameA

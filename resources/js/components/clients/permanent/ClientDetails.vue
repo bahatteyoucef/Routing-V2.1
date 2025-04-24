@@ -59,6 +59,8 @@ export default {
 
             client                :   {
 
+                OpenCustomer                    : '',
+
                 CustomerCode                    : '',
 
                 CustomerNameE                   : '',
@@ -126,6 +128,8 @@ export default {
                 const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.$route.params.id_client+"/show" ,   null)
 
                 this.client.id                            =   res.data.id
+
+                this.client.OpenCustomer                  =   res.data.OpenCustomer
 
                 this.client.CustomerCode                  =   res.data.CustomerCode
 

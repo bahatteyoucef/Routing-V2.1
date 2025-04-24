@@ -105,6 +105,8 @@
                                 </th>
                                 <th class="col-sm-1">Index</th>
 
+                                <th class="col-sm-1">OpenCustomer</th>
+
                                 <th class="col-sm-1">CustomerCode</th>
 
                                 <th class="col-sm-1">CustomerNameE</th>
@@ -142,6 +144,8 @@
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder=""                 /></th>
 
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Index"            /></th>
+
+                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="OpenCustomer"     /></th>
 
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
 
@@ -181,6 +185,8 @@
                                     </div>
                                 </td>
                                 <td>{{index + 1}}</td>
+
+                                <td>{{client.OpenCustomer}}</td>
 
                                 <td>{{client.CustomerCode}}</td>
 

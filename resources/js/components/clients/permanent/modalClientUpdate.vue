@@ -13,8 +13,15 @@
                 <div class="modal-body mt-3">
 
                     <form>
-
                         <div class="mb-3">
+                            <label for="text"               class="form-label fw-bold">Client Ouvert</label>
+                            <select                         class="form-select"         id="OpenCustomer"           v-model="client.OpenCustomer"                           :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                <option     value=0>Non</option>
+                                <option     value=1>Oui</option>
+                            </select>
+                        </div>
+
+                        <div v-if="client.OpenCustomer  ==  1" class="mb-3">
                             <label for="CustomerNameE"      class="form-label">Nom et Prénom de l'Acheteur</label>
                             <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE"                          :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                         </div>
@@ -24,7 +31,7 @@
                             <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA"                          :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                         </div>
 
-                        <div class="mb-3">
+                        <div v-if="client.OpenCustomer  ==  1" class="mb-3">
                             <label for="Tel"                class="form-label">Téléphone</label>
                             <input type="text"              class="form-control"        id="Tel"                    v-model="client.Tel"                                    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                         </div>
@@ -96,7 +103,7 @@
 
                         <!--  -->
 
-                        <div class="mb-3">
+                        <div v-if="client.OpenCustomer  ==  1" class="mb-3">
                             <label for="text"               class="form-label">Disponibilité Produits</label>
                             <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability"       :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                 <option     value="0">No</option>
@@ -104,7 +111,7 @@
                             </select>
                         </div>
 
-                        <div class="mb-3">
+                        <div v-if="client.OpenCustomer  ==  1" class="mb-3">
                             <label for="text"               class="form-label">Source d'Achat</label>
                             <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                 <option     value="Distribution Direct">Distribution Direct</option>
@@ -183,7 +190,7 @@
 
                         <!--  -->
 
-                        <div class="mb-3">
+                        <div v-if="client.OpenCustomer  ==  1" class="mb-3">
                             <div v-show="client.CustomerCode   ==  ''"     class="mt-1 p-0">
                                 <div    id="reader_update" class="scanner_reader w-100"></div>
                             </div>
@@ -209,7 +216,7 @@
 
                         <!--  -->
 
-                        <div class="mb-3">
+                        <div v-if="client.OpenCustomer  ==  1" class="mb-3">
                             <label for="CustomerBarCode_image_update"   class="form-label">Image Code-Barre</label>
                             <input type="file"                          class="form-control"        id="CustomerBarCode_image_update"              accept="image/*"    capture     @change="customerBarCodeImage()"     :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                             <img                                                                    id="CustomerBarCode_image_display_update"      src=""              class="w-100">
@@ -221,7 +228,7 @@
                             <img                                                        id="facade_image_display_update"       src=""              class="w-100">
                         </div>
 
-                        <div class="mb-3">
+                        <div v-if="client.OpenCustomer  ==  1" class="mb-3">
                             <label for="in_store_image_update"  class="form-label">Image In-Store</label>
                             <input type="file"                  class="form-control"    id="in_store_image_update"             accept="image/*"    @change="inStoreImage()"                                             :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                             <img                                                        id="in_store_image_display_update"     src=""              class="w-100">
@@ -273,7 +280,7 @@
 
                     <div class="right-buttons"  style="display: flex; margin-left: auto;">
                         <button type="button"   class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <!-- <button type="button"   class="btn btn-success"                             @click="validateData()"   v-if="client.status   !=  'validated'"      >Validate</button> -->
+                        <button type="button"   class="btn btn-success float-left"  @click="showPositionInGoogleMaps()">Show Position</button>
                         <button type="button"   class="btn btn-primary"                             @click="sendData()"                                                 >Confirm</button>
                     </div>
                 </div>
@@ -296,6 +303,12 @@ export default {
             client      :   {
 
                 id                                      :   '',
+
+                //
+                id_route_import                         :   '',
+
+                //
+                OpenCustomer                            :   '',
 
                 // Slide 1
                 CustomerCode                            :   '',
@@ -428,45 +441,91 @@ export default {
 
             let formData = new FormData();
 
-            formData.append("CustomerCode"                  ,   this.client.CustomerCode)
-            formData.append("CustomerNameE"                 ,   this.client.CustomerNameE)
-            formData.append("CustomerNameA"                 ,   this.client.CustomerNameA)
-            formData.append("Latitude"                      ,   this.client.Latitude)
-            formData.append("Longitude"                     ,   this.client.Longitude)
-            formData.append("Address"                       ,   this.client.Address)
-            formData.append("Neighborhood"                  ,   this.client.Neighborhood)
-            formData.append("Landmark"                      ,   this.client.Landmark)
+            if(this.client.OpenCustomer ==  1) {
+                formData.append("OpenCustomer"                  ,   this.client.OpenCustomer)
+                formData.append("CustomerCode"                  ,   this.client.CustomerCode)
+                formData.append("CustomerNameE"                 ,   this.client.CustomerNameE)
+                formData.append("CustomerNameA"                 ,   this.client.CustomerNameA)
+                formData.append("Latitude"                      ,   this.client.Latitude)
+                formData.append("Longitude"                     ,   this.client.Longitude)
+                formData.append("Address"                       ,   this.client.Address)
+                formData.append("Neighborhood"                  ,   this.client.Neighborhood)
+                formData.append("Landmark"                      ,   this.client.Landmark)
 
-            formData.append("DistrictNo"                    ,   this.client.DistrictNo)
-            formData.append("DistrictNameE"                 ,   this.client.DistrictNameE)
-            formData.append("CityNo"                        ,   this.client.CityNo)
-            formData.append("CityNameE"                     ,   this.client.CityNameE)
-            formData.append("Tel"                           ,   this.client.Tel)
-            formData.append("CustomerType"                  ,   this.client.CustomerType)
-            formData.append("BrandAvailability"             ,   this.client.BrandAvailability)
-            formData.append("BrandSourcePurchase"           ,   this.client.BrandSourcePurchase)
+                formData.append("DistrictNo"                    ,   this.client.DistrictNo)
+                formData.append("DistrictNameE"                 ,   this.client.DistrictNameE)
+                formData.append("CityNo"                        ,   this.client.CityNo)
+                formData.append("CityNameE"                     ,   this.client.CityNameE)
+                formData.append("Tel"                           ,   this.client.Tel)
+                formData.append("CustomerType"                  ,   this.client.CustomerType)
+                formData.append("BrandAvailability"             ,   this.client.BrandAvailability)
+                formData.append("BrandSourcePurchase"           ,   this.client.BrandSourcePurchase)
 
-            formData.append("JPlan"                         ,   this.client.JPlan)
-            formData.append("Journee"                       ,   this.client.Journee)
+                formData.append("JPlan"                         ,   this.client.JPlan)
+                formData.append("Journee"                       ,   this.client.Journee)
 
-            formData.append("CustomerBarCode_image_updated"         ,   this.client.CustomerBarCode_image_updated)
-            formData.append("facade_image_updated"                  ,   this.client.facade_image_updated)
-            formData.append("in_store_image_updated"                ,   this.client.in_store_image_updated)
+                formData.append("CustomerBarCode_image_updated"         ,   this.client.CustomerBarCode_image_updated)
+                formData.append("facade_image_updated"                  ,   this.client.facade_image_updated)
+                formData.append("in_store_image_updated"                ,   this.client.in_store_image_updated)
 
-            formData.append("CustomerBarCode_image"                 ,   this.client.CustomerBarCode_image)
-            formData.append("facade_image"                          ,   this.client.facade_image)
-            formData.append("in_store_image"                        ,   this.client.in_store_image)
+                formData.append("CustomerBarCode_image"                 ,   this.client.CustomerBarCode_image)
+                formData.append("facade_image"                          ,   this.client.facade_image)
+                formData.append("in_store_image"                        ,   this.client.in_store_image)
 
-            formData.append("CustomerBarCode_image_original_name"   ,   this.client.CustomerBarCode_image_original_name)
-            formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
-            formData.append("in_store_image_original_name"          ,   this.client.in_store_image_original_name)
+                formData.append("CustomerBarCode_image_original_name"   ,   this.client.CustomerBarCode_image_original_name)
+                formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
+                formData.append("in_store_image_original_name"          ,   this.client.in_store_image_original_name)
 
-            formData.append("status"                        ,   this.client.status)
-            formData.append("nonvalidated_details"          ,   this.client.nonvalidated_details)
+                formData.append("status"                        ,   this.client.status)
+                formData.append("nonvalidated_details"          ,   this.client.nonvalidated_details)
 
-            formData.append("comment"                       ,   this.client.comment)
+                formData.append("comment"                       ,   this.client.comment)
+            }
 
-            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/update",   formData)
+            else {
+
+                formData.append("OpenCustomer"                  ,   this.client.OpenCustomer)
+                formData.append("CustomerCode"                  ,   '')
+                formData.append("CustomerNameE"                 ,   '')
+                formData.append("CustomerNameA"                 ,   this.client.CustomerNameA)
+                formData.append("Latitude"                      ,   this.client.Latitude)
+                formData.append("Longitude"                     ,   this.client.Longitude)
+                formData.append("Address"                       ,   this.client.Address)
+                formData.append("Neighborhood"                  ,   this.client.Neighborhood)
+                formData.append("Landmark"                      ,   this.client.Landmark)
+
+                formData.append("DistrictNo"                    ,   this.client.DistrictNo)
+                formData.append("DistrictNameE"                 ,   this.client.DistrictNameE)
+                formData.append("CityNo"                        ,   this.client.CityNo)
+                formData.append("CityNameE"                     ,   this.client.CityNameE)
+                formData.append("Tel"                           ,   '')
+                formData.append("CustomerType"                  ,   this.client.CustomerType)
+                formData.append("BrandAvailability"             ,   0)
+                formData.append("BrandSourcePurchase"           ,   '')
+
+                formData.append("JPlan"                         ,   this.client.JPlan)
+                formData.append("Journee"                       ,   this.client.Journee)
+
+                formData.append("CustomerBarCode_image_updated"         ,   true)
+                formData.append("facade_image_updated"                  ,   this.client.facade_image_updated)
+                formData.append("in_store_image_updated"                ,   true)
+
+                formData.append("CustomerBarCode_image"                 ,   '')
+                formData.append("facade_image"                          ,   this.client.facade_image)
+                formData.append("in_store_image"                        ,   '')
+
+                formData.append("CustomerBarCode_image_original_name"   ,   '')
+                formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
+                formData.append("in_store_image_original_name"          ,   '')
+
+                formData.append("status"                        ,   this.client.status)
+                formData.append("nonvalidated_details"          ,   this.client.nonvalidated_details)
+
+                formData.append("comment"                       ,   this.client.comment)
+            }
+
+            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.client.id_route_import+"/clients/"+this.client.id+"/update",   formData)
+            console.log(res)
 
             if(res.status===200){
 
@@ -497,7 +556,7 @@ export default {
 
             this.$showLoadingPage()
 
-            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/delete",   null)
+            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.client.id_route_import+"/clients/"+this.client.id+"/delete",   null)
 
             if(res.status===200){
 
@@ -524,6 +583,20 @@ export default {
 			}
         },
 
+        async showPositionInGoogleMaps() {
+
+            const client_latitude   =   this.client.Latitude;
+            const client_longitude  =   this.client.Longitude;
+
+            // Option A: Search endpoint
+            const url = `https://www.google.com/maps/search/?api=1&query=${client_latitude},${client_longitude}`;
+
+            // Option B: Legacy q=loc: parameter
+            // const url = `https://www.google.com/maps?q=loc:${client_latitude},${client_longitude}&z=15`;
+
+            window.open(url, '_system');
+        },
+
         //
 
         clearData(id_modal) {
@@ -543,27 +616,39 @@ export default {
 
                 //
 
-                let CustomerBarCode_image_update                    =   document.getElementById("CustomerBarCode_image_update")
-                CustomerBarCode_image_update.value                  =   ""
+                let CustomerBarCode_image_update                =   document.getElementById("CustomerBarCode_image_update")
+                if(CustomerBarCode_image_update) {
+                    CustomerBarCode_image_update.value              =   ""
+                }
 
-                let CustomerBarCode_image_display_update            =   document.getElementById("CustomerBarCode_image_display_update")
-                CustomerBarCode_image_display_update.src            =   ""
-
-                //
-
-                let facade_image_update                             =   document.getElementById("facade_image_update")
-                facade_image_update.value                           =   ""
-
-                let facade_image_display_update                     =   document.getElementById("facade_image_display_update")
-                facade_image_display_update.src                     =   ""
+                let CustomerBarCode_image_display_update        =   document.getElementById("CustomerBarCode_image_display_update")
+                if(CustomerBarCode_image_display_update) {
+                    CustomerBarCode_image_display_update.src        =   ""
+                }
 
                 //
 
-                let in_store_image_update                           =   document.getElementById("in_store_image_update")
-                in_store_image_update.value                         =   ""
+                let facade_image_update                         =   document.getElementById("facade_image_update")
+                if(facade_image_update) {
+                    facade_image_update.value                       =   ""
+                }
 
-                let in_store_image_display_update                   =   document.getElementById("in_store_image_display_update")
-                in_store_image_display_update.src                   =   ""
+                let facade_image_display_update                 =   document.getElementById("facade_image_display_update")
+                if(facade_image_display_update) {
+                    facade_image_display_update.src                 =   ""
+                }
+
+                //
+
+                let in_store_image_update                       =   document.getElementById("in_store_image_update")
+                if(in_store_image_update) {
+                    in_store_image_update.value                     =   ""
+                }
+
+                let in_store_image_display_update               =   document.getElementById("in_store_image_display_update")
+                if(in_store_image_display_update) {
+                    in_store_image_display_update.src               =   ""
+                }
 
                 //
 
@@ -583,6 +668,9 @@ export default {
 
                 // Client
                 this.client.id                                      =   '',
+
+                //
+                this.client.OpenCustomer                            =   '',
 
                 // Slide 1
                 this.client.CustomerCode                            =   '',
@@ -667,6 +755,8 @@ export default {
 
         getData(client, all_clients) {
 
+            console.log(client)
+
             this.all_clients    =   all_clients
 
             this.getClientData(client)  
@@ -680,6 +770,10 @@ export default {
             //
 
             this.client.id                              =   client.id
+
+            this.client.id_route_import                 =   client.id_route_import
+
+            this.client.OpenCustomer                    =   client.OpenCustomer
 
             this.client.CustomerCode                    =   client.CustomerCode
 
@@ -726,19 +820,23 @@ export default {
             this.client.facade_image_original_name              =   client.facade_image_original_name
             this.client.in_store_image_original_name            =   client.in_store_image_original_name
 
-            // 
-            this.$createFile(client.CustomerBarCode_image_original_name     ,   "CustomerBarCode_image_update")
-            this.$createFile(client.facade_image_original_name              ,   "facade_image_update")
-            this.$createFile(client.in_store_image_original_name            ,   "in_store_image_update")
+            if((this.client.CustomerBarCode_image_original_name)&&(this.client.OpenCustomer  === '1')) {
+                this.$createFile(client.CustomerBarCode_image_original_name     ,   "CustomerBarCode_image_update")
+                let CustomerBarCode_image_display_update                        =   document.getElementById("CustomerBarCode_image_display_update")
+                CustomerBarCode_image_display_update.src                        =   "/uploads/clients/"+client.id+"/"+client.CustomerBarCode_image
+            }
 
-            // 
-            let CustomerBarCode_image_display_update    =   document.getElementById("CustomerBarCode_image_display_update")
-            let facade_image_display_update             =   document.getElementById("facade_image_display_update")
-            let in_store_image_display_update           =   document.getElementById("in_store_image_display_update")
+            if(this.client.facade_image_original_name) {
+                this.$createFile(client.facade_image_original_name              ,   "facade_image_update")
+                let facade_image_display_update                                 =   document.getElementById("facade_image_display_update")
+                facade_image_display_update.src                                 =   "/uploads/clients/"+client.id+"/"+client.facade_image
+            }
 
-            CustomerBarCode_image_display_update.src    =   "/uploads/clients/"+client.id+"/"+client.CustomerBarCode_image
-            facade_image_display_update.src             =   "/uploads/clients/"+client.id+"/"+client.facade_image
-            in_store_image_display_update.src           =   "/uploads/clients/"+client.id+"/"+client.in_store_image
+            if((this.client.in_store_image_original_name)&&(this.client.OpenCustomer  === '1')) {
+                this.$createFile(client.in_store_image_original_name            ,   "in_store_image_update")
+                let in_store_image_display_update                               =   document.getElementById("in_store_image_display_update")
+                in_store_image_display_update.src                               =   "/uploads/clients/"+client.id+"/"+client.in_store_image
+            }
         },
 
         async getComboData() {

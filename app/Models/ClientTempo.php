@@ -213,7 +213,6 @@ class ClientTempo extends Model
             $client->Landmark                   =   $client_tempo->Landmark;
             $client->BrandAvailability          =   $client_tempo->BrandAvailability;
             $client->BrandSourcePurchase        =   $client_tempo->BrandSourcePurchase;
-
             $client->id_route_import_tempo      =   $client_tempo->id_route_import_tempo;
 
             if($client_tempo->JPlan     !=  null) {

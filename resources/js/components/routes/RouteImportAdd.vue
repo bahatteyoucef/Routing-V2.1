@@ -213,6 +213,7 @@ export default {
 
                 let columns                 =   Object.keys(this.clients[0])
 
+                let OpenCustomer_existe     =   columns.includes("OpenCustomer")
                 let CustomerCode_existe     =   columns.includes("CustomerCode")
                 let CustomerNameE_existe    =   columns.includes("CustomerNameE")
                 let CustomerNameA_existe    =   columns.includes("CustomerNameA")
@@ -228,6 +229,11 @@ export default {
                 let CityNameE_existe        =   columns.includes("CityNameE")
                 let Tel_existe              =   columns.includes("Tel")
                 let CustomerType_existe     =   columns.includes("CustomerType")
+
+                if(!OpenCustomer_existe) {
+
+                    errors.push("Your file doesn't contain the column 'OpenCustomer'")
+                }
 
                 if(!CustomerCode_existe) {
 
@@ -373,6 +379,11 @@ export default {
         setNecessaryAttributs() {
 
             for (let i = 0; i < this.clients.length; i++) {
+
+                if(!this.clients[i].hasOwnProperty("OpenCustomer")) {
+
+                    this.clients[i].OpenCustomer    =   ""
+                }
 
                 if(!this.clients[i].hasOwnProperty("CustomerCode")) {
 

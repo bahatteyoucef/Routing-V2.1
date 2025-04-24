@@ -50,7 +50,7 @@
 
                         <!--  -->
 
-                        <div class="mb-3"   v-if="(user.type_user  ==  'Viewer')||(user.type_user  ==  'BackOffice')||(user.type_user  ==  'BU Manager')">
+                        <div v-if="(user.type_user  ==  'Viewer')||(user.type_user  ==  'BackOffice')||(user.type_user  ==  'BU Manager')">
 
                             <div class="mb-3">
                                 <label for="Route Imports"               class="form-label">Route Imports</label>
@@ -80,20 +80,20 @@
 
                         <!--  -->
 
-                        <div class="mb-3"   v-if="user.type_user    ==  'FrontOffice'">
+                        <div v-if="user.type_user    ==  'FrontOffice'">
 
                             <div class="mb-3">
                                 <label for="accuracy"       class="form-label">Accuracy</label>
-                                <input type="number"        class="form-control"        id="accuracy"                       v-model="user.accuracy">
+                                <input type="number"        class="form-control"        id="accuracy"       v-model="user.accuracy">
                             </div>
 
                             <div class="mb-3">
                                 <label for="Route Imports"               class="form-label">Route Imports</label>
 
                                 <Multiselect
-                                    @select             =   "setListeRouteImport()"
-                                    @deselect           =   "setListeRouteImport()"
-                                    @clear              =   "setListeRouteImport()"
+                                    @select             =   "getDistricts()"
+                                    @deselect           =   "getDistricts()"
+                                    @clear              =   "getDistricts()"
 
                                     v-model             =   "user.selected_route_import"
                                     :options            =   "liste_route_import"
@@ -108,6 +108,50 @@
                                     :canDeselect        =   "true"
                                     :canClear           =   "true"
                                     :allowAbsent        =   "false"
+                                />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="District"               class="form-label">District</label>
+
+                                <Multiselect
+                                    @select             =   "getCities()"
+                                    @deselect           =   "getCities()"
+                                    @clear              =   "getCities()"
+
+                                    v-model             =   "user.selected_district"
+                                    :options            =   "districts"
+                                    mode                =   "single"
+                                    placeholder         =   "Select District"
+                                    class               =   "mt-1"
+
+                                    :close-on-select    =   "false"
+                                    :searchable         =   "true"
+                                    :create-option      =   "false"
+
+                                    :canDeselect        =   "true"
+                                    :canClear           =   "true"
+                                    :allowAbsent        =   "true"
+                                />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="Cities"               class="form-label">Cities</label>
+
+                                <Multiselect
+                                    v-model             =   "user.selected_cities"
+                                    :options            =   "cities"
+                                    mode                =   "tags"
+                                    placeholder         =   "Select Cities"
+                                    class               =   "mt-1"
+
+                                    :close-on-select    =   "false"
+                                    :searchable         =   "true"
+                                    :create-option      =   "false"
+
+                                    :canDeselect        =   "true"
+                                    :canClear           =   "true"
+                                    :allowAbsent        =   "true"
                                 />
                             </div>
 
@@ -152,10 +196,18 @@ export default {
                 max_route_import        :   0       ,
 
                 selected_route_import   :   null    ,
-                liste_route_import      :   null
+                liste_route_import      :   null    ,
+
+                selected_district       :   null    ,
+                selected_cities         :   []      ,
+
+                password                :   ''      ,
+                password_confirmation   :   ''
             },
 
-            liste_route_import          :   []
+            liste_route_import  :   [],
+            districts           :   [],
+            cities              :   []
         }
     },
 
@@ -190,6 +242,9 @@ export default {
             formData.append("selected_route_import"     , this.user.selected_route_import)
             formData.append("liste_route_import"        , JSON.stringify(this.user.liste_route_import))
 
+            formData.append("selected_district"         , this.user.selected_district)
+            formData.append("selected_cities"           , JSON.stringify(this.user.selected_cities))
+
             const res   =   await this.$callApi('post' ,   '/users/'+this.user.id+'/update'    ,   formData)         
 
             // Hide Loading Page
@@ -220,6 +275,7 @@ export default {
 
             $(id_modal).on("hidden.bs.modal",   ()  => {
 
+                this.user.nom_original              =   ''
                 this.user.nom                       =   ''
                 this.user.email                     =   ''
                 this.user.tel                       =   ''
@@ -232,7 +288,14 @@ export default {
                 this.user.selected_route_import     =   null
                 this.user.liste_route_import        =   null
 
+                this.user.selected_district         =   null
+                this.user.selected_cities           =   []
+                this.user.password                  =   ''
+                this.user.password_confirmation     =   ''
+
                 this.liste_route_import             =   []
+                this.districts                      =   []
+                this.cities                         =   []
             });
         },
 
@@ -266,6 +329,15 @@ export default {
             if(this.user.type_user  ==  "FrontOffice") {
 
                 this.user.selected_route_import     =   res.data.liste_route_import
+
+                await this.getDistricts()
+
+                console.log(res.data.DistrictNo)
+                this.user.selected_district         =   res.data.DistrictNo
+
+                await this.getCities()
+
+                this.user.selected_cities           =   res.data.cities
             }
         },
 
@@ -283,9 +355,47 @@ export default {
 
         //
 
-        setListeRouteImport() {   
+        async getDistricts() {   
+
+            this.$showLoadingPage()
+
+            const res_3         =   await this.$callApi("post"  ,   "/route_import/"+this.user.selected_route_import+"/districts"   ,   null)
+            let districts       =   res_3.data
+
+            console.log(res_3.data)
+
+            for (let i = 0; i < districts.length; i++) {
+
+                this.districts.push({ value : districts[i].DistrictNo , label : districts[i].DistrictNo +   "- "    +   districts[i].DistrictNameE})
+            }
+
+            this.user.selected_district =   null
+
+            this.user.cities            =   []
+            this.user.selected_cities   =   []
+
+            this.$hideLoadingPage()
+        },
+
+        async getCities() {
+
+            this.$showLoadingPage()
+
+            const res_3         =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.user.selected_district+"/rtm_cites"       ,   null)
+            let cities          =   res_3.data
+
+            console.log(res_3.data)
+
+            for (let i = 0; i < cities.length; i++) {
+
+                this.cities.push({ value : cities[i].CITYNO , label : cities[i].CITYNO +   "- "    +   cities[i].CityNameE})
+            }
+
+            this.user.cities            =   []
+            this.user.selected_cities   =   []
+
+            this.$hideLoadingPage()
         }
     }
-
 };
 </script>

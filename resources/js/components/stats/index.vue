@@ -96,6 +96,16 @@
         </div>
 
         <div class="col p-1">
+          <div class="card h-100 bg-gradient-secondary card-img-holder text-white p-3" v-if="number_clients_visible !=  null">
+            <div class="card-body p-1">
+              <h4 class="font-weight-normal mb-3">Visible <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
+              </h4>
+              <h2 class="mb-1 animate__animated animate__pulse">{{number_clients_visible}}</h2>
+            </div>
+          </div>
+        </div>
+
+        <div class="col p-1">
           <div class="card h-100 bg-gradient-info card-img-holder text-white p-3" v-if="number_clients_total          !=  null">
             <div class="card-body p-1">
               <h4 class="font-weight-normal mb-3">Total <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i>
@@ -137,11 +147,9 @@
           <div class="card h-100" v-if="show_by_brand_source_purchase_report_content">
             <div class="card-body p-0">
               <div class="row">
-
                 <div class="report_div by_source_achat_report" id="by_source_achat_report">
                     <ByBrandSourcePurchaseReport :key="by_brand_source_purchase_report_chart_data" :by_brand_source_purchase_report_chart_data="by_brand_source_purchase_report_chart_data"  :by_brand_source_purchase_report_table_data="by_brand_source_purchase_report_table_data"></ByBrandSourcePurchaseReport>
                 </div>
-
               </div>
             </div>
           </div>
@@ -152,24 +160,34 @@
           <div class="card h-100" v-if="show_by_brand_availability_report_content">
             <div class="card-body p-0">
               <div class="row">
-
                 <div class="report_div by_brand_availability_report" id="by_brand_availability_report">
                     <ByBrandAvailabilityReport  :key="by_brand_availability_report_chart_data"  :by_brand_availability_report_chart_data="by_brand_availability_report_chart_data"  :by_brand_availability_report_table_data="by_brand_availability_report_table_data"></ByBrandAvailabilityReport>
                 </div>
-
               </div>
             </div>
           </div>
         </div>
-
       </div>
       <!--                                                                                -->
 
       <!-- DailyReport    -->
       <div class="row h-equal p-0 m-0">
 
+        <!--  ByOpenCustomerReport -->
+        <div class="col-4 p-2">
+          <div class="card h-100" v-if="show_by_open_customer_report_content">
+            <div class="card-body p-0">
+              <div class="row">
+                <div class="report_div by_open_customer_report" id="by_open_customer_report">
+                    <ByOpenCustomerReport  :key="by_open_customer_report_chart_data"  :by_open_customer_report_chart_data="by_open_customer_report_chart_data"  :by_open_customer_report_table_data="by_open_customer_report_table_data"></ByOpenCustomerReport>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!--  DailyReport  -->
-        <div class="col-12 p-2">
+        <div class="col-8 p-2">
           <div class="card h-100" v-if="show_daily_report_content">
             <div class="card-body p-0">                
               <div class="report_div" id="daily_report">
@@ -245,6 +263,7 @@
 import ByCustomerTypeReport               from  "./parts/ByCustomerTypeReport.vue"
 import ByBrandSourcePurchaseReport        from  "./parts/ByBrandSourcePurchaseReport.vue"
 import ByBrandAvailabilityReport          from  "./parts/ByBrandAvailabilityReport.vue"
+import ByOpenCustomerReport               from  "./parts/ByOpenCustomerReport.vue"
 
 import DailyReport                        from  "./parts/DailyReport.vue"
 import ByTelAvailabilityReport            from  "./parts/ByTelAvailabilityReport.vue"
@@ -269,6 +288,7 @@ export default {
       number_clients_validated                                  : null    ,
       number_clients_pending                                    : null    ,
       number_clients_nonvalidated                               : null    ,
+      number_clients_visible                                    : null    ,
       number_clients_total                                      : null    ,
       number_clients_expected                                   : null    ,
 
@@ -291,6 +311,12 @@ export default {
       show_by_brand_availability_report_content                 : false   ,
       by_brand_availability_report_chart_data                   : null    ,
       by_brand_availability_report_table_data                   : null    ,
+
+      //
+
+      show_by_open_customer_report_content                      : false   ,
+      by_open_customer_report_chart_data                        : null    ,
+      by_open_customer_report_table_data                        : null    ,
 
       //
 
@@ -339,8 +365,9 @@ export default {
     ByBrandAvailabilityReport     :   ByBrandAvailabilityReport   ,
     ByCityReport                  :   ByCityReport                ,
     ByCustomerTypeReport          :   ByCustomerTypeReport        ,
-    ByBrandSourcePurchaseReport        :   ByBrandSourcePurchaseReport      ,
+    ByBrandSourcePurchaseReport   :   ByBrandSourcePurchaseReport ,
     ByTelAvailabilityReport       :   ByTelAvailabilityReport     ,
+    ByOpenCustomerReport          :   ByOpenCustomerReport        ,
     DailyReport                   :   DailyReport                 ,
     DataCensusReport              :   DataCensusReport            ,
 
@@ -367,6 +394,7 @@ export default {
             this.show_by_customer_type_report_content           =   false
             this.show_by_brand_source_purchase_report_content   =   false
             this.show_by_brand_availability_report_content      =   false
+            this.show_by_open_customer_report_content           =   false
             this.show_daily_report_content                      =   false
             this.show_by_tel_availability_report_content        =   false
             this.show_by_city_report_content                    =   false
@@ -383,6 +411,8 @@ export default {
             await this.$callApi("post",   "/statistics/details",    formData)
             .then(async (res)=> {
 
+                console.log(res)
+
                 //
                 this.$hideLoadingPage()
 
@@ -390,6 +420,7 @@ export default {
                 this.number_clients_validated                     =   res.data.stats_details.number_clients_validated
                 this.number_clients_pending                       =   res.data.stats_details.number_clients_pending  
                 this.number_clients_nonvalidated                  =   res.data.stats_details.number_clients_nonvalidated
+                this.number_clients_visible                       =   res.data.stats_details.number_clients_visible 
                 this.number_clients_total                         =   res.data.stats_details.number_clients_total
                 this.number_clients_expected                      =   res.data.stats_details.number_clients_expected
 
@@ -420,41 +451,50 @@ export default {
                         this.emitter.on('show_by_brand_availability_report_content_ready' , () =>  {
 
                             //
-                            this.daily_report_chart_data                      =   res.data.stats_details.daily_report_chart_data
-                            this.daily_report_table_data                      =   res.data.stats_details.daily_report_table_data
+                            this.by_open_customer_report_chart_data           =   res.data.stats_details.by_open_customer_report_chart_data
+                            this.by_open_customer_report_table_data           =   res.data.stats_details.by_open_customer_report_table_data
 
-                            this.show_daily_report_content                    =   true
+                            this.show_by_open_customer_report_content         =   true
 
-                            this.emitter.on('show_daily_report_content_ready' , () =>  {
+                            this.emitter.on('show_by_open_customer_report_content_ready' , () =>  {
 
                                 //
-                                // this.by_tel_availability_report_chart_data        =   res.data.stats_details.by_tel_availability_report_chart_data
-                                // this.by_tel_availability_report_table_data        =   res.data.stats_details.by_tel_availability_report_table_data
+                                this.daily_report_chart_data                      =   res.data.stats_details.daily_report_chart_data
+                                this.daily_report_table_data                      =   res.data.stats_details.daily_report_table_data
 
-                                // this.show_by_tel_availability_report_content      =   true
+                                this.show_daily_report_content                    =   true
 
-                                // this.emitter.on('show_by_tel_availability_report_content_ready' , () =>  {
+                                this.emitter.on('show_daily_report_content_ready' , () =>  {
 
                                     //
-                                    // this.by_city_report_chart_data                    =   res.data.stats_details.by_city_report_chart_data
-                                    this.by_city_report_table_data                    =   res.data.stats_details.by_city_report_table_data
+                                    // this.by_tel_availability_report_chart_data        =   res.data.stats_details.by_tel_availability_report_chart_data
+                                    // this.by_tel_availability_report_table_data        =   res.data.stats_details.by_tel_availability_report_table_data
 
-                                    this.show_by_city_report_content                  =   true
+                                    // this.show_by_tel_availability_report_content      =   true
 
-                                    this.emitter.on('show_by_city_report_content_ready' , () =>  {
+                                    // this.emitter.on('show_by_tel_availability_report_content_ready' , () =>  {
 
                                         //
-                                        this.data_census_report_table_data                =   res.data.stats_details.data_census_report_table_data
+                                        // this.by_city_report_chart_data                    =   res.data.stats_details.by_city_report_chart_data
+                                        this.by_city_report_table_data                    =   res.data.stats_details.by_city_report_table_data
 
-                                        this.show_data_census_report_content              =   true
+                                        this.show_by_city_report_content                  =   true
 
-                                        this.emitter.on('show_data_census_report_content_ready' , () =>  {
+                                        this.emitter.on('show_by_city_report_content_ready' , () =>  {
 
-                                            this.show_get_data_button     =   true
-                                            this.show_export_data_button  =   true
+                                            //
+                                            this.data_census_report_table_data                =   res.data.stats_details.data_census_report_table_data
+
+                                            this.show_data_census_report_content              =   true
+
+                                            this.emitter.on('show_data_census_report_content_ready' , () =>  {
+
+                                                this.show_get_data_button     =   true
+                                                this.show_export_data_button  =   true
+                                            })
                                         })
-                                    })
-                                // })
+                                    // })
+                                })
                             })
                         })
                     })
@@ -486,6 +526,7 @@ export default {
         this.exportByCustomerTypeReport()
         this.exportByBrandSourcePurchaseReport()
         this.exportByBrandAvailabilityReport()
+        this.exportByOpenCustomerReport()
         this.exportDailyReport()
         // this.exportByTelAvailabilityReport()
         this.exportByCityReport()
@@ -735,6 +776,86 @@ export default {
 
         let columns =   [
                           {header: "Brand Availability" , key: "Brand Availability" , width: 10},
+                          {header: "Clients"            , key: "Clients"            , width: 10},
+                          {header: "Total"              , key: "Total"              , width: 10}
+                        ]
+
+        return columns
+    },
+
+    //
+
+    exportByOpenCustomerReport() {
+
+        // Add a new worksheet to workbook variable
+        const worksheet   =   this.workbook.addWorksheet('By Open Customer Report');
+
+        //
+
+        worksheet.columns =   this.getByOpenCustomerReportColumns()
+
+        //
+
+        let rows          =   this.getByOpenCustomerReportRows()
+
+        worksheet.addRows(rows)
+
+        //
+
+        // Determine the last row of the table
+        const lastRow = worksheet.lastRow.number;
+
+        //
+        const canvas  = document.getElementById("by_open_customer_report_chart")
+        const ctx     = canvas.getContext('2d');
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+        //
+        const imgId   = this.workbook.addImage({
+          base64      : this.imageDataToBase64(imgData),
+          extension   : 'png',
+        });
+
+        // Add the image to the worksheet
+        worksheet.addImage(imgId, {
+          tl  : { col: 1, row: lastRow + 2 },
+          ext : { width: canvas.width, height: canvas.height },
+        });
+    },
+
+    getByOpenCustomerReportRows() {
+
+      let rows  =   []
+
+      let row   =   {}
+
+      for (let index = 0; index < this.by_open_customer_report_table_data.rows.length; index++) {
+
+        row                         =   {}
+
+        row["Open Customer"]        =   this.by_open_customer_report_table_data.rows[index].label 
+        row["Clients"]              =   this.by_open_customer_report_table_data.rows[index].count_clients 
+        row["Total"]                =   parseInt(this.by_open_customer_report_table_data.rows[index].percentage_clients * 100) + "%"
+
+        rows.push(row)
+      }
+
+      // Set Total
+      row                         =   {}
+
+      row["Open Customer"]        =   this.by_open_customer_report_table_data.total_row.label
+      row["Clients"]              =   this.by_open_customer_report_table_data.total_row.count_clients
+      row["Total"]                =   parseInt(this.by_open_customer_report_table_data.total_row.percentage_clients * 100) + "%"
+
+      rows.push(row)
+
+      return rows
+    },
+
+    getByOpenCustomerReportColumns() {
+
+        let columns =   [
+                          {header: "Open Customer"      , key: "Open Customer"      , width: 10},
                           {header: "Clients"            , key: "Clients"            , width: 10},
                           {header: "Total"              , key: "Total"              , width: 10}
                         ]
@@ -1056,7 +1177,7 @@ export default {
         row["OwnerName"]            =   this.data_census_report_table_data.rows[index].OwnerName
         row["JPlan"]                =   this.data_census_report_table_data.rows[index].JPlan
         row["Journee"]              =   this.data_census_report_table_data.rows[index].Journee
-
+        row["OpenCustomer"]         =   this.data_census_report_table_data.rows[index].OpenCustomer
         rows.push(row)
       }
 
@@ -1089,6 +1210,7 @@ export default {
                           {header: "OwnerName"              , key: "OwnerName"            , width: 10},
                           {header: "JPlan"                  , key: "JPlan"                , width: 10},
                           {header: "Journee"                , key: "Journee"              , width: 10},
+                          {header: "OpenCustomer"           , key: "OpenCustomer"         , width: 10},
                         ]
 
         return columns

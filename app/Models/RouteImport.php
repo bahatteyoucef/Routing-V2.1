@@ -518,8 +518,15 @@ class RouteImport extends Model
         $route_import->data     =   Client::query()
                                         ->where('clients.id_route_import', $id)
                                         ->where(function($q) {
-                                            $q->where('clients.owner'   , Auth::user()->id)
-                                            ->orWhere('clients.status'  , 'visible');
+                                            $q->where('clients.owner', Auth::id())
+                                            ->orWhere(function($q2) {
+                                                $q2->where('clients.status', 'visible')
+                                                    ->whereIn('clients.CityNo', function($sub) {
+                                                        $sub->select('CITYNO')
+                                                            ->from('users_cities')
+                                                            ->where('id_user', Auth::id());
+                                                    });
+                                            });
                                         })
                                         ->join('users', 'clients.owner', '=', 'users.id')
                                         ->select('clients.*', 'users.nom as owner_name')
@@ -558,6 +565,7 @@ class RouteImport extends Model
             if($client) {
 
                 $client->CustomerCode           =   $client_elem->CustomerCode;
+                $client->OpenCustomer           =   $client_elem->OpenCustomer;
                 $client->CustomerNameE          =   $client_elem->CustomerNameE;
                 $client->CustomerNameA          =   $client_elem->CustomerNameA;
                 $client->Latitude               =   $client_elem->Latitude;
@@ -753,7 +761,8 @@ class RouteImport extends Model
             //
 
             $client         =   new Client([
-                'CustomerCode'          =>  $client_elem->CustomerCode          ,    
+                'CustomerCode'          =>  $client_elem->CustomerCode          ,
+                'OpenCustomer'          =>  $client_elem->OpenCustomer          ,    
                 'CustomerNameE'         =>  $client_elem->CustomerNameE         ,
                 'CustomerNameA'         =>  $client_elem->CustomerNameA         ,
                 'Latitude'              =>  $client_elem->Latitude              ,
@@ -992,16 +1001,21 @@ class RouteImport extends Model
     public static function clientsByStatus(Request $request, int $id_route_import) {
 
         $clients        =   Client::query()
-                                ->where('clients.id_route_import'   , $id_route_import)
-                                ->where('clients.status'            , $request->get('status'))
+                                ->where('clients.id_route_import', $id_route_import)
+                                ->where('clients.status', $request->get('status'))
                                 ->when(
                                     $request->get('status') !== 'visible',
-                                    fn($q) => $q->where('clients.owner', Auth::id()),       // if true
-                                    fn($q) => $q                                            // if false
+                                    fn($q) => $q->where('clients.owner', Auth::id()),
+                                    fn($q) => $q->whereIn('clients.CityNo', function($sub) {
+                                        $sub->select('CITYNO')
+                                            ->from('users_cities')
+                                            ->where('id_user', Auth::id());
+                                    })
                                 )
                                 ->join('users', 'clients.owner', '=', 'users.id')
                                 ->select('clients.*', 'users.nom as owner_name')
                                 ->get();
+
 
         //
         return $clients;

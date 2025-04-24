@@ -25,7 +25,29 @@
         <div class="container"  style="height : 60vh; overflow : auto;">
             <form>
                 <div class="slideshow-container">
+
+                    <!-- OpenCustomer -->
                     <div class="mySlides slide_1 mt-3">
+                        <div>
+                            <div class="mb-1">
+                                <label for="text"               class="form-label fw-bold">Client Ouvert</label>
+                                <select                         class="form-select"         id="OpenCustomer"                 v-model="client.OpenCustomer"     @change="setTotalQuestions()"   :disabled="client.status_original    ==  'validated'"   >
+                                    <option     value=0>Non</option>
+                                    <option     value=1>Oui</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!--  -->
+
+                        <div class="mt-5">
+                            <ul class="pl-3">
+                                <li>Sélectionnez si le client est ouvert ou non (exemple : <span class="fw-bold">Oui</span>).</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div v-if="client.OpenCustomer  ===  '1'"  v-show="false"  class="mySlides slide_2 mt-3">
                         <div>
                             <label for="CustomerBarCode_image"  class="form-label fw-bold">Code-Barre</label>
                             <div v-show="client.CustomerCode   ==  ''"     class="mt-1 p-0">
@@ -61,7 +83,8 @@
                         </div>
                     </div>
 
-                    <div class="mySlides slide_2 mt-3">
+                    <!-- CustomerBarCode_image -->
+                    <div v-if="client.OpenCustomer  ===  '1'"  v-show="false"  class="mySlides slide_3 mt-3">
                         <div>
                             <label for="CustomerBarCode_image_update"  class="form-label fw-bold">Code-Barre Image</label>
                             <button type="button"                       class="btn btn-secondary w-100 mb-1" @click="$clickFile('CustomerBarCode_image_update')"        :disabled="client.status_original    ==  'validated'"><i class="mdi mdi-camera"></i></button>
@@ -79,7 +102,8 @@
                         </div>
                     </div>
 
-                    <div class="mySlides slide_3 mt-3">
+                    <!-- CustomerNameE -->
+                    <div v-if="client.OpenCustomer  ===  '1'"  v-show="false"  class="mySlides slide_4 mt-3">
                         <div>
                             <label for="CustomerNameE"      class="form-label fw-bold">Nom et Prénom de l'Acheteur</label>
                             <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE"  :disabled="client.status_original    ==  'validated'">
@@ -94,7 +118,8 @@
                         </div>
                     </div>
 
-                    <div class="mySlides slide_4 mt-3">
+                    <!-- CustomerNameA -->
+                    <div v-show="false"  class="mySlides slide_5 mt-3">
                         <div>
                             <label for="CustomerNameA"      class="form-label fw-bold">Raison Sociale</label>
                             <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA"  :disabled="client.status_original    ==  'validated'">
@@ -109,7 +134,8 @@
                         </div>
                     </div>
 
-                    <div class="mySlides slide_5 mt-3">
+                    <!-- Tel -->
+                    <div v-if="client.OpenCustomer  ===  '1'"  v-show="false"  class="mySlides slide_6 mt-3">
                         <div>
                             <label for="Tel"                class="form-label fw-bold">Téléphone</label>
                             <input type="text"              class="form-control"        id="Tel"                    v-model="client.Tel"            :disabled="client.status_original    ==  'validated'">
@@ -124,7 +150,8 @@
                         </div>
                     </div>
 
-                    <div class="mySlides slide_6 mt-3">
+                    <!-- Adresse -->
+                    <div v-show="false" class="mySlides slide_7 mt-3">
                         <div>
                             <label for="Address"            class="form-label fw-bold">Adresse</label>
                             <input type="text"              class="form-control"        id="Address"                v-model="client.Address"        :disabled="client.status_original    ==  'validated'">
@@ -139,7 +166,8 @@
                         </div>
                     </div>
 
-                    <div class="mySlides slide_7 mt-3">
+                    <!-- Neighborhood -->
+                    <div v-show="false" class="mySlides slide_8 mt-3">
                         <div>
                             <label for="Neighborhood"       class="form-label fw-bold">Quartier</label>
                             <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood"   :disabled="client.status_original    ==  'validated'">
@@ -154,7 +182,8 @@
                         </div>
                     </div>
 
-                    <div class="mySlides slide_8 mt-3">
+                    <!-- Landmark -->
+                    <div v-show="false" class="mySlides slide_9 mt-3">
                         <div>
                             <label for="Landmark"           class="form-label fw-bold">Point de Repere</label>
                             <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"       :disabled="client.status_original    ==  'validated'"></textarea>
@@ -169,7 +198,8 @@
                         </div>
                     </div>
 
-                    <div class="mySlides slide_9 mt-3">
+                    <!-- DistrictNo --> 
+                    <div v-show="false" class="mySlides slide_10 mt-3">
                         <div>
                             <label for="DistrictNo"         class="form-label fw-bold">Willaya</label>
                             <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()">
@@ -186,7 +216,8 @@
                         </div>
                     </div>
 
-                    <div class="mySlides slide_10 mt-3">
+                    <!-- CityNo -->
+                    <div v-show="false" class="mySlides slide_11 mt-3">
                         <div>
                             <label for="CityNo"             class="form-label fw-bold">Commune</label>
                             <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo"                                 :disabled="client.status_original    ==  'validated'">
@@ -203,7 +234,8 @@
                         </div>
                     </div>
 
-                    <div class="mySlides slide_11 mt-3">
+                    <!-- CustomerType -->
+                    <div v-show="false" class="mySlides slide_12 mt-3">
                         <div>
                             <label for="text"               class="form-label fw-bold">Type de Magasin</label>
                             <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType"                     :disabled="client.status_original    ==  'validated'">
@@ -235,7 +267,8 @@
                         </div>
                     </div>
 
-                    <div class="mySlides slide_12 mt-3">
+                    <!-- BrandSourcePurchase -->
+                    <div v-if="client.OpenCustomer  ===  '1'"  v-show="false"  class="mySlides slide_13 mt-3">
                         <div>
                             <label for="text"               class="form-label fw-bold">Source d'Achat</label>
                             <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase"       :disabled="client.status_original    ==  'validated'">
@@ -261,7 +294,8 @@
                         </div>
                     </div>
 
-                    <div class="mySlides slide_13 mt-3">
+                    <!-- JPlan -->
+                    <div v-show="false"  class="mySlides slide_14 mt-3">
                         <div>
                             <label for="JPlan"              class="form-label fw-bold">Nom de Vendeur</label>
                             <input type="text"              class="form-control"        id="JPlan"          v-model="client.JPlan"                                          :disabled="client.status_original    ==  'validated'">
@@ -276,7 +310,8 @@
                         </div>
                     </div>
 
-                    <div class="mySlides slide_14 mt-3">
+                    <!-- Journee -->
+                    <div v-show="false"  class="mySlides slide_15 mt-3">
                         <div>
                             <label for="Journee"            class="form-label fw-bold">Journee</label>
 
@@ -305,7 +340,8 @@
                         </div>
                     </div>
 
-                    <div class="mySlides slide_15 mt-3">
+                    <!-- BrandAvailability + In-Store Image -->
+                    <div v-if="client.OpenCustomer  ===  '1'"  v-show="false"  class="mySlides slide_16 mt-3">
                         <div>
                             <div class="mb-1">
                                 <label for="text"               class="form-label fw-bold">Disponibilité Produits</label>
@@ -334,7 +370,8 @@
                         </div>
                     </div>
 
-                    <div class="mySlides slide_16 mt-3">
+                    <!-- Comment -->
+                    <div v-show="false"  class="mySlides slide_17 mt-3">
                         <div>
                             <label      for="comment" class="form-label fw-bold">Commentaire</label>
                             <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"    :disabled="client.status_original    ==  'validated'"></textarea>
@@ -349,7 +386,8 @@
                         </div>
                     </div>
 
-                    <div class="mySlides slide_17 mt-3">
+                    <!-- facade_image -->
+                    <div v-show="false"  class="mySlides slide_18 mt-3">
                         <div>
                             <label for="facade_image_update"    class="form-label fw-bold">Image Facade</label>
                             <button type="button"               class="btn btn-secondary w-100 mb-1" @click="$clickFile('facade_image_update')"     :disabled="client.status_original    ==  'validated'"><i class="mdi mdi-camera"></i></button>
@@ -367,7 +405,8 @@
                         </div>
                     </div>
 
-                    <div class="mySlides slide_18 mt-3">
+                    <!-- GPS -->
+                    <div v-show="false"  class="mySlides slide_19 mt-3">
                         <div>
                             <label for="CustomerCode"       class="form-label fw-bold">Detecter la Position Actuel <button class="btn btn-sm" @click.prevent="showPositionOnMap('show_map')"    :disabled="((client.status_original    ==  'validated')||(check_gps_clicked))"><i class="mdi mdi-reload"></i></button></label>
                             <p class="text-secondary text-small mb-1">Latitude : {{ client.Latitude }}</p>
@@ -477,6 +516,8 @@ export default {
                 // Client
                 id                  :   '',
 
+                OpenCustomer        :   '',
+
                 CustomerCode        :   '',
 
                 old_CustomerNameE   :   '',
@@ -544,7 +585,7 @@ export default {
 
             //
 
-            total_questions                 :   18      ,
+            total_questions                 :   19      ,
 
             //
             check_gps_clicked               :   false   ,
@@ -604,6 +645,9 @@ export default {
         await this.getData()
 
         //
+        this.setTotalQuestions()
+
+        //
         // await this.checkInsidePolygon()
     },  
 
@@ -638,46 +682,95 @@ export default {
 
                 let formData = new FormData();
 
-                formData.append("CustomerCode"                          ,   this.client.CustomerCode)
-                formData.append("CustomerNameE"                         ,   this.client.CustomerNameE)
-                formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
-                formData.append("Latitude"                              ,   this.client.Latitude)
-                formData.append("Longitude"                             ,   this.client.Longitude)
-                formData.append("Address"                               ,   this.client.Address)
+                if(this.client.OpenCustomer ===  '1') {
 
-                formData.append("Neighborhood"                          ,   this.client.Neighborhood)
-                formData.append("Landmark"                              ,   this.client.Landmark)
+                    formData.append("OpenCustomer"                          ,   this.client.OpenCustomer)
+                    formData.append("CustomerCode"                          ,   this.client.CustomerCode)
+                    formData.append("CustomerNameE"                         ,   this.client.CustomerNameE)
+                    formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
+                    formData.append("Latitude"                              ,   this.client.Latitude)
+                    formData.append("Longitude"                             ,   this.client.Longitude)
+                    formData.append("Address"                               ,   this.client.Address)
 
-                formData.append("DistrictNo"                            ,   this.client.DistrictNo)
-                formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
-                formData.append("CityNo"                                ,   this.client.CityNo)
-                formData.append("CityNameE"                             ,   this.client.CityNameE)
-                formData.append("Tel"                                   ,   this.client.Tel)
-                formData.append("CustomerType"                          ,   this.client.CustomerType)
-                formData.append("BrandAvailability"                     ,   this.client.BrandAvailability)
-                formData.append("BrandSourcePurchase"                   ,   this.client.BrandSourcePurchase)
+                    formData.append("Neighborhood"                          ,   this.client.Neighborhood)
+                    formData.append("Landmark"                              ,   this.client.Landmark)
 
-                formData.append("JPlan"                                 ,   this.client.JPlan)
-                formData.append("Journee"                               ,   this.client.Journee)
+                    formData.append("DistrictNo"                            ,   this.client.DistrictNo)
+                    formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
+                    formData.append("CityNo"                                ,   this.client.CityNo)
+                    formData.append("CityNameE"                             ,   this.client.CityNameE)
+                    formData.append("Tel"                                   ,   this.client.Tel)
+                    formData.append("CustomerType"                          ,   this.client.CustomerType)
+                    formData.append("BrandAvailability"                     ,   this.client.BrandAvailability)
+                    formData.append("BrandSourcePurchase"                   ,   this.client.BrandSourcePurchase)
 
-                formData.append("CustomerBarCode_image_updated"         ,   this.client.CustomerBarCode_image_updated)
-                formData.append("facade_image_updated"                  ,   this.client.facade_image_updated)
-                formData.append("in_store_image_updated"                ,   this.client.in_store_image_updated)
+                    formData.append("JPlan"                                 ,   this.client.JPlan)
+                    formData.append("Journee"                               ,   this.client.Journee)
 
-                formData.append("CustomerBarCode_image"                 ,   this.client.CustomerBarCode_image)
-                formData.append("facade_image"                          ,   this.client.facade_image)
-                formData.append("in_store_image"                        ,   this.client.in_store_image)
+                    formData.append("CustomerBarCode_image_updated"         ,   this.client.CustomerBarCode_image_updated)
+                    formData.append("facade_image_updated"                  ,   this.client.facade_image_updated)
+                    formData.append("in_store_image_updated"                ,   this.client.in_store_image_updated)
 
-                formData.append("CustomerBarCode_image_original_name"   ,   this.client.CustomerBarCode_image_original_name)
-                formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
-                formData.append("in_store_image_original_name"          ,   this.client.in_store_image_original_name)
+                    formData.append("CustomerBarCode_image"                 ,   this.client.CustomerBarCode_image)
+                    formData.append("facade_image"                          ,   this.client.facade_image)
+                    formData.append("in_store_image"                        ,   this.client.in_store_image)
 
-                formData.append("status"                                ,   this.client.status)
-                formData.append("nonvalidated_details"                  ,   this.client.nonvalidated_details)
+                    formData.append("CustomerBarCode_image_original_name"   ,   this.client.CustomerBarCode_image_original_name)
+                    formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
+                    formData.append("in_store_image_original_name"          ,   this.client.in_store_image_original_name)
 
-                formData.append("comment"                               ,   this.client.comment)
+                    formData.append("status"                                ,   this.client.status)
+                    formData.append("nonvalidated_details"                  ,   this.client.nonvalidated_details)
+
+                    formData.append("comment"                               ,   this.client.comment)
+                }
+
+                else {
+
+                    formData.append("OpenCustomer"                          ,   this.client.OpenCustomer)
+                    formData.append("CustomerCode"                          ,   '')
+                    formData.append("CustomerNameE"                         ,   '')
+                    formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
+                    formData.append("Latitude"                              ,   this.client.Latitude)
+                    formData.append("Longitude"                             ,   this.client.Longitude)
+                    formData.append("Address"                               ,   this.client.Address)
+
+                    formData.append("Neighborhood"                          ,   this.client.Neighborhood)
+                    formData.append("Landmark"                              ,   this.client.Landmark)
+
+                    formData.append("DistrictNo"                            ,   this.client.DistrictNo)
+                    formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
+                    formData.append("CityNo"                                ,   this.client.CityNo)
+                    formData.append("CityNameE"                             ,   this.client.CityNameE)
+                    formData.append("Tel"                                   ,   '')
+                    formData.append("CustomerType"                          ,   this.client.CustomerType)
+                    formData.append("BrandAvailability"                     ,   0)
+                    formData.append("BrandSourcePurchase"                   ,   '')
+
+                    formData.append("JPlan"                                 ,   this.client.JPlan)
+                    formData.append("Journee"                               ,   this.client.Journee)
+
+                    formData.append("CustomerBarCode_image_updated"         ,   true)
+                    formData.append("facade_image_updated"                  ,   this.client.facade_image_updated)
+                    formData.append("in_store_image_updated"                ,   true)
+
+                    formData.append("CustomerBarCode_image"                 ,   '')
+                    formData.append("facade_image"                          ,   this.client.facade_image)
+                    formData.append("in_store_image"                        ,   '')
+
+                    formData.append("CustomerBarCode_image_original_name"   ,   '')
+                    formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
+                    formData.append("in_store_image_original_name"          ,   '')
+
+                    formData.append("status"                                ,   'pending')
+                    formData.append("nonvalidated_details"                  ,   '')
+
+                    formData.append("comment"                               ,   this.client.comment)
+                }
 
                 if(this.getIsOnline) {
+
+                    console.log(this.client.comment)
 
                     const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/update",   formData)
 
@@ -688,9 +781,6 @@ export default {
 
                         // Send Feedback
                         this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
-
-                        // Send Client
-                        // this.emitter.emit('reSetUpdate' , this.client)
 
                         // Go Back
                         this.$goBack()
@@ -714,9 +804,6 @@ export default {
                     // Hide Loading Page
                     this.$hideLoadingPage()
 
-                    // Send Client
-                    // this.emitter.emit('reSetUpdate' , this.client)
-
                     // Go Back
                     this.$goBack()
                 }
@@ -729,75 +816,6 @@ export default {
         },
 
         //
-
-        clearData(id_modal) {
-
-            $(id_modal).on("hidden.bs.modal",   ()  => {
-
-                // 
-                this.unsetJoursGetData()
-
-                // 
-                this.setUpdateClientAction(null)
-
-                // Client
-                this.client.CustomerCode        =   '',
-
-                this.client.old_CustomerNameE   =   '',
-
-                this.client.CustomerNameE       =   '',
-                this.client.CustomerNameA       =   '',
-                this.client.Tel                 =   '',
-
-                this.client.Address             =   '',
-                this.client.Neighborhood        =   '',
-                this.client.Landmark            =   '',
-
-                this.client.DistrictNo          =   '',
-                this.client.DistrictNameE       =   '',
-
-                this.client.CityNo              =   '',
-                this.client.CityNameE           =   '',
-
-                this.client.Latitude            =   '',
-                this.client.Longitude           =   '',
-
-                // Type
-                this.client.CustomerType        =   '',
-                this.client.BrandAvailability   =   0,
-                this.client.BrandSourcePurchase =   '',
-
-                // Journey Plan
-                this.client.JPlan               =   '',
-
-                this.client.status              =   'pending',
-
-                this.willayas                   =   []  ,
-                this.cites                      =   []  ,
-
-                this.all_clients                =   []  ,
-                this.close_clients              =   []
-
-                // Remove Drawings
-                this.removeDrawings()
-            });
-        },
-
-        removeDrawings() {
-
-            // Not Map
-            if(!this.$route.path.startsWith("/route/obs/")) {
-
-                // Do Nothing 
-            }
-
-            // Map
-            else {
-
-                // Remove Drawings
-                this.$map.$removeDrawings()
-            }   
-        },
 
         async getData() {
 
@@ -824,9 +842,13 @@ export default {
             if(this.getIsOnline) {
 
                 const res                                           =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.$route.params.id_client+"/show",   null)
+                console.log(res.data)
+
                 let client                                          =   res.data
 
                 this.client.id                                      =   client.id
+
+                this.client.OpenCustomer                            =   client.OpenCustomer
 
                 this.client.CustomerCode                            =   client.CustomerCode
 
@@ -874,20 +896,23 @@ export default {
                 this.client.in_store_image_original_name            =   client.in_store_image_original_name
 
                 // 
-                this.$createFile(client.CustomerBarCode_image_original_name     ,   "CustomerBarCode_image_update")
-                this.$createFile(client.facade_image_original_name              ,   "facade_image_update")
-                this.$createFile(client.in_store_image_original_name            ,   "in_store_image_update")
+                if((this.client.CustomerBarCode_image_original_name)&&(this.client.OpenCustomer  === '1')) {
+                    this.$createFile(client.CustomerBarCode_image_original_name     ,   "CustomerBarCode_image_update")
+                    let CustomerBarCode_image_display_update                        =   document.getElementById("CustomerBarCode_image_display_update")
+                    CustomerBarCode_image_display_update.src                        =   "/uploads/clients/"+client.id+"/"+client.CustomerBarCode_image
+                }
 
-                // 
-                let CustomerBarCode_image_display_update    =   document.getElementById("CustomerBarCode_image_display_update")
-                let facade_image_display_update             =   document.getElementById("facade_image_display_update")
-                let in_store_image_display_update           =   document.getElementById("in_store_image_display_update")
+                if(this.client.facade_image_original_name) {
+                    this.$createFile(client.facade_image_original_name              ,   "facade_image_update")
+                    let facade_image_display_update                                 =   document.getElementById("facade_image_display_update")
+                    facade_image_display_update.src                                 =   "/uploads/clients/"+client.id+"/"+client.facade_image
+                }
 
-                CustomerBarCode_image_display_update.src    =   "/uploads/clients/"+client.id+"/"+client.CustomerBarCode_image
-                facade_image_display_update.src             =   "/uploads/clients/"+client.id+"/"+client.facade_image
-                in_store_image_display_update.src           =   "/uploads/clients/"+client.id+"/"+client.in_store_image
-                
-                this.setJoursGetData(client)
+                if((this.client.in_store_image_original_name)&&(this.client.OpenCustomer  === '1')) {
+                    this.$createFile(client.in_store_image_original_name            ,   "in_store_image_update")
+                    let in_store_image_display_update                               =   document.getElementById("in_store_image_display_update")
+                    in_store_image_display_update.src                               =   "/uploads/clients/"+client.id+"/"+client.in_store_image
+                }
 
                 //
                 this.checkClients()
@@ -919,9 +944,6 @@ export default {
                 this.base64ToImage(this.client.CustomerBarCode_image            ,   CustomerBarCode_image_display_update)            
                 this.base64ToImage(this.client.facade_image                     ,   facade_image_display_update)            
                 this.base64ToImage(this.client.in_store_image                   ,   in_store_image_display_update)            
-
-                // 
-                this.setJoursGetData(client)
             }
         },
 
@@ -971,190 +993,6 @@ export default {
 
                 // Hide Loading Page
                 this.$hideLoadingPage()
-            }
-        },
-
-        //
-
-        checkUncheck(id) {
-
-            const jour  =   document.getElementById(id)
-
-            if(jour.checked) {
-
-                jour.removeAttribute('checked')
-            }
-            else {
-
-                jour.setAttribute('checked', 'true')
-            }
-        },
-
-        setJoursGetData(client) {
-
-            const jours         =   document.querySelectorAll(".jours")
-
-            jours.forEach(jour => {
-
-                // Samedi
-                if(jour.id ==   "samedi_checkbox") {
-
-                    if(client.sat   ==  1) {
-
-                        jour.setAttribute('checked', 'true')
-                    }
-                }
-
-                // Dimanche
-                if(jour.id ==   "dimanche_checkbox") {
-
-                    if(client.sun   ==  1) {
-
-                        jour.setAttribute('checked', 'true')
-                    }
-                }
-
-                // Lundi
-                if(jour.id ==   "lundi_checkbox") {
-
-                    if(client.mon   ==  1) {
-
-                        jour.setAttribute('checked', 'true')
-                    }
-                }
-
-                // Mardi
-                if(jour.id ==   "mardi_checkbox") {
-
-                    if(client.tue   ==  1) {
-
-                        jour.setAttribute('checked', 'true')
-                    }
-                }
-
-                // Mercredi
-                if(jour.id ==   "mercredi_checkbox") {
-
-                    if(client.wed   ==  1) {
-
-                        jour.setAttribute('checked', 'true')
-                    }
-                }
-
-                // Jeudi
-                if(jour.id ==   "jeudi_checkbox") {
-
-                    if(client.thu   ==  1) {
-
-                        jour.setAttribute('checked', 'true')
-                    }
-                }
-            });
-        },
-
-        //
-
-        unsetJoursGetData() {
-
-            const jours             =   document.querySelectorAll(".jours")
-
-            jours.forEach(jour => {
-
-                jour.removeAttribute('checked')
-            });
-        
-        },
-
-        //
-
-        setJours() {
-
-            // Samedi
-
-            const samedi_checkbox   =   document.querySelector("#samedi_checkbox")
-            
-            if(samedi_checkbox.checked) {
-
-                this.client.sat         =   1
-            }
-            else {
-
-                this.client.sat         =   0
-            }
-
-            //
-
-            // Dimanche
-
-            const dimanche_checkbox =   document.querySelector("#dimanche_checkbox")
-            
-            if(dimanche_checkbox.checked) {
-
-                this.client.sun         =   1
-            }
-            else {
-
-                this.client.sun         =   1
-            }
-
-            //
-
-            // Lundi
-
-            const lundi_checkbox    =   document.querySelector("#lundi_checkbox")
-            
-            if(lundi_checkbox.checked) {
-
-                this.client.mon         =   1
-            }
-            else {
-
-                this.client.mon         =   1
-            }
-
-            //
-
-            // Mardi
-
-            const mardi_checkbox    =   document.querySelector("#mardi_checkbox")
-            
-            if(mardi_checkbox.checked) {
-
-                this.client.tue         =   1
-            }
-            else {
-
-                this.client.tue         =   0
-            }
-
-            //
-
-            // Mercredi
-
-            const mercredi_checkbox =   document.querySelector("#mercredi_checkbox")
-            
-            if(mercredi_checkbox.checked) {
-
-                this.client.wed         =   1
-            }
-            else {
-
-                this.client.wed         =   0
-            }
-
-            //
-
-            // Jeudi
-
-            const jeudi_checkbox    =   document.querySelector("#jeudi_checkbox")
-            
-            if(jeudi_checkbox.checked) {
-
-                this.client.thu         =   1
-            }
-            else {
-
-                this.client.thu         =   0
             }
         },
 
@@ -1541,6 +1379,22 @@ export default {
                             this.$feedbackSuccess('Success !'   ,   'Le GPS a été pris avec succès ')
                         }
 
+                        else {
+
+                            //
+                            await this.$nextTick()
+
+                            //
+                            this.checkClients()
+
+                            //
+                            // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygonsWithoutMap(this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
+                            this.point_is_inside_user_polygons  =   true
+
+                            // Send Feedback
+                            this.$feedbackSuccess('Success !'   ,   'Le GPS a été pris avec succès ')
+                        }
+
                         //
                         navigator.geolocation.clearWatch(this.watchGPS); // Stop watching
                         this.watchGPS = null; // Reset watcher
@@ -1659,7 +1513,7 @@ export default {
                 //
 
                 // Verifier Si La Question GPS
-                if(this.slideIndex  ==  18) {
+                if(this.slideIndex  ==  this.total_questions) {
 
                     //
                     let position_marker                 =   this.$showPositionOnMap("show_map", this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
@@ -1668,7 +1522,6 @@ export default {
                     // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
                     this.point_is_inside_user_polygons  =   true
                 }
-                //
             }
 
             else {
@@ -1686,253 +1539,441 @@ export default {
 
         validationQuestion() {
 
-            // Slide 1
+            //Slide 1
             if(this.slideIndex  ==  1) {
 
-                if(this.client.CustomerCode !==  "") {
-
-                    return true;
-                }
-
-                else {
-
-                    return false
-                }
-            }
-
-            // Slide 2
-            if(this.slideIndex  ==  2) {
-
-                if((this.client.CustomerBarCode_image !==  "")&&(this.client.CustomerBarCode_image_original_name  !==  "")) {
-
-                    return true;
-                }
-
-                else {
-
-                    return false
-                }
-            }
-
-            // Slide 3
-            if(this.slideIndex  ==  3) {
-
-                if((this.client.CustomerNameE !== "")&&(this.$isUppercase(this.client.CustomerNameE))) {
-
-                    return true;
-                }
-
-                else {
-
-                    return false
-                }
-            }
-
-            // Slide 4
-            if(this.slideIndex  ==  4) {
-
-                if((this.client.CustomerNameA !== "")&&(this.$isUppercase(this.client.CustomerNameA))) {
-
-                    return true;
-                }
-
-                else {
-
-                    return false
-                }
-            }
-
-            // Slide 5
-            if(this.slideIndex  ==  5) {
-
-                if((this.client.Tel !== "")&&((this.client.Tel.startsWith('05'))||(this.client.Tel.startsWith('06'))||(this.client.Tel.startsWith('07')))&&(!isNaN(parseInt(this.client.Tel)))&&(this.client.Tel.length == 10)){
-                    return true;
-                }
-
-                else {
-
-                    return false
-                }
-            }
-
-            // Slide 6
-            if(this.slideIndex  ==  6) {
-
-                if(this.client.Address !==  "") {
-
-                    return true;
-                }
-
-                else {
-
-                    return false
-                }
-            }
-
-            // Slide 7
-            if(this.slideIndex  ==  7) {
-
-                if(this.client.Neighborhood !==  "") {
-
-                    return true;
-                }
-
-                else {
-
-                    return false
-                }
-            }
-
-            // Slide 8
-            if(this.slideIndex  ==  8) {
-
-                if(this.client.Landmark !==  "") {
-
-                    return true;
-                }
-
-                else {
-
-                    return false
-                }
-            }
-
-            // Slide 9
-            if(this.slideIndex  ==  9) {
-
-                if(this.client.DistrictNo !==  "") {
-
-                    return true;
-                }
-
-                else {
-
-                    return false
-                }
-            }
-
-            // Slide 10
-            if(this.slideIndex  ==  10) {
-
-                if(this.client.CityNo !==  "") {
-
-                    return true;
-                }
-
-                else {
-
-                    return false
-                }
-            }
-
-            // Slide 11
-            if(this.slideIndex  ==  11) {
-
-                if(this.client.CustomerType !==  "") {
-
-                    return true;
-                }
-
-                else {
-
-                    return false
-                }
-            }
-
-            // Slide 12
-            if(this.slideIndex  ==  12) {
-
-                if(this.client.BrandSourcePurchase !==  "") {
-
-                    return true;
-                }
-
-                else {
-
-                    return false
-                }
-            }
-
-            // Slide 13
-            if(this.slideIndex  ==  13) {
-
-                if((this.client.JPlan !== "")&&(this.$isUppercase(this.client.JPlan))) {
-
-                    return true;
-                }
-
-                else {
-
-                    return false
-                }
-            }
-
-            // Slide 14
-            if(this.slideIndex  ==  14) {
-
-                if(this.client.Journee !==  "") {
-
-                    return true;
-                }
-
-                else {
-
-                    return false
-                }
-            }
-
-            // Slide 15
-            if(this.slideIndex  ==  15) {
-
-                if((this.client.BrandAvailability   === 0)||(this.client.BrandAvailability  === "0")) {
+                if((this.client.OpenCustomer    === '0')||(this.client.OpenCustomer   === '1')) {
 
                     return true
                 }
 
                 else {
 
-                    if((this.client.in_store_image !==  "")&&(this.client.in_store_image_original_name   !==  "")) {
-
-                        return true
-                    }
-
-                    else {
-
-                        return false
-                    }
-                }
-            }
-
-            // Slide 17
-            if(this.slideIndex  ==  17) {
-
-                if((this.client.facade_image !==  "")&&(this.client.facade_image_original_name   !==  "")) {
-
-                    return true;
-                }
-
-                else {
-
                     return false
                 }
             }
 
-            // Slide 18
-            if(this.slideIndex  ==  18) {
+            else {
 
-                if( ((!isNaN(this.client.Latitude)) &&(this.client.Latitude     !== "") &&(isFinite(Number(this.client.Latitude))))   &&
-                    ((!isNaN(this.client.Longitude))&&(this.client.Longitude    !== "") &&(isFinite(Number(this.client.Longitude))))   ) {
+                if(this.client.OpenCustomer     === '0') {
 
-                    return true;
+                    // Slide 2
+                    if(this.slideIndex  ==  2) {
+
+                        if((this.client.CustomerNameA !== "")&&(this.$isUppercase(this.client.CustomerNameA))) {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 3
+                    if(this.slideIndex  ==  3) {
+
+                        if(this.client.Address !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 4
+                    if(this.slideIndex  ==  4) {
+
+                        if(this.client.Neighborhood !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 5
+                    if(this.slideIndex  ==  5) {
+
+                        if(this.client.Landmark !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 6
+                    if(this.slideIndex  ==  6) {
+
+                        if(this.client.DistrictNo !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 7
+                    if(this.slideIndex  ==  7) {
+
+                        if(this.client.CityNo !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 8
+                    if(this.slideIndex  ==  8) {
+
+                        if(this.client.CustomerType !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 9
+                    if(this.slideIndex  ==  9) {
+
+                        if((this.client.JPlan !== "")&&(this.$isUppercase(this.client.JPlan))) {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 10
+                    if(this.slideIndex  ==  10) {
+
+                        if(this.client.Journee !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 12
+                    if(this.slideIndex  ==  12) {
+
+                        if((this.client.facade_image !==  "")&&(this.client.facade_image_original_name   !==  "")) {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 13
+                    if(this.slideIndex  ==  13) {
+
+                        if( ((!isNaN(this.client.Latitude)) &&(this.client.Latitude     !== "") &&(isFinite(Number(this.client.Latitude))))   &&
+                            ((!isNaN(this.client.Longitude))&&(this.client.Longitude    !== "") &&(isFinite(Number(this.client.Longitude))))   ) {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    return true
                 }
 
                 else {
 
-                    return false
+                    // Slide 2
+                    if(this.slideIndex  ==  2) {
+
+                        if(this.client.CustomerCode !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 3
+                    if(this.slideIndex  ==  3) {
+
+                        if((this.client.CustomerBarCode_image !==  "")&&(this.client.CustomerBarCode_image_original_name  !==  "")) {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 4
+                    if(this.slideIndex  ==  4) {
+
+                        if((this.client.CustomerNameE !== "")&&(this.$isUppercase(this.client.CustomerNameE))) {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 5
+                    if(this.slideIndex  ==  5) {
+
+                        if((this.client.CustomerNameA !== "")&&(this.$isUppercase(this.client.CustomerNameA))) {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 6
+                    if(this.slideIndex  ==  6) {
+
+                        if((this.client.Tel !== "")&&((this.client.Tel.startsWith('05'))||(this.client.Tel.startsWith('06'))||(this.client.Tel.startsWith('07')))&&(!isNaN(parseInt(this.client.Tel)))&&(this.client.Tel.length == 10)){
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 7
+                    if(this.slideIndex  ==  7) {
+
+                        if(this.client.Address !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 8
+                    if(this.slideIndex  ==  8) {
+
+                        if(this.client.Neighborhood !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 9
+                    if(this.slideIndex  ==  9) {
+
+                        if(this.client.Landmark !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 10
+                    if(this.slideIndex  ==  10) {
+
+                        if(this.client.DistrictNo !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 11
+                    if(this.slideIndex  ==  11) {
+
+                        if(this.client.CityNo !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 12
+                    if(this.slideIndex  ==  12) {
+
+                        if(this.client.CustomerType !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 13
+                    if(this.slideIndex  ==  13) {
+
+                        if(this.client.BrandSourcePurchase !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 14
+                    if(this.slideIndex  ==  14) {
+
+                        if((this.client.JPlan !== "")&&(this.$isUppercase(this.client.JPlan))) {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 15
+                    if(this.slideIndex  ==  15) {
+
+                        if(this.client.Journee !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 16
+                    if(this.slideIndex  ==  16) {
+
+                        if((this.client.BrandAvailability   === 0)||(this.client.BrandAvailability  === "0")) {
+
+                            return true
+                        }
+
+                        else {
+
+                            if((this.client.in_store_image !==  "")&&(this.client.in_store_image_original_name   !==  "")) {
+
+                                return true
+                            }
+
+                            else {
+
+                                return false
+                            }
+                        }
+                    }
+
+                    // Slide 18
+                    if(this.slideIndex  ==  18) {
+
+                        if((this.client.facade_image !==  "")&&(this.client.facade_image_original_name   !==  "")) {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 19
+                    if(this.slideIndex  ==  19) {
+
+                        if( ((!isNaN(this.client.Latitude)) &&(this.client.Latitude     !== "") &&(isFinite(Number(this.client.Latitude))))   &&
+                            ((!isNaN(this.client.Longitude))&&(this.client.Longitude    !== "") &&(isFinite(Number(this.client.Longitude))))   ) {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    return true
                 }
             }
+        },
 
-            return true
+        //
+
+        setTotalQuestions() {
+
+            this.total_questions    =   document.getElementsByClassName("mySlides").length
+            console.log(this.total_questions)
         }
     },
 

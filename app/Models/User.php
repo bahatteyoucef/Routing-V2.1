@@ -118,12 +118,22 @@ class User extends Authenticatable
             'password'          =>  ["required", "confirmed"            , "min:6", "max:255"            ]
         ]);
 
-        $validator->sometimes('max_route_import',  ["required", "integer"] , function (Fluent $input) {
+        $validator->sometimes('max_route_import'    ,  ["required", "integer"] , function (Fluent $input) {
     
             return ($input->type_user    ==  "BU Manager");
         });
 
-        $validator->sometimes('accuracy',  ["required", "numeric", "min:0"] , function (Fluent $input) {
+        $validator->sometimes('accuracy'            ,  ["required", "numeric", "min:0"] , function (Fluent $input) {
+    
+            return ($input->type_user    ==  "FrontOffice");
+        });
+
+        $validator->sometimes('selected_district'   ,  ["required"] , function (Fluent $input) {
+    
+            return ($input->type_user    ==  "FrontOffice");
+        });
+
+        $validator->sometimes('selected_cities'     ,  ["required", "json"] , function (Fluent $input) {
     
             return ($input->type_user    ==  "FrontOffice");
         });
@@ -144,7 +154,9 @@ class User extends Authenticatable
 
             'password_non_hashed'   =>  $request->input('password')             ,
             'password'              =>  Hash::make($request->input('password')) ,
-            'owner'                 =>  Auth::user()->id
+            'owner'                 =>  Auth::user()->id                        ,
+
+            'DistrictNo'            =>  $request->input('selected_district')
         ]);
 
         $user->save();
@@ -234,7 +246,20 @@ class User extends Authenticatable
                 $route_import->save();
             }
 
-            $FrontOfficeRole = Role::findByName('FrontOffice');
+            //
+            $selected_cities    =   json_decode($request->get("selected_cities"));
+            foreach ($selected_cities as $selected_city) {
+
+                $user_city          =   new UserCity([
+                    'id_user'           =>  $user->id       ,
+                    'CityNo'            =>  $selected_city
+                ]);
+
+                $user_city->save();
+            }
+
+            //
+            $FrontOfficeRole    =   Role::findByName('FrontOffice');
             $user->assignRole($FrontOfficeRole);
 
             //
@@ -279,6 +304,7 @@ class User extends Authenticatable
         $user->tel                  =   $request->input('tel');
         $user->company              =   $request->input('company');
         $user->type_user            =   $request->input('type_user');
+        $user->DistrictNo           =   $request->input('selected_district');
 
         $user->save();
 
@@ -360,6 +386,10 @@ class User extends Authenticatable
 
         if($request->get("type_user")   ==  "FrontOffice") {
 
+            //
+            UserCity::where("id_user", $user->id)->delete();
+
+            //
             if($request->get("selected_route_import")   !=  "null") {
 
                 $route_import           =   new UserRouteImport([
@@ -371,6 +401,19 @@ class User extends Authenticatable
                 $route_import->save();
             }
 
+            //
+            $selected_cities    =   json_decode($request->get("selected_cities"));
+            foreach ($selected_cities as $selected_city) {
+
+                $user_city          =   new UserCity([
+                    'id_user'           =>  $user->id       ,
+                    'CityNo'            =>  $selected_city
+                ]);
+
+                $user_city->save();
+            }
+
+            //
             $user->syncRoles(['FrontOffice']);
 
             //
@@ -387,9 +430,15 @@ class User extends Authenticatable
 
         //
         $user->liste_route_import   =   DB::table('users_route_import')
-                                        ->where('users_route_import.id_user', $user->id) 
-                                        ->pluck('users_route_import.id_route_import') 
-                                        ->toArray();
+                                            ->where('users_route_import.id_user', $user->id) 
+                                            ->pluck('users_route_import.id_route_import') 
+                                            ->toArray();
+
+        //
+        $user->cities               =   DB::table('users_cities')
+                                            ->where('users_cities.id_user', $user->id) 
+                                            ->pluck('users_cities.CityNo') 
+                                            ->toArray();
 
         return $user;
     }

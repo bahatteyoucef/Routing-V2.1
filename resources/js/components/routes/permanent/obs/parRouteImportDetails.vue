@@ -291,6 +291,8 @@
                             <th class="col-sm-1">Index</th>
                             <th class="col-sm-2">Id</th>
 
+                            <th class="col-sm-2">OpenCustomer</th>
+
                             <th class="col-sm-2">CustomerCode</th>
 
                             <th class="col-sm-2">CustomerNameE</th>
@@ -343,6 +345,8 @@
                             <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Index"            /></th>
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Id"               /></th>
 
+                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="OpenCustomer"     /></th>
+
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
                             <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
@@ -392,7 +396,7 @@
                         <tr v-for="(client, index) in clients_table_affiche" :key="client" role="button" @click="showModalupdateClient(client)">
                             <td>{{index +   1}}</td>
                             <td>{{client.id}}</td>
-
+                            <td>{{client.OpenCustomer}}</td>
                             <td>{{client.CustomerCode}}</td>
                             <td>{{client.CustomerNameE}}</td>
                             <td>{{client.CustomerNameA}}</td>
@@ -1804,6 +1808,8 @@ export default {
 
             // Add Client
             new_client.id               =   client.id
+
+            new_client.OpenCustomer     =   client.OpenCustomer
             new_client.CustomerCode     =   client.CustomerCode
 
             new_client.CustomerNameE    =   client.CustomerNameE
@@ -1859,7 +1865,7 @@ export default {
                 if(this.route_import.clients[i].id  ==  client.id) {
 
                     // Update Client
-
+                    this.route_import.clients[i].OpenCustomer   =   client.OpenCustomer
                     this.route_import.clients[i].CustomerCode   =   client.CustomerCode
 
                     this.route_import.clients[i].CustomerNameE  =   client.CustomerNameE

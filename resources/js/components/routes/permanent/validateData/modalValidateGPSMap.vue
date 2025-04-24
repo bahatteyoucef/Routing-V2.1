@@ -24,6 +24,7 @@
                                 <tr>
                                     <th class="col-sm-1">Index</th>
 
+                                    <th class="col-sm-2">OpenCustomer</th>
                                     <th class="col-sm-2">CustomerCode</th>
 
                                     <th class="col-sm-2">CustomerNameE</th>
@@ -70,6 +71,7 @@
                                 <tr class="datatable_client_double_latitude_longitude_filters">
                                 <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Index"            /></th>
 
+                                <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="OpenCustomer"     /></th>
                                 <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
                                 <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
                                 <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
@@ -115,6 +117,7 @@
                                 <tr v-for="(client, index) in getDoublantLatitudeLongitude" :key="client" role="button" @click="updateElementMap(client)">
                                     <td>{{index +   1}}</td>
 
+                                    <td>{{client.OpenCustomer}}</td>
                                     <td>{{client.CustomerCode}}</td>
                                     <td>{{client.CustomerNameE}}</td>
                                     <td>{{client.CustomerNameA}}</td>
@@ -264,6 +267,7 @@ export default {
 
                 if(this.getDoublantLatitudeLongitude[i].id    ==  client.id) {
 
+                    this.getDoublantLatitudeLongitude[i].OpenCustomer       =   client.OpenCustomer
                     this.getDoublantLatitudeLongitude[i].CustomerCode       =   client.CustomerCode
                     this.getDoublantLatitudeLongitude[i].CustomerNameE      =   client.CustomerNameE
                     this.getDoublantLatitudeLongitude[i].CustomerNameA      =   client.CustomerNameA

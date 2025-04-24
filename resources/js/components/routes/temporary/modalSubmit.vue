@@ -22,6 +22,7 @@
                         <table class="table table-striped datatable_clients_route_import_tempo" id="datatable_clients_route_import_tempo">
                             <thead>
                                 <tr>
+                                    <th class="col-sm-1">OpenCustomer (OpenCustomer)</th>
                                     <th class="col-sm-1">CustomerCode (CustomerCode)</th>
                                     <th class="col-sm-1">CustomerNameE (CustomerNameE)</th>
                                     <th class="col-sm-1">CustomerNameA (CustomerNameA)</th>
@@ -49,7 +50,7 @@
 
                             <thead>
                                 <tr class="datatable_clients_route_import_tempo_filters">
-
+                                    <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="OpenCustomer"     /></th>
                                     <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"     /></th>
                                     <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"    /></th>
                                     <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"    /></th>
@@ -77,6 +78,7 @@
 
                             <tbody>
                                 <tr v-for="client in clients" :key="client.id">
+                                    <td>{{client.OpenCustomer}}</td>
                                     <td>{{client.CustomerCode}}</td>
                                     <td>{{client.CustomerNameE}}</td>
                                     <td>{{client.CustomerNameA}}</td>

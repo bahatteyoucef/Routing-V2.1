@@ -13,6 +13,13 @@
                 <div class="modal-body mt-3">
 
                     <form>
+                        <div class="mb-3">
+                            <label for="text"               class="form-label fw-bold">Client Ouvert</label>
+                            <select                         class="form-select"         id="OpenCustomer"           v-model="client.OpenCustomer">
+                                <option     value=0>Non</option>
+                                <option     value=1>Oui</option>
+                            </select>
+                        </div>
 
                         <div class="mb-3">
                             <label for="CustomerCode"       class="form-label">CustomerCode (CustomerCode)</label>
@@ -160,6 +167,9 @@ export default {
 
                 id                                      :   '',
 
+                //
+                OpenCustomer                            :   '',
+
                 // Slide 1
                 CustomerCode                            :   '',
 
@@ -271,6 +281,7 @@ export default {
 
             let formData = new FormData();
 
+            formData.append("OpenCustomer"                  ,   this.client.OpenCustomer)
             formData.append("CustomerCode"                  ,   this.client.CustomerCode)
             formData.append("CustomerNameE"                 ,   this.client.CustomerNameE)
             formData.append("CustomerNameA"                 ,   this.client.CustomerNameA)
@@ -389,6 +400,9 @@ export default {
                 // Client
                 this.client.id                                      =   '',
 
+                //
+                this.client.OpenCustomer                            =   '',
+
                 // Slide 1
                 this.client.CustomerCode                            =   '',
 
@@ -461,6 +475,8 @@ export default {
         async getClientData(client) {
 
             this.client.id                  =   client.id
+
+            this.client.OpenCustomer        =   client.OpenCustomer
 
             this.client.CustomerCode        =   client.CustomerCode
 

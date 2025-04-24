@@ -48,6 +48,8 @@
 
                         <th class="col-sm-2">JPlan</th>
                         <th class="col-sm-2">Journee</th>
+
+                        <th class="col-sm-2">OpenCustomer</th>
                     </tr>
                 </thead>
 
@@ -76,11 +78,12 @@
                         <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="OwnerName"/></th>
                         <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="JPlan"/></th>
                         <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Journee"/></th>
+                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="OpenCustomer"/></th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    <tr v-for="(row, index) in data_census_report_table_data.rows" :key="row" role="button">
+                    <tr v-for="(row, index) in data_census_report_table_data.rows" :key="row" @click="selectRow(row)" role="button"  :id="'data_census_report_table_'+row.id">
                         <td>{{index +   1}}</td>
 
                         <td>{{ row.created_at }}</td>
@@ -121,16 +124,24 @@
                         <td>{{ row.JPlan }}</td>
                         <td>{{ row.Journee }}</td>
 
+                        <td>{{ row.OpenCustomer }}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
+
+        <!-- Modal Update                   -->
+        <modalClientUpdate          ref="modalClientUpdate"         ></modalClientUpdate>
 
     </div>
 
 </template>
 
 <script>
+
+import modalClientUpdate            from    "../../clients/permanent/modalClientUpdate.vue"
+
+import {mapGetters, mapActions}     from    "vuex"
 
 export default {
 
@@ -147,6 +158,10 @@ export default {
 
     props : ["data_census_report_table_data"],
 
+    components : {
+        modalClientUpdate           
+    },
+
     async mounted() {
 
         //
@@ -157,9 +172,20 @@ export default {
 
         //
         this.emitter.emit('show_data_census_report_content_ready')
+
+        this.emitter.on('reSetUpdate'       , async (client)    =>  {
+
+            await this.updateClientToDatatable(client)
+        })
     },
 
     methods : {
+
+        ...mapActions("client" ,  [
+            "setUpdateClientAction"   ,
+        ]),
+
+        //
 
         async setTable() {
 
@@ -168,6 +194,122 @@ export default {
                 this.datatable_data_census_report_table     =   await this.$DataTableCreate("data_census_report_table")
             }
 
+            catch(e) {
+
+                console.log(e)
+            }
+        },
+
+        async updateClientToDatatable(client) {
+
+            for (let i = 0; i < this.data_census_report_table_data.rows.length; i++) {
+                
+                if(this.data_census_report_table_data.rows[i].id  ==  client.id) {
+
+                    this.data_census_report_table_data.rows[i].OpenCustomer    =   client.OpenCustomer
+                    this.data_census_report_table_data.rows[i].CustomerCode    =   client.CustomerCode
+
+                    this.data_census_report_table_data.rows[i].CustomerNameE   =   client.CustomerNameE
+                    this.data_census_report_table_data.rows[i].CustomerNameA   =   client.CustomerNameA
+                    this.data_census_report_table_data.rows[i].Tel             =   client.Tel
+
+                    this.data_census_report_table_data.rows[i].Latitude        =   client.Latitude         
+                    this.data_census_report_table_data.rows[i].Longitude       =   client.Longitude        
+
+                    this.data_census_report_table_data.rows[i].Address         =   client.Address
+                    this.data_census_report_table_data.rows[i].Neighborhood    =   client.Neighborhood
+                    this.data_census_report_table_data.rows[i].Landmark        =   client.Landmark
+
+                    this.data_census_report_table_data.rows[i].DistrictNo      =   client.DistrictNo      
+                    this.data_census_report_table_data.rows[i].DistrictNameE   =   client.DistrictNameE  
+
+                    this.data_census_report_table_data.rows[i].CityNo          =   client.CityNo           
+                    this.data_census_report_table_data.rows[i].CityNameE       =   client.CityNameE       
+
+                    this.data_census_report_table_data.rows[i].CustomerType    =   client.CustomerType     
+
+                    this.data_census_report_table_data.rows[i].BrandAvailability      =   client.BrandAvailability       
+                    this.data_census_report_table_data.rows[i].BrandSourcePurchase    =   client.BrandSourcePurchase       
+
+                    this.data_census_report_table_data.rows[i].JPlan              =   client.JPlan            
+                    this.data_census_report_table_data.rows[i].Journee            =   client.Journee        
+
+                    this.data_census_report_table_data.rows[i].status                 =   client.status            
+                    this.data_census_report_table_data.rows[i].nonvalidated_details   =   client.nonvalidated_details        
+
+                    this.data_census_report_table_data.rows[i].comment                =   client.comment        
+
+                    this.data_census_report_table_data.rows[i].facade_image                           =   client.facade_image            
+                    this.data_census_report_table_data.rows[i].in_store_image                         =   client.in_store_image        
+                    this.data_census_report_table_data.rows[i].facade_image_original_name             =   client.facade_image_original_name            
+                    this.data_census_report_table_data.rows[i].in_store_image_original_name           =   client.in_store_image_original_name        
+                    this.data_census_report_table_data.rows[i].CustomerBarCode_image                  =   client.CustomerBarCode_image            
+                    this.data_census_report_table_data.rows[i].CustomerBarCode_image_original_name    =   client.CustomerBarCode_image_original_name        
+
+                    break
+                }
+            }
+
+            //
+
+            // Destroy DataTable
+            if(this.datatable_data_census_report_table)  {
+
+                this.datatable_data_census_report_table.destroy()
+            }
+
+            this.datatable_data_census_report_table    =   await this.$DataTableCreate("data_census_report_table")
+        },
+
+        //
+
+        selectRow(client) {
+
+            // Get Element
+            const row           =   document.getElementById("data_census_report_table_"+client.id)
+
+            if(!row.classList.contains("active_row")) {
+
+                // remove Active Class
+                const active_row    =   document.getElementsByClassName("active_row")[0]
+
+                if(active_row) {
+
+                    active_row.classList.remove("active_row")
+                }
+
+                // add Active Class
+                row.classList.add("active_row")
+
+                // Selected Row
+                this.selected_row   =   client
+
+                this.updateElement(client)      
+            }
+
+            else {
+
+                // remove Active Class
+                row.classList.remove("active_row")
+
+                // Selected Row
+                this.selected_row   =   null
+            }
+        },
+
+        async updateElement() {
+
+            try {
+
+                if(this.$isRole("Super Admin")||this.$isRole('BU Manager')||this.$isRole("BackOffice")||this.$isRole('Viewer')) {
+
+                    // ShowModal
+                    var updateModal     =   new Modal(document.getElementById("updateClientModal"));
+                    updateModal.show();
+
+                    this.$refs.modalClientUpdate.getData(this.selected_row, this.data_census_report_table_data.rows)
+                }
+            }
             catch(e) {
 
                 console.log(e)
