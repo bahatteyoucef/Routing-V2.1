@@ -1,94 +1,105 @@
 <template>
-    <div class="row">
-        <div class="col-12 grid-margin">
-            <div class="card">
-                <div class="card-body">
+    <div class="content-wrapper p-3">
+        <div class="card">
+            <div class="card-body">
 
-                    <!-- Header -->
-                    <headerComponent    :title="'List of Users'"            :add_modal="'addUserModal'" :update_modal="'updateUserModal'"   :add_button="'New User'"    
-                                        :update_button="'Update User'"      />
+                <!-- Header -->
+                <h4 class="fw-bold"><u>Users</u></h4>
 
-                    <!-- Table -->
-                    <table class="table table-bordered clickable_table" id="user_index">
+                <!-- Table -->
+                <div id="index_users_container" class="table-container mt-5">
+                    <table class="table table-hover table-bordered index_users mt-0 mb-0 w-100" id="index_users">
                         <thead>
                             <tr>
-                                <th class="col-sm-1">ID</th>
-                                <th class="col-sm-3">Name</th>
-                                <th class="col-sm-3">Email</th>
-                                <th class="col-sm-3">Tel</th>
-                                <th class="col-sm-3">Company</th>
-                                <th class="col-sm-3">Type User</th>
-                                <th class="col-sm-3">Password</th>
+                                <th role="button">#</th>
+                                <th v-for="index_user_column in index_users_columns" :key="index_user_column" role="button">{{ index_user_column.title }}</th>
+                            </tr>
+
+                            <tr id="index_users_filters" class="index_users_filters">
+                                <th></th>
+
+                                <th v-for="index_user_column in index_users_columns" :key="index_user_column">
+                                    <div class="filter_group" :data-column="index_user_column.title">
+                                        <select class="filter_type form-select-sm w-100 mb-2">
+                                            <option value="contains">contains</option>
+                                            <option value="not_contains">not contains</option>
+                                            <option value="exact">exact</option>
+                                            <option value="starts_with">starts with</option>
+                                            <option value="ends_with">ends with</option>
+                                        </select>
+                                        <input
+                                            type="text"
+                                            class="form-control form-control-sm filter_input"
+                                            :placeholder="index_user_column.title"
+                                        />
+                                    </div>
+                                </th>
                             </tr>
                         </thead>
 
-                        <thead>
-                            <tr class="user_index_filters">
-                                <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="ID"           /></th>
-                                <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Name"         /></th>
-                                <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Email"        /></th>
-                                <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Tel"          /></th>
-                                <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Company"      /></th>
-                                <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Type User"    /></th>
-                                <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Password"     /></th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            <tr v-for="user, index in users" :key="index" @click="selectRow(user)"   role="button"   :id="'user_index_'+user.id">
-                                <td>{{index + 1}}</td>
-                                <td>{{user.nom}}</td>
-                                <td>{{user.email}}</td>
-                                <td>{{user.tel}}</td>
-                                <td>{{user.company}}</td>
-                                <td>{{user.type_user}}</td>
-                                <td>{{user.password_non_hashed}}</td>
-                            </tr>
-                        </tbody>
+                        <tbody></tbody>
                     </table>
-
                 </div>
+
             </div>
         </div>
-
-        <!-- Modal Add  -->
-        <modalUserAdd     ref="modalUserAdd">   </modalUserAdd>
-
-        <!-- Modal Update  -->
-        <modalUserUpdate  ref="modalUserUpdate"></modalUserUpdate>
-
     </div>
+
+    <!-- Modal Add  -->
+    <ModalUserAdd     ref="ModalUserAdd">   </ModalUserAdd>
+
+    <!-- Modal Update  -->
+    <ModalUserUpdate  ref="ModalUserUpdate"></ModalUserUpdate>
+
 </template>
  
 <script>
 
-import headerComponent      from "../../template/components/headerComponent.vue"
+import HeaderComponent      from    "@/template/components/HeaderComponent.vue"
 
-import modalUserAdd       from "./modalUserAdd.vue"
-import modalUserUpdate    from "./modalUserUpdate.vue"
+import ModalUserAdd         from    "./ModalUserAdd.vue"
+import ModalUserUpdate      from    "./ModalUserUpdate.vue"
+
+import DatatableHelper      from    "@/services/DatatableHelper"
 
 export default {
 
     data() {
         return {
-            users                   :   [],
-            datatable_user_index    :   null,
+            selected_row                    :   null    ,
 
-            selected_user           :   null,
-            display_modal           :   false,
+            index_users_data                :   []      ,
+            index_users_columns             :   [
+                                                    { data: "id"                    , title: "ID"           },
+                                                    { data: "nom"                   , title: "Name"         },
+                                                    { data: "email"                 , title: "Email"        },
+                                                    { data: "tel"                   , title: "Tel"          },
+                                                    { data: "company"               , title: "Company"      },
+                                                    { data: "type_user"             , title: "Type User"    },
+                                                    { data: "password_non_hashed"   , title: "Password"     },
+                                                ],
 
-            selected_row            :   null
+            datatable_index_users           :   null,
+            datatable_index_users_instance  :   null,
+
+            //
+
+            selected_row                    :   null,
+            selected_row_id                 :   null
         }
     },
 
     components : {
-        headerComponent ,
-        modalUserAdd,
-        modalUserUpdate
+        HeaderComponent ,
+        ModalUserAdd,
+        ModalUserUpdate
     },
 
     async mounted() {
 
+        this.datatable_index_users_instance     =   new DatatableHelper()   
+
+        //
         await this.setDataTable()
     },
 
@@ -96,90 +107,52 @@ export default {
 
         async setDataTable() {
 
-            try {
+            this.$showLoadingPage()
 
-                // Destroy DataTable
-                if(this.datatable_user_index)  {
+            // Initialisation 
+            this.index_users_data   =   [];
 
-                    this.datatable_user_index.destroy()
-                }
+            this.$callApi("post",    "/users", null)
+            .then(async (res)=> {
 
-                // Initialisation 
-                this.users   =   [];
+                this.index_users_data       =   res.data;
 
-                this.$callApi("post",    "/users", null)
-                .then(async (res)=> {
+                // Create DataTable
+                this.datatable_index_users  =   this.datatable_index_users_instance.$DataTableCreate("index_users", this.index_users_data, this.index_users_columns, this.setDataTable, this.addElement, this.updateElement, null, this.selectRow, "Users")      
 
-                    this.users = res.data;
-
-                    this.datatable_user_index   =   await this.$DataTableCreate("user_index")
-                })
-            }
-
-            catch(e) {
-
-                console.log(e)
-            }
+                //
+                this.$hideLoadingPage()
+            })
         },
 
         async addElement() {
 
-            try {
+            // ShowModal
+            var addModal        =   new Modal(document.getElementById("ModalUserAdd"));
+            addModal.show();
 
-                await this.$refs.modalUserAdd.getData()
-            }
-            catch(e) {
-
-                console.log(e)
-            }
+            await this.$refs.ModalUserAdd.getData()
         },
 
-        async updateElement() {
+        async updateElement(selected_row) {
 
-            try {
+            // ShowModal
+            if(selected_row) {
+                var updateModal     =   new Modal(document.getElementById("ModalUserUpdate"));
+                updateModal.show();
 
-                await this.$refs.modalUserUpdate.getData(this.selected_row)
-            }
-            catch(e) {
-
-                console.log(e)
+                await this.$refs.ModalUserUpdate.getData(selected_row)
             }
         },
 
         //
 
-        selectRow(user) {
+        selectRow(selected_row, selected_row_id) {
 
-            // Get Element
-            const row           =   document.getElementById("user_index_"+user.id)
-
-            if(!row.classList.contains("active_row")) {
-
-                // remove Active Class
-                const active_row    =   document.getElementsByClassName("active_row")[0]
-
-                if(active_row) {
-
-                    active_row.classList.remove("active_row")
-                }
-
-                // add Active Class
-                row.classList.add("active_row")
-
-                // Selected Row
-                this.selected_row   =   user
-            }
-
-            else {
-
-                // remove Active Class
-                row.classList.remove("active_row")
-
-                // Selected Row
-                this.selected_row   =   null
-            }
+            this.selected_row       =   selected_row
+            this.selected_row_id    =   selected_row_id
         },
     }
-
 };
+
 </script>

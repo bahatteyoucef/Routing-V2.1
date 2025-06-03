@@ -79,30 +79,42 @@ class User extends Authenticatable
     public static function comboUser() 
     {
     
-        $users      =   DB::table('users')
+        $query  =   DB::table('users')
+                        ->select([
+                            'users.id                   as id',
+                            'users.nom                  as nom',
+                            'users.email                as email',
+                            'users.tel                  as tel',
+                            'users.company              as company',
+                            'users.type_user            as type_user',
+                            'users.accuracy             as accuracy',
+                            'users.max_route_import     as max_route_import',
+                            'users.password_non_hashed  as password_non_hashed',
+                            'users.owner                as owner',
+                        ]);
 
-                        ->select([ 
-                            'users.id                   as  id'                     , 
+        //
+        if (Auth::user()->hasRole('BU Manager')) {
+            $query->where('users.owner', Auth::user()->id);
+        }
 
-                            'users.nom                  as  nom'                    ,
-                            'users.email                as  email'                  ,
+        elseif (Auth::user()->hasRole('BackOffice')) {
 
-                            'users.tel                  as  tel'                    ,
-                            'users.company              as  company'                ,
+            $routeIds   =   DB::table('users_route_import')
+                                ->where('id_user', Auth::user()->id)
+                                ->pluck('id_route_import');
 
-                            'users.type_user            as  type_user'              ,
+            //
+            $query
+                ->join('users_route_import as uri', 'uri.id_user', '=', 'users.id')
+                ->whereIn('uri.id_route_import', $routeIds)
+                ->groupBy('users.id');
+        }
 
-                            'users.accuracy             as  accuracy'               ,
+        //
+        $users = $query->get();
 
-                            'users.max_route_import     as  max_route_import'       ,
-
-                            'users.password_non_hashed  as  password_non_hashed'    ,
-
-                            'users.owner                as  owner'
-                        ])
-
-                        ->get();
-
+        //
         return $users;
     }
 

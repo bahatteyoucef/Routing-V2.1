@@ -2,6 +2,9 @@ import axios                from 'axios'
 
 import * as XLSX            from 'xlsx';
 
+// store
+import store                from '../store/store'
+
 export default {
 
     data() {
@@ -37,6 +40,7 @@ export default {
         //
 
         async $callApi(method, url, dataObj ){
+
             try {
 
                 if(method == "post") {
@@ -53,24 +57,19 @@ export default {
         },
 
         async $callApiResponse(method, url, dataObj, responseType ){
-            try {
 
-                if(method == "post") {
+            if(method == "post") {
 
-                    return await axios.post(url, dataObj, {
-                        responseType: responseType
-                    })
-                }
+                return await axios.post(url, dataObj, {
+                    responseType: responseType
+                })
+            }
 
-                if(method == "get") {
+            if(method == "get") {
 
-                    return await axios.get(url, dataObj, {
-                        responseType: responseType
-                    })
-                }
-
-            } catch (e) {
-                return e.response
+                return await axios.get(url, dataObj, {
+                    responseType: responseType
+                })
             }
         },
 
@@ -93,10 +92,18 @@ export default {
 
         $hideModal(id) {
 
-            const container     =   document.getElementById(id)
-            const modal         =   Modal.getInstance(container)
+            const container = document.getElementById(id);
+            const modal = Modal.getInstance(container);
 
-            modal.hide()
+            return new Promise(resolve => {
+                // Listen for Bootstrap’s `hidden.bs.modal` event
+                container.addEventListener('hidden.bs.modal', () => {
+                    resolve();
+                }, { once: true });
+                
+                // Kick off the hide animation
+                modal.hide();
+            });
         },
 
         //
@@ -159,16 +166,14 @@ export default {
 
         $showLoadingPage() {
 
-            const loading_page          =   document.getElementById("loading_screen")
-            loading_page.style.display  =   "flex";
+            store.commit("loading_page/setShowLoadingPage", true)
         },
 
         // 
 
         $hideLoadingPage() {
 
-            const loading_page          =   document.getElementById("loading_screen")
-            loading_page.style.display  =   "none";
+            store.commit("loading_page/setShowLoadingPage", false)
         },
 
         //
@@ -1012,10 +1017,8 @@ export default {
                     navigator.geolocation.getCurrentPosition(
                         (position) => {
                             const accuracy = position.coords.accuracy;
+
                             console.log(accuracy);
-                            console.log(accuracy_max);
-                            console.log(Math.ceil(accuracy) <= accuracy_max);
-                            console.log(attempts);
 
                             if (Math.ceil(accuracy) <= accuracy_max) {
                                 resolve({ success: true, position });
@@ -1078,24 +1081,21 @@ export default {
 
         //
 
-        async $compressImage(file) {
+        async $compressImage(file, max_size_mb = 0.125, max_width_or_height = 750) {
 
             const options = {
-                maxWidthOrHeight: 500, // Maximum width or height
-                useWebWorker: true,    // Enable Web Worker for better performance
-                fileType: 'image/jpeg',
-                initialQuality: 0.9,   // Starting quality
+                maxWidthOrHeight: max_width_or_height,      // still cap at 500px if you want :contentReference[oaicite:5]{index=5}
+                maxSizeMB: max_size_mb,                     // target ≤0.5 MB (instead of only constraining dimensions)
+                useWebWorker: true,                         // keep UI responsive
+                fileType: 'image/webp',                     // switch to WebP for better quality/size ratio
+                initialQuality: 1,                          // start high; you can dial down if needed
+                alwaysKeepResolution: true                  // preserve original pixel count if the library supports it
             };
 
-            try {
-                const compressedFile        =   await imageCompression(file, options);
-                const compressedFileToSend  =   new File([compressedFile], file.name, { type: 'image/jpeg' });
-
-                return compressedFileToSend; // Return the compressed file
-            } catch (error) {
-                console.error('Error during image compression:', error);
-                throw error;
-            }
+            const compressedBlob = await imageCompression(file, options);
+            return new File([compressedBlob], file.name.replace(/\.\w+$/, '.webp'), {
+                type: 'image/webp'
+            });
         },
 
         $compressImageMuch(file) {
@@ -1189,6 +1189,20 @@ export default {
 
                     this.show_map   =   L.map(map_id).setView([latitude, longitude], 15); // Replace with your coordinates and zoom level
 
+                    // added this to prevent error when i zoom during showing popup
+                    const _oldAnimate = L.Popup.prototype._animateZoom;
+
+                    L.Popup.prototype._animateZoom = function(zoom) {
+                        
+                        if (!this._map) {
+                            // map reference is gone, skip repositioning
+                            return this;
+                        }
+                        
+                        // otherwise call the original method
+                        return _oldAnimate.call(this, zoom);
+                    };
+
                     //
                     this.$hideTerritores()
                     this.$showTerritories(territories)
@@ -1202,10 +1216,177 @@ export default {
                     let marker  =   L.marker([latitude, longitude])
                     marker.addTo(this.show_map);
 
+                    //
                     return marker
                 }
             }
         },
+
+        //  //  //  //  //
+
+        async $showPositionOnMapMultiMap(show_map, map_id, client, close_clients) {
+
+            let closeIcon       = null;
+            let mainIcon        = null;
+            let mainMarker      = null;
+            let closeMarkers    = null;
+
+            if (!window.navigator.onLine) throw new Error("Cannot show map while offline");
+            
+            //
+            const container     =   document.getElementById(map_id);
+
+            // Wait for container to be fully visible
+            await new Promise(resolve => {
+                const checkReady = () => {
+                    if (container.offsetWidth > 0 && container.offsetHeight > 0) {
+                    resolve();
+                    } else {
+                    requestAnimationFrame(checkReady);
+                    }
+                };
+
+                checkReady();
+            });
+
+            // REUSE MAP INSTANCE OR CREATE NEW
+            const map = show_map || new L.Map(map_id, {
+                preferCanvas        : true,
+                zoomControl         : true,
+                zoom                : 12,
+                zoomAnimation       : true,    // keep the map zoom animation
+                markerZoomAnimation : true,    // you can still keep marker zoom animation if you like
+                center              : [0, 0]
+            });
+
+            // added this to prevent error when i zoom during showing popup
+            const _oldAnimate = L.Popup.prototype._animateZoom;
+
+            L.Popup.prototype._animateZoom = function(zoom) {
+                
+                if (!this._map) {
+                    // map reference is gone, skip repositioning
+                    return this;
+                }
+                
+                // otherwise call the original method
+                return _oldAnimate.call(this, zoom);
+            };
+
+            // TILE LAYER MANAGEMENT
+            if (!show_map) {
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+            }
+
+            // ASYNC MAP PREPARATION
+            await new Promise(resolve => map.whenReady(resolve));
+            map.invalidateSize({ animate: false, pan: false });
+
+            // MARKER MANAGEMENT
+            const clearExistingMarkers = () => {
+                map.eachLayer(layer => {
+                    if (layer instanceof L.Marker) map.removeLayer(layer);
+                });
+            };
+
+            if (show_map) clearExistingMarkers();
+
+            // MAIN MARKER
+            if (client) {
+                mainIcon = L.icon({
+                    iconUrl: '/images/A52714.png',
+                    iconSize: [25, 25],
+                    popupAnchor: [0, -15]
+                });
+
+                mainMarker  =    L.marker([client.Latitude, client.Longitude], { draggable: true, icon: mainIcon })
+                                    .bindPopup(this.$createTooltipContent(client))
+                                    .addTo(map);
+
+                // Open popup on mouseover for mainMarker
+                // mainMarker.on('mouseover', function (e) {
+                //     this.openPopup();
+                // });
+
+                // Optional: Close popup on mouseout
+                // mainMarker.on('mouseout', function (e) {
+                //     this.closePopup();
+                // });
+            }
+
+            // CLOSE CLIENTS MARKERS
+            if (close_clients) {
+                
+                closeIcon           =   L.icon({ iconUrl: '/images/F9A825.png', iconSize: [20, 20], popupAnchor: [0, -10] });
+                
+                closeMarkers        =   close_clients.map(c => {
+                                                const marker    =   L.marker([c.Latitude, c.Longitude], { icon: closeIcon })
+                                                                        .bindPopup(this.$createTooltipContent(c))
+                                                                        .addTo(map);
+
+                                                // Open popup on mouseover for close_clients markers
+                                                // marker.on('mouseover', function (e) {
+                                                //     this.openPopup();
+                                                // });
+
+                                                // Optional: Close popup on mouseout
+                                                // marker.on('mouseout', function (e) {
+                                                //     this.closePopup();
+                                                // });
+
+                                                return marker;
+                                            }
+                                        );
+
+                const allMarkers    =   L.featureGroup([mainMarker, ...closeMarkers]);
+                map.fitBounds(allMarkers.getBounds().pad(0.2));
+            }
+
+            return {
+                show_map: map,
+                position_marker: mainMarker,
+                close_clients_markers: closeMarkers
+            };
+        },
+
+        $createTooltipContent(client) {
+            return `
+                CustomerCode   : ${ client.CustomerCode  }  <br />
+                CustomerNameA  : ${ client.CustomerNameA }  <br />
+                CustomerNameE  : ${ client.CustomerNameE }  <br />
+                CustomerType   : ${ client.CustomerType  }  <br />
+            `;
+        },
+
+        $focuseMarkers(show_map, clients_markers) {
+
+            // Create a marker group
+            var markers     =   L.featureGroup();
+
+            // Add markers to the marker group
+            var markerArray =   []  
+
+            // Set Markers
+            clients_markers.forEach(marker => {
+                markerArray.push(marker.addTo(markers))
+            });
+
+            // Add the marker group to the map
+            show_map.addLayer(markers);
+
+            if(markerArray.length > 0) {
+
+                // Get the bounds of all the markers
+                var groupBounds = markers.getBounds();
+
+                // Zoom the map to fit the bounds of the markers
+                show_map.fitBounds(groupBounds);
+            }
+        },
+
+        //  //  //  //  //
 
         $checkMarkerInsideUserPolygons(marker) {
 
@@ -1282,16 +1463,18 @@ export default {
 
             if(window.navigator.onLine) {
 
-                for (let i = 0; i < territories.length; i++) {
+                if(territories) {
+                    for (let i = 0; i < territories.length; i++) {
 
-                    var latlngs     =   JSON.parse(territories[i].latlngs)
+                        var latlngs     =   JSON.parse(territories[i].latlngs)
 
-                    if(Array.isArray(latlngs) && (latlngs.length > 0)) {
+                        if(Array.isArray(latlngs) && (latlngs.length > 0)) {
 
-                        // Territory
-                        var territory           =   L.polygon(latlngs, { color: territories[i].color }).addTo(this.show_map)
-                        this.territories.push(territory)
-                    }          
+                            // Territory
+                            var territory           =   L.polygon(latlngs, { color: territories[i].color }).addTo(this.show_map)
+                            this.territories.push(territory)
+                        }          
+                    }
                 }
             }
         },
@@ -1454,6 +1637,129 @@ export default {
 
             // Define a regex pattern to allow only safe characters
             return !(/[\/\\:*?"<>|& ]/.test(string));
+        },
+
+        //
+
+        $arrayToJson(arr, prefix) {
+
+            let json_result     =   {};
+            
+            //
+            arr.forEach((item, index) => {
+                json_result[`${prefix}${index}`]   =   item;
+            });
+
+            //
+            return json_result;
+        },
+
+        $arrayToString(arr, separator) {
+            return arr.map(item => `"${item}"`).join(separator);
+        },
+
+        //
+
+        $humanToISO(humanDate) {
+        
+            const [dayStr, monthName, yearStr]  =   humanDate.split(' ');
+            const day                           =   dayStr.padStart(2, '0');
+            const year                          =   yearStr;
+
+            //
+            const monthMap                      =   {
+                January : '01', February    :'02', March        : '03'  ,
+                April   : '04', May         :'05', June         : '06'  ,
+                July    : '07', August      :'08', September    : '09'  ,
+                October : '10', November    :'11', December     : '12'
+            };
+
+            //
+            const month                         =   monthMap[monthName];
+
+            if (!month) throw new Error(`Unknown month "${monthName}"`);
+
+            return `${year}-${month}-${day}`;
+        },
+
+        //  //  //
+
+        $magnify(imgID, zoom, zoomContainerID) {
+
+            //
+            let zoomContainer           =   document.getElementById(zoomContainerID)
+            zoomContainer.style.display =   "block"
+
+            //
+            var img, glass, w, h, bw;
+            img     =   document.getElementById(imgID);
+
+            /* Create magnifier glass: */
+            glass   =   document.createElement("DIV");
+            glass.setAttribute("class", "img-magnifier-glass");
+
+            /* Insert magnifier glass: */
+            img.parentElement.insertBefore(glass, img);
+
+            /* Set background properties for the magnifier glass: */
+            glass.style.backgroundImage     =   "url('" + img.src + "')";
+            glass.style.backgroundRepeat    =   "no-repeat";
+            glass.style.backgroundSize      =   (img.width * zoom) + "px " + (img.height * zoom) + "px";
+            bw                              =   3;
+            w                               =   glass.offsetWidth / 2;
+            h                               =   glass.offsetHeight / 2;
+
+            /* Execute a function when someone moves the magnifier glass over the image: */
+            glass.addEventListener("mousemove"  , moveMagnifier);
+            img.addEventListener("mousemove"    , moveMagnifier);
+
+            /*and also for touch screens:*/
+            glass.addEventListener("touchmove"  , moveMagnifier);
+            img.addEventListener("touchmove"    , moveMagnifier);
+
+            function moveMagnifier(e) {
+
+                var pos, x, y;
+
+                /* Prevent any other actions that may occur when moving over the image */
+                e.preventDefault();
+
+                /* Get the cursor's x and y positions: */
+                pos =   getCursorPos(e);
+                x   =   pos.x;
+                y   =   pos.y;
+
+                /* Prevent the magnifier glass from being positioned outside the image: */
+                if (x > img.width - (w / zoom)) {x = img.width - (w / zoom);}
+                if (x < w / zoom) {x = w / zoom;}
+                if (y > img.height - (h / zoom)) {y = img.height - (h / zoom);}
+                if (y < h / zoom) {y = h / zoom;}
+
+                /* Set the position of the magnifier glass: */
+                glass.style.left    =   (x - w) + "px";
+                glass.style.top     =   (y - h) + "px";
+
+                /* Display what the magnifier glass "sees": */
+                glass.style.backgroundPosition  =   "-" + ((x * zoom) - w + bw) + "px -" + ((y * zoom) - h + bw) + "px";
+            }
+
+            function getCursorPos(e) {
+                var a, x = 0, y = 0;
+                e   =   e || window.event;
+
+                /* Get the x and y positions of the image: */
+                a   =   img.getBoundingClientRect();
+
+                /* Calculate the cursor's x and y coordinates, relative to the image: */
+                x   =   e.pageX - a.left;
+                y   =   e.pageY - a.top;
+
+                /* Consider any page scrolling: */
+                x   =   x - window.pageXOffset;
+                y   =   y - window.pageYOffset;
+
+                return {x : x, y : y};
+            }
         }
     }
 }

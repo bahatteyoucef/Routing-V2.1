@@ -42,6 +42,18 @@
 
     /* Map */
 
+    #show_datatable_route_import_obs_clients_div {
+
+        left        :   45% ;
+        /* bottom      :   15% ; */
+    }
+
+    #hide_datatable_route_import_obs_clients_div {
+
+        bottom      :   53% ;
+        /* left        :   46% ; */
+    }
+
     #show_route_datatable_icon_div {
 
         left        :   45% ;

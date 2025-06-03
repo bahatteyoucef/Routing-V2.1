@@ -124,6 +124,9 @@
 	<script src="{{url('Leaflet.markercluster-1.4.1/dist/leaflet.markercluster-src.js')}}">			</script>
 	<script src="{{url('Leaflet.markercluster-1.4.1/src/MarkerCluster.js')}}">						</script>
 
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js">	</script>
+	<script src="/js/L.Polyline.SnakeAnim.js">								</script>
+
 	<!--  -->
 
 	<!-- Excel     -->

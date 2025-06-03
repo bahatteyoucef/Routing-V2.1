@@ -10,7 +10,7 @@
             <div    class="row col-sm-2 justify-content-end">
                 <div v-if="((update_button) && (update_button.length    >   0))"   class="col-sm-4 pr-1 pl-1">
                     <button
-                        button type="button" data-bs-toggle="modal" :data-bs-target="'#'+update_modal" class="btn primary w-100"
+                        button type="button" data-bs-toggle="modal" :data-bs-target="'#'+update_modal" class="btn btn-primary w-100"
                         v-on:click="updateElement()"
                     >
                         <i class="mdi mdi-pencil-box-outline"></i>
@@ -19,7 +19,7 @@
 
                 <div v-if="((add_button) && (add_button.length    >   0))"      class="col-sm-4 pr-1 pl-1">
                     <button
-                        button type="button" data-bs-toggle="modal" :data-bs-target="'#'+add_modal" class="btn primary w-100"
+                        button type="button" data-bs-toggle="modal" :data-bs-target="'#'+add_modal" class="btn btn-primary w-100"
                         v-on:click="addElement()"
                     >
                         <i class="mdi mdi-plus-box-outline"></i>

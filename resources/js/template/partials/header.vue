@@ -86,7 +86,7 @@
                 <span id="profileDropdown" role="button" data-bs-toggle="collapse" href="#profile_header_list" aria-haspopup="true" aria-expanded="false" aria-controls="profile_header_list" class="nav-link dropdown-toggle">
 
                     <div class="nav-profile-img mt-1">
-                      <img :src="'/images/custom/profile.jpg'" alt="image"/>
+                      <img :src="'/images/custom/profile.png'" alt="image"/>
                       <span class="availability-status online"></span>
                     </div>
 
@@ -102,14 +102,14 @@
 
                     <li role="presentation" class="preview-item mt-1" @click="showProfile()">
                         <span  role="button" class="dropdown-item">
-                          <i class="mdi mdi-account mr-2 text_light_primary"></i>
+                          <i class="mdi mdi-account mr-2 text_primary"></i>
                           Profile
                         </span>
                     </li>
 
                     <li role="presentation" class="preview-item mt-1" @click="logOut()">
                         <span  role="button" class="dropdown-item">
-                          <i class="mdi mdi-logout mr-2 text_light_primary"></i>
+                          <i class="mdi mdi-logout mr-2 text_primary"></i>
                           Log Out
                         </span>
                     </li>
@@ -184,6 +184,11 @@ export default {
         this.hideProfileHeaderList()
     },  
 
+    unmounted() {
+
+        this.emitter.off('reSetRouteImport')
+    },
+
     methods: {
 
         ...mapActions("authentification" ,  [
@@ -196,8 +201,6 @@ export default {
 
         async getRouteTempo() {
 
-          try {
-
             this.$callApi("post",    "/route_import_tempo/last", null)
             .then((res)=> {
 
@@ -206,16 +209,9 @@ export default {
                 this.route_import_existe  = true
               }
             })
-          }
-          catch(e) {
-
-              console.log(e)
-          }
         }, 
 
         async fetchMaps() {
-
-          try {
 
             this.$callApi("post",    "/route_import/header", null)
             .then((res)=> {
@@ -224,11 +220,6 @@ export default {
 
                 this.prepareRouteLink()
             })
-          }
-          catch(e) {
-
-              console.log(e)
-          }
         },
 
         prepareRouteLink() {
@@ -354,20 +345,6 @@ export default {
         getClients() {
 
           this.$router.push('/route_import/'+this.getUser.id_route_import+'/clients')
-        },
-
-        async sync() {
-
-          this.$showLoadingPage()
-
-          let res = await this.$indexedDB.$sync()
-
-          if(res  ==  200) {
-
-            this.$feedbackSuccess("Synchronisation Perfomed !" , "a synchronisation has been performed successfuly!")
-          }
-
-          this.$hideLoadingPage()
         },
 
         //

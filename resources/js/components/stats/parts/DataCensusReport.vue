@@ -4,124 +4,48 @@
         
         <!-- Title -->
         <div class="row">
-            <div class="col-9 d-flex align-items-center">
+            <div class="col-sm-9 d-flex align-items-center">
                 <h4 class="mb-0 ml-2">Data Census Report</h4>
             </div>
         </div>
 
-        <!-- Show Table     -->
-        <div        class="table_scroll table_scroll_x table_container table_container mt-5">
-            <table  class="table table-bordered w-100" id="data_census_report_table">
+        <!--  -->
+        <!--  -->
+        <!--  -->
+        <!--  -->
+        <!--  -->
+
+        <div id="data_census_report_table_container" class="table-container mt-5">
+            <table class="table table-hover table-bordered data_census_report_table mt-0 mb-0 w-100" id="data_census_report_table">
                 <thead>
                     <tr>
-                        <th class="col-sm-1">Index</th>
+                        <th role="button">#</th>
+                        <th v-for="submit_client_column in data_census_report_table_columns" :key="submit_client_column" role="button">{{ submit_client_column.title }}</th>
+                    </tr>
 
-                        <th class="col-sm-2">Created At</th>
-                        <th class="col-sm-2">Start Adding Time</th>
-                        <th class="col-sm-2">Adding Duration</th>
+                    <tr id="data_census_report_table_filters" class="data_census_report_table_filters">
+                        <th></th>
 
-                        <th class="col-sm-2">Status</th>
-
-                        <th class="col-sm-2">CustomerType</th>
-                        <th class="col-sm-2">DistrictNameE</th>
-                        <th class="col-sm-2">CityNameE</th>
-
-                        <th class="col-sm-2">CustomerNameA</th>
-                        <th class="col-sm-2">BrandAvailability</th>
-
-                        <th class="col-sm-2">CustomerNameE</th>
-
-                        <th class="col-sm-2">TelAvailability</th>
-                        <th class="col-sm-2">Tel</th>
-
-                        <th class="col-sm-2">Address</th>
-                        <th class="col-sm-2">Neighborhood</th>
-                        <th class="col-sm-2">Landmark</th>
-
-                        <th class="col-sm-2">BrandSourcePurchase</th>
-                        <th class="col-sm-2">CustomerCode</th>
-                        <th class="col-sm-2">GPS</th>
-
-                        <th class="col-sm-2">Comment</th>
-
-                        <th class="col-sm-2">OwnerName</th>
-
-                        <th class="col-sm-2">JPlan</th>
-                        <th class="col-sm-2">Journee</th>
+                        <th v-for="submit_client_column in data_census_report_table_columns" :key="submit_client_column">
+                            <div class="filter_group" :data-column="submit_client_column.title">
+                                <select class="filter_type form-select-sm w-100 mb-2">
+                                    <option value="contains">contains</option>
+                                    <option value="not_contains">not contains</option>
+                                    <option value="exact">exact</option>
+                                    <option value="starts_with">starts with</option>
+                                    <option value="ends_with">ends with</option>
+                                </select>
+                                <input
+                                    type="text"
+                                    class="form-control form-control-sm filter_input"
+                                    :placeholder="submit_client_column.title"
+                                />
+                            </div>
+                        </th>
                     </tr>
                 </thead>
 
-                <thead>
-                    <tr class="data_census_report_table_filters">
-                        <th class="col-sm-1"></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Created At"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Start Adding Time"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Adding Duration"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Status"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="CustomerType"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="DistrictNameE"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="CityNameE"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="BrandAvailability"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="TelAvailability"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Tel"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Address"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Neighborhood"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Landmark"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="BrandSourcePurchase"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="GPS"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Comment"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="OwnerName"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="JPlan"/></th>
-                        <th class="col-sm-3"><input type="text" class="form-control form-control-sm" placeholder="Journee"/></th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <tr v-for="(row, index) in data_census_report_table_data.rows" :key="row" role="button">
-                        <td>{{index +   1}}</td>
-
-                        <td>{{ row.created_at }}</td>
-                        <td>{{ row.start_adding_time }}</td>
-                        <td>{{ row.adding_duration }}</td>
-
-                        <td>
-                            <span v-if="row.status=='nonvalidated'"  href="#" class="badge badge-danger">{{row.status}}</span>
-                            <span v-if="row.status=='pending'"       href="#" class="badge badge-warning">{{row.status}}</span>
-                            <span v-if="row.status=='validated'"     href="#" class="badge badge-success">{{row.status}}</span>
-                        </td>
-
-                        <td>{{ row.CustomerType }}</td>
-                        <td>{{ row.DistrictNameE }}</td>
-                        <td>{{ row.CityNameE }}</td>
-
-                        <td>{{ row.CustomerNameA }}</td>
-                        <td>{{ row.BrandAvailabilityText }}</td>
-
-                        <td>{{ row.CustomerNameE }}</td>
-
-                        <td>{{ row.TelAvailabilityText }}</td>
-                        <td>{{ row.Tel }}</td>
-
-                        <td>{{ row.Address }}</td>
-                        <td>{{ row.Neighborhood }}</td>
-                        <td>{{ row.Landmark }}</td>
-
-                        <td>{{ row.BrandSourcePurchase }}</td>
-                        <td>{{ row.CustomerCode }}</td>
-                        <td>{{ row.Latitude }} , {{ row.Longitude }}</td>
-
-                        <td>{{ row.Comment }}</td>
-
-                        <td>{{ row.OwnerName }}</td>
-
-                        <td>{{ row.JPlan }}</td>
-                        <td>{{ row.Journee }}</td>
-
-                    </tr>
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
 
@@ -131,16 +55,44 @@
 
 <script>
 
+import {mapGetters, mapActions}     from    "vuex"
+
+import DatatableHelper              from    "@/services/DatatableHelper"
+
 export default {
 
     data() {
         return {
 
-            show_data_census_reports_chart      :   false,
+            selected_row                        :   null    ,
 
-            //
+            data_census_report_table_columns    :   [
+                                                        { data: "id"                    , title: "Id"                   },
+                                                        { data: "created_at"            , title: "Created At"           },
+                                                        { data: "status"                , title: "Status"               },
+                                                        { data: "owner"                 , title: "Owner"                },
+                                                        { data: "CustomerIdentifier"    , title: "CustomerIdentifier"   },
+                                                        { data: "CustomerCode"          , title: "CustomerCode"         },
 
-            datatable_data_census_report_table  :   null
+                                                        { data: "CustomerNameE"         , title: "CustomerNameE"        },
+                                                        { data: "CustomerNameA"         , title: "CustomerNameA"        },
+
+                                                        { data: "DistrictNameE"         , title: "DistrictNameE"        },
+                                                        { data: "CityNameE"             , title: "CityNameE"            },
+                                                        { data: "Address"               , title: "Address"              },
+                                                        { data: "Neighborhood"          , title: "Neighborhood"         },
+                                                        { data: "Landmark"              , title: "Landmark"             },
+
+                                                        { data: "Tel"                   , title: "Tel"                  },
+                                                        { data: "CustomerType"          , title: "CustomerType"         },
+
+                                                        { data: "JPlan"                 , title: "JPlan"                },
+                                                        { data: "Journee"               , title: "Journee"              },
+                                                        { data: "Frequency"             , title: "Frequency"            }
+                                                    ],
+
+            datatable_data_census_report_table          :   null,
+            datatable_data_census_report_table_instance :   null
         }
     },
 
@@ -149,27 +101,39 @@ export default {
     async mounted() {
 
         //
+        this.datatable_data_census_report_table_instance    =   new DatatableHelper()
+
+        //
         this.setTable()
 
         //
         await this.$nextTick()
 
         //
-        this.emitter.emit('show_data_census_report_content_ready')
+        this.emitter.emit('show_data_census_report_table_content_ready')
     },
 
     methods : {
 
         async setTable() {
+            this.datatable_data_census_report_table   =   this.datatable_data_census_report_table_instance.$DataTableCreate("data_census_report_table", this.data_census_report_table_data.rows, this.data_census_report_table_columns, null, this.updateElement, null, "Route Import Clients")  
+        },
 
-            try {
+        //
 
-                this.datatable_data_census_report_table     =   await this.$DataTableCreate("data_census_report_table")
-            }
+        async updateElement(selected_row) {
 
-            catch(e) {
+            //
+            if(this.$isRole("Super Admin")||this.$isRole('BU Manager')||this.$isRole("BackOffice")||this.$isRole('Viewer')) {
 
-                console.log(e)
+                this.selected_row       =   selected_row
+
+                // ShowModal
+                var ModalClientUpdate   =   new Modal(document.getElementById("ModalClientUpdate"));
+                ModalClientUpdate.show();
+
+                //
+                this.$parent.$refs.ModalClientUpdate.getData(this.selected_row, this.data_census_report_table_data.rows)
             }
         },
     }

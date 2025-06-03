@@ -1,102 +1,80 @@
 <template>
-    <div class="row">
-        <div class="col-12 grid-margin">
-            <div class="card">
-                <div class="card-body">
+    <div class="content-wrapper p-3">
+        <div class="card">
+            <div class="card-body">
 
-                    <!-- Header -->
-                    <div class="row">
-                        <h4>Profile Details</h4>
+                <!-- Header -->
+                <h3 class="fw-bold"><u>Profile Details</u></h3>
+
+                <!-- Details -->
+                <form class="mt-5">
+
+                    <div class="mb-3 mt-3">
+                        <div class="row">
+                            <label for="nom"                    class="form-label font-weight-bold col-sm-2">Name : </label>
+                            <label                              class="form-label col-sm-4">{{ user.nom }}</label>
+
+                            <label for="email"                  class="form-label font-weight-bold col-sm-2">Email : </label>
+                            <label                              class="form-label col-sm-4">{{ user.email }}</label>
+                        </div>
                     </div>
 
-                    <!-- Details -->
-                    <form class="mt-5">
+                    <!--  -->
 
-                        <div class="mb-3 mt-3">
-                            <div class="row">
-                                <label for="nom"                    class="form-label font-weight-bold col-sm-2">Name : </label>
-                                <label                              class="form-label col-sm-4">{{ user.nom }}</label>
+                    <div class="mb-3 mt-3">
+                        <div class="row">
+                            <label for="tel"                    class="form-label font-weight-bold col-sm-2">Tel : </label>
+                            <label                              class="form-label col-sm-4">{{ user.tel }}</label>
 
-                                <label for="email"                  class="form-label font-weight-bold col-sm-2">Email : </label>
-                                <label                              class="form-label col-sm-4">{{ user.email }}</label>
-                            </div>
+                            <label for="company"                class="form-label font-weight-bold col-sm-2">Company : </label>
+                            <label                              class="form-label col-sm-4">{{ user.company }}</label>
                         </div>
+                    </div>
 
-                        <!--  -->
+                    <!--  -->
 
-                        <div class="mb-3 mt-3">
-                            <div class="row">
-                                <label for="tel"                    class="form-label font-weight-bold col-sm-2">Tel : </label>
-                                <label                              class="form-label col-sm-4">{{ user.tel }}</label>
+                    <div class="mb-3 mt-3">
+                        <div class="row">
+                            <label for="type_user"              class="form-label font-weight-bold col-sm-2">Type User : </label>
+                            <label                              class="form-label col-sm-4">{{ user.type_user }}</label>
 
-                                <label for="company"                class="form-label font-weight-bold col-sm-2">Company : </label>
-                                <label                              class="form-label col-sm-4">{{ user.company }}</label>
-                            </div>
+                            <label for="max_route_import"       class="form-label font-weight-bold col-sm-2">Max Route Import : </label>
+                            <label                              class="form-label col-sm-4">{{ user.max_route_import }}</label>
                         </div>
+                    </div>
 
-                        <!--  -->
+                    <!--  -->
 
-                        <div class="mb-3 mt-3">
-                            <div class="row">
-                                <label for="type_user"              class="form-label font-weight-bold col-sm-2">Type User : </label>
-                                <label                              class="form-label col-sm-4">{{ user.type_user }}</label>
-
-                                <label for="max_route_import"       class="form-label font-weight-bold col-sm-2">Max Route Import : </label>
-                                <label                              class="form-label col-sm-4">{{ user.max_route_import }}</label>
-                            </div>
+                    <div class="mb-3 mt-3">
+                        <div class="row">
+                            <label for="max_route_import"       class="form-label font-weight-bold col-sm-2">Liste Route Import : </label>
+                            <label                              class="form-label col-sm-10">{{ user.liste_route_import_string }}</label>
                         </div>
+                    </div>
 
-                        <!--  -->
-
-                        <div class="mb-3 mt-3">
-                            <div class="row">
-                                <label for="max_route_import"       class="form-label font-weight-bold col-sm-2">Liste Route Import : </label>
-                                <label                              class="form-label col-sm-10">{{ user.liste_route_import_string }}</label>
-                            </div>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="container mt-5">
-                            <div class="row justify-content-center">
-                                <!-- <div class="col-sm-3 mt-3">
-                                    <button type="button" class="btn btn-secondary w-100"       @click="changePassword()">Change Password</button>
-                                </div> -->
-    
-                                <!-- <div class="col-sm-3 mt-3">
-                                    <button type="button" class="btn btn-primary w-100"         @click="updateInformations()">Update Informations</button>
-                                </div> -->
-                            </div>
-                        </div>
-
-                    </form>
-
-                </div>
+                </form>
             </div>
         </div>
-
     </div>
 </template>
  
 <script>
-
-import headerComponent      from "../../template/components/headerComponent.vue"
 
 export default {
 
     data() {
         return {
             user            :   {
-                nom_original            :   '',
+                nom_original                :   '',
 
-                id                      :   '',
-                nom                     :   '',
-                email                   :   '',
-                tel                     :   '',
-                company                 :   '',
-                type_user               :   '',
+                id                          :   '',
+                nom                         :   '',
+                email                       :   '',
+                tel                         :   '',
+                company                     :   '',
+                type_user                   :   '',
 
-                max_route_import        :   0 ,
+                max_route_import            :   0 ,
 
                 liste_route_import          :   [],
                 liste_route_import_string   :   ""
@@ -106,12 +84,7 @@ export default {
         }
     },
 
-    components : {
-        headerComponent 
-    },
-
     async mounted() {
-
         await this.getData()
     },  
 
@@ -164,18 +137,6 @@ export default {
                 this.user.liste_route_import_string     =   this.user.liste_route_import_string     +   " - "   +   this.liste_route_import[i].label
             }
         },
-
-        //
-
-        updateInformations() {
-
-            this.$router.push('/users/'+this.$route.params.id_user+'/update')
-        },
-
-        changePassword() {
-
-            this.$router.push('/users/'+this.$route.params.id_user+'/update/password')
-        }
     }
 };
 </script>

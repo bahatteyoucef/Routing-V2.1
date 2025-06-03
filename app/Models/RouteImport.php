@@ -37,9 +37,17 @@ class RouteImport extends Model
         foreach ($liste_route_import as $route_import) {
 
             $route_import->clients      =   Client::where("id_route_import", $route_import->id)
-                                            ->join('users', 'clients.owner', '=', 'users.id')
-                                            ->select('clients.*', 'users.nom as owner_name')
-                                            ->get();
+                                                ->join('users', 'clients.owner', '=', 'users.id')
+                                                ->select('clients.*', 'users.nom as owner_name')
+                                                ->get();
+
+            //
+            foreach ($route_import->clients as $client) {
+
+                $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+                $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+                $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+            }
         }
 
         return $liste_route_import;
@@ -87,20 +95,11 @@ class RouteImport extends Model
 
         $validator = Validator::make($request->all(), [
             'libelle'                   =>  ["required", "max:255"                  ],
-            'District'                  =>  ["required"                             ],
-            'new_upload'                =>  ["required"                             ],
+            'districts'                 =>  ["required"                             ],
             'data'                      =>  ["required", "json"                     ]
         ]);
 
         //
-
-        $validator->sometimes(['file']                                              , 'required|file:xlsx'      , function (Fluent $input) {
-            return $input->new_upload   ==  "true";
-        });
-
-        $validator->sometimes(['id_route_import_tempo', 'file_route_import_tempo']  , 'required'                , function (Fluent $input) {
-            return $input->new_upload   ==  "false";
-        });
 
         return $validator;
     }
@@ -110,64 +109,57 @@ class RouteImport extends Model
 
         $route_import   =   new RouteImport([
             'libelle'       =>  $request->input('libelle')  ,
-            'District'      =>  $request->input('District') ,
             'owner'         =>  Auth::user()->id
         ]);
 
         $route_import->save();
 
-        if($request->get("new_upload")  ==  "true") {
+        //  //  //
 
-            $fileName                                   =   uniqid().'.'.$request->file->getClientOriginalExtension();
-            $request->file->move(public_path('uploads/route_import/'.Auth::user()->id), $fileName);
+        $route_import_tempo     =   RouteImportTempo::find($request->get("id_route_import_tempo"));
 
-            // 
-
-            $route_import_filename                      =   new RouteImportFile();
-
-            $route_import_filename->id_route_import     =   $route_import->id;
-            $route_import_filename->file                =   $fileName;
-
-            $route_import_filename->save();
+        $from                   =   public_path("uploads/route_import_tempo/" . Auth::user()->id . "/{$route_import_tempo->file}");
+        $to                     =   public_path("uploads/route_import/"       . Auth::user()->id . "/{$route_import_tempo->file}");
+        
+        // Ensure destination directory exists
+        if (! File::exists(dirname($to))) {
+            File::makeDirectory(dirname($to), 0755, true);
+        }
+        
+        // Move the file
+        if (File::exists($from)) {
+            File::move($from, $to);
         }
 
-        else {
+        // 
 
-            $fileName               =   $request->get("file_route_import_tempo");
+        $route_import_filename                      =   new RouteImportFile();
 
-            if(!File::exists(public_path().'/uploads')) {
+        $route_import_filename->id_route_import     =   $route_import->id;
+        $route_import_filename->file                =   $route_import_tempo->file;
 
-                $path = public_path().'/uploads';
-                File::makeDirectory($path, $mode = 0777, true, true);
-            }
+        $route_import_filename->save();
 
-            if(!File::exists(public_path().'/uploads'.'/route_import')) {
-
-                $path = public_path().'/uploads'.'/route_import';
-                File::makeDirectory($path, $mode = 0777, true, true);
-            }
-
-            if(!File::exists(public_path().'/uploads'.'/route_import/'.Auth::user()->id)) {
-
-                $path = public_path().'/uploads'.'/route_import/'.Auth::user()->id;
-                File::makeDirectory($path, $mode = 0777, true, true);
-            }
-
-            //
-
-            File::move(public_path('uploads/'.'route_import_tempo/'.Auth::user()->id.'/'.$fileName), public_path('uploads/'.'route_import/'.Auth::user()->id.'/'.$fileName));
-
-            // 
-
-            $route_import_filename                      =   new RouteImportFile();
-
-            $route_import_filename->id_route_import     =   $route_import->id;
-            $route_import_filename->file                =   $fileName;
-
-            $route_import_filename->save();
-        }
+        //
 
         $route_import->save();
+
+        //  //  //  //  //
+
+        $districts      =   json_decode($request->get("districts"));   
+
+        foreach ($districts as $district) {
+
+            $route_import_district  =   new RouteImportDistrict([
+                'DistrictNo'            =>  $district           ,
+                'id_route_import'       =>  $route_import->id   ,
+                'owner'                 =>  Auth::user()->id
+            ]);
+
+            $route_import_district->save();
+        }
+
+        //  //  //  //  //
 
         // Store Data
         RouteImport::storeData($request, $route_import->id);
@@ -177,7 +169,6 @@ class RouteImport extends Model
 
         // Store Relation with User
         $user_route_import  =   new UserRouteImport([
-
             'id_user'           =>  Auth::user()->id        ,
             'id_route_import'   =>  $route_import->id
         ]);
@@ -226,6 +217,15 @@ class RouteImport extends Model
         $route_import                       =   RouteImport::find($id);
 
         $route_import->clients              =   Client::where("id_route_import", $id)->join('users', 'clients.owner', '=', 'users.id')->select('clients.*', 'users.nom as owner_name')->get();
+
+        //
+        foreach ($route_import->clients as $client) {
+
+            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        }
+
         $route_import->liste_journey_plan   =   JourneyPlan::where("id_route_import", $id)->get();
         $route_import->liste_journee        =   Journee::where("id_route_import", $id)->get();
 
@@ -238,6 +238,14 @@ class RouteImport extends Model
         $route_import                       =   RouteImport::find($id);
 
         $route_import->clients              =   Client::where([["id_route_import", $id], ["clients.owner", Auth::user()->id]])->join('users', 'clients.owner', '=', 'users.id')->select('clients.*', 'users.nom as owner_name')->get();
+
+        //
+        foreach ($route_import->clients as $client) {
+
+            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        }
 
         return $route_import;
     }
@@ -420,18 +428,19 @@ class RouteImport extends Model
 
         foreach ($clients as $client) {
 
-            $filePath   =   public_path('uploads/clients/'.$client->id);  
+            // $filePath   =   public_path('uploads/clients/'.$client->id);  
 
-            if (File::exists($filePath)) {
+            // if (File::exists($filePath)) {
 
-                File::deleteDirectory($filePath);
-            }
+            //     File::deleteDirectory($filePath);
+            // }
 
             $client->delete();
         }
 
         //
 
+        RouteImportDistrict::where("id_route_import", $id)->get();
         JourneyPlan::where("id_route_import", $id)->delete();
         Journee::where("id_route_import", $id)->delete();
     }
@@ -489,15 +498,46 @@ class RouteImport extends Model
 
         $route_import->data     =   Client::where("id_route_import", $id)->join('users', 'clients.owner', '=', 'users.id')->select('clients.*', 'users.nom as owner_name')->get();   
 
+        //
+        foreach ($route_import->data as $client) {
+
+            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        }
+
         return $route_import;
     }
 
-    public static function obsDetailsRouteImportByOwner(string $id)
+    public static function obsDetailsRouteImportFrontOffice(string $id)
     {
 
         $route_import           =   RouteImport::find($id);
 
-        $route_import->data     =   Client::where([["id_route_import", $id], ["clients.owner", Auth::user()->id]])->join('users', 'clients.owner', '=', 'users.id')->select('clients.*', 'users.nom as owner_name')->get();   
+        $route_import->data     =   Client::query()
+                                        ->where('clients.id_route_import', $id)
+                                        ->where(function($q) {
+                                            $q->where('clients.owner', Auth::id())
+                                            ->orWhere(function($q2) {
+                                                $q2->where('clients.status', 'visible')
+                                                    ->whereIn('clients.CityNo', function($sub) {
+                                                        $sub->select('CITYNO')
+                                                            ->from('users_cities')
+                                                            ->where('id_user', Auth::id());
+                                                    });
+                                            });
+                                        })
+                                        ->join('users', 'clients.owner', '=', 'users.id')
+                                        ->select('clients.*', 'users.nom as owner_name')
+                                        ->get();
+
+        //
+        foreach ($route_import->data as $client) {
+
+            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        }
 
         return $route_import;
     }
@@ -509,10 +549,21 @@ class RouteImport extends Model
     public static function clients(int $id)
     {
 
-        return  Client::where("id_route_import", $id)
-                ->join('users', 'clients.owner', '=', 'users.id')
-                ->select('clients.*', 'users.nom as owner_name')
-                ->get();
+        $clients    =   Client::where("id_route_import", $id)
+                            ->join('users', 'clients.owner', '=', 'users.id')
+                            ->select('clients.*', 'users.nom as owner_name')
+                            ->get();
+
+        //
+        foreach ($clients as $client) {
+
+            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        }
+
+        //
+        return $clients;
     }
 
     //
@@ -530,7 +581,10 @@ class RouteImport extends Model
 
             if($client) {
 
+                $client->NewCustomer            =   $client_elem->NewCustomer;
+                $client->CustomerIdentifier     =   $client_elem->CustomerIdentifier;
                 $client->CustomerCode           =   $client_elem->CustomerCode;
+                $client->OpenCustomer           =   $client_elem->OpenCustomer;
                 $client->CustomerNameE          =   $client_elem->CustomerNameE;
                 $client->CustomerNameA          =   $client_elem->CustomerNameA;
                 $client->Latitude               =   $client_elem->Latitude;
@@ -547,6 +601,11 @@ class RouteImport extends Model
                 $client->Landmark               =   $client_elem->Landmark;
                 $client->BrandAvailability      =   $client_elem->BrandAvailability;
                 $client->BrandSourcePurchase    =   $client_elem->BrandSourcePurchase;
+
+                $client->Frequency              =   $client_elem->Frequency;
+                $client->SuperficieMagasin      =   $client_elem->SuperficieMagasin;
+                $client->NbrAutomaticCheckouts  =   $client_elem->NbrAutomaticCheckouts;
+                $client->AvailableBrands        =   $client_elem->AvailableBrands;
 
                 $client->id_route_import        =   $client_elem->id_route_import;
                 $client->owner                  =   Auth::user()->id;
@@ -726,7 +785,10 @@ class RouteImport extends Model
             //
 
             $client         =   new Client([
+                'NewCustomer'           =>  $client_elem->NewCustomer           ,
+                'CustomerIdentifier'    =>  $client_elem->CustomerIdentifier    ,
                 'CustomerCode'          =>  $client_elem->CustomerCode          ,    
+                'OpenCustomer'          =>  $client_elem->OpenCustomer          ,    
                 'CustomerNameE'         =>  $client_elem->CustomerNameE         ,
                 'CustomerNameA'         =>  $client_elem->CustomerNameA         ,
                 'Latitude'              =>  $client_elem->Latitude              ,
@@ -743,6 +805,11 @@ class RouteImport extends Model
                 'Landmark'              =>  $client_elem->Landmark              ,
                 'BrandAvailability'     =>  $client_elem->BrandAvailability     ,
                 'BrandSourcePurchase'   =>  $client_elem->BrandSourcePurchase   ,
+
+                'Frequency'             =>  $client_elem->Frequency             ,
+                'SuperficieMagasin'     =>  $client_elem->SuperficieMagasin     ,
+                'NbrAutomaticCheckouts' =>  $client_elem->NbrAutomaticCheckouts ,
+                'AvailableBrands'       =>  $client_elem->AvailableBrands       ,
 
                 'id_route_import'       =>  $client_elem->id_route_import       ,  
                 'status'                =>  $client_elem->status                ,
@@ -960,18 +1027,74 @@ class RouteImport extends Model
         return $users;
     }
 
+    public static function users(int $id_route_import) {
+
+        $query      =   DB::table('users')
+
+                            ->select([ 
+                                'users.id                               as  id'                 , 
+
+                                'users.nom                              as  nom'                ,
+                                'users.email                            as  email'              ,
+
+                                'users.tel                              as  tel'                ,
+                                'users.company                          as  company'            ,
+
+                                'users.type_user                        as  type_user'          ,
+
+                                'users.accuracy                         as  accuracy'           ,
+
+                                'users.max_route_import                 as  max_route_import'   ,
+
+                                //
+
+                                'users_route_import.id_route_import     as  id_route_import'
+                            ])
+
+                            ->join("users_route_import",    "users.id",     "users_route_import.id_user")
+
+                            ->where("users_route_import.id_route_import", $id_route_import);
+        //        
+        if((Auth::user()->hasRole("BackOffice"))||(Auth::user()->hasRole("BU Manager"))) {
+
+            $query  =   $query->where(function ($sub_query) { // This creates parentheses in SQL
+                            $sub_query->where("users.type_user", "FrontOffice")
+                                    ->orWhere("users.type_user", "BackOffice")
+                                    ->orWhere("users.type_user", "BU Manager");
+                        });
+        }
+
+        //
+        return $query->get();
+    }
+
     //
 
     public static function clientsByStatus(Request $request, int $id_route_import) {
 
-        $clients        =   Client::where([
-                                ["clients.id_route_import"  ,   $id_route_import],
-                                ["clients.owner"            ,   Auth::user()->id],
-                                ["clients.status"           ,   $request->get("status")]
-                                ])
+        $clients        =   Client::query()
+                                ->where('clients.id_route_import', $id_route_import)
+                                ->where('clients.status', $request->get('status'))
+                                ->when(
+                                    $request->get('status') !== 'visible',
+                                    fn($q) => $q->where('clients.owner', Auth::id()),
+                                    fn($q) => $q->whereIn('clients.CityNo', function($sub) {
+                                        $sub->select('CITYNO')
+                                            ->from('users_cities')
+                                            ->where('id_user', Auth::id());
+                                    })
+                                )
                                 ->join('users', 'clients.owner', '=', 'users.id')
                                 ->select('clients.*', 'users.nom as owner_name')
                                 ->get();
+
+        //
+        foreach ($clients as $client) {
+
+            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        }
 
         return $clients;
     }

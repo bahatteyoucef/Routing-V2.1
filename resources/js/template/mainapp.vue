@@ -47,7 +47,7 @@
     </div>
 
     <!-- Install Banner -->
-    <div v-if="mobile_device" v-show="show_install_button"   id="BlockInstall" class="w-100 p-3">
+    <div v-if="(mobile_device)&&($isRole('FrontOffice'))" v-show="show_install_button"   id="BlockInstall" class="w-100 p-3">
         <div class="row">
             <div @click="closeInstallBanner()"  class="col-2 p-0 d-flex justify-content-center align-items-center">
                 <i class="mdi mdi-close font-weight-bold text-light" style="font-size: 30px;"></i>
@@ -145,14 +145,6 @@
                 this.user   =   this.getUser
 
                 if(this.user.nom) {
-
-                    if(this.$isRole("FrontOffice")) {
-
-                        // Set Local DB
-                        await this.$indexedDB.$indexedDB_intialiazeSetDATA()
-                    }
-
-                    //
 
                     this.component_login        =   false
                     this.component_dashboard    =   true

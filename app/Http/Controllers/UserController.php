@@ -15,6 +15,7 @@ use Illuminate\Validation\Rules;
 
 use App\Models\Role;
 use App\Models\RouteImport;
+use App\Models\RouteImportDistrict;
 use App\Models\UserRouteImport;
 use App\Models\UserTerritory;
 use Exception;
@@ -48,9 +49,82 @@ class UserController extends Controller
 
             $user           =   Auth::user();
 
+            if($user->status    ==  "enabled") {
+
+                $user->roles    =   $user->getRoleNames();
+
+                //
+
+                if($user->type_user ==  "FrontOffice") {
+
+                    $user_route_import  =   UserRouteImport::where('id_user', $user->id)->first();  
+
+                    if($user_route_import) {
+
+                        $route_import       =   RouteImport::where('id', $user_route_import->id_route_import)->first();  
+
+                        if($user_route_import) {
+
+                            //
+                            $user->id_route_import  =   $route_import->id;
+                            $user->districts        =   RouteImportDistrict::where('id_route_import', $user_route_import->id_route_import)->pluck('DistrictNo');
+                        }
+
+                        else {
+
+                            $user->id_route_import  =   null;
+                            $user->districts        =   [];
+                        }
+                    }
+
+                    else {
+
+                        $user->id_route_import  =   null;
+                        $user->districts        =   [];
+
+                        return response()->json([
+                            'header'    =>  "Error !",
+                            'errors'    =>  ["Unauthorized !"],
+                        ], Response::HTTP_UNAUTHORIZED);
+                    }
+
+                    //
+
+                    $user_territories           =   UserTerritory::where('id_user', $user->id)->get();  
+
+                    $user->user_territories     =   $user_territories;
+                }
+
+                // 
+
+                return response([
+                    'user'          => $user                                                ,
+                    'access_token'  => Auth::user()->createToken('authToken')->accessToken
+                ], Response::HTTP_OK);
+            }
+
+            else {
+                return response()->json([
+                    'header'    =>  "Error !",
+                    'errors'    =>  ["Unauthorized !"],
+                ], Response::HTTP_UNAUTHORIZED);
+            }
+        }
+
+        return response()->json([
+            'header'    =>  "Error !",
+            'errors'    =>  ["Wrong username or password !"],
+        ], Response::HTTP_UNAUTHORIZED);
+    }
+
+    public function isAuthentificated(Request $request) {
+
+        if((Auth::guard("api")->check())&&(Auth::guard("api")->user()->status   ==  "enabled")) {
+
+            $user           =   Auth::guard("api")->user();
             $user->roles    =   $user->getRoleNames();
 
-            // 
+            //
 
             if($user->type_user ==  "FrontOffice") {
 
@@ -64,46 +138,38 @@ class UserController extends Controller
 
                         //
                         $user->id_route_import  =   $route_import->id;
-                        $user->DistrictNo       =   $route_import->District;
+                        $user->districts        =   RouteImportDistrict::where('id_route_import', $user_route_import->id_route_import)->pluck('DistrictNo');
                     }
 
                     else {
 
                         $user->id_route_import  =   null;
-                        $user->DistrictNo       =   null;
+                        $user->districts        =   [];
                     }
                 }
 
                 else {
 
                     $user->id_route_import  =   null;
-                    $user->DistrictNo       =   null;
+                    $user->districts        =   [];
+
+                    //
+                    return "";
                 }
 
                 //
 
                 $user_territories           =   UserTerritory::where('id_user', $user->id)->get();  
-
                 $user->user_territories     =   $user_territories;
             }
 
-            // 
-
-            return response([
-                'user'          => $user                                                ,
-                'access_token'  => Auth::user()->createToken('authToken')->accessToken
-            ], Response::HTTP_OK);
+            //
+            return $user;
         }
 
-        return response()->json([
-            'header'    =>  "Error !",
-            'errors'    =>  ["Wrong username or password !"],
-        ], Response::HTTP_UNAUTHORIZED);
-    }
-
-    public function isAuthentificated(Request $request) {
-
-        return Auth::guard("api")->check();
+        else {
+            return "";
+        }
     }
 
     // 

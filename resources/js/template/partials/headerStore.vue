@@ -126,7 +126,7 @@ export default {
 
             if(this.getIsOnline) {
 
-                this.$router.push('/')
+                this.$router.push('/front_office')
             }
         },
 

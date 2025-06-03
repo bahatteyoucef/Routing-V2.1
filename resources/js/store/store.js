@@ -7,6 +7,7 @@ import type_client          from "./modules/type_client/type_client"
 import journee              from "./modules/journee/journee"
 import user_territory       from "./modules/user_territory/user_territory"
 import internet             from "./modules/internet/internet"
+import loading_page         from "./modules/loading_page/loading_page"
 
 const store = createStore({});
 
@@ -17,5 +18,6 @@ store.registerModule("type_client"      , type_client);
 store.registerModule("journee"          , journee);
 store.registerModule("user_territory"   , user_territory);
 store.registerModule("internet"         , internet);
+store.registerModule("loading_page"     , loading_page);
 
 export default store ;

@@ -42,6 +42,22 @@ export default {
             })
         },
 
+        $showWarnings(message,warnings)
+        {
+            let validation_warnings =   "<ul>";
+
+            let list_items          =   ""
+
+            Object.keys(warnings).forEach(element => {
+
+                list_items              =   list_items   +   "<li>"  +   warnings[element] +   "</li>"
+            });
+
+            validation_warnings     =   list_items   +   "</ul>"
+            
+            this.$feedbackWarning(message   ,   validation_warnings)
+        },
+
         $feedbackError(header,html)
         {
             this.$swal({

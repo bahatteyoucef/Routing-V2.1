@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Fluent;
 use stdClass;
 
 class ClientTempo extends Model
@@ -30,7 +32,21 @@ class ClientTempo extends Model
 
     public static function index(int $id_route_import_tempo) {
 
-        return ClientTempo::where('id_route_import_tempo', $id_route_import_tempo)->get();
+        $clients        =   Client::where("id_route_import", $id_route_import_tempo)
+                                ->join('users', 'clients.owner', '=', 'users.id')
+                                ->select('clients.*', 'users.nom as owner_name')
+                                ->get();
+
+        //
+        foreach ($clients as $client) {
+
+            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        }
+
+        //
+        return $clients;
     }
 
     //
@@ -47,60 +63,84 @@ class ClientTempo extends Model
 
         foreach ($clients as $client_elem) {
 
-            //
-            if (empty($client_elem->CustomerCode)) {
-                throw new Exception("Le champ CustomerCode est vide.");
+            if(isset($client_elem->owner)) {
+                $user   =   User::where('nom', $client_elem->owner)->first();
             }
 
+            //
+            if(!isset($user)) {
+                $user   =   Auth::user();
+            }
+
+            //  //  //  //  //
+
+            //
             if (preg_match('/[\/\\\\:*?"<>|& ]/', $client_elem->CustomerCode)) {
                 throw new Exception("Le champ CustomerCode contient des caractères interdits : ".$client_elem->CustomerCode);
             }
 
+            //  //  //  //  //
+
+            $brands     =   array_map('trim', explode(',', $client_elem->AvailableBrands)); // Split and trim whitespace
+
+            $result     =   [];
+
+            foreach ($brands as $index => $value) {
+                $result["brand_$index"] = $value;
+            }
+
+            $AvailableBrands    =   json_encode($result, JSON_UNESCAPED_UNICODE);
+
+            //  //  //  //  //
+
             // Client
-            $client         =   new ClientTempo([
-                'CustomerCode'              =>  $client_elem->CustomerCode              ,
-                'CustomerNameE'             =>  mb_strtoupper($client_elem->CustomerNameE, 'UTF-8') ,
-                'CustomerNameA'             =>  mb_strtoupper($client_elem->CustomerNameA, 'UTF-8') ,
-                'Latitude'                  =>  $client_elem->Latitude                  ,
-                'Longitude'                 =>  $client_elem->Longitude                 ,
-                'Address'                   =>  $client_elem->Address                   ,
-                'DistrictNo'                =>  $client_elem->DistrictNo                ,
-                'DistrictNameE'             =>  $client_elem->DistrictNameE             ,
-                'CityNo'                    =>  $client_elem->CityNo                    ,
-                'CityNameE'                 =>  $client_elem->CityNameE                 ,
-                'Tel'                       =>  $client_elem->Tel                       ,
-                'CustomerType'              =>  $client_elem->CustomerType              ,
+            $client             =   new ClientTempo([
+                // 'id'                        =>  $client_elem->id                                        ?? ''               ,
 
-                'Neighborhood'              =>  $client_elem->Neighborhood              ,
-                'Landmark'                  =>  $client_elem->Landmark                  ,
-                'BrandAvailability'         =>  0                                       ,
-                'BrandSourcePurchase'       =>  ""                                      ,
+                'NewCustomer'               =>  $client_elem->NewCustomer                               ?? ''               ,
+                'CustomerIdentifier'        =>  $client_elem->CustomerIdentifier                        ?? ''               ,
+                'CustomerCode'              =>  $client_elem->CustomerCode                              ?? ''               ,
+                'OpenCustomer'              =>  $client_elem->OpenCustomer                              ?? ''               ,
+                'CustomerNameE'             =>  mb_strtoupper($client_elem->CustomerNameE, 'UTF-8')     ?? ''               ,
+                'CustomerNameA'             =>  mb_strtoupper($client_elem->CustomerNameA, 'UTF-8')     ?? ''               ,
+                'Latitude'                  =>  $client_elem->Latitude                                  ?? 0                ,
+                'Longitude'                 =>  $client_elem->Longitude                                 ?? 0                ,
+                'Address'                   =>  $client_elem->Address                                   ?? ''               ,
+                'DistrictNo'                =>  $client_elem->DistrictNo                                ?? ''               ,
+                'DistrictNameE'             =>  $client_elem->DistrictNameE                             ?? ''               ,
+                'CityNo'                    =>  $client_elem->CityNo                                    ?? ''               ,
+                'CityNameE'                 =>  $client_elem->CityNameE                                 ?? ''               ,
+                'Tel'                       =>  $client_elem->Tel                                       ?? ''               ,
+                'tel_comment'               =>  $client_elem->tel_comment                               ?? ''               ,
+                'tel_status'                =>  $client_elem->tel_status                                ?? ''               ,
+                'CustomerType'              =>  $client_elem->CustomerType                              ?? ''               ,
 
-                'id_route_import_tempo'     =>  $id_route_import_tempo  ,
-                'owner'                     =>  Auth::user()->id
+                'status'                    =>  $client_elem->status                                    ?? ''               ,
+
+                'Neighborhood'              =>  $client_elem->Neighborhood                              ?? ''               ,
+                'Landmark'                  =>  $client_elem->Landmark                                  ?? ''               ,
+                'BrandAvailability'         =>  $client_elem->BrandAvailability                         ?? ''               ,
+                'BrandSourcePurchase'       =>  $client_elem->BrandSourcePurchase                       ?? ''               ,
+
+                'Frequency'                 =>  $client_elem->Frequency                                 ?? ''               ,
+                'SuperficieMagasin'         =>  $client_elem->SuperficieMagasin                         ?? ''               ,
+                'NbrAutomaticCheckouts'     =>  $client_elem->NbrAutomaticCheckouts                     ?? ''               ,
+                'AvailableBrands'           =>  $AvailableBrands                                        ?? ''               ,
+
+                'JPlan'                     =>  $client_elem->JPlan                                     ?? ''               ,
+                'Journee'                   =>  $client_elem->Journee                                   ?? ''               ,
+
+                'comment'                   =>  $client_elem->comment                                   ?? ''               ,
+
+                'created_at'                =>  $client_elem->created_at                                ?? Carbon::now()    ,
+
+                'id_route_import_tempo'     =>  $id_route_import_tempo                                  ?? ''               ,
+
+                'owner'                     =>  $user->id                                                                   ,
+                'created_by'                =>  Auth::user()->id
             ]);
 
-            if($client_elem->JPlan      !=  null) {
-
-                $client->JPlan                  =   mb_strtoupper($client_elem->JPlan, 'UTF-8');
-            }
-
-            else {
-
-                $client->JPlan                  =   "";
-            }
-
-            if($client_elem->Journee    !=  null) {
-
-                $client->Journee                =   $client_elem->Journee;
-            }
-
-            else {
-
-                $client->Journee                =   "";
-            }
-
-
+            //
             $client->save();
         }
     }
@@ -111,12 +151,60 @@ class ClientTempo extends Model
     {
 
         $validator = Validator::make($request->all(), [
-            'CustomerCode'          =>  ["required", "max:255", function ($attribute, $value, $fail) {
+            'NewCustomer'           =>  ["required", "max:255"],
+            'OpenCustomer'          =>  ["required", "max:255"],
+            'CustomerIdentifier'    =>  ["required", "max:255"],
+            'CustomerCode'          =>  ["required_if:OpenCustomer,Ouvert", "max:255", function ($attribute, $value, $fail) {
                 if (preg_match('/[\/\\\\:*?"<>|& ]/', $value)) {
                     $fail("Le champ $attribute contient des caractères interdits.");
                 }
             }],
+            'CustomerNameE'         =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+            'CustomerNameA'         =>  ["required", "max:255"],
+            'Tel'                   =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+            'Latitude'              =>  ["required", "max:255"],
+            'Longitude'             =>  ["required", "max:255"],
+            'Address'               =>  ["required", "max:255"],
+            'DistrictNo'            =>  ["required", "max:255"],
+            'DistrictNameE'         =>  ["required", "max:255"],
+            'CityNo'                =>  ["required", "max:255"],
+            'CityNameE'             =>  ["required", "max:255"],
+            'CustomerType'          =>  ["required", "max:255"],
+            'status'                =>  ["required", "max:255"],
+
+            'Frequency'             =>  ["required", "max:255"],
+            'SuperficieMagasin'     =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+            'NbrAutomaticCheckouts' =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
         ]);
+
+        $validator->sometimes('nonvalidated_details',  ["required"] , function (Fluent $input) {
+    
+            return $input->status    ==  "nonvalidated";
+        });
+
+        //
+
+        $validator->sometimes(['AvailableBrands'],  ["required_if:OpenCustomer,Ouvert"] , function (Fluent $input) {
+    
+            return $input->BrandAvailability    ==  "";
+        });
+
+        //
+
+        $validator->sometimes(['CustomerBarCode_image'],  ["required_if:OpenCustomer,Ouvert"] , function (Fluent $input) {
+    
+            return (($input->CustomerBarCode_image_original_name    !=  "")&&($input->CustomerBarCode_image_updated     ==  "true"));
+        });
+        
+        $validator->sometimes(['facade_image'],  ["file"] , function (Fluent $input) {
+    
+            return (($input->facade_image_original_name             !=  "")&&($input->facade_image_updated              ==  "true"));
+        });
+
+        $validator->sometimes(['in_store_image'],  ["required_if:OpenCustomer,Ouvert"] , function (Fluent $input) {
+    
+            return (($input->in_store_image_original_name           !=  "")&&($input->in_store_image_updated            ==  "true"));
+        });
 
         //
 
@@ -127,46 +215,76 @@ class ClientTempo extends Model
 
         $client                             =   ClientTempo::find($id);
 
-        $client->CustomerCode               =   $request->get("CustomerCode");
-        $client->CustomerNameE              =   mb_strtoupper($request->get("CustomerNameE"), 'UTF-8');
-        $client->CustomerNameA              =   mb_strtoupper($request->get("CustomerNameA"), 'UTF-8');
-        $client->Latitude                   =   $request->get("Latitude");
-        $client->Longitude                  =   $request->get("Longitude");
-        $client->Address                    =   $request->get("Address");
-        $client->DistrictNo                 =   $request->get("DistrictNo");
-        $client->DistrictNameE              =   $request->get("DistrictNameE");
-        $client->CityNo                     =   $request->get("CityNo");
-        $client->CityNameE                  =   $request->get("CityNameE");
-        $client->Tel                        =   $request->get("Tel");
-        $client->CustomerType               =   $request->get("CustomerType");
+        if($client) {
 
-        $client->Neighborhood               =   $request->get("Neighborhood");
-        $client->Landmark                   =   $request->get("Landmark");
-        $client->BrandAvailability          =   $request->get("BrandAvailability");
-        $client->BrandSourcePurchase        =   $request->get("BrandSourcePurchase");
+            //
+            $brandsArray             =   json_decode($request->input("AvailableBrands"), true);
 
-        if($request->get("JPlan")   !=  null) {
+            $AvailableBrands        =   [];
+            foreach ($brandsArray as $index => $value) {
+                $AvailableBrands["brand_$index"] = $value;
+            }
+            //
 
-            $client->JPlan              =   mb_strtoupper($request->get("JPlan"), 'UTF-8');
+            $client->NewCustomer                    =   $request->get("NewCustomer")                            ?? ''   ;
+            $client->OpenCustomer                   =   $request->get("OpenCustomer")                           ?? ''   ;
+            $client->CustomerIdentifier             =   $request->get("CustomerIdentifier")                     ?? ''   ;
+            $client->CustomerCode                   =   $request->get("CustomerCode")                           ?? ''   ;
+            $client->Latitude                       =   $request->get("Latitude")                               ?? ''   ;
+            $client->Longitude                      =   $request->get("Longitude")                              ?? ''   ;
+            $client->Address                        =   $request->get("Address")                                ?? ''   ;
+            $client->DistrictNo                     =   $request->get("DistrictNo")                             ?? ''   ;
+            $client->DistrictNameE                  =   $request->get("DistrictNameE")                          ?? ''   ;
+            $client->CityNo                         =   $request->get("CityNo")                                 ?? ''   ;
+            $client->CityNameE                      =   $request->get("CityNameE")                              ?? ''   ;
+            $client->Tel                            =   $request->get("Tel")                                    ?? ''   ;
+            $client->CustomerType                   =   $request->get("CustomerType")                           ?? ''   ;
+
+            $client->Neighborhood                   =   $request->get("Neighborhood")                           ?? ''   ;
+            $client->Landmark                       =   $request->get("Landmark")                               ?? ''   ;
+            $client->BrandAvailability              =   $request->get("BrandAvailability")                      ?? ''   ;
+            $client->BrandSourcePurchase            =   $request->get("BrandSourcePurchase")                    ?? ''   ;
+
+            $client->Frequency                      =   $request->get("Frequency")                              ?? ''   ;
+            $client->SuperficieMagasin              =   $request->get("SuperficieMagasin")                      ?? ''   ;
+            $client->NbrAutomaticCheckouts          =   $request->get("NbrAutomaticCheckouts")                  ?? ''   ;
+            $client->comment                        =   $request->input("comment")                              ?? ''   ;
+            $client->Journee                        =   $request->input("Journee")                              ?? ''   ;
+            $client->status                         =   $request->input("status")                               ?? ''   ;
+            $client->nonvalidated_details           =   $request->input("nonvalidated_details")                 ?? ''   ;
+
+            $client->CustomerNameE                  =   mb_strtoupper($request->get("CustomerNameE"), 'UTF-8')  ?? ''   ;
+            $client->CustomerNameA                  =   mb_strtoupper($request->get("CustomerNameA"), 'UTF-8')  ?? ''   ;
+            $client->JPlan                          =   mb_strtoupper($request->input("JPlan"), 'UTF-8')        ?? ''   ;
+
+            $client->AvailableBrands                =   json_encode($AvailableBrands, JSON_UNESCAPED_UNICODE)           ;
+
+            if(Auth::user()->hasRole('FrontOffice')) {
+
+                $client->owner                          =   Auth::user()->id;
+            }
+
+            else {
+
+                $client->owner                          =   $request->get("owner");
+                $client->tel_status                     =   $request->get("tel_status");
+                $client->tel_comment                    =   $request->get("tel_comment");
+            }
+
+            //
+            $client->save();
+
+            //  //  //  //  //
+            //  //  //  //  //
+            //  //  //  //  //
+
+            //
+            $AvailableBrands_AssocArray                     =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+            $client->AvailableBrands_array_formatted        =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+            $client->AvailableBrands_string_formatted       =   implode(", ", $client->AvailableBrands_array_formatted);
         }
 
-        else {
-
-            $client->JPlan              =   "";
-        }
-
-        if($request->get("Journee") !=  null) {
-
-            $client->Journee            =   $request->get("Journee");
-        }
-
-        else {
-
-            $client->Journee            =   "";
-        }
-
-        $client->save();
-
+        return $client;
     }
 
     //
@@ -277,7 +395,7 @@ class ClientTempo extends Model
 
     public static function deleteClients() {
 
-        ClientTempo::where('owner', Auth::user()->id)->delete();
+        ClientTempo::where('created_by', Auth::user()->id)->delete();
     }
 
     //
@@ -296,57 +414,101 @@ class ClientTempo extends Model
 
     public static function getDoublesTelClients(int $id_route_import_tempo) {
 
-        return  DB::table('clients_tempo')
-                    ->where('id_route_import_tempo', $id_route_import_tempo)
-                    ->whereIn('Tel', function ($query) use ($id_route_import_tempo) {
-                        $query->select('Tel')
-                            ->from('clients_tempo')
+        $clients    =   DB::table('clients_tempo')
                             ->where('id_route_import_tempo', $id_route_import_tempo)
-                            ->groupBy('Tel')
-                            ->havingRaw('COUNT(*) > 1');
-                    })
-                    ->get();
+                            ->whereIn('Tel', function ($query) use ($id_route_import_tempo) {
+                                $query->select('Tel')
+                                    ->from('clients_tempo')
+                                    ->where('id_route_import_tempo', $id_route_import_tempo)
+                                    ->groupBy('Tel')
+                                    ->havingRaw('COUNT(*) > 1');
+                            })
+                            ->get();
+
+        //
+        foreach ($clients as $client) {
+
+            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        }
+
+        //
+        return $clients;
     } 
 
     public static function getDoublesCustomerCodeClients(int $id_route_import_tempo) {
 
-        return  DB::table('clients_tempo')
-                    ->where('id_route_import_tempo', $id_route_import_tempo)
-                    ->whereIn('CustomerCode', function ($query) use ($id_route_import_tempo) {
-                        $query->select('CustomerCode')
-                            ->from('clients_tempo')
+        $clients    =   DB::table('clients_tempo')
                             ->where('id_route_import_tempo', $id_route_import_tempo)
-                            ->groupBy('CustomerCode')
-                            ->havingRaw('COUNT(*) > 1');
-                    })
-                    ->get();
+                            ->whereIn('CustomerCode', function ($query) use ($id_route_import_tempo) {
+                                $query->select('CustomerCode')
+                                    ->from('clients_tempo')
+                                    ->where('id_route_import_tempo', $id_route_import_tempo)
+                                    ->groupBy('CustomerCode')
+                                    ->havingRaw('COUNT(*) > 1');
+                            })
+                            ->get();
+
+        //
+        foreach ($clients as $client) {
+
+            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        }
+
+        //
+        return $clients;
     }
 
     public static function getDoublesCustomerNameEClients(int $id_route_import_tempo) {
 
-        return  DB::table('clients_tempo')
-                    ->where('id_route_import_tempo', $id_route_import_tempo)
-                    ->whereIn('CustomerNameE', function ($query) use ($id_route_import_tempo) {
-                        $query->select('CustomerNameE')
-                            ->from('clients_tempo')
+        $clients    =   DB::table('clients_tempo')
                             ->where('id_route_import_tempo', $id_route_import_tempo)
-                            ->groupBy('CustomerNameE')
-                            ->havingRaw('COUNT(*) > 1');
-                    })
-                    ->get();
+                            ->whereIn('CustomerNameE', function ($query) use ($id_route_import_tempo) {
+                                $query->select('CustomerNameE')
+                                    ->from('clients_tempo')
+                                    ->where('id_route_import_tempo', $id_route_import_tempo)
+                                    ->groupBy('CustomerNameE')
+                                    ->havingRaw('COUNT(*) > 1');
+                            })
+                            ->get();
+
+        //
+        foreach ($clients as $client) {
+
+            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        }
+
+        //
+        return $clients;
     }
 
     public static function getDoublesGPSClients(int $id_route_import_tempo) {
 
-        return  DB::table('clients_tempo')
-                    ->where('id_route_import_tempo', $id_route_import_tempo)
-                    ->whereIn(DB::raw('(Latitude, Longitude)'), function ($query) use ($id_route_import_tempo) {
-                        $query->select('Latitude', 'Longitude')
-                            ->from('clients_tempo')
+        $clients    =   DB::table('clients_tempo')
                             ->where('id_route_import_tempo', $id_route_import_tempo)
-                            ->groupBy('Latitude', 'Longitude')
-                            ->havingRaw('COUNT(*) > 1');
-                    })
-                    ->get();
-    }
+                            ->whereIn(DB::raw('(Latitude, Longitude)'), function ($query) use ($id_route_import_tempo) {
+                                $query->select('Latitude', 'Longitude')
+                                    ->from('clients_tempo')
+                                    ->where('id_route_import_tempo', $id_route_import_tempo)
+                                    ->groupBy('Latitude', 'Longitude')
+                                    ->havingRaw('COUNT(*) > 1');
+                            })
+                            ->get();
+
+        //
+        foreach ($clients as $client) {
+
+            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        }
+
+        //
+        return $clients;
+    } 
 }

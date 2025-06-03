@@ -457,12 +457,12 @@ class RouteImportController extends Controller
 
     //
 
-    public function obsDetailsRouteImportByOwner(int $id)
+    public function obsDetailsRouteImportFrontOffice(int $id)
     {
 
         try {
 
-            $route_import       =   RouteImport::obsDetailsRouteImportByOwner($id);
+            $route_import       =   RouteImport::obsDetailsRouteImportFrontOffice($id);
             // $willayas           =   RTMWillaya::index();
 
             return response()->json([
@@ -494,7 +494,7 @@ class RouteImportController extends Controller
             return response()->json([
                 'clients'           =>  $clients,
                 'route_import'      =>  $route_import
-            ],422);
+            ],200);
         }
 
         catch(Throwable $erreur) {
@@ -603,6 +603,23 @@ class RouteImportController extends Controller
         try {
 
             $users      =   RouteImport::frontOffice($id_route_import);
+            return $users;
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
+    public static function users(int $id_route_import)
+    {
+
+        try {
+
+            $users      =   RouteImport::users($id_route_import);
             return $users;
         }
 

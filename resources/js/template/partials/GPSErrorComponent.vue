@@ -43,25 +43,20 @@ export default {
 
         async fetchImages() {
 
-            try {
+            const response = await fetch('/images/front_office_images/gps-off-icon-error.png');
 
-                const response = await fetch('/images/front_office_images/gps-off-icon-error.png');
-
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch image: ${response.statusText}`);
-                }
-
-                const blob = await response.blob();
-                const reader = new FileReader();
-
-                reader.onloadend = () => {
-                    this.gps_off_icon_error_icon = reader.result;
-                };
-
-                reader.readAsDataURL(blob);
-            } catch (error) {
-                console.error(error);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch image: ${response.statusText}`);
             }
+
+            const blob = await response.blob();
+            const reader = new FileReader();
+
+            reader.onloadend = () => {
+                this.gps_off_icon_error_icon = reader.result;
+            };
+
+            reader.readAsDataURL(blob);
         }
     },
 };

@@ -5,13 +5,11 @@
 
         <div class="container">
             <div class="row">
-
                 <form>
-                    
                     <div class="col-sm-6 mx-auto">
                         <div class="card login shadow p-3 mb-5 bg-body rounded">
                             <div class="row justify-content-center">
-                                <div class="col-6">
+                                <div class="col-sm-4 mt-3">
                                     <img :src="'/images/custom/logo_buzz.png'" loading="lazy" class="card-img-top">
                                 </div>
                             </div>
@@ -44,7 +42,7 @@
                                         <!--  -->
 
                                         <div class="d-grid gap-2 mb-3 mt-3">
-                                            <button type="button" class="btn primary m-0"  @click="login()">Login</button>
+                                            <button type="button" class="btn btn-primary m-0"  @click="login()">Login</button>
                                         </div>
                                     </form>
                                 </div>
@@ -54,7 +52,6 @@
                     </div>
 
                 </form>
-
             </div>
         </div>
     </div>
@@ -63,28 +60,16 @@
 
 <script>
 
-    import axios                        from "axios"
-
-    import {mapGetters, mapActions}     from "vuex"
+    import axios            from    "axios"
+    import { mapActions }   from    "vuex"
 
     export default {
         
         data() {
-
             return {
-
-                nom     : "",
-                password  : ""
+                nom         :   "",
+                password    :   ""
             }
-        },
-
-        computed : {
-
-            ...mapGetters({
-                getUser                     :   'authentification/getUser'              ,
-                getAccessToken              :   'authentification/getAccessToken'       ,
-                getIsAuthentificated        :   'authentification/getIsAuthentificated'
-            }),
         },
 
         methods : {
@@ -99,97 +84,51 @@
 
             async login() {
 
-                try {
+                // Show Loading Page
+                this.$showLoadingPage()
 
-                    // Show Loading Page
-                    this.$showLoadingPage()
+                let formData = new FormData()
 
-                    let formData = new FormData()
+                formData.append("nom"       ,   this.nom)
+                formData.append("password"  ,   this.password)
 
-                    formData.append("nom"     ,   this.nom)
-                    formData.append("password"  ,   this.password)
+                let response = await this.$callApi('post',  '/login',   formData)
+                console.log(response)
 
-                    let response = await this.$callApi('post' ,   '/login'    ,   formData)
+                // Hide Loading Page
+                this.$hideLoadingPage()
 
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
+                if(response.status === 200) {
 
-                    if(response.status === 200) {
+                    this.$feedbackSuccess("Logged in !","You have been logged in successfully !")
 
-                        this.$feedbackSuccess("Logged in !","You have been logged in successfully !")
+                    // Update l'access token
+                    window.$cookies.set('access_token'  , response.data.access_token)
 
-                        // Update l'access token
-                        window.$cookies.set('access_token'  , response.data.access_token)
+                    // Update Authorization
+                    axios.defaults.headers['Authorization'] = `Bearer ${window.$cookies.get('access_token')}`
 
-                        // Update Authorization
-                        axios.defaults.headers['Authorization'] = `Bearer ${window.$cookies.get('access_token')}`
+                    // Update State
+                    this.setUserAction(response.data.user)
+                    this.setAccessTokenAction(response.data.access_token)
+                    this.setIsAuthentificatedAction(true)
 
-                        // Update State
-                        this.setUserAction(response.data.user)
-                        this.setAccessTokenAction(response.data.access_token)
-                        this.setIsAuthentificatedAction(true)
+                    if(this.$isRole("FrontOffice")) {
+                        this.$router.push('/front_office')
+                    }
 
-                        if(this.$isRole("FrontOffice")) {
-
-                            // Set Local DB
-                            await this.$indexedDB.$indexedDB_intialiazeSetDATA()
-                        }
-
-                        // Route To index
+                    else {
                         this.$router.push('/')
                     }
-
-                    else {
-                        this.$showErrors("Error !", response.data.errors)
-                    }
                 }
 
-                catch(e) {
-
-                }
-            },
-
-            // 
-
-            async logout() {
-
-                try {
-
-                    let response = await this.$callApi('post' ,   '/logout'    ,   null)
-
-                    if(response.status === 200) {
-
-                        this.$feedbackSuccess("Logged out !","You have been logged out successfully !")
-
-                        // Delete l'access token
-                        window.$cookies.remove('access_token')
-                    }
-                    
-                    else {
-                        this.$showErrors("error", response.data.errors)
-                    }
-                }
-                catch(e) {
-
-                }
-            },
-
-            // 
-
-            async getAuthUser() {
-
-                try {
-
-                    let response = await this.$callApi('post' ,   '/user'    ,   null)
-                }
-                catch(e) {
-
+                else {
+                    this.$showErrors("Error !", response.data.errors)
                 }
             }
-
         },
-
     };
+
 </script>
 
 <style scoped>
@@ -204,7 +143,7 @@
 
 /* Target the label when the input inside the same .form-group is focused */
 .form-group:focus-within > .label_above_input {
-    color: #D7481F !important; /* Use !important to ensure it overrides other styles */
+    color: #2c78bd !important; /* Use !important to ensure it overrides other styles */
 }
 
 </style>

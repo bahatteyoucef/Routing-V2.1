@@ -1,131 +1,61 @@
-import { createRouter, createWebHistory }   from    "vue-router";
+import { createRouter, createWebHistory }   from "vue-router";
 
 // mixin
-import Authentification                     from    "./mixin/authentification"
+import Authentification                     from "./mixin/authentification";
 
 // store
-import store                                from    "./store/store"
+import store                                from "./store/store";
 
 // Declare a variable at the top of your router file
-let initialRoute  =   true
+let initialRoute = true;
 
-//  //  //  //  //  //  //  //  //  //  //  //
+// Static Imports
+import IndexShared                              from "./components/index/shared/Index.vue";
+import LoginShared                              from "./components/login/Login.vue";
+import UsersShared                              from "./components/users/Index.vue";
+import ShowUsersShared                          from "./components/users/Show.vue";
+import StatsShared                              from "./components/stats/Index.vue";
+import RouteImportClientsShared                 from "./components/routes/shared/crud/RouteImportClients.vue";
+import RouteImportAddShared                     from "./components/routes/shared/crud/RouteImportAdd.vue";
+import RouteImportTempoShared                   from "./components/routes/shared/crud/RouteImportTempo.vue";
+import ParRouteImportDetailsShared              from "./components/routes/shared/obs/ParRouteImportDetails.vue";
+import ParRouteImportFrontOfficeDetails         from "./components/routes/front_office/ParRouteImportFrontOfficeDetails.vue";
 
-// Routes that can be used offline i should remove dynamique import from them
+//  //  //  //  //
 
-import ClientDetails                        from    "./components/clients/permanent/ClientDetails.vue"
+import ClientDetailsFrontOffice                 from "./components/clients/front_office/ClientDetails.vue";
+import ClientAddCurrentPositionFrontOffice      from "./components/clients/front_office/ClientAddCurrentPosition.vue";
+import ClientUpdateFrontOffice                  from "./components/clients/front_office/ClientUpdate.vue";
+import RouteImportClientsByStatusFrontOffice    from "./components/routes/front_office/routeImportClientsByStatus.vue";
 
-import RouteImportClientsByStatus           from    "./components/routes/routeImportClientsByStatus.vue"
+import IndexFrontOffice                         from "./components/index/front_office/index.vue";
 
-//  //  //  //  //  //  //  //  //  //  //  //
+//  //  //  //  //
 
 const routes = [
+    { path: "/"                                                                             , component: IndexShared                                },
+    { path: "/login"                                                                        , component: LoginShared                                },
+    { path: "/users"                                                                        , component: UsersShared                                },
+    { path: "/users/:id_user/show"                                                          , component: ShowUsersShared                            },
+    { path: "/stats"                                                                        , component: StatsShared                                },
 
-    // Index
-    {
-        path        : "/",
-        component   : () => import('./components/index/index.vue')
-    },
+    { path: "/route_import/:id_route_import/clients"                                        , component: RouteImportClientsShared                   },
 
-    // Login
-    {
-        path        : "/login",
-        component   : () => import('./components/login/login.vue')
-    },
+    { path: "/route/obs/route_import/add"                                                   , component: RouteImportAddShared                       },
+    { path: "/route/obs/route_import_tempo"                                                 , component: RouteImportTempoShared                     },
+    { path: "/route/obs/route_import/:id_route_import/details"                              , component: ParRouteImportDetailsShared                },
 
-    // Users
-    {
-        path        : "/users",
-        component   : () => import('./components/users/index.vue')
-    },
+    //  //  //
+    { path: "/route/frontoffice/obs/route_import/:id_route_import/details"                  , component: ParRouteImportFrontOfficeDetails           },
+    { path: "/route/frontoffice/obs/route_import/:id_route_import/clients/selected"         , component: ParRouteImportFrontOfficeDetails           },
 
-    // ShowUsers
-    {
-        path        : "/users/:id_user/show",
-        component   : () => import('./components/users/show.vue')
-    },
+    { path: "/route_import/:id_route_import/clients/:id_client/details"                     , component: ClientDetailsFrontOffice                   },
+    { path: "/route_import/:id_route_import/clients/add"                                    , component: ClientAddCurrentPositionFrontOffice        },
+    { path: "/route_import/:id_route_import/clients/:id_client/update"                      , component: ClientUpdateFrontOffice                    },
 
-    // UserUpdate
-    {
-        path        : "/users/:id_user/update",
-        component   : () => import('./components/users/UserUpdate.vue')
-    },
+    { path: "/route_import/:id_route_import/clients/by_status"                              , component: RouteImportClientsByStatusFrontOffice      },
 
-    // UserUpdate Password
-    {
-        path        : "/users/:id_user/update/password",
-        component   : () => import('./components/users/changePassword.vue')
-    },
-
-    // 
-
-    // ClientsAdd
-    {
-        path        : "/route_import/:id_route_import/clients/add",
-        component   : () => import('./components/clients/permanent/ClientAddCurrentPosition.vue')
-    },
-
-    // ClientsUpdate
-    {
-        path        : "/route_import/:id_route_import/clients/:id_client/update",
-        component   : () => import('./components/clients/permanent/ClientUpdate.vue')
-    },
-
-    // Stats
-    {
-        path        : "/stats",
-        component   : () => import('./components/stats/index.vue')
-    },
-
-    // Imports Tempo
-    {
-        path        : "/route/obs/route_import_tempo",
-        component   : () => import('./components/routes/temporary/routeImportTempo.vue')
-    },
-
-    // Route Import Clients
-    {
-        path        : "/route_import/:id_route_import/clients",
-        component   : () => import('./components/routes/routeImportClients.vue')
-    },
-
-    // Imports Add
-    {
-        path        : "/route/obs/route_import/add",
-        component   : () => import('./components/routes/RouteImportAdd.vue')
-    },
-
-    // Imports Details
-    {
-        path        : "/route/obs/route_import/:id_route_import/details",
-        component   : () => import('./components/routes/permanent/obs/ParRouteImportDetails.vue')
-    },
-
-    //  //  //  //  //  FrontOffice //  //  //  //  //
-
-    // ClientDetails
-    {
-        path        : "/route_import/:id_route_import/clients/:id_client/details",
-        component   : ClientDetails
-    },
-
-    // Route Import Clients
-    {
-        path        : "/route_import/:id_route_import/clients/by_status",
-        component   : RouteImportClientsByStatus
-    },
-
-    // Imports ParRouteImportFrontOfficeDetails Details
-    {
-        path        : "/route/frontoffice/obs/route_import/:id_route_import/details",
-        component   : () => import('./components/routes/permanent/obs/ParRouteImportFrontOfficeDetails.vue')
-    },
-
-    // Route Import Selected Clients
-    {
-        path        : "/route/frontoffice/obs/route_import/:id_route_import/clients/selected",
-        component   : () => import('./components/routes/permanent/obs/showCustomersMap.vue')
-    },
+    { path: "/front_office"                                                                 , component: IndexFrontOffice                           },
 ];
 
 const router = createRouter({
@@ -135,75 +65,40 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
 
-    // Set Store Values
-    Authentification.methods.$fillStore(store)
+    Authentification.methods.$fillStore(store);
 
-    if((to.path == "/login")&&(store.getters[`authentification/getIsAuthentificated`]   ==  false)) {
+    if (to.path === "/login" && store.getters[`authentification/getIsAuthentificated`] === false) {
+        next();
+    } 
 
-        next()
-    }
+    else if (to.path !== "/login" && store.getters[`authentification/getIsAuthentificated`] === true) {
 
-    else {
+        if (Authentification.methods.$isRole("FrontOffice")) {
 
-        if((to.path != "/login")&&(store.getters[`authentification/getIsAuthentificated`]   ==  true)) {
+            const pattern = /^\/route\/obs\/route_import\/\d+\/details$/;
+            let route_obs_frontOffice = pattern.test(to.path);
 
-            if((to.path != "/login")&&(Authentification.methods.$isRole("FrontOffice"))) {
-
-                const pattern = /^\/route\/obs\/route_import\/\d+\/details$/;
-                
-                let route_obs_frontOffice   =   pattern.test(to.path);
-
-                if(route_obs_frontOffice) {
-
-                    next("/")
-                }
-
-                else {
-
-                    if(initialRoute) {
-
-                        initialRoute    =   false
-                        next("/")
-                    }
-
-                    else {
-                    
-                        next()
-                    }
-                }
-            }
+            if (route_obs_frontOffice) {
+                next("/front_office");
+            } 
 
             else {
-
-                if(initialRoute) {
-
-                    initialRoute    =   false
-                    next("/")
-                }
-
-                else {
-
-                    next()    
-                }
+                initialRoute ? (initialRoute = false, next("/front_office")) : next();
             }
         }
 
         else {
-
-            if((to.path == "/login")&&(store.getters[`authentification/getIsAuthentificated`]   ==  true)) {
-
-                next('/')
-            }
-
-            else {
-
-                if((to.path != "/login")&&(store.getters[`authentification/getIsAuthentificated`]   ==  false)) {
-
-                    next('/login')
-                }
-            }
+            initialRoute ? (initialRoute = false, next("/")) : next();
         }
     }
-})
+
+    else if (to.path === "/login" && store.getters[`authentification/getIsAuthentificated`] === true) {
+        next("/");
+    } 
+
+    else if (to.path !== "/login" && store.getters[`authentification/getIsAuthentificated`] === false) {
+        next("/login");
+    }
+});
 
 export default router;

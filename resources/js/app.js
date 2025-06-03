@@ -1,4 +1,3 @@
-
 //  Defaults
 import {createApp}      from    'vue'
 import App              from    './template/mainapp.vue'
@@ -6,7 +5,6 @@ import App              from    './template/mainapp.vue'
 import authentification from    './mixin/authentification'
 import feedbacks        from    './mixin/feedbacks'
 import globals          from    './mixin/globals'
-import datatables       from    './mixin/datatables'
 import responsive       from    './mixin/responsive'
 
 import Map              from    './services/map'
@@ -130,9 +128,13 @@ else {
 app.mixin(authentification)
 app.mixin(feedbacks)
 app.mixin(globals)
-app.mixin(datatables)
 app.mixin(responsive)
 // 
+
+// Datatable
+$.fn.DataTable.ext.pager.numbers_length             =   5;
+
+//
 
 //Sweet Alert
 import VueSweetalert2 from 'vue-sweetalert2';
@@ -174,10 +176,10 @@ app.config.globalProperties.$indexedDB                  =   new IndexedDB()
 //
 
 // Template
-import Header       from    "./template/partials/header.vue";
-import HeaderStore  from    "./template/partials/headerStore.vue";
-import Sidebar      from    "./template/partials/sidebar.vue";
-import Footer       from    "./template/partials/footer.vue";
+import Header       from    "./template/partials/Header.vue";
+import HeaderStore  from    "./template/partials/HeaderStore.vue";
+import Sidebar      from    "./template/partials/Sidebar.vue";
+import Footer       from    "./template/partials/Footer.vue";
 
 app.component('header-part'         ,   Header)
 app.component('header-store-part'   ,   HeaderStore)
@@ -189,8 +191,8 @@ app.component('footer-part'         ,   Footer)
 
 // Sync Page
 
-import LoadingPage              from    "./template/partials/loadingPage.vue";
-import LoginPage                from    "./components/login/login.vue"
+import LoadingPage              from    "./template/partials/LoadingPage.vue";
+import LoginPage                from    "./components/login/Login.vue"
 
 app.component('loading-page'                    ,   LoadingPage)
 app.component('login-page'                      ,   LoginPage)

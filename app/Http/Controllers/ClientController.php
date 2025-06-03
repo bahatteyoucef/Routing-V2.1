@@ -342,11 +342,11 @@ class ClientController extends Controller
 
     //
 
-    public function getDoublesClients(int $id_route_import) {
+    public function getDoublesClients(Request $request, int $id_route_import) {
 
         try {
 
-            $getDoublant    =   Client::getDoublesClients($id_route_import);
+            $getDoublant    =   Client::getDoublesClients($request, $id_route_import);
 
             return $getDoublant;
         }
@@ -363,11 +363,11 @@ class ClientController extends Controller
         }
     }
 
-    public function getDoublesTelClients(int $id_route_import) {
+    public function getDoublesTelClients(Request $request, int $id_route_import) {
 
         try {
 
-            $getDoublant    =   Client::getDoublesTelClients($id_route_import);
+            $getDoublant    =   Client::getDoublesTelClients($request, $id_route_import);
 
             return $getDoublant;
         }
@@ -384,11 +384,11 @@ class ClientController extends Controller
         }
     }
 
-    public function getDoublesCustomerCodeClients(int $id_route_import) {
+    public function getDoublesCustomerCodeClients(Request $request, int $id_route_import) {
 
         try {
 
-            $getDoublant    =   Client::getDoublesCustomerCodeClients($id_route_import);
+            $getDoublant    =   Client::getDoublesCustomerCodeClients($request, $id_route_import);
 
             return $getDoublant;
         }
@@ -405,11 +405,11 @@ class ClientController extends Controller
         }
     }
 
-    public function getDoublesCustomerNameEClients(int $id_route_import) {
+    public function getDoublesCustomerNameEClients(Request $request, int $id_route_import) {
 
         try {
 
-            $getDoublant    =   Client::getDoublesCustomerNameEClients($id_route_import);
+            $getDoublant    =   Client::getDoublesCustomerNameEClients($request, $id_route_import);
 
             return $getDoublant;
         }
@@ -426,11 +426,11 @@ class ClientController extends Controller
         }
     }
 
-    public function getDoublesGPSClients(int $id_route_import) {
+    public function getDoublesGPSClients(Request $request, int $id_route_import) {
 
         try {
 
-            $getDoublant    =   Client::getDoublesGPSClients($id_route_import);
+            $getDoublant    =   Client::getDoublesGPSClients($request, $id_route_import);
 
             return $getDoublant;
         }

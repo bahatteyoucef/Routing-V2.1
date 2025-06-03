@@ -8,27 +8,20 @@ export default {
 
         $fillStore(store) {
 
-            try {
+            // Set Values from Localstorage to Store
+            if(JSON.parse(localStorage.getItem('vuex')) !=  null) {    
 
-                // Set Values from Localstorage to Store
-                if(JSON.parse(localStorage.getItem('vuex')) !=  null) {    
-
-                    store.commit("authentification/setUser"                 , JSON.parse(localStorage.getItem('vuex'))["user"])
-                }
-
-                if(JSON.parse(localStorage.getItem('vuex')) !=  null) {    
-
-                    store.commit("authentification/setAccessToken"          , JSON.parse(localStorage.getItem('vuex'))["access_token"])
-                }
-
-                if(JSON.parse(localStorage.getItem('vuex')) !=  null) {    
-
-                    store.commit("authentification/setIsAuthentificated"    , JSON.parse(localStorage.getItem('vuex'))["isAuthentificated"])
-                }
+                store.commit("authentification/setUser"                 , JSON.parse(localStorage.getItem('vuex'))["user"])
             }
 
-            catch(e) {
+            if(JSON.parse(localStorage.getItem('vuex')) !=  null) {    
 
+                store.commit("authentification/setAccessToken"          , JSON.parse(localStorage.getItem('vuex'))["access_token"])
+            }
+
+            if(JSON.parse(localStorage.getItem('vuex')) !=  null) {    
+
+                store.commit("authentification/setIsAuthentificated"    , JSON.parse(localStorage.getItem('vuex'))["isAuthentificated"])
             }
         },
 

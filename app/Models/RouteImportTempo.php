@@ -36,6 +36,16 @@ class RouteImportTempo extends Model
         if($last_route_import) {
 
             $last_route_import->clients     =   ClientTempo::index($last_route_import->id);
+            $last_route_import->districts   =   RouteImportTempoDistrict::select('RTM_Willaya.DistrictNo', 'RTM_Willaya.DistrictNameE')
+                                                    ->join('RTM_Willaya', 'route_import_tempo_districts.DistrictNo', 'RTM_Willaya.DistrictNo')
+                                                    ->where('route_import_tempo_districts.id_route_import_tempo', $last_route_import->id)
+                                                    ->orderByRaw('CAST(RTM_Willaya.DistrictNo AS SIGNED INTEGER)')
+                                                    ->get();
+        }
+
+        else {
+
+            throw new Exception("Unauthorized !", 403);
         }
 
         return $last_route_import;
@@ -47,7 +57,6 @@ class RouteImportTempo extends Model
         $validator = Validator::make($request->all(), [
             'libelle'           =>  ["required", "max:255"      ],
             'data'              =>  ["required", "json"         ],
-            'District'          =>  ["required"                 ],
             'file'              =>  ["required", "mimes:xlsx"   ]
         ]);
 
@@ -71,11 +80,27 @@ class RouteImportTempo extends Model
 
         $route_import_tempo =   new RouteImportTempo([
             'libelle'       =>  $request->get("libelle")    ,
-            'District'      =>  $request->get("District")   ,
             'owner'         =>  Auth::user()->id
         ]);
 
         $route_import_tempo->save();
+
+        //  //  //  //  //
+
+        $districts      =   json_decode($request->get("districts"));   
+
+        foreach ($districts as $district) {
+
+            $route_import_tempo_district    =   new RouteImportTempoDistrict([
+                'DistrictNo'                    =>  $district                   ,
+                'id_route_import_tempo'         =>  $route_import_tempo->id     ,
+                'owner'                         =>  Auth::user()->id
+            ]);
+
+            $route_import_tempo_district->save();
+        }
+
+        //  //  //  //  //
 
         $fileName                   =   uniqid().'.'.$request->file->getClientOriginalExtension();
         $request->file->move(public_path('uploads/route_import_tempo/'.Auth::user()->id), $fileName);
@@ -93,8 +118,9 @@ class RouteImportTempo extends Model
 
         RouteImportTempo::where('owner', Auth::user()->id)->delete();
         ClientTempo::where('owner', Auth::user()->id)->delete();
+        RouteImportTempoDistrict::where('owner', Auth::user()->id)->delete();
 
-        File::deleteDirectory(public_path('uploads/route_import_tempo/'.Auth::user()->id));
+        // File::deleteDirectory(public_path('uploads/route_import_tempo/'.Auth::user()->id));
     }
 
     //

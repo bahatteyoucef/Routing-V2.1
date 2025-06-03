@@ -57,7 +57,6 @@ Route::post('/user/isAuthentificated', [UserController::class, 'isAuthentificate
 Route::middleware('auth:api')->group(function () {
     
     // RTM WIllaya Cite
-
     Route::post('/rtm_willayas/rtm_cites/details/indexedDB'           ,   function()  { 
 
         $willayas   =   DB::table("RTM_Willaya")->orderByRaw('CAST(DistrictNo AS SIGNED INTEGER)')->get();
@@ -80,6 +79,15 @@ Route::middleware('auth:api')->group(function () {
         }
 
         return $willayas;
+    });
+
+    Route::post('/route_import/{id_route_import}/districts'  ,   function($id_route_import)  { 
+
+        return  DB::table("RTM_Willaya")
+                    ->join("route_import_districts" , "RTM_Willaya.DistrictNo"          , "route_import_districts.DistrictNo")
+                    ->where('route_import_districts.id_route_import', $id_route_import)
+                    ->orderByRaw('CAST(RTM_Willaya.DistrictNo AS SIGNED INTEGER)')
+                    ->get();
     });
 
     Route::post('/rtm_willayas'                             ,   function()  { 
@@ -109,8 +117,6 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/users/store'                                                                          ,   [UserController::class                  , 'store'                                   ]);
     Route::post('/users/{id}/update'                                                                    ,   [UserController::class                  , 'update'                                  ]);
-
-    Route::post('/users/{id}/update/password'                                                           ,   [UserController::class                  , 'changePassword'                          ]);
 
     Route::post('/users/{id}/update/password'                                                           ,   [UserController::class                  , 'changePassword'                          ]);
 
@@ -159,6 +165,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/route_import/index'                                                                   ,   [RouteImportController::class           , 'indexRouteImports'                       ]);
 
     Route::post('/route_import/{id}/users/frontOffice'                                                  ,   [RouteImportController::class           , 'frontOffice'                             ]);
+    Route::post('/route_import/{id}/users'                                                              ,   [RouteImportController::class           , 'users'                                   ]);
+
     //
 
     Route::post('/route_import/{id_route_import}/clients/doubles'                                       ,   [ClientController::class                , 'getDoublesClients'                       ]);
@@ -210,7 +218,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/clients/resume/update'                                                                ,   [ClientController::class                , 'updateResumeClients'                     ]);
 
     Route::post('/route/obs/route_import/{id}/details'                                                  ,   [RouteImportController::class           , 'obsDetailsRouteImport'                   ]);
-    Route::post('/route/obs/route_import/{id}/details/by_owner'                                         ,   [RouteImportController::class           , 'obsDetailsRouteImportByOwner'            ]);
+    Route::post('/route/obs/route_import/{id}/details/for_front_office'                                 ,   [RouteImportController::class           , 'obsDetailsRouteImportFrontOffice'        ]);
 
     //
 

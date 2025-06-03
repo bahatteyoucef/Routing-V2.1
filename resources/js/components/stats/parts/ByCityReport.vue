@@ -4,11 +4,11 @@
 
         <!-- Title -->
         <div class="row">
-            <div class="col-9 d-flex align-items-center">
+            <div class="col-sm-9 d-flex align-items-center">
                 <h4 class="mb-0 ml-2">By City Report</h4>
             </div>
 
-            <!-- <div class="col-3 text-end">
+            <!-- <div class="col-sm-3 text-end">
                 <img    :src="'/images/switch_arrows.png'" @click="toggleChartTable()"    role="button"    class="mb-0 mr-2"/>
             </div> -->
         </div> 
@@ -17,7 +17,7 @@
         <div v-show="show_by_city_report_chart_data"    class="row animate__animated animate__pulse">
 
             <!-- By City Reports  -->
-            <div class="col-12">
+            <div class="col-sm-12">
                 <div        id="by_city_report_chart_scroll"        class="chart_scroll pt-5 pb-1">
                     <div    id="by_city_report_chart_container"     class="bar_chart_container">
                         <canvas id="by_city_report_chart"           ref="by_city_report_chart"></canvas>
@@ -35,8 +35,9 @@
                         <tr>
                             <th>Index</th>
                             <th>City</th>
+                            <th>Validated</th>
+                            <th>Ferme</th>
                             <th>Expected</th>
-                            <th>Added</th>
                             <th>Gap</th>
                             <th>Percentage</th>
                             <th>Status</th>
@@ -44,24 +45,26 @@
                     </thead>
 
                     <tbody>
-                        <tr v-for="row, index_1 in by_city_report_table_data.rows" :key="index_1">
-                            <td>{{ index_1 + 1 }}</td>
-                            <td>{{ row.CityNameE }}</td>
-                            <td>{{ row.expected_clients }}</td>
-                            <td>{{ row.added_clients }}</td>
-                            <td>{{ row.gap }}</td>
-                            <td>{{ parseInt(row.percentage_clients * 100) }} %</td>
-                            <td>{{ row.status_clients }}</td>
-                        </tr>
-
                         <tr>
                             <th>{{ by_city_report_table_data.total_row.label }}</th>
                             <th></th>
+                            <th>{{ by_city_report_table_data.total_row.validated_clients }}</th>
+                            <th>{{ by_city_report_table_data.total_row.ferme_clients }}</th>
                             <th>{{ by_city_report_table_data.total_row.expected_clients }}</th>
-                            <th>{{ by_city_report_table_data.total_row.added_clients }}</th>
                             <th>{{ by_city_report_table_data.total_row.gap }}</th>
                             <th>{{ parseInt(by_city_report_table_data.total_row.percentage_clients * 100) }} %</th>
                             <th>{{ by_city_report_table_data.total_row.status_clients }}</th>
+                        </tr>
+
+                        <tr v-for="row, index_1 in by_city_report_table_data.rows" :key="index_1">
+                            <td>{{ index_1 + 1 }}</td>
+                            <td>{{ row.CityNameE }}</td>
+                            <td>{{ row.validated_clients }}</td>
+                            <td>{{ row.ferme_clients }}</td>
+                            <td>{{ row.expected_clients }}</td>
+                            <td>{{ row.gap }}</td>
+                            <td>{{ parseInt(row.percentage_clients * 100) }} %</td>
+                            <td>{{ row.status_clients }}</td>
                         </tr>
                     </tbody>
                 </table>

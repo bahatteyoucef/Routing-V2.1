@@ -1,148 +1,99 @@
 <template>
-    <div id="loading_screen" class="justify-content-center align-items-center" style="display:none;">
+    <div v-show="getShowLoadingPage" id="loading_screen" role="status" aria-live="polite" aria-busy="true">
+        <span class="sr-only">Loading…</span>
 
-        <div class="circular-progress center-content">
-            <span class="progress-value">{{ progress_integer }} %</span>
+        <div class="loading_container">
+            <div class="sk-cube-grid">
+                <div class="sk-cube sk-cube1"></div>
+                <div class="sk-cube sk-cube2"></div>
+                <div class="sk-cube sk-cube3"></div>
+                <div class="sk-cube sk-cube4"></div>
+                <div class="sk-cube sk-cube5"></div>
+                <div class="sk-cube sk-cube6"></div>
+                <div class="sk-cube sk-cube7"></div>
+                <div class="sk-cube sk-cube8"></div>
+                <div class="sk-cube sk-cube9"></div>
+            </div>
         </div>
-
     </div>
 </template>
 
 <script>
+
+import { mapGetters }   from    "vuex"
+
 export default {
-    
-    data() {
 
-        return {
-
-            loading_screen      :   null    ,   
-            circularProgress    :   null    ,
-
-            displayValue        :   'none'  ,
-
-            progress            :   0       ,
-            progress_integer    :   0       ,
-            increment           :   0.1     , // smaller increment for smoother transition
-            progress_animation  :   null
-        }
+    computed : {
+        ...mapGetters({
+            getShowLoadingPage  :   'loading_page/getShowLoadingPage'
+        }),
     },
-
-    mounted() {
-
-        //
-        this.observeDisplayChange();
-    },
-
-    methods : {
-
-        updateProgress() {
-
-            let progressStartValue  = 0    
-            let progressEndValue    = 100    
-            let speed               = 125
-
-            let step                = 0.5
-
-            let first_part          = true
-            let second_part         = false
-            let third_part          = false
-            let fourth_part         = false
-
-            this.progress_animation = setInterval(() => {
-
-                progressStartValue                      =   progressStartValue  +   step
-
-                this.progress                           =   progressStartValue
-                this.progress_integer                   =   parseInt(this.progress)
-
-                this.circularProgress.style.background  =   `conic-gradient(#D7481F ${progressStartValue * 3.6}deg, #ededed 0deg)`
-
-                if((this.progress   >=   55)&&(first_part)) {
-
-                    step            =   step/2
-
-                    first_part      =   false
-                    second_part     =   true
-                }
-
-                if((this.progress   >=   55)&&(this.progress    <=   75)&&(second_part)) {
-
-                    step            =   step/2
-
-                    second_part     =   false
-                    third_part      =   true
-                }
-
-                if((this.progress   >=   85)&&(this.progress    <=   95)&&(third_part)) {
-
-                    step            =   step/2
-
-                    third_part      =   false
-                    fourth_part     =   true
-                }
-
-                if((this.progress    >=   95)&&(this.progress    <=   100)&&(fourth_part)) {
-
-                    step            =   step/2
-
-                    fourth_part     =   false
-                }
-
-                if(progressStartValue >= progressEndValue){
-
-                    clearInterval(this.progress_animation);
-                }    
-
-            }, speed);        
-        },
-
-        //
-
-        observeDisplayChange() {
-
-            this.loading_screen     =   document.getElementById("loading_screen")
-            this.circularProgress   =   document.querySelector(".circular-progress")   
-
-            const observer = new MutationObserver((mutations) => {
-
-                mutations.forEach((mutation) => {
-
-                    if (mutation.attributeName === 'style') {
-
-                        const display       =   window.getComputedStyle(this.loading_screen).getPropertyValue('display');
-                        this.displayValue   =   display;
-                    }
-                });
-            });
-
-            observer.observe(this.loading_screen, { attributes: true });
-        },
-    },
-
-    watch : {
-
-        displayValue(new_value, old_value) {
-
-            if(new_value    ==  "flex") {
-
-                this.updateProgress()
-            }
-
-            else {
-
-                clearInterval(this.progress_animation);
-
-                this.progress               =   0
-                this.progress_integer       =   0
-                this.progress_animation     =   null
-            }
-        }
-    }
 }
 
 </script>
 
-<style scoped>
+<style>
 
+#loading_screen {
+    display         :   flex;
+    position        :   fixed;
+    z-index         :   99999;
+    height          :   100vh;
+    width           :   100vw;
+    display         :   flex;
+    align-items     :   center; /* Center content vertically */
+    justify-content :   center; /* Center content horizontally */
+    background      :   rgba(255, 255, 255, 0.3);
+    backdrop-filter :   blur(5px);
+}
+
+.loading_container {
+    display         :   flex;
+    align-items     :   center; /* Align items in the center vertically */
+    margin-bottom   :   90px;
+}
+
+.loading_text {
+    color           :   #2c78bd;
+    margin          :   15px;
+}
+
+.sk-cube-grid {
+    display                 :   grid;
+    grid-template-columns   :   repeat(3, 1fr); /* Creates 3 equal columns */
+    gap                     :   3px; /* Adjust the gap size as needed */
+}
+
+.sk-cube {
+    width                   :   35px;         /*10px; /* Cube width */
+    height                  :   35px;         /*10px; /* Cube height */
+    background-color        : #2c78bd;      /* Cube color */
+    animation               :   sk-cube-grid-scale 1.3s infinite ease-in-out;
+}
+
+/* Assign animation delays for each cube */
+.sk-cube1 { animation-delay: 0.2s; }
+.sk-cube2 { animation-delay: 0.3s; }
+.sk-cube3 { animation-delay: 0.4s; }
+.sk-cube4 { animation-delay: 0.1s; }
+.sk-cube5 { animation-delay: 0.2s; }
+.sk-cube6 { animation-delay: 0.3s; }
+.sk-cube7 { animation-delay: 0.0s; }
+.sk-cube8 { animation-delay: 0.1s; }
+.sk-cube9 { animation-delay: 0.2s; }
+
+@keyframes sk-cube-grid-scale {
+    0%, 70%, 100%   {
+        transform       :   scale3D(1, 1, 1);
+    }
+    35% {
+        transform       :   scale3D(0, 0, 1);
+    }
+}
+
+.loading_text {
+    color               :   #2c78bd
+}
 
 </style>

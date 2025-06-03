@@ -84,14 +84,15 @@ class ClientTempoController extends Controller
             }
 
             // store 
-            ClientTempo::updateClient($request, $id_route_import_tempo, $id);
+            $client     =   ClientTempo::updateClient($request, $id_route_import_tempo, $id);
 
             //
             DB::commit();
             //
 
             return response()->json([
-                "header"            =>  "Client Updated !"                             ,
+                "client"            =>  $client                                         ,
+                "header"            =>  "Client Updated !"                              ,
                 "message"           =>  "the client has been updated successfuly!"   
             ]);
         }

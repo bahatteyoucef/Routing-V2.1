@@ -4,27 +4,25 @@ import store    from    "../store/store"
 
 export default class Map {
     
-    //
-
     constructor() {
 
+        // Mode
         this.marker_cluster_mode                            =   "cluster"
 
-        //
-
+        // General
         this.map                                            =   null
         this.titleLayer                                     =   null
 
-        this.distributeur                                   =   null
+        // Clusters and Markers Mode
+        this.markers_lat_lng                                =   {}          // used only to store getLatLngs
+        this.clusters                                       =   {}          // used to store clusters
+        this.markers                                        =   {}          // used to store markers in order to use markers functions for example : bindToolTip
 
-        this.WareHouses                                     =   []
+        // Icons
+        this.markers_icons                                  =   {}
+        this.clusters_icons                                 =   {}
 
-        this.markers_mode_array_markers                     =   {}
-        this.markers_mode_array                             =   []
-
-        this.markers                                        =   {}
-        this.clusters                                       =   []
-
+        // Territories
         this.journey_plan_territories                       =   []
         this.journee_territories                            =   []
         this.user_territories                               =   []
@@ -39,35 +37,59 @@ export default class Map {
         this.draw_control_journey_plan_territory            =   null
         this.editable_layers_journey_plan_territory         =   new L.FeatureGroup()
 
+        // Path
         this.path                                           =   null
 
-        this.colors                                         =   [   '#A52714'       , '#F9A825'     , '#3949AB'     , '#817717'     , '#558B2F'     , 
+        // Colors
+        this.colors                                         =   [       
+                                                                    '#A52714'       , '#F9A825'     , '#3949AB'     , '#817717'     , '#558B2F'     , 
                                                                     '#097138'       , '#006064'     , '#01579B'     , '#1A237E'     , '#673AB7'     ,
                                                                     '#4E342E'       , '#C2185B'     , '#FF5252'     , '#F57C00'     , '#000000'     ,
                                                                     '#FFEA00'       , '#AFB42B'     , '#7CB342'     , '#0F9D58'     , '#0097A7'     ,
                                                                     '#0288D1'       , '#FFD600'     , '#9C27B0'     , '#E65100'     , '#880E4F'     ,
-                                                                    '#795548'       , '#BDBDBD'     , '#757575'     , '#424243'     , '#FBC02D'     ]
+                                                                    '#795548'       , '#BDBDBD'     , '#757575'     , '#424243'     , '#FBC02D'     
+                                                                ]
 
-        //
-
+        // KML Drawings
         this.kml_willayas                                   =   []
         this.kml_layers                                     =   []
 
-        //
-
+        // FrontOffice Marker
         this.user_latitude                                  =   0
         this.user_longitude                                 =   0
         this.user_marker                                    =   null
 
+        // User Role
         this.user_role                                      =   null
     }
 
-    // Map
+    //  //  Create/Destroy Map  //  //
 
-    $createMap(role) {
+    $createMap(role, map_id, left_tools = true, right_tools = true) {
+
+        //
+        this.$destroyMap()
 
         // Create Map
-        this.map            =   L.map('map').setView(["31.26456666666666", "2.7863816666666663"], 5);
+        this.map            =   L.map(map_id, { zoomAnimation: true }).setView([31.26456666666666, 2.7863816666666663], 5);
+
+        //
+
+        // added this to prevent error when i zoom during showing popup
+        const _oldAnimate = L.Popup.prototype._animateZoom;
+
+        L.Popup.prototype._animateZoom = function(zoom) {
+            
+            if (!this._map) {
+                // map reference is gone, skip repositioning
+                return this;
+            }
+            
+            // otherwise call the original method
+            return _oldAnimate.call(this, zoom);
+        };
+
+        //
 
         // TitleLayer
         this.titleLayer     =   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -79,27 +101,30 @@ export default class Map {
 
         if((this.user_role == "Super Admin")||(this.user_role   ==  "BU Manager")||(this.user_role == "BackOffice")) {
 
-            // Add Journey Plan Territory
-            this.$drawJourneyPlanTerritory()
+            if(right_tools) {
 
-            // Add Draw Function
-            this.$drawFonction()
+                // Add Journey Plan Territory
+                this.$drawJourneyPlanTerritory()
+            }
 
-            // Add Events
-            this.$drawSelection()
+            if(left_tools) {
+
+                // Add Draw Function
+                this.$drawFonction()
+            }
+
+            if((right_tools)&&(left_tools)) {
+
+                // Add Events
+                this.$drawSelection()
+            }
         }
 
         if((this.user_role == "FrontOffice")) {
 
-            // Add Draw Function
-            this.$drawFonctionFrontOffice()
-
-            // Add Events
-            this.$drawSelection()
+            // setCurrentPosition
+            this.$setCurrentPosition()
         }
-
-        // setCurrentPosition
-        this.$setCurrentPosition()
     }
 
     $destroyMap() {
@@ -108,46 +133,104 @@ export default class Map {
         if (this.map && this.map.remove) {
             this.map.off();
             this.map.remove();
+
+            //
+            this.map        = null;
+            this.titleLayer = null; // If you track the tileLayer instance
+
+            // Reset collections of markers or other map-related data
+            this.markers            = {};
+            this.markers_lat_lng    = {};
+            this.markers_icons      = {};
         }   
     }
 
-    // Change Mode
+    //  //  //  //  //  //  //  //  //
 
-    $switchMarkerClusterMode(new_mode) {
 
-        this.marker_cluster_mode    =   new_mode
-    }
-
-    // Show Markers 
-
-    $setRouteMarkers(clients, JPID, color) {
+    //  //  Show Markers    //  //
+ 
+    $setRouteMarkers(clients, group, color) {
 
         if(this.marker_cluster_mode     ==  "cluster") {
 
-            // Show Markers
-            this.$showClusters(JPID, color)        
+            // Add Cluster
+            this.$addCluster(group, color)   
 
-            // Add Markers
-            this.$addRouteMarkers(clients, JPID, color)
+            //
+            this.$addClusterMarkers(clients, group, color)
         }
 
         if(this.marker_cluster_mode     ==  "marker") {
 
             // Show Markers
-            this.$showMarkersMode(clients, JPID, color)        
-
-            // Add Markers
-            this.$addRouteDescriptionMarkersMode(clients, JPID, color)
+            this.$showMarkersMode(clients, group, color)        
         }
     }
 
-    // Show Markers Mode
+    //  //  //  //  //  //  //  //
 
-    $showMarkersMode(clients, JPID, color) {
 
-        this.markers_mode_array[JPID]   =   []
+    //  //  Show Cluster Mode   //  //
 
-        var icon                        =   this.$setMarkerIconMarkerMode(JPID, color) 
+    $addCluster(group, color) {
+
+        if(typeof this.clusters_icons[group]    ==  "undefined") {
+
+            this.clusters_icons[group]              =   L.markerClusterGroup({
+        
+                iconCreateFunction: (cluster)   =>  {
+        
+                    var childCount  =   cluster.getChildCount();
+
+                    //
+                    var c           =   'marker-cluster-custom-';
+
+                    //
+                    if (childCount < 10) {
+                        c += 'small';
+                    } 
+
+                    else if (childCount < 100) {
+                        c += 'medium';
+                    } 
+
+                    else {
+                        c += 'large';
+                    }
+
+                    // 
+
+                    var div                     =   document.createElement("div");
+
+                    div.style.backgroundColor   =   color
+                    div.style.border            =   "3px solid #FFFFFF"
+                    div.style.color             =   "white"
+                    div.style.borderRadius      =   "50%"
+
+                    div.innerHTML               =   "<span>" + childCount + "</span>"
+
+                    // 
+
+                    return new L.DivIcon({ html: div, className: 'marker-cluster ' + c, iconSize: new L.Point(50, 50) });
+                }
+            })
+        }
+
+        //
+        this.clusters[group]    =   this.clusters_icons[group]  
+
+        //
+        this.map.addLayer(this.clusters[group])
+    }
+
+    $addClusterMarkers(clients, group, color) {
+
+        //
+        this.$setMarkerIcon(group, color) 
+
+        //
+        var icon    =   this.markers_icons[group]
 
         // Add Markers
         for (let i = 0; i < clients.length; i++) {
@@ -155,10 +238,10 @@ export default class Map {
             if(((clients[i].Latitude != null)&&(clients[i].Longitude != null))
             &&(!isNaN(clients[i].Latitude))&&(!isNaN(clients[i].Longitude))
             &&(clients[i].Latitude <= 90)&&(clients[i].Latitude >= -90)
-            &&(clients[i].Longitude <= 180)&&(clients[i].Latitude >= -180)) {
+            &&(clients[i].Longitude <= 180)&&(clients[i].Longitude >= -180)) {
 
                 // Add Marker
-                this.$addRouteMarkerMode(clients[i], clients[i].Latitude, clients[i].Longitude, JPID, icon)
+                this.$addRouteMarker(clients, i, group, icon)
             }
 
             else {
@@ -167,149 +250,128 @@ export default class Map {
                 clients[i].Longitude  =   0
 
                 // Add Marker
-                this.$addRouteMarkerMode(clients[i], clients[i].Latitude, clients[i].Longitude, JPID, icon)
+                this.$addRouteMarker(clients, i, group, icon)
             }
         }
     }
 
-    $addRouteMarkerMode(client, Latitude, Longitude, JPID, icon) {
+    $addRouteMarker(clients, i, group, icon) {
+
+        // Add Marker
+        let marker  =   L.marker([clients[i].Latitude, clients[i].Longitude], { icon : icon })
+
+        //
+        this.markers_lat_lng[clients[i].id]     =   { lat : marker.getLatLng().lat, lng : marker.getLatLng().lng, group : group }
+
+        this.markers[clients[i].id]             =   { marker : marker, group : group }
+
+        // Add Marker
+        this.clusters[group].addLayer(marker)
+
+        // Add Description
+        this.$addRouteDescription(clients[i], marker)
+    }
+
+    //  //  //  //  //  //  //  //  //
+
+    //  //  Show Markers Mode (Add)   //  //
+
+    $showMarkersMode(clients, group, color) {
+
+        //
+        this.$setMarkerIcon(group, color) 
+
+        //
+        var icon    =   this.markers_icons[group]
+
+        // Add Markers
+        for (let i = 0; i < clients.length; i++) {
+            
+            if(((clients[i].Latitude != null)&&(clients[i].Longitude != null))
+            &&(!isNaN(clients[i].Latitude))&&(!isNaN(clients[i].Longitude))
+            &&(clients[i].Latitude <= 90)&&(clients[i].Latitude >= -90)
+            &&(clients[i].Longitude <= 180)&&(clients[i].Longitude >= -180)) {
+
+                // Add Marker
+                this.$addRouteMarkerMode(clients[i], clients[i].Latitude, clients[i].Longitude, group, icon)
+            }
+
+            else {
+
+                clients[i].Latitude   =   0
+                clients[i].Longitude  =   0
+
+                // Add Marker
+                this.$addRouteMarkerMode(clients[i], clients[i].Latitude, clients[i].Longitude, group, icon)
+            }
+        }
+    }
+
+    $addRouteMarkerMode(client, Latitude, Longitude, group, icon) {
 
         // Add Marker
         let marker  =   L.marker([Latitude, Longitude], { icon : icon })
         marker.addTo(this.map)
 
-        if(typeof this.markers_mode_array_markers[client.JPlan]    ==  "undefined") {
+        //
+        this.markers_lat_lng[client.id]     =   { lat : marker.getLatLng().lat, lng : marker.getLatLng().lng, group : group }
 
-            this.markers_mode_array_markers[client.JPlan]  =   []
-            this.markers_mode_array_markers[client.JPlan].push(marker.getLatLng())
-        }
+        //
+        this.markers[client.id]             =   { marker : marker, group : group }
 
-        else {
-
-            this.markers_mode_array_markers[client.JPlan].push(marker.getLatLng())
-        }
-
-        this.markers_mode_array[JPID].push(marker)
+        //
+        this.$addRouteDescription(client, marker)
     }
 
-    $addRouteDescriptionMarkersMode(clients, JPID) {
+    //  //  //  //  //  //  //  //  //
 
-        let marker  =   null
 
-        if(this.markers_mode_array[JPID]) {
+    //  //  Global CRUD Markers Functions   //  //
 
-            for (let i = 0; i < this.markers_mode_array[JPID].length; i++) {
-                
-                // Add Description
-                marker  =   this.markers_mode_array[JPID][i].bindTooltip(
-                    "CustomerCode   : "     +clients[i].CustomerCode    +"<br />"+
-                    "CustomerNameE  : "     +clients[i].CustomerNameE   +"<br />"+
-                    "CustomerType   : "     +clients[i].CustomerType    +"<br />"+
-                    "JPlan          : "     +clients[i].JPlan           +"<br />"+
-                    "Journee        : "     +clients[i].Journee         +"<br />"+
-                    "Tel            : "     +clients[i].Tel             +"<br />"+
-                    "DistrictName   : "     +clients[i].DistrictNameE   +"<br />"+
-                    "CityName       : "     +clients[i].CityNameE       +"<br />"+
-                    "Address        : "     +clients[i].Address         +"<br />"+
-                    "Latitude       : "     +clients[i].Latitude        +"<br />"+
-                    "Longitude      : "     +clients[i].Longitude           
-                )
+    $setMarkerIcon(group, color) {
 
-                marker.client    =   clients[i];
+        if(typeof this.markers_icons[group]    ==  "undefined") {
 
-                marker.on('click',(event)   => {
-                    
-                    this.$updateModalClient(event.target.client)
-                });
-            }
+            this.markers_icons[group]   =   new L.Icon({
+                iconUrl  : '/images/'+color.substring(1)+'.png',
+                iconSize: [15, 15] // Replace 'width' and 'height' with your desired values
+            });
         }
     }
 
-    $setMarkerIconMarkerMode(JPID, color) {
-
-        let icon        =   null
-
-        icon    =   new L.Icon({
-            iconUrl  : '/images/'+color.substring(1)+'.png',
-            iconSize: [15, 15] // Replace 'width' and 'height' with your desired values
-        });
-
-        return icon
-    }
-
-    //  Show Cluster Mode
-
-    $addRouteMarkers(clients, JPID, color) {
-
-        var icon                            =   this.$setMarkerIcon(JPID, color) 
-
-        // Add Markers
-        for (let i = 0; i < clients.length; i++) {
-            
-            if(((clients[i].Latitude != null)&&(clients[i].Longitude != null))
-            &&(!isNaN(clients[i].Latitude))&&(!isNaN(clients[i].Longitude))
-            &&(clients[i].Latitude <= 90)&&(clients[i].Latitude >= -90)
-            &&(clients[i].Longitude <= 180)&&(clients[i].Latitude >= -180)) {
-
-                // Add Marker
-                this.$addRouteMarker(clients, i, JPID, icon)
-            }
-
-            else {
-
-                clients[i].Latitude   =   0
-                clients[i].Longitude  =   0
-
-                // Add Marker
-                this.$addRouteMarker(clients, i, JPID, icon)
-            }
-        }
-    }
-
-    $addRouteMarker(clients, i, JPID, icon) {
-
-        // Add Marker
-        let marker          =   L.marker([clients[i].Latitude, clients[i].Longitude], { icon : icon })
-
-        if(typeof this.markers[clients[i].JPlan]    ==  "undefined") {
-
-            this.markers[clients[i].JPlan]  =   []
-            this.markers[clients[i].JPlan].push(marker.getLatLng())
-        }
-
-        else {
-
-            this.markers[clients[i].JPlan].push(marker.getLatLng())
-        }
-
-        // Add Description
-        this.$addRouteDescription(clients, i, marker)
-
-        // Add Marker
-        this.clusters[JPID].addLayer(marker)
-    }
-
-    $addRouteDescription(clients, i, marker) {
+    $addRouteDescription(client, marker) {
 
         let marker_obj  =   null
 
         // Add Description
-        marker_obj      =   marker.bindTooltip(
-            "CustomerCode   : "     +clients[i].CustomerCode      +"<br />"+
-            "CustomerNameE  : "     +clients[i].CustomerNameE   +"<br />"+
-            "CustomerType   : "     +clients[i].CustomerType    +"<br />"+
-            "JPlan          : "     +clients[i].JPlan           +"<br />"+
-            "Journee        : "     +clients[i].Journee         +"<br />"+
-            "Tel            : "     +clients[i].Tel             +"<br />"+
-            "DistrictName   : "     +clients[i].DistrictNameE   +"<br />"+
-            "CityName       : "     +clients[i].CityNameE       +"<br />"+
-            "Address        : "     +clients[i].Address         +"<br />"+
-            "Latitude       : "     +clients[i].Latitude        +"<br />"+
-            "Longitude      : "     +clients[i].Longitude           
+        marker_obj      =   marker.bindPopup(
+            "CustomerCode   : "     +client.CustomerCode    +"<br />"+
+            "CustomerNameE  : "     +client.CustomerNameE   +"<br />"+
+            "CustomerType   : "     +client.CustomerType    +"<br />"+
+            "JPlan          : "     +client.JPlan           +"<br />"+
+            "Journee        : "     +client.Journee         +"<br />"+
+            "Tel            : "     +client.Tel             +"<br />"+
+            "DistrictName   : "     +client.DistrictNameE   +"<br />"+
+            "CityName       : "     +client.CityNameE       +"<br />"+
+            "Address        : "     +client.Address         +"<br />"+
+            "Latitude       : "     +client.Latitude        +"<br />"+
+            "Longitude      : "     +client.Longitude       ,
+            { permanent: false }         
         )
 
+        // You would then need to handle opening the popup on hover and closing it on mouseout.
+        marker_obj.on('mouseover', function (e) {
+            this.openPopup();
+        });
+
+        marker_obj.on('mouseout', function (e) {
+            this.closePopup();
+        });
+
+        //  //  //
+
         // Affect Client to marker
-        marker_obj.client    =   clients[i];
+        marker_obj.client    =   client;
 
         // add Event
         marker_obj.on('click',(event)   => {
@@ -318,91 +380,49 @@ export default class Map {
         });
     }
 
-    $setMarkerIcon(JPID, color) {
+    //  //  //  //  //  //  //  //  //  //  //  //
 
-        let icon        =   null
 
-        icon    =   new L.Icon({
-            iconUrl  : '/images/'+color.substring(1)+'.png',
-            iconSize: [15, 15] // Replace 'width' and 'height' with your desired values
-        });
+    //  //  //  Switch Mode //  //  //
 
-        return icon
+    $switchMarkerClusterMode(new_mode) {
+
+        this.marker_cluster_mode    =   new_mode
     }
 
-    $showClusters(JPID, color) {
+    //  //  //  //  //  //  //  //  //
 
-        this.clusters[JPID]             =   L.markerClusterGroup({
-    
-            iconCreateFunction: (cluster)   =>  {
-    
-                var childCount = cluster.getChildCount();
-                // var c = 'marker-cluster-';
-                var c = 'marker-cluster-custom-';
 
-                if (childCount < 10) {
-                    c += 'small';
-                } 
+    //  //  Delete Markers    //   //  //
 
-                else if (childCount < 100) {
-                    c += 'medium';
-                } 
+    $deleteRouteMarkers(clients) {
 
-                else {
-                    c += 'large';
-                }
+        clients.forEach(client => {
 
-                // 
+            const entry = this.markers[client.id];
+            if (!entry) return;
 
-                var div                     =   document.createElement("div");
+            const { marker, group } = entry;
 
-                div.style.backgroundColor   =   color
-                div.style.border            =   "3px solid #FFFFFF"
-                div.style.color             =   "white"
-                div.style.borderRadius      =   "50%"
-
-                div.innerHTML               =   "<span>" + childCount + "</span>"
-
-                // 
-
-                return new L.DivIcon({ html: div, className: 'marker-cluster ' + c, iconSize: new L.Point(50, 50) });
+            // Remove from cluster or map
+            if (this.marker_cluster_mode === 'cluster' && this.clusters[group]) {
+                this.clusters[group].removeLayer(marker);
             }
-        })
 
-        this.map.addLayer(this.clusters[JPID])
+            else {
+                this.map.removeLayer(marker);
+            }
+
+            // Clean up
+            delete this.markers[client.id];
+            delete this.markers_lat_lng[client.id];
+        });
     }
 
-    $focusWareHouseMarkers() {
+    //  //  //  //  //  //  //  //  //
 
-        // Create a marker group
-        var markers = L.featureGroup();
 
-        // Add markers to the marker group
-        var markerArray = []  
-
-        this.clusters.forEach((cluster) => {
-
-            cluster.eachLayer((marker)  =>  {
-
-                markerArray.push(marker.addTo(markers))
-            });
-        });
-
-        // Set WareHouses
-        this.WareHouses.forEach(WareHouse => {
-
-            markerArray.push(WareHouse.addTo(markers))
-        });
-
-        if((this.clusters.length > 0)&&(this.WareHouses.length > 0)) {
-
-            // Get the bounds of all the markers
-            var groupBounds = markers.getBounds();
-
-            // Zoom the map to fit the bounds of the markers
-            this.map.fitBounds(groupBounds);
-        }
-    }
+    //  //  Focus Markers   //  //
 
     $focuseMarkers() {
 
@@ -425,17 +445,17 @@ export default class Map {
         // Add markers to the marker group
         var markerArray = []  
 
-        this.clusters.forEach((cluster) => {
+        for (const [key, cluster] of Object.entries(this.clusters)) {
 
             cluster.eachLayer((marker)  =>  {
 
                 markerArray.push(marker.addTo(markers))
             });
-        });
+        }
 
         if(markerArray.length > 0) {
 
-            if(this.clusters.length > 0) {
+            if(Object.entries(this.clusters).length > 0) {
 
                 // Get the bounds of all the markers
                 var groupBounds = markers.getBounds();
@@ -455,13 +475,10 @@ export default class Map {
         var markerArray = []  
 
         // Set Markers
-        this.markers_mode_array.forEach(marker => {
-            
-            for (let i = 0; i < marker.length; i++) {
+        for (const [key, marker] of Object.entries(this.markers)) {
                 
-                markerArray.push(marker[i].addTo(markers))
-            }
-        });
+            markerArray.push(marker.marker.addTo(markers))
+        };
 
         // Add the marker group to the map
         this.map.addLayer(markers);
@@ -473,83 +490,52 @@ export default class Map {
 
             // Zoom the map to fit the bounds of the markers
             this.map.fitBounds(groupBounds);
-
         }
     }
 
-    // Remove Markers
+    //  //  //  //  //  //  //  //
 
-    $unsetRouteMarkers(JPID) {
 
-        // Clear Route Markers
-        this.$clearRouteData(JPID)
-    }
+    //  //  Clear Markers/Path  //  //
 
     $clearRouteMarkers() {
 
-        // Clear Markers
-        this.clusters.forEach(cluster => {
-                            
-            this.map.removeLayer(cluster)
+        // a) remove all markers from each group
+        Object.values(this.clusters).forEach(clusterGroup => {
+            clusterGroup.clearLayers();
         });
 
-        this.clusters   =   []
-        this.markers    =   {}
+        // b) remove each group’s icon from the map
+        // Object.values(this.clusters_icons).forEach(clusterGroup => {
+        //     if (this.map.hasLayer(clusterGroup)) {
+        //         this.map.removeLayer(clusterGroup);
+        //     }
+        // });
 
         //
-
-        // Clear Markers
-        this.markers_mode_array.forEach(marker => {
-            
-            for (let i = 0; i < marker.length; i++) {
-                
-                this.map.removeLayer(marker[i])
-            }
+        Object.values(this.markers).forEach(marker => {
+            this.map.removeLayer(marker.marker)
         });
 
-        this.markers_mode_array             =   []
-        this.markers_mode_array_markers     =   []
-    }
-
-    $clearRouteData(JPID) {
-
-        // Clear Markers
-        if(this.clusters[JPID]) {
-
-            this.map.removeLayer(this.clusters[JPID])
-        }
-
-        // Clear Route Data
-        this.clusters[JPID] =   []
-
-        // Clear Markers
-        if(this.markers_mode_array[JPID]) {
-
-            for (let i = 0; i < this.markers_mode_array[JPID].length; i++) {
-                
-                this.map.removeLayer(this.markers_mode_array[JPID][i])
-            }
-        }
-
-        // Clear Route Data
-        this.markers_mode_array[JPID]    =   []
+        // c) reset all caches so next time you start fresh
+        this.clusters           =   {};
+        // this.markers_icons = {};
+        this.markers            =   {};
+        this.markers_lat_lng    =   {}
     }
 
     $clearPath() {
 
-        try {
+        this.map.removeLayer(this.path)
+        this.path.remove()
 
-            this.map.removeLayer(this.path)
-            this.path.remove()
-
-            this.path   =   null
-
-        }catch(e) {
-
-        }
+        this.path   =   null
     }
 
-    // Territories
+    //  //  //  //  //  //  //  //  //
+
+
+    //  //  (AUTO and JPLAN) Territories Functions  //  //
 
     $showTerritories() {
 
@@ -569,28 +555,107 @@ export default class Map {
         // Hide
         this.$hideTerritores()
 
-        // Show
-        for (const [key, value] of Object.entries(this.markers)) {
+        //
+        let markers_lat_lng_by_group = Object.values(this.markers_lat_lng).reduce((acc, marker) => {
+            const grp = marker.group;
+            if (!acc[grp]) acc[grp] = [];
+            acc[grp].push(marker);
+            return acc;
+        }, {});
 
-            if(this.markers[key].length >   0) {
+        // Show
+        for (const [key, value] of Object.entries(markers_lat_lng_by_group)) {
+
+            if(markers_lat_lng_by_group[key].length >   0) {
 
                 // Territory Latitude Longitude
-                let territoryLatLngs    =   this.$getTerritoryLatLngs(this.markers[key])
+                let territoryLatLngs    =   this.$getTerritoryLatLngs(markers_lat_lng_by_group[key])
+
+                //  //  //
+
+                let hull    =   null
+
+                if (territoryLatLngs.length >= 3) {
+
+                    // Calculate convex hull using Turf.js
+                    var turfPoints  =   territoryLatLngs.map(function(coord) {
+
+                        return turf.point(coord);
+                    });
+
+                    //
+                    hull            =   turf.convex(turf.featureCollection(turfPoints));
+
+                } else if (territoryLatLngs.length === 2) {
+
+                    territoryLatLngs.push([(territoryLatLngs[0][0] + territoryLatLngs[1][0]) / 2, (territoryLatLngs[0][1] + territoryLatLngs[1][1]) / 2])
+
+                    // Calculate convex hull using Turf.js
+                    var turfPoints  =   territoryLatLngs.map(function(coord) {
+
+                        return turf.point(coord);
+                    });
+
+                    //
+                    hull            =   turf.convex(turf.featureCollection(turfPoints));
+
+                } else if (territoryLatLngs.length === 1) {
+
+                    // Calculate convex hull using Turf.js
+                    var turfPoints  =   territoryLatLngs.map(function(coord) {
+
+                        return turf.point(coord);
+                    });
+
+                    // Create a small buffer around the single point to form a polygon
+                    var point       =   turfPoints[0];
+                    var buffer      =   turf.buffer(point, 0.01, { units: 'kilometers' }); // Adjust the buffer size as needed
+                    hull            =   buffer;
+                }
+
+                //  //  //
+
+                // Convert Turf polygon to Leaflet polygon coordinates
+                var polygonCoords   =   hull.geometry.coordinates[0].map(function(coord) {
+    
+                    return [coord[0], coord[1]]; // Swap lat/lng
+                });
+
+                // Create Turf polygon
+                var turfPolygon = turf.polygon([polygonCoords]);
+
+                // Expand the polygon by 1 units (adjust as needed)
+                var expandedPolygon = turf.transformScale(turfPolygon, 1.1);
+
+                // Convert the expanded polygon to Leaflet polygon coordinates
+                var expandedPolygonCoords = expandedPolygon.geometry.coordinates[0].map(function(coord) {
+
+                    return [coord[0], coord[1]]; // Swap lat/lng
+                });
+
+                // Create Leaflet polygon
+                var territory       =   L.polygon(expandedPolygonCoords, {color: 'black'}).addTo(this.map);
+
+                //  //  //
 
                 // Territory
-                var territory           =   L.polygon(territoryLatLngs, { color: 'black' }).addTo(this.map)
                 this.journey_plan_territories.push(territory)
 
                 this.editable_layers_journey_plan_territory.addLayer(territory)
 
                 // Add Event Edit
                 territory.on("edit", function(event) {
+                    console.log("red layer edited !");
                 })
 
                 // Add Event Click
-                territory.on("click", (event)   => {
-                    this.$addTerritory(event)
-                })
+                if(this.left_tools      ==  true) {
+
+                    territory.on("click", (event)   => {
+
+                        this.$addTerritory(event)
+                    })
+                }
             }
         }
     }
@@ -600,28 +665,108 @@ export default class Map {
         // Hide
         this.$hideTerritores()
 
-        // Show
-        for (const [key, value] of Object.entries(this.markers_mode_array_markers)) {
+        //
+        let markers_lat_lng_by_group = this.markers_lat_lng.reduce((acc, marker) => {
+            const key = marker.group;
+            if (!acc[key]) {
+                acc[key] = [];
+            }
+            acc[key].push(marker);
+            return acc;
+        }, {});
 
-            if(this.markers_mode_array_markers[key].length >   0) {
+        // Show
+        for (const [key, value] of Object.entries(markers_lat_lng_by_group)) {
+
+            if(markers_lat_lng_by_group[key].length >   0) {
 
                 // Territory Latitude Longitude
-                let territoryLatLngs    =   this.$getTerritoryLatLngs(this.markers_mode_array_markers[key])
+                let territoryLatLngs    =   this.$getTerritoryLatLngs(markers_lat_lng_by_group[key])
+
+                //  //  //
+
+                let hull    =   null
+
+                if (territoryLatLngs.length >= 3) {
+
+                    // Calculate convex hull using Turf.js
+                    var turfPoints  =   territoryLatLngs.map(function(coord) {
+
+                        return turf.point(coord);
+                    });
+
+                    //
+                    hull            =   turf.convex(turf.featureCollection(turfPoints));
+
+                } else if (territoryLatLngs.length === 2) {
+
+                    territoryLatLngs.push([(territoryLatLngs[0][0] + territoryLatLngs[1][0]) / 2, (territoryLatLngs[0][1] + territoryLatLngs[1][1]) / 2])
+
+                    // Calculate convex hull using Turf.js
+                    var turfPoints  =   territoryLatLngs.map(function(coord) {
+
+                        return turf.point(coord);
+                    });
+
+                    //
+                    hull            =   turf.convex(turf.featureCollection(turfPoints));
+
+                } else if (territoryLatLngs.length === 1) {
+
+                    // Calculate convex hull using Turf.js
+                    var turfPoints  =   territoryLatLngs.map(function(coord) {
+
+                        return turf.point(coord);
+                    });
+
+                    // Create a small buffer around the single point to form a polygon
+                    var point       =   turfPoints[0];
+                    var buffer      =   turf.buffer(point, 0.01, { units: 'kilometers' }); // Adjust the buffer size as needed
+                    hull            =   buffer;
+                }
+
+                //  //  //
+
+                // Convert Turf polygon to Leaflet polygon coordinates
+                var polygonCoords   =   hull.geometry.coordinates[0].map(function(coord) {
+    
+                    return [coord[0], coord[1]]; // Swap lat/lng
+                });
+
+                // Create Turf polygon
+                var turfPolygon = turf.polygon([polygonCoords]);
+
+                // Expand the polygon by 1 units (adjust as needed)
+                var expandedPolygon = turf.transformScale(turfPolygon, 1.1);
+
+                // Convert the expanded polygon to Leaflet polygon coordinates
+                var expandedPolygonCoords = expandedPolygon.geometry.coordinates[0].map(function(coord) {
+
+                    return [coord[0], coord[1]]; // Swap lat/lng
+                });
+
+                // Create Leaflet polygon
+                var territory       =   L.polygon(expandedPolygonCoords, { color: 'black' }).addTo(this.map);
+
+                //  //  //
 
                 // Territory
-                var territory           =   L.polygon(territoryLatLngs, { color: 'black' }).addTo(this.map)
                 this.journey_plan_territories.push(territory)
 
                 this.editable_layers_journey_plan_territory.addLayer(territory)
 
                 // Add Event Edit
                 territory.on("edit", function(event) {
+                    console.log("red layer edited !");
                 })
 
                 // Add Event Click
-                territory.on("click", (event)   => {
-                    this.$addTerritory(event)
-                })
+                if(this.left_tools      ==  true) {
+
+                    territory.on("click", (event)   => {
+                        this.$addTerritory(event)
+                    })
+                }
             }
         }
     }
@@ -685,8 +830,6 @@ export default class Map {
         return false
     }
 
-    // JPlan Territories
-
     $showJPlanBDTerritories(territories) {
 
         // Hide
@@ -733,7 +876,10 @@ export default class Map {
         });
     }
 
-    // Journee Territories
+    //  //  //  //  //  //  //  //  //  //  //  //  //  //
+
+
+    //  //  //  //  Journee Territories //  //  //  //
 
     $showJourneeBDTerritories(territories) {
 
@@ -783,7 +929,10 @@ export default class Map {
         });
     }
 
-    // User Territories
+    //  //  //  //  //  //  //  //  //  //  //  //  //
+
+
+    //  //  //  //  User Territories    //  //  //  //
 
     $showUserBDTerritoriesFront(territories) {
 
@@ -855,7 +1004,10 @@ export default class Map {
         });
     }
 
-    // Set Distance
+    //  //  //  //  //  //  //  //  //  //  //  //  //
+
+
+    //  //  //  //  Global Territories Functions    //  //  //  //
 
     $setDistanceStraight(source_Latitude, source_Longitude, distination_Latitude, distination_Longitude) {
 
@@ -876,7 +1028,10 @@ export default class Map {
         return parseFloat((Math.round(distance * 100) / 100).toFixed(2))    
     }
 
-    // Draw Territory Journey Plan
+    //  //  //  //  //  //  //  //  //  //  //  //  //  //  //  //
+
+
+    //  //  //  //  Right Drawing Tools //  //  //  //
 
     $drawJourneyPlanTerritory() {
 
@@ -926,46 +1081,10 @@ export default class Map {
         this.editable_layers_journey_plan_territory.addLayer(layer)
     }
 
-    // Draw Functions
+    //  //  //  //  //  //  //  //  //  //  //  //  //
 
-    $drawFonctionFrontOffice() {
 
-        // Set Draw Options
-        this.$drawOptionsFrontOffice()
-    }
-
-    $drawOptionsFrontOffice() {
-
-        // Initialise the FeatureGroup to store editable layers
-        this.map.addLayer(this.editable_layers);
-
-        this.draw_plugin_options = {
-
-            position: 'bottomleft',
-
-            draw: {
-
-                polyline        : false ,
-                circle          : false , 
-                rectangle       : false ,
-                marker          : false ,
-                circlemarker    : false ,
-                polygon         : false
-            },
-
-            edit: {
-                featureGroup    : this.editable_layers, // REQUIRED!!
-                edit            : false,                // Exclude the edit option
-                remove          : false
-            }
-        };
-
-        // Initialise the Draw Control 
-        this.draw_control   =   new L.Control.Draw(this.draw_plugin_options);
-        this.map.addControl(this.draw_control);
-    }
-
-    // Draw Functions
+    //  //  //  //  Left Drawing Tools  //  //  //  //
 
     $drawFonction() {
 
@@ -1021,14 +1140,17 @@ export default class Map {
         this.editable_layers    =   new L.FeatureGroup()
     }
 
+    //  //  //  //  //  //  //  //  //  //  //  //  //
+
+
+    //  //  //  Global Drawing Tools    //  //  //
+
     $setDraw(event) {
 
         let layer   =   event.layer
 
         this.editable_layers.addLayer(layer)
     }
-
-    // Draw Events
 
     $drawSelection() {
 
@@ -1097,50 +1219,10 @@ export default class Map {
         });   
     }
 
-    // Left Bar Events
+    //  //  //  //  //  //  //  //  //  //  //  //  //
 
-    $getClientsFromSelection(event) {
 
-        let clients_change_route    =   []
-
-        this.clusters.forEach(cluster => {
-
-            cluster.eachLayer(marker => {
-
-                if (this.$isMarkerInsidePolygon(marker, event)) {
-
-                    clients_change_route.push(marker.client)
-                }
-            });
-        });
-
-        return clients_change_route
-    }
-
-    $getClientsFromSelectionMarkersMode(event) {
-
-        let clients_change_route    =   []
-
-        this.markers_mode_array.forEach(marker_route => {
-
-            marker_route.forEach(marker => {
-
-                if (this.$isMarkerInsidePolygon(marker, event)) {
-
-                    clients_change_route.push(marker.client)
-                }
-            });
-        });
-
-        return clients_change_route
-    }
-
-    //
-
-    $isMarkerInsidePolygon(marker, event) {
-
-        return event.layer.contains(marker.getLatLng())
-    }
+    //  //  //  //  Left Tools Events   //  //  //  //
 
     $updateModalClientsRoute(clients_change_route) {
 
@@ -1157,7 +1239,53 @@ export default class Map {
         store.commit("client/setUpdateClient"       , client)
     }
 
-    // Right Bar Events
+    //  //  //  //  //  //  //  //  //  //  //  //  //
+
+
+    //  //  //  Polygon Drawing Tools Functions //  //  //
+
+    $getClientsFromSelection(event) {
+
+        let clients_change_route    =   []
+
+        for (const [key, cluster] of Object.entries(this.clusters)) {
+
+            cluster.eachLayer(marker => {
+
+                if (this.$isMarkerInsidePolygon(marker, event)) {
+
+                    clients_change_route.push(marker.client)
+                }
+            });
+        };
+
+        return clients_change_route
+    }
+
+    $getClientsFromSelectionMarkersMode(event) {
+
+        let clients_change_route    =   []
+
+        for (const [key, marker_route] of Object.entries(this.markers)) {
+
+            if (this.$isMarkerInsidePolygon(marker_route.marker, event)) {
+
+                clients_change_route.push(marker.client)
+            }
+        };
+
+        return clients_change_route
+    }
+
+    $isMarkerInsidePolygon(marker, event) {
+
+        return event.layer.contains(marker.getLatLng())
+    }
+
+    //  //  //  //  //  //  //  //  //  //  //  //  //  //
+
+
+    //  //  //  //  Right Drawing Tools     //  //  //  //
 
     $addJourneyPlanTerritory(event) {
 
@@ -1246,7 +1374,10 @@ export default class Map {
         store.commit("journey_plan/setAddJourneyPlan" ,  {"latlngs" : latlngs})
     }
 
-    // Audit Modifs
+    //  //  //  //  //  //  //  //  //  //  //  //  //  //
+
+
+    //  //  //  //  //  Show Position   //  //  //  //  //
 
     $setCurrentPosition() {
 
@@ -1305,7 +1436,10 @@ export default class Map {
         this.map.setView([this.user_marker.getLatLng().lat, this.user_marker.getLatLng().lng], this.map.getZoom());
     }
 
-    //
+    //  //  //  //  //  //  //  //  //  //  //  //  //  //
+
+
+    //  //  //  //  //  KML Functions   //  //  //  //  //
 
     $setKMLLayers(kml_layers) {
 
@@ -1323,23 +1457,5 @@ export default class Map {
         });
     }
 
-    //
-
-    $checkPointInsideUserPolygons(latitude, longitude) {
-
-        let point   =   L.marker([latitude, longitude])
-
-        for (let index = 0; index < this.user_territories.length; index++) {
-
-            if (this.user_territories[index].contains(point.getLatLng())) {
-
-                return true
-            }
-        }
-
-        return false
-    }
-
-    //
-
+    //  //  //  //  //  //  //  //  //  //  //  //  //  //
 }

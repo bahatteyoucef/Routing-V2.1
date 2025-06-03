@@ -144,24 +144,24 @@ export default {
 
                 if(res.status===200){
 
+                    // Close Modal
+                    await this.$hideModal("addJourneyPlanModal")
+
                     // Hide Loading Page
                     this.$hideLoadingPage()
 
                     // Send Client
                     this.emitter.emit('reSetJPlanBDTerritory')
 
-                    // Close Modal
-                    this.$hideModal("addJourneyPlanModal")
-
                 }
                 
                 else{
 
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
                     // Send Errors
                     this.$showErrors("Error !", res.data.errors)
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
                 }            
             }
 
@@ -171,24 +171,23 @@ export default {
 
                 if(res.status===200){
 
+                    // Close Modal
+                    await this.$hideModal("addJourneyPlanModal")
+
                     // Hide Loading Page
                     this.$hideLoadingPage()
 
                     // Send Client
                     this.emitter.emit('reSetJourneeBDTerritory')
-
-                    // Close Modal
-                    this.$hideModal("addJourneyPlanModal")
-
                 }
                 
                 else{
 
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
                     // Send Errors
                     this.$showErrors("Error !", res.data.errors)
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
                 }            
             }
 
@@ -198,23 +197,23 @@ export default {
 
                 if(res.status===200){
 
+                    // Close Modal
+                    await this.$hideModal("addJourneyPlanModal")
+
                     // Hide Loading Page
                     this.$hideLoadingPage()
 
                     // Send Client
                     this.emitter.emit('reSetUserBDTerritory')
-
-                    // Close Modal
-                    this.$hideModal("addJourneyPlanModal")
                 }
                 
                 else{
 
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
                     // Send Errors
                     this.$showErrors("Error !", res.data.errors)
+
+                    // Hide Loading Page
+                    this.$hideLoadingPage()
                 }            
             }
         },
