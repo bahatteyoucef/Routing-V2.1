@@ -59,11 +59,11 @@ Route::middleware('auth:api')->group(function () {
     // RTM WIllaya Cite
     Route::post('/rtm_willayas/rtm_cites/details/indexedDB'           ,   function()  { 
 
-        $willayas   =   DB::table("RTM_Willaya")->orderByRaw('CAST(DistrictNo AS SIGNED INTEGER)')->get();
+        $willayas   =   DB::table("RTM_Willaya")->orderBy('DistrictNameE')->get();
 
         foreach ($willayas as $willaya) {
 
-            $willaya->cites =   DB::table("RTM_City")->where('DistrictNo', $willaya->DistrictNo)->orderByRaw('CAST(CityNo AS SIGNED INTEGER)')->get();
+            $willaya->cites =   DB::table("RTM_City")->where('DistrictNo', $willaya->DistrictNo)->orderBy('CityNameE')->get();
         }
 
         return $willayas;
@@ -71,11 +71,11 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/rtm_willayas/rtm_cites/details'           ,   function()  { 
 
-        $willayas   =   DB::table("RTM_Willaya")->orderByRaw('CAST(DistrictNo AS SIGNED INTEGER)')->get();
+        $willayas   =   DB::table("RTM_Willaya")->orderBy('DistrictNameE')->get();
 
         foreach ($willayas as $willaya) {
 
-            $willaya->cites =   DB::table("RTM_City")->where('DistrictNo', $willaya->DistrictNo)->orderByRaw('CAST(CityNo AS SIGNED INTEGER)')->get();
+            $willaya->cites =   DB::table("RTM_City")->where('DistrictNo', $willaya->DistrictNo)->orderBy('CityNo')->get();
         }
 
         return $willayas;
@@ -86,23 +86,23 @@ Route::middleware('auth:api')->group(function () {
         return  DB::table("RTM_Willaya")
                     ->join("route_import_districts" , "RTM_Willaya.DistrictNo"          , "route_import_districts.DistrictNo")
                     ->where('route_import_districts.id_route_import', $id_route_import)
-                    ->orderByRaw('CAST(RTM_Willaya.DistrictNo AS SIGNED INTEGER)')
+                    ->orderBy('RTM_Willaya.DistrictNameE')
                     ->get();
     });
 
     Route::post('/rtm_willayas'                             ,   function()  { 
 
-        return DB::table("RTM_Willaya")->orderByRaw('CAST(DistrictNo AS SIGNED INTEGER)')->get();
+        return DB::table("RTM_Willaya")->orderBy('DistrictNameE')->get();
     });
 
     Route::post('/rtm_willayas/{DistrictNo}/rtm_cites'      ,   function($DistrictNo)  { 
 
-        return DB::table("RTM_City")->where('DistrictNo', $DistrictNo)->orderByRaw('CAST(CityNo AS SIGNED INTEGER)')->get();
+        return DB::table("RTM_City")->where('DistrictNo', $DistrictNo)->orderBy('CityNameE')->get();
     });
 
     Route::post('/rtm_cites'                                ,   function()  { 
 
-        return DB::table("RTM_City")->orderByRaw('CAST(CityNo AS SIGNED INTEGER)')->get();
+        return DB::table("RTM_City")->orderBy('CityNameE')->get();
     });
 
     //

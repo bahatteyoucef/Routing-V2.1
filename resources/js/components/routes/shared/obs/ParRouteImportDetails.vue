@@ -304,10 +304,10 @@
     <!--                                -->
 
     <!-- Modal Add                      -->
-    <ModalClientAdd                                                 ref="ModalClientAdd"            :id_route_import="id_route_import"                                                      >   </ModalClientAdd>
+    <ModalClientAdd                                                 ref="ModalClientAdd"            :id_route_import="id_route_import"                                                              >   </ModalClientAdd>
 
     <!-- Modal Update                   -->
-    <ModalClientUpdate                                              ref="ModalClientUpdate"         :id_route_import="id_route_import"      :mode="'permanent'"                             >   </ModalClientUpdate>
+    <ModalClientUpdate                                              ref="ModalClientUpdate"         :id_route_import="id_route_import"     :update_type="'normal_update'"      :mode="'permanent'"  >   </ModalClientUpdate>
 
     <!-- Modal Change Route             -->
     <ModalClientsChangeRoute                                        ref="ModalClientsChangeRoute"                                                                                           >   </ModalClientsChangeRoute>
@@ -1597,7 +1597,7 @@ export default {
                 hide_map_filters_button_element.classList.add("animate__fadeInLeft")
 
                 this.hide_map_filters_button            =   true
-            }, 111)
+            }, 555)
         },
 
         hideMapFilters() {
@@ -1629,8 +1629,8 @@ export default {
                     show_map_filters_button_element.classList.add("animate__fadeInLeft")
 
                     this.show_map_filters_button                    =   true 
-                }, 111);
-            }, 111)
+                }, 555);
+            }, 555)
         },
 
         // Show/Hide Datatable

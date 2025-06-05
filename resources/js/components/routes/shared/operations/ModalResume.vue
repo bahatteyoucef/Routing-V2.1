@@ -751,9 +751,6 @@ export default {
 
                 if(res.status===200){
 
-                    // Close Modal
-                    await this.$hideModal("ModalResume")
-
                     // Send Feedback
                     this.$feedbackSuccess(res.data.header     ,   res.data.message)
 
@@ -761,7 +758,10 @@ export default {
                     this.$hideLoadingPage();
 
                     //
-                    this.emitter.emit('reSetClientsDecoupeByJourneeAdd' , this.clients)
+                    this.emitter.emit('reSetClientsDevide' , this.clients)
+
+                    // Close Modal
+                    await this.$hideModal("ModalResume")
                 }
                 
                 else{
@@ -790,9 +790,6 @@ export default {
 
                 if(res.status===200){
 
-                    // Close Modal
-                    await this.$hideModal("ModalResume")
-
                     // Send Feedback
                     this.$feedbackSuccess(res.data.header     ,   res.data.message)
 
@@ -801,6 +798,9 @@ export default {
 
                     //
                     this.emitter.emit('reSetClientsDecoupeByJourneeMap' , this.clients)
+
+                    // Close Modal
+                    await this.$hideModal("ModalResume")
                 }
                 
                 else{

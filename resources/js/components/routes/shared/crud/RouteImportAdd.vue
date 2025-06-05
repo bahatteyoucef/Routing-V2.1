@@ -145,7 +145,7 @@ export default {
 
                         if(this.rdy_send) {
 
-                            this.setLatitudeLongitudeStandard()
+                            this.setGPSStandard()
                             this.setNecessaryAttributs()
 
                             // 
@@ -289,7 +289,7 @@ export default {
 
         //
 
-        setLatitudeLongitudeStandard() {
+        setGPSStandard() {
 
             for (let i = 0; i < this.clients.length; i++) {
 

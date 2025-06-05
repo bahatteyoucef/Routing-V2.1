@@ -706,9 +706,6 @@ export default {
                 let client                                  =   res.data.client
                 client.created_at                           =   this.$formatDate(new Date())
 
-                // Close Modal
-                await this.$hideModal("ModalClientAdd")
-
                 // Send Feedback
                 this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
@@ -717,6 +714,9 @@ export default {
 
                 //
                 this.emitter.emit('reSetAdd' , client)
+
+                // Close Modal
+                await this.$hideModal("ModalClientAdd")
             }
 
             else{

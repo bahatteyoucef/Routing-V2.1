@@ -5,7 +5,7 @@
                 <div class="card-body p-1">
                     <div class="row">
                         <div class="col-sm-10">
-                            <h4 class="font-weight-normal mb-3" role="button" @click="showValidationClients('CustomerCode', getDoublant.getDoublantCustomerCode)">CustomerCode Doubles</h4>
+                            <h4 class="font-weight-normal mb-3" role="button" @click="showValidationClients('CustomerCode')">CustomerCode Doubles</h4>
                         </div>
 
                         <div class="col-sm-2">
@@ -22,7 +22,7 @@
                 <div class="card-body p-1">
                     <div class="row">
                         <div class="col-sm-10">
-                            <h4 class="font-weight-normal mb-3" role="button" @click="showValidationClients('CustomerNameE', getDoublant.getDoublantCustomerNameE)">CustomerNameE Doubles</h4>
+                            <h4 class="font-weight-normal mb-3" role="button" @click="showValidationClients('CustomerNameE')">CustomerNameE Doubles</h4>
                         </div>
 
                         <div class="col-sm-2">
@@ -39,7 +39,7 @@
                 <div class="card-body p-1">
                     <div class="row">
                         <div class="col-sm-10">
-                            <h4 class="font-weight-normal mb-3" role="button" @click="showValidationClients('Tel', getDoublant.getDoublantTel)">Tel Doubles</h4>
+                            <h4 class="font-weight-normal mb-3" role="button" @click="showValidationClients('Tel')">Tel Doubles</h4>
                         </div>
 
                         <div class="col-sm-2">
@@ -56,14 +56,14 @@
                 <div class="card-body p-1">
                     <div class="row">
                         <div class="col-sm-10">
-                            <h4 class="font-weight-normal mb-3" role="button" @click="showValidationClients('GPS', getDoublant.getDoublantLatitudeLongitude)">GPS Doubles</h4>
+                            <h4 class="font-weight-normal mb-3" role="button" @click="showValidationClients('GPS')">GPS Doubles</h4>
                         </div>
 
                         <div class="col-sm-2">
                             <i class="mdi mdi-refresh mdi-24px float-right"    role="button"   @click="getDoubleGPS()"></i>
                         </div>
                     </div>
-                    <h2 class="mb-1 animate__animated animate__pulse">{{ getDoublant.getDoublantLatitudeLongitude.length }}</h2>
+                    <h2 class="mb-1 animate__animated animate__pulse">{{ getDoublant.getDoublantGPS.length }}</h2>
                 </div>
             </div>
         </div>
@@ -71,8 +71,8 @@
 
     <hr />
 
-    <div v-if="validation_type_chosen"     class="row h-equal changing_height_animation p-0 m-0" id="show_validation_clients_parent" style="height: 0px" >
-        <ShowValidationClients      ref="ShowValidationClients"></ShowValidationClients>
+    <div class="row h-equal changing_height_animation p-0 m-0" id="validation_clients_parent" style="height: 0px" >
+        <ShowValidationClients      ref="ShowValidationClients"     :validation_type="validation_type"    :validation_clients="validation_clients"    :total_clients="total_clients"></ShowValidationClients>
     </div>
 
     <!--  -->
@@ -92,12 +92,12 @@ export default {
     data() {
         return {
 
-            validation_type_chosen                         :   null    ,
-            show_validation_clients_child_clicked   :   false   ,
+            validation_clients_child_clicked            :   false   ,
 
             //
 
-            validation_type                            :   ""
+            validation_type                             :   ""      ,
+            validation_clients                          :   []
         }
     },
 
@@ -108,54 +108,92 @@ export default {
         ModalClientUpdate       :   ModalClientUpdate       
     },
 
+    mounted() {
+
+        this.emitter.on("updateDoublesCustomerCode"         , async (client)    =>  {
+            await this.updateClientJSON(client)
+        })
+
+        this.emitter.on("updateDoublesCustomerNameE"        , async (client)    =>  {
+            await this.updateClientJSON(client)
+        })
+
+        this.emitter.on("updateDoublesTel"                  , async (client)    =>  {
+            await this.updateClientJSON(client)
+        })
+
+        this.emitter.on("updateDoublesGPS"    , async (client)    =>  {
+            await this.updateClientJSON(client)
+        })
+
+        //
+
+        this.emitter.on("deleteDoublesCustomerCode"         , async (client)    =>  {
+            await this.deleteClientJSON(client)
+        })
+
+        this.emitter.on("deleteDoublesCustomerNameE"        , async (client)    =>  {
+            await this.deleteClientJSON(client)
+        })
+
+        this.emitter.on("deleteDoublesTel"                  , async (client)    =>  {
+            await this.deleteClientJSON(client)
+        })
+
+        this.emitter.on("deleteDoublesGPS"                  , async (client)    =>  {
+            await this.deleteClientJSON(client)
+        })
+    },
+
     methods     :   {
 
-        async showValidationClients(validation_type_chosen, validation_clients) {
+        async showValidationClients(validation_type) {
 
-            if(!this.show_validation_clients_child_clicked) {
-
-                //
-                this.validation_type                           =   validation_type_chosen
-                console.log(this.validation_type)
+            if(!this.validation_clients_child_clicked) {
 
                 //
-                this.show_validation_clients_child_clicked  =   true
+                this.validation_clients_child_clicked   =   true
 
                 //
-                if(this.validation_type_chosen !=  validation_type_chosen) {
+                if(this.validation_type  !=  validation_type) {
 
-                    this.validation_type_chosen                        =   validation_type_chosen
+                    this.validation_type    =   validation_type
+
+                    if(validation_type   ==  "CustomerCode")     this.validation_clients         =   this.getDoublant.getDoublantCustomerCode
+                    if(validation_type   ==  "CustomerNameE")    this.validation_clients         =   this.getDoublant.getDoublantCustomerNameE
+                    if(validation_type   ==  "Tel")              this.validation_clients         =   this.getDoublant.getDoublantTel
+                    if(validation_type   ==  "GPS")              this.validation_clients         =   this.getDoublant.getDoublantGPS
 
                     //
                     setTimeout(async () => {
-                        const show_validation_clients_parent_div            =   document.getElementById("show_validation_clients_parent")
-                        show_validation_clients_parent_div.style.height     =   "750px"
-                        // show_validation_clients_parent_div.style.padding   =   "15px"
-                        show_validation_clients_parent_div.classList.add("mt-5")
+
+                        const validation_clients_parent_div             =   document.getElementById("validation_clients_parent")
+                        validation_clients_parent_div.style.height      =   "750px"
+                        validation_clients_parent_div.classList.add("mt-5")
 
                         //
-                        await this.$refs.ShowValidationClients.setResumeValidateMap(validation_type_chosen, validation_clients, this.total_clients)
+                        await this.$refs.ShowValidationClients.setDatatable()
 
                         //
-                        this.show_validation_clients_child_clicked  =   false
+                        this.validation_clients_child_clicked  =   false
                     }, 0);
                 }
 
                 else {
 
                     //
-                    const show_validation_clients_parent_div           =   document.getElementById("show_validation_clients_parent")
-                    show_validation_clients_parent_div.style.height    =   "0px"
+                    const validation_clients_parent_div             =   document.getElementById("validation_clients_parent")
+                    validation_clients_parent_div.style.height      =   "0px"
 
                     //
                     setTimeout(async () => {                    
-                        this.validation_type_chosen                                =   null
+                        this.validation_type                            =   null
 
                         //
-                        this.show_validation_clients_child_clicked          =   false
+                        this.validation_clients_child_clicked           =   false
 
                         //
-                        show_validation_clients_parent_div.classList.remove("mt-5")
+                        validation_clients_parent_div.classList.remove("mt-5")
 
                     }, 255);
                 }
@@ -182,7 +220,17 @@ export default {
             this.emitter.emit("refreshDoublantCustomerCode"     ,   this.getDoublant.getDoublantCustomerCode)
 
             //
-            await this.$refs.ShowValidationClients.setResumeValidateMap("CustomerCode", this.getDoublant.getDoublantCustomerCode, this.total_clients)
+            await this.$nextTick()
+
+            //
+            this.validation_type        =   "CustomerCode"
+            this.validation_clients     =   this.getDoublant.getDoublantCustomerCode
+
+            //
+            await this.$nextTick()
+
+            //
+            await this.$refs.ShowValidationClients.setDatatable()
 
             //
             this.$hideLoadingPage()
@@ -206,7 +254,17 @@ export default {
             this.emitter.emit("refreshDoublantCustomerNameE"     ,  this.getDoublant.getDoublantCustomerNameE)
 
             //
-            await this.$refs.ShowValidationClients.setResumeValidateMap("CustomerNameE", this.getDoublant.getDoublantCustomerNameE, this.total_clients)
+            await this.$nextTick()
+
+            //
+            this.validation_type        =   "CustomerNameE"
+            this.validation_clients     =   this.getDoublant.getDoublantCustomerNameE
+
+            //
+            await this.$nextTick()
+
+            //
+            await this.$refs.ShowValidationClients.setDatatable()
 
             //
             this.$hideLoadingPage()
@@ -230,7 +288,17 @@ export default {
             this.emitter.emit("refreshDoublantTel"     ,    this.getDoublant.getDoublantTel)
 
             //
-            await this.$refs.ShowValidationClients.setResumeValidateMap("Tel", this.getDoublant.getDoublantTel, this.total_clients)
+            await this.$nextTick()
+
+            //
+            this.validation_type        =   "Tel"
+            this.validation_clients     =   this.getDoublant.getDoublantTel
+
+            //
+            await this.$nextTick()
+
+            //
+            await this.$refs.ShowValidationClients.setDatatable()
 
             //
             this.$hideLoadingPage()
@@ -242,22 +310,155 @@ export default {
 
             if(this.mode    ==  "temporary") {
                 const res                                       =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.id_route_import_tempo+"/clients_tempo/doubles/GPS"  , null)
-                this.getDoublant.getDoublantLatitudeLongitude   =   res.data
+                this.getDoublant.getDoublantGPS   =   res.data
             }
 
             if(this.mode    ==  "permanent") {
                 const res                                       =   await this.$callApi("post"  ,   "/route_import/"+this.id_route_import+"/clients/doubles/GPS"                    , null)
-                this.getDoublant.getDoublantLatitudeLongitude   =   res.data
+                this.getDoublant.getDoublantGPS   =   res.data
             }
 
             //
-            this.emitter.emit("refreshDoublantLatitudeLongitude"    ,   this.getDoublant.getDoublantLatitudeLongitude)
+            this.emitter.emit("refreshDoublantGPS"    ,   this.getDoublant.getDoublantGPS)
 
             //
-            await this.$refs.ShowValidationClients.setResumeValidateMap("GPS", this.getDoublant.getDoublantLatitudeLongitude, this.total_clients)
+            await this.$nextTick()
+
+            //
+            this.validation_type        =   "GPS"
+            this.validation_clients     =   this.getDoublant.getDoublantGPS
+
+            //
+            await this.$nextTick()
+
+            //
+            await this.$refs.ShowValidationClients.setDatatable()
 
             //
             this.$hideLoadingPage()
+        },
+
+        //
+
+        async updateClientJSON(client) {
+
+            console.log(client)
+            console.log(this.total_clients[0])
+
+            const updatableFields   =   [
+                "NewCustomer"               ,
+                "OpenCustomer"              ,
+                "CustomerIdentifier"        ,
+                "CustomerCode"              ,
+
+                "CustomerNameE"             ,
+                "CustomerNameA"             ,
+
+                "Tel"                       ,
+                "tel_status"                ,
+                "tel_comment"               ,
+
+                "Latitude"                  ,
+                "Longitude"                 ,
+
+                "Address"                   ,
+                "Neighborhood"              ,
+                "Landmark"                  ,
+
+                "DistrictNo"                ,
+                "DistrictNameE"             ,
+
+                "CityNo"                    ,
+                "CityNameE"                 ,
+
+                "CustomerType"              ,
+
+                "BrandAvailability"         ,
+                "BrandSourcePurchase"       ,
+
+                "JPlan"                     ,
+                "Journee"                   ,
+
+                "Frequency"                 ,
+                "SuperficieMagasin"         ,
+                "NbrAutomaticCheckouts"     ,
+
+                "AvailableBrands"                   ,
+                "AvailableBrands_array_formatted"   ,
+                "AvailableBrands_string_formatted"  ,
+
+                "status"                            ,
+                "nonvalidated_details"              ,
+
+                "owner"                             ,
+                "owner_name"                        ,
+
+                "comment"                           ,
+
+                "facade_image"                          ,
+                "in_store_image"                        ,
+                "facade_image_original_name"            ,
+                "in_store_image_original_name"          ,
+                "CustomerBarCode_image"                 ,
+                "CustomerBarCode_image_original_name"   ,
+            ];
+
+            //
+            const collectionsToUpdate = [
+                this.total_clients,
+                this.getDoublant.getDoublantCustomerCode,
+                this.getDoublant.getDoublantCustomerNameE,
+                this.getDoublant.getDoublantTel,
+                this.getDoublant.getDoublantGPS
+            ];
+
+            //
+            for (const arr of collectionsToUpdate) {
+
+                const existing = arr.find(item => item.id === client.id);
+
+                //
+                if (existing) {
+
+                    updatableFields.forEach(field => {
+                        existing[field] = client[field];
+                    });
+
+                    continue;
+                }
+            }
+
+            //
+            await this.$refs.ShowValidationClients.setDatatable()
+        },
+
+        async deleteClientJSON(client) {
+
+            let idx =   -1
+
+            //      
+            idx     =   this.total_clients.findIndex(c => c.id === client.id);
+            if (idx !== -1) this.total_clients.splice(idx, 1);
+
+            //
+            idx     =   this.getDoublant.getDoublantCustomerCode.findIndex(c => c.id === client.id);
+            if (idx !== -1) this.getDoublant.getDoublantCustomerCode.splice(idx, 1);
+
+            //
+            idx     =   this.getDoublant.getDoublantCustomerNameE.findIndex(c => c.id === client.id);
+            if (idx !== -1) this.getDoublant.getDoublantCustomerNameE.splice(idx, 1);
+            
+
+            //
+            idx     =   this.getDoublant.getDoublantTel.findIndex(c => c.id === client.id);
+            if (idx !== -1) this.getDoublant.getDoublantTel.splice(idx, 1);
+            
+            //
+            idx     =   this.getDoublant.getDoublantGPS.findIndex(c => c.id === client.id);
+            if (idx !== -1) this.getDoublant.getDoublantGPS.splice(idx, 1);
+
+            //
+            await this.$refs.ShowValidationClients.setDatatable()
         }
     }
 }

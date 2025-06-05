@@ -268,9 +268,6 @@ export default {
 
             if(res.status===200){
 
-                // Close Modal
-                await this.$hideModal("ModalUserUpdate")
-
                 // Send Feedback
                 this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
 
@@ -279,6 +276,9 @@ export default {
 
                 // Reload DataTable
                 await this.$parent.setDataTable()
+
+                // Close Modal
+                await this.$hideModal("ModalUserUpdate")
 			}
             
             else{

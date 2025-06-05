@@ -119,8 +119,8 @@
     </div>
 
     <!--  -->
-    <ModalValidateClients   ref="ModalValidateClients"                                                                                  ></ModalValidateClients>
-    <ModalClientUpdate      ref="ModalClientUpdate"  :modal_source="modal_source"    :id_route_import="route_import.id_route_import"    ></ModalClientUpdate>                
+    <ModalValidateClients   ref="ModalValidateClients"                                                                                                                                                  ></ModalValidateClients>
+    <ModalClientUpdate      ref="ModalClientUpdate"         :id_route_import="route_import.id_route_import"     :update_type="'normal_update'"      :mode="'permanent'"   :modal_source="modal_source"  ></ModalClientUpdate>                
 
 </template>
 
@@ -185,7 +185,7 @@ export default {
                 if(res.status===200){
 
                     this.clients_doubles_Tel                =   res.data.getDoublantTel
-                    this.clients_doubles_GPS                =   res.data.getDoublantLatitudeLongitude
+                    this.clients_doubles_GPS                =   res.data.getDoublantGPS
                     this.clients_doubles_CustomerNameE      =   res.data.getDoublantCustomerNameE
                     this.clients_doubles_CustomerCode       =   res.data.getDoublantCustomerCode
 

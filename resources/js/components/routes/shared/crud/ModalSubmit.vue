@@ -83,52 +83,52 @@ export default {
 
             submit_clients_data                             :   []      ,
             submit_clients_columns                          :   [
-                                                                    { data: "CustomerCode"          , title: "CustomerCode"         },
-                                                                    { data: "CustomerNameE"         , title: "CustomerNameE"        },
-                                                                    { data: "CustomerNameA"         , title: "CustomerNameA"        },
-                                                                    { data: "DistrictNo"            , title: "DistrictNo"           },
-                                                                    { data: "DistrictNameE"         , title: "DistrictNameE"        },
-                                                                    { data: "CityNo"                , title: "CityNo"               },
-                                                                    { data: "CityNameE"             , title: "CityNameE"            },
-                                                                    // { data: "CustomerBarCode_image" , title: "CustomerBarCode Image"},
-                                                                    // { data: "in_store_image"        , title: "In Store Image"       },
-                                                                    // { data: "facade_image"          , title: "Facade Image"         },
-                                                                    { data: "Address"               , title: "Address"              },
-                                                                    { data: "Neighborhood"          , title: "Neighborhood"         },
-                                                                    { data: "Landmark"              , title: "Landmark"             },
-                                                                    { data: "Latitude"              , title: "Latitude"             },
-                                                                    { data: "Longitude"             , title: "Longitude"            },
-                                                                    { data: "Tel"                   , title: "Tel"                  },
-                                                                    { data: "CustomerType"          , title: "CustomerType"         },
-                                                                    { data: "JPlan"                 , title: "JPlan"                },
-                                                                    { data: "Journee"               , title: "Journee"              },
-                                                                    { data: "comment"               , title: "Comment"              },
-                                                                    { data: "BrandAvailability"     , title: "BrandAvailability"    },
-                                                                    { data: "BrandSourcePurchase"   , title: "BrandSourcePurchase"  },
-                                                                    // { data: "start_adding_time"     , title: "Start Adding Time"    },
-                                                                    // { data: "adding_duration"       , title: "Adding Duration"      },
-                                                                    // { data: "created_at"            , title: "Created At"           },
-                                                                    { data: "status"                , title: "Status"               },
-                                                                    { data: "owner"                 , title: "Owner"                }
-                                                                ],
+                                                                    { data: "id"                                , title: "Id"                               },
+                                                                    { data: "OpenCustomer"                      , title: "OpenCustomer"                     },
+                                                                    { data: "CustomerIdentifier"                , title: "CustomerIdentifier"               },
+                                                                    { data: "CustomerCode"                      , title: "CustomerCode"                     },
+                                                                    { data: "CustomerNameE"                     , title: "CustomerNameE"                    },
+                                                                    { data: "CustomerNameA"                     , title: "CustomerNameA"                    },
+
+                                                                    { data: "DistrictNo"                        , title: "DistrictNo"                       },
+                                                                    { data: "DistrictNameE"                     , title: "DistrictNameE"                    },
+
+                                                                    { data: "CityNo"                            , title: "CityNo"                           },
+                                                                    { data: "CityNameE"                         , title: "CityNameE"                        },
+
+                                                                    { data: "Address"                           , title: "Address"                          },
+                                                                    { data: "Neighborhood"                      , title: "Neighborhood"                     },
+                                                                    { data: "Landmark"                          , title: "Landmark"                         },
+
+                                                                    { data: "Latitude"                          , title: "Latitude"                         },
+                                                                    { data: "Longitude"                         , title: "Longitude"                        },
+
+                                                                    { data: "Tel"                               , title: "Tel"                              },
+                                                                    { data: "CustomerType"                      , title: "CustomerType"                     },
+
+                                                                    { data: "JPlan"                             , title: "JPlan"                            },
+                                                                    { data: "Journee"                           , title: "Journee"                          },
+                                                                    { data: "Frequency"                         , title: "Frequency"                        },
+
+                                                                    { data: "SuperficieMagasin"                 , title: "SuperficieMagasin"                },
+                                                                    { data: "NbrAutomaticCheckouts"             , title: "NbrAutomaticCheckouts"            },
+                                                                    // { data: "AvailableBrands_string_formatted"  , title: "AvailableBrands_string_formatted" },
+                                                                    { data: "comment"                           , title: "comment"                          },
+                                                                    { data: "BrandAvailability"                 , title: "BrandAvailability"                },
+                                                                    { data: "BrandSourcePurchase"               , title: "BrandSourcePurchase"              },
+                                                                    { data: "start_adding_time"                 , title: "start_adding_time"                },
+                                                                    { data: "adding_duration"                   , title: "adding_duration"                  },
+                                                                    { data: "created_at"                        , title: "created_at"                       },
+                                                                    { data: "status"                            , title: "status"                           },
+                                                                    // { data: "owner_name"                        , title: "owner_name"                       },
+                                                            ],
 
             datatable_submit_clients                        :   null    ,
             datatable_submit_clients_instance               :   null    ,
-
-            //  //  //  //  //
-            //  //  //  //  //
-            //  //  //  //  //
-
-            getDoublantTel                                  :   null,
-            getDoublantLatitudeLongitude                    :   null,
-            getDoublantCustomerNameE                        :   null,
-            getDoublantCustomerCode                         :   null,
-
-            ready_to_validate                               :   false
         }
     },
 
-    props : ["id_route_import_tempo"],
+    props : ["id_route_import_tempo", "submit_clients"],
 
     mounted() {
 
@@ -150,15 +150,11 @@ export default {
             formData.append("id_route_import_tempo" ,   this.id_route_import_tempo)
             formData.append("libelle"               ,   this.$parent.route_import.libelle)
             formData.append("districts"             ,   JSON.stringify(districts))
-            formData.append("data"                  ,   JSON.stringify(this.submit_clients_data))
             
             //
             const res   = await this.$callApi('post'    ,   '/route_import/store'   ,   formData)         
 
             if(res.status===200){
-
-                // Close Modal
-                await this.$hideModal("ModalSubmit")
 
                 // Send Feedback
                 this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
@@ -168,6 +164,9 @@ export default {
 
                 // Send Event
                 this.emitter.emit("reSetRouteImport")
+
+                // Close Modal
+                await this.$hideModal("ModalSubmit")
 
                 // Add Route Import
                 this.$router.push("/route/obs/route_import/"+res.data.route_import.id+"/details")
@@ -185,74 +184,10 @@ export default {
 
         //
 
-        setResumeValidate() {
-
-            // Show Loading Page
-            this.$showLoadingPage()
-
-            setTimeout(async () => {
-                
-                this.$showLoadingPage()
-
-                await this.getDataTempo()
-                await this.setDataTableClients()
-
-                const res                   =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.id_route_import_tempo+"/clients_tempo/doubles", null)
-
-                if(res.status===200){
-
-                    this.getDoublantTel                     =   res.data.getDoublantTel
-                    this.getDoublantLatitudeLongitude       =   res.data.getDoublantLatitudeLongitude
-                    this.getDoublantCustomerNameE           =   res.data.getDoublantCustomerNameE
-                    this.getDoublantCustomerCode            =   res.data.getDoublantCustomerCode
-
-                    if((this.getDoublantTel.length  ==  0)&&(this.getDoublantLatitudeLongitude.length  ==  0)&&(this.getDoublantCustomerNameE.length  ==  0)&&(this.getDoublantCustomerCode.length  ==  0)) {
-
-                        this.ready_to_validate  =   true
-                    }
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-                }
-                
-                else{
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
-                    // Send Errors
-                    this.$showErrors("Error !", res.data.errors)
-                }      
-
-            }, 55);
-        },
-
-        //
-
-        async getDataTempo() {
-
-            const res   = await this.$callApi('post' ,   '/route_import_tempo/last'    ,   null)         
-
-            if(res.status===200){
-
-                if(res.data    ==  "")  {
-
-                }
-
-                else {
-
-                    if(typeof res.data.clients  !=  "undefined") {
-
-                        this.submit_clients_data    =   res.data.clients
-                    }
-                }
-            }
-        },
-
-        async setDataTableClients() {
+        async setDatatable() {
 
             // Create DataTable
-            this.datatable_submit_clients     =   this.datatable_submit_clients_instance.$DataTableCreate("submit_clients", this.submit_clients_data, this.submit_clients_columns, this.addElement, this.updateElement, null, "Temporary Clients")      
+            this.datatable_submit_clients   =    this.datatable_submit_clients_instance.$DataTableCreate("submit_clients", this.submit_clients, this.submit_clients_columns, this.setDataTable, null, null, null, () => {}, "Route Import Clients")
         }
     }
 }

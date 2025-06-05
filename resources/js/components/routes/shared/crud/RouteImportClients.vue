@@ -77,10 +77,10 @@
     </div>
 
     <!-- Modal Add                      -->
-    <ModalClientAdd             ref="ModalClientAdd"            :id_route_import="getRouteImportId"                             >   </ModalClientAdd>
+    <ModalClientAdd             ref="ModalClientAdd"            :id_route_import="getRouteImportId"                                                             >   </ModalClientAdd>
 
     <!-- Modal Update                   -->
-    <ModalClientUpdate          ref="ModalClientUpdate"         :id_route_import="getRouteImportId"      :mode="'permanent'"    >   </ModalClientUpdate>
+    <ModalClientUpdate          ref="ModalClientUpdate"         :id_route_import="getRouteImportId"     :update_type="'normal_update'"      :mode="'permanent'" >   </ModalClientUpdate>
 </template>
  
 <script>

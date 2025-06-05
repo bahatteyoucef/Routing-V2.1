@@ -52,7 +52,7 @@ class Client extends Model
         $adding_duration        =   $adding_duration->format('%H:%I:%S');
         //
 
-        $clients    =   json_decode($request->get("data"));
+        $clients                =   ClientTempo::where("id_route_import_tempo", $request->get("id_route_import_tempo"))->get();;
 
         foreach ($clients as $client_elem) {
 
@@ -63,59 +63,8 @@ class Client extends Model
 
             //  //  //  //  //
 
-            //
-            $brands     =   array_map('trim', explode(',', $client_elem->AvailableBrands)); // Split and trim whitespace
-
-            $result     =   [];
-
-            foreach ($brands as $index => $value) {
-                $result["brand_$index"] = $value;
-            }
-
-            $AvailableBrands    =   json_encode($result, JSON_UNESCAPED_UNICODE);
-
-            //  //  //  //  //
-
             // Client
             $client         =   new Client([
-                // 'CustomerIdentifier'    =>  $client_elem->CustomerIdentifier        ,
-                // 'CustomerCode'          =>  $client_elem->CustomerCode              ,
-                // 'NewCustomer'           =>  $client_elem->NewCustomer               ,
-                // 'OpenCustomer'          =>  $client_elem->OpenCustomer              ,
-                // 'CustomerNameE'         =>  mb_strtoupper($client_elem->CustomerNameE, 'UTF-8') ,
-                // 'CustomerNameA'         =>  mb_strtoupper($client_elem->CustomerNameA. 'UTF-8') ,
-                // 'Latitude'              =>  $client_elem->Latitude                  ,
-                // 'Longitude'             =>  $client_elem->Longitude                 ,
-                // 'Address'               =>  $client_elem->Address                   ,
-                // 'DistrictNo'            =>  $client_elem->DistrictNo                ,
-                // 'DistrictNameE'         =>  $client_elem->DistrictNameE             ,
-                // 'CityNo'                =>  $client_elem->CityNo                    ,
-                // 'CityNameE'             =>  $client_elem->CityNameE                 ,
-                // 'Tel'                   =>  $client_elem->Tel                       ,
-                // 'CustomerType'          =>  $client_elem->CustomerType              ,
-
-                // 'Neighborhood'          =>  $client_elem->Neighborhood              ,
-                // 'Landmark'              =>  $client_elem->Landmark                  ,
-                // 'BrandAvailability'     =>  ""                                      ,
-                // 'BrandSourcePurchase'   =>  ""                                      ,
-
-                // 'Frequency'             =>  $client_elem->Frequency                 ,
-                // 'SuperficieMagasin'     =>  $client_elem->SuperficieMagasin         ,
-                // 'NbrAutomaticCheckouts' =>  $client_elem->NbrAutomaticCheckouts     ,
-                // 'AvailableBrands'       =>  $AvailableBrands                        ,
-
-                // 'start_adding_time'     =>  $start_adding_time                      ,
-                // 'adding_duration'       =>  $adding_duration                        ,
-                // 'comment'               =>  ""                                      ,
-
-                // 'id_route_import'       =>  $id_route_import                        ,
-                // 'status'                =>  "visible"                               ,
-                // 'nonvalidated_details'  =>  ""                                      ,
-                // 'created_at'            =>  1                                       ,
-                // 'owner'                 =>  Auth::user()->id                        ,
-
-                //
-
                 'NewCustomer'               =>  $client_elem->NewCustomer                               ?? ''               ,
                 'CustomerIdentifier'        =>  $client_elem->CustomerIdentifier                        ?? ''               ,
                 'CustomerCode'              =>  $client_elem->CustomerCode                              ?? ''               ,
@@ -145,7 +94,7 @@ class Client extends Model
                 'SuperficieMagasin'         =>  $client_elem->SuperficieMagasin                         ?? ''               ,
                 'NbrAutomaticCheckouts'     =>  $client_elem->NbrAutomaticCheckouts                     ?? ''               ,
 
-                'AvailableBrands'           =>  $AvailableBrands                                        ?? ''               ,
+                'AvailableBrands'           =>  $client_elem->AvailableBrands                           ?? ''               ,
 
                 'start_adding_time'         =>  $start_adding_time                                      ?? ''               ,
                 'adding_duration'           =>  $adding_duration                                        ?? ''               ,
@@ -1127,7 +1076,7 @@ class Client extends Model
         $getDoublant->getDoublantCustomerCode           =   Client::getDoublesCustomerCodeClients($request, $id_route_import);
         $getDoublant->getDoublantCustomerNameE          =   Client::getDoublesCustomerNameEClients($request, $id_route_import);
         $getDoublant->getDoublantTel                    =   Client::getDoublesTelClients($request, $id_route_import);
-        $getDoublant->getDoublantLatitudeLongitude      =   Client::getDoublesGPSClients($request, $id_route_import);
+        $getDoublant->getDoublantGPS                    =   Client::getDoublesGPSClients($request, $id_route_import);
 
         return $getDoublant;
     }

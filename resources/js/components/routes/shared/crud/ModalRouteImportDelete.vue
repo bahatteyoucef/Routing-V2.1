@@ -101,9 +101,6 @@ export default {
 
             if(res.status===200){
 
-                // Close Modal
-                await this.$hideModal("ModalRouteImportDelete")
-
                 // Send Feedback
                 this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
 
@@ -112,6 +109,9 @@ export default {
 
                 // Get Route Import
                 this.emitter.emit("reSetRouteImport")
+
+                // Close Modal
+                await this.$hideModal("ModalRouteImportDelete")
             }
 
             else{

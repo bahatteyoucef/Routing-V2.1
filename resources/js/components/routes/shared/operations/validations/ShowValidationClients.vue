@@ -6,19 +6,19 @@
             <h4 class="fw-bold"><u>Validation : <span class="text_primary">{{ validation_type }}</span></u></h4>
         </div>
 
-        <div id="show_validation_clients_container" class="table-container mt-5">
-            <table class="table table-hover table-bordered show_validation_clients mt-0 mb-0 w-100" id="show_validation_clients">
+        <div id="validation_clients_container" class="table-container mt-5">
+            <table class="table table-hover table-bordered validation_clients mt-0 mb-0 w-100" id="validation_clients">
                 <thead>
                     <tr>
                         <th role="button">#</th>
-                        <th v-for="show_validation_client_column in show_validation_clients_columns" :key="show_validation_client_column" role="button">{{ show_validation_client_column.title }}</th>
+                        <th v-for="validation_client_column in validation_clients_columns" :key="validation_client_column" role="button">{{ validation_client_column.title }}</th>
                     </tr>
 
-                    <tr id="show_validation_clients_filters" class="show_validation_clients_filters">
+                    <tr id="validation_clients_filters" class="validation_clients_filters">
                         <th></th>
 
-                        <th v-for="show_validation_client_column in show_validation_clients_columns" :key="show_validation_client_column">
-                            <div class="filter_group" :data-column="show_validation_client_column.title">
+                        <th v-for="validation_client_column in validation_clients_columns" :key="validation_client_column">
+                            <div class="filter_group" :data-column="validation_client_column.title">
                                 <select class="filter_type form-select-sm w-100 mb-2">
                                     <option value="contains">contains</option>
                                     <option value="not_contains">not contains</option>
@@ -29,7 +29,7 @@
                                 <input
                                     type="text"
                                     class="form-control form-control-sm filter_input"
-                                    :placeholder="show_validation_client_column.title"
+                                    :placeholder="validation_client_column.title"
                                 />
                             </div>
                         </th>
@@ -52,13 +52,7 @@ export default {
     data() {
         return {
 
-            validation_type                             :   ""      ,
-            total_clients                               :   []      ,
-
-            //
-
-            show_validation_clients_data                :   []      ,
-            show_validation_clients_columns             :   [
+            validation_clients_columns              :   [
                                                                 { data: "id"                                , title: "Id"                               },
                                                                 { data: "OpenCustomer"                      , title: "OpenCustomer"                     },
                                                                 { data: "CustomerIdentifier"                , title: "CustomerIdentifier"               },
@@ -97,46 +91,26 @@ export default {
                                                                 { data: "created_at"                        , title: "created_at"                       },
                                                                 { data: "status"                            , title: "status"                           },
                                                                 // { data: "owner_name"                        , title: "owner_name"                       },
-                                                            ],
+                                                        ],
 
             //
 
-            datatable_show_validation_clients           :   null    ,
-            datatable_show_validation_clients_instance  :   null    ,
+            datatable_validation_clients            :   null    ,
+            datatable_validation_clients_instance   :   null    ,
 
             //
 
-            selected_row                                :   null    ,
-            selected_row_id                             :   null
+            selected_row                            :   null    ,
+            selected_row_id                         :   null
         }
     },
+
+    props : ["validation_type", "validation_clients", "total_clients"],
 
     mounted(){
 
         //
-        this.datatable_show_validation_clients_instance     =   new DatatableHelper()
-
-        this.emitter.on("updateDoublesCustomerCode"         , async (client)    =>  {
-            await this.updateClientJSON(client)
-        })
-
-        this.emitter.on("updateDoublesCustomerNameE"        , async (client)    =>  {
-            await this.updateClientJSON(client)
-        })
-
-        this.emitter.on("updateDoublesTel"                  , async (client)    =>  {
-            await this.updateClientJSON(client)
-        })
-
-        this.emitter.on("updateDoublesLatitudeLongitude"    , async (client)    =>  {
-            await this.updateClientJSON(client)
-        })
-
-        //  //  //
-
-        this.emitter.on("reSetDelete", async (client)    =>  {
-            await this.deleteClientJSON(client)
-        })
+        this.datatable_validation_clients_instance     =   new DatatableHelper()
     },
 
     unmounted() {
@@ -147,18 +121,9 @@ export default {
 
     methods : {
 
-        async setResumeValidateMap(validation_type, clients, total_clients) {
-
-            this.validation_type                =   validation_type
-            this.show_validation_clients_data   =   clients
-            this.total_clients                  =   total_clients
-
-            await this.setDatatable()
-        },
-
         async setDatatable() {
 
-            this.datatable_show_validation_clients     =    this.datatable_show_validation_clients_instance.$DataTableCreate("show_validation_clients", this.show_validation_clients_data, this.show_validation_clients_columns, this.setDataTable, null, this.updateElement, null, this.selectRow, "Route Import Clients")
+            this.datatable_validation_clients     =    this.datatable_validation_clients_instance.$DataTableCreate("validation_clients", this.validation_clients, this.validation_clients_columns, this.setDataTable, null, this.updateElement, null, this.selectRow, "Route Import Clients")
         },
 
         //
@@ -175,95 +140,95 @@ export default {
 
         //
 
-        async updateClientJSON(client) {
+        // async updateClientJSON(client) {
 
-            console.log(clients)
-            console.log(this.total_clients)
+        //     console.log(clients)
+        //     console.log(this.total_clients)
 
-            for (let i = 0; i < this.show_validation_clients.length; i++) {
+        //     for (let i = 0; i < this.validation_clients.length; i++) {
 
-                if(this.show_validation_clients[i].id  ==  client.id) {
+        //         if(this.validation_clients[i].id  ==  client.id) {
 
-                    // Update Client
-                    this.show_validation_clients[i].NewCustomer                             =   client.NewCustomer
-                    this.show_validation_clients[i].OpenCustomer                            =   client.OpenCustomer
-                    this.show_validation_clients[i].CustomerIdentifier                      =   client.CustomerIdentifier
-                    this.show_validation_clients[i].CustomerCode                            =   client.CustomerCode
+        //             // Update Client
+        //             this.validation_clients[i].NewCustomer                             =   client.NewCustomer
+        //             this.validation_clients[i].OpenCustomer                            =   client.OpenCustomer
+        //             this.validation_clients[i].CustomerIdentifier                      =   client.CustomerIdentifier
+        //             this.validation_clients[i].CustomerCode                            =   client.CustomerCode
 
-                    this.show_validation_clients[i].CustomerNameE                           =   client.CustomerNameE
-                    this.show_validation_clients[i].CustomerNameA                           =   client.CustomerNameA
+        //             this.validation_clients[i].CustomerNameE                           =   client.CustomerNameE
+        //             this.validation_clients[i].CustomerNameA                           =   client.CustomerNameA
 
-                    this.show_validation_clients[i].Tel                                     =   client.Tel
-                    this.show_validation_clients[i].tel_status                              =   client.tel_status
-                    this.show_validation_clients[i].tel_comment                             =   client.tel_comment
+        //             this.validation_clients[i].Tel                                     =   client.Tel
+        //             this.validation_clients[i].tel_status                              =   client.tel_status
+        //             this.validation_clients[i].tel_comment                             =   client.tel_comment
 
-                    this.show_validation_clients[i].Latitude                                =   client.Latitude         
-                    this.show_validation_clients[i].Longitude                               =   client.Longitude        
+        //             this.validation_clients[i].Latitude                                =   client.Latitude         
+        //             this.validation_clients[i].Longitude                               =   client.Longitude        
 
-                    this.show_validation_clients[i].Address                                 =   client.Address
-                    this.show_validation_clients[i].Neighborhood                            =   client.Neighborhood
-                    this.show_validation_clients[i].Landmark                                =   client.Landmark
+        //             this.validation_clients[i].Address                                 =   client.Address
+        //             this.validation_clients[i].Neighborhood                            =   client.Neighborhood
+        //             this.validation_clients[i].Landmark                                =   client.Landmark
 
-                    this.show_validation_clients[i].DistrictNo                              =   client.DistrictNo      
-                    this.show_validation_clients[i].DistrictNameE                           =   client.DistrictNameE  
+        //             this.validation_clients[i].DistrictNo                              =   client.DistrictNo      
+        //             this.validation_clients[i].DistrictNameE                           =   client.DistrictNameE  
 
-                    this.show_validation_clients[i].CityNo                                  =   client.CityNo           
-                    this.show_validation_clients[i].CityNameE                               =   client.CityNameE       
+        //             this.validation_clients[i].CityNo                                  =   client.CityNo           
+        //             this.validation_clients[i].CityNameE                               =   client.CityNameE       
 
-                    this.show_validation_clients[i].CustomerType                            =   client.CustomerType     
+        //             this.validation_clients[i].CustomerType                            =   client.CustomerType     
 
-                    this.show_validation_clients[i].BrandAvailability                       =   client.BrandAvailability       
-                    this.show_validation_clients[i].BrandSourcePurchase                     =   client.BrandSourcePurchase       
+        //             this.validation_clients[i].BrandAvailability                       =   client.BrandAvailability       
+        //             this.validation_clients[i].BrandSourcePurchase                     =   client.BrandSourcePurchase       
 
-                    this.show_validation_clients[i].JPlan                                   =   client.JPlan            
-                    this.show_validation_clients[i].Journee                                 =   client.Journee        
+        //             this.validation_clients[i].JPlan                                   =   client.JPlan            
+        //             this.validation_clients[i].Journee                                 =   client.Journee        
 
-                    this.show_validation_clients[i].Frequency                               =   client.Frequency        
-                    this.show_validation_clients[i].SuperficieMagasin                       =   client.SuperficieMagasin        
-                    this.show_validation_clients[i].NbrAutomaticCheckouts                   =   client.NbrAutomaticCheckouts        
+        //             this.validation_clients[i].Frequency                               =   client.Frequency        
+        //             this.validation_clients[i].SuperficieMagasin                       =   client.SuperficieMagasin        
+        //             this.validation_clients[i].NbrAutomaticCheckouts                   =   client.NbrAutomaticCheckouts        
 
-                    this.show_validation_clients[i].AvailableBrands                         =   client.AvailableBrands
-                    this.show_validation_clients[i].AvailableBrands_array_formatted         =   client.AvailableBrands_array_formatted      // should be array
-                    this.show_validation_clients[i].AvailableBrands_string_formatted        =   client.AvailableBrands_string_formatted     // should be string
+        //             this.validation_clients[i].AvailableBrands                         =   client.AvailableBrands
+        //             this.validation_clients[i].AvailableBrands_array_formatted         =   client.AvailableBrands_array_formatted      // should be array
+        //             this.validation_clients[i].AvailableBrands_string_formatted        =   client.AvailableBrands_string_formatted     // should be string
 
-                    this.show_validation_clients[i].status                                  =   client.status            
-                    this.show_validation_clients[i].nonvalidated_details                    =   client.nonvalidated_details        
+        //             this.validation_clients[i].status                                  =   client.status            
+        //             this.validation_clients[i].nonvalidated_details                    =   client.nonvalidated_details        
 
-                    this.show_validation_clients[i].owner                                   =   client.owner
-                    this.show_validation_clients[i].owner_name                              =   client.owner_name
+        //             this.validation_clients[i].owner                                   =   client.owner
+        //             this.validation_clients[i].owner_name                              =   client.owner_name
 
-                    this.show_validation_clients[i].comment                                 =   client.comment        
+        //             this.validation_clients[i].comment                                 =   client.comment        
 
-                    this.show_validation_clients[i].facade_image                            =   client.facade_image            
-                    this.show_validation_clients[i].in_store_image                          =   client.in_store_image        
-                    this.show_validation_clients[i].facade_image_original_name              =   client.facade_image_original_name            
-                    this.show_validation_clients[i].in_store_image_original_name            =   client.in_store_image_original_name        
-                    this.show_validation_clients[i].CustomerBarCode_image                   =   client.CustomerBarCode_image            
-                    this.show_validation_clients[i].CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name        
+        //             this.validation_clients[i].facade_image                            =   client.facade_image            
+        //             this.validation_clients[i].in_store_image                          =   client.in_store_image        
+        //             this.validation_clients[i].facade_image_original_name              =   client.facade_image_original_name            
+        //             this.validation_clients[i].in_store_image_original_name            =   client.in_store_image_original_name        
+        //             this.validation_clients[i].CustomerBarCode_image                   =   client.CustomerBarCode_image            
+        //             this.validation_clients[i].CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name        
 
-                    break
-                }
-            }
+        //             break
+        //         }
+        //     }
 
-            //
+        //     //
 
-            await this.setDatatable()
-        },
+        //     await this.setDatatable()
+        // },
 
-        async deleteClientJSON(client) {
+        // async deleteClientJSON(client) {
 
-            for (let i = 0; i < this.show_validation_clients.length; i++) {
+        //     for (let i = 0; i < this.validation_clients.length; i++) {
 
-                if(this.show_validation_clients[i].id    ==  client.id) {
+        //         if(this.validation_clients[i].id    ==  client.id) {
 
-                    this.show_validation_clients.splice(i, 1)
-                }                
-            }
+        //             this.validation_clients.splice(i, 1)
+        //         }                
+        //     }
 
-            //
+        //     //
 
-            await this.setDatatable()
-        },
+        //     await this.setDatatable()
+        // },
 
         //
 

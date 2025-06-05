@@ -21,6 +21,6 @@ class RTMWillaya extends Model
 
     public static function index() {
 
-        return DB::table("RTM_Willaya")->orderByRaw('CAST(DistrictNo AS SIGNED INTEGER)')->get();
+        return DB::table("RTM_Willaya")->orderBy('DistrictNameE')->get();
     }
 }

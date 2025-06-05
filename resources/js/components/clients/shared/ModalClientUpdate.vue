@@ -388,7 +388,9 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>                        
 
+                                <div v-if="mode === 'permanent'" class="row mt-3 mb-3">
                                     <div v-if="client.OpenCustomer  === 'Ouvert'" class="col-sm-12">
                                         <label for="CustomerBarCode_image_update"   class="form-label">Image Code-Barre</label>
                                         <input type="file"                          class="form-control"        id="CustomerBarCode_image_update"       accept="image/*"    capture     @change="customerBarCodeImage()"     :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
@@ -401,9 +403,7 @@
                                             />
                                         </div>
                                     </div>
-                                </div>                        
 
-                                <div class="row mt-3 mb-3">
                                     <div class="col-sm-12">
                                         <label for="facade_image_update"    class="form-label">Image Facade</label>
                                         <input type="file"                  class="form-control"    id="facade_image_update"                            accept="image/*"    @change="facadeImage()"                                              :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
@@ -416,9 +416,7 @@
                                             />
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="row mt-3 mb-3">
                                     <div v-if="client.OpenCustomer  === 'Ouvert'" class="col-sm-12">
                                         <label for="in_store_image_update"  class="form-label">Image In-Store</label>
                                         <input type="file"                  class="form-control"    id="in_store_image_update"             accept="image/*"    @change="inStoreImage()"                                             :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
@@ -569,14 +567,7 @@ export default {
                 owner_name                              :   ''
             },
 
-            users                           :   []      ,
-            willayas                        :   []      ,
             cites                           :   []      ,
-
-            // 
-            liste_journey_plan              :   []      ,
-            liste_journee                   :   []      ,
-            liste_type_client               :   []      ,
 
             //
 
@@ -590,6 +581,11 @@ export default {
 
             //
 
+            willayas                        :   []      ,
+            users                           :   []      ,
+
+            //
+
             check_gps_clicked               :   false   ,
             show_modal_client_update_map    :   null    ,
             position_marker                 :   null    ,
@@ -597,7 +593,7 @@ export default {
         }
     },
 
-    props : ["id_route_import", "update_type", "id_route_import_tempo", "mode", "validation_type"],
+    props : ["id_route_import", "update_type", "id_route_import_tempo", "mode", "validation_type", "route_import_willayas", "route_import_users"],
 
     mounted() {
 
@@ -705,9 +701,6 @@ export default {
 
                 if(res.status===200){
 
-                    // Close Modal
-                    await this.$hideModal("ModalClientUpdate")
-
                     // Send Feedback
                     this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
@@ -716,13 +709,18 @@ export default {
 
                     // Validation
                     if(this.update_type ==  "validation") {
-                        this.emitter.emit("updateDoubles"+this.validation_type    , this.client)
+                        this.emitter.emit("updateDoubles"+this.validation_type    , res.data.client)
                     }
 
                     // Update Data
                     else {
-                        this.emitter.emit('reSetUpdate' , res.data.client)
+                        if(this.update_type ==  "normal_update") {
+                            this.emitter.emit('reSetUpdate' , res.data.client)
+                        }
                     }
+
+                    // Close Modal
+                    await this.$hideModal("ModalClientUpdate")
                 }
                 
                 else{
@@ -740,12 +738,8 @@ export default {
                 if(this.mode    ==  "temporary") {
 
                     const res                   =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.id_route_import_tempo+"/clients_tempo/"+this.client.id+"/update",   formData)
-                    console.log(res)
 
                     if(res.status===200){
-
-                        // Close Modal
-                        await this.$hideModal("ModalClientUpdate")
 
                         // Send Feedback
                         this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
@@ -756,13 +750,11 @@ export default {
                         // Validation
                         if(this.update_type ==  "validation") {
 
-                            console.log(this.update_type)
-                            console.log(this.id_route_import_tempo)
-                            console.log(this.client.id)
-                            console.log("updateDoubles"+this.validation_type+"Map")
-
-                            this.emitter.emit("updateDoubles"+this.validation_type+"Map"    , this.client)
+                            this.emitter.emit("updateDoubles"+this.validation_type    , res.data.client)
                         }
+
+                        // Close Modal
+                        await this.$hideModal("ModalClientUpdate")
                     }
                     
                     else{
@@ -787,9 +779,6 @@ export default {
 
                 if(res.status===200){
 
-                    // Close Modal
-                    await this.$hideModal("ModalClientUpdate")
-
                     // Send Feedback
                     this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
@@ -798,13 +787,16 @@ export default {
 
                     // Validation
                     if(this.update_type ==  "validation") {
-                        this.emitter.emit("deleteDoubles"+this.validation_type+"Map"   , this.client)
+                        this.emitter.emit("deleteDoubles"+this.validation_type   , this.client)
                     }
 
                     // Update Data
                     else {
                         this.emitter.emit('reSetDelete' , this.client)
                     }
+
+                    // Close Modal
+                    await this.$hideModal("ModalClientUpdate")
                 }
                 
                 else{
@@ -825,9 +817,6 @@ export default {
 
                     if(res.status===200){
 
-                        // Close Modal
-                        await this.$hideModal("ModalClientUpdate")
-
                         // Send Feedback
                         this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
@@ -836,13 +825,16 @@ export default {
 
                         // Validation
                         if(this.update_type ==  "validation") {
-                            this.emitter.emit("deleteDoubles"+this.validation_type+"Map"   , this.client)
+                            this.emitter.emit("deleteDoubles"+this.validation_type   , this.client)
                         }
 
                         // Update Data
                         else {
                             this.emitter.emit('reSetDelete' , this.client)
                         }
+
+                        // Close Modal
+                        await this.$hideModal("ModalClientUpdate")
                     }
                     
                     else{
@@ -1019,10 +1011,6 @@ export default {
                 this.willayas                                       =   []  ,
                 this.cites                                          =   []  ,
 
-                this.liste_journey_plan                             =   []  ,
-                this.liste_journee                                  =   []  ,
-                this.liste_type_client                              =   []  ,
-
                 this.all_clients                                    =   []  ,
                 this.close_clients                                  =   []
             });
@@ -1030,21 +1018,15 @@ export default {
 
         async getData(client, all_clients) {
 
-            console.log(this.validation_type)
-
             //
             if(this.update_type ==  "validation") {
                 if(this.mode ==  "permanent") {
                     const res           =   await this.$callApi("post", "/route_import/"+this.id_route_import+"/clients", null)
-                    console.log(res)
-
                     this.all_clients    =   res.data.clients   
                 }
 
                 if(this.mode ==  "temporary") {
                     const res           =   await this.$callApi("post", "/route_import_tempo/"+this.id_route_import_tempo+"/clients_tempo", null)
-                    console.log(res)
-
                     this.all_clients    =   res.data   
                 }
             }
@@ -1147,8 +1129,26 @@ export default {
 
         async getComboData() {
 
-            const res_2     =   await this.$callApi("post"  ,   "/rtm_willayas"     ,   null)
-            this.willayas   =   res_2.data
+            if(typeof this.route_import_willayas    ==  "undefined") {
+
+                const res_2     =   await this.$callApi("post"  ,   "/rtm_willayas"     ,   null)
+                this.willayas   =   res_2.data
+            }
+        },
+
+        async getUsers() {
+
+            if(typeof this.route_import_users   ==  "undefined") {
+
+                // Show Loading Page
+                this.$showLoadingPage()
+
+                const res_1     =   await this.$callApi("post"  ,   "/users/combo"   ,   null)
+                this.users      =   res_1.data
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+            }
         },
 
         async getCites() {
@@ -1160,18 +1160,6 @@ export default {
             this.cites      =   res_3.data
 
             this.client.CityNo      =   ""
-
-            // Hide Loading Page
-            this.$hideLoadingPage()
-        },
-
-        async getUsers() {
-
-            // Show Loading Page
-            this.$showLoadingPage()
-
-            const res_1     =   await this.$callApi("post"  ,   "/users/combo"   ,   null)
-            this.users      =   res_1.data
 
             // Hide Loading Page
             this.$hideLoadingPage()
@@ -1284,8 +1272,6 @@ export default {
             this.close_clients  =   []
 
             let distance        =   0
-
-            console.log(this.all_clients)
 
             for (let i = 0; i < this.all_clients.length; i++) {
 

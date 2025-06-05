@@ -36,10 +36,11 @@ class RouteImportTempo extends Model
         if($last_route_import) {
 
             $last_route_import->clients     =   ClientTempo::index($last_route_import->id);
+            
             $last_route_import->districts   =   RouteImportTempoDistrict::select('RTM_Willaya.DistrictNo', 'RTM_Willaya.DistrictNameE')
                                                     ->join('RTM_Willaya', 'route_import_tempo_districts.DistrictNo', 'RTM_Willaya.DistrictNo')
                                                     ->where('route_import_tempo_districts.id_route_import_tempo', $last_route_import->id)
-                                                    ->orderByRaw('CAST(RTM_Willaya.DistrictNo AS SIGNED INTEGER)')
+                                                    ->orderBy('RTM_Willaya.DistrictNameE')
                                                     ->get();
         }
 
@@ -133,6 +134,4 @@ class RouteImportTempo extends Model
         //  Clients
         ClientTempo::storeClients($request, $id);
     }
-
-    //
 }

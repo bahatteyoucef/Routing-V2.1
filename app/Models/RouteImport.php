@@ -94,9 +94,9 @@ class RouteImport extends Model
     {
 
         $validator = Validator::make($request->all(), [
+            'id_route_import_tempo'     =>  ["required", "max:255"                  ],
             'libelle'                   =>  ["required", "max:255"                  ],
             'districts'                 =>  ["required"                             ],
-            'data'                      =>  ["required", "json"                     ]
         ]);
 
         //
@@ -387,22 +387,7 @@ class RouteImport extends Model
     {
 
         //  Clients
-
         Client::storeClients($request, $id);
-
-        // 
-
-        // Journey Plan
-
-        // JourneyPlan::storeListeJourneyPlan($request, $id);
-
-        //
-
-        // Journee
-
-        // Journee::storeJournees($request, $id);
-
-        //
     }
 
     public static function deleteData(int $id)

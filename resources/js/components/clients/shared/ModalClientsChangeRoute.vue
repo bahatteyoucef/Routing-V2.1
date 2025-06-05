@@ -306,9 +306,6 @@ export default {
 
             if(res.status===200){
 
-                // Close Modal
-                await this.$hideModal("ModalClientsChangeRoute")
-
                 // 3) Show success toast (awaits timer/dismiss)
                 this.$feedbackSuccess(res.data.header, res.data.message);
 
@@ -317,6 +314,9 @@ export default {
 
                 // Send Client
                 this.emitter.emit('reSetChangeRoute' , clients_copy)
+
+                // Close Modal
+                await this.$hideModal("ModalClientsChangeRoute")
             }
             
             else{
@@ -345,9 +345,6 @@ export default {
 
             if(res.status===200){
 
-                // Close Modal
-                await this.$hideModal("ModalClientsChangeRoute")
-
                 // Send Feedback
                 this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
@@ -359,6 +356,9 @@ export default {
 
                 // Send Client
                 this.emitter.emit('reSetChangeRouteDelete' , clients_copy)
+
+                // Close Modal
+                await this.$hideModal("ModalClientsChangeRoute")
             }
             
             else{

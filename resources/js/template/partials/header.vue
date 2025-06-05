@@ -177,6 +177,7 @@ export default {
 
         this.emitter.on('reSetRouteImport'          , async ()    =>  {
 
+          this.route_import_existe  = false
           await this.fetchMaps()
         })
 

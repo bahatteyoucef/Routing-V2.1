@@ -133,15 +133,14 @@ export default {
 
                 if(res.status===200){
 
-                    // Close Modal
-                    await this.$hideModal("updateJourneyPlanModal")
-
                     // Hide Loading Page
                     this.$hideLoadingPage()
 
                     // Send Client
                     this.emitter.emit('reSetJPlanBDTerritory')
 
+                    // Close Modal
+                    await this.$hideModal("updateJourneyPlanModal")
                 }
                 
                 else{
@@ -160,14 +159,14 @@ export default {
 
                 if(res.status===200){
 
-                    // Close Modal
-                    await this.$hideModal("updateJourneyPlanModal")
-
                     // Hide Loading Page
                     this.$hideLoadingPage()
 
                     // Send Client
                     this.emitter.emit('reSetJourneeBDTerritory')
+
+                    // Close Modal
+                    await this.$hideModal("updateJourneyPlanModal")
                 }
                 
                 else{
@@ -186,14 +185,14 @@ export default {
 
                 if(res.status===200){
 
-                    // Close Modal
-                    await this.$hideModal("updateJourneyPlanModal")
-
                     // Hide Loading Page
                     this.$hideLoadingPage()
 
                     // Send Client
                     this.emitter.emit('reSetUserBDTerritory')
+
+                    // Close Modal
+                    await this.$hideModal("updateJourneyPlanModal")
                 }
                 
                 else{
@@ -226,14 +225,14 @@ export default {
 
                 if(res.status===200){
 
-                    // Close Modal
-                    await this.$hideModal("updateJourneyPlanModal")
-
                     // Hide Loading Page
                     this.$hideLoadingPage()
 
                     // Send Client
                     this.emitter.emit('reSetJPlanBDTerritory')
+
+                    // Close Modal
+                    await this.$hideModal("updateJourneyPlanModal")
                 }
                 
                 else{
@@ -252,14 +251,14 @@ export default {
 
                 if(res.status===200){
 
-                    // Close Modal
-                    await this.$hideModal("updateJourneyPlanModal")
-
                     // Hide Loading Page
                     this.$hideLoadingPage()
 
                     // Send Client
                     this.emitter.emit('reSetJourneeBDTerritory')
+
+                    // Close Modal
+                    await this.$hideModal("updateJourneyPlanModal")
                 }
                 
                 else{
@@ -278,14 +277,14 @@ export default {
 
                 if(res.status===200){
 
-                    // Close Modal
-                    await this.$hideModal("updateJourneyPlanModal")
-
                     // Hide Loading Page
                     this.$hideLoadingPage()
 
                     // Send Client
                     this.emitter.emit('reSetUserBDTerritory')
+
+                    // Close Modal
+                    await this.$hideModal("updateJourneyPlanModal")
                 }
                 
                 else{

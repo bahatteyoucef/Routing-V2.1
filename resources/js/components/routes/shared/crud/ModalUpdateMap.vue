@@ -74,9 +74,6 @@ export default {
 
             if(res.status===200){
 
-                // Close Modal
-                await this.$hideModal("modalUpdateMap")
-
                 // Send Feedback
                 this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
@@ -85,6 +82,9 @@ export default {
 
                 // Pass Clients to Map
                 this.emitter.emit('reSetClientsUpdateMap'   ,   res.data.clients)
+
+                // Close Modal
+                await this.$hideModal("modalUpdateMap")
 			}
             
             else{
@@ -146,7 +146,7 @@ export default {
 
                             if(this.rdy_send) {
 
-                                this.setLatitudeLongitudeStandard()
+                                this.setGPSStandard()
                                 this.setNecessaryAttributs()
                                 // this.setCustomerNo()
                             }
@@ -275,7 +275,7 @@ export default {
             }
         },
 
-        setLatitudeLongitudeStandard() {
+        setGPSStandard() {
 
             for (let i = 0; i < this.clients.length; i++) {
 

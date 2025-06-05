@@ -225,7 +225,7 @@
     <!--                  -->
 
     <!-- Modal Update     -->
-    <ModalClientUpdate    ref="ModalClientUpdate"         ></ModalClientUpdate>
+    <ModalClientUpdate    ref="ModalClientUpdate"   :id_route_import="route_link"     :update_type="'normal_update'"      :mode="'permanent'"></ModalClientUpdate>
     <!--                  -->
 
   </div>
@@ -1631,66 +1631,66 @@ export default {
         }
 
         //
-        for (let i = 0; i < this.getDoublant.getDoublantLatitudeLongitude.length; i++) {
+        for (let i = 0; i < this.getDoublant.getDoublantGPS.length; i++) {
             
-            if(this.getDoublant.getDoublantLatitudeLongitude[i].id  ==  client.id) {
+            if(this.getDoublant.getDoublantGPS[i].id  ==  client.id) {
 
                 // Update Client
-                this.getDoublant.getDoublantLatitudeLongitude[i].NewCustomer                             =   client.NewCustomer
-                this.getDoublant.getDoublantLatitudeLongitude[i].OpenCustomer                            =   client.OpenCustomer
-                this.getDoublant.getDoublantLatitudeLongitude[i].CustomerIdentifier                      =   client.CustomerIdentifier
-                this.getDoublant.getDoublantLatitudeLongitude[i].CustomerCode                            =   client.CustomerCode
+                this.getDoublant.getDoublantGPS[i].NewCustomer                             =   client.NewCustomer
+                this.getDoublant.getDoublantGPS[i].OpenCustomer                            =   client.OpenCustomer
+                this.getDoublant.getDoublantGPS[i].CustomerIdentifier                      =   client.CustomerIdentifier
+                this.getDoublant.getDoublantGPS[i].CustomerCode                            =   client.CustomerCode
 
-                this.getDoublant.getDoublantLatitudeLongitude[i].CustomerNameE                           =   client.CustomerNameE
-                this.getDoublant.getDoublantLatitudeLongitude[i].CustomerNameA                           =   client.CustomerNameA
+                this.getDoublant.getDoublantGPS[i].CustomerNameE                           =   client.CustomerNameE
+                this.getDoublant.getDoublantGPS[i].CustomerNameA                           =   client.CustomerNameA
 
-                this.getDoublant.getDoublantLatitudeLongitude[i].Tel                                     =   client.Tel
-                this.getDoublant.getDoublantLatitudeLongitude[i].tel_status                              =   client.tel_status
-                this.getDoublant.getDoublantLatitudeLongitude[i].tel_comment                             =   client.tel_comment
+                this.getDoublant.getDoublantGPS[i].Tel                                     =   client.Tel
+                this.getDoublant.getDoublantGPS[i].tel_status                              =   client.tel_status
+                this.getDoublant.getDoublantGPS[i].tel_comment                             =   client.tel_comment
 
-                this.getDoublant.getDoublantLatitudeLongitude[i].Latitude                                =   client.Latitude         
-                this.getDoublant.getDoublantLatitudeLongitude[i].Longitude                               =   client.Longitude        
+                this.getDoublant.getDoublantGPS[i].Latitude                                =   client.Latitude         
+                this.getDoublant.getDoublantGPS[i].Longitude                               =   client.Longitude        
 
-                this.getDoublant.getDoublantLatitudeLongitude[i].Address                                 =   client.Address
-                this.getDoublant.getDoublantLatitudeLongitude[i].Neighborhood                            =   client.Neighborhood
-                this.getDoublant.getDoublantLatitudeLongitude[i].Landmark                                =   client.Landmark
+                this.getDoublant.getDoublantGPS[i].Address                                 =   client.Address
+                this.getDoublant.getDoublantGPS[i].Neighborhood                            =   client.Neighborhood
+                this.getDoublant.getDoublantGPS[i].Landmark                                =   client.Landmark
 
-                this.getDoublant.getDoublantLatitudeLongitude[i].DistrictNo                              =   client.DistrictNo      
-                this.getDoublant.getDoublantLatitudeLongitude[i].DistrictNameE                           =   client.DistrictNameE  
+                this.getDoublant.getDoublantGPS[i].DistrictNo                              =   client.DistrictNo      
+                this.getDoublant.getDoublantGPS[i].DistrictNameE                           =   client.DistrictNameE  
 
-                this.getDoublant.getDoublantLatitudeLongitude[i].CityNo                                  =   client.CityNo           
-                this.getDoublant.getDoublantLatitudeLongitude[i].CityNameE                               =   client.CityNameE       
+                this.getDoublant.getDoublantGPS[i].CityNo                                  =   client.CityNo           
+                this.getDoublant.getDoublantGPS[i].CityNameE                               =   client.CityNameE       
 
-                this.getDoublant.getDoublantLatitudeLongitude[i].CustomerType                            =   client.CustomerType     
+                this.getDoublant.getDoublantGPS[i].CustomerType                            =   client.CustomerType     
 
-                this.getDoublant.getDoublantLatitudeLongitude[i].BrandAvailability                       =   client.BrandAvailability       
-                this.getDoublant.getDoublantLatitudeLongitude[i].BrandSourcePurchase                     =   client.BrandSourcePurchase       
+                this.getDoublant.getDoublantGPS[i].BrandAvailability                       =   client.BrandAvailability       
+                this.getDoublant.getDoublantGPS[i].BrandSourcePurchase                     =   client.BrandSourcePurchase       
 
-                this.getDoublant.getDoublantLatitudeLongitude[i].JPlan                                   =   client.JPlan            
-                this.getDoublant.getDoublantLatitudeLongitude[i].Journee                                 =   client.Journee        
+                this.getDoublant.getDoublantGPS[i].JPlan                                   =   client.JPlan            
+                this.getDoublant.getDoublantGPS[i].Journee                                 =   client.Journee        
 
-                this.getDoublant.getDoublantLatitudeLongitude[i].Frequency                               =   client.Frequency        
-                this.getDoublant.getDoublantLatitudeLongitude[i].SuperficieMagasin                       =   client.SuperficieMagasin        
-                this.getDoublant.getDoublantLatitudeLongitude[i].NbrAutomaticCheckouts                   =   client.NbrAutomaticCheckouts        
+                this.getDoublant.getDoublantGPS[i].Frequency                               =   client.Frequency        
+                this.getDoublant.getDoublantGPS[i].SuperficieMagasin                       =   client.SuperficieMagasin        
+                this.getDoublant.getDoublantGPS[i].NbrAutomaticCheckouts                   =   client.NbrAutomaticCheckouts        
 
-                this.getDoublant.getDoublantLatitudeLongitude[i].AvailableBrands                         =   client.AvailableBrands
-                this.getDoublant.getDoublantLatitudeLongitude[i].AvailableBrands_array_formatted         =   client.AvailableBrands_array_formatted      // should be array
-                this.getDoublant.getDoublantLatitudeLongitude[i].AvailableBrands_string_formatted        =   client.AvailableBrands_string_formatted     // should be string
+                this.getDoublant.getDoublantGPS[i].AvailableBrands                         =   client.AvailableBrands
+                this.getDoublant.getDoublantGPS[i].AvailableBrands_array_formatted         =   client.AvailableBrands_array_formatted      // should be array
+                this.getDoublant.getDoublantGPS[i].AvailableBrands_string_formatted        =   client.AvailableBrands_string_formatted     // should be string
 
-                this.getDoublant.getDoublantLatitudeLongitude[i].status                                  =   client.status            
-                this.getDoublant.getDoublantLatitudeLongitude[i].nonvalidated_details                    =   client.nonvalidated_details        
+                this.getDoublant.getDoublantGPS[i].status                                  =   client.status            
+                this.getDoublant.getDoublantGPS[i].nonvalidated_details                    =   client.nonvalidated_details        
 
-                this.getDoublant.getDoublantLatitudeLongitude[i].owner                                   =   client.owner
-                this.getDoublant.getDoublantLatitudeLongitude[i].owner_name                              =   client.owner_name
+                this.getDoublant.getDoublantGPS[i].owner                                   =   client.owner
+                this.getDoublant.getDoublantGPS[i].owner_name                              =   client.owner_name
 
-                this.getDoublant.getDoublantLatitudeLongitude[i].comment                                 =   client.comment        
+                this.getDoublant.getDoublantGPS[i].comment                                 =   client.comment        
 
-                this.getDoublant.getDoublantLatitudeLongitude[i].facade_image                            =   client.facade_image            
-                this.getDoublant.getDoublantLatitudeLongitude[i].in_store_image                          =   client.in_store_image        
-                this.getDoublant.getDoublantLatitudeLongitude[i].facade_image_original_name              =   client.facade_image_original_name            
-                this.getDoublant.getDoublantLatitudeLongitude[i].in_store_image_original_name            =   client.in_store_image_original_name        
-                this.getDoublant.getDoublantLatitudeLongitude[i].CustomerBarCode_image                   =   client.CustomerBarCode_image            
-                this.getDoublant.getDoublantLatitudeLongitude[i].CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name        
+                this.getDoublant.getDoublantGPS[i].facade_image                            =   client.facade_image            
+                this.getDoublant.getDoublantGPS[i].in_store_image                          =   client.in_store_image        
+                this.getDoublant.getDoublantGPS[i].facade_image_original_name              =   client.facade_image_original_name            
+                this.getDoublant.getDoublantGPS[i].in_store_image_original_name            =   client.in_store_image_original_name        
+                this.getDoublant.getDoublantGPS[i].CustomerBarCode_image                   =   client.CustomerBarCode_image            
+                this.getDoublant.getDoublantGPS[i].CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name        
 
                 break
             }
@@ -1744,10 +1744,10 @@ export default {
         }
 
         //
-        idx = this.getDoublant.getDoublantLatitudeLongitude.findIndex(c => c.id === client.id);
+        idx = this.getDoublant.getDoublantGPS.findIndex(c => c.id === client.id);
 
         if (idx !== -1) {
-          this.getDoublant.getDoublantLatitudeLongitude.splice(idx, 1);
+          this.getDoublant.getDoublantGPS.splice(idx, 1);
         }
     }
   },

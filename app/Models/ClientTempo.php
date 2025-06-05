@@ -32,9 +32,9 @@ class ClientTempo extends Model
 
     public static function index(int $id_route_import_tempo) {
 
-        $clients        =   Client::where("id_route_import", $id_route_import_tempo)
-                                ->join('users', 'clients.owner', '=', 'users.id')
-                                ->select('clients.*', 'users.nom as owner_name')
+        $clients        =   ClientTempo::where("id_route_import_tempo", $id_route_import_tempo)
+                                ->join('users', 'clients_tempo.owner', '=', 'users.id')
+                                ->select('clients_tempo.*', 'users.nom as owner_name')
                                 ->get();
 
         //
@@ -407,7 +407,7 @@ class ClientTempo extends Model
         $getDoublant->getDoublantCustomerCode           =   ClientTempo::getDoublesCustomerCodeClients($id_route_import_tempo);
         $getDoublant->getDoublantCustomerNameE          =   ClientTempo::getDoublesCustomerNameEClients($id_route_import_tempo);
         $getDoublant->getDoublantTel                    =   ClientTempo::getDoublesTelClients($id_route_import_tempo);
-        $getDoublant->getDoublantLatitudeLongitude      =   ClientTempo::getDoublesGPSClients($id_route_import_tempo);
+        $getDoublant->getDoublantGPS                    =   ClientTempo::getDoublesGPSClients($id_route_import_tempo);
 
         return $getDoublant;
     }

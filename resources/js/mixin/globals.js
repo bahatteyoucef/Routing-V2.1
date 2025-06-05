@@ -907,7 +907,7 @@ export default {
             }
 
             clients_double.$getDoublantTel                  =   clients_tempo_double_tel
-            clients_double.$getDoublantLatitudeLongitude    =   clients_tempo_double_latitude_longitude
+            clients_double.$getDoublantGPS                  =   clients_tempo_double_latitude_longitude
             clients_double.$getDoublantCustomerNameE        =   clients_tempo_double_customer_namee
             clients_double.$getDoublantCustomerCode         =   clients_tempo_double_customer_code
 

@@ -389,7 +389,7 @@ path.leaflet-interactive.animate {
 
 .map_shrink {
     width           :   85% !important;
-    transition      :   width 0.5s ease-in-out !important;
+    /* transition      :   width 0.5s ease-in-out !important; */
 }
 
 /*  */
