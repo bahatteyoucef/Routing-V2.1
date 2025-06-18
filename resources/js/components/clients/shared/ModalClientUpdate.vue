@@ -269,7 +269,7 @@
                                     <div class="col-sm-6">
                                         <label for="DistrictNo"         class="form-label">Willaya</label>
                                         <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                            <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
+                                            <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNameE}} ({{willaya.DistrictNo}})</option>
                                         </select>
                                     </div>
 
@@ -593,12 +593,12 @@ export default {
         }
     },
 
-    props : ["id_route_import", "update_type", "id_route_import_tempo", "mode", "validation_type", "route_import_willayas", "route_import_users"],
+    props : ["id_route_import", "update_type", "id_route_import_tempo", "mode", "validation_type", "districts_all", "users_all"],
 
     mounted() {
 
         this.clearData("#ModalClientUpdate")
-    },  
+    },
 
     methods : {
 
@@ -1032,7 +1032,9 @@ export default {
             }
 
             else {
-                this.all_clients    =   all_clients
+                if(this.update_type ==  "normal_update") {
+                    this.all_clients    =   all_clients
+                }
             }
 
             //
@@ -1129,8 +1131,11 @@ export default {
 
         async getComboData() {
 
-            if(typeof this.route_import_willayas    ==  "undefined") {
+            if(this.districts_all) {
+                this.willayas   =   this.districts_all  
+            }
 
+            else {
                 const res_2     =   await this.$callApi("post"  ,   "/rtm_willayas"     ,   null)
                 this.willayas   =   res_2.data
             }
@@ -1138,16 +1143,13 @@ export default {
 
         async getUsers() {
 
-            if(typeof this.route_import_users   ==  "undefined") {
+            if(this.users_all) {
+                this.users          =   this.users_all  
+            }
 
-                // Show Loading Page
-                this.$showLoadingPage()
-
-                const res_1     =   await this.$callApi("post"  ,   "/users/combo"   ,   null)
-                this.users      =   res_1.data
-
-                // Hide Loading Page
-                this.$hideLoadingPage()
+            else {
+                const res_1         =   await this.$callApi("post"  ,   "/users/combo"  ,   null)
+                this.users          =   res_1.data
             }
         },
 

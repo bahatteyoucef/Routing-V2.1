@@ -187,7 +187,7 @@ export default {
         async setDatatable() {
 
             // Create DataTable
-            this.datatable_submit_clients   =    this.datatable_submit_clients_instance.$DataTableCreate("submit_clients", this.submit_clients, this.submit_clients_columns, this.setDataTable, null, null, null, () => {}, "Route Import Clients")
+            this.datatable_submit_clients   =    this.datatable_submit_clients_instance.$DataTableCreate("submit_clients", this.submit_clients, this.submit_clients_columns, this.setDataTable, null, null, null, () => {}, "Map Clients")
         }
     }
 }

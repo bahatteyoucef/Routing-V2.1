@@ -45,14 +45,14 @@ export default {
     data() {
         return { 
 
-            rdy_send        :   false   ,
-
             route_import    : {
 
                 file            :   ""  ,
             },
 
-            clients         :   ""   
+            rdy_send        :   false   ,
+
+            clients         :   ""
         }
     },
 
@@ -71,6 +71,7 @@ export default {
             formData.append("file"                      ,   this.route_import.file)
 
             const res   =   await this.$callApi('post'    ,   '/route_import/'+this.id_route_import+'/update' ,   formData)         
+            console.log(res)
 
             if(res.status===200){
 
@@ -84,7 +85,7 @@ export default {
                 this.emitter.emit('reSetClientsUpdateMap'   ,   res.data.clients)
 
                 // Close Modal
-                await this.$hideModal("modalUpdateMap")
+                await this.$hideModal("ModalUpdateMap")
 			}
             
             else{
@@ -142,21 +143,18 @@ export default {
 
                             //
 
-                            this.checkFileFormat()
+                            this.checkFileFormatAndValidateData()
 
                             if(this.rdy_send) {
 
                                 this.setGPSStandard()
                                 this.setNecessaryAttributs()
-                                // this.setCustomerNo()
+
+                                // 
+
+                                this.route_import.new_upload    =   true
+                                this.route_import.sent_tempo    =   false
                             }
-
-                            // 
-
-                            // await this.setDistrictNoCityNo()
-
-                            this.route_import.new_upload    =   true
-                            this.route_import.sent_tempo    =   false
 
                             // Hide Loading Page
                             this.$hideLoadingPage()
@@ -181,99 +179,101 @@ export default {
 
         //
 
-        checkFileFormat() {
+        checkFileFormatAndValidateData() {
 
-            let errors  =   []
+            let warnings    =   []
 
             if(this.clients.length  >   0) {
 
-                let columns =   Object.keys(this.clients[0])
+                let columns         =   Object.keys(this.clients[0])
 
-                let OpenCustomer_existe     =   columns.includes("OpenCustomer")
-                let CustomerCode_existe     =   columns.includes("CustomerCode")
-                let CustomerNameE_existe    =   columns.includes("CustomerNameE")
-                let CustomerNameA_existe    =   columns.includes("CustomerNameA")
-                let Latitude_existe         =   columns.includes("Latitude")
-                let Longitude_existe        =   columns.includes("Longitude")
-                let Address_existe          =   columns.includes("Address")
-                let DistrictNameE_existe    =   columns.includes("DistrictNameE")
-                let CityNameE_existe        =   columns.includes("CityNameE")
-                let Tel_existe              =   columns.includes("Tel")
-                let CustomerType_existe     =   columns.includes("CustomerType")
+                //
+                const requiredCols  =   [
+                    // 'id'                        ,
+                    'start_adding_time'         ,
+                    'adding_duration'           ,
+                    'comment'                   ,
+                    'NewCustomer'               ,
+                    'OpenCustomer'              ,
+                    'CustomerCode'              ,
+                    'CustomerNameE'             ,
+                    'CustomerNameA'             ,
+                    'Latitude'                  ,
+                    'Longitude'                 ,
+                    'Address'                   ,
+                    'Neighborhood'              ,
+                    'Landmark'                  ,
+                    'DistrictNo'                ,
+                    'DistrictNameE'             ,
+                    'CityNo'                    ,
+                    'CityNameE'                 ,
+                    'Tel'                       ,
+                    'tel_comment'               ,
+                    'tel_status'                ,
+                    'CustomerType'              ,
+                    'JPlan'                     ,
+                    'Journee'                   ,
+                    'BrandAvailability'         ,
+                    'BrandSourcePurchase'       ,
+                    'status'                    ,
+                    'nonvalidated_details'      ,
+                    'created_at'                ,
+                    'owner'                     ,
+                    'CustomerIdentifier'        ,
+                    'AvailableBrands'           ,
+                    'Frequency'                 ,
+                    'SuperficieMagasin'         ,
+                    'NbrAutomaticCheckouts'     ,
+                    'comment'
+                ];
 
-                if(!OpenCustomer_existe) {
+                // 2. Build a map of “exists” flags if you still need them later
+                const exists    =   Object.fromEntries(
+                    requiredCols.map(col => [col, columns.includes(col)])
+                );
 
-                    errors.push("Your file doesn't contain the column 'OpenCustomer'")
-                }
+                // 3. Push warnings for anything missing
+                requiredCols.forEach(col => {
+                    if (!exists[col]) {
+                        warnings.push(`Your file doesn't contain the column '${col}'`);
+                    }
+                });
 
-                if(!CustomerCode_existe) {
+                //
 
-                    errors.push("Your file doesn't contain the column 'CustomerCode'")
-                }
+                if(warnings.length    >   0) {
 
-                if(!CustomerNameE_existe) {
-
-                    errors.push("Your file doesn't contain the column 'CustomerNameE'")
-                }
-
-                if(!CustomerNameA_existe) {
-
-                    errors.push("Your file doesn't contain the column 'CustomerNameA'")
-                }
-
-                if(!Latitude_existe) {
-
-                    errors.push("Your file doesn't contain the column 'Latitude'")
-                }
-
-                if(!Longitude_existe) {
-
-                    errors.push("Your file doesn't contain the column 'Longitude'")
-                }
-
-                if(!Address_existe) {
-
-                    errors.push("Your file doesn't contain the column 'Address'")
-                }
-
-                if(!DistrictNameE_existe) {
-
-                    errors.push("Your file doesn't contain the column 'DistrictNameE'")
-                }
-
-                if(!CityNameE_existe) {
-
-                    errors.push("Your file doesn't contain the column 'CityNameE'")
-                }
-
-                if(!Tel_existe) {
-
-                    errors.push("Your file doesn't contain the column 'Tel'")
-                }
-
-                if(!CustomerType_existe) {
-
-                    errors.push("Your file doesn't contain the column 'CustomerType'")
+                    this.$showWarnings("Warning !", warnings)
+                    this.rdy_send   =   true
                 }
 
                 //
 
-                if(errors.length    >   0) {
-
-                    this.$showErrors("Error !", errors)
-                }
-
-                else {
-
-                    this.rdy_send   =   true
-                }
+                this.rdy_send   =   this.validateData()
             }
 
             else {
 
-                this.$showErrors("Error !", "Your file is empty !")
+                this.$feedbackWarning("Warning !", "Your file is empty !")
+                this.rdy_send   =   true
             }
         },
+
+        validateData() {
+
+            for (let index = 0; index < this.clients.length; index++) {
+
+                if(!this.$isValidForFileName(this.clients[index].CustomerCode)) {
+
+                    this.$showErrors("Error !", [this.clients[index].CustomerNameE+" CustomerCode contient des caractères interdits"])
+                    return false;
+                }
+            }
+
+            return true;
+        },
+
+        //
 
         setGPSStandard() {
 
@@ -305,105 +305,67 @@ export default {
 
         setNecessaryAttributs() {
 
-            for (let i = 0; i < this.clients.length; i++) {
+            // 1) List all your default columns in one array:
+            const defaultCols       =   [
+                // 'id'                    ,
+                'start_adding_time'     ,
+                'adding_duration'       ,
+                'NewCustomer'           ,
+                'OpenCustomer'          ,
+                'CustomerCode'          ,
+                'CustomerNameE'         ,
+                'CustomerNameA'         ,
+                'Address'               ,
+                'Neighborhood'          ,
+                'Landmark'              ,
+                'DistrictNo'            ,
+                'DistrictNameE'         ,
+                'CityNo'                ,
+                'CityNameE'             ,
+                'Tel'                   ,
+                'tel_comment'           ,
+                'tel_status'            ,
+                'CustomerType'          ,
+                'JPlan'                 ,
+                'Journee'               ,
+                'BrandAvailability'     ,
+                'BrandSourcePurchase'   ,
+                'status'                ,
+                'nonvalidated_details'  ,
+                'created_at'            ,
+                'owner'                 ,
+                'CustomerIdentifier'    ,
+                'AvailableBrands'       ,
+                'Frequency'             ,
+                'SuperficieMagasin'     ,
+                'NbrAutomaticCheckouts' ,
+                'comment'               ,
 
-                if(!this.clients[i].hasOwnProperty("OpenCustomer")) {
+                'Latitude'              ,
+                'Longitude'             ,
+            ];
 
-                    this.clients[i].OpenCustomer    =   ""
+            // 2) Declare any “special” non‐empty defaults:
+            const specialDefaults   =   {
+                Latitude                :   0,
+                Longitude               :   0
+            };
+
+            // 3) Build your master defaults object in one pass:
+            const defaults          =   defaultCols.reduce((acc, col) => {
+                acc[col]                =   specialDefaults.hasOwnProperty(col) ?   specialDefaults[col]    :   '';
+                return acc;
+            }, {});
+
+            // 4) Fill in missing props on each client:
+            this.clients.forEach(client => {
+                for (const [key, def] of Object.entries(defaults)) {
+                    if (!client.hasOwnProperty(key)) {
+                        client[key] = def;
+                    }
                 }
-
-                if(!this.clients[i].hasOwnProperty("CustomerCode")) {
-
-                    this.clients[i].CustomerCode    =   ""
-                }
-
-                if(!this.clients[i].hasOwnProperty("CustomerNameE")) {
-
-                    this.clients[i].CustomerNameE   =   ""
-                }
-
-                if(!this.clients[i].hasOwnProperty("CustomerNameA")) {
-
-                    this.clients[i].CustomerNameA   =   ""
-                }
-
-                if(!this.clients[i].hasOwnProperty("Address")) {
-
-                    this.clients[i].Address         =   ""
-                }
-
-                if(!this.clients[i].hasOwnProperty("DistrictNo")) {
-
-                    this.clients[i].DistrictNo      =   "UND"
-                }
-
-                if(!this.clients[i].hasOwnProperty("CityNo")) {
-
-                    this.clients[i].CityNo          =   "UND"
-                }
-
-                if(!this.clients[i].hasOwnProperty("Tel")) {
-
-                    this.clients[i].Tel             =   ""
-                }
-
-                if(!this.clients[i].hasOwnProperty("Latitude")) {
-
-                    this.clients[i].Latitude        =   0
-                }
-
-                if(!this.clients[i].hasOwnProperty("Longitude")) {
-
-                    this.clients[i].Longitude       =   0
-                }
-
-                if(!this.clients[i].hasOwnProperty("CustomerType")) {
-
-                    this.clients[i].CustomerType    =   ""
-                }
-
-                if(!this.clients[i].hasOwnProperty("JPlan")) {
-
-                    this.clients[i].JPlan           =   ""
-                }
-
-                if(!this.clients[i].hasOwnProperty("Journee")) {
-
-                    this.clients[i].Journee         =   ""
-                }
-            }
+            });
         },
-
-        setCustomerNo() {
-
-            let count   =   1
-
-            for (let i = 0; i < this.clients.length; i++) {
-
-                this.clients[i].CustomerNo  =   count
-                count                       =   count   +   1
-            }
-        },
-
-        async setDistrictNoCityNo() {
-
-            let formData = new FormData();
-
-            formData.append("clients"       ,   JSON.stringify(this.clients))
-
-            const res   = await this.$callApi('post' ,   '/route_import/set_willayas_cites'    ,   formData)         
-
-            if(res.status===200){
-
-                this.clients    =   res.data
-			}
-            
-            else{
-
-                // Send Errors
-                this.$showErrors("Error !", res.data.errors)
-			}
-        }
     }
 }
 

@@ -161,6 +161,12 @@ class RouteImport extends Model
 
         //  //  //  //  //
 
+        $clients    =   ClientTempo::where("id_route_import_tempo", $request->get("id_route_import_tempo"))->get();
+
+        $request->merge([
+            'clients'   =>  $clients
+        ]);
+
         // Store Data
         RouteImport::storeData($request, $route_import->id);
 
@@ -183,7 +189,6 @@ class RouteImport extends Model
     {
 
         $validator = Validator::make($request->all(), [
-            'data'              =>  ["required", "json"]    ,
             'file'              =>  ["required", "file:xlsx"]
         ]);
 
@@ -207,8 +212,12 @@ class RouteImport extends Model
 
         // 
 
+        $request->merge([
+            'clients'   =>  json_decode($request->get('data'))
+        ]);
+
         // Store Data
-        RouteImport::storeData($request, $id);
+        RouteImport::updateData($request, $id);
     }
 
     public static function showRouteImport(int $id)
@@ -390,6 +399,13 @@ class RouteImport extends Model
         Client::storeClients($request, $id);
     }
 
+    public static function updateData(Request $request, int $id)
+    {
+
+        //  Clients
+        Client::storeClientsUpdateRouteImport($request, $id);
+    }
+
     public static function deleteData(int $id)
     {
 
@@ -481,10 +497,10 @@ class RouteImport extends Model
 
         $route_import           =   RouteImport::find($id);
 
-        $route_import->data     =   Client::where("id_route_import", $id)->join('users', 'clients.owner', '=', 'users.id')->select('clients.*', 'users.nom as owner_name')->get();   
+        $route_import->clients     =   Client::where("id_route_import", $id)->join('users', 'clients.owner', '=', 'users.id')->select('clients.*', 'users.nom as owner_name')->get();   
 
         //
-        foreach ($route_import->data as $client) {
+        foreach ($route_import->clients as $client) {
 
             $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
             $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array

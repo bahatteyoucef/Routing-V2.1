@@ -42,17 +42,7 @@ class Client extends Model
 
     public static function storeClients(Request $request, int $id_route_import) {
 
-        //
-        $start_adding_date      =   Carbon::now();
-        $finish_adding_date     =   Carbon::now();
-
-        $adding_duration        =   $start_adding_date->diff($finish_adding_date);
-
-        $start_adding_time      =   $start_adding_date->format('H:i:s');
-        $adding_duration        =   $adding_duration->format('%H:%I:%S');
-        //
-
-        $clients                =   ClientTempo::where("id_route_import_tempo", $request->get("id_route_import_tempo"))->get();;
+        $clients                =   $request->get('clients');
 
         foreach ($clients as $client_elem) {
 
@@ -96,8 +86,8 @@ class Client extends Model
 
                 'AvailableBrands'           =>  $client_elem->AvailableBrands                           ?? ''               ,
 
-                'start_adding_time'         =>  $start_adding_time                                      ?? ''               ,
-                'adding_duration'           =>  $adding_duration                                        ?? ''               ,
+                'start_adding_time'         =>  $client_elem->start_adding_time                         ?? ''               ,
+                'adding_duration'           =>  $client_elem->adding_duration                           ?? ''               ,
 
                 'JPlan'                     =>  $client_elem->JPlan                                     ?? ''               ,
                 'Journee'                   =>  $client_elem->Journee                                   ?? ''               ,
@@ -109,6 +99,94 @@ class Client extends Model
                 'id_route_import'           =>  $id_route_import                                        ?? ''               ,
 
                 'owner'                     =>  $client_elem->owner                                     ?? ''               
+            ]);
+
+            //
+            $client->save();
+        }
+    }
+
+    public static function storeClientsUpdateRouteImport(Request $request, int $id_route_import) {
+
+        $clients                =   $request->get('clients');
+
+        foreach ($clients as $client_elem) {
+
+            if(isset($client_elem->owner)) {
+                $user   =   User::where('nom', $client_elem->owner)->first();
+            }
+
+            //
+            if(!isset($user)) {
+                $user   =   Auth::user();
+            }
+
+            //  //  //  //  //
+
+            //
+            if (preg_match('/[\/\\\\:*?"<>|& ]/', $client_elem->CustomerCode)) {
+                throw new Exception("Le champ CustomerCode contient des caractères interdits : ".$client_elem->CustomerCode);
+            }
+
+            //  //  //  //  //
+
+            $brands     =   array_map('trim', explode(',', $client_elem->AvailableBrands)); // Split and trim whitespace
+
+            $result     =   [];
+
+            foreach ($brands as $index => $value) {
+                $result["brand_$index"] = $value;
+            }
+
+            $AvailableBrands    =   json_encode($result, JSON_UNESCAPED_UNICODE);
+
+            //  //  //  //  //
+
+            // Client
+            $client         =   new Client([
+                'NewCustomer'               =>  $client_elem->NewCustomer                               ?? ''               ,
+                'CustomerIdentifier'        =>  $client_elem->CustomerIdentifier                        ?? ''               ,
+                'CustomerCode'              =>  $client_elem->CustomerCode                              ?? ''               ,
+                'OpenCustomer'              =>  $client_elem->OpenCustomer                              ?? ''               ,
+                'CustomerNameE'             =>  mb_strtoupper($client_elem->CustomerNameE, 'UTF-8')     ?? ''               ,
+                'CustomerNameA'             =>  mb_strtoupper($client_elem->CustomerNameA, 'UTF-8')     ?? ''               ,
+                'Latitude'                  =>  $client_elem->Latitude                                  ?? 0                ,
+                'Longitude'                 =>  $client_elem->Longitude                                 ?? 0                ,
+                'Address'                   =>  $client_elem->Address                                   ?? ''               ,
+                'DistrictNo'                =>  $client_elem->DistrictNo                                ?? ''               ,
+                'DistrictNameE'             =>  $client_elem->DistrictNameE                             ?? ''               ,
+                'CityNo'                    =>  $client_elem->CityNo                                    ?? ''               ,
+                'CityNameE'                 =>  $client_elem->CityNameE                                 ?? ''               ,
+                'Tel'                       =>  $client_elem->Tel                                       ?? ''               ,
+                'tel_comment'               =>  $client_elem->tel_comment                               ?? ''               ,
+                'tel_status'                =>  $client_elem->tel_status                                ?? ''               ,
+                'CustomerType'              =>  $client_elem->CustomerType                              ?? ''               ,
+
+                'status'                    =>  $client_elem->status                                    ?? ''               ,
+
+                'Neighborhood'              =>  $client_elem->Neighborhood                              ?? ''               ,
+                'Landmark'                  =>  $client_elem->Landmark                                  ?? ''               ,
+                'BrandAvailability'         =>  $client_elem->BrandAvailability                         ?? ''               ,
+                'BrandSourcePurchase'       =>  $client_elem->BrandSourcePurchase                       ?? ''               ,
+
+                'Frequency'                 =>  $client_elem->Frequency                                 ?? ''               ,
+                'SuperficieMagasin'         =>  $client_elem->SuperficieMagasin                         ?? ''               ,
+                'NbrAutomaticCheckouts'     =>  $client_elem->NbrAutomaticCheckouts                     ?? ''               ,
+                'AvailableBrands'           =>  $AvailableBrands                                        ?? ''               ,
+
+                'start_adding_time'         =>  $client_elem->start_adding_time                         ?? ''               ,
+                'adding_duration'           =>  $client_elem->adding_duration                           ?? ''               ,
+
+                'JPlan'                     =>  $client_elem->JPlan                                     ?? ''               ,
+                'Journee'                   =>  $client_elem->Journee                                   ?? ''               ,
+
+                'comment'                   =>  $client_elem->comment                                   ?? ''               ,
+
+                'created_at'                =>  $client_elem->created_at                                ?? Carbon::now()    ,
+
+                'id_route_import'           =>  $id_route_import                                        ?? ''               ,
+
+                'owner'                     =>  $user->id                                                                   
             ]);
 
             //
@@ -1067,11 +1145,11 @@ class Client extends Model
         return $clients;
     }
 
-    //
+    //  //  //
 
     public static function getDoublesClients(Request $request, int $id_route_import) {
 
-        $getDoublant    =   new stdClass();
+        $getDoublant                                    =   new stdClass();
 
         $getDoublant->getDoublantCustomerCode           =   Client::getDoublesCustomerCodeClients($request, $id_route_import);
         $getDoublant->getDoublantCustomerNameE          =   Client::getDoublesCustomerNameEClients($request, $id_route_import);
@@ -1081,35 +1159,222 @@ class Client extends Model
         return $getDoublant;
     }
 
+    //
+
     public static function getDoublesCustomerCodeClients(Request $request, int $id_route_import) {
 
+        $rows               =   DB::table('clients')
+                                    ->where('id_route_import', $id_route_import)
+                                    ->where('status', 'validated')
+                                    ->get();
+
+        // 2) Parse input dates once
+        $start              =   Carbon::parse($request->get('start_date'));
+        $end                =   Carbon::parse($request->get('end_date'));
+
+        // 3) Filter to the date range
+        $inRange            =   $rows->filter(function ($r) use ($start, $end) {
+                                    $d = Carbon::createFromFormat('d F Y', $r->created_at);
+                                    return $d->between($start, $end);
+                                });
+
+        // 4) Identify which CustomerCodes occur more than once
+        $duplicateCodes     =   $inRange
+                                    ->groupBy('CustomerCode')
+                                    ->filter(function ($group) {
+                                        return $group->count() > 1;
+                                    })
+                                    ->keys()
+                                    ->all(); // array of codes with >1 occurrence
+
+        // 5) Return only the rows whose code is in that list
+        $duplicates         =   $inRange
+                                    ->whereIn('CustomerCode', $duplicateCodes)
+                                    ->values();
+
+        //
+        foreach ($duplicates as $client) {
+
+            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        }
+
+        //
+        return $duplicates;
+    }
+
+    public static function getDoublesCustomerNameEClients(Request $request, int $id_route_import) {
+
+        $rows               =   DB::table('clients')
+                                    ->where('id_route_import', $id_route_import)
+                                    ->where('status', 'validated')
+                                    ->get();
+
+        // 2) Parse input dates once
+        $start              =   Carbon::parse($request->get('start_date'));
+        $end                =   Carbon::parse($request->get('end_date'));
+
+        // 3) Filter to the date range
+        $inRange            =   $rows->filter(function ($r) use ($start, $end) {
+                                    $d = Carbon::createFromFormat('d F Y', $r->created_at);
+                                    return $d->between($start, $end);
+                                });
+
+        // 4) Identify which CustomerNameEs occur more than once
+        $duplicateCodes     =   $inRange
+                                    ->groupBy('CustomerNameE')
+                                    ->filter(function ($group) {
+                                        return $group->count() > 1;
+                                    })
+                                    ->keys()
+                                    ->all(); // array of codes with >1 occurrence
+
+        // 5) Return only the rows whose code is in that list
+        $duplicates         =   $inRange
+                                    ->whereIn('CustomerNameE', $duplicateCodes)
+                                    ->values();
+
+        //
+        foreach ($duplicates as $client) {
+
+            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        }
+
+        //
+        return $duplicates;
+    }
+
+    public static function getDoublesTelClients(Request $request, int $id_route_import) {
+
+        $rows               =   DB::table('clients')
+                                    ->where('id_route_import', $id_route_import)
+                                    ->where('status', 'validated')
+                                    ->get();
+
+        // 2) Parse input dates once
+        $start              =   Carbon::parse($request->get('start_date'));
+        $end                =   Carbon::parse($request->get('end_date'));
+
+        // 3) Filter to the date range
+        $inRange            =   $rows->filter(function ($r) use ($start, $end) {
+                                    $d = Carbon::createFromFormat('d F Y', $r->created_at);
+                                    return $d->between($start, $end);
+                                });
+
+        // 4) Identify which Tels occur more than once
+        $duplicateCodes     =   $inRange
+                                    ->groupBy('Tel')
+                                    ->filter(function ($group) {
+                                        return $group->count() > 1;
+                                    })
+                                    ->keys()
+                                    ->all(); // array of codes with >1 occurrence
+
+        // 5) Return only the rows whose code is in that list
+        $duplicates         =   $inRange
+                                    ->whereIn('Tel', $duplicateCodes)
+                                    ->values();
+
+        //
+        foreach ($duplicates as $client) {
+
+            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        }
+
+        //
+        return $duplicates;
+    } 
+
+    public static function getDoublesGPSClients(Request $request, int $id_route_import) {
+
+        $rows               =   DB::table('clients')
+                                    ->where('id_route_import', $id_route_import)
+                                    ->where('status', 'validated')
+                                    ->get();
+
+        // 2) Parse input dates once
+        $start              =   Carbon::parse($request->get('start_date'));
+        $end                =   Carbon::parse($request->get('end_date'));
+
+        // 3) Filter to the date range
+        $inRange            =   $rows->filter(function ($r) use ($start, $end) {
+                                    $d = Carbon::createFromFormat('d F Y', $r->created_at);
+                                    return $d->between($start, $end);
+                                });
+
+        // 4) Group by the coordinate pair and keep only groups with >1 member
+        $duplicateGroups    =   $inRange
+                                    ->groupBy(function($r) {
+                                        return $r->Latitude . '|' . $r->Longitude;
+                                    })
+                                    ->filter(function($group) {
+                                        return $group->count() > 1;
+                                    });
+
+        // 5) Flatten those groups back into a single collection of rows
+        $duplicates         =   $duplicateGroups
+                                    ->flatMap(function($group) {
+                                        return $group;
+                                    })
+                                    ->values();
+
+        //
+        foreach ($duplicates as $client) {
+
+            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        }
+
+        //
+        return $duplicates;
+    }
+
+    //
+
+    public static function getDoublesCustomerCodeClients_old(Request $request, int $id_route_import) {
+
         $clients    =   DB::table('clients')
-
                             ->join('users', 'clients.owner', 'users.id')
-
                             ->when(
                                 $request->filled('start_date') && $request->filled('end_date'),
                                 function ($q) use ($request) {
-                                    $q->whereBetween(
-                                        DB::raw('STR_TO_DATE(clients.created_at, "%d %M %Y")'),
-                                        [$request->get("start_date"), $request->get("end_date")]
+                                    // convert both sides to MySQL DATE
+                                    $start = $request->get('start_date'); // '2025-06-04'
+                                    $end   = $request->get('end_date');   // '2025-06-10'
+
+                                    return $q->whereBetween(
+                                        DB::raw("STR_TO_DATE(clients.created_at, '%d %M %Y')"),
+                                        [
+                                            DB::raw("STR_TO_DATE('{$start}', '%Y-%m-%d')"),
+                                            DB::raw("STR_TO_DATE('{$end}',   '%Y-%m-%d')")
+                                        ]
                                     );
                                 }
                             )
 
-                            ->where([['id_route_import', $id_route_import], ['clients.status', 'validated']])
+                            ->where([
+                                ['id_route_import', $id_route_import],
+                                ['clients.status', 'validated']
+                            ])
 
-                            ->whereIn('clients.CustomerCode', function ($query) use ($request, $id_route_import) {
+                            ->whereIn('clients.CustomerCode', function ($query) use ($id_route_import) {
                                 $query->select('CustomerCode')
                                     ->from('clients')
-
-                                    ->where([['id_route_import', $id_route_import], ['clients.status', 'validated']])
+                                    ->where([
+                                        ['id_route_import', $id_route_import],
+                                        ['clients.status', 'validated']
+                                    ])
                                     ->groupBy('CustomerCode')
                                     ->havingRaw('COUNT(*) > 1');
                             })
 
                             ->select('clients.*', 'users.nom as owner_name')
-
                             ->get();
 
         //
@@ -1124,7 +1389,7 @@ class Client extends Model
         return $clients;
     }
 
-    public static function getDoublesCustomerNameEClients(Request $request, int $id_route_import) {
+    public static function getDoublesCustomerNameEClients_old(Request $request, int $id_route_import) {
 
         $clients    =   DB::table('clients')
 
@@ -1167,7 +1432,7 @@ class Client extends Model
         return $clients;
     }
 
-    public static function getDoublesTelClients(Request $request, int $id_route_import) {
+    public static function getDoublesTelClients_old(Request $request, int $id_route_import) {
 
         $clients    =   DB::table('clients')
 
@@ -1209,7 +1474,7 @@ class Client extends Model
         return $clients;
     } 
 
-    public static function getDoublesGPSClients(Request $request, int $id_route_import) {
+    public static function getDoublesGPSClients_old(Request $request, int $id_route_import) {
 
         $clients    =   DB::table('clients')
 

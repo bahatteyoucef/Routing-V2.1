@@ -46,15 +46,15 @@
                 </div>
                 <!--  -->
 
-                <!-- Export Range   -->
+                <!-- Resume         -->
                 <div class="col-sm-2 mt-1">
-                    <button v-if="show_export_data_button"    class="btn primary w-100"   @click="exportData()">Export Data</button>
+                    <button v-if="show_export_data_button"    class="btn primary w-100"   @click="showResume()">Resume</button>
                 </div>
                 <!--  -->
 
-                <!--  -->
+                <!-- Export Range   -->
                 <div class="col-sm-2 mt-1">
-                  <button   v-if="show_validate_data_button"  class="btn primary w-100"  data-bs-toggle="modal" :data-bs-target="'#modalValidateMap'"    @click="getDoubles()">Validate</button>
+                    <button v-if="show_export_data_button"    class="btn primary w-100"   @click="exportData()">Export Data</button>
                 </div>
                 <!--  -->
 
@@ -208,7 +208,7 @@
           <div class="card h-100" v-if="show_data_census_report_content">
             <div class="card-body p-0">                
               <div class="report_div" id="data_census_report">
-                  <DataCensusReport :key="data_census_report_table_data"  :data_census_report_table_data="data_census_report_table_data"></DataCensusReport>
+                  <DataCensusReport ref="DataCensusReport" :key="data_census_report_table_data"  :data_census_report_table_data="data_census_report_table_data"></DataCensusReport>
               </div>
             </div>
           </div>
@@ -220,13 +220,13 @@
     </div>
     <!--                  -->
 
-    <!-- Validate         -->
-    <modalValidateMap     ref="modalValidateMap"    :key="route_link+'_'+start_date+'_'+end_date"   :id_route_import="route_link"></modalValidateMap>
-    <!--                  -->
+    <!-- Modal Decoupe By Journee       -->
+    <ModalResume    ref="ModalResume"   :mode="'permanent'"   ></ModalResume>
+    <!--                                -->
 
-    <!-- Modal Update     -->
-    <ModalClientUpdate    ref="ModalClientUpdate"   :id_route_import="route_link"     :update_type="'normal_update'"      :mode="'permanent'"></ModalClientUpdate>
-    <!--                  -->
+    <!-- Update                         -->
+    <ModalClientUpdate    ref="ModalClientUpdate"   :id_route_import="route_link"     :update_type="update_type"    :mode="mode"    :validation_type="validation_type"></ModalClientUpdate>
+    <!--                                -->
 
   </div>
 
@@ -235,7 +235,6 @@
 <script>
 
 import CardDoublants                      from  "../routes/shared/operations/validations/CardDoublants.vue"
-
 import CardStats                          from  "./parts/CardStats.vue"
 
 import ByCustomerTypeReport               from  "./parts/ByCustomerTypeReport.vue"
@@ -250,7 +249,10 @@ import DataCensusReport                   from  "./parts/DataCensusReport.vue"
 
 //
 
-import modalValidateMap                   from  "../routes/shared/operations/ModalValidateMap.vue"
+import ModalResume                        from  "../routes/shared/operations/ModalResume.vue"
+
+//
+
 import ModalClientUpdate                  from  "../clients/shared/ModalClientUpdate.vue"
 
 //
@@ -349,21 +351,86 @@ export default {
       start_date          :   "",
       end_date            :   "",
 
+      update_type         :   null,
+      mode                :   null,
+      validation_type     :   null,
+
       //
 
-      workbook            :   null
+      users_all           :   [],
+      districts_all       :   [],
+
+      //
+
+      workbook            :   null,
     }
   },
 
   async mounted() {
 
-    this.emitter.on("reSetUpdate"  , async (client)    =>  {
+    this.emitter.on("reSetValidationClientUpdate" , (validation_type) =>  {
+      this.update_type        =   'validation'
+      this.mode               =   'permanent'
+      this.validation_type    =   validation_type
+    })
+
+    this.emitter.on("reSetNormalClientUpdate"     , ()                =>  {
+      this.update_type        =   'normal_update'
+      this.mode               =   'permanent'
+      this.validation_type    =   null
+    })
+
+    //
+
+    this.emitter.on("reSetUpdate"                 , async (client)    =>  {
       await this.updateClientJSON(client)
     })
 
-    this.emitter.on("reSetDelete", async (client)    =>  {
+    this.emitter.on("updateDoublesCustomerCode"   , async (client)    =>  {
+      await this.updateClientJSONDoublant(client)
+    })
+
+    this.emitter.on("updateDoublesCustomerNameE"  , async (client)    =>  {
+      await this.updateClientJSONDoublant(client)
+    })
+
+    this.emitter.on("updateDoublesTel"            , async (client)    =>  {
+      await this.updateClientJSONDoublant(client)
+    })
+
+    this.emitter.on("updateDoublesGPS"            , async (client)    =>  {
+      await this.updateClientJSONDoublant(client)
+    })
+
+    //
+
+    this.emitter.on("reSetDelete"                 , async (client)    =>  {
       await this.deleteClientJSON(client)
     })
+
+    this.emitter.on("deleteDoublesCustomerCode"   , async (client)    =>  {
+        await this.deleteClientJSONDoublant(client)
+    })
+
+    this.emitter.on("deleteDoublesCustomerNameE"  , async (client)    =>  {
+        await this.deleteClientJSONDoublant(client)
+    })
+
+    this.emitter.on("deleteDoublesTel"            , async (client)    =>  {
+        await this.deleteClientJSONDoublant(client)
+    })
+
+    this.emitter.on("deleteDoublesGPS"            , async (client)    =>  {
+        await this.deleteClientJSONDoublant(client)
+    })
+
+    //
+
+    this.emitter.on('reSetClientsDecoupeByJourneeMap'   , async (clients)   =>  {
+        await this.getData();
+    })
+
+    //
 
     await this.fetchMaps()
   },
@@ -401,7 +468,7 @@ export default {
 
     //
 
-    modalValidateMap              :   modalValidateMap            ,
+    ModalResume                   :   ModalResume                 ,
 
     //
 
@@ -433,7 +500,7 @@ export default {
           this.show_by_brand_availability_report_content      =   false
           // this.show_by_open_customer_report_content           =   false
           this.show_daily_report_content                      =   false
-          this.show_by_tel_validity_report_content        =   false
+          this.show_by_tel_validity_report_content            =   false
           this.show_by_city_report_content                    =   false
           this.show_data_census_report_content                =   false
           this.show_data_map_report_content                   =   false
@@ -472,6 +539,7 @@ export default {
               //
 
               this.getDoublant                                  =   res.data.stats_details.getDoublant
+              console.log(this.getDoublant)
 
               this.show_card_doublants                          =   true
 
@@ -559,7 +627,26 @@ export default {
                   })
               })
           })
+          .catch((err) => {
+            this.show_get_data_button   =   true
+          })
       }
+
+      else {
+        this.$feedbackWarning("Warning !", "Please select a map, start and an end date !")
+      }
+    },
+
+    //
+
+    async showResume() {
+
+      // ShowModal
+      var ModalResume    =   new Modal(document.getElementById("ModalResume"));
+      ModalResume.show();
+
+      //
+      await this.$refs.ModalResume.getClients()
     },
 
     //
@@ -1227,529 +1314,155 @@ export default {
     //  //  //  //  //
     //  //  //  //  //
 
-    async getDoubles() {
-
-        await this.$refs.modalValidateMap.getDoubles()
-    },
-
     async updateClientJSON(client) {
 
-        //      
-        for (let i = 0; i < this.total_clients.length; i++) {
-            
-            if(this.total_clients[i].id  ==  client.id) {
+      // Collections you need to update
+      const collections = [
+        this.total_clients,
+        this.map_report_data.rows,
+        this.data_census_report_table_data.rows,
+        this.getDoublant.getDoublantCustomerCode,
+        this.getDoublant.getDoublantCustomerNameE,
+        this.getDoublant.getDoublantTel,
+        this.getDoublant.getDoublantGPS,
+      ];
 
-                // Update Client
-                this.total_clients[i].NewCustomer                             =   client.NewCustomer
-                this.total_clients[i].OpenCustomer                            =   client.OpenCustomer
-                this.total_clients[i].CustomerIdentifier                      =   client.CustomerIdentifier
-                this.total_clients[i].CustomerCode                            =   client.CustomerCode
+      // List of fields to sync from the incoming client object
+      const fields = [
+        'NewCustomer', 'OpenCustomer', 'CustomerIdentifier', 'CustomerCode',
+        'CustomerNameE', 'CustomerNameA',
+        'Tel', 'tel_status', 'tel_comment',
+        'Latitude', 'Longitude',
+        'Address', 'Neighborhood', 'Landmark',
+        'DistrictNo', 'DistrictNameE',
+        'CityNo', 'CityNameE',
+        'CustomerType',
+        'BrandAvailability', 'BrandSourcePurchase',
+        'JPlan', 'Journee',
+        'Frequency', 'SuperficieMagasin', 'NbrAutomaticCheckouts',
+        'AvailableBrands', 'AvailableBrands_array_formatted', 'AvailableBrands_string_formatted',
+        'status', 'nonvalidated_details',
+        'owner', 
+        // 'owner_name',
+        'comment',
+        'facade_image', 'in_store_image',
+        'facade_image_original_name', 'in_store_image_original_name',
+        'CustomerBarCode_image', 'CustomerBarCode_image_original_name',
+      ];
 
-                this.total_clients[i].CustomerNameE                           =   client.CustomerNameE
-                this.total_clients[i].CustomerNameA                           =   client.CustomerNameA
-
-                this.total_clients[i].Tel                                     =   client.Tel
-                this.total_clients[i].tel_status                              =   client.tel_status
-                this.total_clients[i].tel_comment                             =   client.tel_comment
-
-                this.total_clients[i].Latitude                                =   client.Latitude         
-                this.total_clients[i].Longitude                               =   client.Longitude        
-
-                this.total_clients[i].Address                                 =   client.Address
-                this.total_clients[i].Neighborhood                            =   client.Neighborhood
-                this.total_clients[i].Landmark                                =   client.Landmark
-
-                this.total_clients[i].DistrictNo                              =   client.DistrictNo      
-                this.total_clients[i].DistrictNameE                           =   client.DistrictNameE  
-
-                this.total_clients[i].CityNo                                  =   client.CityNo           
-                this.total_clients[i].CityNameE                               =   client.CityNameE       
-
-                this.total_clients[i].CustomerType                            =   client.CustomerType     
-
-                this.total_clients[i].BrandAvailability                       =   client.BrandAvailability       
-                this.total_clients[i].BrandSourcePurchase                     =   client.BrandSourcePurchase       
-
-                this.total_clients[i].JPlan                                   =   client.JPlan            
-                this.total_clients[i].Journee                                 =   client.Journee        
-
-                this.total_clients[i].Frequency                               =   client.Frequency        
-                this.total_clients[i].SuperficieMagasin                       =   client.SuperficieMagasin        
-                this.total_clients[i].NbrAutomaticCheckouts                   =   client.NbrAutomaticCheckouts        
-
-                this.total_clients[i].AvailableBrands                         =   client.AvailableBrands
-                this.total_clients[i].AvailableBrands_array_formatted         =   client.AvailableBrands_array_formatted      // should be array
-                this.total_clients[i].AvailableBrands_string_formatted        =   client.AvailableBrands_string_formatted     // should be string
-
-                this.total_clients[i].status                                  =   client.status            
-                this.total_clients[i].nonvalidated_details                    =   client.nonvalidated_details        
-
-                this.total_clients[i].owner                                   =   client.owner
-                this.total_clients[i].owner_name                              =   client.owner_name
-
-                this.total_clients[i].comment                                 =   client.comment        
-
-                this.total_clients[i].facade_image                            =   client.facade_image            
-                this.total_clients[i].in_store_image                          =   client.in_store_image        
-                this.total_clients[i].facade_image_original_name              =   client.facade_image_original_name            
-                this.total_clients[i].in_store_image_original_name            =   client.in_store_image_original_name        
-                this.total_clients[i].CustomerBarCode_image                   =   client.CustomerBarCode_image            
-                this.total_clients[i].CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name        
-
-                break
+      for (const collection of collections) {
+        const item = collection.find(c => c.id === client.id);
+        if (item) {
+          // Copy only the listed fields
+          for (const key of fields) {
+            // Only copy if the property exists in client
+            if (client.hasOwnProperty(key)) {
+              item[key] = client[key];
             }
+          }
         }
+      }
 
-        //
-        for (let i = 0; i < this.map_report_data.rows.length; i++) {
-            
-            if(this.map_report_data.rows[i].id  ==  client.id) {
+      //
 
-                // Update Client
-                this.map_report_data.rows[i].NewCustomer                             =   client.NewCustomer
-                this.map_report_data.rows[i].OpenCustomer                            =   client.OpenCustomer
-                this.map_report_data.rows[i].CustomerIdentifier                      =   client.CustomerIdentifier
-                this.map_report_data.rows[i].CustomerCode                            =   client.CustomerCode
-
-                this.map_report_data.rows[i].CustomerNameE                           =   client.CustomerNameE
-                this.map_report_data.rows[i].CustomerNameA                           =   client.CustomerNameA
-
-                this.map_report_data.rows[i].Tel                                     =   client.Tel
-                this.map_report_data.rows[i].tel_status                              =   client.tel_status
-                this.map_report_data.rows[i].tel_comment                             =   client.tel_comment
-
-                this.map_report_data.rows[i].Latitude                                =   client.Latitude         
-                this.map_report_data.rows[i].Longitude                               =   client.Longitude        
-
-                this.map_report_data.rows[i].Address                                 =   client.Address
-                this.map_report_data.rows[i].Neighborhood                            =   client.Neighborhood
-                this.map_report_data.rows[i].Landmark                                =   client.Landmark
-
-                this.map_report_data.rows[i].DistrictNo                              =   client.DistrictNo      
-                this.map_report_data.rows[i].DistrictNameE                           =   client.DistrictNameE  
-
-                this.map_report_data.rows[i].CityNo                                  =   client.CityNo           
-                this.map_report_data.rows[i].CityNameE                               =   client.CityNameE       
-
-                this.map_report_data.rows[i].CustomerType                            =   client.CustomerType     
-
-                this.map_report_data.rows[i].BrandAvailability                       =   client.BrandAvailability       
-                this.map_report_data.rows[i].BrandSourcePurchase                     =   client.BrandSourcePurchase       
-
-                this.map_report_data.rows[i].JPlan                                   =   client.JPlan            
-                this.map_report_data.rows[i].Journee                                 =   client.Journee        
-
-                this.map_report_data.rows[i].Frequency                               =   client.Frequency        
-                this.map_report_data.rows[i].SuperficieMagasin                       =   client.SuperficieMagasin        
-                this.map_report_data.rows[i].NbrAutomaticCheckouts                   =   client.NbrAutomaticCheckouts        
-
-                this.map_report_data.rows[i].AvailableBrands                         =   client.AvailableBrands
-                this.map_report_data.rows[i].AvailableBrands_array_formatted         =   client.AvailableBrands_array_formatted      // should be array
-                this.map_report_data.rows[i].AvailableBrands_string_formatted        =   client.AvailableBrands_string_formatted     // should be string
-
-                this.map_report_data.rows[i].status                                  =   client.status            
-                this.map_report_data.rows[i].nonvalidated_details                    =   client.nonvalidated_details        
-
-                this.map_report_data.rows[i].owner                                   =   client.owner
-                this.map_report_data.rows[i].owner_name                              =   client.owner_name
-
-                this.map_report_data.rows[i].comment                                 =   client.comment        
-
-                this.map_report_data.rows[i].facade_image                            =   client.facade_image            
-                this.map_report_data.rows[i].in_store_image                          =   client.in_store_image        
-                this.map_report_data.rows[i].facade_image_original_name              =   client.facade_image_original_name            
-                this.map_report_data.rows[i].in_store_image_original_name            =   client.in_store_image_original_name        
-                this.map_report_data.rows[i].CustomerBarCode_image                   =   client.CustomerBarCode_image            
-                this.map_report_data.rows[i].CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name        
-
-                break
-            }
-        }
-
-        //
-        for (let i = 0; i < this.data_census_report_table_data.rows.length; i++) {
-            
-            if(this.data_census_report_table_data.rows[i].id  ==  client.id) {
-
-                // Update Client
-                this.data_census_report_table_data.rows[i].NewCustomer                             =   client.NewCustomer
-                this.data_census_report_table_data.rows[i].OpenCustomer                            =   client.OpenCustomer
-                this.data_census_report_table_data.rows[i].CustomerIdentifier                      =   client.CustomerIdentifier
-                this.data_census_report_table_data.rows[i].CustomerCode                            =   client.CustomerCode
-
-                this.data_census_report_table_data.rows[i].CustomerNameE                           =   client.CustomerNameE
-                this.data_census_report_table_data.rows[i].CustomerNameA                           =   client.CustomerNameA
-
-                this.data_census_report_table_data.rows[i].Tel                                     =   client.Tel
-                this.data_census_report_table_data.rows[i].tel_status                              =   client.tel_status
-                this.data_census_report_table_data.rows[i].tel_comment                             =   client.tel_comment
-
-                this.data_census_report_table_data.rows[i].Latitude                                =   client.Latitude         
-                this.data_census_report_table_data.rows[i].Longitude                               =   client.Longitude        
-
-                this.data_census_report_table_data.rows[i].Address                                 =   client.Address
-                this.data_census_report_table_data.rows[i].Neighborhood                            =   client.Neighborhood
-                this.data_census_report_table_data.rows[i].Landmark                                =   client.Landmark
-
-                this.data_census_report_table_data.rows[i].DistrictNo                              =   client.DistrictNo      
-                this.data_census_report_table_data.rows[i].DistrictNameE                           =   client.DistrictNameE  
-
-                this.data_census_report_table_data.rows[i].CityNo                                  =   client.CityNo           
-                this.data_census_report_table_data.rows[i].CityNameE                               =   client.CityNameE       
-
-                this.data_census_report_table_data.rows[i].CustomerType                            =   client.CustomerType     
-
-                this.data_census_report_table_data.rows[i].BrandAvailability                       =   client.BrandAvailability       
-                this.data_census_report_table_data.rows[i].BrandSourcePurchase                     =   client.BrandSourcePurchase       
-
-                this.data_census_report_table_data.rows[i].JPlan                                   =   client.JPlan            
-                this.data_census_report_table_data.rows[i].Journee                                 =   client.Journee        
-
-                this.data_census_report_table_data.rows[i].Frequency                               =   client.Frequency        
-                this.data_census_report_table_data.rows[i].SuperficieMagasin                       =   client.SuperficieMagasin        
-                this.data_census_report_table_data.rows[i].NbrAutomaticCheckouts                   =   client.NbrAutomaticCheckouts        
-
-                this.data_census_report_table_data.rows[i].AvailableBrands                         =   client.AvailableBrands
-                this.data_census_report_table_data.rows[i].AvailableBrands_array_formatted         =   client.AvailableBrands_array_formatted      // should be array
-                this.data_census_report_table_data.rows[i].AvailableBrands_string_formatted        =   client.AvailableBrands_string_formatted     // should be string
-
-                this.data_census_report_table_data.rows[i].status                                  =   client.status            
-                this.data_census_report_table_data.rows[i].nonvalidated_details                    =   client.nonvalidated_details        
-
-                this.data_census_report_table_data.rows[i].owner                                   =   client.owner
-                this.data_census_report_table_data.rows[i].owner_name                              =   client.owner_name
-
-                this.data_census_report_table_data.rows[i].comment                                 =   client.comment        
-
-                this.data_census_report_table_data.rows[i].facade_image                            =   client.facade_image            
-                this.data_census_report_table_data.rows[i].in_store_image                          =   client.in_store_image        
-                this.data_census_report_table_data.rows[i].facade_image_original_name              =   client.facade_image_original_name            
-                this.data_census_report_table_data.rows[i].in_store_image_original_name            =   client.in_store_image_original_name        
-                this.data_census_report_table_data.rows[i].CustomerBarCode_image                   =   client.CustomerBarCode_image            
-                this.data_census_report_table_data.rows[i].CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name        
-
-                break
-            }
-        }
-
-        //
-        for (let i = 0; i < this.getDoublant.getDoublantCustomerCode.length; i++) {
-            
-            if(this.getDoublant.getDoublantCustomerCode[i].id  ==  client.id) {
-
-                // Update Client
-                this.getDoublant.getDoublantCustomerCode[i].NewCustomer                             =   client.NewCustomer
-                this.getDoublant.getDoublantCustomerCode[i].OpenCustomer                            =   client.OpenCustomer
-                this.getDoublant.getDoublantCustomerCode[i].CustomerIdentifier                      =   client.CustomerIdentifier
-                this.getDoublant.getDoublantCustomerCode[i].CustomerCode                            =   client.CustomerCode
-
-                this.getDoublant.getDoublantCustomerCode[i].CustomerNameE                           =   client.CustomerNameE
-                this.getDoublant.getDoublantCustomerCode[i].CustomerNameA                           =   client.CustomerNameA
-
-                this.getDoublant.getDoublantCustomerCode[i].Tel                                     =   client.Tel
-                this.getDoublant.getDoublantCustomerCode[i].tel_status                              =   client.tel_status
-                this.getDoublant.getDoublantCustomerCode[i].tel_comment                             =   client.tel_comment
-
-                this.getDoublant.getDoublantCustomerCode[i].Latitude                                =   client.Latitude         
-                this.getDoublant.getDoublantCustomerCode[i].Longitude                               =   client.Longitude        
-
-                this.getDoublant.getDoublantCustomerCode[i].Address                                 =   client.Address
-                this.getDoublant.getDoublantCustomerCode[i].Neighborhood                            =   client.Neighborhood
-                this.getDoublant.getDoublantCustomerCode[i].Landmark                                =   client.Landmark
-
-                this.getDoublant.getDoublantCustomerCode[i].DistrictNo                              =   client.DistrictNo      
-                this.getDoublant.getDoublantCustomerCode[i].DistrictNameE                           =   client.DistrictNameE  
-
-                this.getDoublant.getDoublantCustomerCode[i].CityNo                                  =   client.CityNo           
-                this.getDoublant.getDoublantCustomerCode[i].CityNameE                               =   client.CityNameE       
-
-                this.getDoublant.getDoublantCustomerCode[i].CustomerType                            =   client.CustomerType     
-
-                this.getDoublant.getDoublantCustomerCode[i].BrandAvailability                       =   client.BrandAvailability       
-                this.getDoublant.getDoublantCustomerCode[i].BrandSourcePurchase                     =   client.BrandSourcePurchase       
-
-                this.getDoublant.getDoublantCustomerCode[i].JPlan                                   =   client.JPlan            
-                this.getDoublant.getDoublantCustomerCode[i].Journee                                 =   client.Journee        
-
-                this.getDoublant.getDoublantCustomerCode[i].Frequency                               =   client.Frequency        
-                this.getDoublant.getDoublantCustomerCode[i].SuperficieMagasin                       =   client.SuperficieMagasin        
-                this.getDoublant.getDoublantCustomerCode[i].NbrAutomaticCheckouts                   =   client.NbrAutomaticCheckouts        
-
-                this.getDoublant.getDoublantCustomerCode[i].AvailableBrands                         =   client.AvailableBrands
-                this.getDoublant.getDoublantCustomerCode[i].AvailableBrands_array_formatted         =   client.AvailableBrands_array_formatted      // should be array
-                this.getDoublant.getDoublantCustomerCode[i].AvailableBrands_string_formatted        =   client.AvailableBrands_string_formatted     // should be string
-
-                this.getDoublant.getDoublantCustomerCode[i].status                                  =   client.status            
-                this.getDoublant.getDoublantCustomerCode[i].nonvalidated_details                    =   client.nonvalidated_details        
-
-                this.getDoublant.getDoublantCustomerCode[i].owner                                   =   client.owner
-                this.getDoublant.getDoublantCustomerCode[i].owner_name                              =   client.owner_name
-
-                this.getDoublant.getDoublantCustomerCode[i].comment                                 =   client.comment        
-
-                this.getDoublant.getDoublantCustomerCode[i].facade_image                            =   client.facade_image            
-                this.getDoublant.getDoublantCustomerCode[i].in_store_image                          =   client.in_store_image        
-                this.getDoublant.getDoublantCustomerCode[i].facade_image_original_name              =   client.facade_image_original_name            
-                this.getDoublant.getDoublantCustomerCode[i].in_store_image_original_name            =   client.in_store_image_original_name        
-                this.getDoublant.getDoublantCustomerCode[i].CustomerBarCode_image                   =   client.CustomerBarCode_image            
-                this.getDoublant.getDoublantCustomerCode[i].CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name        
-
-                break
-            }
-        }
-
-        //
-        for (let i = 0; i < this.getDoublant.getDoublantCustomerNameE.length; i++) {
-            
-            if(this.getDoublant.getDoublantCustomerNameE[i].id  ==  client.id) {
-
-                // Update Client
-                this.getDoublant.getDoublantCustomerNameE[i].NewCustomer                             =   client.NewCustomer
-                this.getDoublant.getDoublantCustomerNameE[i].OpenCustomer                            =   client.OpenCustomer
-                this.getDoublant.getDoublantCustomerNameE[i].CustomerIdentifier                      =   client.CustomerIdentifier
-                this.getDoublant.getDoublantCustomerNameE[i].CustomerCode                            =   client.CustomerCode
-
-                this.getDoublant.getDoublantCustomerNameE[i].CustomerNameE                           =   client.CustomerNameE
-                this.getDoublant.getDoublantCustomerNameE[i].CustomerNameA                           =   client.CustomerNameA
-
-                this.getDoublant.getDoublantCustomerNameE[i].Tel                                     =   client.Tel
-                this.getDoublant.getDoublantCustomerNameE[i].tel_status                              =   client.tel_status
-                this.getDoublant.getDoublantCustomerNameE[i].tel_comment                             =   client.tel_comment
-
-                this.getDoublant.getDoublantCustomerNameE[i].Latitude                                =   client.Latitude         
-                this.getDoublant.getDoublantCustomerNameE[i].Longitude                               =   client.Longitude        
-
-                this.getDoublant.getDoublantCustomerNameE[i].Address                                 =   client.Address
-                this.getDoublant.getDoublantCustomerNameE[i].Neighborhood                            =   client.Neighborhood
-                this.getDoublant.getDoublantCustomerNameE[i].Landmark                                =   client.Landmark
-
-                this.getDoublant.getDoublantCustomerNameE[i].DistrictNo                              =   client.DistrictNo      
-                this.getDoublant.getDoublantCustomerNameE[i].DistrictNameE                           =   client.DistrictNameE  
-
-                this.getDoublant.getDoublantCustomerNameE[i].CityNo                                  =   client.CityNo           
-                this.getDoublant.getDoublantCustomerNameE[i].CityNameE                               =   client.CityNameE       
-
-                this.getDoublant.getDoublantCustomerNameE[i].CustomerType                            =   client.CustomerType     
-
-                this.getDoublant.getDoublantCustomerNameE[i].BrandAvailability                       =   client.BrandAvailability       
-                this.getDoublant.getDoublantCustomerNameE[i].BrandSourcePurchase                     =   client.BrandSourcePurchase       
-
-                this.getDoublant.getDoublantCustomerNameE[i].JPlan                                   =   client.JPlan            
-                this.getDoublant.getDoublantCustomerNameE[i].Journee                                 =   client.Journee        
-
-                this.getDoublant.getDoublantCustomerNameE[i].Frequency                               =   client.Frequency        
-                this.getDoublant.getDoublantCustomerNameE[i].SuperficieMagasin                       =   client.SuperficieMagasin        
-                this.getDoublant.getDoublantCustomerNameE[i].NbrAutomaticCheckouts                   =   client.NbrAutomaticCheckouts        
-
-                this.getDoublant.getDoublantCustomerNameE[i].AvailableBrands                         =   client.AvailableBrands
-                this.getDoublant.getDoublantCustomerNameE[i].AvailableBrands_array_formatted         =   client.AvailableBrands_array_formatted      // should be array
-                this.getDoublant.getDoublantCustomerNameE[i].AvailableBrands_string_formatted        =   client.AvailableBrands_string_formatted     // should be string
-
-                this.getDoublant.getDoublantCustomerNameE[i].status                                  =   client.status            
-                this.getDoublant.getDoublantCustomerNameE[i].nonvalidated_details                    =   client.nonvalidated_details        
-
-                this.getDoublant.getDoublantCustomerNameE[i].owner                                   =   client.owner
-                this.getDoublant.getDoublantCustomerNameE[i].owner_name                              =   client.owner_name
-
-                this.getDoublant.getDoublantCustomerNameE[i].comment                                 =   client.comment        
-
-                this.getDoublant.getDoublantCustomerNameE[i].facade_image                            =   client.facade_image            
-                this.getDoublant.getDoublantCustomerNameE[i].in_store_image                          =   client.in_store_image        
-                this.getDoublant.getDoublantCustomerNameE[i].facade_image_original_name              =   client.facade_image_original_name            
-                this.getDoublant.getDoublantCustomerNameE[i].in_store_image_original_name            =   client.in_store_image_original_name        
-                this.getDoublant.getDoublantCustomerNameE[i].CustomerBarCode_image                   =   client.CustomerBarCode_image            
-                this.getDoublant.getDoublantCustomerNameE[i].CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name        
-
-                break
-            }
-        }
-
-        //
-        for (let i = 0; i < this.getDoublant.getDoublantTel.length; i++) {
-            
-            if(this.getDoublant.getDoublantTel[i].id  ==  client.id) {
-
-                // Update Client
-                this.getDoublant.getDoublantTel[i].NewCustomer                             =   client.NewCustomer
-                this.getDoublant.getDoublantTel[i].OpenCustomer                            =   client.OpenCustomer
-                this.getDoublant.getDoublantTel[i].CustomerIdentifier                      =   client.CustomerIdentifier
-                this.getDoublant.getDoublantTel[i].CustomerCode                            =   client.CustomerCode
-
-                this.getDoublant.getDoublantTel[i].CustomerNameE                           =   client.CustomerNameE
-                this.getDoublant.getDoublantTel[i].CustomerNameA                           =   client.CustomerNameA
-
-                this.getDoublant.getDoublantTel[i].Tel                                     =   client.Tel
-                this.getDoublant.getDoublantTel[i].tel_status                              =   client.tel_status
-                this.getDoublant.getDoublantTel[i].tel_comment                             =   client.tel_comment
-
-                this.getDoublant.getDoublantTel[i].Latitude                                =   client.Latitude         
-                this.getDoublant.getDoublantTel[i].Longitude                               =   client.Longitude        
-
-                this.getDoublant.getDoublantTel[i].Address                                 =   client.Address
-                this.getDoublant.getDoublantTel[i].Neighborhood                            =   client.Neighborhood
-                this.getDoublant.getDoublantTel[i].Landmark                                =   client.Landmark
-
-                this.getDoublant.getDoublantTel[i].DistrictNo                              =   client.DistrictNo      
-                this.getDoublant.getDoublantTel[i].DistrictNameE                           =   client.DistrictNameE  
-
-                this.getDoublant.getDoublantTel[i].CityNo                                  =   client.CityNo           
-                this.getDoublant.getDoublantTel[i].CityNameE                               =   client.CityNameE       
-
-                this.getDoublant.getDoublantTel[i].CustomerType                            =   client.CustomerType     
-
-                this.getDoublant.getDoublantTel[i].BrandAvailability                       =   client.BrandAvailability       
-                this.getDoublant.getDoublantTel[i].BrandSourcePurchase                     =   client.BrandSourcePurchase       
-
-                this.getDoublant.getDoublantTel[i].JPlan                                   =   client.JPlan            
-                this.getDoublant.getDoublantTel[i].Journee                                 =   client.Journee        
-
-                this.getDoublant.getDoublantTel[i].Frequency                               =   client.Frequency        
-                this.getDoublant.getDoublantTel[i].SuperficieMagasin                       =   client.SuperficieMagasin        
-                this.getDoublant.getDoublantTel[i].NbrAutomaticCheckouts                   =   client.NbrAutomaticCheckouts        
-
-                this.getDoublant.getDoublantTel[i].AvailableBrands                         =   client.AvailableBrands
-                this.getDoublant.getDoublantTel[i].AvailableBrands_array_formatted         =   client.AvailableBrands_array_formatted      // should be array
-                this.getDoublant.getDoublantTel[i].AvailableBrands_string_formatted        =   client.AvailableBrands_string_formatted     // should be string
-
-                this.getDoublant.getDoublantTel[i].status                                  =   client.status            
-                this.getDoublant.getDoublantTel[i].nonvalidated_details                    =   client.nonvalidated_details        
-
-                this.getDoublant.getDoublantTel[i].owner                                   =   client.owner
-                this.getDoublant.getDoublantTel[i].owner_name                              =   client.owner_name
-
-                this.getDoublant.getDoublantTel[i].comment                                 =   client.comment        
-
-                this.getDoublant.getDoublantTel[i].facade_image                            =   client.facade_image            
-                this.getDoublant.getDoublantTel[i].in_store_image                          =   client.in_store_image        
-                this.getDoublant.getDoublantTel[i].facade_image_original_name              =   client.facade_image_original_name            
-                this.getDoublant.getDoublantTel[i].in_store_image_original_name            =   client.in_store_image_original_name        
-                this.getDoublant.getDoublantTel[i].CustomerBarCode_image                   =   client.CustomerBarCode_image            
-                this.getDoublant.getDoublantTel[i].CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name        
-
-                break
-            }
-        }
-
-        //
-        for (let i = 0; i < this.getDoublant.getDoublantGPS.length; i++) {
-            
-            if(this.getDoublant.getDoublantGPS[i].id  ==  client.id) {
-
-                // Update Client
-                this.getDoublant.getDoublantGPS[i].NewCustomer                             =   client.NewCustomer
-                this.getDoublant.getDoublantGPS[i].OpenCustomer                            =   client.OpenCustomer
-                this.getDoublant.getDoublantGPS[i].CustomerIdentifier                      =   client.CustomerIdentifier
-                this.getDoublant.getDoublantGPS[i].CustomerCode                            =   client.CustomerCode
-
-                this.getDoublant.getDoublantGPS[i].CustomerNameE                           =   client.CustomerNameE
-                this.getDoublant.getDoublantGPS[i].CustomerNameA                           =   client.CustomerNameA
-
-                this.getDoublant.getDoublantGPS[i].Tel                                     =   client.Tel
-                this.getDoublant.getDoublantGPS[i].tel_status                              =   client.tel_status
-                this.getDoublant.getDoublantGPS[i].tel_comment                             =   client.tel_comment
-
-                this.getDoublant.getDoublantGPS[i].Latitude                                =   client.Latitude         
-                this.getDoublant.getDoublantGPS[i].Longitude                               =   client.Longitude        
-
-                this.getDoublant.getDoublantGPS[i].Address                                 =   client.Address
-                this.getDoublant.getDoublantGPS[i].Neighborhood                            =   client.Neighborhood
-                this.getDoublant.getDoublantGPS[i].Landmark                                =   client.Landmark
-
-                this.getDoublant.getDoublantGPS[i].DistrictNo                              =   client.DistrictNo      
-                this.getDoublant.getDoublantGPS[i].DistrictNameE                           =   client.DistrictNameE  
-
-                this.getDoublant.getDoublantGPS[i].CityNo                                  =   client.CityNo           
-                this.getDoublant.getDoublantGPS[i].CityNameE                               =   client.CityNameE       
-
-                this.getDoublant.getDoublantGPS[i].CustomerType                            =   client.CustomerType     
-
-                this.getDoublant.getDoublantGPS[i].BrandAvailability                       =   client.BrandAvailability       
-                this.getDoublant.getDoublantGPS[i].BrandSourcePurchase                     =   client.BrandSourcePurchase       
-
-                this.getDoublant.getDoublantGPS[i].JPlan                                   =   client.JPlan            
-                this.getDoublant.getDoublantGPS[i].Journee                                 =   client.Journee        
-
-                this.getDoublant.getDoublantGPS[i].Frequency                               =   client.Frequency        
-                this.getDoublant.getDoublantGPS[i].SuperficieMagasin                       =   client.SuperficieMagasin        
-                this.getDoublant.getDoublantGPS[i].NbrAutomaticCheckouts                   =   client.NbrAutomaticCheckouts        
-
-                this.getDoublant.getDoublantGPS[i].AvailableBrands                         =   client.AvailableBrands
-                this.getDoublant.getDoublantGPS[i].AvailableBrands_array_formatted         =   client.AvailableBrands_array_formatted      // should be array
-                this.getDoublant.getDoublantGPS[i].AvailableBrands_string_formatted        =   client.AvailableBrands_string_formatted     // should be string
-
-                this.getDoublant.getDoublantGPS[i].status                                  =   client.status            
-                this.getDoublant.getDoublantGPS[i].nonvalidated_details                    =   client.nonvalidated_details        
-
-                this.getDoublant.getDoublantGPS[i].owner                                   =   client.owner
-                this.getDoublant.getDoublantGPS[i].owner_name                              =   client.owner_name
-
-                this.getDoublant.getDoublantGPS[i].comment                                 =   client.comment        
-
-                this.getDoublant.getDoublantGPS[i].facade_image                            =   client.facade_image            
-                this.getDoublant.getDoublantGPS[i].in_store_image                          =   client.in_store_image        
-                this.getDoublant.getDoublantGPS[i].facade_image_original_name              =   client.facade_image_original_name            
-                this.getDoublant.getDoublantGPS[i].in_store_image_original_name            =   client.in_store_image_original_name        
-                this.getDoublant.getDoublantGPS[i].CustomerBarCode_image                   =   client.CustomerBarCode_image            
-                this.getDoublant.getDoublantGPS[i].CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name        
-
-                break
-            }
-        }
+      await this.$refs.DataCensusReport.setDataTable()
     },
+
+    async updateClientJSONDoublant(client) {
+
+      // Collections you need to update
+      const collections = [
+        this.map_report_data.rows,
+        this.data_census_report_table_data.rows,
+      ];
+
+      // List of fields to sync from the incoming client object
+      const fields = [
+        'NewCustomer', 'OpenCustomer', 'CustomerIdentifier', 'CustomerCode',
+        'CustomerNameE', 'CustomerNameA',
+        'Tel', 'tel_status', 'tel_comment',
+        'Latitude', 'Longitude',
+        'Address', 'Neighborhood', 'Landmark',
+        'DistrictNo', 'DistrictNameE',
+        'CityNo', 'CityNameE',
+        'CustomerType',
+        'BrandAvailability', 'BrandSourcePurchase',
+        'JPlan', 'Journee',
+        'Frequency', 'SuperficieMagasin', 'NbrAutomaticCheckouts',
+        'AvailableBrands', 'AvailableBrands_array_formatted', 'AvailableBrands_string_formatted',
+        'status', 'nonvalidated_details',
+        'owner', 
+        // 'owner_name',
+        'comment',
+        'facade_image', 'in_store_image',
+        'facade_image_original_name', 'in_store_image_original_name',
+        'CustomerBarCode_image', 'CustomerBarCode_image_original_name',
+      ];
+
+      for (const collection of collections) {
+        const item = collection.find(c => c.id === client.id);
+        if (item) {
+          // Copy only the listed fields
+          for (const key of fields) {
+            // Only copy if the property exists in client
+            if (client.hasOwnProperty(key)) {
+              item[key] = client[key];
+            }
+          }
+        }
+      }
+
+      //
+
+      await this.$refs.DataCensusReport.setDataTable()
+    },
+
+    //
 
     async deleteClientJSON(client) {
 
-        let idx                               = -1
+      // Collections you need to delete from
+      const collections = [
+        this.total_clients,
+        this.map_report_data.rows,
+        this.data_census_report_table_data.rows,
+        this.getDoublant.getDoublantCustomerCode,
+        this.getDoublant.getDoublantCustomerNameE,
+        this.getDoublant.getDoublantTel,
+        this.getDoublant.getDoublantGPS,
+      ];
 
-        //      
-        idx = this.total_clients.findIndex(c => c.id === client.id);
-
+      for (const collection of collections) {
+        const idx = collection.findIndex(c => c.id === client.id);
         if (idx !== -1) {
-          this.total_clients.splice(idx, 1);
+          collection.splice(idx, 1);
         }
+      }
 
-        //
-        idx = this.map_report_data.rows.findIndex(c => c.id === client.id);
+      //
 
+      await this.$refs.DataCensusReport.setDataTable()
+    },
+
+    async deleteClientJSONDoublant(client) {
+
+      // Collections you need to delete from
+      const collections = [
+        this.map_report_data.rows,
+        this.data_census_report_table_data.rows,
+      ];
+
+      for (const collection of collections) {
+        const idx = collection.findIndex(c => c.id === client.id);
         if (idx !== -1) {
-          this.map_report_data.rows.splice(idx, 1);
+          collection.splice(idx, 1);
         }
+      }
 
-        //
-        idx = this.data_census_report_table_data.rows.findIndex(c => c.id === client.id);
+      //
 
-        if (idx !== -1) {
-          this.data_census_report_table_data.rows.splice(idx, 1);
-        }
-
-        //
-        idx = this.getDoublant.getDoublantCustomerCode.findIndex(c => c.id === client.id);
-
-        if (idx !== -1) {
-          this.getDoublant.getDoublantCustomerCode.splice(idx, 1);
-        }
-
-        //
-        idx = this.getDoublant.getDoublantCustomerNameE.findIndex(c => c.id === client.id);
-
-        if (idx !== -1) {
-          this.getDoublant.getDoublantCustomerNameE.splice(idx, 1);
-        }
-
-        //
-        idx = this.getDoublant.getDoublantTel.findIndex(c => c.id === client.id);
-
-        if (idx !== -1) {
-          this.getDoublant.getDoublantTel.splice(idx, 1);
-        }
-
-        //
-        idx = this.getDoublant.getDoublantGPS.findIndex(c => c.id === client.id);
-
-        if (idx !== -1) {
-          this.getDoublant.getDoublantGPS.splice(idx, 1);
-        }
-    }
+      await this.$refs.DataCensusReport.setDataTable()
+    },
   },
 }
 

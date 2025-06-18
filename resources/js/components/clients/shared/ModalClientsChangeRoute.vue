@@ -33,7 +33,7 @@
                                     <label for="DistrictNo"         class="form-label">DistrictNo (DistrictNo)</label>
                                     <select                         class="form-select"         id="DistrictNo"                 v-model="DistrictNo"    @change="getCites()">
                                         <option value=""></option>
-                                        <option v-for="district in districts"                   :key="district.DistrictNo"      :value="district.DistrictNo">{{district.DistrictNo}}- {{district.DistrictNameE}}</option>
+                                        <option v-for="district in districts"                   :key="district.DistrictNo"      :value="district.DistrictNo">{{district.DistrictNameE}} ({{district.DistrictNo}})</option>
                                     </select>
                                 </div>
                             </div>
@@ -146,9 +146,6 @@
 
 <script>
 
-import { nextTick }                 from "vue";
-import { mapGetters, mapActions }   from "vuex"
-
 import DatatableHelper              from "@/services/DatatableHelper"
 
 export default {
@@ -224,6 +221,8 @@ export default {
         }
     },
 
+    props : ["districts_all", "users_all"],
+
     mounted() {
 
         //
@@ -238,7 +237,7 @@ export default {
         async setDataTable() {
 
             //
-            this.datatable_change_route_clients     =   this.datatable_change_route_clients_instance.$DataTableCreate("change_route_clients", this.all_clients, this.change_route_clients_columns, this.setDataTable, null, null, null, this.selectRow, "Route Import Clients", "checkbox", this.checkRow, this.uncheckRow)
+            this.datatable_change_route_clients     =   this.datatable_change_route_clients_instance.$DataTableCreate("change_route_clients", this.all_clients, this.change_route_clients_columns, this.setDataTable, null, null, null, this.selectRow, "Map Clients", "checkbox", this.checkRow, this.uncheckRow)
         },
 
         selectRow(selected_row, selected_row_id) {
@@ -417,11 +416,25 @@ export default {
 
         async getComboData() {
 
-            const res_1                     =   await this.$callApi("post"  ,   "/users/combo"          ,   null)
-            const res_2                     =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
+            if(this.users_all) {
+                this.users          =   this.users_all  
+            }
 
-            this.users                      =   res_1.data
-            this.districts                  =   res_2.data
+            else {
+                const res_1         =   await this.$callApi("post"  ,   "/users/combo"  ,   null)
+                this.users          =   res_1.data
+            }
+
+            //
+
+            if(this.districts_all) {
+                this.districts      =   this.districts_all  
+            }
+
+            else {
+                const res_2         =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
+                this.districts      =   res_2.data
+            }
         },
 
         async getCites() {

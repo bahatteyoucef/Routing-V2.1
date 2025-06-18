@@ -111,52 +111,52 @@ export default {
 
                 if (target && target.files) {
 
-                    this.route_import.file      =   target.files[0]
+                    if(typeof target.files[0]   !=  "undefined") {
 
-                    if(typeof target.files[0] != "undefined") {
+                        this.route_import.file      =   target.files[0]
 
                         let fileReader              =   new FileReader();
 
-                    fileReader.readAsArrayBuffer(this.route_import.file)
+                        fileReader.readAsArrayBuffer(this.route_import.file)
 
-                    fileReader.onload = async (e) => {
+                        fileReader.onload = async (e) => {
 
-                        let arrayBuffer                         =   fileReader.result
+                            let arrayBuffer                         =   fileReader.result
 
-                        var data                                =   new Uint8Array(arrayBuffer)
-                        var arr                                 =   new Array()
+                            var data                                =   new Uint8Array(arrayBuffer)
+                            var arr                                 =   new Array()
 
-                        for (var i = 0; i != data.length; ++i) {
-                            
-                            arr[i] = String.fromCharCode(data[i])
-                        }
+                            for (var i = 0; i != data.length; ++i) {
+                                
+                                arr[i] = String.fromCharCode(data[i])
+                            }
 
-                        var bstr                    =   arr.join("")
-                        var workbook                =   XLSX.read(bstr, { type: "binary" })
+                            var bstr                    =   arr.join("")
+                            var workbook                =   XLSX.read(bstr, { type: "binary" })
 
-                        var first_sheet_name        =   workbook.SheetNames[0]
-                        var worksheet               =   workbook.Sheets[first_sheet_name]
+                            var first_sheet_name        =   workbook.SheetNames[0]
+                            var worksheet               =   workbook.Sheets[first_sheet_name]
 
-                        this.clients                =   [...XLSX.utils.sheet_to_json(worksheet, { raw: true })]
+                            this.clients                =   [...XLSX.utils.sheet_to_json(worksheet, { raw: true })]
 
-                        //
+                            //
 
-                        this.checkFileFormatAndValidateData()
+                            this.checkFileFormatAndValidateData()
 
-                        if(this.rdy_send) {
+                            if(this.rdy_send) {
 
-                            this.setGPSStandard()
-                            this.setNecessaryAttributs()
+                                this.setGPSStandard()
+                                this.setNecessaryAttributs()
 
-                            // 
+                                // 
 
-                            this.route_import.new_upload    =   true
-                            this.route_import.sent_tempo    =   false
-                        }
+                                this.route_import.new_upload    =   true
+                                this.route_import.sent_tempo    =   false
+                            }
 
-                        // Hide Loading Page
-                        this.$hideLoadingPage()
-                    };   
+                            // Hide Loading Page
+                            this.$hideLoadingPage()
+                        };   
                     }  
 
                     else {
@@ -248,10 +248,6 @@ export default {
                         warnings.push(`Your file doesn't contain the column '${col}'`);
                     }
                 });
-
-                //
-
-                console.log(warnings)
 
                 //
 

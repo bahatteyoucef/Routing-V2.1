@@ -320,8 +320,8 @@ export default {
             });
         },
 
-        getData() {
-            this.getComboData()  
+        async getData() {
+            await this.getComboData()  
         },
 
         async getComboData() {
@@ -346,8 +346,6 @@ export default {
 
                 const res_3         =   await this.$callApi("post"  ,   "/route_import/"+this.user.selected_route_import+"/districts"   ,   null)
                 let districts       =   res_3.data
-
-                console.log(res_3.data)
 
                 this.districts      =   []
 
@@ -380,8 +378,6 @@ export default {
 
             const res_3         =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.user.selected_district+"/rtm_cites"       ,   null)
             let cities          =   res_3.data
-
-            console.log(res_3.data)
 
             for (let i = 0; i < cities.length; i++) {
 

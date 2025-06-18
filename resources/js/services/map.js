@@ -6,6 +6,10 @@ export default class Map {
     
     constructor() {
 
+        //
+        this.left_tools                                     =   false
+        this.right_tools                                    =   false
+
         // Mode
         this.marker_cluster_mode                            =   "cluster"
 
@@ -66,6 +70,10 @@ export default class Map {
     //  //  Create/Destroy Map  //  //
 
     $createMap(role, map_id, left_tools = true, right_tools = true) {
+
+        //
+        this.left_tools     =   left_tools
+        this.right_tools    =   right_tools
 
         //
         this.$destroyMap()
@@ -505,13 +513,6 @@ export default class Map {
             clusterGroup.clearLayers();
         });
 
-        // b) remove each group’s icon from the map
-        // Object.values(this.clusters_icons).forEach(clusterGroup => {
-        //     if (this.map.hasLayer(clusterGroup)) {
-        //         this.map.removeLayer(clusterGroup);
-        //     }
-        // });
-
         //
         Object.values(this.markers).forEach(marker => {
             this.map.removeLayer(marker.marker)
@@ -519,7 +520,6 @@ export default class Map {
 
         // c) reset all caches so next time you start fresh
         this.clusters           =   {};
-        // this.markers_icons = {};
         this.markers            =   {};
         this.markers_lat_lng    =   {}
     }
@@ -538,19 +538,6 @@ export default class Map {
     //  //  (AUTO and JPLAN) Territories Functions  //  //
 
     $showTerritories() {
-
-        if(this.marker_cluster_mode ==  "cluster") {
-
-            this.$showTerritoriesClusterMode()
-        }
-
-        if(this.marker_cluster_mode ==  "marker") {
-
-            this.$showTerritoriesMarkerMode()
-        }
-    }
-
-    $showTerritoriesClusterMode() {
 
         // Hide
         this.$hideTerritores()
@@ -634,7 +621,7 @@ export default class Map {
                 });
 
                 // Create Leaflet polygon
-                var territory       =   L.polygon(expandedPolygonCoords, {color: 'black'}).addTo(this.map);
+                var territory       =   L.polygon(expandedPolygonCoords, {color: 'red'}).addTo(this.map);
 
                 //  //  //
 
@@ -649,121 +636,10 @@ export default class Map {
                 })
 
                 // Add Event Click
-                if(this.left_tools      ==  true) {
+                if(this.right_tools      ==  true) {
 
                     territory.on("click", (event)   => {
 
-                        this.$addTerritory(event)
-                    })
-                }
-            }
-        }
-    }
-
-    $showTerritoriesMarkerMode() {
-
-        // Hide
-        this.$hideTerritores()
-
-        //
-        let markers_lat_lng_by_group = this.markers_lat_lng.reduce((acc, marker) => {
-            const key = marker.group;
-            if (!acc[key]) {
-                acc[key] = [];
-            }
-            acc[key].push(marker);
-            return acc;
-        }, {});
-
-        // Show
-        for (const [key, value] of Object.entries(markers_lat_lng_by_group)) {
-
-            if(markers_lat_lng_by_group[key].length >   0) {
-
-                // Territory Latitude Longitude
-                let territoryLatLngs    =   this.$getTerritoryLatLngs(markers_lat_lng_by_group[key])
-
-                //  //  //
-
-                let hull    =   null
-
-                if (territoryLatLngs.length >= 3) {
-
-                    // Calculate convex hull using Turf.js
-                    var turfPoints  =   territoryLatLngs.map(function(coord) {
-
-                        return turf.point(coord);
-                    });
-
-                    //
-                    hull            =   turf.convex(turf.featureCollection(turfPoints));
-
-                } else if (territoryLatLngs.length === 2) {
-
-                    territoryLatLngs.push([(territoryLatLngs[0][0] + territoryLatLngs[1][0]) / 2, (territoryLatLngs[0][1] + territoryLatLngs[1][1]) / 2])
-
-                    // Calculate convex hull using Turf.js
-                    var turfPoints  =   territoryLatLngs.map(function(coord) {
-
-                        return turf.point(coord);
-                    });
-
-                    //
-                    hull            =   turf.convex(turf.featureCollection(turfPoints));
-
-                } else if (territoryLatLngs.length === 1) {
-
-                    // Calculate convex hull using Turf.js
-                    var turfPoints  =   territoryLatLngs.map(function(coord) {
-
-                        return turf.point(coord);
-                    });
-
-                    // Create a small buffer around the single point to form a polygon
-                    var point       =   turfPoints[0];
-                    var buffer      =   turf.buffer(point, 0.01, { units: 'kilometers' }); // Adjust the buffer size as needed
-                    hull            =   buffer;
-                }
-
-                //  //  //
-
-                // Convert Turf polygon to Leaflet polygon coordinates
-                var polygonCoords   =   hull.geometry.coordinates[0].map(function(coord) {
-    
-                    return [coord[0], coord[1]]; // Swap lat/lng
-                });
-
-                // Create Turf polygon
-                var turfPolygon = turf.polygon([polygonCoords]);
-
-                // Expand the polygon by 1 units (adjust as needed)
-                var expandedPolygon = turf.transformScale(turfPolygon, 1.1);
-
-                // Convert the expanded polygon to Leaflet polygon coordinates
-                var expandedPolygonCoords = expandedPolygon.geometry.coordinates[0].map(function(coord) {
-
-                    return [coord[0], coord[1]]; // Swap lat/lng
-                });
-
-                // Create Leaflet polygon
-                var territory       =   L.polygon(expandedPolygonCoords, { color: 'black' }).addTo(this.map);
-
-                //  //  //
-
-                // Territory
-                this.journey_plan_territories.push(territory)
-
-                this.editable_layers_journey_plan_territory.addLayer(territory)
-
-                // Add Event Edit
-                territory.on("edit", function(event) {
-                    console.log("red layer edited !");
-                })
-
-                // Add Event Click
-                if(this.left_tools      ==  true) {
-
-                    territory.on("click", (event)   => {
                         this.$addTerritory(event)
                     })
                 }

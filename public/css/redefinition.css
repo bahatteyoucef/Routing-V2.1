@@ -281,5 +281,10 @@ select:focus, .form-select:focus {
 /*  */
 
 .navbar.fixed-top+.page-body-wrapper {
-    padding-top: 75px;
+    /* padding-top: 75px; */
+}
+
+.multiselect-tag {
+    /* font-size: 11px !important; */
+    white-space: normal !important;
 }

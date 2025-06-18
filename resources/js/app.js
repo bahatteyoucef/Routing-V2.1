@@ -15,7 +15,7 @@ import IndexedDB        from    './services/indexedDB'
 // Creating the app
 const app           =   createApp(App)
 
-// 
+//
 
 // Event Bus
 
@@ -38,7 +38,7 @@ import jquery           from 'jquery'
 
 window.$            =   window.jQuery   =   jquery
 
-// 
+//
 
 // ToolTip
 

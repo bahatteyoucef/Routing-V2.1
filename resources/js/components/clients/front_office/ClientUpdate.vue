@@ -228,7 +228,7 @@
                         <div>
                             <label for="DistrictNo"         class="form-label fw-bold">Willaya</label>
                             <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()">
-                                <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
+                                <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNameE}} ({{willaya.DistrictNo}})</option>
                             </select>
                         </div>
 

@@ -127,6 +127,9 @@ class ClientTempo extends Model
                 'NbrAutomaticCheckouts'     =>  $client_elem->NbrAutomaticCheckouts                     ?? ''               ,
                 'AvailableBrands'           =>  $AvailableBrands                                        ?? ''               ,
 
+                'start_adding_time'         =>  $client_elem->start_adding_time                         ?? ''               ,
+                'adding_duration'           =>  $client_elem->adding_duration                           ?? ''               ,
+
                 'JPlan'                     =>  $client_elem->JPlan                                     ?? ''               ,
                 'Journee'                   =>  $client_elem->Journee                                   ?? ''               ,
 
@@ -412,18 +415,80 @@ class ClientTempo extends Model
         return $getDoublant;
     }
 
+    public static function getDoublesCustomerCodeClients(int $id_route_import_tempo) {
+
+        // build a subquery that returns only the duplicate Tels
+        $duplicates     =   DB::table('clients_tempo')
+                                ->select('CustomerCode')
+                                ->where('id_route_import_tempo', $id_route_import_tempo)
+                                ->groupBy('CustomerCode')
+                                ->havingRaw('COUNT(*) > 1');
+
+        // join that subquery back to the main table
+        $clients        =   DB::table('clients_tempo as c')
+                                ->joinSub($duplicates, 'd', function($join) {
+                                    $join->on('c.CustomerCode', '=', 'd.CustomerCode');
+                                })
+                                ->where('c.id_route_import_tempo', $id_route_import_tempo)
+                                ->get();
+
+        //
+        foreach ($clients as $client) {
+
+            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        }
+
+        //
+        return $clients;
+    }
+
+    public static function getDoublesCustomerNameEClients(int $id_route_import_tempo) {
+
+        // build a subquery that returns only the duplicate Tels
+        $duplicates     =   DB::table('clients_tempo')
+                                ->select('CustomerNameE')
+                                ->where('id_route_import_tempo', $id_route_import_tempo)
+                                ->groupBy('CustomerNameE')
+                                ->havingRaw('COUNT(*) > 1');
+
+        // join that subquery back to the main table
+        $clients        =   DB::table('clients_tempo as c')
+                                ->joinSub($duplicates, 'd', function($join) {
+                                    $join->on('c.CustomerNameE', '=', 'd.CustomerNameE');
+                                })
+                                ->where('c.id_route_import_tempo', $id_route_import_tempo)
+                                ->get();
+
+        //
+        foreach ($clients as $client) {
+
+            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        }
+
+        //
+        return $clients;
+    }
+
     public static function getDoublesTelClients(int $id_route_import_tempo) {
 
-        $clients    =   DB::table('clients_tempo')
-                            ->where('id_route_import_tempo', $id_route_import_tempo)
-                            ->whereIn('Tel', function ($query) use ($id_route_import_tempo) {
-                                $query->select('Tel')
-                                    ->from('clients_tempo')
-                                    ->where('id_route_import_tempo', $id_route_import_tempo)
-                                    ->groupBy('Tel')
-                                    ->havingRaw('COUNT(*) > 1');
-                            })
-                            ->get();
+        // build a subquery that returns only the duplicate Tels
+        $duplicates     =   DB::table('clients_tempo')
+                                ->select('Tel')
+                                ->where('id_route_import_tempo', $id_route_import_tempo)
+                                ->groupBy('Tel')
+                                ->havingRaw('COUNT(*) > 1');
+
+        // join that subquery back to the main table
+        $clients        =   DB::table('clients_tempo as c')
+                                ->joinSub($duplicates, 'd', function($join) {
+                                    $join->on('c.Tel', '=', 'd.Tel');
+                                })
+                                ->where('c.id_route_import_tempo', $id_route_import_tempo)
+                                ->get();
 
         //
         foreach ($clients as $client) {
@@ -437,7 +502,39 @@ class ClientTempo extends Model
         return $clients;
     } 
 
-    public static function getDoublesCustomerCodeClients(int $id_route_import_tempo) {
+    public static function getDoublesGPSClients(int $id_route_import_tempo) {
+
+        // 1) Build a subquery that returns only the duplicate coordinate pairs
+        $duplicates     =   DB::table('clients_tempo')
+                                ->select('Latitude', 'Longitude')
+                                ->where('id_route_import_tempo', $id_route_import_tempo)
+                                ->groupBy('Latitude', 'Longitude')
+                                ->havingRaw('COUNT(*) > 1');
+
+        // 2) Join that back to get all the full rows for those pairs
+        $clients        =   DB::table('clients_tempo as c')
+                                ->joinSub($duplicates, 'd', function ($join) {
+                                    $join->on('c.Latitude',  '=', 'd.Latitude')
+                                        ->on('c.Longitude', '=', 'd.Longitude');
+                                })
+                                ->where('c.id_route_import_tempo', $id_route_import_tempo)
+                                ->get();
+
+        //
+        foreach ($clients as $client) {
+
+            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        }
+
+        //
+        return $clients;
+    } 
+
+    //
+
+    public static function getDoublesCustomerCodeClients_old(int $id_route_import_tempo) {
 
         $clients    =   DB::table('clients_tempo')
                             ->where('id_route_import_tempo', $id_route_import_tempo)
@@ -462,7 +559,7 @@ class ClientTempo extends Model
         return $clients;
     }
 
-    public static function getDoublesCustomerNameEClients(int $id_route_import_tempo) {
+    public static function getDoublesCustomerNameEClients_old(int $id_route_import_tempo) {
 
         $clients    =   DB::table('clients_tempo')
                             ->where('id_route_import_tempo', $id_route_import_tempo)
@@ -487,7 +584,32 @@ class ClientTempo extends Model
         return $clients;
     }
 
-    public static function getDoublesGPSClients(int $id_route_import_tempo) {
+    public static function getDoublesTelClients_old(int $id_route_import_tempo) {
+
+        $clients    =   DB::table('clients_tempo')
+                            ->where('id_route_import_tempo', $id_route_import_tempo)
+                            ->whereIn('Tel', function ($query) use ($id_route_import_tempo) {
+                                $query->select('Tel')
+                                    ->from('clients_tempo')
+                                    ->where('id_route_import_tempo', $id_route_import_tempo)
+                                    ->groupBy('Tel')
+                                    ->havingRaw('COUNT(*) > 1');
+                            })
+                            ->get();
+
+        //
+        foreach ($clients as $client) {
+
+            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
+            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
+            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        }
+
+        //
+        return $clients;
+    }
+
+    public static function getDoublesGPSClients_old(int $id_route_import_tempo) {
 
         $clients    =   DB::table('clients_tempo')
                             ->where('id_route_import_tempo', $id_route_import_tempo)

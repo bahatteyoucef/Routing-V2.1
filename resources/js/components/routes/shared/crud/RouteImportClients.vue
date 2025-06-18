@@ -77,10 +77,10 @@
     </div>
 
     <!-- Modal Add                      -->
-    <ModalClientAdd             ref="ModalClientAdd"            :id_route_import="getRouteImportId"                                                             >   </ModalClientAdd>
+    <ModalClientAdd             ref="ModalClientAdd"            :id_route_import="getRouteImportId"                                                                 :users_all="users_all"      :districts_all="districts_all">   </ModalClientAdd>
 
     <!-- Modal Update                   -->
-    <ModalClientUpdate          ref="ModalClientUpdate"         :id_route_import="getRouteImportId"     :update_type="'normal_update'"      :mode="'permanent'" >   </ModalClientUpdate>
+    <ModalClientUpdate          ref="ModalClientUpdate"         :id_route_import="getRouteImportId"     :update_type="'normal_update'"      :mode="'permanent'"     :users_all="users_all"      :districts_all="districts_all">   </ModalClientUpdate>
 </template>
  
 <script>
@@ -145,6 +145,11 @@ export default {
 
             //
 
+            users_all                               :   []      ,
+            districts_all                           :   []      ,
+
+            //
+
             selected_row                            :   null    ,
             selected_row_id                         :   null
         }
@@ -187,6 +192,7 @@ export default {
         })
 
         await this.setDataTable()
+        await this.getComboData()
     },
 
     unmounted() {
@@ -218,7 +224,7 @@ export default {
                 this.route_import_clients_data          =   res.data.clients
 
                 // Create DataTable
-                this.datatable_route_import_clients     =   this.datatable_route_import_clients_instance.$DataTableCreate("route_import_clients", this.route_import_clients_data, this.route_import_clients_columns, this.setDataTable, this.addElement, this.updateElement, null, this.selectRow, "Route Import Clients")      
+                this.datatable_route_import_clients     =   this.datatable_route_import_clients_instance.$DataTableCreate("route_import_clients", this.route_import_clients_data, this.route_import_clients_columns, this.setDataTable, this.addElement, this.updateElement, null, this.selectRow, "Map Clients")      
 
                 //
                 this.$hideLoadingPage()
@@ -245,6 +251,21 @@ export default {
 
                 await this.$refs.ModalClientUpdate.getData(selected_row, this.route_import_clients_data)
             }
+        },
+
+        //
+
+        async getComboData() {
+
+            this.$showLoadingPage()
+
+            const res_1         =   await this.$callApi("post"  ,   "/users/combo"      ,   null)
+            const res_2         =   await this.$callApi("post"  ,   "/rtm_willayas"     ,   null)
+
+            this.users_all      =   res_1.data
+            this.districts_all  =   res_2.data
+
+            this.$hideLoadingPage()
         },
 
         //  //  //  //  //
@@ -527,7 +548,7 @@ export default {
             //
 
             // Refresh DataTable
-            this.datatable_route_import_clients     =   this.datatable_route_import_clients_instance.$DataTableCreate("route_import_clients", this.route_import_clients_data, this.route_import_clients_columns, this.setDataTable, this.addElement, this.updateElement, null, this.selectRow, "Route Import Clients")      
+            this.datatable_route_import_clients     =   this.datatable_route_import_clients_instance.$DataTableCreate("route_import_clients", this.route_import_clients_data, this.route_import_clients_columns, this.setDataTable, this.addElement, this.updateElement, null, this.selectRow, "Map Clients")      
         },
 
         async updateClientToDatatable(client) {
@@ -583,7 +604,7 @@ export default {
             //
 
             // Destroy DataTable
-            this.datatable_route_import_clients     =   this.datatable_route_import_clients_instance.$DataTableCreate("route_import_clients", this.route_import_clients_data, this.route_import_clients_columns, this.setDataTable, this.addElement, this.updateElement, null, this.selectRow, "Route Import Clients")      
+            this.datatable_route_import_clients     =   this.datatable_route_import_clients_instance.$DataTableCreate("route_import_clients", this.route_import_clients_data, this.route_import_clients_columns, this.setDataTable, this.addElement, this.updateElement, null, this.selectRow, "Map Clients")      
         },
 
         async deleteClientToDatatable(client) {
@@ -599,7 +620,7 @@ export default {
             }
 
             //
-            this.datatable_route_import_clients     =   this.datatable_route_import_clients_instance.$DataTableCreate("route_import_clients", this.route_import_clients_data, this.route_import_clients_columns, this.setDataTable, this.addElement, this.updateElement, null, this.selectRow, "Route Import Clients")      
+            this.datatable_route_import_clients     =   this.datatable_route_import_clients_instance.$DataTableCreate("route_import_clients", this.route_import_clients_data, this.route_import_clients_columns, this.setDataTable, this.addElement, this.updateElement, null, this.selectRow, "Map Clients")      
         },
 
         //

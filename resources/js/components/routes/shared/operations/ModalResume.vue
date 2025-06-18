@@ -182,9 +182,10 @@ export default {
             this.$showLoadingPage()
 
             const res                   =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.$route.params.id_route_import+"/details",   null)
+            console.log(res)
 
             // Set Clients
-            this.clients                =   res.data.route_import.data
+            this.clients                =   res.data.route_import.clients
 
             this.$hideLoadingPage()
         },

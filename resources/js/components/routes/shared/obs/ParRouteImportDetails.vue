@@ -70,6 +70,10 @@
 
                 <div id="tableau_data">
                     <div v-show="show_datatable_route_import_obs_clients_parent" id="datatable_route_import_obs_clients_parent" class="scrollbar scrollbar-deep-blue bg-white p-1 animate__animated mt-0 mb-0">
+                        <div class="tableau_title mt-2 mb-3">
+                            <h4 class="fw-bold"><u>List of <span class="text_primary">{{ clients_table_affiche.length }}</span> client</u></h4>
+                        </div>
+
                         <div id="route_import_obs_clients_container" class="table-container mt-1 mb-1">
                             <table class="table table-hover table-bordered route_import_obs_clients mt-0 mb-0 w-100" id="route_import_obs_clients">
                                 <thead>
@@ -121,7 +125,7 @@
                     <button class="btn btn-primary w-100 m-0 mt-1"                                                                  @click="focuseMarkers()">Focus</button>
                     <button class="btn btn-primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#ModalResume'"         @click="showResume()">Resume</button>
                     <button class="btn btn-primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#ModalUpdateMap'"      >Update</button>
-                    <button class="btn btn-primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#ModalValidateMap'"    @click="getDoubles()">Validate</button>
+                    <!-- <button class="btn btn-primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#ModalValidateClients'"    @click="getDoubles()">Validate</button> -->
                     <button class="btn btn-primary w-100 m-0 mt-1"                                                                  @click="showTerritories()">Auto Territories</button>
                     <button class="btn btn-primary w-100 m-0 mt-1"                                                                  @click="showJPlanBDTerritories()">JPlan Territories</button>
                     <button class="btn btn-primary w-100 m-0 mt-1"                                                                  @click="showJourneeBDTerritories()">Journee Territories</button>
@@ -156,18 +160,6 @@
                         <option value="7">Status</option>
                     </select>
 
-                    <!-- Date Start -->
-                    <div class="mt-1">
-                        <input type="date"  class="form-control"    v-model="date_start"    @change="reAfficherClientsAndMarkers('data_ready')" />
-                    </div>
-                    <!--            -->
-
-                    <!-- Date End   -->
-                    <div class="mt-1">
-                        <input type="date"  class="form-control"    v-model="date_end"      @change="reAfficherClientsAndMarkers('data_ready')" />
-                    </div>
-                    <!--            -->
-
                     <!-- Journey Plan   -->
                     <Multiselect
                         v-model     =   "journey_plan_filter_value"
@@ -178,7 +170,7 @@
 
                         :close-on-select    =   "false"
                         :searchable         =   "true"
-                        :create-option      =   "true"
+                        :create-option      =   "false"
 
                         @change             =   "reAfficherClientsAndMarkers('data_ready')"
                     />
@@ -194,7 +186,7 @@
 
                         :close-on-select    =   "false"
                         :searchable         =   "true"
-                        :create-option      =   "true"
+                        :create-option      =   "false"
 
                         @change             =   "reAfficherClientsAndMarkers('data_ready')"
                     />
@@ -210,7 +202,7 @@
 
                         :close-on-select    =   "false"
                         :searchable         =   "true"
-                        :create-option      =   "true"
+                        :create-option      =   "false"
 
                         @change             =   "reAfficherClientsAndMarkers('data_ready')"
                     />
@@ -226,7 +218,7 @@
 
                         :close-on-select    =   "false"
                         :searchable         =   "true"
-                        :create-option      =   "true"
+                        :create-option      =   "false"
 
                         @change             =   "reAfficherClientsAndMarkers('data_ready')"
                     />
@@ -241,7 +233,7 @@
 
                         :close-on-select    =   "false"
                         :searchable         =   "true"
-                        :create-option      =   "true"
+                        :create-option      =   "false"
 
                         @change             =   "reAfficherClientsAndMarkers('data_ready')"
                     />
@@ -257,7 +249,7 @@
 
                         :close-on-select    =   "false"
                         :searchable         =   "true"
-                        :create-option      =   "true"
+                        :create-option      =   "false"
 
                         @change             =   "reAfficherClientsAndMarkers('data_ready')"
                     />
@@ -273,13 +265,29 @@
 
                         :close-on-select    =   "false"
                         :searchable         =   "true"
-                        :create-option      =   "true"
+                        :create-option      =   "false"
 
                         @change             =   "reAfficherClientsAndMarkers('data_ready')"
                     />
                     <!--                -->
 
                     <!-- Status        -->
+                    <Multiselect
+                        v-model     =   "client_id_filter_value"
+                        :options    =   "clientIdOptions"
+                        mode        =   "tags"
+                        placeholder =   "Filter By Customer"
+                        class       =   "mt-1"
+
+                        :close-on-select    =   "false"
+                        :searchable         =   "true"
+                        :create-option      =   "false"
+
+                        @change             =   "reAfficherClientsAndMarkers('data_ready')"
+                    />
+                    <!--                -->
+
+                    <!-- KML        -->
                     <Multiselect
                         v-model     =   "kml_layers"
                         :options    =   "kml_willayas"
@@ -296,6 +304,18 @@
                         @clear              =   "setKMLLayers()"
                     />
                     <!--                -->
+
+                    <!-- Date Start -->
+                    <div class="mt-1">
+                        <input type="date"  class="form-control"    v-model="date_start"    @change="reAfficherClientsAndMarkers('data_ready')" />
+                    </div>
+                    <!--            -->
+
+                    <!-- Date End   -->
+                    <div class="mt-1">
+                        <input type="date"  class="form-control"    v-model="date_end"      @change="reAfficherClientsAndMarkers('data_ready')" />
+                    </div>
+                    <!--            -->
                 </div>
             </div>
         </div>
@@ -304,28 +324,28 @@
     <!--                                -->
 
     <!-- Modal Add                      -->
-    <ModalClientAdd                                                 ref="ModalClientAdd"            :id_route_import="id_route_import"                                                              >   </ModalClientAdd>
+    <ModalClientAdd                                                 ref="ModalClientAdd"            :id_route_import="id_route_import"                                                                                                                              >   </ModalClientAdd>
 
     <!-- Modal Update                   -->
-    <ModalClientUpdate                                              ref="ModalClientUpdate"         :id_route_import="id_route_import"     :update_type="'normal_update'"      :mode="'permanent'"  >   </ModalClientUpdate>
+    <ModalClientUpdate                                              ref="ModalClientUpdate"         :id_route_import="id_route_import"      :update_type="'normal_update'"      :mode="'permanent'"     :users_all="users_all"      :districts_all="districts_all"  >   </ModalClientUpdate>
 
     <!-- Modal Change Route             -->
-    <ModalClientsChangeRoute                                        ref="ModalClientsChangeRoute"                                                                                           >   </ModalClientsChangeRoute>
+    <ModalClientsChangeRoute                                        ref="ModalClientsChangeRoute"                                                                                                       :users_all="users_all"      :districts_all="districts_all"  >   </ModalClientsChangeRoute>
 
     <!-- Modal Decoupe By Journee       -->
-    <ModalResume                                                    ref="ModalResume"               :mode="'permanent'"                                                                     >   </ModalResume>
+    <ModalResume                                                    ref="ModalResume"               :mode="'permanent'"                                                                                                                                             >   </ModalResume>
 
     <!-- Modal Add New Journey Plan     -->
-    <ModalAddJourneyPlan                                            ref="ModalAddJourneyPlan"                                                                                               >   </ModalAddJourneyPlan>
+    <ModalAddJourneyPlan                                            ref="ModalAddJourneyPlan"                                                                                                                                                                       >   </ModalAddJourneyPlan>
 
     <!-- Modal Add New Journey Plan     -->
-    <ModalUpdateJourneyPlan                                         ref="ModalUpdateJourneyPlan"                                                                                            >   </ModalUpdateJourneyPlan>
+    <ModalUpdateJourneyPlan                                         ref="ModalUpdateJourneyPlan"                                                                                                                                                                    >   </ModalUpdateJourneyPlan>
 
     <!-- Modal Update Map               -->
-    <ModalUpdateMap                                                 ref="ModalUpdateMap"            :id_route_import="id_route_import"                                                      >   </ModalUpdateMap>
+    <ModalUpdateMap                                                 ref="ModalUpdateMap"            :id_route_import="id_route_import"                                                                                                                              >   </ModalUpdateMap>
 
-    <!-- Modal Update Map               -->
-    <ModalValidateMap                                               ref="ModalValidateMap"          :id_route_import="id_route_import"                                                      >   </ModalValidateMap>
+    <!-- Modal Validate Clients         -->
+    <!-- <ModalValidateClients   v-if="route_import"                     ref="ModalValidateClients"      :id_route_import="id_route_import"      :total_clients="route_import.clients"                                                                              >   </ModalValidateClients> -->
 
 </template>
 
@@ -342,7 +362,7 @@ import ModalUpdateJourneyPlan       from    "@/components/territoires/ModalUpdat
 
 import ModalUpdateMap               from    "../crud/ModalUpdateMap.vue"
 
-import ModalValidateMap             from    "../operations/ModalValidateMap.vue"
+// import ModalValidateClients         from    "../operations/ModalValidateClients.vue"
 import ModalResume                  from    "../operations/ModalResume.vue"
 
 import {mapGetters, mapActions}     from    "vuex"
@@ -433,7 +453,7 @@ export default {
             journee_filter_value        :   []                          ,
             liste_journee               :   {}                          ,
 
-            // Ownwer
+            // Owner
 
             owner_filter_value          :   []                          ,
             owners                      :   {}                          ,
@@ -442,6 +462,11 @@ export default {
 
             status_filter_value         :   []                          ,
             liste_status                :   {}                          ,
+
+            // Client
+
+            client_id_filter_value      :   []                          ,
+            clients_ids                 :   {}                          ,
 
             // Clients
             clients_group               :   {}                          ,
@@ -487,10 +512,16 @@ export default {
             journeeOptions                                  :   [],
             ownerOptions                                    :   [],
             statusOptions                                   :   [],
+            clientIdOptions                                 :   [],
 
             //
 
             marker_cluster_mode         :   "cluster"       ,
+
+            //
+
+            users_all                   :   []              ,
+            districts_all               :   []              ,
 
             //
 
@@ -511,8 +542,8 @@ export default {
         ModalAddJourneyPlan         ,
         ModalUpdateJourneyPlan      ,
 
-        ModalUpdateMap              ,
-        ModalValidateMap         
+        ModalUpdateMap              
+        // ModalValidateClients         
     },
 
     computed: {
@@ -549,6 +580,9 @@ export default {
 
         // Get Data (clients + filter values)
         await this.getData()
+
+        //
+        await this.getComboData()
 
         // CRUD Events
 
@@ -672,14 +706,24 @@ export default {
             const res                   =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.id_route_import+"/details",   null)
             this.route_import           =   res.data.route_import
 
-            // Set Clients
-            this.route_import.clients   =   this.route_import.data
-
             // 
-            this.setKMLWillayas(res.data.willayas)
+            this.setKMLWillayas()
 
             //
             await this.reAfficherClientsAndMarkers("initial")
+        },
+
+        async getComboData() {
+
+            this.$showLoadingPage()
+
+            const res_1         =   await this.$callApi("post"  ,   "/users/combo"      ,   null)
+            const res_2         =   await this.$callApi("post"  ,   "/rtm_willayas"     ,   null)
+
+            this.users_all      =   res_1.data
+            this.districts_all  =   res_2.data
+
+            this.$hideLoadingPage()
         },
 
         // Extract Filters Data
@@ -690,13 +734,14 @@ export default {
             const clients       =   this.route_import.clients;
             const palette       =   this.$colors
             const categories    =   [
-                                        { listName: 'liste_journey_plan'    , prop: 'JPlan'                                                                                                     },
-                                        { listName: 'districts'             , prop: 'DistrictNo', complete: c => `${c.DistrictNo}- ${c.DistrictNameE}`  , completeProp: 'DistrictNameComplete'  },
-                                        { listName: 'cites'                 , prop: 'CityNo'    , complete: c => `${c.CityNo}- ${c.CityNameE}`          , completeProp: 'CityNameComplete'      },
-                                        { listName: 'liste_type_client'     , prop: 'CustomerType'                                                                                              },
-                                        { listName: 'liste_journee'         , prop: 'Journee'                                                                                                   },
-                                        { listName: 'owners'                , prop: 'owner_name'                                                                                                },
-                                        { listName: 'liste_status'          , prop: 'status'                                                                                                    },
+                                        { listName: 'liste_journey_plan'    , prop: 'JPlan'                                                                                                                             },
+                                        { listName: 'districts'             , prop: 'DistrictNo'    , complete: c => `${c.DistrictNo}- ${c.DistrictNameE}`                      , completeProp: 'DistrictNameComplete'  },
+                                        { listName: 'cites'                 , prop: 'CityNo'        , complete: c => `${c.CityNo}- ${c.CityNameE}`                              , completeProp: 'CityNameComplete'      },
+                                        { listName: 'liste_type_client'     , prop: 'CustomerType'                                                                                                                      },
+                                        { listName: 'liste_journee'         , prop: 'Journee'                                                                                                                           },
+                                        { listName: 'owners'                , prop: 'owner_name'                                                                                                                        },
+                                        { listName: 'liste_status'          , prop: 'status'                                                                                                                            },
+                                        { listName: 'clients_ids'           , prop: 'id'            , complete: c => `${c.CustomerCode}- ${c.CustomerNameA}`                    , completeProp: 'CustomerNameComplete'  }
                                     ];
 
             // Helper: assign next unused color for a category
@@ -758,19 +803,20 @@ export default {
                 Object.keys(obj).forEach(k => {
 
                     // drop any keys no longer in clients
-                    if (!this.route_import.clients.some(c => c[cat.prop] === k)) 
+                    if (!this.route_import.clients.some(c => c[cat.prop] == k)) 
                         delete obj[k];
                 });
             });
 
             // Apply your sortFilter* methods
-            this.liste_journey_plan   = this.sortFilterJPlan();
-            this.districts            = this.sortFilterDistrictNo();
-            this.cites                = this.sortFilterCityNo();
-            this.liste_type_client    = this.sortFilterCustomerType();
-            this.liste_journee        = this.sortFilterJournee();
-            this.owners               = this.sortFilterOwner();
-            this.liste_status         = this.sortFilterStatus();
+            this.liste_journey_plan     =   this.sortFilterJPlan();
+            this.districts              =   this.sortFilterDistrictNo();
+            this.cites                  =   this.sortFilterCityNo();
+            this.liste_type_client      =   this.sortFilterCustomerType();
+            this.liste_journee          =   this.sortFilterJournee();
+            this.owners                 =   this.sortFilterOwner();
+            this.liste_status           =   this.sortFilterStatus();
+            this.clients_ids            =   this.sortFilterClientId();
 
             // Mirror back into route_import
             Object.assign(this.route_import, {
@@ -781,23 +827,25 @@ export default {
                 liste_journee:      this.liste_journee,
                 owners:             this.owners,
                 liste_status:       this.liste_status,
+                clients_ids:        this.clients_ids
             });
 
             // 6) Build options arrays
             const buildOptions = (obj, valueKey, labelKey) =>
             Object.values(obj).map(item => ({
-                value: item[valueKey],
+                value: item[valueKey].toString(),
                 label: item[labelKey],
             }));
 
             //
-            this.journeyPlanOptions   = buildOptions(this.liste_journey_plan,   'JPlan',           'JPlan');
-            this.districtOptions      = buildOptions(this.districts,            'DistrictNo',      'DistrictNameComplete');
-            this.cityOptions          = buildOptions(this.cites,                'CityNo',          'CityNameComplete');
-            this.customerTypeOptions  = buildOptions(this.liste_type_client,    'CustomerType',    'CustomerType');
-            this.journeeOptions       = buildOptions(this.liste_journee,        'Journee',         'Journee');
-            this.ownerOptions         = buildOptions(this.owners,               'owner_name',      'owner_name');
-            this.statusOptions        = buildOptions(this.liste_status,         'status',          'status');
+            this.journeyPlanOptions     =   buildOptions(this.liste_journey_plan,   'JPlan',           'JPlan');
+            this.districtOptions        =   buildOptions(this.districts,            'DistrictNo',      'DistrictNameComplete');
+            this.cityOptions            =   buildOptions(this.cites,                'CityNo',          'CityNameComplete');
+            this.customerTypeOptions    =   buildOptions(this.liste_type_client,    'CustomerType',    'CustomerType');
+            this.journeeOptions         =   buildOptions(this.liste_journee,        'Journee',         'Journee');
+            this.ownerOptions           =   buildOptions(this.owners,               'owner_name',      'owner_name');
+            this.statusOptions          =   buildOptions(this.liste_status,         'status',          'status');
+            this.clientIdOptions        =   buildOptions(this.clients_ids,          'id',              'CustomerNameComplete');
         },
 
         checkExistJPlan(liste_journey_plan, JPlan) {
@@ -1107,13 +1155,26 @@ export default {
 
         sortFilterStatus() {
 
-            let sortedArray                 =   Object.values(this.liste_status);
+            let sortedArray             =   Object.values(this.liste_status);
             
             sortedArray.sort((a, b)     =>  a.status.localeCompare(b.status));
             
-            let sortedObject                =   sortedArray.reduce((acc, status, index) => {
+            let sortedObject            =   sortedArray.reduce((acc, status, index) => {
+                acc[status.status]          =   status;
+                return acc;
+            }, {});
 
-                acc[status.status]   =   status;
+            return sortedObject
+        },
+
+        sortFilterClientId() {
+
+            let sortedArray             =   Object.values(this.clients_ids);
+            
+            sortedArray.sort((a, b)     =>  a.CustomerNameComplete.localeCompare(b.CustomerNameComplete));
+            
+            let sortedObject            =   sortedArray.reduce((acc, CustomerNameComplete, index) => {
+                acc[CustomerNameComplete.CustomerNameComplete]  =   CustomerNameComplete;
                 return acc;
             }, {});
 
@@ -1144,7 +1205,7 @@ export default {
                 this.clients_markers_affiche    =   this.reAfficheClientsMarkers(this.route_import.clients)
 
                 // Table Data
-                this.reAfficheClientsTable()
+                // this.reAfficheClientsTable()
 
                 // Datatable
                 await this.setDataTable()
@@ -1289,37 +1350,40 @@ export default {
         reAfficheClientsMarkers(param_clients) {
 
             // 1) Pre‑compute filter sets & date bounds
-            const startDate     =   this.date_start, endDate = this.date_end;
+            const startDate         =   this.date_start; 
+            const endDate           =   this.date_end;
 
-            const jpFilter      =   new Set(this.journey_plan_filter_value);
-            const distFilter    =   new Set(this.district_filter_value);
-            const cityFilter    =   new Set(this.city_filter_value);
-            const typeFilter    =   new Set(this.type_client_filter_value);
-            const jourFilter    =   new Set(this.journee_filter_value);
-            const ownerFilter   =   new Set(this.owner_filter_value);
-            const statusFilter  =   new Set(this.status_filter_value);
+            const jpFilter          =   new Set(this.journey_plan_filter_value);
+            const distFilter        =   new Set(this.district_filter_value);
+            const cityFilter        =   new Set(this.city_filter_value);
+            const typeFilter        =   new Set(this.type_client_filter_value);
+            const jourFilter        =   new Set(this.journee_filter_value);
+            const ownerFilter       =   new Set(this.owner_filter_value);
+            const statusFilter      =   new Set(this.status_filter_value);
+            const clientIdsFilter   =   new Set(this.client_id_filter_value);
 
             // 2) One pass: filter route_import.clients
-            const filtered      =   param_clients.filter(client => {
+            const filtered          =   param_clients.filter(client => {
 
                 const cd            =   this.$humanToISO(client.created_at);
 
-                if (startDate           && cd < startDate) return false;
-                if (endDate             && cd > endDate)   return false;
+                if (startDate               && cd < startDate) return false;
+                if (endDate                 && cd > endDate)   return false;
 
-                if (jpFilter.size       && !jpFilter.has(client.JPlan))                         return false;
-                if (distFilter.size     && !distFilter.has(client.DistrictNo.toString()))       return false;
-                if (cityFilter.size     && !cityFilter.has(client.CityNo.toString()))           return false;
-                if (typeFilter.size     && !typeFilter.has(client.CustomerType.toString()))     return false;
-                if (jourFilter.size     && !jourFilter.has(client.Journee.toString()))          return false;
-                if (ownerFilter.size    && !ownerFilter.has(client.owner_name.toString()))      return false;
-                if (statusFilter.size   && !statusFilter.has(client.status.toString()))         return false;
+                if (jpFilter.size           && !jpFilter.has(client.JPlan))                         return false;
+                if (distFilter.size         && !distFilter.has(client.DistrictNo.toString()))       return false;
+                if (cityFilter.size         && !cityFilter.has(client.CityNo.toString()))           return false;
+                if (typeFilter.size         && !typeFilter.has(client.CustomerType.toString()))     return false;
+                if (jourFilter.size         && !jourFilter.has(client.Journee.toString()))          return false;
+                if (ownerFilter.size        && !ownerFilter.has(client.owner_name.toString()))      return false;
+                if (statusFilter.size       && !statusFilter.has(client.status.toString()))         return false;
+                if (clientIdsFilter.size    && !clientIdsFilter.has(client.id.toString()))          return false;
 
                 return true;
             });
 
             // 3) Group filtered clients by your column_group
-            const configs = {
+            const configs   =   {
                 1: { list: this.route_import.liste_journey_plan     , prop: 'JPlan'         , labelKey: 'JPlan'         },
                 2: { list: this.route_import.districts              , prop: 'DistrictNo'    , labelKey: 'DistrictNameE' },
                 3: { list: this.route_import.cites                  , prop: 'CityNo'        , labelKey: 'CityNameE'     },
@@ -1329,10 +1393,10 @@ export default {
                 7: { list: this.route_import.liste_status           , prop: 'status'        , labelKey: 'status'        }
             };
 
-            const cfg = configs[this.column_group];
+            const cfg       =   configs[this.column_group];
 
             // init empty buckets
-            const groups = {};
+            const groups    =   {};
             for (const [key, md] of Object.entries(cfg.list)) {
                 groups[key] = {
                     column_name: typeof md === 'object' && md[cfg.labelKey] ? md[cfg.labelKey] : key,
@@ -1341,9 +1405,15 @@ export default {
                 };
             }
 
+            // assign to table
+            this.clients_table_affiche  =   filtered
+
             // assign clients
             for (let i = 0, L = filtered.length; i < L; i++) {
-                const c = filtered[i], k = c[cfg.prop];
+
+                const c         =   filtered[i]
+                const k         =   c[cfg.prop]
+
                 if (groups[k]) groups[k].clients.push(c);
             }
 
@@ -1364,21 +1434,27 @@ export default {
 
             // now your table is literally the same filtered list—
             // if you need the same date + dropdown filters:
-            const startDate = this.date_start, endDate = this.date_end;
-            const filtered = this.route_import.clients.filter(c => {
-            const cd = this.$humanToISO(c.created_at);
-            if (startDate && cd < startDate) return false;
-            if (endDate   && cd > endDate)   return false;
-            // no need to re‐apply grouping filters if markers already did it
-            return true;
+            const startDate     =   this.date_start 
+            const endDate       =   this.date_end;
+
+            const filtered      =   this.route_import.clients.filter(c => {
+
+                const cd            =   this.$humanToISO(c.created_at);
+
+                if (startDate && cd < startDate) return false;
+                if (endDate   && cd > endDate)   return false;
+
+                // no need to re‐apply grouping filters if markers already did it
+                return true;
             });
-            this.clients_table_affiche = filtered;
+
+            this.clients_table_affiche  =   filtered;
         },
 
         async setDataTable() {
 
             // Create DataTable
-            this.datatable_route_import_obs_clients     =   this.datatable_route_import_obs_clients_instance.$DataTableCreate("route_import_obs_clients", this.clients_table_affiche, this.route_import_obs_clients_columns, this.setDataTable, null, this.updateClient, null, this.selectRow, "Route Import Clients")      
+            this.datatable_route_import_obs_clients     =   this.datatable_route_import_obs_clients_instance.$DataTableCreate("route_import_obs_clients", this.clients_table_affiche, this.route_import_obs_clients_columns, this.setDataTable, null, this.updateClient, null, this.selectRow, "Map Clients")      
         },
 
         selectRow(selected_row, selected_row_id) {
@@ -1457,9 +1533,9 @@ export default {
             await this.$refs.ModalResume.getClients()
         },
 
-        async getDoubles() {
-            await this.$refs.ModalValidateMap.getDoubles()
-        },
+        // async getDoubles() {
+        //     await this.$refs.ModalValidateClients.getDoubles()
+        // },
 
         async showJPlanBDTerritories() {
 
@@ -1554,13 +1630,13 @@ export default {
 
         // Set KML Filters
 
-        setKMLWillayas(kml_willayas) {
+        setKMLWillayas() {
 
             this.kml_willayas   =   []
 
-            for (let i = 0; i < kml_willayas.length; i++) {
+            for (let i = 0; i < this.districts_all.length; i++) {
 
-                this.kml_willayas.push({ value : kml_willayas[i].DistrictNo , label : kml_willayas[i].DistrictNo + "- " + kml_willayas[i].DistrictNameE})
+                this.kml_willayas.push({ value : this.districts_all[i].DistrictNo , label : this.districts_all[i].DistrictNo + "- " + this.districts_all[i].DistrictNameE})
             }
         },
 
@@ -1664,7 +1740,7 @@ export default {
                 setTimeout(() => {
 
                     let map_element                                                 =   document.getElementById("map")
-                    map_element.style.height                                        =   "45%"
+                    map_element.style.height                                        =   "40%"
                 }, 555)
 
             }, 555)

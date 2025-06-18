@@ -89,15 +89,15 @@ export default {
 
             territoire      :   {
 
-                type_territoire     :   '1' ,
+                type_territoire     :   '1'         ,
 
-                JPlan               :   ''  ,
-                Journee             :   ''  ,
+                JPlan               :   ''          ,
+                Journee             :   ''          ,
 
-                description         :   ''  ,
-                id_user             :   ''  ,
+                description         :   ''          ,
+                id_user             :   ''          ,
 
-                color               :   ''  ,
+                color               :   '#000000'   ,
 
                 latlngs             :   null
             },
@@ -235,7 +235,7 @@ export default {
                 this.territoire.description         =   '',
                 this.territoire.id_user             =   '',
 
-                this.territoire.color               =   '',
+                this.territoire.color               =   '#000000',
 
                 // Remove Drawings
                 this.removeDrawings()

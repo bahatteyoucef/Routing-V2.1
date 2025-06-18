@@ -437,11 +437,9 @@ class RouteImportController extends Controller
         try {
 
             $route_import       =   RouteImport::obsDetailsRouteImport($id);
-            $willayas           =   RTMWillaya::index();
 
             return response()->json([
-                "route_import"  =>  $route_import,
-                "willayas"      =>  $willayas
+                "route_import"  =>  $route_import   
             ]);
 
             return $route_import;

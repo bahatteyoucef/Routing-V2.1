@@ -220,7 +220,7 @@
                         <div>
                             <label for="DistrictNo"         class="form-label fw-bold">Willaya</label>
                             <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()">
-                                <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
+                                <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNameE}} ({{willaya.DistrictNo}})</option>
                             </select>
                         </div>
 
@@ -968,11 +968,11 @@ export default {
             this.start_adding_date  =   moment(new Date()).format()
 
             const res                           =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.$route.params.id_route_import+"/details",   null)
-            this.all_clients                    =   res.data.route_import.data
+            this.all_clients                    =   res.data.route_import.clients
 
             //
 
-            this.getComboData()
+            await this.getComboData()
         },
 
         async getComboData() {

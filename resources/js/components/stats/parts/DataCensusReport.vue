@@ -55,8 +55,6 @@
 
 <script>
 
-import {mapGetters, mapActions}     from    "vuex"
-
 import DatatableHelper              from    "@/services/DatatableHelper"
 
 export default {
@@ -91,8 +89,13 @@ export default {
                                                         { data: "Frequency"             , title: "Frequency"            }
                                                     ],
 
-            datatable_data_census_report_table          :   null,
-            datatable_data_census_report_table_instance :   null
+            datatable_data_census_report_table          :   null    ,
+            datatable_data_census_report_table_instance :   null    ,
+
+            //
+
+            selected_row                                :   null    ,
+            selected_row_id                             :   null
         }
     },
 
@@ -104,7 +107,7 @@ export default {
         this.datatable_data_census_report_table_instance    =   new DatatableHelper()
 
         //
-        this.setTable()
+        await this.setDataTable()
 
         //
         await this.$nextTick()
@@ -115,8 +118,14 @@ export default {
 
     methods : {
 
-        async setTable() {
-            this.datatable_data_census_report_table   =   this.datatable_data_census_report_table_instance.$DataTableCreate("data_census_report_table", this.data_census_report_table_data.rows, this.data_census_report_table_columns, null, this.updateElement, null, "Route Import Clients")  
+        async setDataTable() {
+            this.datatable_data_census_report_table     =   this.datatable_data_census_report_table_instance.$DataTableCreate("data_census_report_table", this.data_census_report_table_data.rows, this.data_census_report_table_columns, this.setDataTable, null, this.updateElement, null, this.selectRow, "Map Clients")      
+        },
+
+        selectRow(selected_row, selected_row_id) {
+
+            this.selected_row       =   selected_row
+            this.selected_row_id    =   selected_row_id
         },
 
         //
@@ -126,6 +135,9 @@ export default {
             //
             if(this.$isRole("Super Admin")||this.$isRole('BU Manager')||this.$isRole("BackOffice")||this.$isRole('Viewer')) {
 
+                this.emitter.emit("reSetNormalClientUpdate")
+
+                //
                 this.selected_row       =   selected_row
 
                 // ShowModal

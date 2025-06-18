@@ -269,7 +269,7 @@
                                     <div class="col-sm-6">
                                         <label for="DistrictNo"         class="form-label">Willaya</label>
                                         <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()">
-                                            <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
+                                            <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNameE}} ({{willaya.DistrictNo}})</option>
                                         </select>
                                     </div>
 
@@ -597,7 +597,7 @@ export default {
         }
     },
 
-    props : ["id_route_import"],
+    props : ["id_route_import", "districts_all", "users_all"],
 
     mounted() {
         this.clearData("#ModalClientAdd")
@@ -914,7 +914,7 @@ export default {
             //
             this.all_clients        =   all_clients
 
-            this.getComboData()  
+            await this.getComboData()  
             this.setCoords(client)
 
             await this.showPositionOnMapMultiMap("show_modal_client_add_map");
@@ -931,11 +931,25 @@ export default {
 
         async getComboData() {
 
-            const res_1     =   await this.$callApi("post"  ,   "/users/combo"      ,   null)
-            const res_2     =   await this.$callApi("post"  ,   "/rtm_willayas"     ,   null)
+            if(this.users_all) {
+                this.users          =   this.users_all  
+            }
 
-            this.users      =   res_1.data
-            this.willayas   =   res_2.data
+            else {
+                const res_1         =   await this.$callApi("post"  ,   "/users/combo"  ,   null)
+                this.users          =   res_1.data
+            }
+
+            //
+
+            if(this.districts_all) {
+                this.willayas       =   this.districts_all  
+            }
+
+            else {
+                const res_2         =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
+                this.willayas       =   res_2.data
+            }
         },
 
         async getCites() {

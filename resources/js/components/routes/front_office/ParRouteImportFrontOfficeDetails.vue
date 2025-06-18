@@ -160,7 +160,7 @@ export default {
 
             if(this.is_database_clients_map) {
 
-                const res                   =   await this.$callApi("post"  ,   "route/obs/route_import/"+this.id_route_import+"/details/for_front_office",   null)
+                const res                   =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.id_route_import+"/details/for_front_office",   null)
 
                 this.route_import           =   res.data.route_import
 

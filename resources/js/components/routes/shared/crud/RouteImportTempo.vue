@@ -37,7 +37,7 @@
                     <div class="col-sm-4">
                         <label for="districts"       class="form-label">districts</label>
                         <ul>
-                            <li class="list-item" v-for="district in route_import.districts" :key="district">{{ district.DistrictNo }}- {{ district.DistrictNameE }}</li>
+                            <li class="list-item" v-for="district in route_import.districts" :key="district">{{ district.DistrictNameE }} ({{ district.DistrictNo }})</li>
                         </ul>
                     </div>
                 </form>
@@ -57,17 +57,20 @@
 
     <!--  -->
 
-    <ModalResume    ref="ModalResume"   :id_route_import_tempo="route_import.id_route_import_tempo"     :mode="'temporary'"             ></ModalResume>
-    <ModalSubmit    ref="ModalSubmit"   :id_route_import_tempo="route_import.id_route_import_tempo"     :submit_clients="total_clients"  ></ModalSubmit>
+    <ModalClientUpdate  ref="ModalClientUpdate"     :id_route_import_tempo="route_import.id_route_import_tempo"     :mode="'temporary'"     :update_type="'validation'"     :validation_type="validation_type"  :users_all="users_all"      :districts_all="districts_all"  >   </ModalClientUpdate>
+    <ModalResume        ref="ModalResume"           :id_route_import_tempo="route_import.id_route_import_tempo"     :mode="'temporary'"                                                                                                                                     >   </ModalResume>
+
+    <ModalSubmit        ref="ModalSubmit"           :id_route_import_tempo="route_import.id_route_import_tempo"     :submit_clients="total_clients"                                                                                                                         >   </ModalSubmit>
 
 </template>
 
 <script>
 
-import ModalResume                  from    "../operations/ModalResume.vue"
-import ModalSubmit                  from    "./ModalSubmit.vue"
+import ModalClientUpdate    from    "@/components/clients/shared/ModalClientUpdate.vue"
+import ModalResume          from    "../operations/ModalResume.vue"
+import ModalSubmit          from    "./ModalSubmit.vue"
 
-import CardDoublants                from    "@/components/routes/shared/operations/validations/CardDoublants.vue"
+import CardDoublants        from    "@/components/routes/shared/operations/validations/CardDoublants.vue"
 
 export default {
 
@@ -87,28 +90,39 @@ export default {
                 file_route_import_tempo     :   null
             },
 
-            getDoublant                     :   {}          ,
+            getDoublant                     :   {},
 
-            show_card_doublants             :   false       ,
+            show_card_doublants             :   false,
 
             //
 
-            total_clients                   :   []
+            total_clients                   :   [],
+
+            //
+
+            users_all                       :   [],
+            districts_all                   :   [],
+
+            //
+
+            validation_type                 :   null
         }
     },
 
     components : {
 
-        ModalResume                 :   ModalResume                 ,
-        ModalSubmit                 :   ModalSubmit                 ,
+        ModalClientUpdate   :   ModalClientUpdate   , 
+        ModalResume         :   ModalResume         ,
+        ModalSubmit         :   ModalSubmit         ,
 
-        CardDoublants               :   CardDoublants
+        CardDoublants       :   CardDoublants
     },
 
     async mounted() {
 
         await this.getDataTempo()
         await this.getDoubles()
+        await this.getComboData()
 
         this.emitter.on('reSetClientsDevide' , async (clients)  =>  {
 
@@ -117,6 +131,10 @@ export default {
         })
 
         //
+
+        this.emitter.on("reSetValidationClientUpdate"     , (validation_type) => {
+            this.validation_type    =   validation_type
+        })
 
         this.emitter.on("refreshDoublantCustomerCode"       , async (validation_clients)    =>  {
             await this.updateDoublantsJSON(validation_clients, "CustomerCode")
@@ -130,13 +148,14 @@ export default {
             await this.updateDoublantsJSON(validation_clients, "Tel")
         })
 
-        this.emitter.on("refreshDoublantGPS"  , async (validation_clients)    =>  {
+        this.emitter.on("refreshDoublantGPS"                , async (validation_clients)    =>  {
             await this.updateDoublantsJSON(validation_clients, "GPS")
         })
     },
 
     unmounted() {
 
+        this.emitter.off('reSetValidationClientUpdate')
         this.emitter.off('reSetClientsDecoupeByJourneeAdd')
         this.emitter.off('reSetUpdate')
         this.emitter.off('reSetDelete')
@@ -189,6 +208,21 @@ export default {
                 // Send Errors
                 this.$showErrors("Error !", res.data.errors)
 			}
+        },
+
+        //
+
+        async getComboData() {
+
+            this.$showLoadingPage()
+
+            const res_1         =   await this.$callApi("post"  ,   "/users/combo"      ,   null)
+            const res_2         =   await this.$callApi("post"  ,   "/rtm_willayas"     ,   null)
+
+            this.users_all      =   res_1.data
+            this.districts_all  =   res_2.data
+
+            this.$hideLoadingPage()
         },
 
         //

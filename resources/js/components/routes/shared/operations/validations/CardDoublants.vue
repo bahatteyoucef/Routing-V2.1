@@ -75,17 +75,11 @@
         <ShowValidationClients      ref="ShowValidationClients"     :validation_type="validation_type"    :validation_clients="validation_clients"    :total_clients="total_clients"></ShowValidationClients>
     </div>
 
-    <!--  -->
-
-    <ModalClientUpdate      v-if="id_route_import_tempo"    ref="ModalClientUpdate"     :id_route_import_tempo="id_route_import_tempo"      :mode="'temporary'"     :update_type="'validation'"     :validation_type="validation_type">   </ModalClientUpdate>
-
 </template>
 
 <script>
 
 import ShowValidationClients    from    "./ShowValidationClients.vue"
-
-import ModalClientUpdate        from    "@/components/clients/shared/ModalClientUpdate.vue"
 
 export default {
 
@@ -104,44 +98,51 @@ export default {
     props       :   ["getDoublant", "total_clients", "mode", "id_route_import_tempo", "id_route_import"],
 
     components  :   {
-        ShowValidationClients   :   ShowValidationClients   ,
-        ModalClientUpdate       :   ModalClientUpdate       
+        ShowValidationClients   :   ShowValidationClients
     },
 
     mounted() {
 
         this.emitter.on("updateDoublesCustomerCode"         , async (client)    =>  {
             await this.updateClientJSON(client)
+            this.emitter.emit("reSetUpdate", client)
         })
 
         this.emitter.on("updateDoublesCustomerNameE"        , async (client)    =>  {
             await this.updateClientJSON(client)
+            this.emitter.emit("reSetUpdate", client)
         })
 
         this.emitter.on("updateDoublesTel"                  , async (client)    =>  {
             await this.updateClientJSON(client)
+            this.emitter.emit("reSetUpdate", client)
         })
 
-        this.emitter.on("updateDoublesGPS"    , async (client)    =>  {
+        this.emitter.on("updateDoublesGPS"                  , async (client)    =>  {
             await this.updateClientJSON(client)
+            this.emitter.emit("reSetUpdate", client)
         })
 
         //
 
         this.emitter.on("deleteDoublesCustomerCode"         , async (client)    =>  {
             await this.deleteClientJSON(client)
+            this.emitter.emit("reSetDelete", client)
         })
 
         this.emitter.on("deleteDoublesCustomerNameE"        , async (client)    =>  {
             await this.deleteClientJSON(client)
+            this.emitter.emit("reSetDelete", client)
         })
 
         this.emitter.on("deleteDoublesTel"                  , async (client)    =>  {
             await this.deleteClientJSON(client)
+            this.emitter.emit("reSetDelete", client)
         })
 
         this.emitter.on("deleteDoublesGPS"                  , async (client)    =>  {
             await this.deleteClientJSON(client)
+            this.emitter.emit("reSetDelete", client)
         })
     },
 
@@ -342,9 +343,6 @@ export default {
 
         async updateClientJSON(client) {
 
-            console.log(client)
-            console.log(this.total_clients[0])
-
             const updatableFields   =   [
                 "NewCustomer"               ,
                 "OpenCustomer"              ,
@@ -391,7 +389,7 @@ export default {
                 "nonvalidated_details"              ,
 
                 "owner"                             ,
-                "owner_name"                        ,
+                // "owner_name"                        ,
 
                 "comment"                           ,
 
@@ -459,6 +457,12 @@ export default {
 
             //
             await this.$refs.ShowValidationClients.setDatatable()
+        }
+    },
+
+    watch   :   {
+        validation_type(new_value, old_value) {
+            this.emitter.emit("reSetValidationClientUpdate", new_value)
         }
     }
 }
