@@ -1,5 +1,6 @@
 // 
 
+import client from "../store/modules/client/client"
 import store    from    "../store/store"
 
 export default class Map {
@@ -113,6 +114,10 @@ export default class Map {
 
                 // Add Journey Plan Territory
                 this.$drawJourneyPlanTerritory()
+
+                // 1) Before you add any territories:
+                this.map.createPane('territoryPane');
+                this.map.getPane('territoryPane').style.zIndex = 650;
             }
 
             if(left_tools) {
@@ -364,16 +369,17 @@ export default class Map {
             "Address        : "     +client.Address         +"<br />"+
             "Latitude       : "     +client.Latitude        +"<br />"+
             "Longitude      : "     +client.Longitude       ,
-            { permanent: false }         
+            { 
+                autoPan: false 
+            }       
         )
 
         // You would then need to handle opening the popup on hover and closing it on mouseout.
-        marker_obj.on('mouseover', function (e) {
-            this.openPopup();
+        marker_obj.on('mouseover', (e) => {
+            e.target.openPopup();
         });
 
-        marker_obj.on('mouseout', function (e) {
-            this.closePopup();
+        marker_obj.on('mouseout', (e) => {
         });
 
         //  //  //
@@ -519,8 +525,8 @@ export default class Map {
         });
 
         // c) reset all caches so next time you start fresh
-        this.clusters           =   {};
-        this.markers            =   {};
+        this.clusters           =   {}
+        this.markers            =   {}
         this.markers_lat_lng    =   {}
     }
 
@@ -720,15 +726,32 @@ export default class Map {
             if(Array.isArray(latlngs) && (latlngs.length > 0)) {
 
                 // Territory
-                var territory           =   L.polygon(latlngs, { color: territories[i].color }).addTo(this.map)
+                var territory           =   L.polygon(latlngs, { pane: 'territoryPane', color: territories[i].color }).addTo(this.map)
                 this.journey_plan_territories.push(territory)
 
                 // Add to Editable Layers by Right Drawing tool
                 this.editable_layers_journey_plan_territory.addLayer(territory)
 
                 // Add Description 
-                let territory_obj             =   territory.bindTooltip("JPlan   : " + territories[i].JPlan)
+                let territory_obj             =   territory.bindPopup(
+                    "JPlan   : " + territories[i].JPlan,
+                    { 
+                        autoPan: false 
+                    }       
+                )
 
+                // You would then need to handle opening the popup on hover and closing it on mouseout.
+                territory_obj.on('mouseover', (e) => {
+                    e.target.bringToFront();       // moves this polygon into the highest overlay
+                    e.target.openPopup();
+                });
+
+                territory_obj.on('mouseout', (e) => {
+                    // move it back behind the markers again:
+                    this.map.getPane('territoryPane').style.zIndex = 550;
+                });
+
+                //
                 territory_obj.journey_plan    =   territories[i]
 
                 // Add Event Edit
@@ -770,17 +793,31 @@ export default class Map {
             if(Array.isArray(latlngs) && (latlngs.length > 0)) {
 
                 // Territory
-                var territory           =   L.polygon(latlngs, { color: territories[i].color }).addTo(this.map)
+                var territory           =   L.polygon(latlngs, { pane: 'territoryPane', color: territories[i].color }).addTo(this.map)
                 this.journee_territories.push(territory)
 
                 // Add to Editable Layers by Right Drawing tool
                 this.editable_layers_journey_plan_territory.addLayer(territory)
 
                 // Add Description 
-                let territory_obj           =   territory.bindTooltip(
+                let territory_obj           =   territory.bindPopup(
                     "JPlan      : "     +territories[i].JPlan       +"<br />"+
-                    "Journee    : "     +territories[i].Journee     +"<br />"
+                    "Journee    : "     +territories[i].Journee     +"<br />",
+                    { 
+                        autoPan: false 
+                    }       
                 )
+
+                // You would then need to handle opening the popup on hover and closing it on mouseout.
+                territory_obj.on('mouseover', (e) => {
+                    e.target.bringToFront();       // moves this polygon into the highest overlay
+                    e.target.openPopup();
+                });
+
+                territory_obj.on('mouseout', (e) => {
+                    // move it back behind the markers again:
+                    this.map.getPane('territoryPane').style.zIndex = 550;
+                });
 
                 territory_obj.journee       =   territories[i]
 
@@ -820,7 +857,7 @@ export default class Map {
             if(Array.isArray(latlngs) && (latlngs.length > 0)) {
 
                 // Territory
-                var territory           =   L.polygon(latlngs, { color: territories[i].color }).addTo(this.map)
+                var territory           =   L.polygon(latlngs, { pane: 'territoryPane', color: territories[i].color }).addTo(this.map)
 
                 this.user_territories.push(territory)
 
@@ -844,17 +881,31 @@ export default class Map {
             if(Array.isArray(latlngs) && (latlngs.length > 0)) {
 
                 // Territory
-                var territory           =   L.polygon(latlngs, { color: territories[i].color }).addTo(this.map)
+                var territory           =   L.polygon(latlngs, { pane: 'territoryPane', color: territories[i].color }).addTo(this.map)
                 this.user_territories.push(territory)
 
                 // Add to Editable Layers by Right Drawing tool
                 this.editable_layers_journey_plan_territory.addLayer(territory)
 
                 // Add Description 
-                let territory_obj       =   territory.bindTooltip(
+                let territory_obj       =   territory.bindPopup(
                     "Description    : "     +territories[i].description     +"<br />"+
-                    "User           : "     +territories[i].user            +"<br />"
+                    "User           : "     +territories[i].user            +"<br />",
+                    { 
+                        autoPan: false 
+                    }       
                 )
+
+                // You would then need to handle opening the popup on hover and closing it on mouseout.
+                territory_obj.on('mouseover', (e) => {
+                    e.target.bringToFront();       // moves this polygon into the highest overlay
+                    e.target.openPopup();
+                });
+
+                territory_obj.on('mouseout', (e) => {
+                    // move it back behind the markers again:
+                    this.map.getPane('territoryPane').style.zIndex = 550;
+                });
 
                 territory_obj.user    =   territories[i]
 
@@ -1146,7 +1197,7 @@ export default class Map {
 
             if (this.$isMarkerInsidePolygon(marker_route.marker, event)) {
 
-                clients_change_route.push(marker.client)
+                clients_change_route.push(marker_route.marker.client)
             }
         };
 
@@ -1155,7 +1206,7 @@ export default class Map {
 
     $isMarkerInsidePolygon(marker, event) {
 
-        return event.layer.contains(marker.getLatLng())
+        return event.layer.getBounds().contains(marker.getLatLng())
     }
 
     //  //  //  //  //  //  //  //  //  //  //  //  //  //

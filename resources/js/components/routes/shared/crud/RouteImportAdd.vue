@@ -183,7 +183,7 @@ export default {
 
             for (let index = 0; index < this.districts_full.length; index++) {
 
-                this.districts.push({ value : this.districts_full[index].DistrictNo, label : this.districts_full[index].DistrictNo  +   '- '    +   this.districts_full[index].DistrictNameE })      
+                this.districts.push({ value : this.districts_full[index].DistrictNo, label : this.districts_full[index].DistrictNameE   +   " ("+ this.districts_full[index].DistrictNo +")" })      
             }
         },
 

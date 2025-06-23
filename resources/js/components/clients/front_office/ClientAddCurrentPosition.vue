@@ -238,7 +238,7 @@
                         <div>
                             <label for="CityNo"             class="form-label fw-bold">Commune</label>
                             <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo">
-                                <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CITYNO}}- {{cite.CityNameE}}</option>
+                                <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CityNameE}} ({{cite.CITYNO}})</option>
                             </select>
                         </div>
 

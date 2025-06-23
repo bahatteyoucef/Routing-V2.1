@@ -1356,8 +1356,9 @@ export default {
                 CustomerCode   : ${ client.CustomerCode  }  <br />
                 CustomerNameA  : ${ client.CustomerNameA }  <br />
                 CustomerNameE  : ${ client.CustomerNameE }  <br />
-                CustomerType   : ${ client.CustomerType  }  <br />
-            `;
+                CustomerType   : ${ client.CustomerType  }  <br />`,
+                { permanent: false, autoPan: false }
+            ;
         },
 
         $focuseMarkers(show_map, clients_markers) {
@@ -1760,6 +1761,19 @@ export default {
 
                 return {x : x, y : y};
             }
+        },
+
+        //  //  //
+
+        //
+        $getCurrentTimeHMS() {
+
+            const now       =   new Date();
+            const hours     =   String(now.getHours()).padStart(2, '0');
+            const minutes   =   String(now.getMinutes()).padStart(2, '0');
+            const seconds   =   String(now.getSeconds()).padStart(2, '0');
+
+            return `${hours}:${minutes}:${seconds}`;
         }
     }
 }

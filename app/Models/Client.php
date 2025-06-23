@@ -200,6 +200,7 @@ class Client extends Model
 
         $liste_clients_elem =   json_decode($request->get("clients"));
 
+        //
         foreach ($liste_clients_elem    as  $client_elem) {
 
             $client                 =   Client::find($client_elem->id);
@@ -222,6 +223,12 @@ class Client extends Model
 
                 $client->CityNo         =   $client_elem->CityNo;
                 $client->CityNameE      =   $client_elem->CityNameE;
+            }
+
+            // Set CustomerType
+            if(isset($client_elem->CustomerType)) {
+
+                $client->CustomerType   =   $client_elem->CustomerType;
             }
 
             // Set JPlan

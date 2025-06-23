@@ -75,7 +75,7 @@ Route::middleware('auth:api')->group(function () {
 
         foreach ($willayas as $willaya) {
 
-            $willaya->cites =   DB::table("RTM_City")->where('DistrictNo', $willaya->DistrictNo)->orderBy('CityNo')->get();
+            $willaya->cites =   DB::table("RTM_City")->where('DistrictNo', $willaya->DistrictNo)->orderBy('CityNameE')->get();
         }
 
         return $willayas;

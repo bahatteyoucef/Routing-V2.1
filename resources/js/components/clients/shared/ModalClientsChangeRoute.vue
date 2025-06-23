@@ -44,7 +44,7 @@
                                     <label for="CityNo"             class="form-label">CityNo (CityNo)</label>
                                     <select                         class="form-select"         id="CityNo"                     v-model="CityNo">
                                         <option value=""></option>
-                                        <option v-for="cite in cites"           :key="cite.CITYNO"    :value="cite.CITYNO">{{cite.CITYNO}}- {{cite.CityNameE}}</option>
+                                        <option v-for="cite in cites"           :key="cite.CITYNO"    :value="cite.CITYNO">{{cite.CityNameE}} ({{cite.CITYNO}})</option>
                                     </select>
                                 </div>
                             </div>
@@ -61,6 +61,14 @@
                                 </select>
                             </div>
 
+                            <!-- CustomerType                       -->
+                            <div class="col">
+                                <div class="mb-3">
+                                    <label for="CustomerType"       class="form-label">CustomerType (CustomerType)</label>
+                                    <input type="text"              class="form-control"        id="CustomerType"               v-model="CustomerType">
+                                </div>
+                            </div>
+
                             <!-- JPlan                              -->
                             <div class="col">
                                 <div class="mb-3">
@@ -73,8 +81,9 @@
                             <div class="col">
                                 <div class="mb-3">
                                     <label for="Journee"            class="form-label">WorkDay (Journee)</label>
+                                    <input type="text"              class="form-control"        id="Journee"                    v-model="Journee">
 
-                                    <select                         class="form-select"         id="Journee"                 v-model="Journee">
+                                    <!-- <select                         class="form-select"         id="Journee"                 v-model="Journee">
                                         <option     :value="'Dimanche 1'">Dimanche 1</option>
                                         <option     :value="'Lundi 1'">Lundi 1</option>
                                         <option     :value="'Mardi 1'">Mardi 1</option>
@@ -85,7 +94,7 @@
                                         <option     :value="'Mardi 2'">Mardi 2</option>
                                         <option     :value="'Mercredi 2'">Mercredi 2</option>
                                         <option     :value="'Jeudi 2'">Jeudi 2</option>
-                                    </select>
+                                    </select> -->
                                 </div>
                             </div>
 
@@ -194,6 +203,7 @@ export default {
 
             DistrictNo                      :   ""  ,
             CityNo                          :   ""  ,
+            CustomerType                    :   ""  ,
             JPlan                           :   ""  ,
             Journee                         :   ""  ,
             owner                           :   ""  ,
@@ -274,6 +284,11 @@ export default {
 
                     clients_copy[i].CityNo          =   this.CityNo 
                     clients_copy[i].CityNameE       =   this.getCityNameE(this.CityNo)
+                }
+
+                if(this.CustomerType    !=  "") {
+                    
+                    clients_copy[i].CustomerType    =   this.CustomerType 
                 }
 
                 // Set JPlan
@@ -378,6 +393,7 @@ export default {
 
                 this.DistrictNo                     =   ''
                 this.CityNo                         =   ''
+                this.CustomerType                   =   ''
                 this.JPlan                          =   ''
                 this.Journee                        =   ''
                 this.owner                          =   ''
@@ -400,6 +416,7 @@ export default {
 
             // Set Value
             this.all_clients    =   [...clients]
+            this.clients        =   [...clients]
 
             //
             await this.setDataTable()
@@ -512,7 +529,7 @@ export default {
 
         clientMapRightProperties(clients) {
 
-            const fields = ['owner', 'owner_name', 'DistrictNo', 'DistrictNameE', 'CityNo', 'CityNameE', 'JPlan', 'Journee', 'status'];
+            const fields = ['owner', 'owner_name', 'DistrictNo', 'DistrictNameE', 'CityNo', 'CityNameE', 'CustomerType', 'JPlan', 'Journee', 'status'];
             
             return clients.map(obj => {
                 let result = { id: obj.id };

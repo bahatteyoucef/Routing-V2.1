@@ -56,9 +56,9 @@ class RouteImportTempo extends Model
     {
 
         $validator = Validator::make($request->all(), [
-            'libelle'           =>  ["required", "max:255"      ],
-            'data'              =>  ["required", "json"         ],
-            'file'              =>  ["required", "mimes:xlsx"   ]
+            'libelle'           =>  ["required", "max:255"                                                                                                      ],
+            'data'              =>  ["required", "json"                                                                                                         ],
+            'file'              =>  ["required", "file", "mimetypes:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/octet-stream" ]
         ]);
 
         return $validator;

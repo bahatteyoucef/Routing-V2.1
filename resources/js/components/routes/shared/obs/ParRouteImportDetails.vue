@@ -728,87 +728,76 @@ export default {
 
         // Extract Filters Data
 
-        extractMetaData() {
+        extractMetaData(clients = null) {
 
             // --- 1) Define categories and palette ---
-            const clients       =   this.route_import.clients;
-            const palette       =   this.$colors
+            const clientsToProcess = clients ?? this.route_import.clients;
             const categories    =   [
-                                        { listName: 'liste_journey_plan'    , prop: 'JPlan'                                                                                                                             },
-                                        { listName: 'districts'             , prop: 'DistrictNo'    , complete: c => `${c.DistrictNo}- ${c.DistrictNameE}`                      , completeProp: 'DistrictNameComplete'  },
-                                        { listName: 'cites'                 , prop: 'CityNo'        , complete: c => `${c.CityNo}- ${c.CityNameE}`                              , completeProp: 'CityNameComplete'      },
-                                        { listName: 'liste_type_client'     , prop: 'CustomerType'                                                                                                                      },
-                                        { listName: 'liste_journee'         , prop: 'Journee'                                                                                                                           },
-                                        { listName: 'owners'                , prop: 'owner_name'                                                                                                                        },
-                                        { listName: 'liste_status'          , prop: 'status'                                                                                                                            },
-                                        { listName: 'clients_ids'           , prop: 'id'            , complete: c => `${c.CustomerCode}- ${c.CustomerNameA}`                    , completeProp: 'CustomerNameComplete'  }
+                                        { listName: 'liste_journey_plan'    , prop: 'JPlan'                                                                                                         },
+                                        { listName: 'districts'             , prop: 'DistrictNo'    , complete: c => `${c.DistrictNameE} (${c.DistrictNo})` , completeProp: 'DistrictNameComplete'  },
+                                        { listName: 'cites'                 , prop: 'CityNo'        , complete: c => `${c.CityNameE} (${c.CityNo})`         , completeProp: 'CityNameComplete'      },
+                                        { listName: 'liste_type_client'     , prop: 'CustomerType'                                                                                                  },
+                                        { listName: 'liste_journee'         , prop: 'Journee'                                                                                                       },
+                                        { listName: 'owners'                , prop: 'owner_name'                                                                                                    },
+                                        { listName: 'liste_status'          , prop: 'status'                                                                                                        },
+                                        { listName: 'clients_ids'           , prop: 'id'            , complete: c => `${c.CustomerCode}- ${c.CustomerNameA}`, completeProp: 'CustomerNameComplete'  }
                                     ];
 
-            // Helper: assign next unused color for a category
-            const assignColor   =   usedSet => {
-
-                const color         =   palette[usedSet.size % palette.length];
-
-                usedSet.add(color);
-
-                return color;
-            };
-
             // Helper: build/set metadata entry
-            const makeEntry     =   (cat, client, usedColors) => {
+            const makeEntry = (cat, client) => {
 
-                const entry         =   { [cat.prop]: client[cat.prop] };
+                const entry     =   { [cat.prop]: client[cat.prop] };
 
-                if (cat.complete) 
-                    entry[cat.completeProp] = cat.complete(client);
-
-                entry.color         = assignColor(usedColors);
+                if (cat.complete) entry[cat.completeProp]   =   cat.complete(client);
 
                 return entry;
             };
 
-            // Pre‑populate seenKeys & usedColors if doing an incremental add/delete
+            // Ensure stores exist and prepare for updates
             categories.forEach(cat => {
-
-                const seen          =   new Set(), unique = [];
-
-                // collect unique clients
-                for (let c of clients) {
-
-                    const key = c[cat.prop];
-
-                    if (!seen.has(key)) {
-
-                        seen.add(key);
-                        unique.push(c);
-                    }
-                }
-
-                // build list
-                const used = new Set(), obj = {};
-
-                for (let c of unique) {
-
-                    obj[c[cat.prop]] = makeEntry(cat, c, used);
-                }
-
-                this[cat.listName] = obj;
+                if (!this[cat.listName]) this[cat.listName] = {};
             });
 
-            // Cleanup stale entries (for safety) & sort via existing filters
-            categories.forEach(cat => {
+            // OPTIMIZATION: Single pass through clients
+            clientsToProcess.forEach(client => {
 
-                const obj = this[cat.listName];
+                categories.forEach(cat => {
 
-                Object.keys(obj).forEach(k => {
-
-                    // drop any keys no longer in clients
-                    if (!this.route_import.clients.some(c => c[cat.prop] == k)) 
-                        delete obj[k];
+                    const store     =   this[cat.listName];
+                    const key       =   client[cat.prop];
+                    
+                    if (!(key in store)) store[key]     =   makeEntry(cat, client);
                 });
             });
 
-            // Apply your sortFilter* methods
+            // OPTIMIZATION: Efficient stale entry removal using Sets
+            if (clients === null) {
+
+                // Create a lookup for current keys by category
+                const currentKeysLookup     =   {};
+                
+                // Precompute current keys for fast lookup
+                categories.forEach(cat => {
+                    currentKeysLookup[cat.listName]     =   new Set(
+                        this.route_import.clients.map(c => c[cat.prop])
+                    );
+                });
+
+                // Remove stale entries in O(n) time
+                categories.forEach(cat => {
+
+                    const store         =   this[cat.listName];
+                    const currentKeys   =   currentKeysLookup[cat.listName];
+                    
+                    Object.keys(store).forEach(key => {
+                        if (!currentKeys.has(key)) {
+                            delete store[key];
+                        }
+                    });
+                });
+            }
+
+            // 4) Re-apply your sort/filter pipelines (these already read from this[...] so they only reorder)
             this.liste_journey_plan     =   this.sortFilterJPlan();
             this.districts              =   this.sortFilterDistrictNo();
             this.cites                  =   this.sortFilterCityNo();
@@ -818,34 +807,34 @@ export default {
             this.liste_status           =   this.sortFilterStatus();
             this.clients_ids            =   this.sortFilterClientId();
 
-            // Mirror back into route_import
+            // 5) Mirror back into route_import
             Object.assign(this.route_import, {
-                liste_journey_plan: this.liste_journey_plan,
-                districts:          this.districts,
-                cites:              this.cites,
-                liste_type_client:  this.liste_type_client,
-                liste_journee:      this.liste_journee,
-                owners:             this.owners,
-                liste_status:       this.liste_status,
-                clients_ids:        this.clients_ids
+                liste_journey_plan      :   this.liste_journey_plan     ,
+                districts               :   this.districts              ,
+                cites                   :   this.cites                  ,
+                liste_type_client       :   this.liste_type_client      ,
+                liste_journee           :   this.liste_journee          ,
+                owners                  :   this.owners                 ,
+                liste_status            :   this.liste_status           ,
+                clients_ids             :   this.clients_ids
             });
 
-            // 6) Build options arrays
+            // 6) Build your options arrays as before
             const buildOptions = (obj, valueKey, labelKey) =>
-            Object.values(obj).map(item => ({
-                value: item[valueKey].toString(),
-                label: item[labelKey],
-            }));
+                Object.values(obj).map(item => ({
+                    value: item[valueKey].toString(),
+                    label: item[labelKey]
+                }));
 
             //
-            this.journeyPlanOptions     =   buildOptions(this.liste_journey_plan,   'JPlan',           'JPlan');
-            this.districtOptions        =   buildOptions(this.districts,            'DistrictNo',      'DistrictNameComplete');
-            this.cityOptions            =   buildOptions(this.cites,                'CityNo',          'CityNameComplete');
-            this.customerTypeOptions    =   buildOptions(this.liste_type_client,    'CustomerType',    'CustomerType');
-            this.journeeOptions         =   buildOptions(this.liste_journee,        'Journee',         'Journee');
-            this.ownerOptions           =   buildOptions(this.owners,               'owner_name',      'owner_name');
-            this.statusOptions          =   buildOptions(this.liste_status,         'status',          'status');
-            this.clientIdOptions        =   buildOptions(this.clients_ids,          'id',              'CustomerNameComplete');
+            this.journeyPlanOptions     =   buildOptions(this.liste_journey_plan    ,   'JPlan'         ,   'JPlan');
+            this.districtOptions        =   buildOptions(this.districts             ,   'DistrictNo'    ,   'DistrictNameComplete');
+            this.cityOptions            =   buildOptions(this.cites                 ,   'CityNo'        ,   'CityNameComplete');
+            this.customerTypeOptions    =   buildOptions(this.liste_type_client     ,   'CustomerType'  ,   'CustomerType');
+            this.journeeOptions         =   buildOptions(this.liste_journee         ,   'Journee'       ,   'Journee');
+            this.ownerOptions           =   buildOptions(this.owners                ,   'owner_name'    ,   'owner_name');
+            this.statusOptions          =   buildOptions(this.liste_status          ,   'status'        ,   'status');
+            this.clientIdOptions        =   buildOptions(this.clients_ids           ,   'id'            ,   'CustomerNameComplete');
         },
 
         checkExistJPlan(liste_journey_plan, JPlan) {
@@ -1183,7 +1172,7 @@ export default {
 
         // Prepare Markers and Table Data
 
-        async reAfficherClientsAndMarkers(mode, clients = []) {
+        async reAfficherClientsAndMarkers(mode, clients = null) {
 
             // Show Loading Page
             this.$showLoadingPage()
@@ -1198,64 +1187,110 @@ export default {
                 // delete                       => when delete clients      (clients passed)
                 // standard                     => when resume
 
-                // Extract JPlan, Cites, District
-                if(mode != "data_ready") this.extractMetaData()
-
-                // reAffiche Clients
-                this.clients_markers_affiche    =   this.reAfficheClientsMarkers(this.route_import.clients)
-
-                // Table Data
-                // this.reAfficheClientsTable()
-
-                // Datatable
-                await this.setDataTable()
-
                 // reAffiche Markers
-                if((mode == "data_ready")||(mode == "initial")||(mode == "standard")||(mode == "switch_marker_cluster_mode")) {
+                if(mode == "switch_marker_cluster_mode") {
 
+                    // Show Markers
                     this.setRouteMarkers(mode, this.clients_markers_affiche)
                 }
 
-                //
                 else {
 
-                    if((mode == "add")||(mode == "update")||(mode == "change_route_update")||(mode == "delete")||(mode == "change_route_delete")) {
+                    if((mode == "data_ready")||(mode == "initial")||(mode == "standard")) {
 
-                        if(mode == "add")       {
-
-                            // reAffiche Clients
-                            let clients_markers_affiche    =   this.reAfficheClientsMarkers(clients)
-                            this.addMarkers(clients_markers_affiche)
-                        }
-
-                        if(mode == "update")       {
-
-                            // reAffiche Clients
-                            let clients_markers_affiche    =   this.reAfficheClientsMarkers(clients)
-                            await this.updateMarkers(clients_markers_affiche, clients)
-                        }
-
-                        if(mode == "change_route_update")   {
-
-                            // reAffiche Clients
-                            let clients_markers_affiche    =   this.reAfficheClientsMarkers(clients)
-                            await this.updateMarkers(clients_markers_affiche, clients)
-                        }
-
-                        if(mode == "delete")       {
-
-                            // reAffiche Clients
-                            await this.deleteMarkers(clients)
-                        }
-
-                        if(mode == "change_route_delete")   {
-
-                            // reAffiche Clients
-                            await this.deleteMarkers(clients)
-                        }
+                        // Extract JPlan, Cites, District
+                        if(mode != "data_ready") this.extractMetaData(clients)
 
                         //
-                        this.focuseMarkers()
+                        this.clients_markers_affiche    =   this.reAfficheClientsMarkers(this.route_import.clients)
+
+                        // Datatable
+                        await this.setDataTable()
+
+                        // Show Markers
+                        this.setRouteMarkers(mode, this.clients_markers_affiche)
+                    }
+
+                    //
+                    else {
+
+                        if((mode == "add")||(mode == "update")||(mode == "delete")||(mode == "change_route_update")||(mode == "change_route_delete")) {
+
+                            if(mode == "add")       {
+
+                                // Extract JPlan, Cites, District
+                                this.extractMetaData(clients)
+
+                                // reAffiche Clients
+                                this.clients_markers_affiche            =   this.reAfficheClientsMarkers(this.route_import.clients)
+                                let clients_markers_affiche_partial     =   this.reAfficheClientsMarkersPartly(clients)
+
+                                // Datatable
+                                await this.setDataTable()
+
+                                //
+                                this.addMarkers(clients_markers_affiche_partial)
+                            }
+
+                            if(mode == "update")       {
+
+                                //
+                                this.extractMetaData(clients)
+
+                                // reAffiche Clients
+                                this.clients_markers_affiche            =   this.reAfficheClientsMarkers(this.route_import.clients)
+                                let clients_markers_affiche_partial     =   this.reAfficheClientsMarkersPartly(clients)
+
+                                // Datatable
+                                await this.setDataTable()
+
+                                //
+                                await this.updateMarkers(clients_markers_affiche_partial, clients)
+                            }
+
+                            if(mode == "delete")       {
+
+                                // reAffiche Clients
+                                this.clients_markers_affiche    =   this.reAfficheClientsMarkers(this.route_import.clients)
+
+                                // Datatable
+                                await this.setDataTable()
+
+                                // reAffiche Clients
+                                await this.deleteMarkers(clients)
+                            }
+
+                            if(mode == "change_route_update")   {
+
+                                //
+                                this.extractMetaData(clients)
+
+                                // reAffiche Clients
+                                this.clients_markers_affiche            =   this.reAfficheClientsMarkers(this.route_import.clients)
+                                let clients_markers_affiche_partial     =   this.reAfficheClientsMarkersPartly(clients)
+
+                                // Datatable
+                                await this.setDataTable()
+
+                                //
+                                await this.updateMarkers(clients_markers_affiche_partial, clients)
+                            }
+
+                            if(mode == "change_route_delete")   {
+
+                                // reAffiche Clients
+                                this.clients_markers_affiche    =   this.reAfficheClientsMarkers(this.route_import.clients)
+
+                                // Datatable
+                                await this.setDataTable()
+
+                                // reAffiche Clients
+                                await this.deleteMarkers(clients)
+                            }
+
+                            //
+                            this.focuseMarkers()
+                        }
                     }
                 }
 
@@ -1383,7 +1418,7 @@ export default {
             });
 
             // 3) Group filtered clients by your column_group
-            const configs   =   {
+            const configs           =   {
                 1: { list: this.route_import.liste_journey_plan     , prop: 'JPlan'         , labelKey: 'JPlan'         },
                 2: { list: this.route_import.districts              , prop: 'DistrictNo'    , labelKey: 'DistrictNameE' },
                 3: { list: this.route_import.cites                  , prop: 'CityNo'        , labelKey: 'CityNameE'     },
@@ -1393,16 +1428,21 @@ export default {
                 7: { list: this.route_import.liste_status           , prop: 'status'        , labelKey: 'status'        }
             };
 
+            //
             const cfg       =   configs[this.column_group];
+            const palette   =   this.$colors
+            let i           =   0
 
             // init empty buckets
             const groups    =   {};
             for (const [key, md] of Object.entries(cfg.list)) {
                 groups[key] = {
                     column_name: typeof md === 'object' && md[cfg.labelKey] ? md[cfg.labelKey] : key,
-                    color: md.color,
+                    color: palette[i % palette.length],
                     clients: []
                 };
+
+                i   =   i   +   1
             }
 
             // assign to table
@@ -1430,25 +1470,89 @@ export default {
             return clients_markers_affiche
         },
 
-        reAfficheClientsTable() {
+        reAfficheClientsMarkersPartly(param_clients) {
 
-            // now your table is literally the same filtered list—
-            // if you need the same date + dropdown filters:
-            const startDate     =   this.date_start 
-            const endDate       =   this.date_end;
+            // 1) Pre‑compute filter sets & date bounds
+            const startDate         =   this.date_start; 
+            const endDate           =   this.date_end;
 
-            const filtered      =   this.route_import.clients.filter(c => {
+            const jpFilter          =   new Set(this.journey_plan_filter_value);
+            const distFilter        =   new Set(this.district_filter_value);
+            const cityFilter        =   new Set(this.city_filter_value);
+            const typeFilter        =   new Set(this.type_client_filter_value);
+            const jourFilter        =   new Set(this.journee_filter_value);
+            const ownerFilter       =   new Set(this.owner_filter_value);
+            const statusFilter      =   new Set(this.status_filter_value);
+            const clientIdsFilter   =   new Set(this.client_id_filter_value);
 
-                const cd            =   this.$humanToISO(c.created_at);
+            // 2) One pass: filter route_import.clients
+            const filtered          =   param_clients.filter(client => {
 
-                if (startDate && cd < startDate) return false;
-                if (endDate   && cd > endDate)   return false;
+                const cd            =   this.$humanToISO(client.created_at);
 
-                // no need to re‐apply grouping filters if markers already did it
+                if (startDate               && cd < startDate) return false;
+                if (endDate                 && cd > endDate)   return false;
+
+                if (jpFilter.size           && !jpFilter.has(client.JPlan))                         return false;
+                if (distFilter.size         && !distFilter.has(client.DistrictNo.toString()))       return false;
+                if (cityFilter.size         && !cityFilter.has(client.CityNo.toString()))           return false;
+                if (typeFilter.size         && !typeFilter.has(client.CustomerType.toString()))     return false;
+                if (jourFilter.size         && !jourFilter.has(client.Journee.toString()))          return false;
+                if (ownerFilter.size        && !ownerFilter.has(client.owner_name.toString()))      return false;
+                if (statusFilter.size       && !statusFilter.has(client.status.toString()))         return false;
+                if (clientIdsFilter.size    && !clientIdsFilter.has(client.id.toString()))          return false;
+
                 return true;
             });
 
-            this.clients_table_affiche  =   filtered;
+            // 3) Group filtered clients by your column_group
+            const configs           =   {
+                1: { list: this.route_import.liste_journey_plan     , prop: 'JPlan'         , labelKey: 'JPlan'         },
+                2: { list: this.route_import.districts              , prop: 'DistrictNo'    , labelKey: 'DistrictNameE' },
+                3: { list: this.route_import.cites                  , prop: 'CityNo'        , labelKey: 'CityNameE'     },
+                4: { list: this.route_import.liste_type_client      , prop: 'CustomerType'  , labelKey: 'CustomerType'  },
+                5: { list: this.route_import.liste_journee          , prop: 'Journee'       , labelKey: 'Journee'       },
+                6: { list: this.route_import.owners                 , prop: 'owner_name'    , labelKey: 'owner_name'    },
+                7: { list: this.route_import.liste_status           , prop: 'status'        , labelKey: 'status'        }
+            };
+
+            //
+            const cfg       =   configs[this.column_group];
+            const palette   =   this.$colors
+            let i           =   0
+
+            // init empty buckets
+            const groups    =   {};
+            for (const [key, md] of Object.entries(cfg.list)) {
+                groups[key] = {
+                    column_name: typeof md === 'object' && md[cfg.labelKey] ? md[cfg.labelKey] : key,
+                    color: palette[i % palette.length],
+                    clients: []
+                };
+
+                i   =   i   +   1
+            }
+
+            // assign clients
+            for (let i = 0, L = filtered.length; i < L; i++) {
+
+                const c         =   filtered[i]
+                const k         =   c[cfg.prop]
+
+                if (groups[k]) groups[k].clients.push(c);
+            }
+
+            // 4) sort by descending size & rebuild object
+            let clients_markers_affiche     =   Object
+                                                    .values(groups)
+                                                    .sort((a, b) => b.clients.length - a.clients.length)
+                                                    .reduce((acc, g) => {
+                                                        acc[g.column_name] = g;
+                                                        return acc;
+                                                    }, {});
+
+            //
+            return clients_markers_affiche
         },
 
         async setDataTable() {
@@ -1467,7 +1571,9 @@ export default {
 
         setRouteMarkers(mode, clients_markers_affiche) {
 
-            // Clear Route Data
+            console.log(this.$getCurrentTimeHMS())
+
+            //
             this.clearRouteMarkers()
 
             // Set Markers
@@ -1475,6 +1581,8 @@ export default {
 
             // Focus
             this.focuseMarkers()
+
+            console.log(this.$getCurrentTimeHMS())
         },
 
         removeDrawings() {
@@ -1636,7 +1744,7 @@ export default {
 
             for (let i = 0; i < this.districts_all.length; i++) {
 
-                this.kml_willayas.push({ value : this.districts_all[i].DistrictNo , label : this.districts_all[i].DistrictNo + "- " + this.districts_all[i].DistrictNameE})
+                this.kml_willayas.push({ value : this.districts_all[i].DistrictNo , label : this.districts_all[i].DistrictNameE + " (" + this.districts_all[i].DistrictNo + ")"})
             }
         },
 
@@ -1830,6 +1938,7 @@ export default {
         },
 
         async updateClientsRoute(clients) {
+
             await this.$refs.ModalClientsChangeRoute.getData(clients)
         },
 

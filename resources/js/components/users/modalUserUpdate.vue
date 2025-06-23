@@ -396,7 +396,7 @@ export default {
 
                     for (let i = 0; i < districts.length; i++) {
 
-                        this.districts.push({ value : districts[i].DistrictNo , label : districts[i].DistrictNo +   "- "    +   districts[i].DistrictNameE})
+                        this.districts.push({ value : districts[i].DistrictNo , label : districts[i].DistrictNameE  +   " (" + districts[i].DistrictNo + ")"})
                     }
                 }
 
