@@ -516,7 +516,7 @@ export default {
 
             //
 
-            marker_cluster_mode         :   "cluster"       ,
+            marker_cluster_mode         :   "marker"        ,
 
             //
 
@@ -576,7 +576,7 @@ export default {
         this.setValues()
 
         // Show Clusters
-        await this.map_instance.$switchMarkerClusterMode("cluster")
+        await this.map_instance.$switchMarkerClusterMode(this.marker_cluster_mode)
 
         // Get Data (clients + filter values)
         await this.getData()
@@ -706,9 +706,6 @@ export default {
             const res                   =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.id_route_import+"/details",   null)
             this.route_import           =   res.data.route_import
 
-            // 
-            this.setKMLWillayas()
-
             //
             await this.reAfficherClientsAndMarkers("initial")
         },
@@ -722,6 +719,8 @@ export default {
 
             this.users_all      =   res_1.data
             this.districts_all  =   res_2.data
+
+            this.setKMLWillayas()
 
             this.$hideLoadingPage()
         },
@@ -1576,8 +1575,12 @@ export default {
             //
             this.clearRouteMarkers()
 
+            console.log(this.$getCurrentTimeHMS())
+
             // Set Markers
             this.addMarkers(clients_markers_affiche)
+
+            console.log(this.$getCurrentTimeHMS())
 
             // Focus
             this.focuseMarkers()
@@ -1640,10 +1643,6 @@ export default {
         async showResume() {
             await this.$refs.ModalResume.getClients()
         },
-
-        // async getDoubles() {
-        //     await this.$refs.ModalValidateClients.getDoubles()
-        // },
 
         async showJPlanBDTerritories() {
 
@@ -1739,7 +1738,7 @@ export default {
         // Set KML Filters
 
         setKMLWillayas() {
-
+                
             this.kml_willayas   =   []
 
             for (let i = 0; i < this.districts_all.length; i++) {
@@ -1749,6 +1748,7 @@ export default {
         },
 
         setKMLLayers() {
+
             this.map_instance.$setKMLLayers(this.kml_layers)
         },
 
@@ -1895,6 +1895,8 @@ export default {
 
             if(this.marker_cluster_mode ==  "marker") {
 
+                console.log(this.$getCurrentTimeHMS())
+
                 // Show Markers
                 this.map_instance.$switchMarkerClusterMode("marker")
 
@@ -1905,6 +1907,8 @@ export default {
             else {
 
                 if(this.marker_cluster_mode ==  "cluster") {
+
+                    console.log(this.$getCurrentTimeHMS())
 
                     // Show Markers
                     this.map_instance.$switchMarkerClusterMode("cluster")

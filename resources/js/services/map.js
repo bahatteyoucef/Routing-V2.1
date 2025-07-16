@@ -1,6 +1,5 @@
 // 
 
-import client from "../store/modules/client/client"
 import store    from    "../store/store"
 
 export default class Map {
@@ -12,7 +11,7 @@ export default class Map {
         this.right_tools                                    =   false
 
         // Mode
-        this.marker_cluster_mode                            =   "cluster"
+        this.marker_cluster_mode                            =   "marker"
 
         // General
         this.map                                            =   null
@@ -22,6 +21,9 @@ export default class Map {
         this.markers_lat_lng                                =   {}          // used only to store getLatLngs
         this.clusters                                       =   {}          // used to store clusters
         this.markers                                        =   {}          // used to store markers in order to use markers functions for example : bindToolTip
+
+        //
+        this.markerLayers                                   =   {}
 
         // Icons
         this.markers_icons                                  =   {}
@@ -243,46 +245,48 @@ export default class Map {
         this.$setMarkerIcon(group, color) 
 
         //
-        var icon    =   this.markers_icons[group]
+        var icon                =   this.markers_icons[group]
+
+        //
+        const markers_to_add    =   []; // Array to collect markers before adding in batch
+        let marker_tempo        =   null
 
         // Add Markers
         for (let i = 0; i < clients.length; i++) {
             
-            if(((clients[i].Latitude != null)&&(clients[i].Longitude != null))
-            &&(!isNaN(clients[i].Latitude))&&(!isNaN(clients[i].Longitude))
-            &&(clients[i].Latitude <= 90)&&(clients[i].Latitude >= -90)
-            &&(clients[i].Longitude <= 180)&&(clients[i].Longitude >= -180)) {
+            const client    =   clients[i];
 
-                // Add Marker
-                this.$addRouteMarker(clients, i, group, icon)
+            // Robust coordinate validation and defaulting
+            if (client.Latitude === null || client.Longitude === null || isNaN(client.Latitude) || isNaN(client.Longitude) || client.Latitude > 90 || client.Latitude < -90 || client.Longitude > 180 || client.Longitude < -180) {
+                client.Latitude     =   0; // Default to 0,0 if invalid
+                client.Longitude    =   0;
             }
 
-            else {
+            // Add Marker
+            marker_tempo  =   this.$addRouteMarker(client, group, icon)
+            markers_to_add.push(marker_tempo)
+        }
 
-                clients[i].Latitude   =   0
-                clients[i].Longitude  =   0
-
-                // Add Marker
-                this.$addRouteMarker(clients, i, group, icon)
-            }
+        //
+        if (this.clusters[group]) {
+            this.clusters[group].addLayers(markers_to_add);
         }
     }
 
-    $addRouteMarker(clients, i, group, icon) {
+    $addRouteMarker(client, group, icon) {
 
         // Add Marker
-        let marker  =   L.marker([clients[i].Latitude, clients[i].Longitude], { icon : icon })
+        let marker  =   L.marker([client.Latitude, client.Longitude], { icon : icon })
 
         //
-        this.markers_lat_lng[clients[i].id]     =   { lat : marker.getLatLng().lat, lng : marker.getLatLng().lng, group : group }
-
-        this.markers[clients[i].id]             =   { marker : marker, group : group }
-
-        // Add Marker
-        this.clusters[group].addLayer(marker)
+        this.markers_lat_lng[client.id]     =   { lat : marker.getLatLng().lat, lng : marker.getLatLng().lng, group : group }
+        this.markers[client.id]             =   { marker : marker, group : group }
 
         // Add Description
-        this.$addRouteDescription(clients[i], marker)
+        this.$addRouteDescription(client, marker)
+
+        //
+        return marker
     }
 
     //  //  //  //  //  //  //  //  //
@@ -295,45 +299,46 @@ export default class Map {
         this.$setMarkerIcon(group, color) 
 
         //
-        var icon    =   this.markers_icons[group]
+        var icon                =   this.markers_icons[group]
+
+        //
+        const markers_to_add    =   []; // Array to collect markers for batch addition
+        let marker_tempo        =   null
 
         // Add Markers
         for (let i = 0; i < clients.length; i++) {
             
-            if(((clients[i].Latitude != null)&&(clients[i].Longitude != null))
-            &&(!isNaN(clients[i].Latitude))&&(!isNaN(clients[i].Longitude))
-            &&(clients[i].Latitude <= 90)&&(clients[i].Latitude >= -90)
-            &&(clients[i].Longitude <= 180)&&(clients[i].Longitude >= -180)) {
+            const client    =   clients[i];
 
-                // Add Marker
-                this.$addRouteMarkerMode(clients[i], clients[i].Latitude, clients[i].Longitude, group, icon)
+            // Robust coordinate validation and defaulting
+            if (client.Latitude === null || client.Longitude === null || isNaN(client.Latitude) || isNaN(client.Longitude) || client.Latitude > 90 || client.Latitude < -90 || client.Longitude > 180 || client.Longitude < -180) {
+                client.Latitude     =   0; // Default to 0,0 if invalid
+                client.Longitude    =   0;
             }
 
-            else {
-
-                clients[i].Latitude   =   0
-                clients[i].Longitude  =   0
-
-                // Add Marker
-                this.$addRouteMarkerMode(clients[i], clients[i].Latitude, clients[i].Longitude, group, icon)
-            }
+            // Add Marker
+            marker_tempo  =   this.$addRouteMarkerMode(client, group, icon)
+            markers_to_add.push(marker_tempo)
         }
+
+        //
+        markers_to_add.forEach(marker => marker.addTo(this.map));
     }
 
-    $addRouteMarkerMode(client, Latitude, Longitude, group, icon) {
+    $addRouteMarkerMode(client, group, icon) {
 
         // Add Marker
-        let marker  =   L.marker([Latitude, Longitude], { icon : icon })
-        marker.addTo(this.map)
+        let marker  =   L.marker([client.Latitude, client.Longitude], { icon : icon })
 
         //
         this.markers_lat_lng[client.id]     =   { lat : marker.getLatLng().lat, lng : marker.getLatLng().lng, group : group }
-
-        //
         this.markers[client.id]             =   { marker : marker, group : group }
 
         //
         this.$addRouteDescription(client, marker)
+
+        //
+        return marker
     }
 
     //  //  //  //  //  //  //  //  //
@@ -342,55 +347,50 @@ export default class Map {
     //  //  Global CRUD Markers Functions   //  //
 
     $setMarkerIcon(group, color) {
-
-        if(typeof this.markers_icons[group]    ==  "undefined") {
-
-            this.markers_icons[group]   =   new L.Icon({
-                iconUrl  : '/images/'+color.substring(1)+'.png',
-                iconSize: [15, 15] // Replace 'width' and 'height' with your desired values
+        if (typeof this.markers_icons[group] === "undefined") {
+            this.markers_icons[group] = new L.Icon({
+                iconUrl: '/images/' + color.substring(1) + '.png',
+                iconSize: [15, 15]
             });
         }
     }
 
     $addRouteDescription(client, marker) {
 
-        let marker_obj  =   null
+        // Store client data directly on the marker for easy access
+        marker.client = client;
 
-        // Add Description
-        marker_obj      =   marker.bindPopup(
-            "CustomerCode   : "     +client.CustomerCode    +"<br />"+
-            "CustomerNameE  : "     +client.CustomerNameE   +"<br />"+
-            "CustomerType   : "     +client.CustomerType    +"<br />"+
-            "JPlan          : "     +client.JPlan           +"<br />"+
-            "Journee        : "     +client.Journee         +"<br />"+
-            "Tel            : "     +client.Tel             +"<br />"+
-            "DistrictName   : "     +client.DistrictNameE   +"<br />"+
-            "CityName       : "     +client.CityNameE       +"<br />"+
-            "Address        : "     +client.Address         +"<br />"+
-            "Latitude       : "     +client.Latitude        +"<br />"+
-            "Longitude      : "     +client.Longitude       ,
-            { 
-                autoPan: false 
-            }       
-        )
-
-        // You would then need to handle opening the popup on hover and closing it on mouseout.
-        marker_obj.on('mouseover', (e) => {
-            e.target.openPopup();
+        // Use 'mouseover' and 'mouseout' to handle popup open/close
+        // Lazy load popup content on 'mouseover' to avoid creating all popups upfront
+        marker.on('mouseover', (e) => {
+            // Only bind and open if the popup content hasn't been set yet
+            // or if it's currently closed.
+            if (!e.target._popup || !e.target._popup._content) {
+                const popupContent = `
+                    <b>Customer Code:</b> ${client.CustomerCode}<br />
+                    <b>Customer Name:</b> ${client.CustomerNameE}<br />
+                    <b>Customer Type:</b> ${client.CustomerType}<br />
+                    <b>JPlan:</b> ${client.JPlan}<br />
+                    <b>Journee:</b> ${client.Journee}<br />
+                    <b>Tel:</b> ${client.Tel}<br />
+                    <b>District:</b> ${client.DistrictNameE}<br />
+                    <b>City:</b> ${client.CityNameE}<br />
+                    <b>Address:</b> ${client.Address}<br />
+                    <b>Latitude:</b> ${client.Latitude}<br />
+                    <b>Longitude:</b> ${client.Longitude}
+                `;
+                e.target.bindPopup(popupContent, { autoPan: false, closeButton: false }).openPopup();
+            } else {
+                e.target.openPopup();
+            }
         });
 
-        marker_obj.on('mouseout', (e) => {
+        marker.on('mouseout', (e) => {
         });
 
-        //  //  //
-
-        // Affect Client to marker
-        marker_obj.client    =   client;
-
-        // add Event
-        marker_obj.on('click',(event)   => {
-            
-            this.$updateModalClient(event.target.client)
+        // Add click event for modal update
+        marker.on('click', (event) => {
+            this.$updateModalClient(event.target.client);
         });
     }
 
@@ -453,58 +453,30 @@ export default class Map {
 
     $focuseMarkersClusterMode() {
 
-        // Create a marker group
-        var markers = L.featureGroup();
-
-        // Add markers to the marker group
-        var markerArray = []  
-
-        for (const [key, cluster] of Object.entries(this.clusters)) {
-
-            cluster.eachLayer((marker)  =>  {
-
-                markerArray.push(marker.addTo(markers))
+        // gather every child marker from each cluster
+        const allChildMarkers = [];
+        Object.values(this.clusters).forEach(clusterGroup => {
+                clusterGroup.getLayers().forEach(child => {
+                allChildMarkers.push(child.getLatLng());
             });
-        }
+        });
 
-        if(markerArray.length > 0) {
+        if (allChildMarkers.length === 0) return;
 
-            if(Object.entries(this.clusters).length > 0) {
-
-                // Get the bounds of all the markers
-                var groupBounds = markers.getBounds();
-
-                // Zoom the map to fit the bounds of the markers
-                this.map.fitBounds(groupBounds);
-            }
-        }
+        const bounds = L.latLngBounds(allChildMarkers);
+        this.map.fitBounds(bounds);
     }
 
     $focuseMarkersMode() {
 
-        // Create a marker group
-        var markers = L.featureGroup();
+        // collect all lat/lngs from your existing markers
+        const latlngs = Object.values(this.markers).map(({ marker }) => marker.getLatLng());
 
-        // Add markers to the marker group
-        var markerArray = []  
+        if (latlngs.length === 0) return;
 
-        // Set Markers
-        for (const [key, marker] of Object.entries(this.markers)) {
-                
-            markerArray.push(marker.marker.addTo(markers))
-        };
-
-        // Add the marker group to the map
-        this.map.addLayer(markers);
-
-        if(markerArray.length > 0) {
-
-            // Get the bounds of all the markers
-            var groupBounds = markers.getBounds();
-
-            // Zoom the map to fit the bounds of the markers
-            this.map.fitBounds(groupBounds);
-        }
+        // build bounds & fit once
+        const bounds = L.latLngBounds(latlngs);
+        this.map.fitBounds(bounds);
     }
 
     //  //  //  //  //  //  //  //
@@ -512,22 +484,40 @@ export default class Map {
 
     //  //  Clear Markers/Path  //  //
 
+    $getCurrentTimeHMS() {
+
+        const now       =   new Date();
+        const hours     =   String(now.getHours()).padStart(2, '0');
+        const minutes   =   String(now.getMinutes()).padStart(2, '0');
+        const seconds   =   String(now.getSeconds()).padStart(2, '0');
+
+        return `${hours}:${minutes}:${seconds}`;
+    }
+
     $clearRouteMarkers() {
+
+        console.log(this.$getCurrentTimeHMS())
 
         // a) remove all markers from each group
         Object.values(this.clusters).forEach(clusterGroup => {
             clusterGroup.clearLayers();
         });
 
+        console.log(this.$getCurrentTimeHMS())
+
         //
         Object.values(this.markers).forEach(marker => {
             this.map.removeLayer(marker.marker)
         });
 
+        console.log(this.$getCurrentTimeHMS())
+
         // c) reset all caches so next time you start fresh
         this.clusters           =   {}
         this.markers            =   {}
         this.markers_lat_lng    =   {}
+
+        console.log(this.$getCurrentTimeHMS())
     }
 
     $clearPath() {
@@ -1206,7 +1196,7 @@ export default class Map {
 
     $isMarkerInsidePolygon(marker, event) {
 
-        return event.layer.getBounds().contains(marker.getLatLng())
+        return event.layer.contains(marker.getLatLng()) // event.layer.getBounds().contains(marker.getLatLng())
     }
 
     //  //  //  //  //  //  //  //  //  //  //  //  //  //
@@ -1372,7 +1362,6 @@ export default class Map {
 
         // Delete all kml layers
         this.kml_layers.forEach(kml_layer => {
-
             this.map.removeLayer(kml_layer);            
         })
 

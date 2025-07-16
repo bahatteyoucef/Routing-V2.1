@@ -411,6 +411,8 @@ export default {
 
         async getData(clients) {
 
+            console.log(clients)
+
             // Show Loading Page
             this.$showLoadingPage()
 
