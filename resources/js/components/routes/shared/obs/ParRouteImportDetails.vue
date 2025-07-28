@@ -516,7 +516,7 @@ export default {
 
             //
 
-            marker_cluster_mode         :   "marker"        ,
+            marker_cluster_mode         :   "cluster"       ,
 
             //
 

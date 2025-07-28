@@ -11,7 +11,7 @@ export default class Map {
         this.right_tools                                    =   false
 
         // Mode
-        this.marker_cluster_mode                            =   "marker"
+        this.marker_cluster_mode                            =   "cluster"
 
         // General
         this.map                                            =   null
@@ -273,23 +273,8 @@ export default class Map {
         }
     }
 
-    $addRouteMarker(client, group, icon) {
-
-        // Add Marker
-        let marker  =   L.marker([client.Latitude, client.Longitude], { icon : icon })
-
-        //
-        this.markers_lat_lng[client.id]     =   { lat : marker.getLatLng().lat, lng : marker.getLatLng().lng, group : group }
-        this.markers[client.id]             =   { marker : marker, group : group }
-
-        // Add Description
-        this.$addRouteDescription(client, marker)
-
-        //
-        return marker
-    }
-
     //  //  //  //  //  //  //  //  //
+
 
     //  //  Show Markers Mode (Add)   //  //
 
@@ -317,28 +302,14 @@ export default class Map {
             }
 
             // Add Marker
-            marker_tempo  =   this.$addRouteMarkerMode(client, group, icon)
+            marker_tempo  =   this.$addRouteMarker(client, group, icon)
             markers_to_add.push(marker_tempo)
         }
 
+        console.log(this.markers)
+
         //
         markers_to_add.forEach(marker => marker.addTo(this.map));
-    }
-
-    $addRouteMarkerMode(client, group, icon) {
-
-        // Add Marker
-        let marker  =   L.marker([client.Latitude, client.Longitude], { icon : icon })
-
-        //
-        this.markers_lat_lng[client.id]     =   { lat : marker.getLatLng().lat, lng : marker.getLatLng().lng, group : group }
-        this.markers[client.id]             =   { marker : marker, group : group }
-
-        //
-        this.$addRouteDescription(client, marker)
-
-        //
-        return marker
     }
 
     //  //  //  //  //  //  //  //  //
@@ -353,6 +324,22 @@ export default class Map {
                 iconSize: [15, 15]
             });
         }
+    }
+
+    $addRouteMarker(client, group, icon) {
+
+        // Add Marker
+        let marker  =   L.marker([client.Latitude, client.Longitude], { icon : icon })
+
+        //
+        this.markers_lat_lng[client.id]     =   { lat : marker.getLatLng().lat, lng : marker.getLatLng().lng, group : group }
+        this.markers[client.id]             =   { marker : marker, group : group }
+
+        // Add Description
+        this.$addRouteDescription(client, marker)
+
+        //
+        return marker
     }
 
     $addRouteDescription(client, marker) {
@@ -408,6 +395,22 @@ export default class Map {
 
 
     //  //  Delete Markers    //   //  //
+
+    $createMarker(client, group, icon) {
+    
+        let marker = L.marker([client.Latitude, client.Longitude], {
+            icon: icon
+        });
+
+        // Store a reference back to the client data and group
+        this.markers_lat_lng[client.id] = { lat: client.Latitude, lng: client.Longitude, group: group };
+        this.markers[client.id] = { marker: marker, group: group };
+
+        // Add popup and click events
+        this.$addRouteDescription(client, marker);
+
+        return marker;
+    }
 
     $deleteRouteMarkers(clients) {
 

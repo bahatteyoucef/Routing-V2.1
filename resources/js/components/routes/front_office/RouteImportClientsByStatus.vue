@@ -1,110 +1,149 @@
 <template>
-    <div>
-
-        <!-- OPTIONS -->
-        <div class="row p-3 pb-0 pt-0">
-            <div class="col-lg-7 mx-auto">
-
-                <div class="row mt-2">
-                    <div class="p-1 pt-0 col-sm-12 d-flex justify-content-end">
-                        <div class="col-2 pl-1 pr-1">
-                            <button class="btn btn-primary w-100 m-0"   @click="showHideCodeBar()"><i class="mdi mdi-barcode"></i></button>
-                        </div>
-
-                        <div class="col-2 pl-1 pr-1">
-                            <button class="btn btn-primary w-100 m-0"   @click="showMap()"><i class="mdi mdi-map-marker-circle"></i></button>
-                        </div>
-
-                        <div class="col-8 pl-1 pr-1">
-                            <select         class="form-select"     id="filter_status"      v-model="filter_status"     @change="getClients()">
-                                <option     :value="'validated'">Validé</option>
-                                <option     :value="'pending'">en Attente</option>
-                                <option     :value="'nonvalidated'">Refusé</option>
-                                <option     :value="'visible'">Visible</option>
-                                <option     :value="'ferme'">Fermé</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row mt-2">
-                    <div class="col-sm-12 p-0">
-                        <input class="form-control" placeholder="Filtrer Par Raison Social..." v-model="search_by_CustomerNameA_value" @input="searchByCustomerNameA()"/>
-                    </div>
-                </div>
-
-                <div class="row mt-1" v-if="show_barcode_div">
-
-                    <div id="reader" class="scanner_reader mt-1"></div>
-
-                    <div v-show="search_by_clientbarcode_value   !=  ''"    id="refresh_client_barcode_filter_button" class="mt-1 p-0">
-                        <button type="button" class="btn btn-primary w-100" @click="setBarCodeReader()">Re-Capture Bar Code</button>
-                    </div>
-
-                    <div v-show="search_by_clientbarcode_value   !=  ''"    id="clientbarcode_value" class="mt-1 p-0"></div>
-
-                </div>
+  <div>
+    <!-- OPTIONS -->
+    <div class="row p-3 pb-0 pt-0">
+      <div class="col-lg-7 mx-auto">
+        <div class="row mt-2">
+          <div class="p-1 pt-0 col-sm-12 d-flex justify-content-end">
+            <div class="col-2 pl-1 pr-1">
+              <button class="btn btn-primary w-100 m-0" @click="showHideCodeBar()">
+                <i class="mdi mdi-barcode"></i>
+              </button>
             </div>
-        </div>
-
-        <!--  -->
-
-        <!-- Client Cards -->
-        <div class="row mt-3" style="overflow-y: auto; height : 1000px">
-            <div class="col-lg-8 mx-auto mb-3">
-                <!-- List group-->
-                <ul class="list-group shadow mb-5">
-
-                    <!-- list group item-->
-                    <li v-for="client, index in clients_filtered" :key="index"  @click="getDetailsPage(client)"   class="list-group-item"     role="button">
-                        <!-- Custom content-->
-                        <div class="media align-items-lg-center flex-column flex-lg-row p-1">
-
-                            <div class="media-body order-2 order-lg-1 w-100">
-
-                                <h5 class="mt-0 font-weight-bold mb-2">{{ client.CustomerNameA }} ({{ client.CustomerNameE }})</h5>
-                            
-                                <p class="font-italic text-muted mb-0 small">{{ client.Address }} - {{ client.CityNameE }}</p>
-
-                                <div>
-                                    <div v-if="client.status    ==  'validated'"        class="badge badge-success mt-1 mb-1">
-                                        Validé
-                                    </div>
-
-                                    <div v-if="client.status    ==  'pending'"          class="badge badge-warning mt-1 mb-1">
-                                        en Attente
-                                    </div>
-
-                                    <div v-if="client.status    ==  'nonvalidated'"     class="badge badge-danger mt-1 mb-1">
-                                        Refusé
-                                    </div>
-
-                                    <div v-if="client.status    ==  'visible'"          class="badge badge-info mt-1 mb-1">
-                                        Visible
-                                    </div>
-
-                                    <div v-if="client.status    ==  'ferme'"            class="badge badge-secondary mt-1 mb-1">
-                                        Fermé
-                                    </div>
-
-                                </div>
-
-                                <div v-if="client.status    ==  'nonvalidated'" class="mt-1 mb-1">
-                                    <span class="text-small text-danger">{{ client.nonvalidated_details }}</span>
-                                </div>
-
-                            </div>
-
-                        </div> <!-- End -->
-                    </li> <!-- End -->
-
-                </ul> <!-- End -->
+            <div class="col-2 pl-1 pr-1">
+              <button class="btn btn-primary w-100 m-0" @click="showMap()">
+                <i class="mdi mdi-map-marker-circle"></i>
+              </button>
             </div>
+            <div class="col-8 pl-1 pr-1">
+              <select
+                class="form-select"
+                id="filter_status"
+                v-model="filter_status"
+                @change="getClients()"
+              >
+                <option :value="'validated'">Validé</option>
+                <option :value="'pending'">en Attente</option>
+                <option :value="'nonvalidated'">Refusé</option>
+                <option :value="'visible'">Visible</option>
+                <option :value="'ferme'">Fermé</option>
+              </select>
+            </div>
+          </div>
         </div>
+        <div class="row mt-2">
+          <div class="col-sm-12 p-0">
+            <input
+              class="form-control"
+              placeholder="Filtrer Par Raison Social..."
+              v-model="search_by_CustomerNameA_value"
+              @input="searchByCustomerNameA()"
+            />
+          </div>
+        </div>
+        <div class="row mt-1" v-if="show_barcode_div">
+          <div id="reader" class="scanner_reader mt-1"></div>
+          <div
+            v-show="search_by_clientbarcode_value !== ''"
+            id="refresh_client_barcode_filter_button"
+            class="mt-1 p-0"
+          >
+            <button
+              type="button"
+              class="btn btn-primary w-100"
+              @click="setBarCodeReader()"
+            >
+              Re-Capture Bar Code
+            </button>
+          </div>
+          <div
+            v-show="search_by_clientbarcode_value !== ''"
+            id="clientbarcode_value"
+            class="mt-1 p-0"
+          ></div>
+        </div>
+      </div>
     </div>
+
+    <!-- Client Cards with Virtual Scroll -->
+    <div class="row mt-3" style="height: 80vh; overflow-y: auto;">
+      <div class="col-lg-8 mx-auto mb-3">
+        <!-- use Vue 3 compatible virtual scroller -->
+        <RecycleScroller
+          :items="clients_filtered"
+          :item-size="120"
+          key-field="CustomerNo"
+          class="list-group shadow mb-5"
+        >
+          <template #default="{ item: client }">
+            <li
+              @click="getDetailsPage(client)"
+              class="list-group-item"
+              role="button"
+            >
+              <div class="media align-items-lg-center flex-column flex-lg-row p-1">
+                <div class="media-body order-2 order-lg-1 w-100">
+                  <h5 class="mt-0 font-weight-bold mb-2">
+                    {{ client.CustomerNameA }} ({{ client.CustomerNameE }})
+                  </h5>
+                  <p class="font-italic text-muted mb-0 small">
+                    {{ client.Address }} - {{ client.CityNameE }}
+                  </p>
+                  <div>
+                    <span
+                      v-if="client.status === 'validated'"
+                      class="badge badge-success mt-1 mb-1"
+                    >
+                      Validé
+                    </span>
+                    <span
+                      v-if="client.status === 'pending'"
+                      class="badge badge-warning mt-1 mb-1"
+                    >
+                      en Attente
+                    </span>
+                    <span
+                      v-if="client.status === 'nonvalidated'"
+                      class="badge badge-danger mt-1 mb-1"
+                    >
+                      Refusé
+                    </span>
+                    <span
+                      v-if="client.status === 'visible'"
+                      class="badge badge-info mt-1 mb-1"
+                    >
+                      Visible
+                    </span>
+                    <span
+                      v-if="client.status === 'ferme'"
+                      class="badge badge-secondary mt-1 mb-1"
+                    >
+                      Fermé
+                    </span>
+                  </div>
+                  <div
+                    v-if="client.status === 'nonvalidated'"
+                    class="mt-1 mb-1"
+                  >
+                    <span class="text-small text-danger">
+                      {{ client.nonvalidated_details }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </template>
+        </RecycleScroller>
+      </div>
+    </div>
+  </div>
 </template>
  
 <script>
+
+// switch to Vue 3 compatible virtual scroller
+import { RecycleScroller }          from    'vue3-virtual-scroller'
+// import 'vue3-virtual-scroller/dist/index.css'
 
 import Multiselect                  from    '@vueform/multiselect'
 
@@ -143,6 +182,7 @@ export default {
     },
 
     components: {
+        RecycleScroller,
         Multiselect
     },
 
