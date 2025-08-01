@@ -30,6 +30,7 @@ These Composer dependencies are released under the MIT License.
 
 | Package                         | Version      | Original Copyright                 |
 |---------------------------------|--------------|------------------------------------|
+| vue-virtual-scroller            | ^2.0.0-beta.8| @ 2017–2023 Akryum                 |
 | axios                           | ^1.1.2       | © 2015 Matt Zabriskie              |
 | laravel-vite-plugin             | ^0.7.0       | © 2022 Laravel                     |
 | lodash                          | ^4.17.19     | © 2009–2023 John-David Dalton      |

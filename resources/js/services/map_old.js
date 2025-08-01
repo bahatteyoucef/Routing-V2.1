@@ -22,10 +22,6 @@ export default class Map {
         this.clusters                                       =   {}          // used to store clusters
         this.markers                                        =   {}          // used to store markers in order to use markers functions for example : bindToolTip
 
-        //
-        this.markerGroups                                   =   {}
-        this.canvasRenderer                                 =   L.canvas({ padding: 0.5 })
-
         // Icons
         this.markers_icons                                  =   {}
         this.clusters_icons                                 =   {}
@@ -107,9 +103,6 @@ export default class Map {
         this.titleLayer     =   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(this.map);
-
-        // create & store a canvas renderer
-        this.map.addLayer(this.canvasRenderer);
 
         // User Role
         this.user_role      =   role
@@ -284,45 +277,34 @@ export default class Map {
 
     $showMarkersMode(clients, group, color) {
 
-        // 1) filter/normalize coords
-        const pts   =   clients
-                            .map(c => ({
-                                lat: +c.Latitude || 0,
-                                lng: +c.Longitude || 0,
-                                client: c,
-                            }))
-                            .filter(p => !isNaN(p.lat) && !isNaN(p.lng));
+        //
+        this.$setMarkerIcon(group, color) 
 
-        // 2) remove any existing canvas markers for this group
-        //    (we assume you never mix icons and canvas for one group)
-        //    you could also keep a per-group layerGroup of circleMarkers
-        if (!this.markerGroups[group]) { this.markerGroups[group]    =   L.layerGroup().addTo(this.map) }
+        //
+        var icon                =   this.markers_icons[group]
 
-        // 3) draw on canvas: create circleMarkers with the shared renderer
-        const renderer      =   this.canvasRenderer;
-        const layerGroup    =   this.markerGroups[group];
+        //
+        const markers_to_add    =   []; // Array to collect markers for batch addition
+        let marker_tempo        =   null
 
-        pts.forEach(({ lat, lng, client }) => {
+        // Add Markers
+        for (let i = 0; i < clients.length; i++) {
+            
+            const client    =   clients[i];
 
-            const m = L.circleMarker([lat, lng], {
-                renderer,               // ← draw into the shared canvas
-                radius: 8,              // circle radius in pixels
-                fillColor: color,       // your group-specific fill
-                fillOpacity: 1,         // fully opaque fill
-                stroke: true,           // enable the outline
-                color: '#ffffff',     // stroke (border) color
-                weight: 1,              // border width in pixels
-            });
+            // Robust coordinate validation and defaulting
+            if (client.Latitude === null || client.Longitude === null || isNaN(client.Latitude) || isNaN(client.Longitude) || client.Latitude > 90 || client.Latitude < -90 || client.Longitude > 180 || client.Longitude < -180) {
+                client.Latitude     =   0; // Default to 0,0 if invalid
+                client.Longitude    =   0;
+            }
 
-            m.client = client;
+            // Add Marker
+            marker_tempo  =   this.$addRouteMarker(client, group, icon)
+            markers_to_add.push(marker_tempo)
+        }
 
-            // add your popup/click handlers as before:
-            this.$addRouteDescription(client, m);
-
-            this.markers[client.id]         =   { marker: m, group };
-            this.markers_lat_lng[client.id] =   { lat, lng, group };
-            layerGroup.addLayer(m);
-        });
+        //
+        markers_to_add.forEach(marker => marker.addTo(this.map));
     }
 
     //  //  //  //  //  //  //  //  //
@@ -409,39 +391,43 @@ export default class Map {
 
     //  //  Delete Markers    //   //  //
 
+    $createMarker(client, group, icon) {
+    
+        let marker = L.marker([client.Latitude, client.Longitude], {
+            icon: icon
+        });
+
+        // Store a reference back to the client data and group
+        this.markers_lat_lng[client.id] = { lat: client.Latitude, lng: client.Longitude, group: group };
+        this.markers[client.id] = { marker: marker, group: group };
+
+        // Add popup and click events
+        this.$addRouteDescription(client, marker);
+
+        return marker;
+    }
+
     $deleteRouteMarkers(clients) {
 
-        clients.forEach(c => {
+        clients.forEach(client => {
 
-            const entry             =   this.markers[c.id];
+            const entry = this.markers[client.id];
             if (!entry) return;
 
-            const { marker, group } =   entry;
+            const { marker, group } = entry;
 
-            if (this.marker_cluster_mode === 'cluster') {
-                // remove from the cluster group
-                const cg = this.clusters[group];
-
-                if (cg) {
-                    cg.removeLayer(marker);
-                }
+            // Remove from cluster or map
+            if (this.marker_cluster_mode === 'cluster' && this.clusters[group]) {
+                this.clusters[group].removeLayer(marker);
             }
 
             else {
-                // remove from the plain-marker FeatureGroup
-                const lg = this.markerGroups[group];
-                if (lg) {
-                    lg.removeLayer(marker);
-                    if (Object.keys(lg._layers).length === 0) {
-                        this.map.removeLayer(lg);
-                        delete this.markerGroups[group];
-                    }
-                }
+                this.map.removeLayer(marker);
             }
 
-            // finally clean up your lookup
-            delete this.markers[c.id];
-            delete this.markers_lat_lng[c.id];
+            // Clean up
+            delete this.markers[client.id];
+            delete this.markers_lat_lng[client.id];
         });
     }
 
@@ -481,12 +467,14 @@ export default class Map {
 
     $focuseMarkersMode() {
 
-        const latlngs = Object.values(this.markers).map(({ marker }) =>
-            marker.getLatLng()
-        );
+        // collect all lat/lngs from your existing markers
+        const latlngs = Object.values(this.markers).map(({ marker }) => marker.getLatLng());
 
-        if (!latlngs.length) return;
-        this.map.fitBounds(L.latLngBounds(latlngs));
+        if (latlngs.length === 0) return;
+
+        // build bounds & fit once
+        const bounds = L.latLngBounds(latlngs);
+        this.map.fitBounds(bounds);
     }
 
     //  //  //  //  //  //  //  //
@@ -508,17 +496,24 @@ export default class Map {
 
         console.log(this.$getCurrentTimeHMS())
 
-        // clear clusters:
-        Object.values(this.clusters).forEach(cg => cg.clearLayers());
-    
-        // clear all canvas groups:
-        Object.values(this.markerGroups).forEach(lg => lg.clearLayers());
-    
-        // caches:
-        this.clusters           =   {};
-        this.markers            =   {};
-        this.markers_lat_lng    =   {};
-        this.markerGroups       =   {};
+        // a) remove all markers from each group
+        Object.values(this.clusters).forEach(clusterGroup => {
+            clusterGroup.clearLayers();
+        });
+
+        console.log(this.$getCurrentTimeHMS())
+
+        //
+        Object.values(this.markers).forEach(marker => {
+            this.map.removeLayer(marker.marker)
+        });
+
+        console.log(this.$getCurrentTimeHMS())
+
+        // c) reset all caches so next time you start fresh
+        this.clusters           =   {}
+        this.markers            =   {}
+        this.markers_lat_lng    =   {}
 
         console.log(this.$getCurrentTimeHMS())
     }
@@ -1038,7 +1033,7 @@ export default class Map {
 
             edit: {
                 featureGroup    : this.editable_layers, // REQUIRED!!
-                edit            : true,                 // Include the edit option
+                edit            : false,                // Exclude the edit option
                 remove          : true
             }
         };
@@ -1087,22 +1082,25 @@ export default class Map {
 
                     // Set Draw
                     this.$setDraw(event)
-                    const layer     =   event.layer
 
-                    // 2) define one small helper to re‐compute & send the selected clients
-                    const updateSelection   =   () => {
+                    if(this.marker_cluster_mode     ==  "cluster") {
 
-                        if (this.marker_cluster_mode    === "cluster")  clients_change_route      =   this.$getClientsFromSelection({ layer })
-                        if (this.marker_cluster_mode    === "marker")   clients_change_route      =   this.$getClientsFromSelectionMarkersMode({ layer })
-                        
-                        this.$updateModalClientsRoute(clients_change_route)
-                    };
+                        // Get Clients (Polygon)
+                        clients_change_route    =   this.$getClientsFromSelection(event)
+                    }
 
-                    // 3) run it once immediately
-                    updateSelection()
+                    if(this.marker_cluster_mode     ==  "marker") {
 
-                    // 5) if you still need the click behavior, you can similarly re‐use it:
-                    layer.on("click", (event)   => { updateSelection() })
+                        // Get Clients (Polygon)
+                        clients_change_route    =   this.$getClientsFromSelectionMarkersMode(event)
+                    }
+
+                    // Change Route
+                    this.$updateModalClientsRoute(clients_change_route)
+
+                    // Add Event
+                    layer.on("edit", function(event) {
+                    })
                 }
 
                 // Journey Plan Territory
@@ -1129,13 +1127,6 @@ export default class Map {
 
                 // Add New Client
                 this.$addModalClient(event)
-
-                // Click Event
-                layer.on("click", ()    =>  {
-
-                    // Add New Customer
-                    this.$addModalClient(event)
-                })
             }
 
             //

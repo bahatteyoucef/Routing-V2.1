@@ -701,6 +701,9 @@ export default {
 
                 if(res.status===200){
 
+                    let client          =   res.data.client
+                    client.owner_name   =   this.client.owner_name
+
                     // Send Feedback
                     this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
@@ -709,13 +712,14 @@ export default {
 
                     // Validation
                     if(this.update_type ==  "validation") {
-                        this.emitter.emit("updateDoubles"+this.validation_type    , res.data.client)
+                        this.emitter.emit("updateDoubles"+this.validation_type    , client)
                     }
 
                     // Update Data
                     else {
                         if(this.update_type ==  "normal_update") {
-                            this.emitter.emit('reSetUpdate' , res.data.client)
+
+                            this.emitter.emit('reSetUpdate' , client)
                         }
                     }
 
@@ -741,6 +745,9 @@ export default {
 
                     if(res.status===200){
 
+                        let client          =   res.data.client
+                        client.owner_name   =   this.client.owner_name
+
                         // Send Feedback
                         this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
@@ -750,7 +757,7 @@ export default {
                         // Validation
                         if(this.update_type ==  "validation") {
 
-                            this.emitter.emit("updateDoubles"+this.validation_type    , res.data.client)
+                            this.emitter.emit("updateDoubles"+this.validation_type    , client)
                         }
 
                         // Close Modal

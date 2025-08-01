@@ -704,6 +704,7 @@ export default {
 
                 // Send Client
                 let client                                  =   res.data.client
+                client.owner_name                           =   this.client.owner_name
                 client.created_at                           =   this.$formatDate(new Date())
 
                 // Send Feedback
@@ -803,6 +804,9 @@ export default {
 
                 //
                 this.client.OpenCustomer                            =   '',
+
+                //
+                this.client.CustomerIdentifier                      =   '',
 
                 // Slide 1
                 this.client.CustomerCode                            =   '',

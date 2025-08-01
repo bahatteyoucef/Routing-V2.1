@@ -1259,9 +1259,9 @@ export default {
             await new Promise(resolve => {
                 const checkReady = () => {
                     if (container.offsetWidth > 0 && container.offsetHeight > 0) {
-                    resolve();
+                        resolve();
                     } else {
-                    requestAnimationFrame(checkReady);
+                        requestAnimationFrame(checkReady);
                     }
                 };
 
@@ -1320,19 +1320,9 @@ export default {
                     popupAnchor: [0, -15]
                 });
 
-                mainMarker  =    L.marker([client.Latitude, client.Longitude], { draggable: true, icon: mainIcon })
-                                    .bindPopup(this.$createTooltipContent(client))
+                mainMarker  =    L.marker([client.Latitude, client.Longitude]       , { draggable: true , icon: mainIcon })
+                                    .bindPopup(this.$createTooltipContent(client)   , { permanent: false, autoPan: false })
                                     .addTo(map);
-
-                // Open popup on mouseover for mainMarker
-                // mainMarker.on('mouseover', function (e) {
-                //     this.openPopup();
-                // });
-
-                // Optional: Close popup on mouseout
-                // mainMarker.on('mouseout', function (e) {
-                //     this.closePopup();
-                // });
             }
 
             // CLOSE CLIENTS MARKERS
@@ -1341,19 +1331,9 @@ export default {
                 closeIcon           =   L.icon({ iconUrl: '/images/F9A825.png', iconSize: [20, 20], popupAnchor: [0, -10] });
                 
                 closeMarkers        =   close_clients.map(c => {
-                                                const marker    =   L.marker([c.Latitude, c.Longitude], { icon: closeIcon })
-                                                                        .bindPopup(this.$createTooltipContent(c))
+                                                const marker    =   L.marker([c.Latitude, c.Longitude]              , { icon: closeIcon                     })
+                                                                        .bindPopup(this.$createTooltipContent(c)    , { permanent: false, autoPan: false    })
                                                                         .addTo(map);
-
-                                                // Open popup on mouseover for close_clients markers
-                                                // marker.on('mouseover', function (e) {
-                                                //     this.openPopup();
-                                                // });
-
-                                                // Optional: Close popup on mouseout
-                                                // marker.on('mouseout', function (e) {
-                                                //     this.closePopup();
-                                                // });
 
                                                 return marker;
                                             }
@@ -1372,12 +1352,11 @@ export default {
 
         $createTooltipContent(client) {
             return `
-                CustomerCode   : ${ client.CustomerCode  }  <br />
-                CustomerNameA  : ${ client.CustomerNameA }  <br />
-                CustomerNameE  : ${ client.CustomerNameE }  <br />
-                CustomerType   : ${ client.CustomerType  }  <br />`,
-                { permanent: false, autoPan: false }
-            ;
+                CustomerCode   : ${client.CustomerCode}  <br />
+                CustomerNameA  : ${client.CustomerNameA} <br />
+                CustomerNameE  : ${client.CustomerNameE} <br />
+                CustomerType   : ${client.CustomerType}  <br />
+            `;
         },
 
         $focuseMarkers(show_map, clients_markers) {

@@ -121,6 +121,8 @@
                 <div id="map_operation_buttons" v-if="(($isRole('Super Admin'))||($isRole('BU Manager'))||($isRole('BackOffice')))">
                     <h5 class="fw-bold text-center primary_color">Operations</h5>
 
+                    <button class="btn btn-primary w-100 m-0 mt-1" @click="clearRouteMarkers()">Clear Data</button>
+
                     <button class="btn btn-primary w-100 m-0 mt-1"                                                                  @click="getData()">Refresh</button>
                     <button class="btn btn-primary w-100 m-0 mt-1"                                                                  @click="focuseMarkers()">Focus</button>
                     <button class="btn btn-primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#ModalResume'"         @click="showResume()">Resume</button>
@@ -703,6 +705,8 @@ export default {
             this.$showLoadingPage()
                 
             const res                   =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.id_route_import+"/details",   null)
+            console.log(res)
+
             this.route_import           =   res.data.route_import
 
             //
@@ -1223,6 +1227,9 @@ export default {
                                 this.clients_markers_affiche            =   this.reAfficheClientsMarkers(this.route_import.clients)
                                 let clients_markers_affiche_partial     =   this.reAfficheClientsMarkersPartly(clients)
 
+                                console.log(this.clients_markers_affiche)
+                                console.log(clients_markers_affiche_partial)
+
                                 // Datatable
                                 await this.setDataTable()
 
@@ -1304,45 +1311,54 @@ export default {
             // JPlan
             if(this.column_group    ==  1) {
 
-                this.journey_plan_filter_value      =   [column_name]
+                if(column_name  !=  "")     this.journey_plan_filter_value      =   [column_name]
+                else                        this.journey_plan_filter_value      =   [""]
             }
 
             // District
             if(this.column_group    ==  2) {
 
                 let DistrictNo                      =   this.getDistrictNo(column_name)
-                this.district_filter_value          =   [DistrictNo]
+
+                if(column_name  !=  "")     this.district_filter_value          =   [DistrictNo]
+                else                        this.district_filter_value          =   [""]
             }
 
             // City
             if(this.column_group    ==  3) {
 
                 let CityNo                          =   this.getCityNo(column_name)
-                this.city_filter_value              =   [CityNo]
+
+                if(column_name  !=  "")     this.city_filter_value              =   [CityNo]
+                else                        this.city_filter_value              =   [""]
             }
 
             // CustomerType
             if(this.column_group    ==  4) {
 
-                this.type_client_filter_value       =   [column_name]
+                if(column_name  !=  "")     this.type_client_filter_value       =   [column_name]
+                else                        this.type_client_filter_value       =   [""]
             }
 
             // Journee
             if(this.column_group    ==  5) {
 
-                this.journee_filter_value           =   [column_name]
+                if(column_name  !=  "")     this.journee_filter_value           =   [column_name]
+                else                        this.journee_filter_value           =   [""]
             }
 
             // Owner
             if(this.column_group    ==  6) {
 
-                this.owner_filter_value             =   [column_name]
+                if(column_name  !=  "")     this.owner_filter_value             =   [column_name]
+                else                        this.owner_filter_value             =   [""]
             }
 
             // Staus
             if(this.column_group    ==  7) {
 
-                this.status_filter_value            =   [column_name]
+                if(column_name  !=  "")     this.status_filter_value            =   [column_name]
+                else                        this.status_filter_value            =   [""]
             }
         },
 
@@ -1519,7 +1535,9 @@ export default {
 
             // init empty buckets
             const groups    =   {};
+
             for (const [key, md] of Object.entries(cfg.list)) {
+
                 groups[key] = {
                     column_fullname: typeof md === 'object' && md[cfg.labelFull] ? md[cfg.labelFull] : key,
                     column_name: typeof md === 'object' && md[cfg.labelKey] ? md[cfg.labelKey] : key,
@@ -1540,7 +1558,7 @@ export default {
             }
 
             // 4) sort by descending size & rebuild object
-            let clients_markers_affiche   =   Object
+            let clients_markers_affiche     =   Object
                                                     .values(groups)
                                                     .sort((a, b) => b.clients.length - a.clients.length);
 
@@ -1593,9 +1611,9 @@ export default {
         addMarkers(clients_markers_affiche) {
 
             // Set Markers
-            for (const [key, value] of Object.entries(clients_markers_affiche))  {
+            for (let index = 0; index < clients_markers_affiche.length; index++) {
 
-                this.map_instance.$setRouteMarkers(clients_markers_affiche[key].clients, key, clients_markers_affiche[key].color)
+                this.map_instance.$setRouteMarkers(clients_markers_affiche[index].clients, clients_markers_affiche[index].column_name, clients_markers_affiche[index].color)
             }
         },
 
@@ -1609,9 +1627,9 @@ export default {
             setTimeout(() => {
                 
                 // Set Markers
-                for (const [key, value] of Object.entries(clients_markers_affiche))  {
+                for (let index = 0; index < clients_markers_affiche.length; index++) {
 
-                    this.map_instance.$setRouteMarkers(clients_markers_affiche[key].clients, key, clients_markers_affiche[key].color)
+                    this.map_instance.$setRouteMarkers(clients_markers_affiche[index].clients, clients_markers_affiche[index].column_name, clients_markers_affiche[index].color)
                 }
             }, 0);
         },
