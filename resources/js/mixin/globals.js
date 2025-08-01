@@ -314,15 +314,34 @@ export default {
             };
         },
 
-        $displayImage(image, outputElement) {
+        $displayImage(file, imgElement) {
 
-            const blobUrl = URL.createObjectURL(image); // Create a Blob URL from the image
+            if (!imgElement) return;
+    
+            // Clean up previous object URL
+            if (imgElement._objectURL) {
+                URL.revokeObjectURL(imgElement._objectURL);
+                imgElement._objectURL = null;
+            }
 
-            // Set the image source to the Blob URL
-            outputElement.src = blobUrl;
+            if (!file) {
+                imgElement.src = "";
+                return;
+            }
 
-            // Revoke the Blob URL when it's no longer needed to free memory
-            outputElement.onload = () => URL.revokeObjectURL(blobUrl);
+            try {
+                // Create and store object URL
+                const objectUrl = URL.createObjectURL(file);
+                imgElement.src = objectUrl;
+                imgElement._objectURL = objectUrl;  // Store reference on element
+                
+                // Keep component reference for cleanup
+                this.customerBarCodeObjectURL = objectUrl;
+            } 
+            catch (error) {
+                console.error("Image display failed:", error);
+                imgElement.src = "";
+            }
         },
 
         //
@@ -1089,7 +1108,7 @@ export default {
                 useWebWorker: true,                         // keep UI responsive
                 fileType: 'image/webp',                     // switch to WebP for better quality/size ratio
                 initialQuality: 1,                          // start high; you can dial down if needed
-                alwaysKeepResolution: true                  // preserve original pixel count if the library supports it
+                alwaysKeepResolution: false                 // preserve original pixel count if the library supports it
             };
 
             const compressedBlob = await imageCompression(file, options);
@@ -1685,7 +1704,7 @@ export default {
 
         //  //  //
 
-        $magnify(imgID, zoom, zoomContainerID) {
+        $magnify_old(imgID, zoom, zoomContainerID) {
 
             //
             let zoomContainer           =   document.getElementById(zoomContainerID)
@@ -1759,6 +1778,73 @@ export default {
                 x   =   x - window.pageXOffset;
                 y   =   y - window.pageYOffset;
 
+                return {x : x, y : y};
+            }
+        },
+
+        $magnify(imgID, zoom, zoomContainerID) {
+
+            let zoomContainer           =   document.getElementById(zoomContainerID)
+            zoomContainer.style.display =   "block"
+
+            //
+
+            var img, glass, w, h, bw;
+            img = document.getElementById(imgID);
+
+            /* Create magnifier glass: */
+            glass = document.createElement("DIV");
+            glass.setAttribute("class", "img-magnifier-glass");
+
+            /* Insert magnifier glass: */
+            img.parentElement.insertBefore(glass, img);
+
+            /* Set background properties for the magnifier glass: */
+            glass.style.backgroundImage = "url('" + img.src + "')";
+            glass.style.backgroundRepeat = "no-repeat";
+            glass.style.backgroundSize = (img.width * zoom) + "px " + (img.height * zoom) + "px";
+            bw = 3;
+            w = glass.offsetWidth / 2;
+            h = glass.offsetHeight / 2;
+
+            /* Execute a function when someone moves the magnifier glass over the image: */
+            glass.addEventListener("mousemove", moveMagnifier);
+            img.addEventListener("mousemove", moveMagnifier);
+
+            /*and also for touch screens:*/
+            glass.addEventListener("touchmove", moveMagnifier);
+            img.addEventListener("touchmove", moveMagnifier);
+            function moveMagnifier(e) {
+                var pos, x, y;
+                /* Prevent any other actions that may occur when moving over the image */
+                e.preventDefault();
+                /* Get the cursor's x and y positions: */
+                pos = getCursorPos(e);
+                x = pos.x;
+                y = pos.y;
+                /* Prevent the magnifier glass from being positioned outside the image: */
+                if (x > img.width - (w / zoom)) {x = img.width - (w / zoom);}
+                if (x < w / zoom) {x = w / zoom;}
+                if (y > img.height - (h / zoom)) {y = img.height - (h / zoom);}
+                if (y < h / zoom) {y = h / zoom;}
+                /* Set the position of the magnifier glass: */
+                glass.style.left = (x - w) + "px";
+                glass.style.top = (y - h) + "px";
+                /* Display what the magnifier glass "sees": */
+                glass.style.backgroundPosition = "-" + ((x * zoom) - w + bw) + "px -" + ((y * zoom) - h + bw) + "px";
+            }
+
+            function getCursorPos(e) {
+                var a, x = 0, y = 0;
+                e = e || window.event;
+                /* Get the x and y positions of the image: */
+                a = img.getBoundingClientRect();
+                /* Calculate the cursor's x and y coordinates, relative to the image: */
+                x = e.pageX - a.left;
+                y = e.pageY - a.top;
+                /* Consider any page scrolling: */
+                x = x - window.pageXOffset;
+                y = y - window.pageYOffset;
                 return {x : x, y : y};
             }
         },

@@ -37,7 +37,7 @@
                         <button class="rounded btn btn-secondary text-white w-100 p-1" @click="openDirectionsInGoogleMaps()">Itinéraire <i class="mdi mdi-map-marker-circle"></i></button>
                     </div>
 
-                    <div v-if="((getIsOnline)&&(client.status != 'validated'))" class="text-center m-1 p-0">
+                    <div v-if="((getIsOnline)&&(show_delete_button))" class="text-center m-1 p-0">
                         <button class="rounded btn btn-danger text-white w-100 p-1" @click="deleteClient()">Supprimer <i class="mdi mdi-delete"></i></button>
                     </div>
                 </div>
@@ -93,6 +93,8 @@ export default {
                 JPlan                           : '',
                 Journee                         : ''
             },
+
+            show_delete_button  :   false
         }
     },
 
@@ -114,42 +116,47 @@ export default {
 
             const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.$route.params.id_client+"/show" ,   null)
 
-                this.client.id                            =   res.data.id
+            this.client.id                              =   res.data.id
 
-                this.client.NewCustomer                   =   res.data.NewCustomer   
+            this.client.NewCustomer                     =   res.data.NewCustomer   
 
-                this.client.OpenCustomer                  =   res.data.OpenCustomer
+            this.client.OpenCustomer                    =   res.data.OpenCustomer
 
-                this.client.CustomerCode                  =   res.data.CustomerCode
+            this.client.CustomerCode                    =   res.data.CustomerCode
 
-                this.client.CustomerNameE                 =   res.data.CustomerNameE
-                this.client.CustomerNameA                 =   res.data.CustomerNameA                              
+            this.client.CustomerNameE                   =   res.data.CustomerNameE
+            this.client.CustomerNameA                   =   res.data.CustomerNameA                              
 
-                this.client.RegionNo                      =   res.data.RegionNo
-                this.client.DistrictNo                    =   res.data.DistrictNo
-                this.client.CityNo                        =   res.data.CityNo
-                this.client.Address                       =   res.data.Address
+            this.client.RegionNo                        =   res.data.RegionNo
+            this.client.DistrictNo                      =   res.data.DistrictNo
+            this.client.CityNo                          =   res.data.CityNo
+            this.client.Address                         =   res.data.Address
 
-                this.client.AddressA                      =   res.data.AddressA                 
-                this.client.CityNameE                     =   res.data.CityNameE
-                this.client.DistrictNameE                 =   res.data.DistrictNameE
+            this.client.AddressA                        =   res.data.AddressA                 
+            this.client.CityNameE                       =   res.data.CityNameE
+            this.client.DistrictNameE                   =   res.data.DistrictNameE
 
-                this.client.Tel                           =   res.data.Tel
+            this.client.Tel                             =   res.data.Tel
 
-                this.client.CustomerType                  =   res.data.CustomerType
-                this.client.status                        =   res.data.status
+            this.client.CustomerType                    =   res.data.CustomerType
+            this.client.status                          =   res.data.status
 
-                this.client.Latitude                      =   res.data.Latitude
-                this.client.Longitude                     =   res.data.Longitude
+            this.client.Latitude                        =   res.data.Latitude
+            this.client.Longitude                       =   res.data.Longitude
 
-                this.client.JPlan                         =   res.data.JPlan
-                this.client.Journee                       =   res.data.Journee
+            this.client.JPlan                           =   res.data.JPlan
+            this.client.Journee                         =   res.data.Journee
 
-                this.client.facade_image_original_name    =   res.data.facade_image_original_name
-                this.client.in_store_image_original_name  =   res.data.in_store_image_original_name
+            this.client.facade_image_original_name      =   res.data.facade_image_original_name
+            this.client.in_store_image_original_name    =   res.data.in_store_image_original_name
 
-                this.client.facade_image                  =   res.data.facade_image
-                this.client.in_store_image                =   res.data.in_store_image
+            this.client.facade_image                    =   res.data.facade_image
+            this.client.in_store_image                  =   res.data.in_store_image
+
+            //
+            if(this.client.status != 'validated') {
+                this.show_delete_button                     =   true
+            }
         },
 
         //

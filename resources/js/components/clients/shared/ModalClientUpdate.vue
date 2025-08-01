@@ -425,7 +425,7 @@
                                             <img
                                                 id="in_store_image_display_update"
                                                 class="w-100"
-                                                @load="$magnify('in_store_image_display_update', 3, 3, 'in_store_image_display_update_container')"
+                                                @load="$magnify('in_store_image_display_update', 3, 'in_store_image_display_update_container')"
                                             />
                                         </div>
                                     </div>

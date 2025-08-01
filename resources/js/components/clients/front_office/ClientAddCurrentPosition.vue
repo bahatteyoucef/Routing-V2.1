@@ -662,6 +662,7 @@ export default {
 
                 // Slide 3
                 CustomerBarCode_image                   :   '',
+                CustomerBarCode_image_currentObjectURL  :   null,
                 CustomerBarCode_image_original_name     :   '',
 
                 // Slide 4
@@ -714,7 +715,10 @@ export default {
                 // Slide 19
                 BrandAvailability                       :   '',
                 AvailableBrands                         :   [],
+
+                //
                 in_store_image                          :   '',
+                in_store_image_currentObjectURL         :   null,
                 in_store_image_original_name            :   '',
 
                 // Slide 20
@@ -722,6 +726,7 @@ export default {
 
                 // Slide 21
                 facade_image                            :   '',
+                facade_image_currentObjectURL           :   null,
                 facade_image_original_name              :   '',
 
                 // Slide 22
@@ -821,6 +826,24 @@ export default {
         if (this.watchGPS) {
             navigator.geolocation.clearWatch(this.watchGPS);
             this.watchGPS = null; // Reset the variable to null after clearing
+        }
+    },
+
+    beforeDestroy() {
+
+        // Clean up when component is destroyed
+        if (this.client.CustomerBarCode_image_currentObjectURL) {
+            URL.revokeObjectURL(this.client.CustomerBarCode_image_currentObjectURL);
+        }
+
+        // Clean up when component is destroyed
+        if (this.client.facade_image_currentObjectURL) {
+            URL.revokeObjectURL(this.client.facade_image_currentObjectURL);
+        }
+
+        // Clean up when component is destroyed
+        if (this.client.in_store_image_currentObjectURL) {
+            URL.revokeObjectURL(this.client.in_store_image_currentObjectURL);
         }
     },
 
@@ -1023,94 +1046,145 @@ export default {
 
         async customerBarCodeImage() {
 
-            const CustomerBarCode_image  =   document.getElementById("CustomerBarCode_image").files[0];
+            const input     =   document.getElementById("CustomerBarCode_image");
+            const display   =   document.getElementById("CustomerBarCode_image_display");
+            const file      =   input.files[0];
 
-            if(CustomerBarCode_image) {
+            // Clear previous resources
+            if (this.client.CustomerBarCode_image_currentObjectURL) {
 
-                this.client.CustomerBarCode_image_original_name     =   CustomerBarCode_image.name
-                this.client.CustomerBarCode_image                   =   await this.$compressImage(CustomerBarCode_image)
-
-                //
-
-                let CustomerBarCode_image_display                   =   document.getElementById("CustomerBarCode_image_display")
-
-                //
-                this.$displayImage(this.client.CustomerBarCode_image, CustomerBarCode_image_display)
+                URL.revokeObjectURL(this.client.CustomerBarCode_image_currentObjectURL);
+                this.client.CustomerBarCode_image_currentObjectURL  =   null;
             }
 
-            else {
+            if (!file) {
 
-                    this.client.CustomerBarCode_image_original_name     =   ""
-                    this.client.CustomerBarCode_image                   =   ""
+                this.client.CustomerBarCode_image_original_name     =   "";
+                this.client.CustomerBarCode_image                   =   "";
 
-                    const CustomerBarCode_image_display                 =   document.getElementById("CustomerBarCode_image_display")
+                display.src                                         =   "";
 
-                    if(CustomerBarCode_image_display) {
+                return;
+            }
 
-                        CustomerBarCode_image_display.src                   =   ""
-                    }
+            try {
+                // 1. Use lighter compression
+                const compressedFile                                =   await this.$compressImage(file);
+                
+                // 2. Use object URL instead of base64
+                const objectUrl                                     =   URL.createObjectURL(compressedFile);
+                this.client.CustomerBarCode_image_currentObjectURL  =   objectUrl;
+                display.src                                         =   objectUrl;
+
+                // 3. Store compressed file instead of base64 string
+                this.client.CustomerBarCode_image_original_name     =   file.name;
+                this.client.CustomerBarCode_image                   =   compressedFile;
+            } 
+
+            catch (error) {
+
+                console.error("Image processing failed:", error);
+
+                this.client.CustomerBarCode_image_original_name     =   "";
+                this.client.CustomerBarCode_image                   =   "";
+
+                display.src = "";
             }
         },
 
         async facadeImage() {
 
-            const facade_image  =   document.getElementById("facade_image").files[0];
+            const input     =   document.getElementById("facade_image");
+            const display   =   document.getElementById("facade_image_display");
+            const file      =   input.files[0];
 
-            if(facade_image) {
+            // Clear previous resources
+            if (this.client.facade_image_currentObjectURL) {
 
-                this.client.facade_image_original_name      =   facade_image.name
-                this.client.facade_image                    =   await this.$compressImage(facade_image)
-
-                //
-
-                let facade_image_display                    =   document.getElementById("facade_image_display")
-
-                //
-                this.$displayImage(this.client.facade_image, facade_image_display)
+                URL.revokeObjectURL(this.client.facade_image_currentObjectURL);
+                this.client.facade_image_currentObjectURL   =   null;
             }
 
-            else {
+            if (!file) {
 
-                    this.client.facade_image_original_name      =   ""
-                    this.client.facade_image                    =   ""
+                this.client.facade_image_original_name      =   "";
+                this.client.facade_image                    =   "";
 
-                    const facade_image_display                  =   document.getElementById("facade_image_display")
+                display.src                                 =   "";
 
-                    if(facade_image_display) {
+                return;
+            }
 
-                        facade_image_display.src                    =   ""
-                    }
+            try {
+                // 1. Use lighter compression
+                const compressedFile                                =   await this.$compressImage(file);
+                
+                // 2. Use object URL instead of base64
+                const objectUrl                                     =   URL.createObjectURL(compressedFile);
+                this.client.facade_image_currentObjectURL           =   objectUrl;
+                display.src                                         =   objectUrl;
+
+                // 3. Store compressed file instead of base64 string
+                this.client.facade_image_original_name              =   file.name;
+                this.client.facade_image                            =   compressedFile;
+            } 
+
+            catch (error) {
+
+                console.error("Image processing failed:", error);
+
+                this.client.facade_image_original_name      =   "";
+                this.client.facade_image                    =   "";
+
+                display.src = "";
             }
         },
 
         async inStoreImage() {
 
-            const in_store_image  =   document.getElementById("in_store_image").files[0];
+            const input     =   document.getElementById("in_store_image");
+            const display   =   document.getElementById("in_store_image_display");
+            const file      =   input.files[0];
 
-            if(in_store_image) {
+            // Clear previous resources
+            if (this.client.in_store_image_currentObjectURL) {
 
-                this.client.in_store_image_original_name    =   in_store_image.name
-                this.client.in_store_image                  =   await this.$compressImage(in_store_image)
-                
-                //
-
-                let in_store_image_display                  =   document.getElementById("in_store_image_display")
-
-                //
-                this.$displayImage(this.client.in_store_image, in_store_image_display)
+                URL.revokeObjectURL(this.client.in_store_image_currentObjectURL);
+                this.client.in_store_image_currentObjectURL =   null;
             }
 
-            else {
+            if (!file) {
 
-                    this.client.in_store_image_original_name    =   ""
-                    this.client.in_store_image                  =   ""
+                this.client.in_store_image_original_name    =   "";
+                this.client.in_store_image                  =   "";
 
-                    const in_store_image_display                =   document.getElementById("in_store_image_display")
+                display.src                                 =   "";
 
-                    if(in_store_image_display) {
+                return;
+            }
 
-                        in_store_image_display.src                  =   ""
-                    }
+            try {
+                // 1. Use lighter compression
+                const compressedFile                                =   await this.$compressImage(file);
+                
+                // 2. Use object URL instead of base64
+                const objectUrl                                     =   URL.createObjectURL(compressedFile);
+                this.client.in_store_image_currentObjectURL         =   objectUrl;
+                display.src                                         =   objectUrl;
+
+                // 3. Store compressed file instead of base64 string
+                this.client.in_store_image_original_name            =   file.name;
+                this.client.in_store_image                          =   compressedFile;
+            } 
+
+            catch (error) {
+
+                console.error("Image processing failed:", error);
+
+                this.client.in_store_image_original_name    =   "";
+                this.client.in_store_image                  =   "";
+
+                display.src = "";
             }
         },
 

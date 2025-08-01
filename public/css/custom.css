@@ -379,18 +379,15 @@
 /*  */
 
 .img-magnifier-container {
-    position:relative;
-    cursor:none;
+    position: relative;
 }
 
 .img-magnifier-container:hover .img-magnifier-glass {
     position: absolute;
     border: 3px solid #000;
-    border-radius: 50%;
     cursor: none;
-    /*Set the size of the magnifier glass:*/
-    width: 200px; /* 100px; */
-    height: 200px; /* 100px; */
+    width: 100px;
+    height: 100px;
     display:block;
 }
 

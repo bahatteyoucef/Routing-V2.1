@@ -31,7 +31,7 @@
                                         <template #content>
                                             <table class="table table-borderless scrollbar scrollbar-deep-blue mb-0">
                                                 <tr v-for="groupe in clients_markers_affiche" :key="groupe">
-                                                    <th class="p-1 col-sm-7"><span @click="filterFromMapInfo(groupe.column_name)" role="button">{{ groupe.column_name }} : </span></th>
+                                                    <th class="p-1 col-sm-7"><span @click="filterFromMapInfo(groupe.column_name)" role="button">{{ groupe.column_fullname }} : </span></th>
                                                     <td class="p-1 col-sm-3"><span>{{ groupe.clients.length }} Clients </span></td>
                                                     <td class="p-1 col-sm-1">
                                                         <span   :style="    'display: inline-block;'+
@@ -469,7 +469,6 @@ export default {
             clients_ids                 :   {}                          ,
 
             // Clients
-            clients_group               :   {}                          ,
             clients_markers_affiche     :   {}                          ,
             clients_table_affiche       :   []                          ,
 
@@ -819,21 +818,21 @@ export default {
             });
 
             // 6) Build your options arrays as before
-            const buildOptions = (obj, valueKey, labelKey) =>
+            const buildOptions          =   (obj, valueKey, labelKey) =>
                 Object.values(obj).map(item => ({
                     value: item[valueKey].toString(),
                     label: item[labelKey]
                 }));
 
             //
-            this.journeyPlanOptions     =   buildOptions(this.liste_journey_plan    ,   'JPlan'         ,   'JPlan');
-            this.districtOptions        =   buildOptions(this.districts             ,   'DistrictNo'    ,   'DistrictNameComplete');
-            this.cityOptions            =   buildOptions(this.cites                 ,   'CityNo'        ,   'CityNameComplete');
-            this.customerTypeOptions    =   buildOptions(this.liste_type_client     ,   'CustomerType'  ,   'CustomerType');
-            this.journeeOptions         =   buildOptions(this.liste_journee         ,   'Journee'       ,   'Journee');
-            this.ownerOptions           =   buildOptions(this.owners                ,   'owner_name'    ,   'owner_name');
-            this.statusOptions          =   buildOptions(this.liste_status          ,   'status'        ,   'status');
-            this.clientIdOptions        =   buildOptions(this.clients_ids           ,   'id'            ,   'CustomerNameComplete');
+            this.journeyPlanOptions     =   buildOptions(this.liste_journey_plan    ,   'JPlan'         ,   'JPlan'                 );
+            this.districtOptions        =   buildOptions(this.districts             ,   'DistrictNo'    ,   'DistrictNameComplete'  );
+            this.cityOptions            =   buildOptions(this.cites                 ,   'CityNo'        ,   'CityNameComplete'      );
+            this.customerTypeOptions    =   buildOptions(this.liste_type_client     ,   'CustomerType'  ,   'CustomerType'          );
+            this.journeeOptions         =   buildOptions(this.liste_journee         ,   'Journee'       ,   'Journee'               );
+            this.ownerOptions           =   buildOptions(this.owners                ,   'owner_name'    ,   'owner_name'            );
+            this.statusOptions          =   buildOptions(this.liste_status          ,   'status'        ,   'status'                );
+            this.clientIdOptions        =   buildOptions(this.clients_ids           ,   'id'            ,   'CustomerNameComplete'  );
         },
 
         checkExistJPlan(liste_journey_plan, JPlan) {
@@ -1418,13 +1417,13 @@ export default {
 
             // 3) Group filtered clients by your column_group
             const configs           =   {
-                1: { list: this.route_import.liste_journey_plan     , prop: 'JPlan'         , labelKey: 'JPlan'         },
-                2: { list: this.route_import.districts              , prop: 'DistrictNo'    , labelKey: 'DistrictNameE' },
-                3: { list: this.route_import.cites                  , prop: 'CityNo'        , labelKey: 'CityNameE'     },
-                4: { list: this.route_import.liste_type_client      , prop: 'CustomerType'  , labelKey: 'CustomerType'  },
-                5: { list: this.route_import.liste_journee          , prop: 'Journee'       , labelKey: 'Journee'       },
-                6: { list: this.route_import.owners                 , prop: 'owner_name'    , labelKey: 'owner_name'    },
-                7: { list: this.route_import.liste_status           , prop: 'status'        , labelKey: 'status'        }
+                1: { list: this.route_import.liste_journey_plan     , prop: 'JPlan'         , labelKey: 'JPlan'         , labelFull: 'JPlan'                },
+                2: { list: this.route_import.districts              , prop: 'DistrictNo'    , labelKey: 'DistrictNameE' , labelFull: 'DistrictNameComplete' },
+                3: { list: this.route_import.cites                  , prop: 'CityNo'        , labelKey: 'CityNameE'     , labelFull: 'CityNameComplete'     },
+                4: { list: this.route_import.liste_type_client      , prop: 'CustomerType'  , labelKey: 'CustomerType'  , labelFull: 'CustomerType'         },
+                5: { list: this.route_import.liste_journee          , prop: 'Journee'       , labelKey: 'Journee'       , labelFull: 'Journee'              },
+                6: { list: this.route_import.owners                 , prop: 'owner_name'    , labelKey: 'owner_name'    , labelFull: 'owner_name'           },
+                7: { list: this.route_import.liste_status           , prop: 'status'        , labelKey: 'status'        , labelFull: 'status'               }
             };
 
             //
@@ -1435,7 +1434,9 @@ export default {
             // init empty buckets
             const groups    =   {};
             for (const [key, md] of Object.entries(cfg.list)) {
+
                 groups[key] = {
+                    column_fullname: typeof md === 'object' && md[cfg.labelFull] ? md[cfg.labelFull] : key,
                     column_name: typeof md === 'object' && md[cfg.labelKey] ? md[cfg.labelKey] : key,
                     color: palette[i % palette.length],
                     clients: []
@@ -1459,11 +1460,7 @@ export default {
             // 4) sort by descending size & rebuild object
             let clients_markers_affiche     =   Object
                                                     .values(groups)
-                                                    .sort((a, b) => b.clients.length - a.clients.length)
-                                                    .reduce((acc, g) => {
-                                                        acc[g.column_name] = g;
-                                                        return acc;
-                                                    }, {});
+                                                    .sort((a, b) => b.clients.length - a.clients.length);
 
             //
             return clients_markers_affiche
@@ -1506,13 +1503,13 @@ export default {
 
             // 3) Group filtered clients by your column_group
             const configs           =   {
-                1: { list: this.route_import.liste_journey_plan     , prop: 'JPlan'         , labelKey: 'JPlan'         },
-                2: { list: this.route_import.districts              , prop: 'DistrictNo'    , labelKey: 'DistrictNameE' },
-                3: { list: this.route_import.cites                  , prop: 'CityNo'        , labelKey: 'CityNameE'     },
-                4: { list: this.route_import.liste_type_client      , prop: 'CustomerType'  , labelKey: 'CustomerType'  },
-                5: { list: this.route_import.liste_journee          , prop: 'Journee'       , labelKey: 'Journee'       },
-                6: { list: this.route_import.owners                 , prop: 'owner_name'    , labelKey: 'owner_name'    },
-                7: { list: this.route_import.liste_status           , prop: 'status'        , labelKey: 'status'        }
+                1: { list: this.route_import.liste_journey_plan     , prop: 'JPlan'         , labelKey: 'JPlan'         , labelFull: 'JPlan'                },
+                2: { list: this.route_import.districts              , prop: 'DistrictNo'    , labelKey: 'DistrictNameE' , labelFull: 'DistrictNameComplete' },
+                3: { list: this.route_import.cites                  , prop: 'CityNo'        , labelKey: 'CityNameE'     , labelFull: 'CityNameComplete'     },
+                4: { list: this.route_import.liste_type_client      , prop: 'CustomerType'  , labelKey: 'CustomerType'  , labelFull: 'CustomerType'         },
+                5: { list: this.route_import.liste_journee          , prop: 'Journee'       , labelKey: 'Journee'       , labelFull: 'Journee'              },
+                6: { list: this.route_import.owners                 , prop: 'owner_name'    , labelKey: 'owner_name'    , labelFull: 'owner_name'           },
+                7: { list: this.route_import.liste_status           , prop: 'status'        , labelKey: 'status'        , labelFull: 'status'               }
             };
 
             //
@@ -1524,6 +1521,7 @@ export default {
             const groups    =   {};
             for (const [key, md] of Object.entries(cfg.list)) {
                 groups[key] = {
+                    column_fullname: typeof md === 'object' && md[cfg.labelFull] ? md[cfg.labelFull] : key,
                     column_name: typeof md === 'object' && md[cfg.labelKey] ? md[cfg.labelKey] : key,
                     color: palette[i % palette.length],
                     clients: []
@@ -1542,13 +1540,9 @@ export default {
             }
 
             // 4) sort by descending size & rebuild object
-            let clients_markers_affiche     =   Object
+            let clients_markers_affiche   =   Object
                                                     .values(groups)
-                                                    .sort((a, b) => b.clients.length - a.clients.length)
-                                                    .reduce((acc, g) => {
-                                                        acc[g.column_name] = g;
-                                                        return acc;
-                                                    }, {});
+                                                    .sort((a, b) => b.clients.length - a.clients.length);
 
             //
             return clients_markers_affiche
@@ -1570,22 +1564,22 @@ export default {
 
         setRouteMarkers(mode, clients_markers_affiche) {
 
-            console.log(this.$getCurrentTimeHMS())
+            // console.log(this.$getCurrentTimeHMS())
 
             //
             this.clearRouteMarkers()
 
-            console.log(this.$getCurrentTimeHMS())
+            // console.log(this.$getCurrentTimeHMS())
 
             // Set Markers
             this.addMarkers(clients_markers_affiche)
 
-            console.log(this.$getCurrentTimeHMS())
+            // console.log(this.$getCurrentTimeHMS())
 
             // Focus
             this.focuseMarkers()
 
-            console.log(this.$getCurrentTimeHMS())
+            // console.log(this.$getCurrentTimeHMS())
         },
 
         removeDrawings() {
@@ -1895,7 +1889,7 @@ export default {
 
             if(this.marker_cluster_mode ==  "marker") {
 
-                console.log(this.$getCurrentTimeHMS())
+                // console.log(this.$getCurrentTimeHMS())
 
                 // Show Markers
                 this.map_instance.$switchMarkerClusterMode("marker")
@@ -1908,7 +1902,7 @@ export default {
 
                 if(this.marker_cluster_mode ==  "cluster") {
 
-                    console.log(this.$getCurrentTimeHMS())
+                    // console.log(this.$getCurrentTimeHMS())
 
                     // Show Markers
                     this.map_instance.$switchMarkerClusterMode("cluster")

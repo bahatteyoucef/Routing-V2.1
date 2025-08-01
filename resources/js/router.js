@@ -26,7 +26,7 @@ import ParRouteImportFrontOfficeDetails         from "./components/routes/front_
 import ClientDetailsFrontOffice                 from "./components/clients/front_office/ClientDetails.vue";
 import ClientAddCurrentPositionFrontOffice      from "./components/clients/front_office/ClientAddCurrentPosition.vue";
 import ClientUpdateFrontOffice                  from "./components/clients/front_office/ClientUpdate.vue";
-import RouteImportClientsByStatusFrontOffice    from "./components/routes/front_office/routeImportClientsByStatus.vue";
+import RouteImportClientsByStatusFrontOffice    from "./components/routes/front_office/RouteImportClientsByStatus.vue";
 
 import IndexFrontOffice                         from "./components/index/front_office/index.vue";
 

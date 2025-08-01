@@ -306,8 +306,6 @@ export default class Map {
             markers_to_add.push(marker_tempo)
         }
 
-        console.log(this.markers)
-
         //
         markers_to_add.forEach(marker => marker.addTo(this.map));
     }
@@ -499,28 +497,28 @@ export default class Map {
 
     $clearRouteMarkers() {
 
-        console.log(this.$getCurrentTimeHMS())
+        // console.log(this.$getCurrentTimeHMS())
 
         // a) remove all markers from each group
         Object.values(this.clusters).forEach(clusterGroup => {
             clusterGroup.clearLayers();
         });
 
-        console.log(this.$getCurrentTimeHMS())
+        // console.log(this.$getCurrentTimeHMS())
 
         //
         Object.values(this.markers).forEach(marker => {
             this.map.removeLayer(marker.marker)
         });
 
-        console.log(this.$getCurrentTimeHMS())
+        // console.log(this.$getCurrentTimeHMS())
 
         // c) reset all caches so next time you start fresh
         this.clusters           =   {}
         this.markers            =   {}
         this.markers_lat_lng    =   {}
 
-        console.log(this.$getCurrentTimeHMS())
+        // console.log(this.$getCurrentTimeHMS())
     }
 
     $clearPath() {

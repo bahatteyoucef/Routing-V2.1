@@ -1,5 +1,6 @@
 <template>
     <div>
+        <!-- OPTIONS -->
         <div class="row p-3 pb-0 pt-0">
             <div class="col-lg-7 mx-auto">
 
@@ -45,86 +46,127 @@
             </div>
         </div>
 
-        <RecycleScroller
-            class="row mt-2"
-            style="height: 80vh;"
-            :items="clients_filtered"
-            :item-size="itemHeight"
-            key-field="id" 
-            v-slot="{ item }"
+        <!-- Client Cards with Manual Virtual Scrolling -->
+        <div
+            class="row mt-3"
+            style="height: 80vh; overflow-y: auto; position: relative;"
+            ref="scrollContainer"
+            @scroll="onScroll"
         >
-            <div class="col mx-auto pl-2 pr-2">
-                <ul class="list-group">
+            <div class="col-lg-8 mx-auto mb-3" style="position: relative;">
+                <!-- top spacer -->
+                <div :style="{ height: topSpacer + 'px' }"></div>
+
+                <ul class="list-group shadow mb-5">
                     <li
-                        @click="getDetailsPage(item)"
-                        class="list-group-item shadow"
+                        v-for="(client, idx) in windowedClients"
+                        :key="startIndex + idx"
+                        @click="getDetailsPage(client)"
+                        class="list-group-item"
                         role="button"
                         :style="{ height: itemHeight + 'px', overflow: 'hidden' }"
                     >
+                        <!-- existing client card markup -->
                         <div class="media align-items-lg-center flex-column flex-lg-row p-1">
                             <div class="media-body order-2 order-lg-1 w-100">
-                                <h6 class="mt-0 font-weight-bold mb-2">{{ item.CustomerNameA }} ({{ item.CustomerNameE }})</h6>
-                                <p class="font-italic text-muted mb-0 small">{{ item.Address }} - {{ item.CityNameE }}</p>
+                                <h5 class="mt-0 font-weight-bold mb-2">{{ client.CustomerNameA }} ({{ client.CustomerNameE }})</h5>
+                                <p class="font-italic text-muted mb-0 small">{{ client.Address }} - {{ client.CityNameE }}</p>
 
                                 <div>
-                                    <span v-if="item.status === 'validated'" class="badge badge-success mt-1 mb-1">Validé</span>
-                                    <span v-if="item.status === 'pending'" class="badge badge-warning mt-1 mb-1">en Attente</span>
-                                    <span v-if="item.status === 'nonvalidated'" class="badge badge-danger mt-1 mb-1">Refusé</span>
-                                    <span v-if="item.status === 'visible'" class="badge badge-info mt-1 mb-1">Visible</span>
-                                    <span v-if="item.status === 'ferme'" class="badge badge-secondary mt-1 mb-1">Fermé</span>
+                                    <span v-if="client.status === 'validated'" class="badge badge-success mt-1 mb-1">Validé</span>
+                                    <span v-if="client.status === 'pending'" class="badge badge-warning mt-1 mb-1">en Attente</span>
+                                    <span v-if="client.status === 'nonvalidated'" class="badge badge-danger mt-1 mb-1">Refusé</span>
+                                    <span v-if="client.status === 'visible'" class="badge badge-info mt-1 mb-1">Visible</span>
+                                    <span v-if="client.status === 'ferme'" class="badge badge-secondary mt-1 mb-1">Fermé</span>
                                 </div>
 
-                                <div v-if="item.status === 'nonvalidated'" class="mt-1 mb-1">
-                                    <span class="text-small text-danger">{{ item.nonvalidated_details }}</span>
+                                <div v-if="client.status === 'nonvalidated'" class="mt-1 mb-1">
+                                    <span class="text-small text-danger">{{ client.nonvalidated_details }}</span>
                                 </div>
                             </div>
                         </div>
                     </li>
                 </ul>
+
+                <!-- bottom spacer -->
+                <div :style="{ height: bottomSpacer + 'px' }"></div>
             </div>
-        </RecycleScroller>
+        </div>
     </div>
 </template>
 
 <script>
 
-import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
-import { RecycleScroller } from 'vue-virtual-scroller'
+import Multiselect                  from    '@vueform/multiselect'
 
-import Multiselect from '@vueform/multiselect'
-import { mapGetters, mapActions } from "vuex"
+import {mapGetters, mapActions}     from    "vuex"
 
 export default {
 
-    components: {
-        RecycleScroller,
-        Multiselect
-    },
-
     data() {
+        
         return {
-            clients                         : [],
-            clients_filtered                : [],
-            search_by_CustomerNameA_value   : "",
-            search_by_clientbarcode_value   : "",
-            scanner                         : null,
-            show_barcode_div                : false,
-            filter_status                   : "validated",
-            
+
+            clients                             :   [],
+            clients_filtered                    :   [],
+
             //
-            itemHeight: 120,
+
+            search_by_CustomerNameA_value       :   "",
+            search_by_clientbarcode_value       :   "",
+        
+            //
+
+            scanner                             :   null,
+            show_barcode_div                    :   false,
+
+            //
+
+            filter_status                       :   "validated" ,
+
+            //
+
+            scrollContainer                     :   null,
+            itemHeight                          :   120,
+            windowSize                          :   10,
+            startIndex                          :   0
         }
     },
 
-    computed: {
+    computed : {
+
         ...mapGetters({
-            getUser: 'authentification/getUser',
-            getFilterStatusRouteImportClientsByStatus: 'client/getFilterStatusRouteImportClientsByStatus'
+            getUser                                     :   'authentification/getUser'                          ,
+            getFilterStatusRouteImportClientsByStatus   :   'client/getFilterStatusRouteImportClientsByStatus'  
         }),
+
+        //
+
+        safeClients() {
+            return this.clients_filtered || []
+        },
+        
+        windowedClients() {
+            const start = this.startIndex
+            return this.safeClients.slice(start, start + this.windowSize)
+        },
+
+        topSpacer() {
+            return this.startIndex * this.itemHeight
+        },
+
+        bottomSpacer() {
+            const total = this.safeClients.length
+            const rendered = Math.min(total - this.startIndex, this.windowSize)
+            return (total - this.startIndex - rendered) * this.itemHeight
+        }
+    },
+
+    components: {
+        Multiselect
     },
 
     beforeMount() {
-        
         let filter_status       =   this.getFilterStatusRouteImportClientsByStatus
 
         if(filter_status    !=  "") {
@@ -150,14 +192,19 @@ export default {
         }
     },
 
-    methods: {
-        ...mapActions("client", [
-            "setSelectedClientsAction",
-            "setFilterStatusRouteImportClientsByStatusAction",
+    //
+
+    methods : {
+
+        ...mapActions("client" ,  [
+            "setSelectedClientsAction"                          ,
+            "setFilterStatusRouteImportClientsByStatusAction"   ,
+
             "setUpdateClientAction"
         ]),
 
-        // getClients, getDetailsPage, showMap (No changes needed here)
+        //
+
         async getClients() {
 
             this.$showLoadingPage()
@@ -182,6 +229,8 @@ export default {
             })
         },
 
+        //
+
         getDetailsPage(client) {
 
             this.setUpdateClientAction(client)      
@@ -196,7 +245,8 @@ export default {
             this.$router.push('/route/frontoffice/obs/route_import/'+this.$route.params.id_route_import+'/details')
         },
 
-        // searchByCustomerNameA (No changes needed here)
+        //
+
         searchByCustomerNameA() {
 
             this.clients_filtered     =   this.clients
@@ -215,7 +265,8 @@ export default {
             return this.clients_filtered
         },
 
-        // BarCode Methods (No changes needed here)
+        //  //  //  BarCode
+
         showHideCodeBar() {
 
             if(this.show_barcode_div    ==  false) {
@@ -282,6 +333,7 @@ export default {
             } catch (error) {
                 console.error('Error rendering scanner:', error);
             }
+
         },
 
         success(clientbarcode_value) {
@@ -321,11 +373,18 @@ export default {
 
             return this.clients_filtered
         },
+
+        //  //  //
+
+        onScroll() {
+            const el = this.$refs.scrollContainer
+            if (!el) return
+            this.startIndex = Math.floor(el.scrollTop / this.itemHeight)
+        },
     },
 
-    watch: {
+    watch : {
 
-        // watch (No changes needed here)
         search_by_clientbarcode_value(newValue, oldValue) {
 
             this.searchByClientBarCode()
@@ -334,7 +393,3 @@ export default {
 }
 
 </script>
-
-<style scoped>
-
-</style>
