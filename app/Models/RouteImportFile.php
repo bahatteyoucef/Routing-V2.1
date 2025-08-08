@@ -21,8 +21,7 @@ class RouteImportFile extends Model
 
     //
 
-    public static function deleteRouteImportFile($fileName, $directory = "uploads/route_import")
-    {
+    public static function deleteRouteImportFile($fileName, $directory = "uploads/route_import") {
 
         if (File::exists($directory)) {
 
@@ -45,5 +44,4 @@ class RouteImportFile extends Model
 
         return false;
     }
-
 }

@@ -162,42 +162,6 @@ class ClientController extends Controller
 
     //
 
-    public function updateClients(Request $request, int $id_route_import)
-    {
-
-        try {
-
-            //
-            DB::beginTransaction();
-            //
-
-            // update 
-            Client::updateClients($request, $id_route_import);
-            
-            //
-            DB::commit();
-            //
-
-            return response()->json([
-                "header"            =>  "Clients Updated !"                      ,
-                "message"           =>  "the clients have been updated successfully !"
-            ]);
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
-    }
-
-    //
-
     public function updateResumeClients(Request $request)
     {
 
@@ -217,42 +181,6 @@ class ClientController extends Controller
             return response()->json([
                 "header"            =>  "Clients Updated !"                      ,
                 "message"           =>  "the clients have been updated successfully !"
-            ]);
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
-    }
-
-    //
-
-    public function validateClient(int $id_route_import, int $id)
-    {
-
-        try {
-
-            //
-            DB::beginTransaction();
-            //
-
-            // update 
-            Client::validateClient($id_route_import, $id);
-            
-            //
-            DB::commit();
-            //
-
-            return response()->json([
-                "header"            =>  "Clients Validated !"                           ,
-                "message"           =>  "the client have been validated successfully !"
             ]);
         }
 

@@ -68,9 +68,12 @@ class Kernel extends HttpKernel
         'guestApiWeb'       => \App\Http\Middleware\GuestApiWeb::class,
         'authApiWeb'        => \App\Http\Middleware\AuthApiWeb::class,
 
-        'Administrateur'    => \App\Http\Middleware\Administrateur::class,
-        'RTM Manager'       => \App\Http\Middleware\RTMManager::class,
-        'BU Manager'        => \App\Http\Middleware\BUManager::class,
-        'Salesman'          => \App\Http\Middleware\Salesman::class,
+        'isEnabledUser'     => \App\Http\Middleware\isEnabledUser::class,
+
+        'SuperAdmin'        => \App\Http\Middleware\SuperAdmin::class,
+        'BUManager'        => \App\Http\Middleware\BUManager::class,
+        'BackOffice'        => \App\Http\Middleware\BackOffice::class,
+        'FrontOffice'       => \App\Http\Middleware\FrontOffice::class,
+        'Viewer'            => \App\Http\Middleware\Viewer::class
     ];
 }

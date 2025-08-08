@@ -23,8 +23,7 @@ class UserTerritory extends Model
 
     //
 
-    public static function validateStore(Request $request) 
-    {
+    public static function validateStore(Request $request) {
 
         $validator = Validator::make($request->all(), [
             'description'   =>  ["required", "max:255"] ,
@@ -52,8 +51,7 @@ class UserTerritory extends Model
 
     //
 
-    public static function validateUpdate(Request $request) 
-    {
+    public static function validateUpdate(Request $request) {
 
         $validator = Validator::make($request->all(), [
             'description'   =>  ["required", "max:255"] ,

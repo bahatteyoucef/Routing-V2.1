@@ -28,8 +28,7 @@ class RouteImportTempo extends Model
 
     //
 
-    public static function lastTempo()
-    {
+    public static function lastTempo() {
 
         $last_route_import              =   RouteImportTempo::where('owner', Auth::user()->id)->first();
 
@@ -52,8 +51,7 @@ class RouteImportTempo extends Model
         return $last_route_import;
     }
 
-    public static function validateStore(Request $request) 
-    {
+    public static function validateStore(Request $request) {
 
         $validator = Validator::make($request->all(), [
             'libelle'           =>  ["required", "max:255"                                                                                                      ],
@@ -64,8 +62,7 @@ class RouteImportTempo extends Model
         return $validator;
     }
 
-    public static function storeRouteImportTempo(Request $request) 
-    {
+    public static function storeRouteImportTempo(Request $request) {
 
         if(Auth::user()->hasRole("BU Manager")) {
 
@@ -128,8 +125,7 @@ class RouteImportTempo extends Model
 
     // Clients
 
-    public static function storeData(Request $request, int $id)
-    {
+    public static function storeData(Request $request, int $id) {
 
         //  Clients
         ClientTempo::storeClients($request, $id);

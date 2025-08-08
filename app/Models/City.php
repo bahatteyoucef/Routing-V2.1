@@ -5,14 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class UserRouteImport extends Model
-{
+class City extends Model {
+
     use HasFactory;
 
     protected $guarded      =   [];
 
-    protected $table        =   'users_route_import';
-    protected $primaryKey   =   'id';
+    protected $table        =   'RTM_City';
+    protected $primaryKey   =   'CITYNO';
 
     public    $timestamps   =   false;
+
+    //
 }

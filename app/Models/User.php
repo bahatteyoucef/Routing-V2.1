@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -10,8 +9,6 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Validation\Rules;
 
 use Laravel\Passport\HasApiTokens;
 
@@ -46,8 +43,7 @@ class User extends Authenticatable
 
     //
 
-    public static function indexUser() 
-    {
+    public static function indexUser() {
     
         $users      =   DB::table('users')
 
@@ -76,8 +72,7 @@ class User extends Authenticatable
         return $users;
     }
 
-    public static function comboUser() 
-    {
+    public static function comboUser() {
     
         $query  =   DB::table('users')
                         ->select([
@@ -118,8 +113,7 @@ class User extends Authenticatable
         return $users;
     }
 
-    public static function validateStore(Request $request) 
-    {
+    public static function validateStore(Request $request) {
 
         $validator = Validator::make($request->all(), [
             'nom'               =>  ["required", "alpha_num", Rule::unique('users', 'nom')],
@@ -144,8 +138,7 @@ class User extends Authenticatable
         return $validator;
     }
 
-    public static function storeUser(Request $request) 
-    {
+    public static function storeUser(Request $request) {
         
         $user = new User([
             'nom'                   =>  $request->input('nom')                  ,
@@ -257,8 +250,7 @@ class User extends Authenticatable
         //
     }
 
-    public static function validateUpdate(Request $request, int $id) 
-    {
+    public static function validateUpdate(Request $request, int $id) {
 
         $validator = Validator::make($request->all(), [
             'nom'               =>  ["required", "alpha_num", Rule::unique('users', 'nom')->ignore($id)],
@@ -281,8 +273,7 @@ class User extends Authenticatable
         return $validator;
     }
 
-    public static function updateUser(Request $request, int $id) 
-    {
+    public static function updateUser(Request $request, int $id) {
 
         $user                       =   User::find($id);
 
@@ -291,6 +282,7 @@ class User extends Authenticatable
         $user->tel                  =   $request->input('tel');
         $user->company              =   $request->input('company');
         $user->type_user            =   $request->input('type_user');
+        $user->status               =   $request->input('status');
 
         $user->save();
 
@@ -391,8 +383,7 @@ class User extends Authenticatable
         }
     }
 
-    public static function showUser(int $id) 
-    {
+    public static function showUser(int $id) {
     
         //
         $user                       =   User::find($id);

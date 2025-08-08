@@ -10,7 +10,9 @@ import store                                from "./store/store";
 let initialRoute = true;
 
 // Static Imports
+
 import IndexShared                              from "./components/index/shared/Index.vue";
+
 import LoginShared                              from "./components/login/Login.vue";
 import UsersShared                              from "./components/users/Index.vue";
 import ShowUsersShared                          from "./components/users/Show.vue";
@@ -23,12 +25,14 @@ import ParRouteImportFrontOfficeDetails         from "./components/routes/front_
 
 //  //  //  //  //
 
+import IndexFrontOffice                         from "./components/index/front_office/index.vue";
+
 import ClientDetailsFrontOffice                 from "./components/clients/front_office/ClientDetails.vue";
 import ClientAddCurrentPositionFrontOffice      from "./components/clients/front_office/ClientAddCurrentPosition.vue";
 import ClientUpdateFrontOffice                  from "./components/clients/front_office/ClientUpdate.vue";
 import RouteImportClientsByStatusFrontOffice    from "./components/routes/front_office/RouteImportClientsByStatus.vue";
 
-import IndexFrontOffice                         from "./components/index/front_office/index.vue";
+import ExpectedClients                          from "./components/districts/ExpectedClients.vue";
 
 //  //  //  //  //
 
@@ -56,6 +60,8 @@ const routes = [
     { path: "/route_import/:id_route_import/clients/by_status"                              , component: RouteImportClientsByStatusFrontOffice      },
 
     { path: "/front_office"                                                                 , component: IndexFrontOffice                           },
+
+    { path: "/districts/expected_clients"                                                   , component: ExpectedClients}
 ];
 
 const router = createRouter({

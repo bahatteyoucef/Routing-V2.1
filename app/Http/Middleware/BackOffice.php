@@ -6,20 +6,12 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class Administrateur
-{
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
-     * @param  string|null  $guard
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
-     */
+class BackOffice {
+
     public function handle(Request $request, Closure $next, ...$guards)
     {
         // Check if the user has the "Admin" role
-        if (Auth::guard('api')->user()->hasRole('Administrateur')) {
+        if ((Auth::guard('api')->user()->hasRole('BackOffice')) || (Auth::guard('api')->user()->hasRole('BU Manager')) || (Auth::guard('api')->user()->hasRole('Super Admin'))) {
             return $next($request);
         }
     

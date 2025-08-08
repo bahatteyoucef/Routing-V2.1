@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Fluent;
 use stdClass;
@@ -40,6 +39,7 @@ class Client extends Model
 
     //
 
+    // when user add new map
     public static function storeClients(Request $request, int $id_route_import) {
 
         $clients                =   $request->get('clients');
@@ -106,6 +106,7 @@ class Client extends Model
         }
     }
 
+    // when user upload new clients file in route import
     public static function storeClientsUpdateRouteImport(Request $request, int $id_route_import) {
 
         $clients                =   $request->get('clients');
@@ -196,6 +197,7 @@ class Client extends Model
 
     //
 
+    // polygon change multiple informations for clients
     public static function changeRouteClients(Request $request, int $id_route_import) {
 
         $liste_clients_elem =   json_decode($request->get("clients"));
@@ -253,6 +255,7 @@ class Client extends Model
         }
     }
 
+    // polygon delete a group of clients
     public static function deleteClients(Request $request, int $id_route_import) {
 
         $liste_clients_ids  =   json_decode($request->get("clients"), true);
@@ -887,6 +890,22 @@ class Client extends Model
 
     //
 
+    public static function deleteClient(int $id_route_import, int $id) {
+
+        $client     =   Client::find($id);
+
+        // $directory  =   public_path('uploads/clients/'.$client->id);
+
+        // if (File::exists($directory)) {
+
+        //     File::deleteDirectory($directory);
+        // }
+
+        $client->delete();
+    }
+
+    //
+
     public static function showClient(Request $request, int $id_route_import, int $id) {
 
         $client =   Client::find($id);
@@ -911,21 +930,7 @@ class Client extends Model
 
     //
 
-    public static function validateClient(int $id_route_import, int $id) {
-
-        $client                     =   Client::find($id);
-
-        if($client) {
-
-            $client->status         =   "validated";
-            $client->owner          =   Auth::user()->id;
-
-            $client->save();
-        }
-    }
-
-    //
-
+    // Resume Clients
     public static function updateResumeClients(Request $request) {
 
         $clients    =   json_decode($request->get("data"));
@@ -963,82 +968,7 @@ class Client extends Model
 
     //
 
-    public static function updateClients(Request $request, int $id_route_import) {
-
-        $clients    =   json_decode($request->get("data"));
-
-        foreach ($clients as $client_tempo) {
-
-            // Client
-            $client                             =   Client::find($client_tempo->id);
-
-            $client->NewCustomer                =   $client_tempo->NewCustomer;
-            $client->CustomerIdentifier         =   $client_tempo->CustomerIdentifier;
-            $client->CustomerCode               =   $client_tempo->CustomerCode;
-            $client->OpenCustomer               =   $client_tempo->OpenCustomer;
-            $client->CustomerNameE              =   mb_strtoupper($client_tempo->CustomerNameE, 'UTF-8');
-            $client->CustomerNameA              =   mb_strtoupper($client_tempo->CustomerNameA, 'UTF-8');
-            $client->Latitude                   =   $client_tempo->Latitude;
-            $client->Longitude                  =   $client_tempo->Longitude;
-            $client->Address                    =   $client_tempo->Address;
-            $client->DistrictNo                 =   $client_tempo->DistrictNo;
-            $client->DistrictNameE              =   $client_tempo->DistrictNameE;
-            $client->CityNo                     =   $client_tempo->CityNo;
-            $client->CityNameE                  =   $client_tempo->CityNameE;
-            $client->Tel                        =   $client_tempo->Tel;
-            $client->CustomerType               =   $client_tempo->CustomerType;
-
-            $client->Frequency                  =   $client_tempo->Frequency;
-            $client->SuperficieMagasin          =   $client_tempo->SuperficieMagasin;
-            $client->NbrAutomaticCheckouts      =   $client_tempo->NbrAutomaticCheckouts;
-
-            $client->Neighborhood               =   $client_tempo->Neighborhood;
-            $client->Landmark                   =   $client_tempo->Landmark;
-            $client->BrandAvailability          =   $client_tempo->BrandAvailability;
-            $client->BrandSourcePurchase        =   $client_tempo->BrandSourcePurchase;
-
-            if($client_tempo->JPlan     !=  null) {
-    
-                $client->JPlan                      =   mb_strtoupper($client_tempo->JPlan, 'UTF-8');
-            }
-
-            else {
-
-                $client->JPlan                      =   "";
-            }
-
-            if($client_tempo->Journee   !=  null) {
-
-                $client->Journee                    =   $client_tempo->Journee;
-            }
-
-            else {
-
-                $client->Journee                    =   "";
-            }
-
-            $client->save();
-        }
-    }
-
-    //
-
-    public static function deleteClient(int $id_route_import, int $id) {
-
-        $client     =   Client::find($id);
-
-        // $directory  =   public_path('uploads/clients/'.$client->id);
-
-        // if (File::exists($directory)) {
-
-        //     File::deleteDirectory($directory);
-        // }
-
-        $client->delete();
-    }
-
-    //
-
+    // Export Clients
     public static function clientsExport(Request $request) {
 
         if($request->get("status") ==  "All") {
@@ -1154,6 +1084,7 @@ class Client extends Model
 
     //  //  //
 
+    // Get Doubles
     public static function getDoublesClients(Request $request, int $id_route_import) {
 
         $getDoublant                                    =   new stdClass();

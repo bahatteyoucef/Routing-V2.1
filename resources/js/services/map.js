@@ -506,8 +506,6 @@ export default class Map {
 
     $clearRouteMarkers() {
 
-        console.log(this.$getCurrentTimeHMS())
-
         // clear clusters:
         Object.values(this.clusters).forEach(cg => cg.clearLayers());
     
@@ -519,8 +517,6 @@ export default class Map {
         this.markers            =   {};
         this.markers_lat_lng    =   {};
         this.markerGroups       =   {};
-
-        console.log(this.$getCurrentTimeHMS())
     }
 
     $clearPath() {
@@ -538,112 +534,54 @@ export default class Map {
 
     $showTerritories() {
 
-        // Hide
-        this.$hideTerritores()
+        // remove any existing territory polygons
+        this.$hideTerritores();
 
-        //
-        let markers_lat_lng_by_group = Object.values(this.markers_lat_lng).reduce((acc, marker) => {
-            const grp = marker.group;
-            if (!acc[grp]) acc[grp] = [];
-            acc[grp].push(marker);
-            return acc;
-        }, {});
+        // decide whether we’re in cluster or plain-marker mode
+        const groupSources = this.marker_cluster_mode === 'cluster'
+            // cluster: each clusterGroup is an L.MarkerClusterGroup instance
+            ? this.clusters
+            // marker: each group is an L.LayerGroup of circleMarkers
+            : this.markerGroups;
 
-        // Show
-        for (const [key, value] of Object.entries(markers_lat_lng_by_group)) {
+        // walk each group
+        for (const [group, layerGroup] of Object.entries(groupSources)) {
+            // get every child marker’s LatLng
+            const pts = layerGroup.getLayers()
+            .map(m => m.getLatLng())
+            .filter(latlng => latlng);  // skip any weird nulls
 
-            if(markers_lat_lng_by_group[key].length >   0) {
+            if (pts.length === 0) continue;
 
-                // Territory Latitude Longitude
-                let territoryLatLngs    =   this.$getTerritoryLatLngs(markers_lat_lng_by_group[key])
-
-                //  //  //
-
-                let hull    =   null
-
-                if (territoryLatLngs.length >= 3) {
-
-                    // Calculate convex hull using Turf.js
-                    var turfPoints  =   territoryLatLngs.map(function(coord) {
-
-                        return turf.point(coord);
-                    });
-
-                    //
-                    hull            =   turf.convex(turf.featureCollection(turfPoints));
-
-                } else if (territoryLatLngs.length === 2) {
-
-                    territoryLatLngs.push([(territoryLatLngs[0][0] + territoryLatLngs[1][0]) / 2, (territoryLatLngs[0][1] + territoryLatLngs[1][1]) / 2])
-
-                    // Calculate convex hull using Turf.js
-                    var turfPoints  =   territoryLatLngs.map(function(coord) {
-
-                        return turf.point(coord);
-                    });
-
-                    //
-                    hull            =   turf.convex(turf.featureCollection(turfPoints));
-
-                } else if (territoryLatLngs.length === 1) {
-
-                    // Calculate convex hull using Turf.js
-                    var turfPoints  =   territoryLatLngs.map(function(coord) {
-
-                        return turf.point(coord);
-                    });
-
-                    // Create a small buffer around the single point to form a polygon
-                    var point       =   turfPoints[0];
-                    var buffer      =   turf.buffer(point, 0.01, { units: 'kilometers' }); // Adjust the buffer size as needed
-                    hull            =   buffer;
-                }
-
-                //  //  //
-
-                // Convert Turf polygon to Leaflet polygon coordinates
-                var polygonCoords   =   hull.geometry.coordinates[0].map(function(coord) {
-    
-                    return [coord[0], coord[1]]; // Swap lat/lng
-                });
-
-                // Create Turf polygon
-                var turfPolygon = turf.polygon([polygonCoords]);
-
-                // Expand the polygon by 1 units (adjust as needed)
-                var expandedPolygon = turf.transformScale(turfPolygon, 1.1);
-
-                // Convert the expanded polygon to Leaflet polygon coordinates
-                var expandedPolygonCoords = expandedPolygon.geometry.coordinates[0].map(function(coord) {
-
-                    return [coord[0], coord[1]]; // Swap lat/lng
-                });
-
-                // Create Leaflet polygon
-                var territory       =   L.polygon(expandedPolygonCoords, {color: 'red'}).addTo(this.map);
-
-                //  //  //
-
-                // Territory
-                this.journey_plan_territories.push(territory)
-
-                this.editable_layers_journey_plan_territory.addLayer(territory)
-
-                // Add Event Edit
-                territory.on("edit", function(event) {
-                    console.log("red layer edited !");
-                })
-
-                // Add Event Click
-                if(this.right_tools      ==  true) {
-
-                    territory.on("click", (event)   => {
-
-                        this.$addTerritory(event)
-                    })
-                }
+            // build the smallest territory hull around pts
+            const coords = pts.map(p => [p.lat, p.lng]);
+            let hullFeature;
+            if (coords.length >= 3) {
+            const turfPts = coords.map(c => turf.point(c));
+            hullFeature    = turf.convex(turf.featureCollection(turfPts));
+            } else if (coords.length === 2) {
+            // add midpoint so turf.convex() returns a line‐buffered polygon
+            const [a, b] = coords;
+            coords.push([(a[0]+b[0])/2, (a[1]+b[1])/2]);
+            hullFeature = turf.convex(turf.featureCollection(coords.map(c=>turf.point(c))));
+            } else {
+            // single point: buffer it
+            hullFeature = turf.buffer(turf.point(coords[0]), 0.01, { units:'kilometers' });
             }
-        }
+
+            // expand & convert back to Leaflet latlngs
+            const expanded = turf.transformScale(hullFeature, 1.1);
+            const latlngs  = expanded.geometry.coordinates[0].map(c => [c[0], c[1]]);
+
+            // draw the polygon
+            const poly = L.polygon(latlngs, { color: 'red' }).addTo(this.map);
+            this.journey_plan_territories.push(poly);
+            this.editable_layers_journey_plan_territory.addLayer(poly);
+
+    // wire edit & click exactly as before
+    poly.on('edit',  () => console.log('territory edited!'));
+    poly.on('click', e => this.$addTerritory(e));
+  }
     }
 
     $getTerritoryLatLngs(markers) {

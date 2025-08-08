@@ -31,7 +31,7 @@
                                         <template #content>
                                             <table class="table table-borderless scrollbar scrollbar-deep-blue mb-0">
                                                 <tr v-for="groupe in clients_markers_affiche" :key="groupe">
-                                                    <th class="p-1 col-sm-7"><span @click="filterFromMapInfo(groupe.column_name)" role="button">{{ groupe.column_fullname }} : </span></th>
+                                                    <th class="p-1 col-sm-7"><span @click="filterFromMapInfo(groupe)" role="button">{{ groupe.column_fullname }} : </span></th>
                                                     <td class="p-1 col-sm-3"><span>{{ groupe.clients.length }} Clients </span></td>
                                                     <td class="p-1 col-sm-1">
                                                         <span   :style="    'display: inline-block;'+
@@ -127,7 +127,6 @@
                     <button class="btn btn-primary w-100 m-0 mt-1"                                                                  @click="focuseMarkers()">Focus</button>
                     <button class="btn btn-primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#ModalResume'"         @click="showResume()">Resume</button>
                     <button class="btn btn-primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#ModalUpdateMap'"      >Update</button>
-                    <!-- <button class="btn btn-primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#ModalValidateClients'"    @click="getDoubles()">Validate</button> -->
                     <button class="btn btn-primary w-100 m-0 mt-1"                                                                  @click="showTerritories()">Auto Territories</button>
                     <button class="btn btn-primary w-100 m-0 mt-1"                                                                  @click="showJPlanBDTerritories()">JPlan Territories</button>
                     <button class="btn btn-primary w-100 m-0 mt-1"                                                                  @click="showJourneeBDTerritories()">Journee Territories</button>
@@ -178,53 +177,6 @@
                     />
                     <!--                -->
 
-                    <!-- District       -->
-                    <Multiselect
-                        v-model     =   "district_filter_value"
-                        :options    =   "districtOptions"
-                        mode        =   "tags"
-                        placeholder =   "Filter By DistrictNameE"
-                        class       =   "mt-1"
-
-                        :close-on-select    =   "false"
-                        :searchable         =   "true"
-                        :create-option      =   "false"
-
-                        @change             =   "reAfficherClientsAndMarkers('data_ready')"
-                    />
-                    <!--                -->
-
-                    <!-- City           -->
-                    <Multiselect
-                        v-model     =   "city_filter_value"
-                        :options    =   "cityOptions"
-                        mode        =   "tags"
-                        placeholder =   "Filter By CityNameE"
-                        class       =   "mt-1"
-
-                        :close-on-select    =   "false"
-                        :searchable         =   "true"
-                        :create-option      =   "false"
-
-                        @change             =   "reAfficherClientsAndMarkers('data_ready')"
-                    />
-                    <!--                -->
-
-                    <!-- CustomerType   -->
-                    <Multiselect
-                        v-model     =   "type_client_filter_value"
-                        :options    =   "customerTypeOptions"
-                        mode        =   "tags"
-                        placeholder =   "Filter By CustomerType"
-                        class       =   "mt-1"
-
-                        :close-on-select    =   "false"
-                        :searchable         =   "true"
-                        :create-option      =   "false"
-
-                        @change             =   "reAfficherClientsAndMarkers('data_ready')"
-                    />
-
                     <!-- Journee        -->
                     <Multiselect
                         v-model     =   "journee_filter_value"
@@ -273,7 +225,55 @@
                     />
                     <!--                -->
 
-                    <!-- Status        -->
+                    <!-- CustomerType   -->
+                    <Multiselect
+                        v-model     =   "type_client_filter_value"
+                        :options    =   "customerTypeOptions"
+                        mode        =   "tags"
+                        placeholder =   "Filter By CustomerType"
+                        class       =   "mt-1"
+
+                        :close-on-select    =   "false"
+                        :searchable         =   "true"
+                        :create-option      =   "false"
+
+                        @change             =   "reAfficherClientsAndMarkers('data_ready')"
+                    />
+                    <!--                -->
+
+                    <!-- District       -->
+                    <Multiselect
+                        v-model     =   "district_filter_value"
+                        :options    =   "districtOptions"
+                        mode        =   "tags"
+                        placeholder =   "Filter By DistrictNameE"
+                        class       =   "mt-1"
+
+                        :close-on-select    =   "false"
+                        :searchable         =   "true"
+                        :create-option      =   "false"
+
+                        @change             =   "reAfficherClientsAndMarkers('data_ready')"
+                    />
+                    <!--                -->
+
+                    <!-- City           -->
+                    <Multiselect
+                        v-model     =   "city_filter_value"
+                        :options    =   "cityOptions"
+                        mode        =   "tags"
+                        placeholder =   "Filter By CityNameE"
+                        class       =   "mt-1"
+
+                        :close-on-select    =   "false"
+                        :searchable         =   "true"
+                        :create-option      =   "false"
+
+                        @change             =   "reAfficherClientsAndMarkers('data_ready')"
+                    />
+                    <!--                -->
+
+                    <!-- Customer        -->
                     <Multiselect
                         v-model     =   "client_id_filter_value"
                         :options    =   "clientIdOptions"
@@ -346,9 +346,6 @@
     <!-- Modal Update Map               -->
     <ModalUpdateMap                                                 ref="ModalUpdateMap"            :id_route_import="id_route_import"                                                                                                                              >   </ModalUpdateMap>
 
-    <!-- Modal Validate Clients         -->
-    <!-- <ModalValidateClients   v-if="route_import"                     ref="ModalValidateClients"      :id_route_import="id_route_import"      :total_clients="route_import.clients"                                                                              >   </ModalValidateClients> -->
-
 </template>
 
 <script>
@@ -364,7 +361,6 @@ import ModalUpdateJourneyPlan       from    "@/components/territoires/ModalUpdat
 
 import ModalUpdateMap               from    "../crud/ModalUpdateMap.vue"
 
-// import ModalValidateClients         from    "../operations/ModalValidateClients.vue"
 import ModalResume                  from    "../operations/ModalResume.vue"
 
 import {mapGetters, mapActions}     from    "vuex"
@@ -544,7 +540,6 @@ export default {
         ModalUpdateJourneyPlan      ,
 
         ModalUpdateMap              
-        // ModalValidateClients         
     },
 
     computed: {
@@ -735,20 +730,20 @@ export default {
             // --- 1) Define categories and palette ---
             const clientsToProcess = clients ?? this.route_import.clients;
             const categories    =   [
-                                        { listName: 'liste_journey_plan'    , prop: 'JPlan'                                                                                                         },
-                                        { listName: 'districts'             , prop: 'DistrictNo'    , complete: c => `${c.DistrictNameE} (${c.DistrictNo})` , completeProp: 'DistrictNameComplete'  },
-                                        { listName: 'cites'                 , prop: 'CityNo'        , complete: c => `${c.CityNameE} (${c.CityNo})`         , completeProp: 'CityNameComplete'      },
-                                        { listName: 'liste_type_client'     , prop: 'CustomerType'                                                                                                  },
-                                        { listName: 'liste_journee'         , prop: 'Journee'                                                                                                       },
-                                        { listName: 'owners'                , prop: 'owner_name'                                                                                                    },
-                                        { listName: 'liste_status'          , prop: 'status'                                                                                                        },
-                                        { listName: 'clients_ids'           , prop: 'id'            , complete: c => `${c.CustomerCode}- ${c.CustomerNameA}`, completeProp: 'CustomerNameComplete'  }
+                                        { listName: 'liste_journey_plan'    , prop: 'JPlan'                                                                                                                 },
+                                        { listName: 'districts'             , prop: 'DistrictNo'    , complete: c => `${c.DistrictNameE}`                           , completeProp: 'DistrictNameComplete'  },
+                                        { listName: 'cites'                 , prop: 'CityNo'        , complete: c => `${c.CityNameE}`                               , completeProp: 'CityNameComplete'      },
+                                        { listName: 'liste_type_client'     , prop: 'CustomerType'                                                                                                          },
+                                        { listName: 'liste_journee'         , prop: 'Journee'                                                                                                               },
+                                        { listName: 'owners'                , prop: 'owner_name'                                                                                                            },
+                                        { listName: 'liste_status'          , prop: 'status'                                                                                                                },
+                                        { listName: 'clients_ids'           , prop: 'id'            , complete: c => `${c.CustomerNameA} (${c.CustomerCode})`       , completeProp: 'CustomerNameComplete'  }
                                     ];
 
             // Helper: build/set metadata entry
             const makeEntry = (cat, client) => {
 
-                const entry     =   { [cat.prop]: client[cat.prop] };
+                const entry     =   { [cat.prop]: client[cat.prop], [cat.prop_secondary]: client[cat.prop_secondary] };
 
                 if (cat.complete) entry[cat.completeProp]   =   cat.complete(client);
 
@@ -790,10 +785,14 @@ export default {
 
                     const store         =   this[cat.listName];
                     const currentKeys   =   currentKeysLookup[cat.listName];
-                    
+
                     Object.keys(store).forEach(key => {
-                        if (!currentKeys.has(key)) {
-                            delete store[key];
+
+                        // --- FIX ---
+                        const keyToCheck    =   cat.listName === 'clients_ids' ? parseInt(key, 10) : key;
+
+                        if (!currentKeys.has(keyToCheck)) {
+                            delete store[key]; // Still delete using the original string key
                         }
                     });
                 });
@@ -837,97 +836,6 @@ export default {
             this.ownerOptions           =   buildOptions(this.owners                ,   'owner_name'    ,   'owner_name'            );
             this.statusOptions          =   buildOptions(this.liste_status          ,   'status'        ,   'status'                );
             this.clientIdOptions        =   buildOptions(this.clients_ids           ,   'id'            ,   'CustomerNameComplete'  );
-        },
-
-        checkExistJPlan(liste_journey_plan, JPlan) {
-
-            for (const [key, value] of Object.entries(liste_journey_plan)) {
-
-                if(key  ==  JPlan) {
-
-                    return true
-                }
-            }
-
-            return false
-        },
-
-        checkExistDistrictNo(districts, DistrictNo) {
-
-            for (const [key, value] of Object.entries(districts)) {
-            
-                if(key  ==  DistrictNo) {
-
-                    return true
-                }
-            }
-
-            return false
-        },
-
-        checkExistCityNo(cites, CityNo) {
-
-            for (const [key, value] of Object.entries(cites)) {
-            
-                if(key  ==  CityNo) {
-
-                    return true
-                }
-            }
-
-            return false
-        },
-
-        checkExistCustomerType(liste_type_client, CustomerType) {
-
-            for (const [key, value] of Object.entries(liste_type_client)) {
-            
-                if(key  ==  CustomerType) {
-
-                    return true
-                }
-            }
-
-            return false
-        },
-
-        checkExistJournee(liste_journee, Journee) {
-
-            for (const [key, value] of Object.entries(liste_journee)) {
-                
-                if(key  ==  Journee) {
-
-                    return true
-                }
-            }
-
-            return false
-        },
-
-        checkExistOwner(owners, owner_name) {
-
-            for (const [key, value] of Object.entries(owners)) {
-                
-                if(key  ==  owner_name) {
-
-                    return true
-                }
-            }
-
-            return false
-        },
-
-        checkExistStatus(liste_status, status) {
-
-            for (const [key, value] of Object.entries(liste_status)) {
-                
-                if(key  ==  status) {
-
-                    return true
-                }
-            }
-
-            return false
         },
 
         sortFilterJPlan() {
@@ -982,40 +890,13 @@ export default {
 
         sortFilterDistrictNo() {
 
-            let sortedArray                 =   Object.values(this.districts);
+            let sortedArray         =   Object.values(this.districts);
+            
+            sortedArray.sort((a, b) =>  a.DistrictNo.localeCompare(b.DistrictNo));
+            
+            let sortedObject        =   sortedArray.reduce((acc, type_client, index) => {
 
-            sortedArray.sort((a, b)             =>  {
-
-                // Use a regular expression to match numbers at the end of the string
-                let regex = /\d+$/;
-                
-                // Use the match method to find the matched numbers
-                let a_last_number   =   a.DistrictNo.match(regex);
-                let b_last_number   =   b.DistrictNo.match(regex);
-
-                // Check if there is a match and return the result, or return null if there's no match
-                if(a_last_number    ==  null) {
-
-                    return -1
-                }
-
-                else {
-
-                    if(b_last_number    ==  null) {
-
-                        return 1
-                    }
-
-                    else {
-
-                        return a_last_number - b_last_number
-                    }
-                }
-            })
-
-            let sortedObject                =   sortedArray.reduce((acc, district, index) => {
-                
-                acc[district.DistrictNo]            =   district;
+                acc[type_client.DistrictNo]  =   type_client;
                 return acc;
             }, {});
 
@@ -1024,40 +905,13 @@ export default {
 
         sortFilterCityNo() {
 
-            let sortedArray                 =   Object.values(this.cites);
+            let sortedArray         =   Object.values(this.cites);
+            
+            sortedArray.sort((a, b) =>  a.CityNo.localeCompare(b.CityNo));
+            
+            let sortedObject                =   sortedArray.reduce((acc, type_client, index) => {
 
-            sortedArray.sort((a, b)             =>  {
-
-                // Use a regular expression to match numbers at the end of the string
-                let regex = /\d+$/;
-                
-                // Use the match method to find the matched numbers
-                let a_last_number   =   a.CityNo.match(regex);
-                let b_last_number   =   b.CityNo.match(regex);
-
-                // Check if there is a match and return the result, or return null if there's no match
-                if(a_last_number    ==  null) {
-
-                    return -1
-                }
-
-                else {
-
-                    if(b_last_number    ==  null) {
-
-                        return 1
-                    }
-
-                    else {
-
-                        return a_last_number - b_last_number
-                    }
-                }
-            })
-
-            let sortedObject                =   sortedArray.reduce((acc, cite, index) => {
-
-                acc[cite.CityNo]                    =   cite;
+                acc[type_client.CityNo]     =   type_client;
                 return acc;
             }, {});
 
@@ -1160,16 +1014,16 @@ export default {
 
         sortFilterClientId() {
 
-            let sortedArray             =   Object.values(this.clients_ids);
-            
-            sortedArray.sort((a, b)     =>  a.CustomerNameComplete.localeCompare(b.CustomerNameComplete));
-            
-            let sortedObject            =   sortedArray.reduce((acc, CustomerNameComplete, index) => {
-                acc[CustomerNameComplete.CustomerNameComplete]  =   CustomerNameComplete;
+            const sortedArray = Object.values(this.clients_ids).sort((a, b) => a.CustomerNameComplete.localeCompare(b.CustomerNameComplete));
+
+            // 🚀 key by `id` so nothing gets lost
+            const sortedObject = sortedArray.reduce((acc, client) => {
+
+                acc[client.id] = client;
                 return acc;
             }, {});
 
-            return sortedObject
+            return sortedObject;
         },
 
         // Prepare Markers and Table Data
@@ -1226,9 +1080,6 @@ export default {
                                 // reAffiche Clients
                                 this.clients_markers_affiche            =   this.reAfficheClientsMarkers(this.route_import.clients)
                                 let clients_markers_affiche_partial     =   this.reAfficheClientsMarkersPartly(clients)
-
-                                console.log(this.clients_markers_affiche)
-                                console.log(clients_markers_affiche_partial)
 
                                 // Datatable
                                 await this.setDataTable()
@@ -1306,81 +1157,57 @@ export default {
 
         // Get Map Info Key ("Map Info")
 
-        filterFromMapInfo(column_name) {
+        filterFromMapInfo(groupe) {
+
+            console.log(groupe)
 
             // JPlan
             if(this.column_group    ==  1) {
 
-                if(column_name  !=  "")     this.journey_plan_filter_value      =   [column_name]
-                else                        this.journey_plan_filter_value      =   [""]
+                if(groupe.column_name  !=  "")  this.journey_plan_filter_value      =   [groupe.column_name]
+                else                            this.journey_plan_filter_value      =   [""]
             }
 
             // District
             if(this.column_group    ==  2) {
 
-                let DistrictNo                      =   this.getDistrictNo(column_name)
-
-                if(column_name  !=  "")     this.district_filter_value          =   [DistrictNo]
-                else                        this.district_filter_value          =   [""]
+                if(groupe.column_name  !=  "")  this.district_filter_value          =   [groupe.column_name]
+                else                            this.district_filter_value          =   [""]
             }
 
             // City
             if(this.column_group    ==  3) {
 
-                let CityNo                          =   this.getCityNo(column_name)
-
-                if(column_name  !=  "")     this.city_filter_value              =   [CityNo]
-                else                        this.city_filter_value              =   [""]
+                if(groupe.column_name  !=  "")  this.city_filter_value              =   [groupe.column_name]
+                else                            this.city_filter_value              =   [""]
             }
 
             // CustomerType
             if(this.column_group    ==  4) {
 
-                if(column_name  !=  "")     this.type_client_filter_value       =   [column_name]
-                else                        this.type_client_filter_value       =   [""]
+                if(groupe.column_name  !=  "")  this.type_client_filter_value       =   [groupe.column_name]
+                else                            this.type_client_filter_value       =   [""]
             }
 
             // Journee
             if(this.column_group    ==  5) {
 
-                if(column_name  !=  "")     this.journee_filter_value           =   [column_name]
-                else                        this.journee_filter_value           =   [""]
+                if(groupe.column_name  !=  "")  this.journee_filter_value           =   [groupe.column_name]
+                else                            this.journee_filter_value           =   [""]
             }
 
             // Owner
             if(this.column_group    ==  6) {
 
-                if(column_name  !=  "")     this.owner_filter_value             =   [column_name]
-                else                        this.owner_filter_value             =   [""]
+                if(groupe.column_name  !=  "")  this.owner_filter_value             =   [groupe.column_name]
+                else                            this.owner_filter_value             =   [""]
             }
 
             // Staus
             if(this.column_group    ==  7) {
 
-                if(column_name  !=  "")     this.status_filter_value            =   [column_name]
-                else                        this.status_filter_value            =   [""]
-            }
-        },
-
-        getDistrictNo(DistrictNameE) {
-
-            for (const [key, value] of Object.entries(this.districts)) {
-
-                if(this.districts[key].DistrictNameE    ==  DistrictNameE) {
-
-                    return key
-                }
-            }
-        },
-
-        getCityNo(CityNameE) {
-
-            for (const [key, value] of Object.entries(this.cites)) {
-
-                if(this.cites[key].CityNameE            ==  CityNameE) {
-
-                    return key
-                }
+                if(groupe.column_name  !=  "")  this.status_filter_value            =   [groupe.column_name]
+                else                            this.status_filter_value            =   [""]
             }
         },
 
@@ -1433,13 +1260,13 @@ export default {
 
             // 3) Group filtered clients by your column_group
             const configs           =   {
-                1: { list: this.route_import.liste_journey_plan     , prop: 'JPlan'         , labelKey: 'JPlan'         , labelFull: 'JPlan'                },
-                2: { list: this.route_import.districts              , prop: 'DistrictNo'    , labelKey: 'DistrictNameE' , labelFull: 'DistrictNameComplete' },
-                3: { list: this.route_import.cites                  , prop: 'CityNo'        , labelKey: 'CityNameE'     , labelFull: 'CityNameComplete'     },
-                4: { list: this.route_import.liste_type_client      , prop: 'CustomerType'  , labelKey: 'CustomerType'  , labelFull: 'CustomerType'         },
-                5: { list: this.route_import.liste_journee          , prop: 'Journee'       , labelKey: 'Journee'       , labelFull: 'Journee'              },
-                6: { list: this.route_import.owners                 , prop: 'owner_name'    , labelKey: 'owner_name'    , labelFull: 'owner_name'           },
-                7: { list: this.route_import.liste_status           , prop: 'status'        , labelKey: 'status'        , labelFull: 'status'               }
+                1: { list: this.route_import.liste_journey_plan     , prop: 'JPlan'                     , labelKey: 'JPlan'         , labelFull: 'JPlan'                },
+                2: { list: this.route_import.districts              , prop: 'DistrictNo'                , labelKey: 'DistrictNameE' , labelFull: 'DistrictNo'           },
+                3: { list: this.route_import.cites                  , prop: 'CityNo'                    , labelKey: 'CityNameE'     , labelFull: 'CityNo'               },
+                4: { list: this.route_import.liste_type_client      , prop: 'CustomerType'              , labelKey: 'CustomerType'  , labelFull: 'CustomerType'         },
+                5: { list: this.route_import.liste_journee          , prop: 'Journee'                   , labelKey: 'Journee'       , labelFull: 'Journee'              },
+                6: { list: this.route_import.owners                 , prop: 'owner_name'                , labelKey: 'owner_name'    , labelFull: 'owner_name'           },
+                7: { list: this.route_import.liste_status           , prop: 'status'                    , labelKey: 'status'        , labelFull: 'status'               }
             };
 
             //
@@ -1472,6 +1299,10 @@ export default {
 
                 if (groups[k]) groups[k].clients.push(c);
             }
+
+            console.log(configs[this.column_group])
+            console.log(this.clients_table_affiche)
+            console.log(groups)
 
             // 4) sort by descending size & rebuild object
             let clients_markers_affiche     =   Object
@@ -1519,13 +1350,13 @@ export default {
 
             // 3) Group filtered clients by your column_group
             const configs           =   {
-                1: { list: this.route_import.liste_journey_plan     , prop: 'JPlan'         , labelKey: 'JPlan'         , labelFull: 'JPlan'                },
-                2: { list: this.route_import.districts              , prop: 'DistrictNo'    , labelKey: 'DistrictNameE' , labelFull: 'DistrictNameComplete' },
-                3: { list: this.route_import.cites                  , prop: 'CityNo'        , labelKey: 'CityNameE'     , labelFull: 'CityNameComplete'     },
-                4: { list: this.route_import.liste_type_client      , prop: 'CustomerType'  , labelKey: 'CustomerType'  , labelFull: 'CustomerType'         },
-                5: { list: this.route_import.liste_journee          , prop: 'Journee'       , labelKey: 'Journee'       , labelFull: 'Journee'              },
-                6: { list: this.route_import.owners                 , prop: 'owner_name'    , labelKey: 'owner_name'    , labelFull: 'owner_name'           },
-                7: { list: this.route_import.liste_status           , prop: 'status'        , labelKey: 'status'        , labelFull: 'status'               }
+                1: { list: this.route_import.liste_journey_plan     , prop: 'JPlan'                     , labelKey: 'JPlan'         , labelFull: 'JPlan'                },
+                2: { list: this.route_import.districts              , prop: 'DistrictNo'                , labelKey: 'DistrictNameE' , labelFull: 'DistrictNo'           },
+                3: { list: this.route_import.cites                  , prop: 'CityNo'                    , labelKey: 'CityNameE'     , labelFull: 'CityNo'               },
+                4: { list: this.route_import.liste_type_client      , prop: 'CustomerType'              , labelKey: 'CustomerType'  , labelFull: 'CustomerType'         },
+                5: { list: this.route_import.liste_journee          , prop: 'Journee'                   , labelKey: 'Journee'       , labelFull: 'Journee'              },
+                6: { list: this.route_import.owners                 , prop: 'owner_name'                , labelKey: 'owner_name'    , labelFull: 'owner_name'           },
+                7: { list: this.route_import.liste_status           , prop: 'status'                    , labelKey: 'status'        , labelFull: 'status'               }
             };
 
             //

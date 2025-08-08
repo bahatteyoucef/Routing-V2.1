@@ -48,7 +48,7 @@
                             <label for="status"              class="form-label">Status</label>
                             <select                             class="form-select"         id="status"                     v-model="user.status">
                                 <option value="enabled">enabled</option>
-                                <option value="disabled">Disabled</option>
+                                <option value="disabled">disabled</option>
                             </select>
                         </div>
 

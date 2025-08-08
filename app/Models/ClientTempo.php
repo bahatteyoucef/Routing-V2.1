@@ -30,6 +30,7 @@ class ClientTempo extends Model
 
     //
 
+    // Clients Tempo Index
     public static function index(int $id_route_import_tempo) {
 
         $clients        =   ClientTempo::where("id_route_import_tempo", $id_route_import_tempo)
@@ -51,6 +52,7 @@ class ClientTempo extends Model
 
     //
 
+    // when user add new map
     public static function storeClients(Request $request, int $id_route_import_tempo) {
 
         //
@@ -304,62 +306,7 @@ class ClientTempo extends Model
 
     //
 
-    public static function updateClients(Request $request, int $id_route_import_tempo) {
-
-        $clients    =   json_decode($request->get("data"));
-
-        foreach ($clients as $client_tempo) {
-
-            // Client
-
-            $client                             =   ClientTempo::find($client_tempo->id);
-
-            $client->CustomerCode               =   $client_tempo->CustomerCode;
-            $client->CustomerNameE              =   mb_strtoupper($client_tempo->CustomerNameE, 'UTF-8');
-            $client->CustomerNameA              =   mb_strtoupper($client_tempo->CustomerNameA, 'UTF-8');
-            $client->Latitude                   =   $client_tempo->Latitude;
-            $client->Longitude                  =   $client_tempo->Longitude;
-            $client->Address                    =   $client_tempo->Address;
-            $client->DistrictNo                 =   $client_tempo->DistrictNo;
-            $client->DistrictNameE              =   $client_tempo->DistrictNameE;
-            $client->CityNo                     =   $client_tempo->CityNo;
-            $client->CityNameE                  =   $client_tempo->CityNameE;
-            $client->Tel                        =   $client_tempo->Tel;
-            $client->CustomerType               =   $client_tempo->CustomerType;
-
-            $client->Neighborhood               =   $client_tempo->Neighborhood;
-            $client->Landmark                   =   $client_tempo->Landmark;
-            $client->BrandAvailability          =   $client_tempo->BrandAvailability;
-            $client->BrandSourcePurchase        =   $client_tempo->BrandSourcePurchase;
-
-            $client->id_route_import_tempo      =   $client_tempo->id_route_import_tempo;
-
-            if($client_tempo->JPlan     !=  null) {
-
-                $client->JPlan                  =   mb_strtoupper($client_tempo->JPlan, 'UTF-8');
-            }
-
-            else {
-
-                $client->JPlan                  =   "";
-            }
-
-            if($client_tempo->Journee   !=  null) {
-
-                $client->Journee                =   $client_tempo->Journee;
-            }
-
-            else {
-
-                $client->Journee                =   "";
-            }
-
-            $client->save();
-        }
-    }
-
-    //
-
+    // Resume Clients
     public static function updateResumeClients(Request $request) {
 
         $clients    =   json_decode($request->get("data"));
@@ -396,6 +343,7 @@ class ClientTempo extends Model
 
     //
 
+    // Delete Clients Tempo when submit clients or when add new map
     public static function deleteClients() {
 
         ClientTempo::where('created_by', Auth::user()->id)->delete();

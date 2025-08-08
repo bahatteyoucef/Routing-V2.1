@@ -6,12 +6,12 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class BUManager {
+class SuperAdmin {
 
     public function handle(Request $request, Closure $next, ...$guards)
     {
         // Check if the user has the "Admin" role
-        if ((Auth::guard('api')->user()->hasRole('BU Manager')) || (Auth::guard('api')->user()->hasRole('Super Admin'))) {
+        if (Auth::guard('api')->user()->hasRole('Super Admin')) {
             return $next($request);
         }
     

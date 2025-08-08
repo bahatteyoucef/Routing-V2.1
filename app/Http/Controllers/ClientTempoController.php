@@ -142,39 +142,6 @@ class ClientTempoController extends Controller
         }
     }
 
-    public function updateClients(Request $request, int $id_route_import_tempo) {
-
-        try {
-
-            //
-            DB::beginTransaction();
-            //
-
-            // store 
-            ClientTempo::updateClients($request, $id_route_import_tempo);
-
-            //
-            DB::commit();
-            //
-
-            return response()->json([
-                "header"            =>  "Clients Updated !"                             ,
-                "message"           =>  "the clients have been updated successfuly!"   
-            ]);
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
-    }
-
     //
 
     public function updateResumeClients(Request $request) {

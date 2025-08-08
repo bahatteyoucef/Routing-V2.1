@@ -61,19 +61,23 @@
               <li class="col-sm-7 nav-item">
 
                 <div class="row justify-content-end">
-                  <div class="col-sm-3 mt-1">
+                  <div class="col-sm-2 mt-1">
                     <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToStats()">Stats</button>
                   </div>
 
-                  <div class="col-sm-3 mt-1"  v-if="$isRole('Super Admin')||$isRole('BU Manager')">
+                  <div class="col-sm-2 mt-1"  v-if="$isRole('Super Admin')||$isRole('BU Manager')">
                     <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToUsers()">Users</button>
                   </div>
 
-                  <div class="col-sm-3 mt-1"  v-if="$isRole('Super Admin')||$isRole('BU Manager')">
+                  <div class="col-sm-2 mt-1"  v-if="$isRole('Super Admin')">
+                    <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToDistricts()">Districts</button>
+                  </div>
+
+                  <div class="col-sm-2 mt-1"  v-if="$isRole('Super Admin')||$isRole('BU Manager')">
                     <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="AddRouteImport()">New Import</button>
                   </div>
 
-                  <div class="col-sm-3 mt-1"  v-if="(route_import_existe)">
+                  <div class="col-sm-2 mt-1"  v-if="(route_import_existe)">
                     <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToRouteTempo()">Suspended Import</button>
                   </div>
                 </div>
@@ -269,6 +273,12 @@ export default {
 
             // Go To Route
             this.$router.push('/users')
+        },
+
+        goToDistricts() {
+
+            // Go To Route
+            this.$router.push('/districts/expected_clients')
         },
 
         goToMap() {

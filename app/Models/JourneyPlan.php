@@ -41,8 +41,7 @@ class JourneyPlan extends Model
 
     //
 
-    public static function validateStore(Request $request) 
-    {
+    public static function validateStore(Request $request) {
 
         $validator = Validator::make($request->all(), [
             'JPlan'         =>  ["required", "max:255"],
@@ -68,8 +67,7 @@ class JourneyPlan extends Model
 
     //
 
-    public static function validateUpdate(Request $request) 
-    {
+    public static function validateUpdate(Request $request) {
 
         $validator = Validator::make($request->all(), [
             'JPlan'         =>  ["required", "max:255"],
@@ -107,7 +105,4 @@ class JourneyPlan extends Model
             $journey_plan->delete();
         }
     }
-
-    //
-
 }

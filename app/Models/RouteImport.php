@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,9 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Fluent;
+
 use stdClass;
 use ZipArchive;
 
@@ -29,8 +27,7 @@ class RouteImport extends Model
 
     //
 
-    public static function indexRouteImport()
-    {
+    public static function indexRouteImport() {
 
         $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
 
@@ -53,35 +50,14 @@ class RouteImport extends Model
         return $liste_route_import;
     }
 
-    public static function headerRouteImports()
-    {
+    public static function headerRouteImports() {
 
         $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
 
         return $liste_route_import;
     }
 
-    public static function statsRouteImports()
-    {
-
-        $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
-
-        return $liste_route_import;
-    }
-
-    //
-
-    public static function indexRouteImports()
-    {
-        $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
-
-        return $liste_route_import;
-    }
-
-    //
-
-    public static function comboRouteImport()
-    {
+    public static function statsRouteImports() {
 
         $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
 
@@ -90,8 +66,24 @@ class RouteImport extends Model
 
     //
 
-    public static function validateStore(Request $request) 
-    {
+    public static function indexRouteImports() {
+        $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
+
+        return $liste_route_import;
+    }
+
+    //
+
+    public static function comboRouteImport() {
+
+        $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
+
+        return $liste_route_import;
+    }
+
+    //
+
+    public static function validateStore(Request $request) {
 
         $validator = Validator::make($request->all(), [
             'id_route_import_tempo'     =>  ["required", "max:255"                  ],
@@ -104,8 +96,7 @@ class RouteImport extends Model
         return $validator;
     }
 
-    public static function storeRouteImport(Request $request) 
-    {
+    public static function storeRouteImport(Request $request) {
 
         $route_import   =   new RouteImport([
             'libelle'       =>  $request->input('libelle')  ,
@@ -185,8 +176,7 @@ class RouteImport extends Model
         return $route_import;
     }
 
-    public static function validateUpdate(Request $request)
-    {
+    public static function validateUpdate(Request $request) {
 
         $validator = Validator::make($request->all(), [
             'file'              =>  ["required", "file:xlsx"]
@@ -195,8 +185,7 @@ class RouteImport extends Model
         return $validator;
     }
 
-    public static function updateRouteImport(Request $request, int $id)
-    {
+    public static function updateRouteImport(Request $request, int $id) {
 
         $fileName               =   uniqid().'.'.$request->file->getClientOriginalExtension();
         $request->file->move(public_path('uploads/route_import/'.Auth::user()->id), $fileName);
@@ -220,8 +209,7 @@ class RouteImport extends Model
         RouteImport::updateData($request, $id);
     }
 
-    public static function showRouteImport(int $id)
-    {
+    public static function showRouteImport(int $id) {
 
         $route_import                       =   RouteImport::find($id);
 
@@ -241,8 +229,7 @@ class RouteImport extends Model
         return $route_import;
     }
 
-    public static function indexedDBShowRouteImport(int $id)
-    {
+    public static function indexedDBShowRouteImport(int $id) {
 
         $route_import                       =   RouteImport::find($id);
 
@@ -259,8 +246,7 @@ class RouteImport extends Model
         return $route_import;
     }
 
-    public static function deleteRouteImport(int $id)
-    {
+    public static function deleteRouteImport(int $id) {
 
         $route_import       =   RouteImport::find($id);
 
@@ -274,16 +260,14 @@ class RouteImport extends Model
 
     // User Territory
 
-    public static function userTerritory(int $id) 
-    {
+    public static function userTerritory(int $id) {
 
         $liste_user_territory   =   UserTerritory::where('id_route_import', $id)->orderBy("id_user")->get();
 
         return $liste_user_territory;
     }
 
-    public static function userTerritoryUtil(Request $request, int $id) 
-    {
+    public static function userTerritoryUtil(Request $request, int $id) {
 
         $liste_user_territory_array     =   json_decode($request->get("liste_user_territory"));
 
@@ -315,16 +299,14 @@ class RouteImport extends Model
 
     // Journey Plan
 
-    public static function journeyPlan(int $id) 
-    {
+    public static function journeyPlan(int $id) {
 
         $liste_journey_plan =   JourneyPlan::where('id_route_import', $id)->orderBy("JPlan")->get();
 
         return $liste_journey_plan;
     }
 
-    public static function journeyPlanUtil(Request $request, int $id) 
-    {
+    public static function journeyPlanUtil(Request $request, int $id) {
 
         $liste_journey_plan_array =   json_decode($request->get("liste_journey_plan"));
 
@@ -345,16 +327,14 @@ class RouteImport extends Model
 
     // Journee
 
-    public static function journees(int $id) 
-    {
+    public static function journees(int $id) {
 
         $journees   =   Journee::where('id_route_import', $id)->orderBy("JPlan")->get();
 
         return $journees;
     }
 
-    public static function journeesUtil(Request $request, int $id) 
-    {
+    public static function journeesUtil(Request $request, int $id) {
 
         $liste_journey_plan_array   =   json_decode($request->get("liste_journey_plan"));
         $journees_array             =   json_decode($request->get("journees"));
@@ -392,22 +372,19 @@ class RouteImport extends Model
 
     // Clients
 
-    public static function storeData(Request $request, int $id)
-    {
+    public static function storeData(Request $request, int $id) {
 
         //  Clients
         Client::storeClients($request, $id);
     }
 
-    public static function updateData(Request $request, int $id)
-    {
+    public static function updateData(Request $request, int $id) {
 
         //  Clients
         Client::storeClientsUpdateRouteImport($request, $id);
     }
 
-    public static function deleteData(int $id)
-    {
+    public static function deleteData(int $id) {
 
         // Delete Route Import Files and Excel Files
 
@@ -450,8 +427,7 @@ class RouteImport extends Model
 
     // Validate City District in Clients
 
-    public static function setWillayasCites(Request $request)
-    {
+    public static function setWillayasCites(Request $request) {
 
         $clients    =   json_decode($request->get("clients"));
 
@@ -492,8 +468,7 @@ class RouteImport extends Model
 
     // Routing
 
-    public static function obsDetailsRouteImport(string $id)
-    {
+    public static function obsDetailsRouteImport(string $id) {
 
         $route_import           =   RouteImport::find($id);
 
@@ -510,8 +485,7 @@ class RouteImport extends Model
         return $route_import;
     }
 
-    public static function obsDetailsRouteImportFrontOffice(string $id)
-    {
+    public static function obsDetailsRouteImportFrontOffice(string $id) {
 
         $route_import           =   RouteImport::find($id);
 
@@ -547,8 +521,7 @@ class RouteImport extends Model
 
     // Clients
 
-    public static function clients(int $id)
-    {
+    public static function clients(int $id) {
 
         $clients    =   Client::where("id_route_import", $id)
                             ->join('users', 'clients.owner', '=', 'users.id')
@@ -569,8 +542,7 @@ class RouteImport extends Model
 
     //
 
-    public static function sync(Request $request)
-    {
+    public static function sync(Request $request) {
 
         //
 
