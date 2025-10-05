@@ -321,7 +321,14 @@ export default {
         },
 
         async getData() {
+
+            // Show Loading Page
+            this.$showLoadingPage()
+
             await this.getComboData()  
+
+            // Hide Loading Page
+            this.$hideLoadingPage()
         },
 
         async getComboData() {

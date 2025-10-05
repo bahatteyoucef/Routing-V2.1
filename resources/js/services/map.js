@@ -1305,17 +1305,26 @@ export default class Map {
 
     $setKMLLayers(kml_layers) {
 
+        console.log(kml_layers)
+
         // Delete all kml layers
         this.kml_layers.forEach(kml_layer => {
+
+            console.log(kml_layer)
+
             this.map.removeLayer(kml_layer);            
         })
 
         // Add all kml layers
         kml_layers.forEach(kml_layer => {
             
+            console.log(kml_layer)
+
             // Add new layers
             this.kml_layers[kml_layer]   =   omnivore.kml('/kml/'+kml_layer+'.kml').addTo(this.map);
         });
+
+        console.log(this.kml_layers)
     }
 
     //  //  //  //  //  //  //  //  //  //  //  //  //  //

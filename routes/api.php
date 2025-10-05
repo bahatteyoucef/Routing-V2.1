@@ -94,7 +94,7 @@ Route::middleware(['auth:api', 'isEnabledUser'])->group(function () {
 
     Route::post('/users'                                                                                ,   [UserController::class                  , 'index'                                   ])->middleware('BUManager');
     Route::post('/users/combo'                                                                          ,   [UserController::class                  , 'combo'                                   ])->middleware('BUManager');
-    Route::post('/users/{id}/show'                                                                      ,   [UserController::class                  , 'show'                                    ])->middleware('BUManager');
+    Route::post('/users/{id}/show'                                                                      ,   [UserController::class                  , 'show'                                    ]);
 
     Route::post('/users/store'                                                                          ,   [UserController::class                  , 'store'                                   ])->middleware('BUManager');
     Route::post('/users/{id}/update'                                                                    ,   [UserController::class                  , 'update'                                  ])->middleware('BUManager');

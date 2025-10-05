@@ -323,8 +323,13 @@ export default {
         },
 
         async getData(user) {
-            await this.getComboData()  
+
+            this.$showLoadingPage()
+
             await this.getUserData(user)  
+            await this.getComboData()  
+
+            this.$hideLoadingPage()
         },
 
         async getUserData(user) {

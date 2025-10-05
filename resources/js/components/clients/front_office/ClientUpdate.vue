@@ -977,13 +977,17 @@ export default {
 
         async getData() {
 
+            // Show Loading Page
+            this.$showLoadingPage()
+
             const res           =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.$route.params.id_route_import+"/details",   null)
             this.all_clients    =   res.data.route_import.clients
 
-            //
-
             await this.getClientData()  
             await this.getComboData()
+
+            // Hide Loading Page
+            this.$hideLoadingPage()
         },
 
         async getClientData() {

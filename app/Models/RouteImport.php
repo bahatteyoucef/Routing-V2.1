@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -27,9 +29,37 @@ class RouteImport extends Model
 
     //
 
+    public function scopePermittedByRole(Builder $query, String $type = "id") {
+
+        $user       =   Auth::user();
+
+        // Super Admin sees everything
+        if ($user && $user->hasRole('Super Admin')) return $query;
+
+        // Roles that should be limited to assigned route_imports (same logic as your original)
+        $limitedRoles   =   ['BU Manager', 'BackOffice', 'Viewer', 'FrontOffice'];
+
+        if ($user && $user->hasAnyRole($limitedRoles)) {
+
+            // Get all id_route_import assigned to the user
+            $allowedIds     =   UserRouteImport::where('id_user', $user->id)
+                                    ->pluck('id_route_import')
+                                    ->unique()
+                                    ->toArray();
+
+            //
+            if (empty($allowedIds)) return $query->whereRaw('0 = 1'); // return empty results
+
+            //
+            return $query->whereIn('route_import' . '.' . $type, $allowedIds);
+        }
+    }
+
+    //
+
     public static function indexRouteImport() {
 
-        $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
+        $liste_route_import             =   RouteImport::orderBy("id", "desc")->permittedByRole()->get();
 
         foreach ($liste_route_import as $route_import) {
 
@@ -52,14 +82,14 @@ class RouteImport extends Model
 
     public static function headerRouteImports() {
 
-        $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
+        $liste_route_import             =   RouteImport::orderBy("id", "desc")->permittedByRole()->get();
 
         return $liste_route_import;
     }
 
     public static function statsRouteImports() {
 
-        $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
+        $liste_route_import             =   RouteImport::orderBy("id", "desc")->permittedByRole()->get();
 
         return $liste_route_import;
     }
@@ -67,7 +97,8 @@ class RouteImport extends Model
     //
 
     public static function indexRouteImports() {
-        $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
+
+        $liste_route_import             =   RouteImport::orderBy("id", "desc")->permittedByRole()->get();
 
         return $liste_route_import;
     }
@@ -76,7 +107,7 @@ class RouteImport extends Model
 
     public static function comboRouteImport() {
 
-        $liste_route_import             =   RouteImport::orderBy("id", "desc")->get();
+        $liste_route_import             =   RouteImport::orderBy("id", "desc")->permittedByRole()->get();
 
         return $liste_route_import;
     }

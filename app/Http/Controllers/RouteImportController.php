@@ -16,13 +16,12 @@ use Illuminate\Support\Facades\Response;
 class RouteImportController extends Controller
 {
     
-    public function index()
-    {
+    public function index() {
 
         try {
 
             $liste_route_import     =   RouteImport::indexRouteImport();
-            return User::filterRouteImport($liste_route_import);
+            return $liste_route_import;
         }
 
         catch(Throwable $erreur) {
@@ -33,13 +32,12 @@ class RouteImportController extends Controller
         }
     }
 
-    public function combo()
-    {
+    public function combo() {
 
         try {
 
             $liste_route_import     =   RouteImport::comboRouteImport();
-            return User::filterRouteImport($liste_route_import);
+            return $liste_route_import;
         }
 
         catch(Throwable $erreur) {
@@ -50,8 +48,7 @@ class RouteImportController extends Controller
         }
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
 
         try {
 
@@ -94,8 +91,7 @@ class RouteImportController extends Controller
         }
     }
 
-    public function update(Request $request, int $id)
-    {
+    public function update(Request $request, int $id) {
 
         try {
 
@@ -137,8 +133,7 @@ class RouteImportController extends Controller
         }
     }
 
-    public function show(int $id)
-    {
+    public function show(int $id) {
 
         try {
 
@@ -154,8 +149,7 @@ class RouteImportController extends Controller
         }
     }
 
-    public function indexedDBShow(int $id)
-    {
+    public function indexedDBShow(int $id) {
 
         try {
 
@@ -171,8 +165,7 @@ class RouteImportController extends Controller
         }
     }
 
-    public function delete(int $id)
-    {
+    public function delete(int $id) {
 
         try {
 
@@ -207,8 +200,7 @@ class RouteImportController extends Controller
 
     //
 
-    public function userTerritory(int $id)
-    {
+    public function userTerritory(int $id) {
 
         try {
 
@@ -238,8 +230,7 @@ class RouteImportController extends Controller
         }
     }
 
-    public function userTerritoryUtil(Request $request, int $id)
-    {
+    public function userTerritoryUtil(Request $request, int $id) {
 
         try {
 
@@ -271,8 +262,7 @@ class RouteImportController extends Controller
 
     //
 
-    public function journeyPlan(int $id)
-    {
+    public function journeyPlan(int $id) {
 
         try {
 
@@ -302,8 +292,7 @@ class RouteImportController extends Controller
         }
     }
 
-    public function journeyPlanUtil(Request $request, int $id)
-    {
+    public function journeyPlanUtil(Request $request, int $id) {
 
         try {
 
@@ -335,8 +324,7 @@ class RouteImportController extends Controller
 
     //
 
-    public function journees(int $id)
-    {
+    public function journees(int $id) {
 
         try {
 
@@ -365,8 +353,8 @@ class RouteImportController extends Controller
             ],422);
         }
     }
-    public function journeesUtil(Request $request, int $id)
-    {
+
+    public function journeesUtil(Request $request, int $id) {
 
         try {
 
@@ -398,8 +386,7 @@ class RouteImportController extends Controller
 
     //
 
-    public function setWillayasCites(Request $request)
-    {
+    public function setWillayasCites(Request $request) {
 
         try {
 
@@ -431,8 +418,7 @@ class RouteImportController extends Controller
 
     //
 
-    public function obsDetailsRouteImport(int $id)
-    {
+    public function obsDetailsRouteImport(int $id) {
 
         try {
 
@@ -455,8 +441,7 @@ class RouteImportController extends Controller
 
     //
 
-    public function obsDetailsRouteImportFrontOffice(int $id)
-    {
+    public function obsDetailsRouteImportFrontOffice(int $id) {
 
         try {
 
@@ -481,8 +466,7 @@ class RouteImportController extends Controller
 
     //
 
-    public function clients(int $id)
-    {
+    public function clients(int $id) {
 
         try {
 
@@ -505,8 +489,7 @@ class RouteImportController extends Controller
 
     //
 
-    public function sync(Request $request)
-    {
+    public function sync(Request $request) {
     
         try {
 
@@ -542,13 +525,12 @@ class RouteImportController extends Controller
 
     //
 
-    public function headerRouteImports()
-    {
+    public function headerRouteImports() {
 
         try {
 
             $liste_route_import     =   RouteImport::headerRouteImports();
-            return User::filterRouteImport($liste_route_import);
+            return $liste_route_import;
         }
 
         catch(Throwable $erreur) {
@@ -559,13 +541,12 @@ class RouteImportController extends Controller
         }
     }
 
-    public function indexRouteImports()
-    {
+    public function indexRouteImports() {
 
         try {
 
             $liste_route_import     =   RouteImport::indexRouteImports();
-            return User::filterRouteImport($liste_route_import);
+            return $liste_route_import;
         }
 
         catch(Throwable $erreur) {
@@ -576,13 +557,12 @@ class RouteImportController extends Controller
         }
     }
 
-    public function statsRouteImports()
-    {
+    public function statsRouteImports() {
 
         try {
 
             $liste_route_import     =   RouteImport::statsRouteImports();
-            return User::filterRouteImport($liste_route_import);
+            return $liste_route_import;
         }
 
         catch(Throwable $erreur) {
@@ -595,8 +575,7 @@ class RouteImportController extends Controller
 
     //
 
-    public static function frontOffice(int $id_route_import)
-    {
+    public static function frontOffice(int $id_route_import) {
 
         try {
 
@@ -612,8 +591,7 @@ class RouteImportController extends Controller
         }
     }
 
-    public static function users(int $id_route_import)
-    {
+    public static function users(int $id_route_import) {
 
         try {
 

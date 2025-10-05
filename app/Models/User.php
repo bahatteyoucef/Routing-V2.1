@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -45,31 +46,42 @@ class User extends Authenticatable
 
     public static function indexUser() {
     
-        $users      =   DB::table('users')
+        if((Auth::user()->hasRole("Super Admin"))||(Auth::user()->hasRole("BU Manager"))) {
 
-                        ->select([ 
-                            'users.id                   as  id'                     , 
+            $query  =   DB::table('users')
 
-                            'users.nom                  as  nom'                    ,
-                            'users.email                as  email'                  ,
+                            ->select([ 
+                                'users.id                   as  id'                     , 
 
-                            'users.tel                  as  tel'                    ,
-                            'users.company              as  company'                ,
+                                'users.nom                  as  nom'                    ,
+                                'users.email                as  email'                  ,
 
-                            'users.type_user            as  type_user'              ,
+                                'users.tel                  as  tel'                    ,
+                                'users.company              as  company'                ,
 
-                            'users.accuracy             as  accuracy'               ,
+                                'users.type_user            as  type_user'              ,
 
-                            'users.max_route_import     as  max_route_import'       ,
+                                'users.accuracy             as  accuracy'               ,
 
-                            'users.password_non_hashed  as  password_non_hashed'    ,
+                                'users.max_route_import     as  max_route_import'       ,
 
-                            'users.owner                as  owner'   
-                        ])
+                                'users.password_non_hashed  as  password_non_hashed'    ,
 
-                        ->get();
+                                'users.owner                as  owner'   
+                            ]);
 
-        return $users;
+            if(Auth::user()->hasRole("BU Manager")) {
+
+                $query  =   $query->where("owner", Auth::user()->id);
+            }
+
+            return $query->get();
+        }
+
+        else {
+
+            throw new Exception("Unauthorized", 403);
+        }
     }
 
     public static function comboUser() {
@@ -389,160 +401,15 @@ class User extends Authenticatable
         $user                       =   User::find($id);
 
         //
-        $user->liste_route_import   =   DB::table('users_route_import')
-                                        ->where('users_route_import.id_user', $user->id) 
-                                        ->pluck('users_route_import.id_route_import') 
-                                        ->toArray();
+        $user->liste_route_import   =   DB::table('route_import')
+                                            // ->pluck('users_route_import.id_route_import') 
+                                            // ->toArray();
+                                            ->select('route_import.*')
+                                            ->join('users_route_import', 'route_import.id', 'users_route_import.id_route_import')
+                                            ->where('users_route_import.id_user', $user->id) 
+                                            ->get();
 
         return $user;
-    }
-
-    //
-
-    public static function filterUsers($users) {
-
-        if(Auth::user()->hasRole("Super Admin")) {
-
-            return $users;
-        }
-
-        else {
-
-            if(Auth::user()->hasRole("BU Manager")) {
-
-                return $users->where("owner", Auth::user()->id);
-            }
-
-            else {
-
-                if(Auth::user()->hasRole("BackOffice")) {
-
-                    $users->filter(function ($user, $key) {
-
-                        return [];
-                    });
-                }
-
-                else {
-
-                    if(Auth::user()->hasRole("Viewer")) {
-
-                        $users->filter(function ($user, $key) {
-
-                            return [];
-                        });
-                    }
-
-                    else {
-
-                        if(Auth::user()->hasRole("FrontOffice")) {
-
-                            return [];
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public static function filterRouteImport($liste_route_import) {
-
-        $liste_route_import_final   =   [];
-
-        if(Auth::user()->hasRole("Super Admin")) {
-
-            return $liste_route_import;
-        }
-
-        else {
-
-            if(Auth::user()->hasRole("BU Manager")) {
-
-                foreach ($liste_route_import as $route_import) {
-
-                    # code...
-                    $liste_user_route_import            =   UserRouteImport::where('id_user', Auth::user()->id)->get();
-
-                    foreach ($liste_user_route_import as $user_route_import) {
-
-                        if($user_route_import->id_route_import  ==  $route_import->id) {
-
-                            array_push($liste_route_import_final, $route_import);
-                        }
-                    }
-                }
-
-                return $liste_route_import_final;
-            }
-
-            else {
-
-                if(Auth::user()->hasRole("BackOffice")) {
-
-                    foreach ($liste_route_import as $route_import) {
-
-                        # code...
-                        $liste_user_route_import            =   UserRouteImport::where('id_user', Auth::user()->id)->get();
-
-                        foreach ($liste_user_route_import as $user_route_import) {
-
-                            if($user_route_import->id_route_import  ==  $route_import->id) {
-
-                                array_push($liste_route_import_final, $route_import);
-                            }
-                        }
-                    }
-
-                    return $liste_route_import_final;
-                }
-
-                else {
-
-                    if(Auth::user()->hasRole("Viewer")) {
-
-                        foreach ($liste_route_import as $route_import) {
-
-                            # code...
-                            $liste_user_route_import            =   UserRouteImport::where('id_user', Auth::user()->id)->get();
-
-                            foreach ($liste_user_route_import as $user_route_import) {
-
-                                if($user_route_import->id_route_import  ==  $route_import->id) {
-
-                                    array_push($liste_route_import_final, $route_import);
-                                }
-                            }
-                        }
-
-                        return $liste_route_import_final;
-                    }
-
-                    else {
-
-                        if(Auth::user()->hasRole("FrontOffice")) {
-
-                            foreach ($liste_route_import as $route_import) {
-
-                                # code...
-                                $liste_user_route_import            =   UserRouteImport::where('id_user', Auth::user()->id)->get();
-
-                                foreach ($liste_user_route_import as $user_route_import) {
-
-                                    if($user_route_import->id_route_import  ==  $route_import->id) {
-
-                                        array_push($liste_route_import_final, $route_import);
-                                    }
-                                }
-                            }
-
-                            return $liste_route_import_final;
-                        }
-                    }
-                }
-            }
-        }
-
-        //
     }
 
     //

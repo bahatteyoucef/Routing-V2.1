@@ -92,15 +92,22 @@ export default {
 
         async getData(user) {
 
-            await this.getComboData()  
+            // Show Loading Page
+            this.$showLoadingPage()
+
             await this.getUserData()  
+            await this.getComboData()  
 
             this.setListeRouteImport()
+
+            // Hide Loading Page
+            this.$hideLoadingPage()
         },
 
         async getUserData() {
 
             const res                   =   await this.$callApi("post"  ,   "/users/"+this.$route.params.id_user+"/show"    ,   null)
+            console.log(res)
 
             this.user.nom_original          =   res.data.nom
 
@@ -134,7 +141,7 @@ export default {
 
             for (let i = 0; i < this.user.liste_route_import.length; i++) {
 
-                this.user.liste_route_import_string     =   this.user.liste_route_import_string     +   " - "   +   this.liste_route_import[i].label
+                this.user.liste_route_import_string     =   this.user.liste_route_import_string     +   " - "   +   this.user.liste_route_import[i].libelle
             }
         },
     }

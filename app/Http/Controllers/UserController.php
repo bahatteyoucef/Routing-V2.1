@@ -180,7 +180,7 @@ class UserController extends Controller
         try {
 
             $users          =   User::indexUser();
-            return User::filterUsers($users);
+            return $users;
         }
 
         catch(Throwable $erreur) {

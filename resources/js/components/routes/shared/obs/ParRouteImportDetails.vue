@@ -121,8 +121,6 @@
                 <div id="map_operation_buttons" v-if="(($isRole('Super Admin'))||($isRole('BU Manager'))||($isRole('BackOffice')))">
                     <h5 class="fw-bold text-center primary_color">Operations</h5>
 
-                    <button class="btn btn-primary w-100 m-0 mt-1" @click="clearRouteMarkers()">Clear Data</button>
-
                     <button class="btn btn-primary w-100 m-0 mt-1"                                                                  @click="getData()">Refresh</button>
                     <button class="btn btn-primary w-100 m-0 mt-1"                                                                  @click="focuseMarkers()">Focus</button>
                     <button class="btn btn-primary w-100 m-0 mt-1"  data-bs-toggle="modal" :data-bs-target="'#ModalResume'"         @click="showResume()">Resume</button>
@@ -1413,22 +1411,14 @@ export default {
 
         setRouteMarkers(mode, clients_markers_affiche) {
 
-            // console.log(this.$getCurrentTimeHMS())
-
             //
             this.clearRouteMarkers()
-
-            // console.log(this.$getCurrentTimeHMS())
 
             // Set Markers
             this.addMarkers(clients_markers_affiche)
 
-            // console.log(this.$getCurrentTimeHMS())
-
             // Focus
             this.focuseMarkers()
-
-            // console.log(this.$getCurrentTimeHMS())
         },
 
         removeDrawings() {
