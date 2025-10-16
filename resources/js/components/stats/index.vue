@@ -221,11 +221,11 @@
     <!--                  -->
 
     <!-- Modal Decoupe By Journee       -->
-    <ModalResume    ref="ModalResume"   :mode="'permanent'"   ></ModalResume>
+    <ModalResume          ref="ModalResume"         :mode="'permanent'"             :id_route_import="route_link"></ModalResume>
     <!--                                -->
 
     <!-- Update                         -->
-    <ModalClientUpdate    ref="ModalClientUpdate"   :id_route_import="route_link"     :update_type="update_type"    :mode="mode"    :validation_type="validation_type"></ModalClientUpdate>
+    <ModalClientUpdate    ref="ModalClientUpdate"   :update_type="update_type"      :id_route_import="route_link"   :mode="mode"    :validation_type="validation_type"></ModalClientUpdate>
     <!--                                -->
 
   </div>
@@ -539,7 +539,8 @@ export default {
               //
 
               this.getDoublant                                  =   res.data.stats_details.getDoublant
-              console.log(this.getDoublant)
+
+              //
 
               this.show_card_doublants                          =   true
 
@@ -646,7 +647,7 @@ export default {
       ModalResume.show();
 
       //
-      await this.$refs.ModalResume.getClients()
+      await this.$refs.ModalResume.getClients(this.total_clients)
     },
 
     //

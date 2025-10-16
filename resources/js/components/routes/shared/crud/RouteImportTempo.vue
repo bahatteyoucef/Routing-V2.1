@@ -126,7 +126,16 @@ export default {
 
         this.emitter.on('reSetClientsDevide' , async (clients)  =>  {
 
-            this.total_clients  =   clients
+            for (let i = 0; i < this.total_clients.length; i++) {
+                const client    =   this.total_clients[i]
+                const upd       =   clients[client.id] // undefined if not present
+
+                if (upd) {
+                    client.JPlan    =   clients[client.id].JPlan
+                    client.Journee  =   clients[client.id].Journee
+                }
+            }
+
             await this.getDoubles()
         })
 
@@ -155,10 +164,12 @@ export default {
 
     unmounted() {
 
-        this.emitter.off('reSetValidationClientUpdate')
         this.emitter.off('reSetClientsDecoupeByJourneeAdd')
         this.emitter.off('reSetUpdate')
         this.emitter.off('reSetDelete')
+
+        this.emitter.off('reSetClientsDevide')
+        this.emitter.off('reSetValidationClientUpdate')
         this.emitter.off('refreshDoublantCustomerCode')
         this.emitter.off('refreshDoublantCustomerNameE')
         this.emitter.off('refreshDoublantTel')
@@ -168,7 +179,7 @@ export default {
     methods : {
 
         async showResume() {
-            await this.$refs.ModalResume.getClients()
+            await this.$refs.ModalResume.getClients(this.total_clients)
         },
 
         async submitRouteImport() {

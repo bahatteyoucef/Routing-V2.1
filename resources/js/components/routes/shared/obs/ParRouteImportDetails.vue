@@ -333,7 +333,7 @@
     <ModalClientsChangeRoute                                        ref="ModalClientsChangeRoute"                                                                                                       :users_all="users_all"      :districts_all="districts_all"  >   </ModalClientsChangeRoute>
 
     <!-- Modal Decoupe By Journee       -->
-    <ModalResume                                                    ref="ModalResume"               :mode="'permanent'"                                                                                                                                             >   </ModalResume>
+    <ModalResume                                                    ref="ModalResume"               :id_route_import="id_route_import"      :mode="'permanent'"                                                                                                     >   </ModalResume>
 
     <!-- Modal Add New Journey Plan     -->
     <ModalAddJourneyPlan                                            ref="ModalAddJourneyPlan"                                                                                                                                                                       >   </ModalAddJourneyPlan>
@@ -638,7 +638,15 @@ export default {
 
         this.emitter.on('reSetClientsDecoupeByJourneeMap'   , async (clients)   =>  {
 
-            this.route_import.clients   =   clients
+            for (let i = 0; i < this.route_import.clients.length; i++) {
+                const client    =   this.route_import.clients[i]
+                const upd       =   clients[client.id] // undefined if not present
+                    
+                if (upd) {
+                    client.JPlan    =   clients[client.id].JPlan
+                    client.Journee  =   clients[client.id].Journee
+                }
+            }
 
             //
             await this.reAfficherClientsAndMarkers("standard");
@@ -1157,8 +1165,6 @@ export default {
 
         filterFromMapInfo(groupe) {
 
-            console.log(groupe)
-
             // JPlan
             if(this.column_group    ==  1) {
 
@@ -1297,10 +1303,6 @@ export default {
 
                 if (groups[k]) groups[k].clients.push(c);
             }
-
-            console.log(configs[this.column_group])
-            console.log(this.clients_table_affiche)
-            console.log(groups)
 
             // 4) sort by descending size & rebuild object
             let clients_markers_affiche     =   Object
@@ -1473,8 +1475,8 @@ export default {
             this.map_instance.$showTerritories()
         },
 
-        async showResume() {
-            await this.$refs.ModalResume.getClients()
+        showResume() {
+            this.$refs.ModalResume.getClients(this.route_import.clients)            
         },
 
         async showJPlanBDTerritories() {
@@ -1728,8 +1730,6 @@ export default {
 
             if(this.marker_cluster_mode ==  "marker") {
 
-                // console.log(this.$getCurrentTimeHMS())
-
                 // Show Markers
                 this.map_instance.$switchMarkerClusterMode("marker")
 
@@ -1740,8 +1740,6 @@ export default {
             else {
 
                 if(this.marker_cluster_mode ==  "cluster") {
-
-                    // console.log(this.$getCurrentTimeHMS())
 
                     // Show Markers
                     this.map_instance.$switchMarkerClusterMode("cluster")

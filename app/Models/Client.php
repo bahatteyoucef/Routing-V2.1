@@ -32,8 +32,20 @@ class Client extends Model
         parent::boot();
 
         // Event hook to set the date before storing a new object in the database
-        static::creating(function ($client) {
-            $client->created_at = Carbon::now()->format('d F Y');;
+        static::creating(function ($model) {
+            $model->created_at  =   Carbon::now()->format('d F Y');
+            $model->updated_at  =   Carbon::now()->format('Y-m-d H:i:s');
+
+            //
+            if(!(Auth::user()->hasRole('FrontOffice'))) $model->owner_bo    =   Auth::user()->id;
+        });
+
+        //
+        static::updating(function ($model) {
+            $model->updated_at  =   Carbon::now()->format('Y-m-d H:i:s');
+
+            //
+            if(!(Auth::user()->hasRole('FrontOffice'))) $model->owner_bo    =   Auth::user()->id;
         });
     }
 
