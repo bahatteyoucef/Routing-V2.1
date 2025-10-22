@@ -638,6 +638,8 @@ export default {
 
         this.emitter.on('reSetClientsDecoupeByJourneeMap'   , async (clients)   =>  {
 
+            console.log(clients)
+
             for (let i = 0; i < this.route_import.clients.length; i++) {
                 const client    =   this.route_import.clients[i]
                 const upd       =   clients[client.id] // undefined if not present
@@ -645,6 +647,8 @@ export default {
                 if (upd) {
                     client.JPlan    =   clients[client.id].JPlan
                     client.Journee  =   clients[client.id].Journee
+
+                    console.log(client)
                 }
             }
 

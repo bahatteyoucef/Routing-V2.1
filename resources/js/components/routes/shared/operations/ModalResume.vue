@@ -12,11 +12,14 @@
 
                 <div class="modal-body mt-3 table-responsive">
                     <ResumeComponent 
+                        ref="ResumeComponent"
                         :key="clients" 
+
                         :mode="mode"
                         :clients="clients"
                         :id_route_import_tempo=id_route_import_tempo    
-                        :id_route_import="id_route_import_tempo">
+                        :id_route_import="id_route_import"
+                    >
                     </ResumeComponent>
                 </div>
 
@@ -56,10 +59,13 @@ export default {
 
     methods : {
 
-        getClients(clients) {
+        async getClients(clients) {
 
             this.clients    =   clients.map(({ id, JPlan, Journee, CustomerType, Latitude, Longitude }) => ({ id, JPlan, Journee, CustomerType, Latitude, Longitude }))
-            
+
+            //
+            await this.$nextTick()
+
             //
             this.$refs.ResumeComponent.setResume()
         },
@@ -165,16 +171,12 @@ export default {
 
             $(id_modal).on("hidden.bs.modal",   ()  => {
     
-                this.$refs.ResumeComponent.datatable_resume_global      =   null    
-
                 this.$refs.ResumeComponent.nomber_routes                =   0       
 
                 this.$refs.ResumeComponent.nombre_journee               =   ""      
                 this.$refs.ResumeComponent.liste_jourey_plan            =   []      
 
                 this.$refs.ResumeComponent.resume_liste_journey_plan    =   null    
-
-                this.$refs.ResumeComponent.clients                      =   []      
 
                 //  //  //  //  //
 

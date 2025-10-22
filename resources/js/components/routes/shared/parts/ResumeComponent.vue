@@ -1,11 +1,19 @@
 <template>
     <div>
         <div v-if="(($isRole('Super Admin'))||($isRole('BU Manager'))||($isRole('BackOffice')))"    class="row">
-            <div class="col-sm-11">
-                <input type="number" class="form-control" placeholder="number of routes"    v-model="nomber_routes"/>
+            <div class="col-sm-3">
+                <input type="number" class="form-control" placeholder="number of routes"        v-model="nomber_routes"/>
             </div>
 
-            <div class="col-sm-1">
+            <div class="col-sm-3">
+                <input type="text"  class="form-control" placeholder="routes label prefix"      v-model="routeLabelPrefix"/>
+            </div>
+
+            <div class="col-sm-3">
+                <input type="text"  class="form-control" placeholder="journees label prefix"    v-model="journeeLabelPrefix"/>
+            </div>
+
+            <div class="col-sm-3">
                 <button class="btn btn-primary w-100"   @click="decouperRoutes()"> Divide </button>
             </div>
         </div>
@@ -58,7 +66,6 @@
             <hr />
 
             <table class="table mt-3">
-
                 <thead>
                     <tr>
                         <th class="col-sm-2">JPlan</th>
@@ -70,11 +77,8 @@
                 </thead>
 
                 <tbody id="datatable_resume_par_jour_body">
-
                 </tbody>
-
             </table>
-
 
         </div>
     </div>
@@ -87,8 +91,6 @@ export default {
     data() {
         return { 
 
-            datatable_resume_global     :   null    ,
-
             nomber_routes               :   0       ,
 
             nombre_journee              :   ""      ,
@@ -96,19 +98,16 @@ export default {
 
             resume_liste_journey_plan   :   null    ,
 
-            clients                     :   []      ,
+            //
+
+            routeLabelPrefix            :   "ROUTE" ,
+            journeeLabelPrefix          :   "Jour"
         }
     },
 
     props   : ["clients", "id_route_import_tempo", "id_route_import"],
 
-    components : {
-        ResumeComponent :   ResumeComponent
-    },
-
     mounted() {
-
-        this.clearData("#ModalResume")
     },  
 
     methods : {
@@ -117,20 +116,17 @@ export default {
 
             // Show Loading Page
             this.$showLoadingPage()
-
-            setTimeout(async () => {
                 
-                this.resume_liste_journey_plan  =   this.$getResumeFileRouting(this.clients)
+            this.resume_liste_journey_plan  =   this.$getResumeFileRouting(this.clients)
 
-                // Global
-                this.addGlobalBody()
+            // Global
+            this.addGlobalBody()
 
-                // Par Jour
-                this.addParJourBody()
+            // Par Jour
+            this.addParJourBody()
 
-                // Hide Loading Page
-                this.$hideLoadingPage()
-            }, 0);
+            // Hide Loading Page
+            this.$hideLoadingPage()
         },
 
         //  //  //  //  //
@@ -213,13 +209,15 @@ export default {
                     clientList: this.clients,
                     numGroups: this.nomber_routes,
                     propertyName: 'JPlan',
-                    labelPrefix: 'ROUTE'
+                    labelPrefix: this.routeLabelPrefix
                 });
                 
                 // Once partitioning is done, continue.
                 this.setResume();
                 this.$hideLoadingPage();
             }
+
+            console.log(this.clients)
         },
 
         async decouperClients(key) {
@@ -234,7 +232,7 @@ export default {
                     clientList: clientsForThisRoute,
                     numGroups: nombre_journee,
                     propertyName: 'Journee',
-                    labelPrefix: 'Jour'
+                    labelPrefix: this.journeeLabelPrefix
                 });
 
                 this.setResume();

@@ -6,14 +6,32 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title" v-if="clients">Change Clients Route : {{clients.length}} clients</h5>
-                    <h5 class="modal-title" v-if="!clients">Change Clients Route : 0 clients</h5>
+                    <h5 class="modal-title" v-if="clients">Clients : {{clients.length}} clients</h5>
+                    <h5 class="modal-title" v-if="!clients">Clients : 0 clients</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body mt-3 table-responsive">
 
-                    <form>
+                    <div>
+                        <div class="row mb-3">
+                            <div class="col-sm-1">
+                                <label for="operation"      class="form-label mt-1">Operation :</label>
+                            </div>
+
+                            <div class="col-sm-11">
+                                <select                     class="form-select"     id="operation"          v-model="operation"     @change="changeOperation">
+                                    <option value="multi_update">Multi update</option>
+                                    <option value="devide_clients">Devide clients</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <!-- Multi Update -->
+                    <form v-show="operation   ==  'multi_update'">
                         <div class="row mb-3">
 
                             <!-- Owner                        -->
@@ -82,59 +100,61 @@
                                 <div class="mb-3">
                                     <label for="Journee"            class="form-label">WorkDay (Journee)</label>
                                     <input type="text"              class="form-control"        id="Journee"                    v-model="Journee">
-
-                                    <!-- <select                         class="form-select"         id="Journee"                 v-model="Journee">
-                                        <option     :value="'Dimanche 1'">Dimanche 1</option>
-                                        <option     :value="'Lundi 1'">Lundi 1</option>
-                                        <option     :value="'Mardi 1'">Mardi 1</option>
-                                        <option     :value="'Mercredi 1'">Mercredi 1</option>
-                                        <option     :value="'Jeudi 1'">Jeudi 1</option>
-                                        <option     :value="'Dimanche 2'">Dimanche 2</option>
-                                        <option     :value="'Lundi 2'">Lundi 2</option>
-                                        <option     :value="'Mardi 2'">Mardi 2</option>
-                                        <option     :value="'Mercredi 2'">Mercredi 2</option>
-                                        <option     :value="'Jeudi 2'">Jeudi 2</option>
-                                    </select> -->
                                 </div>
                             </div>
 
                         </div>
+
+                        <!-- Table Clients -->
+                        <div id="change_route_clients_container" class="table-container mt-5">
+                            <table class="table table-hover table-bordered change_route_clients mt-0 mb-0 w-100" id="change_route_clients">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" @change="checkUncheckAllRows()" value="true" v-model="all_rows_checked"></th>
+                                        <th role="button">#</th>
+                                        <th v-for="change_route_client_column in change_route_clients_columns" :key="change_route_client_column" role="button">{{ change_route_client_column.title }}</th>
+                                    </tr>
+
+                                    <tr id="change_route_clients_filters" class="change_route_clients_filters">
+                                        <th></th>
+                                        <th></th>
+
+                                        <th v-for="change_route_client_column in change_route_clients_columns" :key="change_route_client_column">
+                                            <div class="filter_group" :data-column="change_route_client_column.title">
+                                                <select class="filter_type form-select-sm w-100 mb-2">
+                                                    <option value="contains">contains</option>
+                                                    <option value="not_contains">not contains</option>
+                                                    <option value="exact">exact</option>
+                                                    <option value="starts_with">starts with</option>
+                                                    <option value="ends_with">ends with</option>
+                                                </select>
+                                                <input
+                                                    type="text"
+                                                    class="form-control form-control-sm filter_input"
+                                                    :placeholder="change_route_client_column.title"
+                                                />
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody></tbody>
+                            </table>
+                        </div>
                     </form>
 
-                    <div id="change_route_clients_container" class="table-container mt-5">
-                        <table class="table table-hover table-bordered change_route_clients mt-0 mb-0 w-100" id="change_route_clients">
-                            <thead>
-                                <tr>
-                                    <th><input type="checkbox" @change="checkUncheckAllRows()" value="true" v-model="all_rows_checked"></th>
-                                    <th role="button">#</th>
-                                    <th v-for="change_route_client_column in change_route_clients_columns" :key="change_route_client_column" role="button">{{ change_route_client_column.title }}</th>
-                                </tr>
+                    <!-- Resume -->
+                    <div v-show="operation   ==  'devide_clients'">
+                        <ResumeComponent 
+                            ref="ResumeComponent_partly"
+                            :key="clients" 
 
-                                <tr id="change_route_clients_filters" class="change_route_clients_filters">
-                                    <th></th>
-                                    <th></th>
-
-                                    <th v-for="change_route_client_column in change_route_clients_columns" :key="change_route_client_column">
-                                        <div class="filter_group" :data-column="change_route_client_column.title">
-                                            <select class="filter_type form-select-sm w-100 mb-2">
-                                                <option value="contains">contains</option>
-                                                <option value="not_contains">not contains</option>
-                                                <option value="exact">exact</option>
-                                                <option value="starts_with">starts with</option>
-                                                <option value="ends_with">ends with</option>
-                                            </select>
-                                            <input
-                                                type="text"
-                                                class="form-control form-control-sm filter_input"
-                                                :placeholder="change_route_client_column.title"
-                                            />
-                                        </div>
-                                    </th>
-                                </tr>
-                            </thead>
-
-                            <tbody></tbody>
-                        </table>
+                            :mode="'permanent'"
+                            :clients="clients_devide"
+                            :id_route_import_tempo=null    
+                            :id_route_import="$route.params.id_route_import"
+                        >
+                        </ResumeComponent>
                     </div>
                 </div>
 
@@ -142,8 +162,9 @@
                     <button type="button" class="btn btn-danger"    @click="deleteClients()">Delete</button>
 
                     <div class="right-buttons"  style="display: flex; margin-left: auto;">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary"   @click="sendData()">Confirm</button>
+                        <button                                     type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button v-if="operation === 'multi_update'" type="button" class="btn btn-primary" @click="multiUpdate()">Confirm</button>
+                        <button v-if="operation === 'devide_clients'" type="button" class="btn btn-primary" @click="devideClients()">Confirm</button>                    
                     </div>
                 </div>
 
@@ -155,7 +176,9 @@
 
 <script>
 
-import DatatableHelper              from "@/services/DatatableHelper"
+import DatatableHelper      from "@/services/DatatableHelper"
+
+import ResumeComponent      from "@/components/routes/shared/parts/ResumeComponent.vue"
 
 export default {
 
@@ -214,6 +237,8 @@ export default {
             all_clients                     :   []  ,
             clients                         :   []  ,
 
+            clients_devide                  :   null,
+
             //
 
             districts                       :   []  ,
@@ -226,12 +251,20 @@ export default {
 
             //
 
-            selected_row                    :   ""  ,
-            selected_row_id                 :   ""
+            selected_row                    :   ""      ,
+            selected_row_id                 :   ""      ,
+
+            //
+
+            operation                       :   "multi_update"
         }
     },
 
     props : ["districts_all", "users_all"],
+
+    components : {
+        ResumeComponent :   ResumeComponent
+    },
 
     mounted() {
 
@@ -256,7 +289,7 @@ export default {
             this.selected_row_id    =   selected_row_id
         },
 
-        async sendData() {
+        async multiUpdate() {
 
             this.$showLoadingPage()
 
@@ -343,6 +376,56 @@ export default {
 			}
         },
 
+        async devideClients() {
+
+            this.$showLoadingPage()
+
+            let formData    =   new FormData();
+
+            let clients     =   this.clients_devide.map(obj => { return { id   :   obj.id  ,   JPlan   :   obj.JPlan   ,   Journee :   obj.Journee };});
+
+            //
+
+            console.log(clients)
+
+            //
+
+            formData.append("data"      ,   JSON.stringify(clients))
+
+            const res                   =   await this.$callApi("post"  ,   "/clients/resume/update",  formData)
+            console.log(res)
+
+            if(res.status===200){
+
+                // Send Feedback
+                this.$feedbackSuccess(res.data.header     ,   res.data.message)
+
+                // 5) Now hide the spinner
+                this.$hideLoadingPage();
+
+                //
+                const clients_object = clients.reduce((acc, { id, JPlan, Journee }) => {
+                    acc[id] = { JPlan, Journee };
+                    return acc;
+                }, {});
+
+                //
+                this.emitter.emit('reSetClientsDecoupeByJourneeMap' , clients_object)
+
+                // Close Modal
+                await this.$hideModal("ModalClientsChangeRoute")
+            }
+            
+            else{
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
+
+                // Hide Loading Page
+                this.$hideLoadingPage()
+            }
+        },
+
         async deleteClients() {
 
             this.$showLoadingPage()
@@ -354,6 +437,8 @@ export default {
             //
 
             formData.append("clients", JSON.stringify(clients_ids_copy))
+
+            //
 
             const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/delete",   formData)
 
@@ -411,8 +496,6 @@ export default {
 
         async getData(clients) {
 
-            console.log(clients)
-
             // Show Loading Page
             this.$showLoadingPage()
 
@@ -421,10 +504,16 @@ export default {
             this.clients        =   [...clients]
 
             //
+            this.clients_devide =   clients.map(({ id, JPlan, Journee, CustomerType, Latitude, Longitude }) => ({ id, JPlan, Journee, CustomerType, Latitude, Longitude }))
+
+            //
             await this.setDataTable()
 
             //
             await this.getComboData()
+
+            //
+            this.$refs.ResumeComponent_partly.setResume()
 
             //
             this.checkUncheckAllRows()
@@ -544,6 +633,12 @@ export default {
                 
                 return result;
             });
+        },
+
+        //  //  //
+
+        async changeOperation() {
+
         }
     }
 };

@@ -129,7 +129,7 @@ export default class Map {
             if(left_tools) {
 
                 // Add Draw Function
-                this.$drawFonction()
+                this.$drawMultiUpdate()
             }
 
             if((right_tools)&&(left_tools)) {
@@ -944,13 +944,13 @@ export default class Map {
 
     //  //  //  //  Left Drawing Tools  //  //  //  //
 
-    $drawFonction() {
+    $drawMultiUpdate() {
 
         // Set Draw Options
-        this.$drawOptions()
+        this.$drawMultiUpdateOptions()
     }
 
-    $drawOptions() {
+    $drawMultiUpdateOptions() {
 
         // Initialise the FeatureGroup to store editable layers
         this.map.addLayer(this.editable_layers);
@@ -1304,8 +1304,6 @@ export default class Map {
     //  //  //  //  //  KML Functions   //  //  //  //  //
 
     $setKMLLayers(kml_layers) {
-
-        console.log(kml_layers)
 
         // Delete all kml layers
         this.kml_layers.forEach(kml_layer => {
