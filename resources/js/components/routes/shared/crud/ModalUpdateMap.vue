@@ -2,7 +2,7 @@
 
     <!-- Modal -->
     <div class="modal fade" id="ModalUpdateMap" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl expanded_modal modal-dialog-scrollable">
+        <div class="modal-dialog modal-l modal-dialog-scrollable">
             <div class="modal-content">
 
                 <div class="modal-header">

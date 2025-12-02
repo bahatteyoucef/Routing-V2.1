@@ -412,6 +412,87 @@ export default class Map {
     $deleteRouteMarkers(clients) {
 
         clients.forEach(c => {
+            const entry = this.markers[c.id];
+            if (!entry) return;
+
+            const { marker, group } = entry;
+
+            if (this.marker_cluster_mode === 'cluster') {
+                // remove from the cluster group
+                const cg = this.clusters[group];
+
+                if (cg) {
+                    // remove the marker from the cluster
+                    try { cg.removeLayer(marker); } catch (err) { /* ignore */ }
+
+                    // if cluster group has no more child layers, remove & cleanup
+                    try {
+                        const remaining = (typeof cg.getLayers === 'function') ? cg.getLayers().length : 0;
+                        if (remaining === 0) {
+                            // clear layers defensively
+                            try { if (typeof cg.clearLayers === 'function') cg.clearLayers(); } catch(e){}
+
+                            // remove from map if present
+                            if (this.map && typeof this.map.hasLayer === 'function' && this.map.hasLayer(cg)) {
+                                try { this.map.removeLayer(cg); } catch (e) {}
+                            }
+
+                            // delete cluster references so next add recreates them with new color
+                            delete this.clusters[group];
+
+                            if (this.clusters_icons && this.clusters_icons[group]) {
+                                delete this.clusters_icons[group];
+                            }
+
+                            // also delete cached icon for this group so marker icons are recreated
+                            if (this.markers_icons && this.markers_icons[group]) {
+                                delete this.markers_icons[group];
+                            }
+                        }
+                    } 
+                    
+                    catch (err) {
+                        console.warn('Error while cleaning cluster group', group, err);
+                    }
+                }
+            } 
+
+            else {
+                // remove from the plain-marker FeatureGroup
+                const lg = this.markerGroups[group];
+                if (lg) {
+                    try { lg.removeLayer(marker); } catch (err) { /* ignore */ }
+
+                    // If empty, remove and cleanup
+                    try {
+                        const layerCount = lg._layers ? Object.keys(lg._layers).length : 0;
+                        if (layerCount === 0) {
+                            if (this.map && typeof this.map.hasLayer === 'function' && this.map.hasLayer(lg)) {
+                            try { this.map.removeLayer(lg); } catch (e) {}
+                            }
+                            delete this.markerGroups[group];
+                        }
+                    } 
+                    catch (err) {
+                        console.warn('Error while cleaning marker group', group, err);
+                    }
+
+                    // delete markers_icons cache so icons will be recreated with new color
+                    if (this.markers_icons && this.markers_icons[group]) {
+                        delete this.markers_icons[group];
+                    }
+                }
+            }
+
+            // finally clean up your lookup entries for this marker
+            delete this.markers[c.id];
+            delete this.markers_lat_lng[c.id];
+        });
+    }
+
+    $deleteRouteMarkers_old(clients) {
+
+        clients.forEach(c => {
 
             const entry             =   this.markers[c.id];
             if (!entry) return;

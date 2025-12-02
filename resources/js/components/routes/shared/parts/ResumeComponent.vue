@@ -1,687 +1,497 @@
 <template>
-    <div>
-        <div v-if="(($isRole('Super Admin'))||($isRole('BU Manager'))||($isRole('BackOffice')))"    class="row">
-            <div class="col-sm-3">
-                <input type="number" class="form-control" placeholder="number of routes"        v-model="nomber_routes"/>
-            </div>
-
-            <div class="col-sm-3">
-                <input type="text"  class="form-control" placeholder="routes label prefix"      v-model="routeLabelPrefix"/>
-            </div>
-
-            <div class="col-sm-3">
-                <input type="text"  class="form-control" placeholder="journees label prefix"    v-model="journeeLabelPrefix"/>
-            </div>
-
-            <div class="col-sm-3">
-                <button class="btn btn-primary w-100"   @click="decouperRoutes()"> Divide </button>
-            </div>
-        </div>
-
-        <hr v-if="(($isRole('Super Admin'))||($isRole('BU Manager'))||($isRole('BackOffice')))" />
-
-        <div class="mt-5">
-
-            <div class="col-sm-12 p-0"> 
-                <h5>Resume (Global) :</h5>
-            </div>
-
-            <hr />
-
-            <table class="table mt-3">
-
-                <thead>
-                    <tr>
-                        <th class="col-sm-2">JPlan</th>
-                        <th class="col-sm-1">JPlan Clients</th>
-
-                        <th class="col-sm-1">District</th>
-                        <th class="col-sm-1">District Clients</th>
-
-                        <th class="col-sm-1">City</th>
-                        <th class="col-sm-1">City Clients</th>
-
-                        <th class="col-sm-1">CustomerType</th>
-                        <th class="col-sm-1">CustomerType Clients</th>
-
-                        <th class="col-sm-2">Options</th>
-                    </tr>
-                </thead>
-
-                <tbody id="datatable_resume_global_body">
-
-                </tbody>
-                
-            </table>
-
-        </div>
-
-        <hr />
-
-        <div class="mt-5">
-            <div class="col-sm-12 p-0"> 
-                <h5>Resume (Journee) :</h5>
-            </div>
-
-            <hr />
-
-            <table class="table mt-3">
-                <thead>
-                    <tr>
-                        <th class="col-sm-2">JPlan</th>
-                        <th class="col-sm-2">Journee</th>
-                        <th class="col-sm-2">Journee Clients</th>
-                        <th class="col-sm-2">City</th>
-                        <th class="col-sm-2">City Clients</th>
-                    </tr>
-                </thead>
-
-                <tbody id="datatable_resume_par_jour_body">
-                </tbody>
-            </table>
-
-        </div>
+  <div>
+    <div v-if="$isRole('Super Admin') || $isRole('BU Manager') || $isRole('BackOffice')" class="row">
+      <div class="col-sm-3">
+        <input type="number" class="form-control" placeholder="number of routes" v-model="nomber_routes"/>
+      </div>
+      <div class="col-sm-3">
+        <input type="text" class="form-control" placeholder="routes label prefix" v-model="routeLabelPrefix"/>
+      </div>
+      <div class="col-sm-3">
+        <input type="text" class="form-control" placeholder="journees label prefix" v-model="journeeLabelPrefix"/>
+      </div>
+      <div class="col-sm-3">
+        <button class="btn btn-primary w-100" @click="decouperRoutes()"> Divide </button>
+      </div>
     </div>
+
+    <hr v-if="$isRole('Super Admin') || $isRole('BU Manager') || $isRole('BackOffice')" />
+
+    <div class="mt-5">
+      <div class="col-sm-12 p-0">
+        <h5>Resume (Global) :</h5>
+      </div>
+      <hr />
+      <table class="table mt-3">
+        <thead>
+          <tr>
+            <th class="col-sm-2">JPlan</th>
+            <th class="col-sm-1">JPlan Clients</th>
+            <th class="col-sm-1">District</th>
+            <th class="col-sm-1">District Clients</th>
+            <th class="col-sm-1">City</th>
+            <th class="col-sm-1">City Clients</th>
+            <th class="col-sm-1">CustomerType</th>
+            <th class="col-sm-1">CustomerType Clients</th>
+            <th class="col-sm-2">Options</th>
+          </tr>
+        </thead>
+        <tbody id="datatable_resume_global_body">
+           <tr v-for="(row, rowIndex) in generatedRows" :key="'g-'+rowIndex">
+             <td v-for="(cell, cellIndex) in row.cells" 
+                 :key="cellIndex" 
+                 :rowspan="cell.rowspan">
+                 
+                 <span v-if="!cell.isOption">{{ cell.text }}</span>
+
+                 <div v-else class="row justify-content-center">
+                    <div v-if="$isRole('Super Admin') || $isRole('BU Manager') || $isRole('BackOffice')">
+                       <input type="number" 
+                              class="form-control w-75 mb-1" 
+                              placeholder="workdays..."
+                              :id="'route_' + cell.routeKey">
+                       <button type="button" 
+                               class="btn-primary btn w-75"
+                               @click="decouperClients(cell.routeKey)">
+                           Divide
+                       </button>
+                    </div>
+                 </div>
+             </td>
+           </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr />
+
+    <div class="mt-5">
+      <div class="col-sm-12 p-0">
+        <h5>Resume (Journee) :</h5>
+      </div>
+      <hr />
+      <table class="table mt-3">
+        <thead>
+          <tr>
+            <th class="col-sm-2">JPlan</th>
+            <th class="col-sm-2">Journee</th>
+            <th class="col-sm-2">Journee Clients</th>
+            <th class="col-sm-2">City</th>
+            <th class="col-sm-2">City Clients</th>
+          </tr>
+        </thead>
+        <tbody id="datatable_resume_par_jour_body">
+            <tr v-for="(row, rowIndex) in generatedRowsParJour" :key="'j-'+rowIndex">
+              <td v-for="(cell, cellIndex) in row.cells" 
+                  :key="cellIndex" 
+                  :rowspan="cell.rowspan">
+                  {{ cell.text }}
+              </td>
+            </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </template>
 
 <script>
-
 export default {
+  props: ["clients", "id_route_import_tempo", "id_route_import", "mode"],
+  data() {
+    return {
+      nomber_routes: 0,
+      routeLabelPrefix: "ROUTE",
+      journeeLabelPrefix: "Jour",
+      
+      // Data Holders for the Algorithm
+      routingTree: {}, 
+      
+      // The arrays that feed the HTML tables
+      generatedRows: [],
+      generatedRowsParJour: []
+    };
+  },
+  methods: {
+    
+    // ==========================================
+    // 1. MAIN ENTRY POINT
+    // ==========================================
+    setResume() {
+      this.$showLoadingPage();
 
-    data() {
-        return { 
+      // Step A: Build the Data Tree (O(N) Complexity)
+      this.routingTree = this.buildDataTree(this.clients);
 
-            nomber_routes               :   0       ,
+      // Step B: Generate the "Global" Table Rows
+      this.generatedRows = this.generateGlobalRows(this.routingTree);
 
-            nombre_journee              :   ""      ,
-            liste_jourey_plan           :   []      ,
+      // Step C: Generate the "Par Jour" Table Rows
+      this.generatedRowsParJour = this.generateParJourRows(this.routingTree);
 
-            resume_liste_journey_plan   :   null    ,
+      this.$hideLoadingPage();
+    },
 
-            //
 
-            routeLabelPrefix            :   "ROUTE" ,
-            journeeLabelPrefix          :   "Jour"
+    // ==========================================
+    // 2. CORE OPTIMIZATION: ONE-PASS GROUPING
+    // ==========================================
+    buildDataTree(clients) {
+      const tree = {};
+
+      // 1. Aggregation Phase
+      clients.forEach(client => {
+        const routeKey = client.JPlan || "Unassigned";
+        
+        // Ensure Route Node
+        if (!tree[routeKey]) {
+          tree[routeKey] = {
+            id: routeKey,
+            clients: [],
+            districts: {}, // Map for Global View
+            journees: {},  // Map for Journee View
+            rowspanGlobal: 0,
+            rowspanJournee: 0
+          };
+        }
+        const routeNode = tree[routeKey];
+        routeNode.clients.push(client);
+
+        // --- Branch 1: Districts (Global View) ---
+        const distKey = client.DistrictNo;
+        if (!routeNode.districts[distKey]) {
+          routeNode.districts[distKey] = {
+            id: distKey,
+            name: client.DistrictNameE,
+            clients: [],
+            cities: {},
+            rowspan: 0
+          };
+        }
+        const distNode = routeNode.districts[distKey];
+        distNode.clients.push(client);
+
+        const cityKey = client.CityNo;
+        if (!distNode.cities[cityKey]) {
+          distNode.cities[cityKey] = {
+            id: cityKey,
+            name: client.CityNameE,
+            clients: [],
+            types: {},
+            rowspan: 0
+          };
+        }
+        const cityNode = distNode.cities[cityKey];
+        cityNode.clients.push(client);
+
+        const typeKey = client.CustomerType;
+        if (!cityNode.types[typeKey]) {
+          cityNode.types[typeKey] = {
+            id: typeKey,
+            clients: [],
+            rowspan: 1 // Leaf node always has rowspan 1 initially
+          };
+        }
+        cityNode.types[typeKey].clients.push(client);
+
+        // --- Branch 2: Journees (Par Jour View) ---
+        const jourKey = client.Journee || "No Day";
+        if (!routeNode.journees[jourKey]) {
+          routeNode.journees[jourKey] = {
+            id: jourKey,
+            clients: [],
+            cities: {},
+            rowspan: 0
+          };
+        }
+        const jourNode = routeNode.journees[jourKey];
+        jourNode.clients.push(client);
+
+        // We group by City again inside Journee
+        if (!jourNode.cities[cityKey]) {
+           jourNode.cities[cityKey] = {
+             id: cityKey,
+             name: client.CityNameE,
+             clients: [],
+             rowspan: 1 // Leaf node for this view
+           };
+        }
+        jourNode.cities[cityKey].clients.push(client);
+      });
+
+      // 2. Sorting & Rowspan Calculation Phase
+      // We convert Maps to Arrays for sorting, then calculate rowspans bottom-up
+      const sortedRoutes = Object.values(tree).sort((a,b) => this.naturalSort(a.id, b.id));
+
+      sortedRoutes.forEach(route => {
+        
+        // --- Process Global Tree ---
+        const districtsArr = Object.values(route.districts).sort((a,b) => a.id - b.id); // Assuming DistrictNo is numeric/sortable
+        route.districtsArray = districtsArr;
+        
+        let routeGlobalRowspan = 0;
+
+        districtsArr.forEach(dist => {
+           const citiesArr = Object.values(dist.cities).sort((a,b) => a.id - b.id);
+           dist.citiesArray = citiesArr;
+           let distRowspan = 0;
+
+           citiesArr.forEach(city => {
+              const typesArr = Object.values(city.types).sort((a,b) => this.naturalSort(a.id, b.id));
+              city.typesArray = typesArr;
+              // City Rowspan = Sum of Type Rowspans (each is 1)
+              city.rowspan = typesArr.length; 
+              distRowspan += city.rowspan;
+           });
+
+           dist.rowspan = distRowspan;
+           routeGlobalRowspan += distRowspan;
+        });
+        route.rowspanGlobal = routeGlobalRowspan;
+
+
+        // --- Process Journee Tree ---
+        const journeesArr = Object.values(route.journees).sort((a,b) => this.naturalSort(a.id, b.id));
+        route.journeesArray = journeesArr;
+        
+        let routeJourneeRowspan = 0;
+
+        journeesArr.forEach(jour => {
+           const citiesArr = Object.values(jour.cities).sort((a,b) => a.id - b.id);
+           jour.citiesArray = citiesArr;
+           
+           // Journee Rowspan = number of cities in that day
+           jour.rowspan = citiesArr.length; 
+           routeJourneeRowspan += jour.rowspan;
+        });
+        route.rowspanJournee = routeJourneeRowspan;
+      });
+
+      return sortedRoutes; 
+    },
+
+    // ==========================================
+    // 3. TABLE GENERATION (From Tree -> Flat Rows)
+    // ==========================================
+    
+    generateGlobalRows(sortedRoutes) {
+      const rows = [];
+      
+      sortedRoutes.forEach(route => {
+         // We prepare the Route cells that only appear in the first row of this group
+         const routeCells = [
+           { text: route.id, rowspan: route.rowspanGlobal },
+           { text: route.clients.length, rowspan: route.rowspanGlobal }
+         ];
+
+         // Option Cell logic
+         const optionCell = { 
+            isOption: true, 
+            routeKey: route.id, 
+            rowspan: route.rowspanGlobal 
+         };
+
+         let isFirstDist = true;
+
+         route.districtsArray.forEach(dist => {
+            const distCells = [
+              { text: dist.name, rowspan: dist.rowspan },
+              { text: dist.clients.length, rowspan: dist.rowspan }
+            ];
+
+            let isFirstCity = true;
+
+            dist.citiesArray.forEach(city => {
+               const cityCells = [
+                 { text: city.name, rowspan: city.rowspan },
+                 { text: city.clients.length, rowspan: city.rowspan }
+               ];
+
+               let isFirstType = true;
+
+               city.typesArray.forEach(type => {
+                  const typeCells = [
+                    { text: type.id, rowspan: type.rowspan },
+                    { text: type.clients.length, rowspan: type.rowspan }
+                  ];
+
+                  // Construct the final row
+                  let currentRow = { cells: [] };
+
+                  if (isFirstDist && isFirstCity && isFirstType) {
+                     // Very Top Row of the Route Group: Add Route Data
+                     currentRow.cells.push(...routeCells);
+                  }
+                  
+                  if (isFirstCity && isFirstType) {
+                     // Top Row of District
+                     currentRow.cells.push(...distCells);
+                  }
+
+                  if (isFirstType) {
+                     // Top Row of City
+                     currentRow.cells.push(...cityCells);
+                  }
+
+                  // Always add Type
+                  currentRow.cells.push(...typeCells);
+
+                  // If it's the very first row of the route, add the Options cell at the end
+                  if (isFirstDist && isFirstCity && isFirstType) {
+                    currentRow.cells.push(optionCell);
+                  }
+
+                  rows.push(currentRow);
+                  isFirstType = false;
+               });
+               isFirstCity = false;
+            });
+            isFirstDist = false;
+         });
+      });
+      return rows;
+    },
+
+    generateParJourRows(sortedRoutes) {
+      const rows = [];
+      
+      sortedRoutes.forEach(route => {
+         const routeCells = [
+           { text: route.id, rowspan: route.rowspanJournee }
+         ];
+
+         let isFirstJour = true;
+
+         route.journeesArray.forEach(jour => {
+            const jourCells = [
+               { text: jour.id, rowspan: jour.rowspan },
+               { text: jour.clients.length, rowspan: jour.rowspan }
+            ];
+
+            let isFirstCity = true;
+
+            jour.citiesArray.forEach(city => {
+               const cityCells = [
+                  { text: city.name, rowspan: 1 }, // Leaves are always 1 here
+                  { text: city.clients.length, rowspan: 1 }
+               ];
+
+               let currentRow = { cells: [] };
+
+               if (isFirstJour && isFirstCity) {
+                  currentRow.cells.push(...routeCells);
+               }
+
+               if (isFirstCity) {
+                  currentRow.cells.push(...jourCells);
+               }
+
+               currentRow.cells.push(...cityCells);
+               rows.push(currentRow);
+
+               isFirstCity = false;
+            });
+            isFirstJour = false;
+         });
+      });
+      return rows;
+    },
+
+    // ==========================================
+    // 4. UTILITIES
+    // ==========================================
+    
+    // Efficient Natural Sort (handles numbers inside strings like "Route 1", "Route 10")
+    naturalSort(a, b) {
+      return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+    },
+
+    // Your existing Partition logic (kept mostly as is, but calls setResume at end)
+    async partitionClients({ clientList, numGroups, propertyName, labelPrefix }) {
+        if (!clientList || clientList.length === 0 || !numGroups || numGroups <= 0) return;
+
+        const addedClientIds = new Set();
+        const clients = [...clientList]; // Shallow copy
+
+        // Sort by arbitrary seed (latitude in this case)
+        clients.sort((b, a) => this.getDistance(0, 0, a.Latitude, a.Longitude) - this.getDistance(0, 0, b.Latitude, b.Longitude));
+
+        const clientsPerGroup = Math.floor(clients.length / numGroups);
+        let remainingClients = clients.length % numGroups;
+        let groupCounter = 0;
+
+        for (const startClient of clients) {
+            if (groupCounter >= numGroups) break;
+            if (addedClientIds.has(startClient.id)) continue;
+
+            groupCounter++;
+            const label = labelPrefix + " " + groupCounter;
+
+            startClient[propertyName] = label; // Update the client object
+            addedClientIds.add(startClient.id);
+
+            const neighbors = clients.filter(c => !addedClientIds.has(c.id));
+            
+            // Basic nearest neighbor
+            neighbors.sort((a, b) => 
+                this.getDistance(startClient.Latitude, startClient.Longitude, a.Latitude, a.Longitude) - 
+                this.getDistance(startClient.Latitude, startClient.Longitude, b.Latitude, b.Longitude)
+            );
+
+            const numToTake = clientsPerGroup - 1 + (remainingClients > 0 ? 1 : 0);
+            if (remainingClients > 0) remainingClients--;
+
+            const clientsToAdd = neighbors.slice(0, numToTake);
+            for (const clientToAdd of clientsToAdd) {
+                clientToAdd[propertyName] = label;
+                addedClientIds.add(clientToAdd.id);
+            }
         }
     },
 
-    props   : ["clients", "id_route_import_tempo", "id_route_import"],
-
-    mounted() {
-    },  
-
-    methods : {
-
-        setResume() {
-
-            // Show Loading Page
-            this.$showLoadingPage()
-                
-            this.resume_liste_journey_plan  =   this.$getResumeFileRouting(this.clients)
-
-            // Global
-            this.addGlobalBody()
-
-            // Par Jour
-            this.addParJourBody()
-
-            // Hide Loading Page
-            this.$hideLoadingPage()
-        },
-
-        //  //  //  //  //
-
-        async partitionClients({ clientList, numGroups, propertyName, labelPrefix }) {
-            if (!clientList || clientList.length === 0 || !numGroups || numGroups <= 0) {
-                return [];
-            }
-
-            // Use a Set for O(1) average time complexity checks to see if a client has been added.
-            // This is a massive performance improvement over Array.prototype.find or a for-loop.
-            const addedClientIds = new Set();
-            
-            // Work on a shallow copy to avoid modifying the original array's order during sorting.
-            const clients = [...clientList];
-            
-            // Initial sort to pick the first "seed" client for the first route.
-            // Sorting by distance from 0,0 is arbitrary. Consider a better heuristic,
-            // e.g., finding the geometric center of all clients and starting with the one farthest from it.
-            clients.sort((b, a) => this.getDistance(0, 0, a.Latitude, a.Longitude) - this.getDistance(0, 0, b.Latitude, b.Longitude));
-
-            const allGroups = [];
-            const clientsPerGroup = Math.floor(clients.length / numGroups);
-            let remainingClients = clients.length % numGroups;
-            let groupCounter = 0;
-
-            for (const startClient of clients) {
-                // If we have already created all the required groups, stop.
-                if (allGroups.length >= numGroups) break;
-
-                // Skip this client if it has already been assigned to a group.
-                if (addedClientIds.has(startClient.id)) {
-                    continue;
-                }
-
-                groupCounter++;
-                const currentGroup = [];
-                
-                // Add the starting client to the new group and mark it as added.
-                startClient[propertyName] = `${labelPrefix} ${groupCounter}`;
-                currentGroup.push(startClient);
-                addedClientIds.add(startClient.id);
-
-                // Create a list of potential neighbors (those not yet assigned).
-                // This is still the most expensive part of the algorithm.
-                const neighbors = clients.filter(c => !addedClientIds.has(c.id));
-                
-                // Sort neighbors by distance to the current group's starting client.
-                neighbors.sort((a, b) => 
-                    this.getDistance(startClient.Latitude, startClient.Longitude, a.Latitude, a.Longitude) -
-                    this.getDistance(startClient.Latitude, startClient.Longitude, b.Latitude, b.Longitude)
-                );
-
-                // Determine how many clients this specific group should get.
-                // This distributes the remainder clients one by one to the first few groups.
-                const numToTake = clientsPerGroup - 1 + (remainingClients > 0 ? 1 : 0);
-                remainingClients--;
-
-                // Add the closest neighbors to the group.
-                const clientsToAdd = neighbors.slice(0, numToTake);
-                for (const clientToAdd of clientsToAdd) {
-                    clientToAdd[propertyName] = `${labelPrefix} ${groupCounter}`;
-                    currentGroup.push(clientToAdd);
-                    addedClientIds.add(clientToAdd.id);
-                }
-                
-                allGroups.push(currentGroup);
-            }
-            
-            return allGroups;
-        },
-
-        async decouperRoutes() {
-            if (this.nomber_routes > 0) {
-                this.$showLoadingPage();
-                
-                // The 'await' keyword pauses execution here until the promise resolves,
-                // but it does NOT block the UI thread. The loading page will be visible.
-                await this.partitionClients({
-                    clientList: this.clients,
-                    numGroups: this.nomber_routes,
-                    propertyName: 'JPlan',
-                    labelPrefix: this.routeLabelPrefix
-                });
-                
-                // Once partitioning is done, continue.
-                this.setResume();
-                this.$hideLoadingPage();
-            }
-
-            console.log(this.clients)
-        },
-
-        async decouperClients(key) {
-            const nombre_journee = parseInt(document.getElementById("route_" + key).value, 10);
-
-            if (nombre_journee > 0) {
-                this.$showLoadingPage();
-                
-                const clientsForThisRoute = this.resume_liste_journey_plan[key].clients;
-
-                await this.partitionClients({
-                    clientList: clientsForThisRoute,
-                    numGroups: nombre_journee,
-                    propertyName: 'Journee',
-                    labelPrefix: this.journeeLabelPrefix
-                });
-
-                this.setResume();
-                this.$hideLoadingPage();
-            }
-        },
-
-        getDistance(latitude_1, longitude_1, latitude_2, longitude_2) {
-
-            return this.$map.$setDistanceStraight(latitude_1, longitude_1, latitude_2, longitude_2)
-        },
-
-        //  //  //  //  //
-
-        //
-
-        addGlobalBody() {
-
-            let district_index          =   1
-            let cite_index              =   1
-            let type_client_index       =   1
-
-            let tbody                   =   document.getElementById("datatable_resume_global_body")
-
-            tbody.innerHTML             =   ""
-
-            // Create rows and cells for each data entry
-            for (const [key, journey_plan] of Object.entries(this.resume_liste_journey_plan)) {
-
-                var customerJourneyPlanRow                          =   document.createElement("tr");
-
-                //
-
-                var JourneyPlanCell                                 =   document.createElement("td");
-                JourneyPlanCell.textContent                         =   journey_plan.JPlan;
-                JourneyPlanCell.setAttribute("rowspan"              ,   journey_plan.rowspan);
-
-                //
-
-                var JourneyPlanClientsCell                          =   document.createElement("td");
-                JourneyPlanClientsCell.textContent                  =   journey_plan.clients.length;
-                JourneyPlanClientsCell.setAttribute("rowspan"       ,   journey_plan.rowspan);
-
-                //
-
-                customerJourneyPlanRow.appendChild(JourneyPlanCell)
-                customerJourneyPlanRow.appendChild(JourneyPlanClientsCell)
-
-                //
-
-                for (const [key_2, district] of Object.entries(this.resume_liste_journey_plan[key].districts)) {
-
-                    var districtRow                          =   document.createElement("tr");
-
-                    //
-
-                    var districtCell                                =   document.createElement("td");
-                    districtCell.textContent                        =   district.DistrictNameE;
-                    districtCell.setAttribute("rowspan"             ,   district.rowspan);
-
-                    //
-
-                    var districtClientsCell                         =   document.createElement("td");
-                    districtClientsCell.textContent                 =   district.clients.length;
-                    districtClientsCell.setAttribute("rowspan"      ,   district.rowspan);
-
-                    //
-
-                    if(district_index   ==  1) {
-
-                        customerJourneyPlanRow.appendChild(districtCell)
-                        customerJourneyPlanRow.appendChild(districtClientsCell)
-                    }
-
-                    else {
-
-                        districtRow.appendChild(districtCell)
-                        districtRow.appendChild(districtClientsCell)
-                    }
-
-                    //
-
-                    // Create the remaining cites rows
-                    for (const [key_3, cite] of Object.entries(this.resume_liste_journey_plan[key].districts[key_2].cites)) {
-
-                        var citeRow                                 =   document.createElement("tr");
-
-                        //
-
-                        var citeCell                                =   document.createElement("td");
-                        citeCell.textContent                        =   cite.CityNameE;
-                        citeCell.setAttribute("rowspan"             ,   cite.rowspan);
-
-                        //
-
-                        var citeClientsCell                         =   document.createElement("td");
-                        citeClientsCell.textContent                 =   cite.clients.length;
-                        citeClientsCell.setAttribute("rowspan"      ,   cite.rowspan);
-
-                        //
-
-                        if(district_index   ==  1) {
-
-                            if(cite_index   ==  1) {
-
-                                customerJourneyPlanRow.appendChild(citeCell)
-                                customerJourneyPlanRow.appendChild(citeClientsCell)
-                            }
-
-                            else {
-
-                                citeRow.appendChild(citeCell)
-                                citeRow.appendChild(citeClientsCell)
-                            }
-                        }
-
-                        else {
-
-                            if(cite_index   ==  1) {
-
-                                districtRow.appendChild(citeCell)
-                                districtRow.appendChild(citeClientsCell)
-                            }
-
-                            else {
-
-                                citeRow.appendChild(citeCell)
-                                citeRow.appendChild(citeClientsCell)
-                            }
-                        }
-
-                        // Create the remaining type client rows
-                        for (const [key_4, type_client] of Object.entries(this.resume_liste_journey_plan[key].districts[key_2].cites[key_3].liste_type_client)) {
-
-                            var CustomerTypeRow                             =   document.createElement("tr");
-
-                            //
-
-                            var CustomerTypeCell                            =   document.createElement("td");
-                            CustomerTypeCell.textContent                    =   type_client.CustomerType;
-                            CustomerTypeCell.setAttribute("rowspan"         ,   type_client.rowspan);
-
-                            //
-
-                            var CustomerTypeClientsCell                     =   document.createElement("td");
-                            CustomerTypeClientsCell.textContent             =   type_client.clients.length;
-                            CustomerTypeClientsCell.setAttribute("rowspan"  ,   type_client.rowspan);
-
-                            //
-
-                            if(district_index   ==  1) {
-
-                                if(cite_index   ==  1) {
-
-                                    if(type_client_index    ==  1) {
-
-                                        customerJourneyPlanRow.appendChild(CustomerTypeCell)
-                                        customerJourneyPlanRow.appendChild(CustomerTypeClientsCell)
-
-                                        tbody.appendChild(customerJourneyPlanRow)
-                                    }
-
-                                    else {
-
-                                        CustomerTypeRow.appendChild(CustomerTypeCell)
-                                        CustomerTypeRow.appendChild(CustomerTypeClientsCell)
-
-                                        tbody.appendChild(CustomerTypeRow)
-                                    }
-                                }
-
-                                else {
-
-                                    if(type_client_index    ==  1) {
-
-                                        citeRow.appendChild(CustomerTypeCell)
-                                        citeRow.appendChild(CustomerTypeClientsCell)
-
-                                        tbody.appendChild(citeRow)
-                                    }
-
-                                    else {
-
-                                        CustomerTypeRow.appendChild(CustomerTypeCell)
-                                        CustomerTypeRow.appendChild(CustomerTypeClientsCell)
-
-                                        tbody.appendChild(CustomerTypeRow)
-                                    }
-                                }
-                            }
-
-                            else {
-
-                                if(cite_index   ==  1) {
-
-                                    if(type_client_index    ==  1) {
-
-                                        districtRow.appendChild(CustomerTypeCell)
-                                        districtRow.appendChild(CustomerTypeClientsCell)
-
-                                        tbody.appendChild(districtRow)
-                                    }
-
-                                    else {
-
-                                        CustomerTypeRow.appendChild(CustomerTypeCell)
-                                        CustomerTypeRow.appendChild(CustomerTypeClientsCell)
-
-                                        tbody.appendChild(CustomerTypeRow)
-                                    }
-                                }
-
-                                else {
-
-                                    if(type_client_index    ==  1) {
-
-                                        citeRow.appendChild(CustomerTypeCell)
-                                        citeRow.appendChild(CustomerTypeClientsCell)
-
-                                        tbody.appendChild(citeRow)
-                                    }
-
-                                    else {
-
-                                        CustomerTypeRow.appendChild(CustomerTypeCell)
-                                        CustomerTypeRow.appendChild(CustomerTypeClientsCell)
-
-                                        tbody.appendChild(CustomerTypeRow)
-                                    }
-                                }
-                            }
-
-                            //
-
-                            type_client_index                       =   type_client_index   +   1
-                        }
-
-                        type_client_index                           =   1
-
-                        cite_index                                  =   cite_index          +   1
-                    }
-
-                    cite_index                                      =   1   
-
-                    district_index                                  =   district_index      +   1
-                }
-
-                //
-
-                district_index          =   1
-
-                //
-
-                var OptionsCell                                 =   document.createElement("td")
-                OptionsCell.setAttribute("rowspan"              ,   journey_plan.rowspan)
-
-                var OptionsDiv                                  =   document.createElement("div")
-                OptionsDiv.classList.add("row")
-                OptionsDiv.classList.add("justify-content-center")
-
-                if((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice'))) {
-
-                    var OptionsInput                                =   document.createElement("input")
-                    OptionsInput.setAttribute("type", "number")
-                    OptionsInput.setAttribute("id"  , "route_"+key)
-                    OptionsInput.setAttribute("placeholder" ,   "number of workdays ...")
-
-                    OptionsInput.classList.add("form-control")
-                    OptionsInput.classList.add("w-75")
-
-                    var OptionsButton                               =   document.createElement("button")
-                    OptionsButton.setAttribute("type", "button")
-                    OptionsButton.classList.add("btn-primary")
-                    OptionsButton.classList.add("btn")
-                    OptionsButton.classList.add("mt-1")
-                    OptionsButton.classList.add("w-75")
-
-                    OptionsButton.textContent                       =   "Divide"
-
-                    //
-                    OptionsButton.addEventListener("click", ()  =>  {this.decouperClients(key)})
-                    OptionsDiv.appendChild(OptionsInput)
-                    OptionsDiv.appendChild(OptionsButton)
-                }
-
-                OptionsCell.appendChild(OptionsDiv)
-                customerJourneyPlanRow.appendChild(OptionsCell)
-
-                //
-            }
-        },
-
-        addParJourBody() {
-
-            let journee_index           =   1
-            let cite_index              =   1
-
-            let tbody                   =   document.getElementById("datatable_resume_par_jour_body")
-
-            tbody.innerHTML             =   ""
-
-            // Create rows and cells for each data entry
-            for (const [key, journey_plan] of Object.entries(this.resume_liste_journey_plan)) {
-
-                var customerJourneyPlanRow                          =   document.createElement("tr");
-
-                //
-
-                var JourneyPlanCell                                 =   document.createElement("td");
-                JourneyPlanCell.textContent                         =   journey_plan.JPlan;
-                JourneyPlanCell.setAttribute("rowspan"              ,   journey_plan.rowspan_journee);
-
-                //
-
-                customerJourneyPlanRow.appendChild(JourneyPlanCell)
-
-                //
-
-                for (const [key_2, journee] of Object.entries(this.resume_liste_journey_plan[key].liste_journee)) {
-
-                    var journeeRow                                  =   document.createElement("tr");
-
-                    //
-
-                    var journeeCell                                 =   document.createElement("td");
-                    journeeCell.textContent                         =   journee.Journee;
-                    journeeCell.setAttribute("rowspan"              ,   journee.rowspan_journee);    
-
-                    //
-
-                    var journeeClientsCell                          =   document.createElement("td");
-                    journeeClientsCell.textContent                  =   journee.clients.length;
-                    journeeClientsCell.setAttribute("rowspan"       ,   journee.rowspan_journee);
-
-                    //
-
-                    if(journee_index   ==  1) {
-
-                        customerJourneyPlanRow.appendChild(journeeCell)
-                        customerJourneyPlanRow.appendChild(journeeClientsCell)
-                    }
-
-                    else {
-
-                        journeeRow.appendChild(journeeCell)
-                        journeeRow.appendChild(journeeClientsCell)
-                    }
-
-                    //
-
-                    // Create the remaining cites rows
-                    for (const [key_3, cite] of Object.entries(this.resume_liste_journey_plan[key].liste_journee[key_2].cites)) {
-
-                        var citeRow                                 =   document.createElement("tr");
-
-                        //
-
-                        var citeCell                                =   document.createElement("td");
-                        citeCell.textContent                        =   cite.CityNameE;
-                        citeCell.setAttribute("rowspan"             ,   cite.rowspan_journee);
-
-                        //
-
-                        var citeClientsCell                         =   document.createElement("td");
-                        citeClientsCell.textContent                 =   cite.clients.length;
-                        citeClientsCell.setAttribute("rowspan"      ,   cite.rowspan_journee);
-
-                        //
-
-                        if(journee_index    ==  1) {
-
-                            if(cite_index   ==  1) {
-
-                                customerJourneyPlanRow.appendChild(citeCell)
-                                customerJourneyPlanRow.appendChild(citeClientsCell)
-
-                                tbody.appendChild(customerJourneyPlanRow)
-                            }
-
-                            else {
-
-                                citeRow.appendChild(citeCell)
-                                citeRow.appendChild(citeClientsCell)
-
-                                tbody.appendChild(citeRow)
-                            }
-                        }
-
-                        else {
-
-                            if(cite_index   ==  1) {
-
-                                journeeRow.appendChild(citeCell)
-                                journeeRow.appendChild(citeClientsCell)
-
-                                tbody.appendChild(journeeRow)
-                            }
-
-                            else {
-
-                                citeRow.appendChild(citeCell)
-                                citeRow.appendChild(citeClientsCell)
-
-                                tbody.appendChild(citeRow)
-                            }
-                        }
-
-                        cite_index                                  =   cite_index  +   1
-                    }
-
-                    cite_index                                      =   1   
-
-                    journee_index                                   =   journee_index      +   1
-                }
-
-                journee_index   =   1
-            }            
-
-        },
-
-        //
-
-        getRowSpan(value) {
-
-            let count = 1;
-
-            if (this.isObject(value)) {
-
-                for (const subKey in value) {
-
-                    if(subKey   !=  "clients") {
-
-                        if (this.isObject(value[subKey])) {
-                            count += this.getRowSpan(value[subKey]);
-                        } else {
-                            count++;
-                        }
-                    }
-                }
-            }
-    
-            return count;
-        },
-
-        isObject(value) {
-
-            return typeof value === "object" && value !== null;
-        },
+    async decouperRoutes() {
+      if (this.nomber_routes > 0) {
+        this.$showLoadingPage();
+        await this.partitionClients({ 
+            clientList: this.clients, 
+            numGroups: this.nomber_routes, 
+            propertyName: 'JPlan', 
+            labelPrefix: this.routeLabelPrefix 
+        });
+        this.setResume(); // Re-calculate tree
+        this.$hideLoadingPage();
+      }
+    },
+
+    async decouperClients(routeKey) {
+       const input = document.getElementById("route_" + routeKey);
+       if(!input) return;
+       
+       const nombre_journee = parseInt(input.value, 10);
+       
+       // Find clients for this route from our generated tree
+       // We can iterate the tree easily since it is an array now
+       const routeNode = this.routingTree.find(r => r.id == routeKey);
+       
+       if (nombre_journee > 0 && routeNode) {
+          this.$showLoadingPage();
+          await this.partitionClients({ 
+             clientList: routeNode.clients, 
+             numGroups: nombre_journee, 
+             propertyName: 'Journee', 
+             labelPrefix: this.journeeLabelPrefix 
+          });
+          this.setResume(); // Re-calculate tree
+          this.$hideLoadingPage();
+       }
+    },
+
+    getDistance(lat1, lon1, lat2, lon2) {
+       if (this.$map && this.$map.$setDistanceStraight) {
+          return this.$map.$setDistanceStraight(lat1, lon1, lat2, lon2);
+       }
+       // Fallback if map helper not ready (Pythagoras approx for speed in sorting)
+       return Math.sqrt(Math.pow(lat2-lat1, 2) + Math.pow(lon2-lon1, 2));
     }
-}
-
+  }
+};
 </script>

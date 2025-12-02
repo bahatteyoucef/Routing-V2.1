@@ -507,10 +507,6 @@ export default {
 
             selected_row                :   null            ,
             selected_row_id             :   null            ,
-
-            //
-
-            used_colors                 :   []
         }
     },
 
@@ -545,6 +541,59 @@ export default {
 
             getUser                 :   'authentification/getUser'              
         }),
+
+        //
+
+        usedColors() {
+
+            console.log(this.clients_markers_affiche)
+
+            const list  =   this.clients_markers_affiche;
+
+            if (!Array.isArray(list)) return [];
+
+            return list.flatMap(item => {
+                const raw = item?.color;
+                console.log(raw)
+
+                if (raw === null || raw === undefined) return [];
+
+                // If already an array of colors
+                if (Array.isArray(raw)) {
+                    return raw.map(c => String(c).trim()).filter(Boolean);
+                }
+
+                // If it's an object (maybe { color: 'red' } or { r:..., g:..., b:... })
+                if (typeof raw === 'object') {
+                    if (raw.color) {
+                        return Array.isArray(raw.color)
+                        ? raw.color.map(c => String(c).trim()).filter(Boolean)
+                        : [String(raw.color).trim()].filter(Boolean);
+                    }
+                    // fallback: stringify the object (you can adjust this behavior)
+                    return [JSON.stringify(raw)];
+                }
+
+                // Now raw is a primitive (string/number)
+                const s = String(raw).trim();
+
+                // Try parse JSON string (e.g. '["red","blue"]')
+                try {
+                    const parsed = JSON.parse(s);
+                    if (Array.isArray(parsed)) return parsed.map(c => String(c).trim()).filter(Boolean);
+                } 
+
+                catch (e) {
+                    // not JSON — continue
+                }
+
+                // Comma separated string like "red, blue"
+                if (s.includes(',')) return s.split(',').map(p => p.trim()).filter(Boolean);
+
+                // Single value (e.g. "red" or "#ff0000")
+                return s ? [s] : [];
+            });
+        },
     },
 
     async mounted() {
@@ -628,6 +677,8 @@ export default {
 
         this.emitter.on('reSetClientsDecoupeByJourneeMap'   , async (clients)   =>  {
 
+            console.log(clients)
+
             for (let i = 0; i < this.route_import.clients.length; i++) {
                 const client    =   this.route_import.clients[i]
                 const upd       =   clients[client.id] // undefined if not present
@@ -635,6 +686,8 @@ export default {
                 if (upd) {
                     client.JPlan    =   clients[client.id].JPlan
                     client.Journee  =   clients[client.id].Journee
+
+                    console.log(client)
                 }
             }
 
@@ -696,6 +749,8 @@ export default {
             this.$showLoadingPage()
                 
             const res                   =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.id_route_import+"/details",   null)
+            console.log(res)
+
             this.route_import           =   res.data.route_import
 
             //
@@ -1264,26 +1319,17 @@ export default {
 
             //
             const cfg       =   configs[this.column_group];
+            const palette   =   this.$colors
             let i           =   0
-
-            //
-            const palette       =   this.$colors
-            this.used_colors    =   []
-            let selected_color  =   null
 
             // init empty buckets
             const groups    =   {};
             for (const [key, md] of Object.entries(cfg.list)) {
 
-                //
-                selected_color          =   palette[(this.used_colors.length + i) % palette.length]
-                this.used_colors.push(selected_color)
-
-                //
                 groups[key] = {
                     column_fullname: typeof md === 'object' && md[cfg.labelFull] ? md[cfg.labelFull] : key,
                     column_name: typeof md === 'object' && md[cfg.labelKey] ? md[cfg.labelKey] : key,
-                    color: selected_color,
+                    color: palette[(this.usedColors.length + i) % palette.length],
                     clients: []
                 };
 
@@ -1356,29 +1402,21 @@ export default {
 
             //
             const cfg       =   configs[this.column_group];
+            const palette   =   this.$colors
             let i           =   0
-
-            //
-            const palette       =   this.$colors
-            let selected_color  =   null
 
             // init empty buckets
             const groups    =   {};
+
             for (const [key, md] of Object.entries(cfg.list)) {
 
-                //
-                selected_color          =   palette[(this.used_colors.length + i) % palette.length]
-                this.used_colors.push(selected_color)
-
-                //
-                groups[key]             =   {
+                groups[key] = {
                     column_fullname: typeof md === 'object' && md[cfg.labelFull] ? md[cfg.labelFull] : key,
                     column_name: typeof md === 'object' && md[cfg.labelKey] ? md[cfg.labelKey] : key,
-                    color: selected_color,
+                    color: palette[(this.usedColors.length + i) % palette.length],
                     clients: []
                 };
 
-                //
                 i   =   i   +   1
             }
 
@@ -1450,9 +1488,12 @@ export default {
 
             await this.$nextTick()
 
-            setTimeout(() => {                
+            setTimeout(() => {
+                
                 // Set Markers
                 for (let index = 0; index < clients_markers_affiche.length; index++) {
+
+                    console.log(clients_markers_affiche[index].color)
                     this.map_instance.$setRouteMarkers(clients_markers_affiche[index].clients, clients_markers_affiche[index].column_name, clients_markers_affiche[index].color)
                 }
             }, 0);

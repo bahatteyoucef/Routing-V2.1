@@ -61,7 +61,7 @@ export default {
 
         async getClients(clients) {
 
-            this.clients    =   clients.map(({ id, JPlan, Journee, CustomerType, Latitude, Longitude }) => ({ id, JPlan, Journee, CustomerType, Latitude, Longitude }))
+            this.clients    =   clients.map(({ id, DistrictNo, DistrictNameE, CityNo, CityNameE, JPlan, Journee, CustomerType, Latitude, Longitude }) => ({ id, DistrictNo, DistrictNameE, CityNo, CityNameE, JPlan, Journee, CustomerType, Latitude, Longitude }))
 
             //
             await this.$nextTick()

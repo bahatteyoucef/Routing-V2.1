@@ -510,7 +510,7 @@ export default {
 
             //
 
-            used_colors                 :   []
+            selected_colors             :   []
         }
     },
 
@@ -544,7 +544,12 @@ export default {
             //
 
             getUser                 :   'authentification/getUser'              
-        }),
+        })
+
+    },
+
+    created() {
+        this.selected_colors    =   this.$map.colors
     },
 
     async mounted() {
@@ -628,6 +633,8 @@ export default {
 
         this.emitter.on('reSetClientsDecoupeByJourneeMap'   , async (clients)   =>  {
 
+            console.log(clients)
+
             for (let i = 0; i < this.route_import.clients.length; i++) {
                 const client    =   this.route_import.clients[i]
                 const upd       =   clients[client.id] // undefined if not present
@@ -635,6 +642,8 @@ export default {
                 if (upd) {
                     client.JPlan    =   clients[client.id].JPlan
                     client.Journee  =   clients[client.id].Journee
+
+                    console.log(client)
                 }
             }
 
@@ -696,6 +705,8 @@ export default {
             this.$showLoadingPage()
                 
             const res                   =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.id_route_import+"/details",   null)
+            console.log(res)
+
             this.route_import           =   res.data.route_import
 
             //
@@ -749,7 +760,7 @@ export default {
                         if(mode != "data_ready") this.extractMetaData(clients)
 
                         //
-                        this.reAfficheClientsMarkers(this.route_import.clients)
+                        this.clients_markers_affiche    =   this.reAfficheClientsMarkers(this.route_import.clients)
 
                         // Datatable
                         await this.setDataTable()
@@ -769,7 +780,7 @@ export default {
                                 this.extractMetaData(clients)
 
                                 // reAffiche Clients
-                                this.reAfficheClientsMarkers(this.route_import.clients)
+                                this.clients_markers_affiche            =   this.reAfficheClientsMarkers(this.route_import.clients)
                                 let clients_markers_affiche_partial     =   this.reAfficheClientsMarkersPartly(clients)
 
                                 // Datatable
@@ -785,7 +796,7 @@ export default {
                                 this.extractMetaData(clients)
 
                                 // reAffiche Clients
-                                this.reAfficheClientsMarkers(this.route_import.clients)
+                                this.clients_markers_affiche            =   this.reAfficheClientsMarkers(this.route_import.clients)
                                 let clients_markers_affiche_partial     =   this.reAfficheClientsMarkersPartly(clients)
 
                                 // Datatable
@@ -798,7 +809,7 @@ export default {
                             if(mode == "delete")       {
 
                                 // reAffiche Clients
-                                this.reAfficheClientsMarkers(this.route_import.clients)
+                                this.clients_markers_affiche    =   this.reAfficheClientsMarkers(this.route_import.clients)
 
                                 // Datatable
                                 await this.setDataTable()
@@ -813,7 +824,7 @@ export default {
                                 this.extractMetaData(clients)
 
                                 // reAffiche Clients
-                                this.reAfficheClientsMarkers(this.route_import.clients)
+                                this.clients_markers_affiche            =   this.reAfficheClientsMarkers(this.route_import.clients)
                                 let clients_markers_affiche_partial     =   this.reAfficheClientsMarkersPartly(clients)
 
                                 // Datatable
@@ -826,7 +837,7 @@ export default {
                             if(mode == "change_route_delete")   {
 
                                 // reAffiche Clients
-                                this.reAfficheClientsMarkers(this.route_import.clients)
+                                this.clients_markers_affiche    =   this.reAfficheClientsMarkers(this.route_import.clients)
 
                                 // Datatable
                                 await this.setDataTable()
@@ -1264,26 +1275,17 @@ export default {
 
             //
             const cfg       =   configs[this.column_group];
+            const palette   =   this.$colors
             let i           =   0
-
-            //
-            const palette       =   this.$colors
-            this.used_colors    =   []
-            let selected_color  =   null
 
             // init empty buckets
             const groups    =   {};
             for (const [key, md] of Object.entries(cfg.list)) {
 
-                //
-                selected_color          =   palette[(this.used_colors.length + i) % palette.length]
-                this.used_colors.push(selected_color)
-
-                //
                 groups[key] = {
                     column_fullname: typeof md === 'object' && md[cfg.labelFull] ? md[cfg.labelFull] : key,
                     column_name: typeof md === 'object' && md[cfg.labelKey] ? md[cfg.labelKey] : key,
-                    color: selected_color,
+                    color: palette[i % palette.length],
                     clients: []
                 };
 
@@ -1303,9 +1305,12 @@ export default {
             }
 
             // 4) sort by descending size & rebuild object
-            this.clients_markers_affiche    =   Object
+            let clients_markers_affiche     =   Object
                                                     .values(groups)
                                                     .sort((a, b) => b.clients.length - a.clients.length);
+
+            //
+            return clients_markers_affiche
         },
 
         reAfficheClientsMarkersPartly(param_clients) {
@@ -1356,29 +1361,21 @@ export default {
 
             //
             const cfg       =   configs[this.column_group];
+            const palette   =   this.$colors
             let i           =   0
-
-            //
-            const palette       =   this.$colors
-            let selected_color  =   null
 
             // init empty buckets
             const groups    =   {};
+
             for (const [key, md] of Object.entries(cfg.list)) {
 
-                //
-                selected_color          =   palette[(this.used_colors.length + i) % palette.length]
-                this.used_colors.push(selected_color)
-
-                //
-                groups[key]             =   {
+                groups[key] = {
                     column_fullname: typeof md === 'object' && md[cfg.labelFull] ? md[cfg.labelFull] : key,
                     column_name: typeof md === 'object' && md[cfg.labelKey] ? md[cfg.labelKey] : key,
-                    color: selected_color,
+                    color: palette[i % palette.length],
                     clients: []
                 };
 
-                //
                 i   =   i   +   1
             }
 
@@ -1450,9 +1447,12 @@ export default {
 
             await this.$nextTick()
 
-            setTimeout(() => {                
+            setTimeout(() => {
+                
                 // Set Markers
                 for (let index = 0; index < clients_markers_affiche.length; index++) {
+
+                    console.log(clients_markers_affiche[index].color)
                     this.map_instance.$setRouteMarkers(clients_markers_affiche[index].clients, clients_markers_affiche[index].column_name, clients_markers_affiche[index].color)
                 }
             }, 0);
