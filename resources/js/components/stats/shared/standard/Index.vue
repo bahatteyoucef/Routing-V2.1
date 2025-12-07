@@ -234,7 +234,7 @@
 
 <script>
 
-import CardDoublants                      from  "../routes/shared/operations/validations/CardDoublants.vue"
+import CardDoublants                      from  "../../../routes/shared/operations/validations/CardDoublants.vue"
 import CardStats                          from  "./parts/CardStats.vue"
 
 import ByCustomerTypeReport               from  "./parts/ByCustomerTypeReport.vue"
@@ -249,11 +249,11 @@ import DataCensusReport                   from  "./parts/DataCensusReport.vue"
 
 //
 
-import ModalResume                        from  "../routes/shared/operations/ModalResume.vue"
+import ModalResume                        from  "../../../routes/shared/operations/ModalResume.vue"
 
 //
 
-import ModalClientUpdate                  from  "../clients/shared/ModalClientUpdate.vue"
+import ModalClientUpdate                  from  "../../../clients/shared/ModalClientUpdate.vue"
 
 //
 
@@ -513,7 +513,7 @@ export default {
           formData.append("start_date"    , this.start_date)
           formData.append("end_date"      , this.end_date)
 
-          await this.$callApi("post",   "/statistics/details",    formData)
+          await this.$callApi("post",   "/statistics/standard",    formData)
           .then(async (res)=> {
 
               console.log(res)

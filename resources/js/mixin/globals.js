@@ -1387,7 +1387,6 @@ export default {
 
         //  //  //
 
-        //
         $getCurrentTimeHMS() {
 
             const now       =   new Date();
@@ -1396,6 +1395,172 @@ export default {
             const seconds   =   String(now.getSeconds()).padStart(2, '0');
 
             return `${hours}:${minutes}:${seconds}`;
+        },
+
+        //  //  //
+
+        $chartRendered(callback) {
+            return {
+                id: 'afterChartRendered',
+                // Change from 'afterInit' to 'afterRender'.
+                // 'afterRender' fires after the initial draw, which is much safer.
+                afterRender: (chart) => { 
+                    // Optional: You can check if the chart is currently animating 
+                    // if (chart.animating) { return; } 
+
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
+                }
+            };
+        },
+
+        $splitOnSpaceChartJSLabels(arr) {
+            if (!Array.isArray(arr)) return [];
+            return arr.map(item => {
+                const s = String(item ?? '');
+                // regex: capture parenthesis groups or words
+                const regex = /\([^()]*\)|[^\s()]+/g;
+                const parts = [];
+                let m;
+                while ((m = regex.exec(s)) !== null) {
+                    parts.push(m[0]);
+                }
+                // fallback to original string if nothing matched
+                return parts.length ? parts : [s];
+            });
+        },
+
+        $valueOnTopOfEachBarPlugin(id = 'value_on_top', format_billion_million = true, decimal_number = 2) {
+            return {
+                id: id,
+                beforeDatasetsDraw(chart, args, options = {}) {
+                    const ctx = chart.ctx;
+                    ctx.save();
+
+                    const opts = Object.assign({
+                        format_billion_million: format_billion_million,
+                        decimal_number: decimal_number,
+                        // minimal slice angle (radians) to attempt drawing inside pie
+                        minSliceAngleToDraw: 0.07 // ~4 degrees; tune if needed
+                    }, options);
+
+                    const fmt = (value) => {
+                        if (value === null || value === undefined) return '';
+                        const n = Number(value);
+                        if (Number.isNaN(n)) return String(value);
+                        const dec = Number.isInteger(opts.decimal_number) ? opts.decimal_number : 2;
+                        if (opts.format_billion_million) {
+                        if (Math.abs(n) >= 1e9) return (n / 1e9).toFixed(dec) + 'B';
+                        if (Math.abs(n) >= 1e6) return (n / 1e6).toFixed(dec) + 'M';
+                        if (Math.abs(n) >= 1e3) return (n / 1e3).toFixed(dec) + 'K';
+                        return n.toFixed(dec).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+                        } else {
+                        return n.toFixed(dec).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+                        }
+                    };
+
+                    // iterate datasets
+                    chart.data.datasets.forEach((dataset, datasetIndex) => {
+                        const meta = chart.getDatasetMeta(datasetIndex);
+                        if (!meta || meta.hidden) return;
+
+                        // pick a safe default color (string)
+                        const datasetBg = dataset.backgroundColor;
+                        const datasetBorder = dataset.borderColor;
+
+                        // BAR case
+                        if (meta.type === 'bar' || chart.config.type === 'bar') {
+                            meta.data.forEach((barEl, i) => {
+                                const value = dataset.data[i];
+                                const text = fmt(value);
+                                if (!text) return;
+                                ctx.font = 'bold 12px sans-serif';
+                                ctx.fillStyle = (Array.isArray(datasetBorder) ? (datasetBorder[i] || '#000') : (datasetBorder || '#000'));
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'bottom';
+                                const x = (barEl.x !== undefined) ? barEl.x : (barEl.centerX ?? 0);
+                                const y = (barEl.y !== undefined) ? barEl.y : (barEl.centerY ?? 0);
+                                ctx.fillText(text, x, y - 6);
+                            });
+                        }
+                        // LINE case
+                        else if (meta.type === 'line' || chart.config.type === 'line') {
+                            meta.data.forEach((pointEl, i) => {
+                                const value = dataset.data[i];
+                                const text = fmt(value);
+                                if (!text) return;
+                                ctx.font = 'bold 12px sans-serif';
+                                ctx.fillStyle = (Array.isArray(datasetBorder) ? (datasetBorder[i] || '#000') : (datasetBorder || '#000'));
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'bottom';
+                                const x = pointEl.x ?? (pointEl.cx ?? 0);
+                                const y = pointEl.y ?? (pointEl.cy ?? 0);
+                                ctx.fillText(text, x, y - 6);
+                            });
+                        }
+                    });
+
+                    ctx.restore();
+                }
+            };
+        },
+
+        $setDefaultColors(datasets, labels, chartType = 'bar') {
+            const chartOptions = {
+                barColors: [
+                    'rgba(17, 141, 255, 0.6)', 'rgba(33, 155, 157, 0.6)', 'rgba(220, 53, 69, 0.6)', 'rgba(249, 168, 37, 0.6)',
+                    'rgba(57, 73, 171, 0.6)', 'rgba(129, 119, 23, 0.6)', 'rgba(85, 139, 47, 0.6)', 'rgba(9, 113, 56, 0.6)',
+                    'rgba(0, 96, 100, 0.6)', 'rgba(1, 87, 155, 0.6)', 'rgba(26, 35, 126, 0.6)', 'rgba(103, 58, 183, 0.6)',
+                    'rgba(78, 52, 46, 0.6)', 'rgba(194, 24, 91, 0.6)', 'rgba(247, 0, 0, 0.6)', 'rgba(245, 124, 0, 0.6)',
+                    'rgba(0, 0, 0, 0.6)', 'rgba(255, 234, 0, 0.6)', 'rgba(175, 180, 43, 0.6)', 'rgba(124, 179, 66, 0.6)',
+                    'rgba(15, 157, 88, 0.6)', 'rgba(0, 151, 167, 0.6)', 'rgba(2, 136, 209, 0.6)', 'rgba(255, 214, 0, 0.6)',
+                    'rgba(156, 39, 176, 0.6)', 'rgba(230, 81, 0, 0.6)', 'rgba(136, 14, 79, 0.6)', 'rgba(121, 85, 72, 0.6)',
+                    'rgba(189, 189, 189, 0.6)', 'rgba(117, 117, 117, 0.6)', 'rgba(66, 66, 67, 0.6)', 'rgba(251, 192, 45, 0.6)',
+                    'rgba(165, 39, 20, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(17, 141, 255, 0.8)', 'rgba(33, 155, 157, 0.8)', 'rgba(220, 53, 69, 0.8)', 'rgba(249, 168, 37, 0.8)',
+                    'rgba(57, 73, 171, 0.8)', 'rgba(129, 119, 23, 0.8)', 'rgba(85, 139, 47, 0.8)', 'rgba(9, 113, 56, 0.8)',
+                    'rgba(0, 96, 100, 0.8)', 'rgba(1, 87, 155, 0.8)', 'rgba(26, 35, 126, 0.8)', 'rgba(103, 58, 183, 0.8)',
+                    'rgba(78, 52, 46, 0.8)', 'rgba(194, 24, 91, 0.8)', 'rgba(247, 0, 0, 0.8)', 'rgba(245, 124, 0, 0.8)',
+                    'rgba(0, 0, 0, 0.8)', 'rgba(255, 234, 0, 0.8)', 'rgba(175, 180, 43, 0.8)', 'rgba(124, 179, 66, 0.8)',
+                    'rgba(15, 157, 88, 0.8)', 'rgba(0, 151, 167, 0.8)', 'rgba(2, 136, 209, 0.8)', 'rgba(255, 214, 0, 0.8)',
+                    'rgba(156, 39, 176, 0.8)', 'rgba(230, 81, 0, 0.8)', 'rgba(136, 14, 79, 0.8)', 'rgba(121, 85, 72, 0.8)',
+                    'rgba(189, 189, 189, 0.8)', 'rgba(117, 117, 117, 0.8)', 'rgba(66, 66, 67, 0.8)', 'rgba(251, 192, 45, 0.8)',
+                    'rgba(165, 39, 20, 0.8)'
+                ]
+            };
+
+            const isPieLike = (chartType === 'pie' || chartType === 'doughnut');
+
+            datasets.forEach((dataset, index) => {
+                // --- SCENARIO 1: Pie/Doughnut Chart (Rainbow Slices) ---
+                if (isPieLike) {
+                    // We need an array of colors, one for every slice (label)
+                    const bgColors = [];
+                    const bdColors = [];
+                    for (let i = 0; i < labels.length; i++) {
+                        bgColors.push(chartOptions.barColors[i % chartOptions.barColors.length]);
+                        bdColors.push(chartOptions.borderColor[i % chartOptions.borderColor.length]);
+                    }
+                    dataset.backgroundColor = bgColors;
+                    dataset.borderColor = bdColors;
+                    dataset.borderWidth = 2;
+                } 
+                // --- SCENARIO 2: Bar/Line Chart (Distinct Color per Dataset) ---
+                else {
+                    // We need one single color for the whole dataset
+                    const color = chartOptions.barColors[index % chartOptions.barColors.length];
+                    const border = chartOptions.borderColor[index % chartOptions.borderColor.length];
+                    
+                    dataset.backgroundColor = color;
+                    dataset.borderColor = border;
+                    dataset.borderWidth = 1;
+                }
+            });
+
+            return datasets;
         }
     }
 }

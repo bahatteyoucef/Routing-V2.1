@@ -185,31 +185,31 @@ path.leaflet-interactive.animate {
     z-index: 999;
 }
 
-#toggle_div div.btn-container{
+#toggle_div div.btn-container, #show_hide_values_toggle_div div.btn-container {
     display         : table-cell;
     vertical-align  : middle;
     text-align      : center;
 }
 
-#toggle_div div.btn-container i{
+#toggle_div div.btn-container i, #show_hide_values_toggle_div div.btn-container i {
     display     : inline-block;
     position    : relative;
     top         : -9px;
 }
 
-#toggle_div label {
+#toggle_div label, #show_hide_values_toggle_div label {
     font-size       : 13px;
     color           : #424242;
     font-weight     : 500;
 }
 
-#toggle_div .btn-color-mode-switch{
+#toggle_div .btn-color-mode-switch, #show_hide_values_toggle_div .btn-color-mode-switch {
     display         : inline-block;
     margin          : 0px;
     position        : relative;
 }
 
-#toggle_div .btn-color-mode-switch > label.btn-color-mode-switch-inner{
+#toggle_div .btn-color-mode-switch > label.btn-color-mode-switch-inner, #show_hide_values_toggle_div .btn-color-mode-switch > label.btn-color-mode-switch-inner {
     margin          : 0px;
     width           : 140px;
     height          : 35px;
@@ -222,7 +222,7 @@ path.leaflet-interactive.animate {
     cursor: pointer;
 }
 
-#toggle_div .btn-color-mode-switch > label.btn-color-mode-switch-inner:before{
+#toggle_div .btn-color-mode-switch > label.btn-color-mode-switch-inner:before, #show_hide_values_toggle_div .btn-color-mode-switch > label.btn-color-mode-switch-inner:before {
     content         : attr(data-on);
     position        : absolute;
     font-size       : 12px;
@@ -231,7 +231,7 @@ path.leaflet-interactive.animate {
     right           : 20px;
 }
 
-#toggle_div .btn-color-mode-switch > label.btn-color-mode-switch-inner:after{
+#toggle_div .btn-color-mode-switch > label.btn-color-mode-switch-inner:after, #show_hide_values_toggle_div .btn-color-mode-switch > label.btn-color-mode-switch-inner:after {
     content         : attr(data-off);
     width           : 70px;
     height          : 32px;
@@ -246,14 +246,14 @@ path.leaflet-interactive.animate {
     padding         : 5px 0px;
 }
 
-#toggle_div .btn-color-mode-switch > .alert{
+#toggle_div .btn-color-mode-switch > .alert, #show_hide_values_toggle_div .btn-color-mode-switch > .alert {
     display         : none;
     background      : #FF9800;
     border          : none;
     color           : #fff;
 }
 
-#toggle_div .btn-color-mode-switch input[type="checkbox"]{
+#toggle_div .btn-color-mode-switch input[type="checkbox"], #show_hide_values_toggle_div .btn-color-mode-switch input[type="checkbox"] {
     cursor          : pointer;
     width           : 50px;
     height          : 35px;
@@ -264,69 +264,69 @@ path.leaflet-interactive.animate {
     margin          : 0px;
 }
 
-#toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner{
+#toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner, #show_hide_values_toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner {
     background      : #2c78bd;
     color           : #fff;
 }
 
-#toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:after{
+#toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:after, #show_hide_values_toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:after {
     content         : attr(data-on);
     left            : 68px;
     background      : #3c3c3c;
 }
 
-#toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:before{
+#toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:before, #show_hide_values_toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:before {
     content         : attr(data-off);
     right           : auto;
     left            : 20px;
 }
 
-#toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner{
+#toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner, #show_hide_values_toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner {
     /*background: #66BB6A; */
     /*color: #fff;*/
 }
 
-#toggle_div .btn-color-mode-switch input[type="checkbox"]:checked ~ .alert{
+#toggle_div .btn-color-mode-switch input[type="checkbox"]:checked ~ .alert, #show_hide_values_toggle_div .btn-color-mode-switch input[type="checkbox"]:checked ~ .alert {
     display         : #2c78bd;
 }
 
 /*mode preview*/
-#toggle_div .dark-preview{
+#toggle_div .dark-preview, #show_hide_values_toggle_div .dark-preview {
     background      : #2c78bd;
 }
 
-#toggle_div .dark-preview div.btn-container i.fa-sun-o{
+#toggle_div .dark-preview div.btn-container i.fa-sun-o, #show_hide_values_toggle_div .dark-preview div.btn-container i.fa-sun-o {
     color           : #777;
 }
 
-#toggle_div .dark-preview div.btn-container i.fa-moon-o{
+#toggle_div .dark-preview div.btn-container i.fa-moon-o, #show_hide_values_toggle_div .dark-preview div.btn-container i.fa-moon-o {
     color           : #fff;
     text-shadow     : 0px 0px 11px #fff;
 }
 
-#toggle_div .white-preview{
+#toggle_div .white-preview, #show_hide_values_toggle_div .white-preview {
     background      : #fff;
 }
 
-#toggle_div .white-preview div.btn-container i.fa-sun-o{
+#toggle_div .white-preview div.btn-container i.fa-sun-o, #show_hide_values_toggle_div .white-preview div.btn-container i.fa-sun-o {
     color           : #ffa500;
     text-shadow     : 0px 0px 16px #ffa500;
 }
 
-#toggle_div.white-preview div.btn-container i.fa-moon-o{
+#toggle_div.white-preview div.btn-container i.fa-moon-o, #show_hide_values_toggle_div .white-preview div.btn-container i.fa-moon-o {
     color           : #777;
 }
 
-#toggle_div p.by a{
+#toggle_div p.by a, #show_hide_values_toggle_div p.by a {
     text-decoration : none;
     color           : #000;
 }
 
-#toggle_div .dark-preview p.by a{
+#toggle_div .dark-preview p.by a, #show_hide_values_toggle_div .dark-preview p.by a {
     color           : #777;
 }
 
-#toggle_div .white-preview p.by a{
+#toggle_div .white-preview p.by a, #show_hide_values_toggle_div .white-preview p.by a {
     color           : #000;
 }
 

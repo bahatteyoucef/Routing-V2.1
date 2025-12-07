@@ -87,6 +87,7 @@ export default {
                 formData.append("data"  ,   JSON.stringify(clients))
 
                 const res                   =   await this.$callApi("post"  ,   "/clients_tempo/resume/update", formData)
+                console.log(res)
 
                 if(res.status===200){
 

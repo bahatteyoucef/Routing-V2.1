@@ -28,15 +28,23 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-sm-4 p-1"  v-if="$isRole('Super Admin')||$isRole('BU Manager')">
+                                <div class="col p-1"  v-if="$isRole('Super Admin')||$isRole('BU Manager')">
                                     <button class="btn btn-danger text-white w-100" data-bs-toggle="modal" :data-bs-target="'#ModalRouteImportDelete'"     @click="setRouteImportDelete(route_import.id)">Delete</button>
                                 </div>
 
-                                <div class="col-sm-4 p-1">
+                                <div class="col p-1">
                                     <button class="btn bg-white text-black w-100" @click="navToMap(route_import.id)">Map</button>
                                 </div>
 
-                                <div class="col-sm-4 p-1"  v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')">
+                                <div class="col p-1"  v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')">
+                                    <button class="btn bg-white text-black w-100" @click="getClientsValidation(route_import.id)">Validation</button>
+                                </div>
+
+                                <div class="col p-1"  v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')">
+                                    <button class="btn bg-white text-black w-100" @click="getClientsConfirmation(route_import.id)">Confirmation</button>
+                                </div>
+
+                                <div class="col p-1"  v-if="$isRole('Super Admin')||$isRole('BU Manager')||$isRole('BackOffice')">
                                     <button class="btn bg-white text-black w-100" @click="getClients(route_import.id)">Clients</button>
                                 </div>
                             </div>
@@ -108,6 +116,16 @@ export default {
         async setRouteImportDelete(id_route_import) {
 
             await this.$refs.ModalRouteImportDelete.setRouteImportDelete(id_route_import)
+        },
+
+        getClientsValidation(id_route_import) {
+
+            this.$router.push('/route_import/'+id_route_import+'/clients/validation')
+        },
+
+        getClientsConfirmation(id_route_import) {
+
+            this.$router.push('/route_import/'+id_route_import+'/clients/confirmation')
         },
 
         getClients(id_route_import) {

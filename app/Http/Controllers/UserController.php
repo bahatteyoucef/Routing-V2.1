@@ -357,4 +357,21 @@ class UserController extends Controller
             ],422);
         }
     }
+
+    public static function pointings(Request $request)
+    {
+
+        try {
+
+            $pointings  =   User::pointings($request);
+            return $pointings;
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
 }

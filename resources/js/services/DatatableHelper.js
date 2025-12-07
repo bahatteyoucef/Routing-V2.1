@@ -62,7 +62,7 @@ class DataTableHelper {
             this.$selectedRowID     =   null
 
             //
-            this.$selectRowFn(null, null)
+            if(this.$selectRowFn) this.$selectRowFn(null, null)
         }
 
         else {
@@ -202,7 +202,7 @@ class DataTableHelper {
                 event.currentTarget.classList.remove('active_row')
 
                 //
-                this.$selectRowFn(null, null)
+                if(this.$selectRowFn) this.$selectRowFn(null, null)
             }
 
             else {
@@ -216,7 +216,7 @@ class DataTableHelper {
                 this.$selectedRowID  =   rowId;
 
                 //
-                this.$selectRowFn(this.$selectedRow, this.$selectedRowID)
+                if(this.$selectRowFn) this.$selectRowFn(this.$selectedRow, this.$selectedRowID)
 
                 // remove active class from all rows
                 $('#' + this.$tableId + ' tbody tr').removeClass('active_row');

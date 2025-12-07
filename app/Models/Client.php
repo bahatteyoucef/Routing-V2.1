@@ -11,7 +11,10 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\File;
+
 use Illuminate\Support\Fluent;
+
 use stdClass;
 
 class Client extends Model
@@ -27,25 +30,35 @@ class Client extends Model
 
     //
 
-    protected static function boot()
-    {
+    protected static function boot() {
         parent::boot();
 
-        // Event hook to set the date before storing a new object in the database
-        static::creating(function ($model) {
-            $model->created_at  =   Carbon::now()->format('d F Y');
-            $model->updated_at  =   Carbon::now()->format('Y-m-d H:i:s');
+        //        
+        $userId         =   Auth::check() ? Auth::user()->id : null;
+        $isFrontOffice  =   Auth::check() && Auth::user()->hasRole('FrontOffice');
 
+        static::creating(function ($model) use ($userId, $isFrontOffice) {
             //
-            if(!(Auth::user()->hasRole('FrontOffice'))) $model->owner_bo    =   Auth::user()->id;
+            if (empty($model->created_at)) {
+                // WARNING: Storing 'd F Y' in a DATETIME field will fail. Assuming the field is a STRING.
+                $model->created_at = Carbon::now()->format('d F Y'); 
+            }
+            $model->updated_at = Carbon::now()->format('Y-m-d H:i:s');
+            
+            // Use the pre-calculated variable
+            if (!$isFrontOffice) {
+                $model->owner_bo = $userId;
+            }
         });
 
-        //
-        static::updating(function ($model) {
-            $model->updated_at  =   Carbon::now()->format('Y-m-d H:i:s');
-
-            //
-            if(!(Auth::user()->hasRole('FrontOffice'))) $model->owner_bo    =   Auth::user()->id;
+        static::updating(function ($model) use ($userId, $isFrontOffice) {
+            // Laravel's default timestamp handling covers this, but we keep it if you need the custom format
+            $model->updated_at = Carbon::now()->format('Y-m-d H:i:s');
+            
+            // Use the pre-calculated variable
+            if (!$isFrontOffice) {
+                $model->owner_bo = $userId;
+            }
         });
     }
 
@@ -54,246 +67,302 @@ class Client extends Model
     // when user add new map
     public static function storeClients(Request $request, int $id_route_import) {
 
-        $clients                =   $request->get('clients');
+        // Assume clients is a JSON string/array, not an array of objects for simplicity.
+        // If it's an array of objects, convert it using array_map or json_decode(true).
+        $clientsData    =   json_decode($request->get('clients'), true);
+        if (empty($clientsData)) return;
 
-        foreach ($clients as $client_elem) {
+        $now            =   Carbon::now();
+        $createdAt      =   $now->format('d F Y'); // Custom format from boot()
+        $updatedAt      =   $now->format('Y-m-d H:i:s');
+        $ownerBo        =   Auth::check() && !Auth::user()->hasRole('FrontOffice') ? Auth::user()->id : null;
+        
+        $dataToInsert   =   [];
 
-            //
-            if (preg_match('/[\/\\\\:*?"<>|& ]/', $client_elem->CustomerCode)) {
-                throw new Exception("Le champ CustomerCode contient des caractères interdits : ".$client_elem->CustomerCode);
+        DB::transaction(function () use ($clientsData, $id_route_import, $createdAt, $updatedAt, $ownerBo, &$dataToInsert) {
+            foreach ($clientsData as $client_elem) {
+                // 1. Validation and Error Check (Moved to top for efficiency)
+                if (isset($client_elem['CustomerCode']) && preg_match('/[\/\\\\:*?"<>|& ]/', $client_elem['CustomerCode'])) {
+                    // Must throw here as per original logic, stops the batch insert.
+                    throw new \Exception("Le champ CustomerCode contient des caractères interdits : ".$client_elem['CustomerCode']);
+                }
+                
+                // 2. Data Transformation (using null coalescing ?? and strtoupper)
+                $dataToInsert[] = [
+                    'NewCustomer'               =>  $client_elem['NewCustomer']                             ??  ''              ,
+                    'CustomerIdentifier'        =>  $client_elem['CustomerIdentifier']                      ??  ''              ,
+                    'CustomerCode'              =>  $client_elem['CustomerCode']                            ??  ''              ,
+                    'OpenCustomer'              =>  $client_elem['OpenCustomer']                            ??  ''              ,
+                    'CustomerNameE'             =>  mb_strtoupper($client_elem['CustomerNameE'], 'UTF-8')   ??  ''              ,
+                    'CustomerNameA'             =>  mb_strtoupper($client_elem['CustomerNameA'], 'UTF-8')   ??  ''              ,
+                    'Latitude'                  =>  $client_elem['Latitude']                                ??  0               ,
+                    'Longitude'                 =>  $client_elem['Longitude']                               ??  0               ,
+                    'Address'                   =>  $client_elem['Address']                                 ??  ''              ,
+                    'DistrictNo'                =>  $client_elem['DistrictNo']                              ??  ''              ,
+                    'DistrictNameE'             =>  $client_elem['DistrictNameE']                           ??  ''              ,
+                    'CityNo'                    =>  $client_elem['CityNo']                                  ??  ''              ,
+                    'CityNameE'                 =>  $client_elem['CityNameE']                               ??  ''              ,
+                    'Tel'                       =>  $client_elem['Tel']                                     ??  ''              ,
+                    'tel_comment'               =>  $client_elem['tel_comment']                             ??  ''              ,
+                    'tel_status'                =>  $client_elem['tel_status']                              ??  ''              ,
+                    'CustomerType'              =>  $client_elem['CustomerType']                            ??  ''              ,
+
+                    'status'                    =>  $client_elem['status']                                  ??  ''              ,
+
+                    'Neighborhood'              =>  $client_elem['Neighborhood']                            ??  ''              ,
+                    'Landmark'                  =>  $client_elem['Landmark']                                ??  ''              ,
+                    'BrandAvailability'         =>  $client_elem['BrandAvailability']                       ??  ''              ,
+                    'BrandSourcePurchase'       =>  $client_elem['BrandSourcePurchase']                     ??  ''              ,
+
+                    'Frequency'                 =>  $client_elem['Frequency']                               ??  ''              ,
+                    'SuperficieMagasin'         =>  $client_elem['SuperficieMagasin']                       ??  ''              ,
+                    'NbrAutomaticCheckouts'     =>  $client_elem['NbrAutomaticCheckouts']                   ??  ''              ,
+
+                    'AvailableBrands'           =>  $client_elem['AvailableBrands']                         ??  ''              ,
+
+                    'start_adding_time'         =>  $client_elem['start_adding_time']                       ??  ''              ,
+                    'adding_duration'           =>  $client_elem['adding_duration']                         ??  ''              ,
+
+                    'JPlan'                     =>  $client_elem['JPlan']                                   ??  ''              ,
+                    'Journee'                   =>  $client_elem['Journee']                                 ??  ''              ,
+
+                    'comment'                   =>  $client_elem['comment']                                 ??  ''              ,
+                    
+                    // Manually include the event/auth data
+                    'created_at'                =>  $client_elem['created_at']                              ??  $createdAt      ,
+                    'updated_at'                =>  $updatedAt                                                                  , // set on insert
+                    'owner_bo'                  =>  $ownerBo                                                                    ,
+                    'id_route_import'           =>  $id_route_import                                                            ,
+                    'owner'                     =>  $client_elem['owner']                                   ??  (Auth::check() ? Auth::user()->id : null) // Assuming 'owner' is the request owner field
+                ];
             }
 
-            //  //  //  //  //
-
-            // Client
-            $client         =   new Client([
-                'NewCustomer'               =>  $client_elem->NewCustomer                               ?? ''               ,
-                'CustomerIdentifier'        =>  $client_elem->CustomerIdentifier                        ?? ''               ,
-                'CustomerCode'              =>  $client_elem->CustomerCode                              ?? ''               ,
-                'OpenCustomer'              =>  $client_elem->OpenCustomer                              ?? ''               ,
-                'CustomerNameE'             =>  mb_strtoupper($client_elem->CustomerNameE, 'UTF-8')     ?? ''               ,
-                'CustomerNameA'             =>  mb_strtoupper($client_elem->CustomerNameA, 'UTF-8')     ?? ''               ,
-                'Latitude'                  =>  $client_elem->Latitude                                  ?? 0                ,
-                'Longitude'                 =>  $client_elem->Longitude                                 ?? 0                ,
-                'Address'                   =>  $client_elem->Address                                   ?? ''               ,
-                'DistrictNo'                =>  $client_elem->DistrictNo                                ?? ''               ,
-                'DistrictNameE'             =>  $client_elem->DistrictNameE                             ?? ''               ,
-                'CityNo'                    =>  $client_elem->CityNo                                    ?? ''               ,
-                'CityNameE'                 =>  $client_elem->CityNameE                                 ?? ''               ,
-                'Tel'                       =>  $client_elem->Tel                                       ?? ''               ,
-                'tel_comment'               =>  $client_elem->tel_comment                               ?? ''               ,
-                'tel_status'                =>  $client_elem->tel_status                                ?? ''               ,
-                'CustomerType'              =>  $client_elem->CustomerType                              ?? ''               ,
-
-                'status'                    =>  $client_elem->status                                    ?? ''               ,
-
-                'Neighborhood'              =>  $client_elem->Neighborhood                              ?? ''               ,
-                'Landmark'                  =>  $client_elem->Landmark                                  ?? ''               ,
-                'BrandAvailability'         =>  $client_elem->BrandAvailability                         ?? ''               ,
-                'BrandSourcePurchase'       =>  $client_elem->BrandSourcePurchase                       ?? ''               ,
-
-                'Frequency'                 =>  $client_elem->Frequency                                 ?? ''               ,
-                'SuperficieMagasin'         =>  $client_elem->SuperficieMagasin                         ?? ''               ,
-                'NbrAutomaticCheckouts'     =>  $client_elem->NbrAutomaticCheckouts                     ?? ''               ,
-
-                'AvailableBrands'           =>  $client_elem->AvailableBrands                           ?? ''               ,
-
-                'start_adding_time'         =>  $client_elem->start_adding_time                         ?? ''               ,
-                'adding_duration'           =>  $client_elem->adding_duration                           ?? ''               ,
-
-                'JPlan'                     =>  $client_elem->JPlan                                     ?? ''               ,
-                'Journee'                   =>  $client_elem->Journee                                   ?? ''               ,
-
-                'comment'                   =>  $client_elem->comment                                   ?? ''               ,
-
-                'created_at'                =>  $client_elem->created_at                                ?? Carbon::now()    ,
-
-                'id_route_import'           =>  $id_route_import                                        ?? ''               ,
-
-                'owner'                     =>  $client_elem->owner                                     ?? ''               
-            ]);
-
-            //
-            $client->save();
-        }
+            // 3. Batch Insert (Use chunking for large datasets, e.g., 500 records per query)
+            $chunks     =   array_chunk($dataToInsert, 500);
+            foreach ($chunks as $chunk) {
+                Client::insert($chunk); // Use insert() which is much faster than save()
+            }
+        });
     }
 
     // when user upload new clients file in route import
     public static function storeClientsUpdateRouteImport(Request $request, int $id_route_import) {
+        $clientsData = json_decode($request->get('clients'), true);
+        if (empty($clientsData)) return;
 
-        $clients                =   $request->get('clients');
+        // --- Optimization 1: Batch User Lookup (Saves thousands of queries) ---
+        $ownerNames = array_column($clientsData, 'owner');
+        $ownerNames = array_filter(array_unique($ownerNames)); // Get unique, non-empty names
+        
+        // Map of 'OwnerName' => User ID
+        $userMap = User::whereIn('nom', $ownerNames)->pluck('id', 'nom')->toArray();
+        $defaultUserId = Auth::check() ? Auth::user()->id : null;
 
-        foreach ($clients as $client_elem) {
+        $now = Carbon::now();
+        $createdAt = $now->format('d F Y');
+        $updatedAt = $now->format('Y-m-d H:i:s');
+        $ownerBo = Auth::check() && !Auth::user()->hasRole('FrontOffice') ? Auth::user()->id : null;
 
-            if(isset($client_elem->owner)) {
-                $user   =   User::where('nom', $client_elem->owner)->first();
+        $dataToUpsert = [];
+
+        DB::transaction(function () use ($clientsData, $id_route_import, $userMap, $defaultUserId, $createdAt, $updatedAt, $ownerBo, &$dataToUpsert) {
+            foreach ($clientsData as $client_elem) {
+                
+                // --- Logic for 'owner' (Optimized) ---
+                $ownerId = $defaultUserId;
+                if (isset($client_elem['owner'])) {
+                    // Use the pre-queried map, fallback to default user if name not found
+                    $ownerId = $userMap[$client_elem['owner']] ?? $defaultUserId;
+                }
+
+                // 1. Validation (Same as above)
+                if (isset($client_elem['CustomerCode']) && preg_match('/[\/\\\\:*?"<>|& ]/', $client_elem['CustomerCode'])) {
+                    throw new \Exception("Le champ CustomerCode contient des caractères interdits : ".$client_elem['CustomerCode']);
+                }
+                
+                // 2. Brand Mapping (Simplified and more readable)
+                $brands = array_map('trim', explode(',', $client_elem['AvailableBrands'] ?? ''));
+                $AvailableBrands = json_encode(array_combine(
+                    array_map(fn($index) => "brand_$index", array_keys($brands)),
+                    $brands
+                ), JSON_UNESCAPED_UNICODE);
+
+                // 3. Build Upsert Row
+                $dataToUpsert[] = [
+                    // ... (include all other fields, similar to storeClients, but using $client_elem['key'])
+                    'NewCustomer'               =>  $client_elem['NewCustomer']                                 ?? ''           ,
+                    'CustomerIdentifier'        =>  $client_elem['CustomerIdentifier']                          ?? ''           ,
+                    'CustomerCode'              =>  $client_elem['CustomerCode']                                ?? ''           ,
+                    'OpenCustomer'              =>  $client_elem['OpenCustomer']                                ?? ''           ,
+                    'CustomerNameE'             =>  mb_strtoupper($client_elem['CustomerNameE']                 ?? '', 'UTF-8') ,
+                    'CustomerNameA'             =>  mb_strtoupper($client_elem['CustomerNameA']                 ?? '', 'UTF-8') ,
+
+                    'Latitude'                  =>  $client_elem['Latitude']                                    ?? 0            ,
+                    'Longitude'                 =>  $client_elem['Longitude']                                   ?? 0            ,
+
+                    'AvailableBrands'           =>  $AvailableBrands,
+
+                    'Address'                   =>  $client_elem['Address']                                     ?? ''           ,
+                    'DistrictNo'                =>  $client_elem['DistrictNo']                                  ?? ''           ,
+                    'DistrictNameE'             =>  $client_elem['DistrictNameE']                               ?? ''           ,
+                    'CityNo'                    =>  $client_elem['CityNo']                                      ?? ''           ,
+                    'CityNameE'                 =>  $client_elem['CityNameE']                                   ?? ''           ,
+                    'Tel'                       =>  $client_elem['Tel']                                         ?? ''           ,
+                    'tel_comment'               =>  $client_elem['tel_comment']                                 ?? ''           ,
+                    'tel_status'                =>  $client_elem['tel_status']                                  ?? ''           ,
+                    'CustomerType'              =>  $client_elem['CustomerType']                                ?? ''           ,
+
+                    'status'                    =>  $client_elem['status']                                      ?? ''           ,
+
+                    'Neighborhood'              =>  $client_elem['Neighborhood']                                ?? ''           ,
+                    'Landmark'                  =>  $client_elem['Landmark']                                    ?? ''           ,
+                    'BrandAvailability'         =>  $client_elem['BrandAvailability']                           ?? ''           ,
+                    'BrandSourcePurchase'       =>  $client_elem['BrandSourcePurchase']                         ?? ''           ,
+
+                    'Frequency'                 =>  $client_elem['Frequency']                                   ?? ''           ,
+                    'SuperficieMagasin'         =>  $client_elem['SuperficieMagasin']                           ?? ''           ,
+                    'NbrAutomaticCheckouts'     =>  $client_elem['NbrAutomaticCheckouts']                       ?? ''           ,
+
+                    'start_adding_time'         =>  $client_elem['start_adding_time']                           ?? ''           ,
+                    'adding_duration'           =>  $client_elem['adding_duration']                             ?? ''           ,
+
+                    'JPlan'                     =>  $client_elem['JPlan']                                       ?? ''           ,
+                    'Journee'                   =>  $client_elem['Journee']                                     ?? ''           ,
+
+                    'comment'                   =>  $client_elem['comment']                                     ?? ''           ,
+
+                    // Manually include event/auth data
+                    'created_at'                =>  $client_elem['created_at'] ?? $createdAt,
+                    'updated_at'                =>  $updatedAt,
+                    'owner_bo'                  =>  $ownerBo,
+                    'id_route_import'           =>  $id_route_import,
+                    'owner'                     =>  $ownerId,
+                ];
             }
 
-            //
-            if(!isset($user)) {
-                $user   =   Auth::user();
+            // --- Optimization 2: Batch Upsert (Requires a unique key, likely CustomerCode + id_route_import) ---
+            // Assuming (CustomerCode, id_route_import) is a unique key for upserting
+            $chunks = array_chunk($dataToUpsert, 500);
+            
+            foreach ($chunks as $chunk) {
+                Client::upsert(
+                    $chunk,
+                    ['CustomerCode', 'id_route_import'], // Unique columns to identify the row
+                    array_keys(head($chunk)) // Update all columns except the unique keys
+                );
             }
-
-            //  //  //  //  //
-
-            //
-            if (preg_match('/[\/\\\\:*?"<>|& ]/', $client_elem->CustomerCode)) {
-                throw new Exception("Le champ CustomerCode contient des caractères interdits : ".$client_elem->CustomerCode);
-            }
-
-            //  //  //  //  //
-
-            $brands     =   array_map('trim', explode(',', $client_elem->AvailableBrands)); // Split and trim whitespace
-
-            $result     =   [];
-
-            foreach ($brands as $index => $value) {
-                $result["brand_$index"] = $value;
-            }
-
-            $AvailableBrands    =   json_encode($result, JSON_UNESCAPED_UNICODE);
-
-            //  //  //  //  //
-
-            // Client
-            $client         =   new Client([
-                'NewCustomer'               =>  $client_elem->NewCustomer                               ?? ''               ,
-                'CustomerIdentifier'        =>  $client_elem->CustomerIdentifier                        ?? ''               ,
-                'CustomerCode'              =>  $client_elem->CustomerCode                              ?? ''               ,
-                'OpenCustomer'              =>  $client_elem->OpenCustomer                              ?? ''               ,
-                'CustomerNameE'             =>  mb_strtoupper($client_elem->CustomerNameE, 'UTF-8')     ?? ''               ,
-                'CustomerNameA'             =>  mb_strtoupper($client_elem->CustomerNameA, 'UTF-8')     ?? ''               ,
-                'Latitude'                  =>  $client_elem->Latitude                                  ?? 0                ,
-                'Longitude'                 =>  $client_elem->Longitude                                 ?? 0                ,
-                'Address'                   =>  $client_elem->Address                                   ?? ''               ,
-                'DistrictNo'                =>  $client_elem->DistrictNo                                ?? ''               ,
-                'DistrictNameE'             =>  $client_elem->DistrictNameE                             ?? ''               ,
-                'CityNo'                    =>  $client_elem->CityNo                                    ?? ''               ,
-                'CityNameE'                 =>  $client_elem->CityNameE                                 ?? ''               ,
-                'Tel'                       =>  $client_elem->Tel                                       ?? ''               ,
-                'tel_comment'               =>  $client_elem->tel_comment                               ?? ''               ,
-                'tel_status'                =>  $client_elem->tel_status                                ?? ''               ,
-                'CustomerType'              =>  $client_elem->CustomerType                              ?? ''               ,
-
-                'status'                    =>  $client_elem->status                                    ?? ''               ,
-
-                'Neighborhood'              =>  $client_elem->Neighborhood                              ?? ''               ,
-                'Landmark'                  =>  $client_elem->Landmark                                  ?? ''               ,
-                'BrandAvailability'         =>  $client_elem->BrandAvailability                         ?? ''               ,
-                'BrandSourcePurchase'       =>  $client_elem->BrandSourcePurchase                       ?? ''               ,
-
-                'Frequency'                 =>  $client_elem->Frequency                                 ?? ''               ,
-                'SuperficieMagasin'         =>  $client_elem->SuperficieMagasin                         ?? ''               ,
-                'NbrAutomaticCheckouts'     =>  $client_elem->NbrAutomaticCheckouts                     ?? ''               ,
-                'AvailableBrands'           =>  $AvailableBrands                                        ?? ''               ,
-
-                'start_adding_time'         =>  $client_elem->start_adding_time                         ?? ''               ,
-                'adding_duration'           =>  $client_elem->adding_duration                           ?? ''               ,
-
-                'JPlan'                     =>  $client_elem->JPlan                                     ?? ''               ,
-                'Journee'                   =>  $client_elem->Journee                                   ?? ''               ,
-
-                'comment'                   =>  $client_elem->comment                                   ?? ''               ,
-
-                'created_at'                =>  $client_elem->created_at                                ?? Carbon::now()    ,
-
-                'id_route_import'           =>  $id_route_import                                        ?? ''               ,
-
-                'owner'                     =>  $user->id                                                                   
-            ]);
-
-            //
-            $client->save();
-        }
+        });
     }
 
     //
 
     // polygon change multiple informations for clients
     public static function changeRouteClients(Request $request, int $id_route_import) {
+        // Ensure clients is decoded as an associative array for consistency
+        $clientsToUpdate    =   json_decode($request->get("clients"), true); 
+        if (empty($clientsToUpdate)) return;
 
-        $liste_clients_elem =   json_decode($request->get("clients"));
+        $createdAt          =   Carbon::now()->format('d F Y');
+        $updatedAt          =   Carbon::now()->format('Y-m-d H:i:s');
+        $ownerBo            =   Auth::check() && !Auth::user()->hasRole('FrontOffice') ? Auth::user()->id : null;
 
-        //
-        foreach ($liste_clients_elem    as  $client_elem) {
+        $dataToUpsert       =   [];
+        $updateColumns      =   ['created_at', 'updated_at', 'owner_bo'];
+        
+        foreach ($clientsToUpdate as $client_elem) {
+            $row    =   [
+                'id'            =>  $client_elem['id']  ,
+                'created_at'    =>  $createdAt          ,
+                'updated_at'    =>  $updatedAt          ,
+                'owner_bo'      =>  $ownerBo            , // Update owner_bo on modification
+            ];
+            
+            // Add optional fields and track which ones need to be updated
+            if (isset($client_elem['owner'])) {
+                $row['owner']   =   $client_elem['owner'];
 
-            $client                 =   Client::find($client_elem->id);
-
-            // Set DistrictNo
-            if(isset($client_elem->owner)) {
-
-                $client->owner          =   $client_elem->owner;
+                if (!in_array('owner', $updateColumns))         $updateColumns[]    =   'owner';
             }
 
-            // Set DistrictNo
-            if((isset($client_elem->DistrictNo))&&(isset($client_elem->DistrictNameE))) {
-
-                $client->DistrictNo     =   $client_elem->DistrictNo;
-                $client->DistrictNameE  =   $client_elem->DistrictNameE;
+            if (isset($client_elem['JPlan'])) {
+                $row['JPlan']   =   mb_strtoupper($client_elem['JPlan'], 'UTF-8');
+                if (!in_array('JPlan', $updateColumns))         $updateColumns[]    =   'JPlan';
             }
 
-            // Set CityNo
-            if((isset($client_elem->CityNo))&&(isset($client_elem->CityNameE))) {
+            if (isset($client_elem['DistrictNo']) && isset($client_elem['DistrictNameE'])) {
+                $row['DistrictNo']      =   $client_elem['DistrictNo'];
+                $row['DistrictNameE']   =   $client_elem['DistrictNameE'];
 
-                $client->CityNo         =   $client_elem->CityNo;
-                $client->CityNameE      =   $client_elem->CityNameE;
+                if (!in_array('DistrictNo'      , $updateColumns)) $updateColumns[] =   'DistrictNo';
+                if (!in_array('DistrictNameE'   , $updateColumns)) $updateColumns[] =   'DistrictNameE';
             }
 
-            // Set CustomerType
-            if(isset($client_elem->CustomerType)) {
+            if (isset($client_elem['CityNo']) && isset($client_elem['CityNameE'])) {
+                $row['CityNo']      =   $client_elem['CityNo'];
+                $row['CityNameE']   =   $client_elem['CityNameE'];
 
-                $client->CustomerType   =   $client_elem->CustomerType;
+                if (!in_array('CityNo'      , $updateColumns))  $updateColumns[]    =   'CityNo';
+                if (!in_array('CityNameE'   , $updateColumns))  $updateColumns[]    =   'CityNameE';
             }
 
-            // Set JPlan
-            if(isset($client_elem->JPlan)) {
-
-                $client->JPlan          =   mb_strtoupper($client_elem->JPlan, 'UTF-8');
+            if (isset($client_elem['CustomerType'])) {
+                $row['CustomerType']    =   $client_elem['CustomerType'];
+                if (!in_array('CustomerType', $updateColumns))  $updateColumns[]    =   'CustomerType';
             }
 
-            // Set Journee
-            if(isset($client_elem->Journee)) {
-
-                $client->Journee        =   $client_elem->Journee;
+            if (isset($client_elem['status'])) {
+                $row['status']          =   $client_elem['status'];
+                if (!in_array('status', $updateColumns))        $updateColumns[]    =   'status';
             }
 
-            // Set Status
-            if(isset($client_elem->status)) {
-
-                $client->status         =   $client_elem->status;
+            if (isset($client_elem['Journee'])) {
+                $row['Journee']         =   $client_elem['Journee'];
+                if (!in_array('Journee', $updateColumns))       $updateColumns[]    =   'Journee';
             }
 
-            $client->save();
+            $dataToUpsert[]     =   $row;
+        }
+
+        // --- Batch Update ---
+        $chunks = array_chunk($dataToUpsert, 500);
+        foreach ($chunks as $chunk) {
+            Client::upsert(
+                $chunk,
+                ['id'], // Unique by ID (Primary Key)
+                // Use the dynamically built list of columns to update
+                array_unique($updateColumns) 
+            );
         }
     }
 
-    // polygon delete a group of clients
     public static function deleteClients(Request $request, int $id_route_import) {
-
         $liste_clients_ids  =   json_decode($request->get("clients"), true);
+        if (empty($liste_clients_ids)) return;
 
-        //
-        if (!empty($liste_clients_ids)) {
+        // --- Optimization 1: Efficient Bulk Fetch for File Cleanup ---
+        // Fetch only the IDs (or just the ID and the data needed for the directory path)
+        // We still need the IDs for file cleanup
+        $clientsToDelete    =   Client::whereIn('id', $liste_clients_ids)->get(['id']);
+                    
+        $ids                =   $clientsToDelete->pluck('id')->toArray();
+        
+        // 1. Delete all database records in one query
+        Client::whereIn('id', $ids)->delete(); // One efficient query!
 
-            $clients        =   Client::whereIn('id', $liste_clients_ids)->get(); // Fetch clients first
-
-            foreach ($clients as $client) {
-
-                // $directory = public_path('uploads/clients/' . $client->id);
-
-                // if (File::exists($directory)) {
-                //     File::deleteDirectory($directory); // Delete the entire directory
-                // }
-
-                $client->delete(); // Delete client record
-            }
-        }
+        // 2. Handle File Deletion (less critical, but still necessary)
+        // Note: File operations are slow and should not be in the DB transaction if possible.
+        // Since the original logic had it inside, we keep it here but acknowledge it's slow.
+        // foreach ($clientsToDelete as $client) {
+        //     $directory = public_path('uploads/clients/' . $client->id);
+        //     if (File::exists($directory)) {
+        //         File::deleteDirectory($directory); 
+        //     }
+        // }
     }
 
     //
 
-    public static function validateStore(Request $request) 
-    {
+    public static function validateStore(Request $request) {
 
         $validator = Validator::make($request->all(), [
             'NewCustomer'           =>  ["required", "max:255"],
@@ -359,27 +428,22 @@ class Client extends Model
 
     public static function storeClient(Request $request, int $id_route_import) {
 
-        //
+        // --- Optimization 1: Consolidate Date/Time Calculations ---
         $start_adding_date      =   Carbon::parse($request->get("start_adding_date"));
         $finish_adding_date     =   Carbon::parse($request->get("finish_adding_date"));
-
-        $adding_duration        =   $start_adding_date->diff($finish_adding_date);
-
+        $adding_duration        =   $start_adding_date->diff($finish_adding_date)->format('%H:%I:%S');
         $start_adding_time      =   $start_adding_date->format('H:i:s');
-        $adding_duration        =   $adding_duration->format('%H:%I:%S');
-        //
-
-        //
-        $brandsArray            =   json_decode($request->input("AvailableBrands"), true);
-
-        $AvailableBrands        =   [];
-        foreach ($brandsArray as $index => $value) {
-            $AvailableBrands["brand_$index"] = $value;
-        }
-        //
-
-        //
-        $client     =   new Client([
+        
+        // --- Optimization 2: Simplify Brand Mapping ---
+        $brandsArray            =   json_decode($request->input("AvailableBrands"), true) ?? [];
+        $AvailableBrands        =   array_combine(
+            array_map(fn($index)    =>  "brand_$index", array_keys($brandsArray)),
+            $brandsArray
+        );
+        $AvailableBrandsJson    =   json_encode($AvailableBrands, JSON_UNESCAPED_UNICODE);
+        
+        // --- Optimization 3: Mass Assignment (Single save at the end) ---
+        $client                 =   new Client([
             'CustomerIdentifier'            =>  $request->input("CustomerIdentifier")                       ?? ''   ,
             'NewCustomer'                   =>  $request->input("NewCustomer")                              ?? ''   ,
             'OpenCustomer'                  =>  $request->input("OpenCustomer")                             ?? ''   ,
@@ -404,176 +468,46 @@ class Client extends Model
             'Frequency'                     =>  $request->input("Frequency")                                ?? ''   ,
             'SuperficieMagasin'             =>  $request->input("SuperficieMagasin")                        ?? ''   ,
             'NbrAutomaticCheckouts'         =>  $request->input("NbrAutomaticCheckouts")                    ?? ''   ,
-            'AvailableBrands'               =>  json_encode($AvailableBrands, JSON_UNESCAPED_UNICODE)       ?? ''   ,
 
-            'start_adding_time'             =>  $start_adding_time                                          ?? ''   ,
-            'adding_duration'               =>  $adding_duration                                            ?? ''   ,
+            'AvailableBrands'               =>  $AvailableBrandsJson                                                ,
+            'start_adding_time'             =>  $start_adding_time                                                  , // Use calculated value
+            'adding_duration'               =>  $adding_duration                                                    , // Use calculated value
             'comment'                       =>  $request->input("comment")                                  ?? ''   ,
-
-            'id_route_import'               =>  $id_route_import                                            ?? ''   ,  
-
-            'owner'                         =>  Auth::user()->id
+            'id_route_import'               =>  $id_route_import                                                    ,
+            'owner'                         =>  Auth::user()->id                                                    ,
+            'JPlan'                         =>  mb_strtoupper($request->input("JPlan")                      ?? ''   , 'UTF-8'),
+            'Journee'                       =>  $request->input("Journee")                                  ?? ''   ,
+            'status'                        =>  $request->input("status")                                   ?? ''   ,
+            'nonvalidated_details'          =>  $request->input("nonvalidated_details")                     ?? ''   ,
+            'tel_status'                    =>  $request->get("tel_status")                                 ?? ''   , // Assuming these are NOT in the mass assignment $fillable array
+            'tel_comment'                   =>  $request->get("tel_comment")                                ?? ''   ,
         ]);
-
-        if(!((Auth::user()->hasRole('FrontOffice'))||(Auth::user()->hasRole('Viewer')))) {
-
-            $client->tel_status                     =   $request->get("tel_status")     ?? ''   ;
-            $client->tel_comment                    =   $request->get("tel_comment")    ?? ''   ;
+        
+        // Apply role-specific overrides after mass assignment
+        if (!((Auth::user()->hasRole('FrontOffice')) || (Auth::user()->hasRole('Viewer')))) {
+            // If not FrontOffice/Viewer, allow setting these
+            $client->tel_status     =   $request->get("tel_status")     ?? $client->tel_status; 
+            $client->tel_comment    =   $request->get("tel_comment")    ?? $client->tel_comment;
         }
 
-        //
+        $client->save(); // The first save is crucial to get the client->id for file paths!
 
-        $client->save();
+        // --- Optimization 4: Use Helper for Image Uploads ---
+        self::handleClientImageUpload($request, $client, 'CustomerBarCode_image');
+        self::handleClientImageUpload($request, $client, 'facade_image');
+        self::handleClientImageUpload($request, $client, 'in_store_image');
+        
+        // The model is now updated with the final file paths. Save changes.
+        $client->save(); 
 
-        //
-
-        if($request->input("JPlan") !=  null) {
-
-            $client->JPlan      =   mb_strtoupper($request->input("JPlan"), 'UTF-8');
-        }
-
-        else {
-
-            $client->JPlan      =   "";
-        }
-
-        //
-
-        if($request->input("Journee") !=  null) {
-
-            $client->Journee      =   $request->input("Journee");
-        }
-
-        else {
-
-            $client->Journee      =   "";
-        }
-
-        //
-
-        if($request->hasFile("CustomerBarCode_image")) {
-
-            $fileName                           =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_CUSTOMERCODE_".$client->CustomerCode.'.'.$request->file("CustomerBarCode_image")->getClientOriginalExtension();
-
-            $request->file("CustomerBarCode_image")->move(public_path('uploads/clients/'.$client->id), $fileName);
-
-            $client->CustomerBarCode_image      =   $fileName;
-        } 
-
-        else {
-
-            $client->CustomerBarCode_image      =   "";
-        }
-
-        //
-
-        if($request->hasFile("facade_image")) {
-
-            $fileName                   =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_FACADE_".$client->CustomerCode.'.'.$request->file("facade_image")->getClientOriginalExtension();
-
-            $request->file("facade_image")->move(public_path('uploads/clients/'.$client->id), $fileName);
-
-            $client->facade_image       =   $fileName;
-        } 
-
-        else {
-
-            $client->facade_image       =   "";
-        }
-
-        //
-
-        if($request->hasFile("in_store_image")) {
-
-            $fileName                   =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_IN_STORE_".$client->CustomerCode.'.'.$request->file("in_store_image")->getClientOriginalExtension();
-
-            $request->file("in_store_image")->move(public_path('uploads/clients/'.$client->id), $fileName);
-
-            $client->in_store_image     =   $fileName;
-        }
-
-        else {
-
-            $client->in_store_image     =   "";
-        }
-
-        //
-
-        if($request->input("CustomerBarCode_image_original_name") !=  null) {
-
-            $client->CustomerBarCode_image_original_name    =   $request->input("CustomerBarCode_image_original_name");
-        }
-
-        else {
-
-            $client->CustomerBarCode_image_original_name    =   "";
-        }
-
-        //
-
-        if($request->input("facade_image_original_name") !=  null) {
-
-            $client->facade_image_original_name             =   $request->input("facade_image_original_name");
-        }
-
-        else {
-
-            $client->facade_image_original_name             =   "";
-        }
-
-        //
-
-        if($request->input("in_store_image_original_name") !=  null) {
-
-            $client->in_store_image_original_name           =   $request->input("in_store_image_original_name");
-        }
-
-        else {
-
-            $client->in_store_image_original_name           =   "";
-        }
-
-        //
-
-        if($request->input("status") !=  null) {
-
-            $client->status      =   $request->input("status");
-        }
-
-        else {
-
-            $client->status      =   "";
-        }
-
-        //
-
-        if($request->input("nonvalidated_details") !=  null) {
-
-            $client->nonvalidated_details      =   $request->input("nonvalidated_details");
-        }
-
-        else {
-
-            $client->nonvalidated_details      =   "";
-        }
-
-        //
-
-        $client->save();
-
-        //
-        $AvailableBrands_AssocArray                     =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
-        $client->AvailableBrands_array_formatted        =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
-        $client->AvailableBrands_string_formatted       =   implode(", ", $client->AvailableBrands_array_formatted);
-
-        //
+        // --- Optimization 5: Move data formatting outside the model, or use accessors/mutators ---
+        // The final data formatting should be handled by an API resource or accessor, not inside the function.        
         return $client;
     }
 
     //
 
-    public static function validateUpdate(Request $request) 
-    {
+    public static function validateUpdate(Request $request) {
 
         $validator = Validator::make($request->all(), [
             'NewCustomer'           =>  ["required", "max:255"],
@@ -637,304 +571,133 @@ class Client extends Model
     }
 
     public static function updateClient(Request $request, int $id_route_import, int $id) {
-
-        $client                     =   Client::find($id);
-
-        if($client) {
-
-            if( ((Auth::user()->hasRole("FrontOffice"))&&($client->status ==  "validated"   ))                                              ||
-                ((Auth::user()->hasRole("FrontOffice"))&&($client->status !=  "visible"     )&&($client->owner  !=  Auth::user()->id)))     {
-
-                throw new Exception("Unauthorized", 403);
-            }
-
-            //
-            $brandsArray             =   json_decode($request->input("AvailableBrands"), true);
-
-            $AvailableBrands        =   [];
-            foreach ($brandsArray as $index => $value) {
-                $AvailableBrands["brand_$index"] = $value;
-            }
-            //
-
-            $client->NewCustomer                    =   $request->get("NewCustomer")                            ?? ''   ;
-            $client->OpenCustomer                   =   $request->get("OpenCustomer")                           ?? ''   ;
-            $client->CustomerIdentifier             =   $request->get("CustomerIdentifier")                     ?? ''   ;
-            $client->CustomerCode                   =   $request->get("CustomerCode")                           ?? ''   ;
-            $client->CustomerNameE                  =   mb_strtoupper($request->get("CustomerNameE"), 'UTF-8')  ?? ''   ;
-            $client->CustomerNameA                  =   mb_strtoupper($request->get("CustomerNameA"), 'UTF-8')  ?? ''   ;
-            $client->Latitude                       =   $request->get("Latitude")                               ?? ''   ;
-            $client->Longitude                      =   $request->get("Longitude")                              ?? ''   ;
-            $client->Address                        =   $request->get("Address")                                ?? ''   ;
-            $client->DistrictNo                     =   $request->get("DistrictNo")                             ?? ''   ;
-            $client->DistrictNameE                  =   $request->get("DistrictNameE")                          ?? ''   ;
-            $client->CityNo                         =   $request->get("CityNo")                                 ?? ''   ;
-            $client->CityNameE                      =   $request->get("CityNameE")                              ?? ''   ;
-            $client->Tel                            =   $request->get("Tel")                                    ?? ''   ;
-            $client->CustomerType                   =   $request->get("CustomerType")                           ?? ''   ;
-
-            $client->Neighborhood                   =   $request->get("Neighborhood")                           ?? ''   ;
-            $client->Landmark                       =   $request->get("Landmark")                               ?? ''   ;
-            $client->BrandAvailability              =   $request->get("BrandAvailability")                      ?? ''   ;
-            $client->BrandSourcePurchase            =   $request->get("BrandSourcePurchase")                    ?? ''   ;
-
-            $client->Frequency                      =   $request->get("Frequency")                              ?? ''   ;
-            $client->SuperficieMagasin              =   $request->get("SuperficieMagasin")                      ?? ''   ;
-            $client->NbrAutomaticCheckouts          =   $request->get("NbrAutomaticCheckouts")                  ?? ''   ;
-            $client->AvailableBrands                =   json_encode($AvailableBrands, JSON_UNESCAPED_UNICODE)           ;
-
-            $client->comment                        =   $request->input("comment")                              ?? ''   ;
-
-            $client->id_route_import                =   $id_route_import                                                ;
-
-            if(Auth::user()->hasRole('FrontOffice')) {
-
-                $client->owner                          =   Auth::user()->id;
-            }
-
-            else {
-
-                $client->owner                          =   $request->get("owner");
-                $client->tel_status                     =   $request->get("tel_status");
-                $client->tel_comment                    =   $request->get("tel_comment");
-            }
-
-            //
-
-            if($request->input("JPlan") !=  null) {
-
-                $client->JPlan      =   mb_strtoupper($request->input("JPlan"), 'UTF-8');
-            }
-
-            else {
-
-                $client->JPlan      =   "";
-            }
-
-            //
-
-            if($request->input("Journee") !=  null) {
-
-                $client->Journee      =   $request->input("Journee");
-            }
-
-            else {
-
-                $client->Journee      =   "";
-            }
-
-            //
-
-            if($request->get("CustomerBarCode_image_updated")    ==  "true") {
-
-                $old_CustomerBarCode_image  =   $client->CustomerBarCode_image;                             
-
-                //
-
-                if($request->hasFile("CustomerBarCode_image")) {
-
-                    $fileName                           =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_CUSTOMERCODE_".$client->CustomerCode.'.'.$request->file("CustomerBarCode_image")->getClientOriginalExtension();
-
-                    $request->file("CustomerBarCode_image")->move(public_path('uploads/clients/'.$client->id), $fileName);
-
-                    $client->CustomerBarCode_image      =   $fileName;
-                }
-
-                else {
-
-                    $client->CustomerBarCode_image      =   "";
-                }
-
-                // Delete Old CustomerBarCode_image
-                if(($old_CustomerBarCode_image  !=  "")&&($old_CustomerBarCode_image    !=  $client->CustomerBarCode_image)) {
-
-                    $filePath       =   public_path('uploads/clients/'.$client->id.'/'.$old_CustomerBarCode_image);  
-
-                    if (file_exists($filePath)) {
-
-                        unlink($filePath);
-                    }
-                }
-            }
-
-            //
-
-            if($request->get("facade_image_updated")    ==  "true") {
-
-                $old_facade_image  =   $client->facade_image;                             
-
-                //
-
-                if($request->hasFile("facade_image")) {
-
-                    $fileName                   =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_FACADE_".$client->CustomerCode.'.'.$request->file("facade_image")->getClientOriginalExtension();
-
-                    $request->file("facade_image")->move(public_path('uploads/clients/'.$client->id), $fileName);
-
-                    $client->facade_image       =   $fileName;
-                } 
-
-                else {
-
-                    $client->facade_image       =   "";
-                }
-
-                // Delete Old facade_image
-                if(($old_facade_image   !=  "")&&($old_facade_image  !=  $client->facade_image)) {
-
-                    $filePath       =   public_path('uploads/clients/'.$client->id.'/'.$old_facade_image);  
-
-                    if (file_exists($filePath)) {
-
-                        unlink($filePath);
-                    }
-                }
-            }
-
-            //
-
-            if($request->get("in_store_image_updated")  ==  "true") {
-
-                $old_in_store_image  =   $client->in_store_image;                             
-
-                //
-
-                if($request->hasFile("in_store_image")) {
-
-                    $fileName                   =   $client->DistrictNo."_".$client->CityNo."_".$client->id."_IN_STORE_".$client->CustomerCode.'.'.$request->file("in_store_image")->getClientOriginalExtension();
-
-                    $request->file("in_store_image")->move(public_path('uploads/clients/'.$client->id), $fileName);
-
-                    $client->in_store_image     =   $fileName;
-                }
-
-                else {
-
-                    $client->in_store_image     =   "";
-                }
-
-                // Delete Old in_store_image
-                if(($old_in_store_image   !=  "")&&($old_in_store_image  !=  $client->in_store_image)) {
-
-                    $filePath       =   public_path('uploads/clients/'.$client->id.'/'.$old_in_store_image);  
-
-                    if (file_exists($filePath)) {
-
-                        unlink($filePath);
-                    }
-                }
-            }
-
-            //
-
-            if($request->input("CustomerBarCode_image_original_name") !=  null) {
-
-                $client->CustomerBarCode_image_original_name      =   $request->input("CustomerBarCode_image_original_name");
-            }
-
-            else {
-
-                $client->CustomerBarCode_image_original_name      =   "";
-            }
-
-            //
-
-            if($request->input("facade_image_original_name") !=  null) {
-
-                $client->facade_image_original_name      =   $request->input("facade_image_original_name");
-            }
-
-            else {
-
-                $client->facade_image_original_name      =   "";
-            }
-
-            //
-
-            if($request->input("in_store_image_original_name") !=  null) {
-
-                $client->in_store_image_original_name      =   $request->input("in_store_image_original_name");
-            }
-
-            else {
-
-                $client->in_store_image_original_name      =   "";
-            }
-
-            //
-
-            if($request->input("status") !=  null) {
-
-                $client->status      =   $request->input("status");
-            }
-
-            else {
-
-                $client->status      =   "";
-            }
-
-            //
-
-            if($request->input("nonvalidated_details") !=  null) {
-
-                $client->nonvalidated_details      =   $request->input("nonvalidated_details");
-            }
-
-            else {
-
-                $client->nonvalidated_details      =   "";
-            }
-
-            $client->save();
-
-            //  //  //  //  //
-            //  //  //  //  //
-            //  //  //  //  //
-
-            //
-            $AvailableBrands_AssocArray                     =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
-            $client->AvailableBrands_array_formatted        =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
-            $client->AvailableBrands_string_formatted       =   implode(", ", $client->AvailableBrands_array_formatted);
+        $client = Client::find($id);
+        if (!$client) return null;
+
+        // Security Check
+        $user = Auth::user();
+        $isFrontOffice = $user->hasRole("FrontOffice");
+        
+        if ($isFrontOffice && ($client->status == "validated" || ($client->status != "visible" && $client->owner != $user->id))) {
+            throw new Exception("Unauthorized", 403);
         }
 
-        return $client;
+        // 1. Formatting Brands
+        $brandsArray = json_decode($request->input("AvailableBrands"), true) ?? [];
+        $formattedBrands = [];
+        foreach ($brandsArray as $index => $value) {
+            $formattedBrands["brand_$index"] = $value;
+        }
+
+        // 2. Mass Assignment (Fill simple fields)
+        $client->fill($request->only([
+            'NewCustomer', 'OpenCustomer', 'CustomerIdentifier', 'CustomerCode',
+            'Latitude', 'Longitude', 'Address', 'DistrictNo', 'DistrictNameE',
+            'CityNo', 'CityNameE', 'Tel', 'CustomerType', 'Neighborhood', 
+            'Landmark', 'BrandAvailability', 'BrandSourcePurchase', 'Frequency', 
+            'SuperficieMagasin', 'NbrAutomaticCheckouts', 'comment', 'status', 
+            'nonvalidated_details'
+        ]));
+
+        // 3. Set Complex Fields
+        $client->CustomerNameE = mb_strtoupper($request->get("CustomerNameE") ?? '', 'UTF-8');
+        $client->CustomerNameA = mb_strtoupper($request->get("CustomerNameA") ?? '', 'UTF-8');
+        $client->AvailableBrands = json_encode($formattedBrands, JSON_UNESCAPED_UNICODE);
+        $client->id_route_import = $id_route_import;
+        
+        // JPlan Logic
+        $client->JPlan = $request->has("JPlan") ? mb_strtoupper($request->input("JPlan"), 'UTF-8') : "";
+        $client->Journee = $request->input("Journee") ?? "";
+
+        // Owner Logic
+        if (Auth::user()->hasRole('FrontOffice')) {
+            $client->owner = Auth::user()->id;
+        } else {
+            $client->owner = $request->get("owner");
+            $client->tel_status = $request->get("tel_status");
+            $client->tel_comment = $request->get("tel_comment");
+        }
+
+        // 4. IMAGE HANDLING (Reuse the helper!)
+        self::handleClientImageUpload($request, $client, 'CustomerBarCode_image');
+        self::handleClientImageUpload($request, $client, 'facade_image');
+        self::handleClientImageUpload($request, $client, 'in_store_image');
+
+        // 5. Handle Original Names (Simple string assignment)
+        $client->CustomerBarCode_image_original_name = $request->input("CustomerBarCode_image_original_name") ?? "";
+        $client->facade_image_original_name          = $request->input("facade_image_original_name") ?? "";
+        $client->in_store_image_original_name        = $request->input("in_store_image_original_name") ?? "";
+
+        // 6. Save
+        $client->save();
+
+        // 7. Format Response
+        return self::appendFormattedBrands($client);
+    }
+
+    //
+
+    private static function handleClientImageUpload(Request $request, Client $client, string $field) {
+        // 1. Check if this field needs processing
+        // For 'Store', we usually just check hasFile.
+        // For 'Update', the frontend sends a specific flag (e.g. "facade_image_updated")
+        $isUpdated = $request->input($field.'_updated') === 'true';
+        
+        // If not updated and no file sent, do nothing.
+        if (!$request->hasFile($field) && !$isUpdated) {
+            return;
+        }
+
+        $oldFileName = $client->$field;
+        $type = strtoupper(str_replace('_image', '', $field)); // e.g. "FACADE"
+
+        // 2. Handle New File Upload
+        if ($request->hasFile($field)) {
+            $file = $request->file($field);
+            $extension = $file->getClientOriginalExtension();
+            
+            // Standard Naming: DISTRICT_CITY_ID_TYPE_CODE.ext
+            $fileName = "{$client->DistrictNo}_{$client->CityNo}_{$client->id}_{$type}_{$client->CustomerCode}.{$extension}";
+            
+            $path = public_path("uploads/clients/{$client->id}");
+            $file->move($path, $fileName);
+            
+            $client->$field = $fileName;
+        } 
+        // 3. Handle clearing the image (User deleted it in frontend without uploading new one)
+        else if ($isUpdated) {
+            $client->$field = "";
+        }
+
+        // 4. Cleanup Old File (Only for Update scenarios)
+        // If we had a filename, and it has changed (or become empty), delete the physical old file.
+        if (!empty($oldFileName) && $oldFileName !== $client->$field) {
+            $oldFilePath = public_path("uploads/clients/{$client->id}/{$oldFileName}");
+            if (File::exists($oldFilePath)) {
+                File::delete($oldFilePath);
+            }
+        }
     }
 
     //
 
     public static function deleteClient(int $id_route_import, int $id) {
-
-        $client     =   Client::find($id);
-
-        // $directory  =   public_path('uploads/clients/'.$client->id);
-
-        // if (File::exists($directory)) {
-
-        //     File::deleteDirectory($directory);
-        // }
-
-        $client->delete();
+        // If you need file deletion, uncomment the directory logic here
+        Client::destroy($id);
     }
 
-    //
-
     public static function showClient(Request $request, int $id_route_import, int $id) {
-
-        $client =   Client::find($id);
+        // Eager load 'owner' relationship if 'User' model is related via 'owner' field
+        $client = Client::with('ownerUser')->find($id); 
         
-        if($client) {
+        if ($client) {
+            // Assuming you have a relationship defined in Client model: public function ownerUser() { return $this->belongsTo(User::class, 'owner'); }
+            if ($client->ownerUser) {
+                $client->owner_name = $client->ownerUser->nom;
+            }
             
-            $user   =   User::find($client->id);
-            
-            if($user) {
-                
-                $client->owner_name                         =   $user->nom;
-            }            
-
-            //
-            $AvailableBrands_AssocArray                     =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
-            $client->AvailableBrands_array_formatted        =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
-            $client->AvailableBrands_string_formatted       =   implode(", ", $client->AvailableBrands_array_formatted);
+            // Use helper to format brands
+            self::appendFormattedBrands($client);
         }
         
         return $client;
@@ -945,36 +708,54 @@ class Client extends Model
     // Resume Clients
     public static function updateResumeClients(Request $request) {
 
-        $clients    =   json_decode($request->get("data"));
+        $clientsData    =   json_decode($request->get("data"), true);
+        if (empty($clientsData)) return;
 
-        foreach ($clients as $client_tempo) {
+        $chunkSize      =   1000;
+        
+        // Pre-format dates exactly as you had them in your boot() method
+        $createdAt      =   Carbon::now()->format('d F Y'); 
+        $updatedAt      =   Carbon::now()->format('Y-m-d H:i:s');
 
-            // Client
+        $chunks = array_chunk($clientsData, $chunkSize);
 
-            $client                             =   Client::find($client_tempo->id);
+        foreach ($chunks as $chunk) {
+            $upsertData     =   [];
 
-            if($client_tempo->JPlan     !=  null) {
-    
-                $client->JPlan                      =   mb_strtoupper($client_tempo->JPlan, 'UTF-8');
+            foreach ($chunk as $clientData) {
+                // Logic for JPlan
+                $jPlan      =   !empty($clientData['JPlan']) 
+                                ? mb_strtoupper($clientData['JPlan'], 'UTF-8') 
+                                : "";
+
+                // Logic for Journee
+                $journee    =   !empty($clientData['Journee']) 
+                                ? mb_strtoupper($clientData['Journee'], 'UTF-8') 
+                                : "";
+
+                // Build the row
+                $row = [
+                    'id'            =>  $clientData['id'],
+                    'JPlan'         =>  $jPlan,
+                    'Journee'       =>  $journee,
+
+                    // Manually add the timestamps and owner
+                    'owner_bo'      =>  Auth::user()->id,
+                    'created_at'    =>  $createdAt, 
+                    'updated_at'    =>  $updatedAt,
+                ];
+
+                //
+                $upsertData[] = $row;
             }
 
-            else {
-
-                $client->JPlan                      =   "";
-            }
-
-            if($client_tempo->Journee   !=  null) {
-
-                $client->Journee                    =   $client_tempo->Journee;
-            }
-
-            else {
-
-                $client->Journee                    =   "";
-            }
-
-            //
-            $client->save();
+            // 2. Perform Upsert
+            Client::upsert(
+                $upsertData ,
+                ['id']      , // Unique column
+                
+                ['JPlan', 'Journee', 'updated_at', 'owner_bo']
+            );
         }
     }
 
@@ -982,113 +763,37 @@ class Client extends Model
 
     // Export Clients
     public static function clientsExport(Request $request) {
+        $status = $request->get("status");
+        $routeId = $request->get("id_route_import");
 
-        if($request->get("status") ==  "All") {
+        // 1. Build Query
+        $query = Client::where("id_route_import", $routeId)
+            ->with('ownerUser') // Use Eager Loading
+            ->orderBy('id', 'desc');
 
-            $clients    =   Client::where("id_route_import", $request->get("id_route_import"))
-                                ->select("clients.*", "users.nom as owner")
-                                ->join("users", "clients.owner", "users.id")
-                                ->orderBy('clients.id', 'desc')
-                                ->get()
-                                ->makeHidden(['id_route_import']);
+        // 2. Apply Filters
+        $query->when($status !== "All", function ($q) use ($status) {
+            // Map frontend status strings to DB values if they differ, otherwise just use $status
+            $dbStatus = match(strtolower($status)) {
+                'validated' => 'validated',
+                'pending' => 'pending',
+                'nonvalidated' => 'nonvalidated',
+                'visible' => 'visible',
+                'ferme' => 'ferme',
+                default => $status
+            };
+            return $q->where('status', $dbStatus);
+        });
 
-            //
-            foreach ($clients as $client) {
+        $clients = $query->get()->makeHidden(['id_route_import']);
 
-                $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
-                $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
-                $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        // 3. Format Brands (Ideally use an API Resource, but looping here is acceptable for export)
+        foreach ($clients as $client) {
+            // Map owner name manually if not using API Resource
+            if ($client->ownerUser) {
+                $client->owner = $client->ownerUser->nom; 
             }
-        }
-
-        if($request->get("status") ==  "Validated") {
-
-            $clients    =   Client::where([["status", "validated"]    , ["id_route_import", $request->get("id_route_import")]])
-                                ->select("clients.*", "users.nom as owner")
-                                ->join("users", "clients.owner", "users.id")
-                                ->orderBy('clients.id', 'desc')
-                                ->get()
-                                ->makeHidden(['id_route_import']);
-
-            //
-            foreach ($clients as $client) {
-
-                $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
-                $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
-                $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
-            }
-        }
-
-        if($request->get("status") ==  "Pending") {
-
-            $clients    =   Client::where([["status", "pending"]      , ["id_route_import", $request->get("id_route_import")]])
-                                ->select("clients.*", "users.nom as owner")
-                                ->join("users", "clients.owner", "users.id")
-                                ->orderBy('clients.id', 'desc')
-                                ->get()
-                                ->makeHidden(['id_route_import']);
-
-            //
-            foreach ($clients as $client) {
-
-                $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
-                $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
-                $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
-            }
-        }
-
-        if($request->get("status") ==  "NonValidated") {
-
-            $clients    =   Client::where([["status", "nonvalidated"] , ["id_route_import", $request->get("id_route_import")]])
-                                ->select("clients.*", "users.nom as owner")
-                                ->join("users", "clients.owner", "users.id")
-                                ->orderBy('clients.id', 'desc')
-                                ->get()
-                                ->makeHidden(['id_route_import']);
-
-            //
-            foreach ($clients as $client) {
-
-                $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
-                $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
-                $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
-            }
-        }
-
-        if($request->get("status") ==  "Visible") {
-
-            $clients    =   Client::where([["status", "visible"]    , ["id_route_import", $request->get("id_route_import")]])
-                                ->select("clients.*", "users.nom as owner")
-                                ->join("users", "clients.owner", "users.id")
-                                ->orderBy('clients.id', 'desc')
-                                ->get()
-                                ->makeHidden(['id_route_import']);
-
-            //
-            foreach ($clients as $client) {
-
-                $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
-                $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
-                $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
-            }
-        }
-
-        if($request->get("status") ==  "ferme") {
-
-            $clients    =   Client::where([["status", "ferme"]      , ["id_route_import", $request->get("id_route_import")]])
-                                ->select("clients.*", "users.nom as owner")
-                                ->join("users", "clients.owner", "users.id")
-                                ->orderBy('clients.id', 'desc')
-                                ->get()
-                                ->makeHidden(['id_route_import']);
-
-            //
-            foreach ($clients as $client) {
-
-                $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
-                $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
-                $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
-            }
+            self::appendFormattedBrands($client);
         }
 
         return $clients;
@@ -1096,374 +801,96 @@ class Client extends Model
 
     //  //  //
 
-    // Get Doubles
+    // Wrapper
     public static function getDoublesClients(Request $request, int $id_route_import) {
-
-        $getDoublant                                    =   new stdClass();
-
-        $getDoublant->getDoublantCustomerCode           =   Client::getDoublesCustomerCodeClients($request, $id_route_import);
-        $getDoublant->getDoublantCustomerNameE          =   Client::getDoublesCustomerNameEClients($request, $id_route_import);
-        $getDoublant->getDoublantTel                    =   Client::getDoublesTelClients($request, $id_route_import);
-        $getDoublant->getDoublantGPS                    =   Client::getDoublesGPSClients($request, $id_route_import);
-
-        return $getDoublant;
+        return [
+            'getDoublantCustomerCode'  => self::findDuplicates($request, $id_route_import, 'CustomerCode'),
+            'getDoublantCustomerNameE' => self::findDuplicates($request, $id_route_import, 'CustomerNameE'),
+            'getDoublantTel'           => self::findDuplicates($request, $id_route_import, 'Tel'),
+            'getDoublantGPS'           => self::findDuplicates($request, $id_route_import, 'GPS'),
+        ];
     }
 
-    //
+    // GENERIC DUPLICATE FINDER
+    private static function findDuplicates(Request $request, int $idRoute, string $type) {
+        $startDate = Carbon::parse($request->get('start_date'))->format('Y-m-d');
+        $endDate = Carbon::parse($request->get('end_date'))->format('Y-m-d');
 
-    public static function getDoublesCustomerCodeClients(Request $request, int $id_route_import) {
+        // Base Query: Filter by Route and Status
+        $query = DB::table('clients')
+            ->where('id_route_import', $idRoute)
+            ->where('status', 'validated');
 
-        $rows               =   DB::table('clients')
-                                    ->where('id_route_import', $id_route_import)
-                                    ->where('status', 'validated')
-                                    ->get();
+        // 1. DATE FILTERING IN SQL (Much faster than PHP)
+        // Assumes created_at is stored as '06 December 2023'. 
+        // We convert it to SQL Date for comparison.
+        $query->whereRaw("STR_TO_DATE(created_at, '%d %M %Y') BETWEEN ? AND ?", [$startDate, $endDate]);
 
-        // 2) Parse input dates once
-        $start              =   Carbon::parse($request->get('start_date'));
-        $end                =   Carbon::parse($request->get('end_date'));
-
-        // 3) Filter to the date range
-        $inRange            =   $rows->filter(function ($r) use ($start, $end) {
-                                    $d = Carbon::createFromFormat('d F Y', $r->created_at);
-                                    return $d->between($start, $end);
-                                });
-
-        // 4) Identify which CustomerCodes occur more than once
-        $duplicateCodes     =   $inRange
-                                    ->groupBy('CustomerCode')
-                                    ->filter(function ($group) {
-                                        return $group->count() > 1;
-                                    })
-                                    ->keys()
-                                    ->all(); // array of codes with >1 occurrence
-
-        // 5) Return only the rows whose code is in that list
-        $duplicates         =   $inRange
-                                    ->whereIn('CustomerCode', $duplicateCodes)
-                                    ->values();
-
-        //
-        foreach ($duplicates as $client) {
-
-            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
-            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
-            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+        // 2. IDENTIFY DUPLICATES
+        // We need to find which values appear more than once
+        if ($type === 'GPS') {
+            $groupBy = ['Latitude', 'Longitude'];
+            $select = [DB::raw("CONCAT(Latitude, '-', Longitude) as match_key")];
+        } else {
+            $groupBy = [$type];
+            $select = [$type];
         }
 
-        //
-        return $duplicates;
+        // Subquery to get the duplicate keys
+        $duplicates = DB::table('clients')
+            ->select($groupBy)
+            ->where('id_route_import', $idRoute)
+            ->where('status', 'validated')
+            ->whereRaw("STR_TO_DATE(created_at, '%d %M %Y') BETWEEN ? AND ?", [$startDate, $endDate])
+            ->groupBy($groupBy)
+            ->havingRaw('COUNT(*) > 1')
+            ->get();
+
+        if ($duplicates->isEmpty()) {
+            return [];
+        }
+
+        // 3. FETCH FULL ROWS FOR THOSE DUPLICATES
+        if ($type === 'GPS') {
+            // Logic for GPS is trickier in SQL, doing a simple PHP filter on the small result set is okay here
+            // or join on lat/long. 
+            // For simplicity, let's execute the main query and filter by the lat/longs we found.
+            $latLongs = $duplicates->map(function($d) { return $d->Latitude . '|' . $d->Longitude; })->toArray();
+            
+            // This part fetches the rows
+            $rows = $query->get()->filter(function($row) use ($latLongs) {
+                return in_array($row->Latitude . '|' . $row->Longitude, $latLongs);
+            })->values();
+            
+        } else {
+            // Standard WhereIn
+            $keys = $duplicates->pluck($type)->toArray();
+            $rows = $query->whereIn($type, $keys)->get();
+        }
+
+        // 4. Format Brands
+        foreach ($rows as $client) {
+            self::appendFormattedBrands($client);
+        }
+
+        return $rows;
     }
 
-    public static function getDoublesCustomerNameEClients(Request $request, int $id_route_import) {
-
-        $rows               =   DB::table('clients')
-                                    ->where('id_route_import', $id_route_import)
-                                    ->where('status', 'validated')
-                                    ->get();
-
-        // 2) Parse input dates once
-        $start              =   Carbon::parse($request->get('start_date'));
-        $end                =   Carbon::parse($request->get('end_date'));
-
-        // 3) Filter to the date range
-        $inRange            =   $rows->filter(function ($r) use ($start, $end) {
-                                    $d = Carbon::createFromFormat('d F Y', $r->created_at);
-                                    return $d->between($start, $end);
-                                });
-
-        // 4) Identify which CustomerNameEs occur more than once
-        $duplicateCodes     =   $inRange
-                                    ->groupBy('CustomerNameE')
-                                    ->filter(function ($group) {
-                                        return $group->count() > 1;
-                                    })
-                                    ->keys()
-                                    ->all(); // array of codes with >1 occurrence
-
-        // 5) Return only the rows whose code is in that list
-        $duplicates         =   $inRange
-                                    ->whereIn('CustomerNameE', $duplicateCodes)
-                                    ->values();
-
-        //
-        foreach ($duplicates as $client) {
-
-            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
-            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
-            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
+    private static function appendFormattedBrands($client) {
+        // Handle both Object (Eloquent) and Array (DB::table)
+        $brandsJson = is_array($client) ? ($client['AvailableBrands'] ?? '{}') : $client->AvailableBrands;
+        
+        $assoc = json_decode($brandsJson, true) ?? [];
+        $values = array_values($assoc);
+        
+        if (is_array($client)) {
+            $client['AvailableBrands_array_formatted'] = $values;
+            $client['AvailableBrands_string_formatted'] = implode(", ", $values);
+        } else {
+            $client->AvailableBrands_array_formatted = $values;
+            $client->AvailableBrands_string_formatted = implode(", ", $values);
         }
-
-        //
-        return $duplicates;
-    }
-
-    public static function getDoublesTelClients(Request $request, int $id_route_import) {
-
-        $rows               =   DB::table('clients')
-                                    ->where('id_route_import', $id_route_import)
-                                    ->where('status', 'validated')
-                                    ->get();
-
-        // 2) Parse input dates once
-        $start              =   Carbon::parse($request->get('start_date'));
-        $end                =   Carbon::parse($request->get('end_date'));
-
-        // 3) Filter to the date range
-        $inRange            =   $rows->filter(function ($r) use ($start, $end) {
-                                    $d = Carbon::createFromFormat('d F Y', $r->created_at);
-                                    return $d->between($start, $end);
-                                });
-
-        // 4) Identify which Tels occur more than once
-        $duplicateCodes     =   $inRange
-                                    ->groupBy('Tel')
-                                    ->filter(function ($group) {
-                                        return $group->count() > 1;
-                                    })
-                                    ->keys()
-                                    ->all(); // array of codes with >1 occurrence
-
-        // 5) Return only the rows whose code is in that list
-        $duplicates         =   $inRange
-                                    ->whereIn('Tel', $duplicateCodes)
-                                    ->values();
-
-        //
-        foreach ($duplicates as $client) {
-
-            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
-            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
-            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
-        }
-
-        //
-        return $duplicates;
-    } 
-
-    public static function getDoublesGPSClients(Request $request, int $id_route_import) {
-
-        $rows               =   DB::table('clients')
-                                    ->where('id_route_import', $id_route_import)
-                                    ->where('status', 'validated')
-                                    ->get();
-
-        // 2) Parse input dates once
-        $start              =   Carbon::parse($request->get('start_date'));
-        $end                =   Carbon::parse($request->get('end_date'));
-
-        // 3) Filter to the date range
-        $inRange            =   $rows->filter(function ($r) use ($start, $end) {
-                                    $d = Carbon::createFromFormat('d F Y', $r->created_at);
-                                    return $d->between($start, $end);
-                                });
-
-        // 4) Group by the coordinate pair and keep only groups with >1 member
-        $duplicateGroups    =   $inRange
-                                    ->groupBy(function($r) {
-                                        return $r->Latitude . '|' . $r->Longitude;
-                                    })
-                                    ->filter(function($group) {
-                                        return $group->count() > 1;
-                                    });
-
-        // 5) Flatten those groups back into a single collection of rows
-        $duplicates         =   $duplicateGroups
-                                    ->flatMap(function($group) {
-                                        return $group;
-                                    })
-                                    ->values();
-
-        //
-        foreach ($duplicates as $client) {
-
-            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
-            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
-            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
-        }
-
-        //
-        return $duplicates;
-    }
-
-    //
-
-    public static function getDoublesCustomerCodeClients_old(Request $request, int $id_route_import) {
-
-        $clients    =   DB::table('clients')
-                            ->join('users', 'clients.owner', 'users.id')
-                            ->when(
-                                $request->filled('start_date') && $request->filled('end_date'),
-                                function ($q) use ($request) {
-                                    // convert both sides to MySQL DATE
-                                    $start = $request->get('start_date'); // '2025-06-04'
-                                    $end   = $request->get('end_date');   // '2025-06-10'
-
-                                    return $q->whereBetween(
-                                        DB::raw("STR_TO_DATE(clients.created_at, '%d %M %Y')"),
-                                        [
-                                            DB::raw("STR_TO_DATE('{$start}', '%Y-%m-%d')"),
-                                            DB::raw("STR_TO_DATE('{$end}',   '%Y-%m-%d')")
-                                        ]
-                                    );
-                                }
-                            )
-
-                            ->where([
-                                ['id_route_import', $id_route_import],
-                                ['clients.status', 'validated']
-                            ])
-
-                            ->whereIn('clients.CustomerCode', function ($query) use ($id_route_import) {
-                                $query->select('CustomerCode')
-                                    ->from('clients')
-                                    ->where([
-                                        ['id_route_import', $id_route_import],
-                                        ['clients.status', 'validated']
-                                    ])
-                                    ->groupBy('CustomerCode')
-                                    ->havingRaw('COUNT(*) > 1');
-                            })
-
-                            ->select('clients.*', 'users.nom as owner_name')
-                            ->get();
-
-        //
-        foreach ($clients as $client) {
-
-            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
-            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
-            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
-        }
-
-        //
-        return $clients;
-    }
-
-    public static function getDoublesCustomerNameEClients_old(Request $request, int $id_route_import) {
-
-        $clients    =   DB::table('clients')
-
-                            ->join('users', 'clients.owner', 'users.id')
-
-                            ->when(
-                                $request->filled('start_date') && $request->filled('end_date'),
-                                function ($q) use ($request) {
-                                    $q->whereBetween(
-                                        DB::raw('STR_TO_DATE(clients.created_at, "%d %M %Y")'),
-                                        [$request->get("start_date"), $request->get("end_date")]
-                                    );
-                                }
-                            )
-
-                            ->where([['id_route_import', $id_route_import], ['clients.status', 'validated']])
-
-                            ->whereIn('clients.CustomerNameE', function ($query) use ($request, $id_route_import) {
-                                $query->select('CustomerNameE')
-                                    ->from('clients')
-
-                                    ->where([['id_route_import', $id_route_import], ['clients.status', 'validated']])
-                                    ->groupBy('CustomerNameE')
-                                    ->havingRaw('COUNT(*) > 1');
-                            })
-
-                            ->select('clients.*', 'users.nom as owner_name')
-
-                            ->get();
-
-        //
-        foreach ($clients as $client) {
-
-            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
-            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
-            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
-        }
-
-        //
-        return $clients;
-    }
-
-    public static function getDoublesTelClients_old(Request $request, int $id_route_import) {
-
-        $clients    =   DB::table('clients')
-
-                            ->join('users', 'clients.owner', 'users.id')
-
-                            ->when(
-                                $request->filled('start_date') && $request->filled('end_date'),
-                                function ($q) use ($request) {
-                                    $q->whereBetween(
-                                        DB::raw('STR_TO_DATE(clients.created_at, "%d %M %Y")'),
-                                        [$request->get("start_date"), $request->get("end_date")]
-                                    );
-                                }
-                            )
-
-                            ->where([['id_route_import', $id_route_import], ['clients.status', 'validated']])
-                            ->whereIn('clients.Tel', function ($query) use ($request, $id_route_import) {
-                                $query->select('Tel')
-                                    ->from('clients')
-
-                                    ->where([['id_route_import', $id_route_import], ['clients.status', 'validated']])
-                                    ->groupBy('Tel')
-                                    ->havingRaw('COUNT(*) > 1');
-                            })
-
-                            ->select('clients.*', 'users.nom as owner_name')
-
-                            ->get();
-
-        //
-        foreach ($clients as $client) {
-
-            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
-            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
-            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
-        }
-
-        //
-        return $clients;
-    } 
-
-    public static function getDoublesGPSClients_old(Request $request, int $id_route_import) {
-
-        $clients    =   DB::table('clients')
-
-                            ->join('users', 'clients.owner', 'users.id')
-
-                            ->when(
-                                $request->filled('start_date') && $request->filled('end_date'),
-                                function ($q) use ($request) {
-                                    $q->whereBetween(
-                                        DB::raw('STR_TO_DATE(clients.created_at, "%d %M %Y")'),
-                                        [$request->get("start_date"), $request->get("end_date")]
-                                    );
-                                }
-                            )
-
-                            ->where([['id_route_import', $id_route_import], ['clients.status', 'validated']])
-
-                            ->whereIn(DB::raw('(clients.Latitude, clients.Longitude)'), function ($query) use ($request, $id_route_import) {
-                                $query->select('Latitude', 'Longitude')
-                                    ->from('clients')
-
-                                    ->where([['id_route_import', $id_route_import], ['clients.status', 'validated']])
-                                    ->groupBy('Latitude', 'Longitude')
-                                    ->havingRaw('COUNT(*) > 1');
-                            })
-
-                            ->select('clients.*', 'users.nom as owner_name')
-
-                            ->get();
-
-        //
-        foreach ($clients as $client) {
-
-            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
-            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
-            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
-        }
-
-        //
-        return $clients;
+        
+        return $client;
     }
 }

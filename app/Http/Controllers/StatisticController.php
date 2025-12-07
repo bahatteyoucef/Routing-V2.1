@@ -6,16 +6,21 @@ use App\Models\Statistic;
 use Illuminate\Http\Request;
 use Throwable;
 
-class StatisticController extends Controller
-{
-    //
+use App\Services\StatisticsService;
+use Illuminate\Support\Facades\Log;
 
-    public static function statsDetails(Request $request) {
+class StatisticController extends Controller {
+
+    public function __construct(private StatisticsService $statisticsService) {}
+
+    //  //  //
+
+    public static function statsStandard(Request $request) {
 
         try {
 
             //
-            $stats_details  =   Statistic::statsDetails($request);
+            $stats_details  =   Statistic::statsStandard($request);
 
             //
             return response()->json([
@@ -31,4 +36,17 @@ class StatisticController extends Controller
             ],422);
         }
     } 
+
+    public function statisticsDetails(Request $request) {
+
+        try {
+            $result = $this->statisticsService->statisticsDetails($request);
+            return response()->json(['stats_details' => $result]);
+        } catch (Throwable $e) {
+            Log::error('stats controller failure', ['exception' => $e]);
+            return response()->json(['errors' => [$e->getMessage()]], 422);
+        }
+    }
+
+    //  //  //
 }

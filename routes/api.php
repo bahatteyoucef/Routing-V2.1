@@ -99,6 +99,8 @@ Route::middleware(['auth:api', 'isEnabledUser'])->group(function () {
     Route::post('/users/store'                                                                          ,   [UserController::class                  , 'store'                                   ])->middleware('BUManager');
     Route::post('/users/{id}/update'                                                                    ,   [UserController::class                  , 'update'                                  ])->middleware('BUManager');
 
+    Route::post('/users/pointings'                                                                      ,   [UserController::class                  , 'pointings'                               ])->middleware('BUManager');
+
     //
 
     // Route Import Tempo
@@ -203,7 +205,8 @@ Route::middleware(['auth:api', 'isEnabledUser'])->group(function () {
 
     //
 
-    Route::post('/statistics/details'                                                                   ,   [StatisticController::class             , 'statsDetails'                            ])->middleware('Viewer');
+    Route::post('/statistics/standard'                                                                  ,   [StatisticController::class             , 'statsDetails'                            ])->middleware('Viewer');
+    Route::post('/statistics/self-service'                                                              ,   [StatisticController::class             , 'statisticsDetails'                       ])->middleware('Viewer');
 
     //
 
