@@ -4,197 +4,196 @@
     <div class="card mt-3 mb-3">
         <div class="card-body p-0">
             <div class="report_div" id="by_dynamic_property_filters_report">
-              <div class="row">
-                <!-- Chart type -->
-                <div class="col-sm-3">
-                  <select class="form-select h-100" v-model="chartType"                             :disabled="chartBuilding" @change="onLocalChartTypeChange">
-                    <option value="bar">Bar</option>
-                    <option value="line">Line</option>
-                    <option value="pie">Pie</option>
-                  </select>
-                </div>
-
-                <div class="col-sm-2">
-                  <div id="show_hide_values_toggle_div" class="h-100 w-100">
-                    <div class="h-100 w-100" id="showValuesToggle_div">
-                        <label class="switch btn-color-mode-switch h-100 w-100">
-                            <input type="checkbox"        name="showValuesToggle"   id="showValuesToggle"   v-model="showValuesToggle"      :disabled="chartBuilding"   @change="buildChart()"  true-value="1"  false-value="0">
-                            <label for="showValuesToggle" data-on="Show Values"     data-off="Hide Values"                                  class="btn-color-mode-switch-inner h-100"></label>
-                        </label>
+                <div class="row">
+                    <!-- Chart type -->
+                    <div class="col-sm-3">
+                        <select class="form-select h-100" v-model="chartType"                             :disabled="chartBuilding" @change="onLocalChartTypeChange">
+                            <option value="bar">Bar</option>
+                            <option value="line">Line</option>
+                            <option value="pie">Pie</option>
+                        </select>
                     </div>
-                  </div>
-                </div>
 
-                <!-- Export Buttons -->
-                <div class="col-sm-3">
-                  <button class="btn btn-success w-100 h-100" @click="exportStatsWithChartExcel()"  :disabled="chartBuilding">Export XLSX</button>
-                </div>
+                    <div class="col-sm-2">
+                        <div id="show_hide_values_toggle_div" class="h-100 w-100">
+                            <div class="h-100 w-100" id="showValuesToggle_div">
+                                <label class="switch btn-color-mode-switch h-100 w-100">
+                                    <input type="checkbox"        name="showValuesToggle"   id="showValuesToggle"   v-model="showValuesToggle"      :disabled="chartBuilding"   @change="buildChart()"  true-value="1"  false-value="0">
+                                    <label for="showValuesToggle" data-on="Show Values"     data-off="Hide Values"                                  class="btn-color-mode-switch-inner h-100"></label>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="col-sm-3">
-                  <button class="btn btn-secondary w-100 h-100" @click="exportChartPngAsFile()"     :disabled="chartBuilding">Chart PNG</button>
-                </div>
+                    <!-- Export Buttons -->
+                    <div class="col-sm-3">
+                        <button class="btn btn-success w-100 h-100" @click="exportStatsWithChartExcel()"  :disabled="chartBuilding">Export XLSX</button>
+                    </div>
 
-                <div class="col-sm-1 text-right">
-                  <img
-                    :src="'/images/switch_arrows.png'"
-                    @click="toggleChartTable()"
-                    role="button"
-                    class="mb-0 mr-2"
-                  />
+                    <div class="col-sm-3">
+                        <button class="btn btn-secondary w-100 h-100" @click="exportChartPngAsFile()"     :disabled="chartBuilding">Chart PNG</button>
+                    </div>
+
+                    <div class="col-sm-1 text-right">
+                        <img
+                            :src="'/images/switch_arrows.png'"
+                            @click="toggleChartTable()"
+                            role="button"
+                            class="mb-0 mr-2"
+                        />
+                    </div>
                 </div>
-              </div>
             </div>
         </div>
     </div>
 
     <!-- Chart -->
     <div v-show="showChart" class="card mt-3 mb-3">
-      <div class="card-body p-0">
-        <div class="col-sm-12">
-          <div id="chart_scroll" class="chart_scroll pt-4 pb-1" style="width: 100%; overflow-x: auto; overflow-y: hidden;">
-            
-            <div id="chart_container" class="chart_container" style="position: relative; height: 500px; width: 100%;">
-              <canvas ref="reportChart" id="reportChart"></canvas>
+        <div class="card-body p-0">
+            <div class="col-sm-12">
+                <div id="chart_scroll" class="chart_scroll pt-4 pb-1" style="width: 100%; overflow-x: auto; overflow-y: hidden;">
+                    <div id="chart_container" class="chart_container" style="position: relative; height: 500px; width: 100%;">
+                        <canvas ref="reportChart" id="reportChart"></canvas>
+                    </div>
+                </div>
             </div>
-
-          </div>
         </div>
-      </div>
     </div>
 
     <!-- Tables (Numbers + Percentages) -->
     <div v-show="!showChart" class="card mt-3 mb-3">
-      <div class="col-sm-12">
-        <!-- NUMBERS TABLE -->
-        <div v-if="tableNumbers" class="mb-4">
-          <h5><u>Details (Numbers)</u></h5>
-          <div class="table-responsive mt-3">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th class='col' v-for="(c,i) in tableNumbers.columns" :key="'num-h-'+i">{{ c }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(row,ri) in tableNumbers.rows" :key="'num-r-'+ri">
-                  <th class='col'>{{ row.label }}</th>
+        <div class="col-sm-12">
+            <!-- NUMBERS TABLE -->
+            <div v-if="tableNumbers" class="mb-4">
+            <h5><u>Details (Numbers)</u></h5>
+            <div class="table-responsive mt-3">
+                <table class="table">
+                <thead>
+                    <tr>
+                    <th class='col' v-for="(c,i) in tableNumbers.columns" :key="'num-h-'+i">{{ c }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(row,ri) in tableNumbers.rows" :key="'num-r-'+ri">
+                    <th class='col'>{{ row.label }}</th>
 
-                  <!-- MATRIX case: row.values exists -->
-                  <template v-if="row.values && Array.isArray(row.values)">
-                    <td class='col' v-for="(v,ci) in row.values" :key="'num-v-'+ci">{{ v }}</td>
-                    <th class='col'>{{ row.total }}</th>
-                  </template>
+                    <!-- MATRIX case: row.values exists -->
+                    <template v-if="row.values && Array.isArray(row.values)">
+                        <td class='col' v-for="(v,ci) in row.values" :key="'num-v-'+ci">{{ v }}</td>
+                        <th class='col'>{{ row.total }}</th>
+                    </template>
 
-                  <!-- STANDARD case: single count column -->
-                  <template v-else-if="typeof row.count !== 'undefined'">
-                    <td class='col'>{{ row.count }}</td>
-                  </template>
+                    <!-- STANDARD case: single count column -->
+                    <template v-else-if="typeof row.count !== 'undefined'">
+                        <td class='col'>{{ row.count }}</td>
+                    </template>
 
-                  <!-- FALLBACK: if tableColumns are dynamic, attempt to print fields other than label -->
-                  <template v-else>
-                    <td class='col' v-for="(col,ci) in (tableNumbers.columns.slice(1) || [])" :key="'num-f-'+ci">
-                      {{ row[col] ?? '' }}
-                    </td>
-                  </template>
-                </tr>
+                    <!-- FALLBACK: if tableColumns are dynamic, attempt to print fields other than label -->
+                    <template v-else>
+                        <td class='col' v-for="(col,ci) in (tableNumbers.columns.slice(1) || [])" :key="'num-f-'+ci">
+                        {{ row[col] ?? '' }}
+                        </td>
+                    </template>
+                    </tr>
 
-                <!-- totals row -->
-                <tr>
-                  <th>{{ tableNumbers.totals?.label ?? 'Total' }}</th>
+                    <!-- totals row -->
+                    <tr>
+                    <th>{{ tableNumbers.totals?.label ?? 'Total' }}</th>
 
-                  <!-- MATRIX totals -->
-                  <template v-if="Array.isArray(tableNumbers.totals?.values)">
-                    <th class='col' v-for="(v,ci) in tableNumbers.totals.values" :key="'num-t-'+ci">{{ v }}</th>
-                    <th class='col'>{{ tableNumbers.totals.total }}</th>
-                  </template>
+                    <!-- MATRIX totals -->
+                    <template v-if="Array.isArray(tableNumbers.totals?.values)">
+                        <th class='col' v-for="(v,ci) in tableNumbers.totals.values" :key="'num-t-'+ci">{{ v }}</th>
+                        <th class='col'>{{ tableNumbers.totals.total }}</th>
+                    </template>
 
-                  <!-- STANDARD totals -->
-                  <template v-else-if="typeof tableNumbers.totals?.count !== 'undefined'">
-                    <th class='col'>{{ tableNumbers.totals.count }}</th>
-                  </template>
+                    <!-- STANDARD totals -->
+                    <template v-else-if="typeof tableNumbers.totals?.count !== 'undefined'">
+                        <th class='col'>{{ tableNumbers.totals.count }}</th>
+                    </template>
 
-                  <!-- FALLBACK empty cells to match header -->
-                  <template v-else>
-                    <th class='col' v-for="(col,ci) in (tableNumbers.columns.slice(1) || [])" :key="'num-empty-'+ci">&nbsp;</th>
-                  </template>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                    <!-- FALLBACK empty cells to match header -->
+                    <template v-else>
+                        <th class='col' v-for="(col,ci) in (tableNumbers.columns.slice(1) || [])" :key="'num-empty-'+ci">&nbsp;</th>
+                    </template>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+            </div>
+
+            <hr class="mt-5 mb-5" />
+
+            <!-- PERCENTAGES TABLE -->
+            <div v-if="tablePercentages" class="mb-2">
+                <h5><u>Details (Percent % of total)</u></h5>
+                <div class="table-responsive mt-3">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class='col' v-for="(c,i) in tablePercentages.columns" :key="'pct-h-'+i">{{ c }}</th>
+                            </tr>
+                        </thead>
+                    
+                        <tbody>
+                            <tr v-for="(row,ri) in tablePercentages.rows" :key="'pct-r-'+ri">
+                                <th class='col'>{{ row.label }}</th>
+
+                                <template v-if="row.values && Array.isArray(row.values)">
+                                    <td class='col' v-for="(v,ci) in row.values" :key="'pct-v-'+ci">{{ formatPercent(v) }}</td>
+                                    <th>{{ formatPercent(row.total) }}</th>
+                                </template>
+
+                                <template v-else>
+                                    <td class='col'>{{ formatPercent(row.percent ?? row.count ?? 0) }}</td>
+                                </template>
+                            </tr>
+
+                            <!-- totals row -->
+                            <tr>
+                                <th>{{ tablePercentages.totals?.label ?? 'Total' }}</th>
+
+                                <template v-if="Array.isArray(tablePercentages.totals?.values)">
+                                    <th class='col' v-for="(v,ci) in tablePercentages.totals.values" :key="'pct-t-'+ci">{{ formatPercent(v) }}</th>
+                                    <th class='col'>{{ formatPercent(tablePercentages.totals.total) }}</th>
+                                </template>
+
+                                <template v-else>
+                                    <th class='col'>{{ formatPercent(tablePercentages.totals?.percent ?? 0) }}</th>
+                                </template>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Fallback: if there is no numbers table, show earlier single-table behavior (compat) -->
+            <div v-if="!tableNumbers && tableDataNormalized.rows.length" class="mt-2">
+                <h6>Details</h6>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                            <th class='col' v-for="(c,i) in tableDataNormalized.columns" :key="'f-h-'+i">{{ c }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(row,ri) in tableDataNormalized.rows" :key="'f-r-'+ri">
+                                <th>{{ row.label }}</th>
+                                <td class='col' v-if="row.count !== undefined">{{ row.count }}</td>
+                                <template v-else>
+                                    <td class='col' v-for="(col,ci) in tableDataNormalized.columns.slice(1)" :key="'f-c-'+ci">{{ row[col] ?? '' }}</td>
+                                </template>
+                            </tr>
+                            <tr>
+                                <th class='col'>{{ tableDataNormalized.totals?.label ?? 'Total' }}</th>
+                                <th class='col' v-if="typeof tableDataNormalized.totals?.count !== 'undefined'">{{ tableDataNormalized.totals.count }}</th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
-
-        <hr class="mt-5 mb-5" />
-
-        <!-- PERCENTAGES TABLE -->
-        <div v-if="tablePercentages" class="mb-2">
-          <h5><u>Details (Percent % of total)</u></h5>
-          <div class="table-responsive mt-3">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th class='col' v-for="(c,i) in tablePercentages.columns" :key="'pct-h-'+i">{{ c }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(row,ri) in tablePercentages.rows" :key="'pct-r-'+ri">
-                  <th class='col'>{{ row.label }}</th>
-
-                  <template v-if="row.values && Array.isArray(row.values)">
-                    <td class='col' v-for="(v,ci) in row.values" :key="'pct-v-'+ci">{{ formatPercent(v) }}</td>
-                    <th>{{ formatPercent(row.total) }}</th>
-                  </template>
-
-                  <template v-else>
-                    <td class='col'>{{ formatPercent(row.percent ?? row.count ?? 0) }}</td>
-                  </template>
-                </tr>
-
-                <!-- totals row -->
-                <tr>
-                  <th>{{ tablePercentages.totals?.label ?? 'Total' }}</th>
-
-                  <template v-if="Array.isArray(tablePercentages.totals?.values)">
-                    <th class='col' v-for="(v,ci) in tablePercentages.totals.values" :key="'pct-t-'+ci">{{ formatPercent(v) }}</th>
-                    <th class='col'>{{ formatPercent(tablePercentages.totals.total) }}</th>
-                  </template>
-
-                  <template v-else>
-                    <th class='col'>{{ formatPercent(tablePercentages.totals?.percent ?? 0) }}</th>
-                  </template>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Fallback: if there is no numbers table, show earlier single-table behavior (compat) -->
-        <div v-if="!tableNumbers && tableDataNormalized.rows.length" class="mt-2">
-          <h6>Details</h6>
-          <div class="table-responsive">
-            <table class="table table-bordered">
-              <thead>
-                <tr>
-                  <th class='col' v-for="(c,i) in tableDataNormalized.columns" :key="'f-h-'+i">{{ c }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(row,ri) in tableDataNormalized.rows" :key="'f-r-'+ri">
-                  <th>{{ row.label }}</th>
-                  <td class='col' v-if="typeof row.count !== 'undefined'">{{ row.count }}</td>
-                  <template v-else>
-                    <td class='col' v-for="(col,ci) in tableDataNormalized.columns.slice(1)" :key="'f-c-'+ci">{{ row[col] ?? '' }}</td>
-                  </template>
-                </tr>
-                <tr>
-                  <th class='col'>{{ tableDataNormalized.totals?.label ?? 'Total' }}</th>
-                  <th class='col' v-if="typeof tableDataNormalized.totals?.count !== 'undefined'">{{ tableDataNormalized.totals.count }}</th>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-      </div>
     </div>
 
     <!-- Clients -->
@@ -260,6 +259,11 @@ export default {
   props: {
     stats_details: {
       type: Object,
+      required: true
+    },
+
+    stats_mode: {
+      type: String,
       required: true
     },
 
@@ -424,262 +428,566 @@ export default {
 
     /* */
 
-    async buildChart() {
+    async buildChart_new() {
+        console.log(this.showValuesToggle);
 
-      console.log(this.showValuesToggle)
+        this.chartBuilding = true;
 
-      // mark building (disable UI while building)
-      this.chartBuilding = true;
+        try {
+            this.destroyChart();
 
-      try {
-        // destroy existing chart first
-        this.destroyChart();
+            const canvas = this.$refs.reportChart;
+            if (!canvas) return;
+            const ctx = canvas.getContext?.("2d");
+            if (!ctx) return;
 
-        const canvas = this.$refs.reportChart;
-        if (!canvas) return;
-        const ctx = canvas.getContext?.("2d");
-        if (!ctx) return;
+            const chartPayload = this.chartDataNormalized || { labels: [], datasets: [] };
 
-        // prepare data for Chart.js
-        const chartPayload = this.chartDataNormalized || { labels: [], datasets: [] };
-
-        console.log(chartPayload.labels)
-
-        // ensure datasets are objects (Chart.js expects label + data arrays)
-        let datasets = (chartPayload.datasets || []).map((ds, idx) => {
-          if (Array.isArray(ds)) {
-            return { label: `Series ${idx+1}`, data: ds };
-          }
-          return {
-            ...ds, 
-            label: ds.label ?? `Series ${idx+1}`,
-            data: ds.data ?? [],
-            backgroundColor: ds.backgroundColor,
-            borderColor: ds.borderColor
-          };
-        });
-
-        // Chart type (from prop / local value)
-        const type = (this.chartType || "bar").toLowerCase();
-        const isPieLike = (type === 'pie' || type === 'doughnut');
-
-        // Build safe labels: convert anything to string and optionally insert line-breaks
-        let labelsForChart = (chartPayload.labels || []).map(lbl => {
-          const s = String(lbl ?? '');
-          const parts = this.$splitOnSpaceChartJSLabels([s])[0] || [s];
-          return parts.join('\n'); // Chart.js supports multi-line labels
-        });
-
-        // ######################################################
-        // ### CORE FIX: CONVERT BAR DATA STRUCTURE TO PIE DATA ###
-        // ######################################################
-        if (isPieLike) {
-            let pieLabels = []; // These become the Types (e.g., AG Self)
-            let pieData = [];   // These become the Totals for each Type
-            
-            datasets.forEach(dataset => {
-                // 1. Label becomes the dataset's label (e.g., "AG Self")
-                pieLabels.push(dataset.label);
-
-                // 2. Data becomes the sum of all points in this dataset (total value across all cities)
-                const total = dataset.data.reduce((sum, value) => sum + (Number(value) || 0), 0);
-                pieData.push(total);
+            // 1. Prepare standard Datasets (Types)
+            let datasets = (chartPayload.datasets || []).map((ds, idx) => {
+                if (Array.isArray(ds)) {
+                    return { label: `Series ${idx + 1}`, data: ds };
+                }
+                return {
+                    ...ds,
+                    label: ds.label ?? `Series ${idx + 1}`,
+                    data: Array.isArray(ds.data) ? ds.data : [],
+                    backgroundColor: ds.backgroundColor,
+                    borderColor: ds.borderColor
+                };
             });
 
-            // 3. Overwrite the chart payload with the new aggregated structure
-            labelsForChart = pieLabels;
-            datasets = [{
-                label: 'Total Value by Type', // Single dataset label
-                data: pieData,
-                // backgroundColor and borderColor will be filled by $setDefaultColors later
-            }];
-        }
-        // ######################################################
+            // 2. Prepare standard Labels (Cities / slices)
+            let labelsForChart = (chartPayload.labels || []).map(lbl => {
+                const s = String(lbl ?? '');
+                const parts = this.$splitOnSpaceChartJSLabels([s])[0] || [s];
+                return parts.join('\n');
+            });
 
-        // plugin instances
-        const valueOnTopPlugin = this.$valueOnTopOfEachBarPlugin('value_on_top', true, 2);
-        const after_chart_rendered_plugin = this.$chartRendered(this.setReportChart);
+            const type = (this.chartType || "bar").toLowerCase();
+            const isPieLike = (type === 'pie' || type === 'doughnut');
 
-        // 1. Define plugins
-        // Only create the "Value on Top" plugin if the toggle is TRUE
-        let activePlugins = [after_chart_rendered_plugin, ChartDataLabels];
+            // ######################################################
+            // ### TRANSPOSE DATA FOR CONCENTRIC RINGS ONLY WHEN NEEDED ###
+            // ######################################################
+            if (isPieLike) {
+                // Decide whether we SHOULD transpose:
+                // - If stats_mode === 'by_property_mode' then the payload is the "many datasets = types" shape and MUST be transposed.
+                // - If stats_mode is missing, assume transposition is needed only when there are multiple datasets.
+                const shouldTranspose = (this.stats_mode === 'by_property_mode')
+                    || (!this.stats_mode && datasets.length > 1);
 
-        if (this.showValuesToggle ==  "1") {
-            const valueOnTopPlugin = this.$valueOnTopOfEachBarPlugin('value_on_top', true, 2);
-            activePlugins.push(valueOnTopPlugin);
-        }
+                if (shouldTranspose) {
+                    // Build typeLabels from dataset labels (these become pie slices)
+                    const typeLabels = datasets.map(ds => String(ds.label ?? '') || 'Untitled');
 
-        datasets = this.$setDefaultColors(datasets, labelsForChart);
+                    // Build new datasets: one dataset per original label (city),
+                    // where each dataset.data is an array of values across types
+                    const cityDatasets = labelsForChart.map((cityLabel, cityIndex) => {
+                        const cityData = datasets.map(typeDataset => {
+                            // ensure numeric and safe
+                            const v = typeDataset.data?.[cityIndex];
+                            return Number(v) || 0;
+                        });
+                        return {
+                            label: cityLabel,
+                            data: cityData,
+                        };
+                    });
 
-        console.log('datasets normalized (before chart):', datasets);
-
-        // --- NEW LOGIC: Dynamic Width Calculation ---
-        const numDataPoints = labelsForChart.length;
-        
-        // How many pixels wide should one bar/column be?
-        // Increase this if your labels are very long (e.g., 50px, 80px)
-        const minWidthPerPoint = 40; 
-        
-        // Calculate total required width
-        const totalWidth = numDataPoints * minWidthPerPoint;
-
-        // Get the container and wrapper
-        const container = document.getElementById('chart_container');
-        const wrapper = document.getElementById('chart_scroll');
-
-        if (container && wrapper) {
-          // If the calculated width is bigger than the screen, apply it.
-          // Otherwise, stick to '100%' so it doesn't look empty on small datasets.
-          if (totalWidth > wrapper.clientWidth) {
-            container.style.width = `${totalWidth}px`;
-          } else {
-            container.style.width = '100%';
-          }
-        }
-        // ---------------------------------------------
-
-        // base config
-        const chartConfig = {
-          type: type,
-          data: {
-            labels: labelsForChart,
-            datasets: datasets
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: { position: "top" },
-              // plugin-specific options will be added below
-              display: ((isPieLike) && (this.showValuesToggle  ==  "1")) ? true : false, // <--- ⚠️ ERROR: isPieLike is undefined!
-            },
-            scales: {},
-
-            onClick: async (evt) => {
-              // Try to get a single element under the click (the exact dataset segment)
-              const elems = this.chartInstance.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
-              if (elems && elems.length) {
-                const el = elems[0]; // single element (datasetIndex + index)
-                await this.openForDatasetAtIndex(el.index, el.datasetIndex);
-                return;
-              }
-
-              // Fallback: get all elements that share the same index (useful for stacked bars or clicking label area)
-              const allAtIndex = this.chartInstance.getElementsAtEventForMode(evt, 'index', { intersect: false }, true);
-              if (allAtIndex && allAtIndex.length) {
-                // Decide behaviour: open aggregated clients for the label (all datasets)
-                // We'll take the common index of the first element
-                const idx = allAtIndex[0].index;
-                await this.openForAllDatasetsAtIndex(idx);
-              }
-            },
-          },
-          plugins: activePlugins
-        };
-
-        // scales for bar/line
-        if (type === "bar" || type === "line") {
-          chartConfig.options.scales = {
-            x: { stacked: false, ticks: { autoSkip: false } },
-            y: { beginAtZero: true, ticks: { precision: 0 } }
-          };
-        } else {
-          // no scales for pie/doughnut
-          chartConfig.options.scales = undefined;
-        }
-
-        // ----- ChartDataLabels configuration (ONLY active for pie/doughnut) -----
-        const hasDataLabels = typeof ChartDataLabels !== 'undefined';
-        if (hasDataLabels) {
-          // Register plugin if needed (if you use modular Chart.js you may need Chart.register)
-          try {
-            if (Chart && Chart.register && !Chart.registry?.plugins?.get?.('datalabels')) {
-              // register once (safe)
-              Chart.register(ChartDataLabels);
+                    // Replace variables
+                    labelsForChart = typeLabels;
+                    datasets = cityDatasets;
+                } else {
+                    // No transpose; ensure dataset data lengths match labels (pad with zeros if needed)
+                    datasets = datasets.map(ds => {
+                        const wanted = labelsForChart.length;
+                        const copy = Array.from(ds.data || []);
+                        while (copy.length < wanted) copy.push(0);
+                        if (copy.length > wanted) copy.length = wanted; // trim if longer
+                        return { ...ds, data: copy };
+                    });
+                }
+            } else {
+                // bar/line: ensure each dataset length matches labels (pad/trim)
+                datasets = datasets.map(ds => {
+                    const wanted = labelsForChart.length;
+                    const copy = Array.isArray(ds.data) ? Array.from(ds.data) : [];
+                    while (copy.length < wanted) copy.push(0);
+                    if (copy.length > wanted) copy.length = wanted;
+                    return { ...ds, data: copy };
+                });
             }
-          } catch (e) {
-            // ignore registration errors
-          }
+            // ######################################################
 
-          // Put ChartDataLabels plugin into chartConfig.plugins only if available
-          chartConfig.plugins.push(ChartDataLabels);
+            const after_chart_rendered_plugin = this.$chartRendered(this.setReportChart);
+            let activePlugins = [after_chart_rendered_plugin];
 
-          chartConfig.options.plugins.datalabels = {
-            // --- THIS IS THE FIX FOR THE PIE VALUES TOGGLE ---
-            // It checks if it's a pie AND if the toggle is "1"
-            display: (context) => {
-                return isPieLike && (this.showValuesToggle == "1");
-            },
+            // Only push ChartDataLabels into activePlugins if we actually have it (we register later too)
+            if (typeof ChartDataLabels !== 'undefined') {
+                activePlugins.push(ChartDataLabels);
+            }
 
-            // -------------------------------------------------
+            // Only push the "Value On Top" plugin if toggle is 1
+            if (this.showValuesToggle == "1") {
+                const valueOnTopPlugin = this.$valueOnTopOfEachBarPlugin('value_on_top', true, 2);
+                activePlugins.push(valueOnTopPlugin);
+            }
 
-            // white color inside the pie
-            color: '#ffffff',
+            datasets = this.$setDefaultColors(datasets, labelsForChart, type);
 
-            // center labels for pie slices
-            anchor: 'center',
-            align: 'center',
+            const numDataPoints = labelsForChart.length;
+            const minWidthPerPoint = 40;
+            const totalWidth = numDataPoints * minWidthPerPoint;
 
-            // font settings
-            font: {
-              weight: 'bold',
-              size: 12
-            },
+            const container = document.getElementById('chart_container');
+            const wrapper = document.getElementById('chart_scroll');
 
-            // clamp so labels don't overflow
-            clamp: true,
-            clip: true,
+            if (container && wrapper) {
+                if (totalWidth > wrapper.clientWidth) {
+                    container.style.width = `${totalWidth}px`;
+                } else {
+                    container.style.width = '100%';
+                }
+            }
 
-            // formatter: show percentage on first line, raw value second line
-            formatter: (value, ctx) => {
-              // if not pie, hide
-              if (!isPieLike) return '';
+            const chartConfig = {
+                type: type,
+                data: {
+                    labels: labelsForChart,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        // Legend visible always
+                        legend: {
+                            position: "top",
+                            display: true
+                        },
+                    },
+                    scales: {},
+                    onClick: async (evt) => {
+                        const elems = this.chartInstance.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+                        if (elems && elems.length) {
+                            const el = elems[0];
+                            await this.openForDatasetAtIndex(el.index, el.datasetIndex);
+                            return;
+                        }
+                        const allAtIndex = this.chartInstance.getElementsAtEventForMode(evt, 'index', { intersect: false }, true);
+                        if (allAtIndex && allAtIndex.length) {
+                            const idx = allAtIndex[0].index;
+                            await this.openForAllDatasetsAtIndex(idx);
+                        }
+                    },
+                },
+                plugins: activePlugins
+            };
 
-              // total across dataset (for percentage)
-              const data = ctx.chart.data.datasets[ctx.datasetIndex].data;
-              const total = data.reduce((acc, v) => acc + (Number(v) || 0), 0);
-              const pct = total ? ((Number(value) || 0) / total * 100) : 0;
+            if (type === "bar" || type === "line") {
+                chartConfig.options.scales = {
+                    x: { stacked: false, ticks: { autoSkip: false } },
+                    y: { beginAtZero: true, ticks: { precision: 0 } }
+                };
+            } else {
+                chartConfig.options.scales = undefined;
+            }
 
-              // choose number formatting: 2 decimals for percent, integer for value
-              const pctStr = !isNaN(pct) ? pct.toFixed(2) + '%' : '';
-              const valStr = (Number(value) || 0).toString();
+            const hasDataLabels = typeof ChartDataLabels !== 'undefined';
+            if (hasDataLabels) {
+                try {
+                    if (Chart && Chart.register && !Chart.registry?.plugins?.get?.('datalabels')) {
+                        Chart.register(ChartDataLabels);
+                    }
+                } catch (e) { /* ignore registration errors */ }
 
-              // ChartDataLabels supports multi-line if you return an array or a string with '\n'
-              // Put percent first line, value second line
-              return `${pctStr}\n${valStr}`;
-            },
+                // Configure datalabels plugin only (already added to plugins array above)
+                chartConfig.options.plugins.datalabels = {
+                    display: (context) => {
+                        return isPieLike && (this.showValuesToggle == "1");
+                    },
+                    color: '#ffffff',
+                    anchor: 'center',
+                    align: 'center',
+                    font: { weight: 'bold', size: 10 },
+                    clamp: true,
+                    clip: true,
+                    formatter: (value, ctx) => {
+                        if (!isPieLike) return '';
+                        const data = ctx.chart.data.datasets[ctx.datasetIndex].data;
+                        const total = data.reduce((acc, v) => acc + (Number(v) || 0), 0);
+                        const pct = total ? ((Number(value) || 0) / total * 100) : 0;
+                        if (pct < 3) return '';
+                        return !isNaN(pct) ? pct.toFixed(1) + '%' : '';
+                    }
+                };
+            } else {
+                chartConfig.options.plugins.datalabels = { display: false };
+            }
 
-            // optionally a text shadow or background to improve readability
-            // you can uncomment these if you want a subtle stroke
-            // textStrokeColor: 'rgba(0,0,0,0.25)',
-            // textStrokeWidth: 2,
-          };
-        } else {
-          // if plugin not present, ensure we don't push undefined; keep it disabled silently
-          // plugin will just not render labels — that's fine
-          chartConfig.options.plugins.datalabels = { display: false };
-        }
+            try {
+                this.chartInstance = new Chart(ctx, chartConfig);
+            } catch (e) {
+                console.error('Chart creation failed:', e);
+                this.chartInstance = null;
+            }
 
-        // create Chart (assumes Chart global available)
-        try {
-          this.chartInstance = new Chart(ctx, chartConfig);
+            this.emitter.on('reportChart_rendered', () => {
+                this.emitter.off('reportChart_rendered');
+                this.chartBuilding = false;
+            });
         } catch (e) {
-          // if Chart isn't available or config fails, keep page usable and log
-          // console.warn('Chart build error:', e);
-          this.chartInstance = null;
+            console.error(e);
+            this.chartBuilding = false;
         }
+    },
 
-        this.emitter.on('reportChart_rendered', () => {
+    async buildChart() {
+        console.log(this.showValuesToggle);
 
-            this.emitter.off('reportChart_rendered')
+        this.chartBuilding = true;
 
-            //
-            this.chartBuilding  =   false
-        })
-      }
-      catch(e) {
+        try {
+            this.destroyChart();
 
-      }
+            const canvas = this.$refs.reportChart;
+            if (!canvas) return;
+            const ctx = canvas.getContext?.("2d");
+            if (!ctx) return;
+
+            const chartPayload = this.chartDataNormalized || { labels: [], datasets: [] };
+
+            // 1. Prepare standard Datasets (Types)
+            let datasets = (chartPayload.datasets || []).map((ds, idx) => {
+                if (Array.isArray(ds)) {
+                    return { label: `Series ${idx + 1}`, data: ds };
+                }
+                return {
+                    ...ds,
+                    label: (ds.label ?? `Series ${idx + 1}`),
+                    data: Array.isArray(ds.data) ? ds.data : [],
+                    backgroundColor: ds.backgroundColor,
+                    borderColor: ds.borderColor,
+                    borderWidth: ds.borderWidth,
+                    pointRadius: ds.pointRadius
+                };
+            });
+
+            // 2. Prepare standard Labels (Cities / slices)
+            let labelsForChart = (chartPayload.labels || []).map(lbl => {
+                const s = String(lbl ?? '');
+                const parts = this.$splitOnSpaceChartJSLabels([s])[0] || [s];
+                return parts.join('\n');
+            });
+
+            const type = (this.chartType || "bar").toLowerCase();
+            const isPieLike = (type === 'pie' || type === 'doughnut');
+
+            // ######################################################
+            // ### TRANSPOSE DATA FOR CONCENTRIC RINGS ONLY WHEN NEEDED ###
+            // ######################################################
+            if (isPieLike) {
+                const shouldTranspose = (chartPayload.stats_mode === 'by_property_mode')
+                    || (!chartPayload.stats_mode && datasets.length > 1);
+
+                if (shouldTranspose) {
+                    const typeLabels = datasets.map(ds => String(ds.label ?? '') || 'Untitled');
+
+                    const cityDatasets = labelsForChart.map((cityLabel, cityIndex) => {
+                        const cityData = datasets.map(typeDataset => {
+                            const v = typeDataset.data?.[cityIndex];
+                            return Number(v) || 0;
+                        });
+                        return {
+                            label: cityLabel,
+                            data: cityData,
+                        };
+                    });
+
+                    labelsForChart = typeLabels;
+                    datasets = cityDatasets;
+                } else {
+                    datasets = datasets.map(ds => {
+                        const wanted = labelsForChart.length;
+                        const copy = Array.from(ds.data || []);
+                        while (copy.length < wanted) copy.push(0);
+                        if (copy.length > wanted) copy.length = wanted;
+                        return { ...ds, data: copy };
+                    });
+                }
+            } else {
+                // bar/line: normalize data lengths
+                datasets = datasets.map(ds => {
+                    const wanted = labelsForChart.length;
+                    const copy = Array.isArray(ds.data) ? Array.from(ds.data) : [];
+                    while (copy.length < wanted) copy.push(0);
+                    if (copy.length > wanted) copy.length = wanted;
+                    return { ...ds, data: copy };
+                });
+            }
+            // ######################################################
+
+            // Ensure each dataset has a label (important for normal legend)
+            datasets = datasets.map((ds, i) => ({ ...ds, label: String(ds.label ?? `Series ${i+1}`) }));
+
+            const after_chart_rendered_plugin = this.$chartRendered(this.setReportChart);
+            let activePlugins = [after_chart_rendered_plugin];
+
+            // Only push ChartDataLabels if present
+            const hasChartDataLabels = typeof ChartDataLabels !== 'undefined';
+            if (hasChartDataLabels) activePlugins.push(ChartDataLabels);
+
+            if (this.showValuesToggle == "1") {
+                const valueOnTopPlugin = this.$valueOnTopOfEachBarPlugin('value_on_top', true, 2);
+                activePlugins.push(valueOnTopPlugin);
+            }
+
+            datasets = this.$setDefaultColors(datasets, labelsForChart, type);
+
+            // --- Prepare original arrays for backgrounds, borders, widths, pointRadius ---
+            const originalColorsPerDataset = datasets.map(ds => {
+                if (Array.isArray(ds.backgroundColor)) {
+                    const arr = ds.backgroundColor.slice();
+                    if (arr.length < labelsForChart.length) {
+                        const fillVal = arr[arr.length - 1] ?? (ds.borderColor ?? 'rgba(0,0,0,0.1)');
+                        while (arr.length < labelsForChart.length) arr.push(fillVal);
+                    } else if (arr.length > labelsForChart.length) arr.length = labelsForChart.length;
+                    return arr.slice();
+                } else {
+                    const colorVal = ds.backgroundColor ?? ds.borderColor ?? 'rgba(54,162,235,0.6)';
+                    return Array.from({ length: labelsForChart.length }, () => colorVal);
+                }
+            });
+
+            const originalBorderPerDataset = datasets.map(ds => {
+                if (Array.isArray(ds.borderColor)) {
+                    const arr = ds.borderColor.slice();
+                    if (arr.length < labelsForChart.length) {
+                        const fillVal = arr[arr.length - 1] ?? 'rgba(0,0,0,0.1)';
+                        while (arr.length < labelsForChart.length) arr.push(fillVal);
+                    } else if (arr.length > labelsForChart.length) arr.length = labelsForChart.length;
+                    return arr.slice();
+                } else {
+                    const colorVal = ds.borderColor ?? 'rgba(0,0,0,0.1)';
+                    return Array.from({ length: labelsForChart.length }, () => colorVal);
+                }
+            });
+
+            const originalBorderWidthPerDataset = datasets.map(ds => {
+                if (Array.isArray(ds.borderWidth)) {
+                    const arr = ds.borderWidth.slice();
+                    if (arr.length < labelsForChart.length) {
+                        const fillVal = arr[arr.length - 1] ?? (typeof ds.borderWidth === 'number' ? ds.borderWidth : 1);
+                        while (arr.length < labelsForChart.length) arr.push(fillVal);
+                    } else if (arr.length > labelsForChart.length) arr.length = labelsForChart.length;
+                    return arr.slice();
+                } else {
+                    const bw = (typeof ds.borderWidth === 'number') ? ds.borderWidth : 1;
+                    return Array.from({ length: labelsForChart.length }, () => bw);
+                }
+            });
+
+            // pointRadius original (for line charts points)
+            const originalPointRadiusPerDataset = datasets.map(ds => {
+                if (Array.isArray(ds.pointRadius)) {
+                    const arr = ds.pointRadius.slice();
+                    if (arr.length < labelsForChart.length) {
+                        const fillVal = arr[arr.length - 1] ?? (typeof ds.pointRadius === 'number' ? ds.pointRadius : 3);
+                        while (arr.length < labelsForChart.length) arr.push(fillVal);
+                    } else if (arr.length > labelsForChart.length) arr.length = labelsForChart.length;
+                    return arr.slice();
+                } else {
+                    const pr = (typeof ds.pointRadius === 'number') ? ds.pointRadius : 3;
+                    return Array.from({ length: labelsForChart.length }, () => pr);
+                }
+            });
+
+            // Ensure each dataset.backgroundColor/borderColor/borderWidth/pointRadius are arrays
+            datasets = datasets.map((ds, i) => {
+                const bg = Array.isArray(ds.backgroundColor) ? ds.backgroundColor.slice() : originalColorsPerDataset[i].slice();
+                const br = Array.isArray(ds.borderColor) ? ds.borderColor.slice() : originalBorderPerDataset[i].slice();
+                const bw = Array.isArray(ds.borderWidth) ? ds.borderWidth.slice() : originalBorderWidthPerDataset[i].slice();
+                const pr = Array.isArray(ds.pointRadius) ? ds.pointRadius.slice() : originalPointRadiusPerDataset[i].slice();
+                // normalize lengths
+                bg.length = labelsForChart.length; br.length = labelsForChart.length;
+                bw.length = labelsForChart.length; pr.length = labelsForChart.length;
+                // fill undefined slots with originals
+                for (let k=0;k<labelsForChart.length;k++){
+                    if (bg[k] === undefined) bg[k] = originalColorsPerDataset[i][k];
+                    if (br[k] === undefined) br[k] = originalBorderPerDataset[i][k];
+                    if (bw[k] === undefined) bw[k] = originalBorderWidthPerDataset[i][k];
+                    if (pr[k] === undefined) pr[k] = originalPointRadiusPerDataset[i][k];
+                }
+                return { ...ds, backgroundColor: bg, borderColor: br, borderWidth: bw, pointRadius: pr };
+            });
+
+            const numDataPoints = labelsForChart.length;
+            const minWidthPerPoint = 40;
+            const totalWidth = numDataPoints * minWidthPerPoint;
+
+            const container = document.getElementById('chart_container');
+            const wrapper = document.getElementById('chart_scroll');
+
+            if (container && wrapper) {
+                if (totalWidth > wrapper.clientWidth) {
+                    container.style.width = `${totalWidth}px`;
+                } else {
+                    container.style.width = '100%';
+                }
+            }
+
+            // Build legend configuration:
+            let legendConfig = {
+                position: "top",
+                display: true,
+                labels: { color: '#000' }
+            };
+
+            const wantsLegendAsXAxisLabels = (!isPieLike)
+                && (chartPayload.stats_mode === 'standard_mode' || !chartPayload.stats_mode)
+                && (datasets.length === 1);
+
+            if (wantsLegendAsXAxisLabels) {
+                legendConfig = {
+                    position: 'top',
+                    display: true,
+                    labels: {
+                        generateLabels: (chart) => {
+                            const ds = chart.data.datasets[0];
+                            const colors = Array.isArray(ds.backgroundColor) ? ds.backgroundColor : originalColorsPerDataset[0];
+                            return labelsForChart.map((lab, idx) => ({
+                                text: lab.replace(/\n/g, ' '),
+                                fillStyle: colors[idx] ?? 'rgba(0,0,0,0.1)',
+                                hidden: !!(chart._hiddenIndexes && chart._hiddenIndexes.has(idx)),
+                                index: idx
+                            }));
+                        },
+                        color: '#000',
+                    },
+                    onClick: (evt, legendItem, legend) => {
+                        const chart = legend.chart;
+                        const idx = legendItem.index;
+                        if (!chart._hiddenIndexes) chart._hiddenIndexes = new Set();
+
+                        const isHidden = chart._hiddenIndexes.has(idx);
+                        if (isHidden) {
+                            // show: restore colors/borders/widths/pointRadius for all datasets at index idx
+                            chart._hiddenIndexes.delete(idx);
+                            chart.data.datasets.forEach((dset, dIdx) => {
+                                dset.backgroundColor[idx] = originalColorsPerDataset[dIdx][idx] ?? dset.backgroundColor[idx];
+                                dset.borderColor[idx] = originalBorderPerDataset[dIdx][idx] ?? dset.borderColor[idx];
+                                dset.borderWidth[idx] = originalBorderWidthPerDataset[dIdx][idx] ?? dset.borderWidth[idx];
+                                if (dset.pointRadius && Array.isArray(dset.pointRadius)) {
+                                    dset.pointRadius[idx] = originalPointRadiusPerDataset[dIdx][idx] ?? dset.pointRadius[idx];
+                                }
+                            });
+                        } else {
+                            // hide: set backgroundColor/borderColor transparent and borderWidth 0 and pointRadius 0
+                            chart._hiddenIndexes.add(idx);
+                            chart.data.datasets.forEach((dset) => {
+                                dset.backgroundColor[idx] = 'rgba(0,0,0,0)';
+                                dset.borderColor[idx] = 'rgba(0,0,0,0)';
+                                dset.borderWidth[idx] = 0;
+                                if (dset.pointRadius && Array.isArray(dset.pointRadius)) {
+                                    dset.pointRadius[idx] = 0;
+                                }
+                            });
+                        }
+                        chart.update();
+                    }
+                };
+            }
+
+            const chartConfig = {
+                type: type,
+                data: {
+                    labels: labelsForChart,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: legendConfig,
+                    },
+                    scales: {},
+                    onClick: async (evt) => {
+                        const elems = this.chartInstance.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+                        if (elems && elems.length) {
+                            const el = elems[0];
+                            await this.openForDatasetAtIndex(el.index, el.datasetIndex);
+                            return;
+                        }
+                        const allAtIndex = this.chartInstance.getElementsAtEventForMode(evt, 'index', { intersect: false }, true);
+                        if (allAtIndex && allAtIndex.length) {
+                            const idx = allAtIndex[0].index;
+                            await this.openForAllDatasetsAtIndex(idx);
+                        }
+                    },
+                },
+                plugins: activePlugins
+            };
+
+            if (type === "bar" || type === "line") {
+                chartConfig.options.scales = {
+                    x: { stacked: false, ticks: { autoSkip: false } },
+                    y: { beginAtZero: true, ticks: { precision: 0 } }
+                };
+            } else {
+                chartConfig.options.scales = undefined;
+            }
+
+            if (hasChartDataLabels) {
+                try {
+                    if (Chart && Chart.register && !Chart.registry?.plugins?.get?.('datalabels')) {
+                        Chart.register(ChartDataLabels);
+                    }
+                } catch (e) { /* ignore registration issues */ }
+
+                chartConfig.options.plugins.datalabels = {
+                    display: (context) => {
+                        return isPieLike && (this.showValuesToggle == "1");
+                    },
+                    color: '#ffffff',
+                    anchor: 'center',
+                    align: 'center',
+                    font: { weight: 'bold', size: 10 },
+                    clamp: true,
+                    clip: true,
+                    formatter: (value, ctx) => {
+                        if (!isPieLike) return '';
+                        const data = ctx.chart.data.datasets[ctx.datasetIndex].data;
+                        const total = data.reduce((acc, v) => acc + (Number(v) || 0), 0);
+                        const pct = total ? ((Number(value) || 0) / total * 100) : 0;
+                        if (pct < 3) return '';
+                        return !isNaN(pct) ? pct.toFixed(1) + '%' : '';
+                    }
+                };
+            } else {
+                chartConfig.options.plugins.datalabels = { display: false };
+            }
+
+            try {
+                this.chartInstance = new Chart(ctx, chartConfig);
+                // Attach originals for debugging/inspection
+                this.chartInstance._originalColorsPerDataset = originalColorsPerDataset;
+                this.chartInstance._originalBorderPerDataset = originalBorderPerDataset;
+                this.chartInstance._originalBorderWidthPerDataset = originalBorderWidthPerDataset;
+                this.chartInstance._originalPointRadiusPerDataset = originalPointRadiusPerDataset;
+            } catch (e) {
+                console.error('Chart creation failed:', e);
+                this.chartInstance = null;
+            }
+
+            this.emitter.on('reportChart_rendered', () => {
+                this.emitter.off('reportChart_rendered');
+                this.chartBuilding = false;
+            });
+        } catch (e) {
+            console.error(e);
+            this.chartBuilding = false;
+        }
     },
 
     setReportChart() {
@@ -1109,7 +1417,7 @@ export default {
     //  //  //  //  //
 
     // Clicked the label area (or stacked area) — aggregate across datasets
-    async openForAllDatasetsAtIndex(labelIndex) {
+    async openForAllDatasetsAtIndex_old(labelIndex) {
       // FIX: Use original label
       const rawLabel = this.chartDataNormalized.labels[labelIndex];
 
@@ -1136,7 +1444,7 @@ export default {
     },
 
     // Clicked a single dataset segment (labelIndex + datasetIndex)
-    async openForDatasetAtIndex(labelIndex, datasetIndex) {
+    async openForDatasetAtIndex_old(labelIndex, datasetIndex) {
       const rawLabel = this.chartDataNormalized.labels[labelIndex]; 
       
       const dataset = this.chartInstance.data.datasets[datasetIndex];
@@ -1163,6 +1471,118 @@ export default {
       // e.g. clients where month === label and ownerKey === key
       if(this.secondary_property) return this.statistic_details_clients.filter(c => (c[this.primary_property] === label) && (c[this.secondary_property] === key));
       else                        return this.statistic_details_clients.filter(c => (c[this.primary_property] === label));
+    },
+
+    //  //  //
+
+    // Helper to determine if the current chart is using the transposed (Concentric) logic
+    isChartTransposed() {
+        const chartPayload = this.chartDataNormalized || { labels: [], datasets: [] };
+        const type = (this.chartType || "bar").toLowerCase();
+        const isPieLike = (type === 'pie' || type === 'doughnut');
+        
+        // This condition must match exactly the logic used in buildChart
+        return isPieLike && (
+            (chartPayload.stats_mode === 'by_property_mode') || 
+            (!chartPayload.stats_mode && chartPayload.datasets.length > 1)
+        );
+    },
+
+    // Clicked a single dataset segment (labelIndex + datasetIndex)
+    async openForDatasetAtIndex(labelIndex, datasetIndex) {
+        const isTransposed = this.isChartTransposed();
+        
+        let rawLabel; // The primary property (e.g., City/Date)
+        let key;      // The secondary property (e.g., Status/Series)
+
+        if (isTransposed) {
+            // --- TRANSPOSED MODE (Concentric Pie) ---
+            // visual datasetIndex = index of the Original Label (Ring)
+            // visual labelIndex   = index of the Original Dataset (Slice Color)
+
+            // 1. Get Label from the normalized labels array using the *datasetIndex*
+            rawLabel = this.chartDataNormalized.labels[datasetIndex];
+
+            // 2. Get Key from the normalized datasets array using the *labelIndex*
+            const originalDataset = this.chartDataNormalized.datasets[labelIndex];
+            key = originalDataset ? (originalDataset.clientKey || originalDataset.key || originalDataset.label) : null;
+
+        } else {
+            // --- STANDARD MODE ---
+            rawLabel = this.chartDataNormalized.labels[labelIndex];
+            
+            // In standard mode, we can trust the chartInstance's dataset or the normalized one at datasetIndex
+            const dataset = this.chartInstance.data.datasets[datasetIndex];
+            key = dataset.clientKey || dataset.key || dataset.label;
+        }
+
+        console.log(`Filtering (${isTransposed ? 'Transposed' : 'Standard'}) by:`, { rawLabel, key });
+
+        this.selectedClients = this.getClientsByLabelAndDatasetKey(rawLabel, key);
+        
+        await this.$nextTick();
+
+        // ShowModal
+        var ModalSelfServiceChartClients = new Modal(document.getElementById("ModalSelfServiceChartClients"));
+        ModalSelfServiceChartClients.show();
+
+        if (this.$refs.ModalSelfServiceChartClients) {
+            this.$refs.ModalSelfServiceChartClients.setDataTable(this.selectedClients);
+        }
+    },
+
+    // Clicked the label area (or stacked area)
+    async openForAllDatasetsAtIndex(indexFromEvent) {
+        const isTransposed = this.isChartTransposed();
+        let rawLabel;
+        
+        // In transposed mode, the concept of "Index" usually refers to the Legend (The Series/Status).
+        // In standard mode, "Index" refers to the X-Axis Label (The City/Date).
+        
+        if (isTransposed) {
+            // If transposed, clicking an "Index" (like via legend) implies filtering by the Series (the visual Label)
+            // It gets complicated here because 'rawLabel' usually expects the Primary Property.
+            // Depending on your UX, you might want to disable this for Concentric pies or handle it specifically.
+            // Assuming you want to show all clients for a specific Series across all Cities:
+            
+            const originalDataset = this.chartDataNormalized.datasets[indexFromEvent];
+            const targetKey = originalDataset ? (originalDataset.clientKey || originalDataset.key || originalDataset.label) : null;
+            
+            // Filter: All clients where Secondary Property == targetKey
+            if (this.secondary_property) {
+                this.selectedClients = this.statistic_details_clients.filter(c => 
+                    String(c[this.secondary_property]) === String(targetKey)
+                );
+            } else {
+                // If no secondary property, this state is ambiguous in transposed mode
+                this.selectedClients = [];
+            }
+        } else {
+            // --- STANDARD MODE ---
+            rawLabel = this.chartDataNormalized.labels[indexFromEvent];
+
+            // collect all dataset keys currently visible
+            const keys = this.chartInstance.data.datasets.map(d => d.clientKey || d.key || d.label);
+
+            if (this.secondary_property) {
+                this.selectedClients = this.statistic_details_clients.filter(c => 
+                    (String(c[this.primary_property]) === String(rawLabel)) && 
+                    (keys.includes(c[this.secondary_property]))
+                );
+            } else {
+                this.selectedClients = this.statistic_details_clients.filter(c => 
+                    (String(c[this.primary_property]) === String(rawLabel))
+                );
+            }
+        }
+
+        // ShowModal
+        var ModalSelfServiceChartClients = new Modal(document.getElementById("ModalSelfServiceChartClients"));
+        ModalSelfServiceChartClients.show();
+
+        if (this.$refs.ModalSelfServiceChartClients) {
+            this.$refs.ModalSelfServiceChartClients.setDataTable(this.selectedClients);
+        }
     },
   }
 }

@@ -1561,6 +1561,12 @@ export default {
             });
 
             return datasets;
+        },
+
+        $colorForIndex(col, idx, fallback = 'rgba(0,0,0,0.1)') {
+            if (Array.isArray(col)) return col[idx] ?? fallback;
+            return col ?? fallback;
         }
+
     }
 }

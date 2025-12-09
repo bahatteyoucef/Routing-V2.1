@@ -114,7 +114,10 @@ export default {
                 // Set Value
                 this.self_service_chart_clients_data        =   [...self_service_chart_clients_data]
 
-                console.log(self_service_chart_clients_data)
+                //
+                if (this.datatable_self_service_chart_clients) {
+                    this.datatable_self_service_chart_clients.destroy();   // Destroy existing chart for proper updates
+                }
 
                 // Create DataTable
                 this.datatable_self_service_chart_clients   =   this.datatable_self_service_chart_clients_instance.$DataTableCreate("self_service_chart_clients", this.self_service_chart_clients_data, this.self_service_chart_clients_columns, null, null, null, null, null, "Self-service chart clients")      

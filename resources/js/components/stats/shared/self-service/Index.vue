@@ -285,6 +285,7 @@
           ref="ByDynamicProperty"
           :key="stats_details"
           :stats_details="stats_details"
+          :stats_mode="stats_mode"
           :primary_property="primary_property"
           :secondary_property="secondary_property"
           :percentageBaseOption="percentageBaseOption"
