@@ -1314,7 +1314,7 @@ class Statistic extends Model
 
     //
 
-    public static function statsDetails(Request $request) {
+    public static function standardStatistics(Request $request) {
 
         $stats_details  =   new stdClass();
 

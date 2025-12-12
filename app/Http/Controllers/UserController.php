@@ -208,6 +208,23 @@ class UserController extends Controller
         }
     }
 
+    public function comboBackOffice()
+    {
+        
+        try {
+
+            $users          =   User::comboBackOffice();
+            return $users;
+        }
+
+        catch(Throwable $erreur) {
+
+            return response()->json([
+                'errors'    =>  [$erreur->getMessage()],
+            ],422);
+        }
+    }
+
     public function store(Request $request) 
     {    
 

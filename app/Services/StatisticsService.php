@@ -13,7 +13,7 @@ use Exception;
 
 class StatisticsService {
 
-    public function statisticsDetails(Request $request) {
+    public function selfServiceStatistics(Request $request) {
 
         try {
             $params = $this->prepareParams($request);
@@ -29,7 +29,7 @@ class StatisticsService {
                     throw new Exception("Unsupported stats_mode '{$params['stats_mode']}'");
             }
         } catch (Throwable $e) {
-            Log::error('StatisticsService::statisticsDetails failed', ['exception' => $e]);
+            Log::error('StatisticsService::selfServiceStatistics failed', ['exception' => $e]);
             // rethrow or return consistent error structure (controller may wrap)
             throw $e;
         }
@@ -163,7 +163,7 @@ class StatisticsService {
         foreach ($conditions as $ic => $c) {
             if (!isset($c['target'])) continue;
             // allow only simple column names
-            if (!is_string($c['target'] || '') ) {
+            if (!array_key_exists('target', $c) || !is_string($c['target'])) {
                 throw new Exception("Invalid condition target at index {$ic}.");
             }
             // check existence
@@ -209,12 +209,31 @@ class StatisticsService {
                 $notNullMethod = ($method === 'where') ? 'whereNotNull' : 'orWhereNotNull';
                 $betweenMethod = ($method === 'where') ? 'whereBetween' : 'orWhereBetween';
 
-                // detect date-like condition
-                $dateOpCandidates = ['after','before','between','equals','greater_than','less_than','gte','lte'];
-                $isDateTarget = ($type === 'date') ||
-                                in_array($op, $dateOpCandidates, true) ||
-                                (is_string($target) && preg_match('/(_date|date$|_at$|updated_at|created_at)/i', $target));
+                // --- 1. DETERMINE IF THIS IS A DATE OPERATION ---
+                $isDateTarget = false;
 
+                if ($type === 'date') {
+                    // Explicitly declared as date
+                    $isDateTarget = true;
+                } elseif ($type === 'string' || $type === 'number') {
+                    // Explicitly declared as NOT date
+                    $isDateTarget = false;
+                } else {
+                    // No type provided: Safe Guessing Logic
+                    // We only assume it's a date if:
+                    // 1. The operator is strictly time-based ('after', 'before')
+                    // 2. OR the column name explicitly looks like a date (ends in _date, _at)
+                    $strictDateOps = ['after', 'before'];
+                    $nameImpliesDate = (is_string($target) && preg_match('/(_date|date$|_at$|updated_at|created_at)/i', $target));
+
+                    if (in_array($op, $strictDateOps, true)) {
+                        $isDateTarget = true;
+                    } elseif ($nameImpliesDate) {
+                        $isDateTarget = true;
+                    }
+                }
+                
+                // --- 2. EXECUTE DATE LOGIC ---
                 if ($isDateTarget) {
                     // normalize alias
                     if ($op === 'after') $op = 'greater_than';
@@ -224,7 +243,7 @@ class StatisticsService {
                         if ($d === null || $d === '') return false;
                         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $d)) return false;
                         try {
-                            $dt = Carbon::createFromFormat('Y-m-d', $d);
+                            $dt = \Carbon\Carbon::createFromFormat('Y-m-d', $d);
                             return $dt && $dt->format('Y-m-d') === $d;
                         } catch (Throwable $ex) {
                             return false;
@@ -260,6 +279,7 @@ class StatisticsService {
                     continue;
                 }
 
+                // --- 3. EXECUTE STRING/NUMBER LOGIC ---
                 // non-date handling (common cases)
                 if (in_array($op, ['equals','not_equals','greater_than','less_than','gte','lte'], true)) {
                     $operatorMap = [

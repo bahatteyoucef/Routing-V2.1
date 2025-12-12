@@ -127,6 +127,41 @@ class User extends Authenticatable
         return $users;
     }
 
+    public static function comboBackOffice() {
+        $query  =   DB::table('users')
+                        ->select([
+                            'users.id as id',
+                            'users.nom as nom',
+                            'users.email as email',
+                            'users.tel as tel',
+                            'users.company as company',
+                            'users.type_user as type_user',
+                            'users.accuracy as accuracy',
+                            'users.max_route_import as max_route_import',
+                            'users.password_non_hashed as password_non_hashed',
+                            'users.owner as owner',
+                        ])
+                        ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                        ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                        ->where([['roles.name', 'BackOffice'], ['model_has_roles.model_type', 'App\Models\User']]);
+
+        // Keep your existing logic if you still need to filter by owner/routes
+        if (Auth::user()->hasRole('BU Manager')) {
+            $query->where('users.owner', Auth::user()->id);
+
+        } elseif (Auth::user()->hasRole('BackOffice')) {
+            $routeIds   =   DB::table('users_route_import')
+                                ->where('id_user', Auth::user()->id)
+                                ->pluck('id_route_import');
+
+            $query->join('users_route_import as uri', 'uri.id_user', '=', 'users.id')
+                ->whereIn('uri.id_route_import', $routeIds);
+        }
+
+        // Group by ID to avoid duplicates if a user has multiple roles (unlikely here but safe)
+        return $query->get();
+    }
+
     public static function validateStore(Request $request) {
 
         $validator = Validator::make($request->all(), [
@@ -553,7 +588,7 @@ class User extends Authenticatable
             $clientsQuery = Client::where('clients.owner_bo', $owner)
                 ->whereBetween('clients.updated_at', [$startDate, $endDate])
                 ->join('users as bo', 'clients.owner_bo', '=', 'bo.id')
-                ->select('clients.*', 'bo.username as owner_name');
+                ->select('clients.*', 'bo.nom as owner_name');
 
             if (!empty($route_links)) {
                 $clientsQuery->whereIn('clients.id_route_import', $route_links);

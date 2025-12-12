@@ -15,12 +15,12 @@ class StatisticController extends Controller {
 
     //  //  //
 
-    public static function statsStandard(Request $request) {
+    public static function standardStatistics(Request $request) {
 
         try {
 
             //
-            $stats_details  =   Statistic::statsStandard($request);
+            $stats_details  =   Statistic::standardStatistics($request);
 
             //
             return response()->json([
@@ -37,10 +37,10 @@ class StatisticController extends Controller {
         }
     } 
 
-    public function statisticsDetails(Request $request) {
+    public function selfServiceStatistics(Request $request) {
 
         try {
-            $result = $this->statisticsService->statisticsDetails($request);
+            $result = $this->statisticsService->selfServiceStatistics($request);
             return response()->json(['stats_details' => $result]);
         } catch (Throwable $e) {
             Log::error('stats controller failure', ['exception' => $e]);

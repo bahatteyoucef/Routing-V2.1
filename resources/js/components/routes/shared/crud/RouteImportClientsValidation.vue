@@ -431,7 +431,7 @@
                                     <label for="owner"          class="form-label">Owner</label>
                                     <select                     class="form-select"     id="owner"          v-model="client.owner">
                                         <option value=""></option>
-                                        <option v-for="user in users"                   :key="user.id"      :value="user.id">{{user.username}}</option>
+                                        <option v-for="user in users"                   :key="user.id"      :value="user.id">{{user.nom}}</option>
                                     </select>
                                 </div>
 
@@ -1192,7 +1192,7 @@ export default {
 
                 if(this.users[i].id  ==  owner) {
 
-                    return this.users[i].username
+                    return this.users[i].nom
                 }                
             }
         },

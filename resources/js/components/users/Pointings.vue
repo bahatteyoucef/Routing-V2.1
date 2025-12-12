@@ -64,101 +64,101 @@
             </div>
         </div>
 
-        <div v-if="pointings" class="col-sm-12 p-2 mt-2">
-            <div v-for="pointing, index_1 in pointings" :key="index_1" class="mt-3">
-                <!-- Pointing Details -->
+        <div v-if="users_pointings" class="col-sm-12 p-2 mt-2">
+            <div v-for="user_pointing, index_1 in users_pointings" :key="index_1" class="mt-3">
+                <!-- User Pointing Details -->
                 <div class="row h-equal p-0 pl-2 m-0">
                     <div class="col p-1">
-                        <div v-if="pointing.details.number_clients_confirmed   !=  null" class="card h-100 card-img-holder text-white p-3"       style="background-color: #0F9D58">
+                        <div v-if="user_pointing.details.number_clients_confirmed   !=  null" class="card h-100 card-img-holder text-white p-3"       style="background-color: #0F9D58">
                             <div class="card-body p-1">
                                 <h4 class="font-weight-normal mb-3">Confirmed <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i></h4>
-                                <h2 class="mb-1">{{pointing.details.number_clients_confirmed}}</h2>
+                                <h2 class="mb-1">{{user_pointing.details.number_clients_confirmed}}</h2>
                             </div>
                         </div>
                     </div>
 
                     <div class="col p-1">
-                        <div v-if="pointing.details.number_clients_validated   !=  null" class="card h-100 card-img-holder text-white p-3"       style="background-color: #0F9D58">
+                        <div v-if="user_pointing.details.number_clients_validated   !=  null" class="card h-100 card-img-holder text-white p-3"       style="background-color: #0F9D58">
                             <div class="card-body p-1">
                                 <h4 class="font-weight-normal mb-3">Validated <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i></h4>
-                                <h2 class="mb-1">{{pointing.details.number_clients_validated}}</h2>
+                                <h2 class="mb-1">{{user_pointing.details.number_clients_validated}}</h2>
                             </div>
                         </div>
                     </div>
 
                     <div class="col p-1">
-                        <div v-if="pointing.details.number_clients_ferme   !=  null" class="card h-100 card-img-holder text-white p-3"           style="background-color: #0288D1;">
+                        <div v-if="user_pointing.details.number_clients_ferme   !=  null" class="card h-100 card-img-holder text-white p-3"           style="background-color: #0288D1;">
                             <div class="card-body p-1">
                                 <h4 class="font-weight-normal mb-3">Ferme <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i></h4>
-                                <h2 class="mb-1">{{pointing.details.number_clients_ferme}}</h2>
+                                <h2 class="mb-1">{{user_pointing.details.number_clients_ferme}}</h2>
                             </div>
                         </div>
                     </div>
 
                     <div class="col p-1">
-                        <div v-if="pointing.details.number_clients_refus   !=  null" class="card h-100 card-img-holder text-white p-3"           style="background-color: #880E4F;">
+                        <div v-if="user_pointing.details.number_clients_refus   !=  null" class="card h-100 card-img-holder text-white p-3"           style="background-color: #880E4F;">
                             <div class="card-body p-1">
                                 <h4 class="font-weight-normal mb-3">Refus <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i></h4>
-                                <h2 class="mb-1">{{pointing.details.number_clients_refus}}</h2>
+                                <h2 class="mb-1">{{user_pointing.details.number_clients_refus}}</h2>
                             </div>
                         </div>
                     </div>
 
                     <div class="col p-1">
-                        <div v-if="pointing.details.number_clients_introuvable   !=  null" class="card h-100 card-img-holder text-white p-3"     style="background-color: #000000;">
+                        <div v-if="user_pointing.details.number_clients_introuvable   !=  null" class="card h-100 card-img-holder text-white p-3"     style="background-color: #000000;">
                             <div class="card-body p-1">
                                 <h4 class="font-weight-normal mb-3">Introuvable <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i></h4>
-                                <h2 class="mb-1">{{pointing.details.number_clients_introuvable}}</h2>
+                                <h2 class="mb-1">{{user_pointing.details.number_clients_introuvable}}</h2>
                             </div>
                         </div>
                     </div>
 
                     <div class="col p-1">
-                        <div v-if="pointing.details.number_clients_pending !=  null" class="card h-100 card-img-holder text-white p-3"           style="background-color: #F57C00;">
+                        <div v-if="user_pointing.details.number_clients_pending !=  null" class="card h-100 card-img-holder text-white p-3"           style="background-color: #F57C00;">
                             <div class="card-body p-1">
                                 <h4 class="font-weight-normal mb-3">Pending <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i></h4>
-                                <h2 class="mb-1">{{pointing.details.number_clients_pending}}</h2>
+                                <h2 class="mb-1">{{user_pointing.details.number_clients_pending}}</h2>
                             </div>
                         </div>
                     </div>
 
                     <div class="col p-1">
-                        <div v-if="pointing.details.number_clients_nonvalidated    !=  null" class="card h-100 card-img-holder text-white p-3"   style="background-color: #F70000;">
+                        <div v-if="user_pointing.details.number_clients_nonvalidated    !=  null" class="card h-100 card-img-holder text-white p-3"   style="background-color: #F70000;">
                             <div class="card-body p-1">
                                 <h4 class="font-weight-normal mb-3">Non Validated <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i></h4>
-                                <h2 class="mb-1">{{pointing.details.number_clients_nonvalidated}}</h2>
+                                <h2 class="mb-1">{{user_pointing.details.number_clients_nonvalidated}}</h2>
                             </div>
                         </div>
                     </div>
 
                     <div class="col p-1">
-                        <div v-if="pointing.details.number_clients_visible !=  null" class="card h-100 card-img-holder text-white p-3"           style="background-color: #3949AB;">
+                        <div v-if="user_pointing.details.number_clients_visible !=  null" class="card h-100 card-img-holder text-white p-3"           style="background-color: #3949AB;">
                             <div class="card-body p-1">
                                 <h4 class="font-weight-normal mb-3">Visible <i class="mdi mdi-bookmark-outline mdi-24px float-right"></i></h4>
-                                <h2 class="mb-1">{{pointing.details.number_clients_visible}}</h2>
+                                <h2 class="mb-1">{{user_pointing.details.number_clients_visible}}</h2>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Pointing Start Time + Days -->
+                <!-- User Pointing Start Time + Days -->
                 <div class="row h-equal p-0 pl-2 m-0">
                     <div class="col-sm-2 p-1">
-                        <div v-if="pointing.username   !=  null" class="card h-100 card-img-holder p-3">
+                        <div v-if="user_pointing.nom   !=  null" class="card h-100 card-img-holder p-3">
                             <div class="card-body p-1">
                                 <h4 class="font-weight-normal mb-3">User<i class="mdi mdi-account-outline mdi-24px float-right"></i></h4>
-                                <h2 class="mb-1">{{pointing.username}}</h2>
+                                <h2 class="mb-1">{{user_pointing.nom}}</h2>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Pointing Start Time -->
+                    <!-- User Pointing Start Time -->
                     <div class="col-sm-2 p-1">
-                        <div :id="'start_time_col_'+pointing.id" class="h-50">
-                            <div v-if="pointing.details.start_time   !=  null" class="card h-100 p-3">
+                        <div :id="'start_time_col_'+user_pointing.id" class="h-50">
+                            <div v-if="user_pointing.details.start_time   !=  null" class="card h-100 p-3">
                                 <div class="card-body p-1">
                                     <h4 class="font-weight-normal mb-3">Start Time <i class="mdi mdi-clock-outline mdi-24px float-right"></i></h4>
-                                    <h2 class="mb-1">{{pointing.details.start_time}}</h2>
+                                    <h2 class="mb-1">{{user_pointing.details.start_time}}</h2>
                                 </div>
                             </div>
 
@@ -170,11 +170,11 @@
                             </div>
                         </div>
 
-                        <div :id="'end_time_col_'+pointing.id" class="end_time_col h-50">
-                            <div v-if="pointing.details.end_time   !=  null" class="card h-100 p-3">
+                        <div :id="'end_time_col_'+user_pointing.id" class="end_time_col h-50">
+                            <div v-if="user_pointing.details.end_time   !=  null" class="card h-100 p-3">
                                 <div class="card-body p-1">
                                     <h4 class="font-weight-normal mb-3">End Time <i class="mdi mdi-clock-outline mdi-24px float-right"></i></h4>
-                                    <h2 class="mb-1">{{pointing.details.end_time}}</h2>
+                                    <h2 class="mb-1">{{user_pointing.details.end_time}}</h2>
                                 </div>
                             </div>
 
@@ -187,11 +187,11 @@
                         </div>
                     </div>
 
-                    <!-- Pointing Days -->
-                    <div class="col-sm-8 p-1 pointing_days_col"  :id="'pointing_days_col_'+pointing.id">
-                        <div v-if="pointing.clients" class="card h-100 p-3">
-                            <div :id="'pointing_days_parent_'+pointing.id"   class="pointing_days_parent table_scroll table_container">
-                                <table  class="table table-bordered pointing_days" id="pointing_days">
+                    <!-- User Pointing Days -->
+                    <div class="col-sm-8 p-1 user_pointing_days_col"  :id="'user_pointing_days_col_'+user_pointing.id">
+                        <div v-if="user_pointing.clients" class="card h-100 p-3">
+                            <div :id="'user_pointing_days_parent_'+user_pointing.id"   class="user_pointing_days_parent table_scroll table_container">
+                                <table  class="table table-bordered user_pointing_days" id="user_pointing_days">
                                     <thead>
                                         <tr>
                                             <th>Day</th>
@@ -211,19 +211,19 @@
                                     <tbody>
                                         <tr>
                                             <th>Total</th>
-                                            <th>{{ pointing.details.start_time }}</th>
-                                            <th>{{ pointing.details.end_time }}</th>
-                                            <th>{{ pointing.details.number_clients_confirmed }}</th>
-                                            <th>{{ pointing.details.number_clients_validated }}</th>
-                                            <th>{{ pointing.details.number_clients_ferme }}</th>
-                                            <th>{{ pointing.details.number_clients_refus }}</th>
-                                            <th>{{ pointing.details.number_clients_introuvable }}</th>
-                                            <th>{{ pointing.details.number_clients_pending }}</th>
-                                            <th>{{ pointing.details.number_clients_nonvalidated }}</th>
-                                            <th>{{ pointing.details.number_clients_visible }}</th>
+                                            <th>{{ user_pointing.details.start_time }}</th>
+                                            <th>{{ user_pointing.details.end_time }}</th>
+                                            <th>{{ user_pointing.details.number_clients_confirmed }}</th>
+                                            <th>{{ user_pointing.details.number_clients_validated }}</th>
+                                            <th>{{ user_pointing.details.number_clients_ferme }}</th>
+                                            <th>{{ user_pointing.details.number_clients_refus }}</th>
+                                            <th>{{ user_pointing.details.number_clients_introuvable }}</th>
+                                            <th>{{ user_pointing.details.number_clients_pending }}</th>
+                                            <th>{{ user_pointing.details.number_clients_nonvalidated }}</th>
+                                            <th>{{ user_pointing.details.number_clients_visible }}</th>
                                         </tr>
 
-                                        <tr v-for="day, index_2 in pointing.days" :key="index_2">
+                                        <tr v-for="day, index_2 in user_pointing.days" :key="index_2">
                                             <td>{{ day.day }}</td>
                                             <td>{{ day.start_time }}</td>
                                             <td>{{ day.end_time }}</td>
@@ -243,190 +243,43 @@
                     </div>
                 </div>
 
-                <!-- Pointing End Time + Clients -->
+                <!-- User Pointing End Time + Clients -->
                 <div class="row h-equal p-0 pl-2 m-0">
                     <div class="col-sm-12 p-1"  id="clients_col">
-                        <div v-if="pointing.clients" class="card h-100 p-3">
-                            <div :id="'pointing_clients_parent'+pointing.id"   class="pointing_clients_parent table_scroll table_container pb-3">
-                                <table  class="table table-bordered pointing_clients" :id="'pointing_clients_'+pointing.id">
+                        <div v-if="user_pointing.clients" class="card h-100 p-3">
+                            <div :id="'user_pointing_clients_'+user_pointing.id+'_container'" class="table-container mt-5">
+                                <table  class="table table-bordered user_pointing_clients" :id="'user_pointing_clients_'+user_pointing.id">
                                     <thead>
                                         <tr>
-                                            <th class="col-sm-1">Index</th>
-
-                                            <th class="col-sm-2">Id</th>
-
-                                            <th class="col-sm-2">Created At</th>
-                                            <!-- <th class="col-sm-2">Start Adding Time</th> -->
-                                            <!-- <th class="col-sm-2">Adding Duration</th> -->
-                                            <th class="col-sm-2">Status</th>
-                                            <th class="col-sm-2">Owner</th>
-
-                                            <th class="col-sm-2">CustomerIdentifier</th>
-
-                                            <th class="col-sm-2">CustomerBarCodeExiste</th>
-                                            <th class="col-sm-2">CustomerCode (BarCode)</th>
-
-                                            <th class="col-sm-2">CustomerNameE</th>
-                                            <th class="col-sm-2">CustomerNameA</th>
-
-                                            <!-- <th class="col-sm-1">DistrictNo</th> -->
-                                            <th class="col-sm-2">DistrictNameE</th>
-
-                                            <!-- <th class="col-sm-1">CityNo</th> -->
-                                            <th class="col-sm-2">CityNameE</th>
-
-                                            <!-- <th class="col-sm-2">CustomerBarCode Image</th> -->
-                                            <!-- <th class="col-sm-2">In Store Image</th> -->
-                                            <!-- <th class="col-sm-2">Facade Image</th> -->
-
-                                            <th class="col-sm-2">Address</th>
-                                            <!-- <th class="col-sm-2">Neighborhood</th> -->
-                                            <!-- <th class="col-sm-2">Landmark</th> -->
-
-                                            <!-- <th class="col-sm-2">Latitude</th> -->
-                                            <!-- <th class="col-sm-2">Longitude</th> -->
-
-                                            <th class="col-sm-2">Tel</th>
-
-                                            <th class="col-sm-1">CustomerType</th>
-
-                                            <!-- <th class="col-sm-2">JPlan</th> -->
-                                            <!-- <th class="col-sm-2">Journee</th> -->
-
-                                            <!-- <th class="col-sm-2">Frequency</th> -->
-                                            <!-- <th class="col-sm-2">SuperficieMagasin</th> -->
-                                            <!-- <th class="col-sm-2">NbrAutomaticCheckouts</th> -->
-                                            <!-- <th class="col-sm-2">AvailableBrands</th> -->
-
-                                            <!--  -->
-
-                                            <th class="col-sm-2">Comment</th>
-                                            <!-- <th class="col-sm-2">BrandAvailability</th> -->
-                                            <!-- <th class="col-sm-2">BrandSourcePurchase</th> -->
+                                            <th role="button">#</th>
+                                            <th v-for="user_pointing_clients_column in user_pointing_clients_columns" :key="user_pointing_clients_column" role="button">{{ user_pointing_clients_column.title }}</th>
                                         </tr>
                                     </thead>
 
                                     <thead>
-                                        <tr :class="'pointing_clients_filters pointing_clients_'+pointing.id+'_filters'">
+                                        <tr :id="'user_pointing_clients_'+user_pointing.id+'_filters'" class="user_pointing_clients_filters">
+                                            <th></th>
 
-                                            <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Index"                    /></th>
-
-                                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Id"                       /></th>
-
-                                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Created_At"               /></th>
-                                            <!-- <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Start Adding Time"        /></th> -->
-                                            <!-- <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Adding Duration"          /></th> -->
-                                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Status"                   /></th>
-                                            <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Owner"                    /></th>
-
-                                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerIdentifier"       /></th>
-
-                                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerBarCodeExiste"    /></th>
-                                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerCode"             /></th>
-                                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameE"            /></th>
-                                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CustomerNameA"            /></th>
-
-                                            <!-- <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="DistrictNo"               /></th> -->
-                                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="DistrictNameE"            /></th>
-
-                                            <!-- <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CityNo"                   /></th> -->
-                                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="CityNameE"                /></th>
-
-                                            <!-- <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerBarCode Image"    /></th> -->
-                                            <!-- <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="In Store Image"           /></th> -->
-                                            <!-- <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Facade Image"             /></th> -->
-
-                                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Address"                  /></th>
-                                            <!-- <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Neighborhood"             /></th> -->
-                                            <!-- <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Landmark"                 /></th> -->
-
-                                            <!-- <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Latitude"                 /></th> -->
-                                            <!-- <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Longitude"                /></th> -->
-
-                                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Tel"                      /></th>
-
-                                            <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="CustomerType"             /></th>
-
-                                            <!-- <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="JPlan"                    /></th> -->
-                                            <!-- <th class="col-sm-1"><input type="text" class="form-control form-control-sm" placeholder="Journee"                  /></th> -->
-
-                                            <!-- <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Frequency"                /></th> -->
-                                            <!-- <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="SuperficieMagasin"        /></th> -->
-                                            <!-- <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="NbrAutomaticCheckouts"    /></th> -->
-                                            <!-- <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="AvailableBrands"          /></th> -->
-
-                                            <!--  -->
-
-                                            <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="Comment"                  /></th>
-                                            <!-- <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="BrandAvailability"        /></th> -->
-                                            <!-- <th class="col-sm-2"><input type="text" class="form-control form-control-sm" placeholder="BrandSourcePurchase"      /></th> -->
+                                            <th v-for="user_pointing_clients_column in user_pointing_clients_columns" :key="user_pointing_clients_column">
+                                                <div class="filter_group" :data-column="user_pointing_clients_column.title">
+                                                    <select class="filter_type form-select-sm w-100 mb-2">
+                                                        <option value="contains">contains</option>
+                                                        <option value="not_contains">not contains</option>
+                                                        <option value="exact">exact</option>
+                                                        <option value="starts_with">starts with</option>
+                                                        <option value="ends_with">ends with</option>
+                                                    </select>
+                                                    <input
+                                                        type="text"
+                                                        class="form-control form-control-sm filter_input"
+                                                        :placeholder="user_pointing_clients_column.title"
+                                                    />
+                                                </div>
+                                            </th>
                                         </tr>
                                     </thead>
                                     
                                     <tbody>
-                                        <tr v-for="client, index_3 in pointing.clients" :key="index_3"    :id="'pointing_clients_'+pointing.id+'_'+client.id">
-                                            <td>{{index_3 +   1}}</td>
-
-                                            <td>{{client.id}}</td>
-
-                                            <td>{{client.created_at}}</td>
-                                            <!-- <td>{{client.start_adding_time}}</td> -->
-                                            <!-- <td>{{client.adding_duration}}</td> -->
-
-                                            <td>
-                                                <span v-if="client.status=='nonvalidated'"  href="#" class="badge badge-danger">{{client.status}}</span>
-                                                <span v-if="client.status=='pending'"       href="#" class="badge badge-warning">{{client.status}}</span>
-                                                <span v-if="client.status=='confirmed'"     href="#" class="badge badge-success">{{client.status}}</span>
-                                                <span v-if="client.status=='validated'"     href="#" class="badge badge-success">{{client.status}}</span>
-                                                <span v-if="client.status=='visible'"       href="#" class="badge badge-info">{{client.status}}</span>
-                                                <span v-if="client.status=='ferme'"         href="#" class="badge badge-secondary">{{client.status}}</span>
-                                                <span v-if="client.status=='refus'"         href="#" class="badge badge-refus">{{client.status}}</span>
-                                            </td>
-
-                                            <td>{{client.owner_name}}</td>
-
-                                            <td>{{client.CustomerIdentifier}}</td>
-
-                                            <td>{{client.CustomerBarCodeExiste}}</td>
-                                            <td>{{client.CustomerCode}}</td>
-                                            <td>{{client.CustomerNameE}}</td>
-                                            <td>{{client.CustomerNameA}}</td>
-
-                                            <!-- <td>{{client.DistrictNo}}</td> -->
-                                            <td>{{client.DistrictNameE}}</td>
-
-                                            <!-- <td>{{client.CityNo}}</td> -->
-                                            <td>{{client.CityNameE}}</td>
-
-                                            <!-- <td>{{client.CustomerBarCode_image}}</td> -->
-                                            <!-- <td>{{client.in_store_image}}</td> -->
-                                            <!-- <td>{{client.facade_image}}</td> -->
-
-                                            <td>{{client.Address}}</td>
-                                            <!-- <td>{{client.Neighborhood}}</td> -->
-                                            <!-- <td>{{client.Landmark}}</td> -->
-
-                                            <!-- <td>{{client.Latitude}}</td> -->
-                                            <!-- <td>{{client.Longitude}}</td> -->
-
-                                            <td>{{client.Tel}}</td>
-
-                                            <td>{{client.CustomerType}}</td>
-
-                                            <!-- <td>{{client.JPlan}}</td> -->
-                                            <!-- <td>{{client.Journee}}</td> -->
-
-                                            <!-- <td>{{client.Frequency}}</td> -->
-                                            <!-- <td>{{client.SuperficieMagasin}}</td> -->
-                                            <!-- <td>{{client.NbrAutomaticCheckouts}}</td> -->
-                                            <!-- <td>{{client.AvailableBrands_string_formatted}}</td> -->
-
-                                            <!--  -->
-
-                                            <td>{{client.comment}}</td>
-                                            <!-- <td>{{client.BrandAvailability}}</td> -->
-                                            <!-- <td>{{client.BrandSourcePurchase}}</td> -->
-                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -443,13 +296,35 @@
  
 <script>
 
-import Multiselect  from  "@vueform/multiselect"
+import Multiselect          from    "@vueform/multiselect"
+
+import DatatableHelper      from    "@/services/DatatableHelper"
 
 export default {
 
     data() {
         return {
-            pointings               :   [],
+            user_pointing_clients_columns   :   [
+                                                    { data: "id"                        , title: "Id"                   },
+                                                    { data: "created_at"                , title: "Created At"           },
+                                                    { data: "status"                    , title: "Status"               },
+                                                    { data: "owner_name"                , title: "Owner"                },
+                                                    { data: "CustomerIdentifier"        , title: "CustomerIdentifier"   },
+                                                    // { data: "CustomerBarCodeExiste"     , title: "CustomerBarCodeExiste"},
+                                                    { data: "CustomerCode"              , title: "CustomerCode"         },
+                                                    { data: "CustomerNameE"             , title: "CustomerNameE"        },
+                                                    { data: "CustomerNameA"             , title: "CustomerNameA"        },
+                                                    { data: "DistrictNameE"             , title: "DistrictNameE"        },
+                                                    { data: "CityNameE"                 , title: "CityNameE"            },
+                                                    { data: "Address"                   , title: "Address"              },
+                                                    { data: "Tel"                       , title: "Tel"                  },
+                                                    { data: "CustomerType"              , title: "CustomerType"         },
+                                                    // { data: "Comment"                   , title: "Comment"              },
+                                                ],
+
+            //
+
+            users_pointings         :   [],
 
             start_date              :   "",
             end_date                :   "",
@@ -466,7 +341,7 @@ export default {
 
             //
 
-            list_datatable_poiting  :   {}
+            list_datatable_users_pointings  :   {}
         }
     },
 
@@ -476,6 +351,9 @@ export default {
 
     async mounted() {
 
+        this.datatable_users_pointings_instance     =   new DatatableHelper()   
+
+        //
         this.start_date     =   new Date().toISOString().slice(0,10);
         this.end_date       =   new Date().toISOString().slice(0,10);
 
@@ -495,7 +373,7 @@ export default {
                     this.$showLoadingPage()
 
                     // Initialisation 
-                    this.pointings  =   [];
+                    this.users_pointings  =   [];
 
                     //
                     let formData    =   new FormData()
@@ -517,8 +395,8 @@ export default {
                         console.log(res)
 
                         //
-                        this.pointings      =   res.data;
-                        this.prepareDatatables()
+                        this.users_pointings      =   res.data;
+                        await this.prepareDatatables()
 
                         //
                         this.$hideLoadingPage()
@@ -543,6 +421,9 @@ export default {
             const res_1                     =   await this.$callApi("post",     "/route_import/combo"       ,   null)
             const res_2                     =   await this.$callApi("post",     "/users/combo/backoffice"   ,   null)
 
+            console.log(res_1)
+            console.log(res_2)
+
             this.liste_route_import_all     =   res_1.data
             this.users_all                  =   res_2.data
 
@@ -553,7 +434,7 @@ export default {
 
             for (let i = 0; i < this.users_all.length; i++) {
 
-                this.users.push({ value : this.users_all[i].id , label : this.users_all[i].username})
+                this.users.push({ value : this.users_all[i].id , label : this.users_all[i].nom})
             }
 
             //
@@ -564,8 +445,11 @@ export default {
 
         async prepareDatatables() {
 
-            for (let index = 0; index < this.pointings.length; index++) 
-                this.list_datatable_poiting[this.pointings[index].id]   =   await this.$DataTableCreate("pointing_clients_"+this.pointings[index].id)
+            await this.$nextTick(() => {
+                for (let index = 0; index < this.users_pointings.length; index++) {
+                    this.list_datatable_users_pointings[this.users_pointings[index].id]     =   this.datatable_users_pointings_instance.$DataTableCreate("user_pointing_clients_"+this.users_pointings[index].id, this.users_pointings[index].clients, this.user_pointing_clients_columns, null, null, null, null, null, "Pointings")      
+                }
+            });
         }
     }
 };
@@ -574,20 +458,20 @@ export default {
 
 <style scoped>
 
-.start_time_col, .end_time_col, .pointing_days_col {
+.start_time_col, .end_time_col, .user_pointing_days_col {
     /* height : 300px; */
 }
 
-.pointing_days_parent {
+.user_pointing_days_parent {
     height : 300px;
     overflow : auto;
 }
 
-.pointing_clients_parent {
+.user_pointing_clients_parent {
     overflow : auto;
 }
 
-.pointing_clients {
+.user_pointing_clients {
     overflow : auto
 }
 

@@ -94,6 +94,7 @@ Route::middleware(['auth:api', 'isEnabledUser'])->group(function () {
 
     Route::post('/users'                                                                                ,   [UserController::class                  , 'index'                                   ])->middleware('BUManager');
     Route::post('/users/combo'                                                                          ,   [UserController::class                  , 'combo'                                   ])->middleware('BUManager');
+    Route::post('/users/combo/backoffice'                                                               ,   [UserController::class                  , 'comboBackOffice'                         ])->middleware('BUManager');
     Route::post('/users/{id}/show'                                                                      ,   [UserController::class                  , 'show'                                    ]);
 
     Route::post('/users/store'                                                                          ,   [UserController::class                  , 'store'                                   ])->middleware('BUManager');
@@ -205,8 +206,8 @@ Route::middleware(['auth:api', 'isEnabledUser'])->group(function () {
 
     //
 
-    Route::post('/statistics/standard'                                                                  ,   [StatisticController::class             , 'statsDetails'                            ])->middleware('Viewer');
-    Route::post('/statistics/self-service'                                                              ,   [StatisticController::class             , 'statisticsDetails'                       ])->middleware('Viewer');
+    Route::post('/statistics/standard'                                                                  ,   [StatisticController::class             , 'standardStatistics'                      ])->middleware('Viewer');
+    Route::post('/statistics/self-service'                                                              ,   [StatisticController::class             , 'selfServiceStatistics'                   ])->middleware('Viewer');
 
     //
 

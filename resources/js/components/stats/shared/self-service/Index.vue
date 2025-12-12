@@ -192,7 +192,7 @@
                         <div class="condition-row row g-2 mb-2" v-for="cond in conditions" :key="cond.id">
                             <!-- 0) type -->
                             <div class="col-sm-2">
-                                <select class="form-select h-100" v-model="cond.type" @change="onCondTypeChange(cond)">
+                                <select class="form-select h-100" v-model="cond.type" @change="onCondTypeChange(cond)"  disabled>
                                     <option value="string">String</option>
                                     <option value="number">Number</option>
                                     <!-- ADDED: date type option -->
@@ -213,6 +213,7 @@
                                     :canDeselect="false"
                                     :canClear="false"
                                     :allowAbsent="false"
+  
                                     @input="onConditionPropertyChange(cond)"
                                 />
                             </div>
@@ -434,43 +435,33 @@ export default {
         formData.append('order_dir', this.orderDir);
         formData.append('order_rule', this.orderRule);
 
-        if (this.primary_property) formData.append("primary_property", this.primary_property.value ?? this.primary_property);
-        if (this.secondary_property) formData.append("secondary_property", this.secondary_property.value ?? this.secondary_property);
-        if (this.percentageBaseOption) formData.append('percentage_base', this.percentageBaseOption);
+        if (this.primary_property)      formData.append("primary_property", this.primary_property.value ?? this.primary_property);
+        if (this.secondary_property)    formData.append("secondary_property", this.secondary_property.value ?? this.secondary_property);
+        if (this.percentageBaseOption)  formData.append('percentage_base', this.percentageBaseOption);
 
         // include global logical operator
         formData.append("conditions_logic", this.conditionsLogic);
 
         // attach conditions payload
         const condPayload = validatedObj.sanitized;
+
         if (condPayload.length) formData.append("conditions", JSON.stringify(condPayload));
 
         // request backend to also return matching clients (no pagination)
         const res = await this.$callApi("post", "/statistics/self-service", formData);
         console.log(res)
-        console.log(res.data.stats_details)
 
         // expecting: { stats_details: {...}, clients: [...] }
         if (res.status == 200) {
           this.stats_details = res.data.stats_details ?? null;
 
-          console.log(22222)
-
           this.$hideLoadingPage();
-
-          console.log(33333)
-
           this.$feedbackSuccess(res.data?.header ?? "Success", res.data?.message ?? "Statistics loaded.");
         }
 
         else {
 
-          console.log(44444)
-
           this.$hideLoadingPage();
-
-          console.log(55555)
-
           this.$showErrors(res.data?.header ?? "Error !", res.data?.errors);
         }
       } catch (e) {
@@ -499,7 +490,9 @@ export default {
         // Normalize property and operator
         const target = c.property ? (c.property.value ?? c.property) : null;
         let op = c.operator;
-        const type = c.type || 'string'; // 'string'|'number'|'date'
+        
+        // CRITICAL: Ensure type is passed. Default to string if missing.
+        const type = c.type || 'string'; 
 
         // --- Basic Validation ---
         if (!target) {
@@ -511,96 +504,109 @@ export default {
           continue;
         }
 
-        // Map convenience aliases for dates
+        // Map convenience aliases for dates (Backend expects greater_than/less_than)
         if (type === 'date') {
           if (op === 'after') op = 'greater_than';
           if (op === 'before') op = 'less_than';
         }
 
-        // --- Refactored Logic Chain ---
-        if (noValueOps.includes(op)) {
-          // 1. Operators that require NO value
-          const entry = { target, operator: op };
-          if (type === 'date') entry.type = 'date';
-          sanitized.push(entry);
+        // Initialize the entry object with the explicit TYPE
+        const entry = { target, operator: op, type: type };
 
-        } else if (op === 'between') {
-          // 2. 'between' operator (range)
-          if (type === 'date') {
-            const lowRaw = (c.inputValueLow ?? '').toString().trim();
-            const highRaw = (c.inputValueHigh ?? '').toString().trim();
-            if (lowRaw === '' || highRaw === '') {
-              errors.push(`Condition #${i + 1}: Both start and end dates are required for 'between'.`);
-            } else if (!dateRe.test(lowRaw) || !dateRe.test(highRaw)) {
-              errors.push(`Condition #${i + 1}: Dates must be in YYYY-MM-DD format for '${target}'.`);
+        // --- Logic Chain ---
+        
+        // 1. Operators that require NO value
+        if (noValueOps.includes(op)) {
+          sanitized.push(entry);
+        } 
+        
+        // 2. 'between' operator (range)
+        else if (op === 'between') {
+          const lowRaw = (c.inputValueLow ?? '').toString().trim();
+          const highRaw = (c.inputValueHigh ?? '').toString().trim();
+
+          if (lowRaw === '' || highRaw === '') {
+            errors.push(`Condition #${i + 1}: Both start and end values are required for 'between'.`);
+          } else {
+            if (type === 'date') {
+              if (!dateRe.test(lowRaw) || !dateRe.test(highRaw)) {
+                errors.push(`Condition #${i + 1}: Dates must be in YYYY-MM-DD format.`);
+              } else {
+                entry.value = [lowRaw, highRaw];
+                sanitized.push(entry);
+              }
+            } else if (type === 'number') {
+              if (isNaN(Number(lowRaw)) || isNaN(Number(highRaw))) {
+                errors.push(`Condition #${i + 1}: Values must be numeric.`);
+              } else {
+                entry.value = [Number(lowRaw), Number(highRaw)];
+                sanitized.push(entry);
+              }
             } else {
-              const entry = { target, operator: 'between', value: [lowRaw, highRaw], type: 'date' };
+              // String between (rare but possible)
+              entry.value = [lowRaw, highRaw];
               sanitized.push(entry);
             }
-          } else {
-            const lowRaw = (c.inputValueLow ?? '').toString().trim();
-            const highRaw = (c.inputValueHigh ?? '').toString().trim();
-            if (lowRaw === '' || highRaw === '') {
-              errors.push(`Condition #${i + 1}: Both low and high values are required for 'between'.`);
-            } else if (isNaN(Number(lowRaw)) || isNaN(Number(highRaw))) {
-              errors.push(`Condition #${i + 1}: 'between' values must be numeric.`);
-            } else {
-              sanitized.push({ target, operator: 'between', value: [Number(lowRaw), Number(highRaw)] });
-            }
           }
-
-        } else if (multiOps.includes(op)) {
-          // 3. Operators that require MULTIPLE values
+        } 
+        
+        // 3. Operators that require MULTIPLE values
+        else if (multiOps.includes(op)) {
           let values = Array.isArray(c.selectedValues) ? c.selectedValues : [];
+          // fallback to comma separated string if select is empty
           if (values.length === 0 && (c.inputValue || '').toString().trim()) {
             values = c.inputValue.split(',').map(x => x.trim()).filter(Boolean);
           }
+
           if (values.length === 0) {
             errors.push(`Condition #${i + 1}: Operator '${op}' requires at least one value.`);
           } else {
-            // if date type: ensure each date is valid
             if (type === 'date') {
               const bad = values.find(v => !dateRe.test(v));
-              if (bad) {
-                errors.push(`Condition #${i + 1}: All date values must be in YYYY-MM-DD format.`);
-              } else {
-                sanitized.push({ target, operator: op, value: values, type: 'date' });
+              if (bad) errors.push(`Condition #${i + 1}: All dates must be YYYY-MM-DD.`);
+              else {
+                entry.value = values;
+                sanitized.push(entry);
               }
+            } else if (type === 'number') {
+               // convert to numbers
+               const nums = values.map(Number);
+               if (nums.some(isNaN)) errors.push(`Condition #${i + 1}: All values must be numeric.`);
+               else {
+                 entry.value = nums;
+                 sanitized.push(entry);
+               }
             } else {
-              sanitized.push({ target, operator: op, value: values });
+              entry.value = values;
+              sanitized.push(entry);
             }
           }
-
-        } else {
-          // 4. All other operators that require a SINGLE value
+        } 
+        
+        // 4. Single Value operators
+        else {
           const rawValue = (c.inputValue ?? '').toString().trim();
+
           if (type === 'date') {
-            // date single-value operators: equals, greater_than, less_than, gte, lte etc.
-            if (rawValue === '') {
-              errors.push(`Condition #${i + 1}: A date value is required for operator '${op}'.`);
-            } else if (!dateRe.test(rawValue)) {
-              errors.push(`Condition #${i + 1}: Date must be in YYYY-MM-DD format for '${target}'.`);
-            } else {
-              // Use mapped operator if necessary (we already mapped after/before above)
-              const entry = { target, operator: op, value: rawValue, type: 'date' };
+            if (rawValue === '') errors.push(`Condition #${i + 1}: Date required.`);
+            else if (!dateRe.test(rawValue)) errors.push(`Condition #${i + 1}: Invalid date format.`);
+            else {
+              entry.value = rawValue;
               sanitized.push(entry);
             }
           } else if (type === 'number') {
-            if (rawValue === '') {
-              errors.push(`Condition #${i + 1}: A value is required for operator '${op}'.`);
-            } else {
-              const num = Number(rawValue);
-              if (isNaN(num)) {
-                errors.push(`Condition #${i + 1}: Value must be a valid number.`);
-              } else {
-                sanitized.push({ target, operator: op, value: num });
-              }
+            if (rawValue === '') errors.push(`Condition #${i + 1}: Number required.`);
+            else if (isNaN(Number(rawValue))) errors.push(`Condition #${i + 1}: Invalid number.`);
+            else {
+              entry.value = Number(rawValue);
+              sanitized.push(entry);
             }
-          } else { // string
-            if (rawValue === '') {
-              errors.push(`Condition #${i + 1}: A value is required for operator '${op}'.`);
-            } else {
-              sanitized.push({ target, operator: op, value: rawValue });
+          } else {
+            // String
+            if (rawValue === '') errors.push(`Condition #${i + 1}: Value required.`);
+            else {
+              entry.value = rawValue;
+              sanitized.push(entry);
             }
           }
         }
@@ -618,11 +624,12 @@ export default {
         id,
         property: null,
         operator: "equals",
-        type: "string",
+        type: "string",            // default until property selected or user changes it
         inputValue: "",
         inputValueLow: "",
         inputValueHigh: "",
-        selectedValues: []
+        selectedValues: [],
+        _userSelectedType: false   // internal flag to avoid auto-overwrite
       });
     },
 
@@ -648,19 +655,71 @@ export default {
       return ['between'].includes(op);
     },
 
-    onConditionPropertyChange(cond) {
-      cond.inputValue = ""
-      cond.inputValueLow = ""
-      cond.inputValueHigh = ""
-      cond.selectedValues = []
+    async onConditionPropertyChange(cond) {
+      this.$nextTick(() => {
+        // quick safety
+        if (!cond || !cond.property) {
+          return;
+        }
+
+        // Reset the explicit-user-type flag because property changed
+        cond._userSelectedType = false;
+
+        // property can be either a string or { value, label, type }
+        const prop = cond.property;
+        const propVal = (prop && (prop.value ?? prop)) ?? null;
+
+        // Prefer explicit metadata on property (prop.type)
+        let detectedType = null;
+        if (prop && typeof prop === 'object' && prop.type) {
+          detectedType = prop.type; // use provided type
+        } else if (typeof propVal === 'string') {
+          // fallback heuristics (kept for backwards compatibility)
+          const isDate = /(_date|date$|_at$|updated_at|created_at)/i.test(propVal);
+          const isNumber = /(Id$|No$|Count$|Total$|Price$)/i.test(propVal);
+
+          if (isDate) detectedType = 'date';
+          else if (isNumber) detectedType = 'number';
+          else detectedType = 'string';
+        } else {
+          detectedType = 'string';
+        }
+
+        // Only set the condition type if user didn't explicitly pick a type
+        if (!cond._userSelectedType) {
+          // assignment should be reactive in Vue 3; use Object.assign to be extra-safe
+          Object.assign(cond, { type: detectedType });
+        } else {
+        }
+
+        // Reset operator according to the effective type
+        cond.operator = (cond.type === 'number' || cond.type === 'date') ? 'equals' : 'contains';
+
+        // Reset UI values
+        cond.inputValue = "";
+        cond.inputValueLow = "";
+        cond.inputValueHigh = "";
+        cond.selectedValues = [];
+
+      });
     },
 
     onCondTypeChange(cond) {
       if (!cond) return;
+
+      // Mark that the user explicitly chose a type so auto-detection won't overwrite it
+      cond._userSelectedType = true;
+
+      // Set sensible default operator for the chosen type
       if (cond.type === 'number') cond.operator = 'equals';
       else if (cond.type === 'date') cond.operator = 'equals';
       else cond.operator = 'contains';
-      this.onConditionPropertyChange(cond)
+
+      // Keep values cleared for the new type
+      cond.inputValue = "";
+      cond.inputValueLow = "";
+      cond.inputValueHigh = "";
+      cond.selectedValues = [];
     },
 
     // ------------------------------
@@ -677,23 +736,23 @@ export default {
     },
 
     prepareOptions() {
-      this.properties = []
-      const push = (v, l) => this.properties.push({ value: v, label: l })
+      this.properties = [];
+      const push = (v, l, t = 'string') => this.properties.push({ value: v, label: l, type: t });
 
-      push("DistrictNo"             ,   "Wilaya / رقم الولاية"                                             )
-      push("DistrictNameE"          ,   "Wilaya / إسم الولاية"                                             )
-      push("CityNo"                 ,   "Commune / رقم البلدية"                                           )
-      push("CityNameE"              ,   "Commune / إسم البلدية"                                           )
-      push("Address"                ,   "Adresse de magasin / عنوان المتجر"                               )
-      push("CustomerType"           ,   "Type de magasin / نوع المتجر"                                    )
-      push("CustomerNameA"          ,   "Raison Sociale / اسم نقطة لبيع"                                  )
-      push("CustomerNameE"          ,   "Nom et prenom de l'acheteur ou gérant / لقب واسم صاحب المحل"    )
-      push("Tel"                    ,   "Numero de téléphone / رقم الهاتف"                                )
-      push("CustomerCode"           ,   "Capturer Code-Barre"                                             )
-      push("BrandSourcePurchase"    ,   "Source d'achat des produits Ramy Milk  / مصدر شراء منتجات رامي" )
-      push("status"                 ,   "Status PDV"                                                      )
-      push("created_at"             ,   "Date de creation"                                                )
-      push("tel_status"             ,   "Status de Telephone"                                             )
+      push("DistrictNo"          , "Wilaya / رقم الولاية"               , "number");
+      push("DistrictNameE"       , "Wilaya / إسم الولاية"               , "string");
+      push("CityNo"              , "Commune / رقم البلدية"             , "number");
+      push("CityNameE"           , "Commune / إسم البلدية"             , "string");
+      push("Address"             , "Adresse de magasin / عنوان المتجر" , "string");
+      push("CustomerType"        , "Type de magasin / نوع المتجر"      , "string");
+      push("CustomerNameA"       , "Raison Sociale / اسم نقطة لبيع"    , "string");
+      push("CustomerNameE"       , "Nom ... / لقب واسم صاحب المحل"    , "string");
+      push("Tel"                 , "Numero de téléphone / رقم الهاتف"  , "string");
+      push("CustomerCode"        , "Capturer Code-Barre"                , "string");
+      push("BrandSourcePurchase" , "Source d'achat ... "                , "string");
+      push("status"              , "Status PDV"                         , "string");
+      push("created_at"          , "Date de creation"                   , "date");
+      push("tel_status"          , "Status de Telephone"                , "string");
     }
   }
 }

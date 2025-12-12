@@ -14,8 +14,11 @@ let initialRoute = true;
 import IndexShared                              from "./components/index/shared/Index.vue";
 
 import LoginShared                              from "./components/login/Login.vue";
+
 import UsersShared                              from "./components/users/Index.vue";
 import ShowUsersShared                          from "./components/users/Show.vue";
+import PointingsShared                          from "./components/users/Pointings.vue";
+
 import StatsStandardShared                      from "./components/stats/shared/standard/Index.vue";
 import StatsSelfServiceShared                   from "./components/stats/shared/self-service/Index.vue";
 
@@ -46,6 +49,7 @@ const routes = [
     { path: "/login"                                                                        , component: LoginShared                                },
     { path: "/users"                                                                        , component: UsersShared                                },
     { path: "/users/:id_user/show"                                                          , component: ShowUsersShared                            },
+    { path: "/users/pointings"                                                              , component: PointingsShared                            },
 
     { path: "/stats/standard"                                                               , component: StatsStandardShared                        },
     { path: "/stats/self-service"                                                           , component: StatsSelfServiceShared                     },

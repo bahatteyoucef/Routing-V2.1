@@ -678,7 +678,7 @@ export default {
 
                 if(this.users[i].id  ==  owner) {
 
-                    return this.users[i].username
+                    return this.users[i].nom
                 }                
             }
         },
