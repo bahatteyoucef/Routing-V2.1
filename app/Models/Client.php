@@ -578,7 +578,7 @@ class Client extends Model
         $user = Auth::user();
         $isFrontOffice = $user->hasRole("FrontOffice");
         
-        if ($isFrontOffice && ($client->status == "validated" || ($client->status != "visible" && $client->owner != $user->id))) {
+        if ($isFrontOffice && ($client->status == "validated" || $client->status == "confirmed" || ($client->status != "visible" && $client->owner != $user->id))) {
             throw new Exception("Unauthorized", 403);
         }
 
@@ -819,7 +819,7 @@ class Client extends Model
         // Base Query: Filter by Route and Status
         $query = DB::table('clients')
             ->where('id_route_import', $idRoute)
-            ->where('status', 'validated');
+            ->whereIn('status', ['validated', 'confirmed']);
 
         // 1. DATE FILTERING IN SQL (Much faster than PHP)
         // Assumes created_at is stored as '06 December 2023'. 
@@ -840,7 +840,7 @@ class Client extends Model
         $duplicates = DB::table('clients')
             ->select($groupBy)
             ->where('id_route_import', $idRoute)
-            ->where('status', 'validated')
+            ->where('status', ['validated', 'confirmed'])
             ->whereRaw("STR_TO_DATE(created_at, '%d %M %Y') BETWEEN ? AND ?", [$startDate, $endDate])
             ->groupBy($groupBy)
             ->havingRaw('COUNT(*) > 1')

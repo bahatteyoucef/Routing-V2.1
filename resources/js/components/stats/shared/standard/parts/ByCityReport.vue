@@ -35,8 +35,10 @@
                         <tr>
                             <th>Index</th>
                             <th>City</th>
+                            <th>Confirmed</th>
                             <th>Validated</th>
                             <th>Ferme</th>
+                            <th>Refus</th>
                             <th>Expected</th>
                             <th>Gap</th>
                             <th>Percentage</th>
@@ -48,8 +50,10 @@
                         <tr>
                             <th>{{ by_city_report_table_data.total_row.label }}</th>
                             <th></th>
+                            <th>{{ by_city_report_table_data.total_row.confirmed_clients }}</th>
                             <th>{{ by_city_report_table_data.total_row.validated_clients }}</th>
                             <th>{{ by_city_report_table_data.total_row.ferme_clients }}</th>
+                            <th>{{ by_city_report_table_data.total_row.refus_clients }}</th>
                             <th>{{ by_city_report_table_data.total_row.expected_clients }}</th>
                             <th>{{ by_city_report_table_data.total_row.gap }}</th>
                             <th>{{ parseInt(by_city_report_table_data.total_row.percentage_clients * 100) }} %</th>
@@ -59,8 +63,10 @@
                         <tr v-for="row, index_1 in by_city_report_table_data.rows" :key="index_1">
                             <td>{{ index_1 + 1 }}</td>
                             <td>{{ row.CityNameE }}</td>
+                            <td>{{ row.confirmed_clients }}</td>
                             <td>{{ row.validated_clients }}</td>
                             <td>{{ row.ferme_clients }}</td>
+                            <td>{{ row.refus_clients }}</td>
                             <td>{{ row.expected_clients }}</td>
                             <td>{{ row.gap }}</td>
                             <td>{{ parseInt(row.percentage_clients * 100) }} %</td>

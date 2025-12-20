@@ -33,7 +33,7 @@
                                 <label for="text"               class="form-label fw-bold">Client Ouvert</label>
                                 <select                         class="form-select"         id="OpenCustomer"                 v-model="client.OpenCustomer"     @change="setStatus()">
                                     <option     value="Ferme">Ferme</option>
-                                    <option     value="Ouvert">Ouvert</option>
+                                    <option     value="refus">Refus</option>
                                 </select>
                             </div>
                         </div>
@@ -911,7 +911,7 @@ export default {
                     formData.append("finish_adding_date"                    ,   moment(new Date()).format())
                 }
 
-                else {
+                if(this.client.OpenCustomer === 'Ferme') {
                     formData.append("NewCustomer"                           ,   this.client.NewCustomer)
                     formData.append("OpenCustomer"                          ,   this.client.OpenCustomer)
 
@@ -953,6 +953,64 @@ export default {
                     formData.append("nonvalidated_details"                  ,   '')
 
                     formData.append("comment"                               ,   this.client.comment)
+
+                    formData.append("start_adding_date"                     ,   this.start_adding_date)
+                    formData.append("finish_adding_date"                    ,   moment(new Date()).format())
+                }
+
+                if(this.client.OpenCustomer === 'refus') {
+
+                    formData.append("CustomerIdentifier"                    ,   this.client.CustomerIdentifier)
+
+                    formData.append("NewCustomer"                           ,   this.client.NewCustomer)
+                    formData.append("OpenCustomer"                          ,   this.client.OpenCustomer)
+
+                    formData.append("CustomerBarCodeExiste"                 ,   '')
+
+                    formData.append("CustomerCode"                          ,   '')
+                    formData.append("CustomerNameE"                         ,   '')
+                    formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
+                    formData.append("Latitude"                              ,   this.client.Latitude)
+                    formData.append("Longitude"                             ,   this.client.Longitude)
+                    formData.append("RvrsGeoAddress"                        ,   this.client.RvrsGeoAddress)
+                    formData.append("Address"                               ,   this.client.Address)
+                    formData.append("Neighborhood"                          ,   this.client.Neighborhood)
+                    formData.append("Landmark"                              ,   this.client.Landmark)
+                    formData.append("DistrictNo"                            ,   this.client.DistrictNo)
+                    formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
+                    formData.append("CityNo"                                ,   this.client.CityNo)
+                    formData.append("CityNameE"                             ,   this.client.CityNameE)
+
+                    formData.append("Tel"                                   ,   '')
+                    formData.append("tel_status"                            ,   'nonvalidated')
+                    formData.append("tel_comment"                           ,   '')
+
+                    formData.append("CustomerType"                          ,   this.client.CustomerType)
+
+                    formData.append("NbrVitrines"                           ,   '')
+                    formData.append("NbrAutomaticCheckouts"                 ,   '')
+
+                    formData.append("SuperficieMagasin"                     ,   '')
+
+                    formData.append("CustomerBarCodeExiste_image"           ,   '')
+                    formData.append("CustomerBarCode_image"                 ,   '')
+                    formData.append("facade_image"                          ,   this.client.facade_image)
+                    formData.append("in_store_image"                        ,   '')
+
+                    formData.append("CustomerBarCodeExiste_image_original_name" ,   '')
+                    formData.append("CustomerBarCode_image_original_name"       ,   '')
+                    formData.append("facade_image_original_name"                ,   this.client.facade_image_original_name)
+                    formData.append("in_store_image_original_name"              ,   '')
+
+                    formData.append("status"                                ,   'pending')
+                    formData.append("nonvalidated_details"                  ,   '')
+
+                    formData.append("comment"                               ,   this.client.comment)
+
+                    formData.append("JPlan"                                 ,   this.client.JPlan)
+                    formData.append("Journee"                               ,   this.client.Journee)
+                    formData.append("BrandAvailability"                     ,   this.client.BrandAvailability)
+                    formData.append("BrandSourcePurchase"                   ,   this.client.BrandSourcePurchase)
 
                     formData.append("start_adding_date"                     ,   this.start_adding_date)
                     formData.append("finish_adding_date"                    ,   moment(new Date()).format())
@@ -1557,7 +1615,7 @@ export default {
             //Slide 1
             if(this.slideIndex  ==  1) {
 
-                if(((this.client.NewCustomer    === "Nouveau Client")||(this.client.NewCustomer    === "Client Existant"))&&((this.client.OpenCustomer    === "Ferme")||(this.client.OpenCustomer   === "Ouvert"))) {
+                if(((this.client.NewCustomer    === "Nouveau Client")||(this.client.NewCustomer    === "Client Existant"))&&((this.client.OpenCustomer    === "Ferme")||(this.client.OpenCustomer   === "Ouvert"))||(this.client.OpenCustomer === 'Refus')) {
 
                     return true
                 }
@@ -1569,6 +1627,194 @@ export default {
             }
 
             else {
+                if(this.client.OpenCustomer     === "Refus") {
+
+                    // Slide 2
+                    if(this.slideIndex  ==  2) {
+
+                        if(this.client.CustomerIdentifier !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 3
+                    if(this.slideIndex  ==  3) {
+
+                        if((this.client.CustomerNameA !== "")&&(this.$isUppercase(this.client.CustomerNameA))) {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 4
+                    if(this.slideIndex  ==  4) {
+
+                        if(this.client.Address !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 5
+                    if(this.slideIndex  ==  5) {
+
+                        if(this.client.Neighborhood !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 6
+                    if(this.slideIndex  ==  6) {
+
+                        if(this.client.Landmark !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 7
+                    if(this.slideIndex  ==  7) {
+
+                        if(this.client.DistrictNo !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 8
+                    if(this.slideIndex  ==  8) {
+
+                        if(this.client.CityNo !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 9
+                    if(this.slideIndex  ==  9) {
+
+                        if(this.client.CustomerType !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 10
+                    if(this.slideIndex  ==  10) {
+
+                        if((this.client.JPlan !== "")&&(this.$isUppercase(this.client.JPlan))) {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 11
+                    if(this.slideIndex  ==  11) {
+
+                        if(this.client.Frequency !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 12
+                    if(this.slideIndex  ==  12) {
+
+                        if(this.client.Journee !==  "") {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 14
+                    if(this.slideIndex  ==  14) {
+
+                        if((this.client.facade_image !==  "")&&(this.client.facade_image_original_name   !==  "")) {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    // Slide 15
+                    if(this.slideIndex  ==  15) {
+
+                        if( ((!isNaN(this.client.Latitude)) &&(this.client.Latitude     !== "") &&(isFinite(Number(this.client.Latitude))))   &&
+                            ((!isNaN(this.client.Longitude))&&(this.client.Longitude    !== "") &&(isFinite(Number(this.client.Longitude))))   ) {
+
+                            return true;
+                        }
+
+                        else {
+
+                            return false
+                        }
+                    }
+
+                    return true;
+                }
+
                 if(this.client.OpenCustomer     === "Ferme") {
 
                     // Slide 2
@@ -1757,7 +2003,7 @@ export default {
                     return true;
                 }
 
-                else {
+                if(this.client.OpenCustomer     === "Ouvert") {
 
                     // Slide 2
                     if(this.slideIndex  ==  2) {
@@ -2075,6 +2321,10 @@ export default {
         //
 
         setStatus() {
+
+            if(this.client.OpenCustomer == "Refus") {
+                this.client.status     =   "refus"
+            }
 
             if(this.client.OpenCustomer ==  "Ferme") {
                 this.client.status     =   "ferme"

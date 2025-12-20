@@ -106,10 +106,14 @@ export default {
             },
 
             // clients_non_owner               :   [],
+            clients_introuvable             :   [],
+            clients_owner_confirmed         :   [],
             clients_owner_validated         :   [],
             clients_owner_pending           :   [],
             clients_owner_non_validated     :   [],
             clients_owner_visible           :   [],
+            client_owner_ferme              :   [],
+            client_owner_refus              :   [],
 
             //
             is_database_clients_map         :   false
@@ -252,69 +256,90 @@ export default {
             this.setClientsArrays()
 
             // this.$map.$setRouteMarkers(this.clients_non_owner               , 1, "#000000")
-            this.$map.$setRouteMarkers(this.clients_owner_validated         , 2, "#0F9D58")
-            this.$map.$setRouteMarkers(this.clients_owner_pending           , 3, "#F57C00")
-            this.$map.$setRouteMarkers(this.clients_owner_non_validated     , 4, "#F70000")
-            this.$map.$setRouteMarkers(this.clients_owner_visible           , 5, "#3949AB")
-            this.$map.$setRouteMarkers(this.clients_owner_ferme             , 6, "#000000")
+            this.$map.$setRouteMarkers(this.clients_introuvable             , 1, "#000000") // Black 
+            this.$map.$setRouteMarkers(this.clients_owner_confirmed         , 2, "#0F9D58") // Green
+            this.$map.$setRouteMarkers(this.clients_owner_validated         , 3, "#0F9D58") // Green
+            this.$map.$setRouteMarkers(this.clients_owner_pending           , 4, "#F57C00") // Orange
+            this.$map.$setRouteMarkers(this.clients_owner_non_validated     , 5, "#F70000") // Red
+            this.$map.$setRouteMarkers(this.clients_owner_visible           , 6, "#3949AB") // Purple
+            this.$map.$setRouteMarkers(this.clients_owner_ferme             , 7, "#0288D1") // Blue
+            this.$map.$setRouteMarkers(this.clients_owner_refus             , 8, "#880E4F") // Blue
         },
 
         setClientsArrays() {
 
-            this.clients_non_owner              =   []
+            this.clients_introuvable            =   []
+            this.clients_owner_confirmed        =   []
             this.clients_owner_validated        =   []
             this.clients_owner_pending          =   []
             this.clients_owner_non_validated    =   []
             this.clients_owner_visible          =   []
             this.clients_owner_ferme            =   []
+            this.clients_owner_refus            =   []
 
             for (let i = 0; i < this.route_import.clients.length; i++) {
 
                 // Black
-                // if(this.route_import.clients[i].owner   !=  this.getUser.id) {
+                if(this.route_import.clients[i].status   ==  "introuvable") {
 
-                //     this.clients_non_owner.push(this.route_import.clients[i])
-                // }
+                    this.clients_introuvable.push(this.route_import.clients[i])
+                }
 
-                // else {
+                else {
 
-                    if(this.route_import.clients[i].status == "validated") {
+                    if(this.route_import.clients[i].status == "confirmed") {
 
-                        this.clients_owner_validated.push(this.route_import.clients[i])
+                        this.clients_owner_confirmed.push(this.route_import.clients[i])
                     }
 
                     else {
 
-                        if(this.route_import.clients[i].status == "pending") {
+                        if(this.route_import.clients[i].status == "validated") {
 
-                            this.clients_owner_pending.push(this.route_import.clients[i])
+                            this.clients_owner_validated.push(this.route_import.clients[i])
                         }
 
                         else {
 
-                            if(this.route_import.clients[i].status == "nonvalidated") {
+                            if(this.route_import.clients[i].status == "pending") {
 
-                                this.clients_owner_non_validated.push(this.route_import.clients[i])
+                                this.clients_owner_pending.push(this.route_import.clients[i])
                             }
 
                             else {
 
-                                if(this.route_import.clients[i].status == "visible") {
+                                if(this.route_import.clients[i].status == "nonvalidated") {
 
-                                    this.clients_owner_visible.push(this.route_import.clients[i])
+                                    this.clients_owner_non_validated.push(this.route_import.clients[i])
                                 }
 
                                 else {
 
-                                    if(this.route_import.clients[i].status == "ferme") {
+                                    if(this.route_import.clients[i].status == "visible") {
 
-                                        this.clients_owner_ferme.push(this.route_import.clients[i])
+                                        this.clients_owner_visible.push(this.route_import.clients[i])
+                                    }
+
+                                    else {
+
+                                        if(this.route_import.clients[i].status == "ferme") {
+
+                                            this.clients_owner_ferme.push(this.route_import.clients[i])
+                                        }
+
+                                        else {
+
+                                            if(this.route_import.clients[i].status == "refus") {
+
+                                                this.clients_owner_refus.push(this.route_import.clients[i])
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                // }
+                }
             }
         },
 

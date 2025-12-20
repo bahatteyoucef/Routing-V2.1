@@ -224,33 +224,11 @@ export default {
                 this.route_import_clients_data          =   res.data.clients
 
                 // Create DataTable
-                this.datatable_route_import_clients     =   this.datatable_route_import_clients_instance.$DataTableCreate("route_import_clients", this.route_import_clients_data, this.route_import_clients_columns, this.setDataTable, this.addElement, this.updateElement, null, this.selectRow, "Map Clients")      
+                this.datatable_route_import_clients     =   this.datatable_route_import_clients_instance.$DataTableCreate("route_import_clients", this.route_import_clients_data, this.route_import_clients_columns, this.setDataTable, null, null, null, this.selectRow, "Map Clients")      
 
                 //
                 this.$hideLoadingPage()
             })
-        },
-
-        //
-
-        async addElement() {
-            
-            // ShowModal
-            var addModal    =   new Modal(document.getElementById("ModalClientAdd"));
-            addModal.show();
-
-            let client      =   { lat : 0, lng : 0 }
-            await this.$refs.ModalClientAdd.getData(client, this.route_import_clients_data)
-        },
-
-        async updateElement(selected_row) {
-
-            if(selected_row) {
-                var updateModal     =   new Modal(document.getElementById("ModalClientUpdate"));
-                updateModal.show();
-
-                await this.$refs.ModalClientUpdate.getData(selected_row, this.route_import_clients_data)
-            }
         },
 
         //
@@ -479,151 +457,6 @@ export default {
         },
 
         //  //  //  //  //
-
-        //  //  //  //  //
-
-        //  //  //  //  //
-
-        async addClientToDatatable(client) {
-
-            let new_client      =   {}
-
-            // Add Client
-            new_client.id                       =   client.id
-
-            new_client.CustomerIdentifier       =   client.CustomerIdentifier
-
-            new_client.CustomerCode             =   client.CustomerCode
-
-            new_client.CustomerNameE            =   client.CustomerNameE
-            new_client.CustomerNameA            =   client.CustomerNameA
-            new_client.Tel                      =   client.Tel
-
-            new_client.Latitude                 =   client.Latitude         
-            new_client.Longitude                =   client.Longitude        
-
-            new_client.Address                  =   client.Address
-            new_client.Neighborhood             =   client.Neighborhood
-            new_client.Landmark                 =   client.Landmark
-
-            new_client.DistrictNo               =   client.DistrictNo      
-            new_client.DistrictNameE            =   client.DistrictNameE 
-
-            new_client.CityNo                   =   client.CityNo           
-            new_client.CityNameE                =   client.CityNameE       
-
-            new_client.CustomerType             =   client.CustomerType     
-
-            new_client.BrandAvailability        =   client.BrandAvailability       
-            new_client.BrandSourcePurchase      =   client.BrandSourcePurchase       
-
-            new_client.JPlan                    =   client.JPlan            
-            new_client.Journee                  =   client.Journee        
-
-            new_client.Frequency                =   client.Frequency
-            new_client.SuperficieMagasin        =   client.SuperficieMagasin
-            new_client.NbrAutomaticCheckouts    =   client.NbrAutomaticCheckouts
-
-            new_client.AvailableBrands                      =   client.AvailableBrands                      // should be json
-            new_client.AvailableBrands_array_formatted      =   client.AvailableBrands_array_formatted      // should be array
-            new_client.AvailableBrands_string_formatted     =   client.AvailableBrands_string_formatted     // should be string
-
-            new_client.status                   =   client.status            
-            new_client.nonvalidated_details     =   client.nonvalidated_details        
-
-            new_client.comment                  =   client.comment
-
-            new_client.facade_image                         =   client.facade_image            
-            new_client.in_store_image                       =   client.in_store_image        
-            new_client.facade_image_original_name           =   client.facade_image_original_name            
-            new_client.in_store_image_original_name         =   client.in_store_image_original_name        
-            new_client.CustomerBarCode_image                =   client.CustomerBarCode_image            
-            new_client.CustomerBarCode_image_original_name  =   client.CustomerBarCode_image_original_name        
-
-            new_client.owner_name       =   this.getUser.nom
-            new_client.created_at       =   this.$formatDate(new Date())
- 
-            this.route_import_clients_data.push(new_client)
-
-            //
-
-            // Refresh DataTable
-            this.datatable_route_import_clients     =   this.datatable_route_import_clients_instance.$DataTableCreate("route_import_clients", this.route_import_clients_data, this.route_import_clients_columns, this.setDataTable, this.addElement, this.updateElement, null, this.selectRow, "Map Clients")      
-        },
-
-        async updateClientToDatatable(client) {
-
-            for (let i = 0; i < this.route_import_clients_data.length; i++) {
-                
-                if(this.route_import_clients_data[i].id  ==  client.id) {
-
-                    this.route_import_clients_data[i].CustomerIdentifier    =   client.CustomerIdentifier
-                    this.route_import_clients_data[i].CustomerCode          =   client.CustomerCode
-
-                    this.route_import_clients_data[i].CustomerNameE         =   client.CustomerNameE
-                    this.route_import_clients_data[i].CustomerNameA         =   client.CustomerNameA
-                    this.route_import_clients_data[i].Tel                   =   client.Tel
-
-                    this.route_import_clients_data[i].Latitude              =   client.Latitude         
-                    this.route_import_clients_data[i].Longitude             =   client.Longitude        
-
-                    this.route_import_clients_data[i].Address               =   client.Address
-                    this.route_import_clients_data[i].Neighborhood          =   client.Neighborhood
-                    this.route_import_clients_data[i].Landmark              =   client.Landmark
-
-                    this.route_import_clients_data[i].DistrictNo            =   client.DistrictNo      
-                    this.route_import_clients_data[i].DistrictNameE         =   client.DistrictNameE  
-
-                    this.route_import_clients_data[i].CityNo                =   client.CityNo           
-                    this.route_import_clients_data[i].CityNameE             =   client.CityNameE       
-
-                    this.route_import_clients_data[i].CustomerType          =   client.CustomerType     
-
-                    this.route_import_clients_data[i].BrandAvailability     =   client.BrandAvailability       
-                    this.route_import_clients_data[i].BrandSourcePurchase   =   client.BrandSourcePurchase       
-
-                    this.route_import_clients_data[i].JPlan                 =   client.JPlan            
-                    this.route_import_clients_data[i].Journee               =   client.Journee        
-
-                    this.route_import_clients_data[i].status                =   client.status            
-                    this.route_import_clients_data[i].nonvalidated_details   =   client.nonvalidated_details        
-
-                    this.route_import_clients_data[i].comment                =   client.comment        
-
-                    this.route_import_clients_data[i].facade_image                           =   client.facade_image            
-                    this.route_import_clients_data[i].in_store_image                         =   client.in_store_image        
-                    this.route_import_clients_data[i].facade_image_original_name             =   client.facade_image_original_name            
-                    this.route_import_clients_data[i].in_store_image_original_name           =   client.in_store_image_original_name        
-                    this.route_import_clients_data[i].CustomerBarCode_image                  =   client.CustomerBarCode_image            
-                    this.route_import_clients_data[i].CustomerBarCode_image_original_name    =   client.CustomerBarCode_image_original_name        
-
-                    break
-                }
-            }
-
-            //
-
-            // Destroy DataTable
-            this.datatable_route_import_clients     =   this.datatable_route_import_clients_instance.$DataTableCreate("route_import_clients", this.route_import_clients_data, this.route_import_clients_columns, this.setDataTable, this.addElement, this.updateElement, null, this.selectRow, "Map Clients")      
-        },
-
-        async deleteClientToDatatable(client) {
-
-            for (let i = 0; i < this.route_import_clients_data.length; i++) {
-                
-                if(this.route_import_clients_data[i].id  ==  client.id) {
-
-                    this.route_import_clients_data.splice(i, 1)
-
-                    break
-                }
-            }
-
-            //
-            this.datatable_route_import_clients     =   this.datatable_route_import_clients_instance.$DataTableCreate("route_import_clients", this.route_import_clients_data, this.route_import_clients_columns, this.setDataTable, this.addElement, this.updateElement, null, this.selectRow, "Map Clients")      
-        },
-
-        //
 
         selectRow(selected_row, selected_row_id) {
 

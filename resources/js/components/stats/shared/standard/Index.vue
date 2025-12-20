@@ -30,13 +30,13 @@
 
                 <!-- Select Date Range  -->
                 <div class="col-sm-2 mt-1">
-                    <input type="date"                        class="form-control"        v-model="start_date"/>
+                    <input type="date"                        class="form-control" v-model="start_date"/>
                 </div>
                 <!--  -->
 
                 <!-- Select Date Range  -->
                 <div class="col-sm-2 mt-1">
-                    <input type="date"                        class="form-control"        v-model="end_date"/>
+                    <input type="date"                        class="form-control" v-model="end_date"/>
                 </div>
                 <!--  -->
 
@@ -46,15 +46,15 @@
                 </div>
                 <!--  -->
 
-                <!-- Resume         -->
-                <div class="col-sm-2 mt-1">
-                    <button v-if="show_export_data_button"    class="btn primary w-100"   @click="showResume()">Resume</button>
-                </div>
-                <!--  -->
-
                 <!-- Export Range   -->
                 <div class="col-sm-2 mt-1">
                     <button v-if="show_export_data_button"    class="btn primary w-100"   @click="exportData()">Export Data</button>
+                </div>
+                <!--  -->
+
+                <!--  -->
+                <div class="col-sm-2 mt-1">
+                  <button   v-if="show_validate_data_button"  class="btn primary w-100"  data-bs-toggle="modal" :data-bs-target="'#modalValidateMap'"    @click="getDoubles()">Validate</button>
                 </div>
                 <!--  -->
 
@@ -69,26 +69,15 @@
 
       <!-- Card Stats     -->
       <CardStats  v-if="show_card_stats"
-                  :number_clients_validated="number_clients_validated"        :number_clients_ferme="number_clients_ferme"      :number_clients_pending="number_clients_pending"
-                  :number_clients_nonvalidated="number_clients_nonvalidated"  :number_clients_visible="number_clients_visible"  :number_clients_total="number_clients_total"
-                  :number_clients_expected="number_clients_expected">
+                  :number_clients_tel_status_validated="number_clients_tel_status_validated"
+                  :number_clients_confirmed="number_clients_confirmed"        :number_clients_validated="number_clients_validated"    :number_clients_ferme="number_clients_ferme"                :number_clients_refus="number_clients_refus"                :number_clients_pending="number_clients_pending"
+                  :number_clients_nonvalidated="number_clients_nonvalidated"  :number_clients_visible="number_clients_visible"        :number_clients_introuvable="number_clients_introuvable"
+                  :number_clients_non_visible="number_clients_non_visible"    :number_clients_total="number_clients_total"            :number_clients_expected="number_clients_expected">
       </CardStats>
       <!--                -->
 
       <!-- Card Doublant  -->
-      <div v-if="show_card_doublants" class="row h-equal p-0 m-0">
-        <div class="col-sm-12 p-2">
-          <div class="card h-100">
-            <div class="card-body p-0">                
-              <div class="report_div" id="validation_report">
-                <div class="validations_div mt-5">
-                    <CardDoublants  :getDoublant="getDoublant"    :total_clients="total_clients"    :mode="'permanent'"   :id_route_import="route_link"></CardDoublants>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <CardDoublants  v-if="show_card_doublants"  :getDoublant="getDoublant"  :total_clients="total_clients"></CardDoublants>
       <!--                -->
 
       <!-- ByCustomerTypeReport + ByBrandSourcePurchaseReport + ByBrandAvailabilityReport -->
@@ -105,26 +94,30 @@
           </div>
         </div>
 
-        <!--  ByBrandSourcePurchaseReport -->
+        <!--  -->
+
+        <!--  ByNewCustomerReport  -->
         <div class="col-sm-4 p-2">
-          <div class="card h-100" v-if="show_by_brand_source_purchase_report_content">
+          <div class="card h-100" v-if="show_by_new_customer_report_content">
             <div class="card-body p-0">
               <div class="row">
-                <div class="report_div by_source_achat_report" id="by_source_achat_report">
-                    <ByBrandSourcePurchaseReport :key="by_brand_source_purchase_report_chart_data" :by_brand_source_purchase_report_chart_data="by_brand_source_purchase_report_chart_data"  :by_brand_source_purchase_report_table_data="by_brand_source_purchase_report_table_data"></ByBrandSourcePurchaseReport>
+                <div class="report_div by_new_customer_report" id="by_new_customer_report">
+                    <ByNewCustomerReport :key="by_new_customer_report_chart_data" :by_new_customer_report_chart_data="by_new_customer_report_chart_data"  :by_new_customer_report_table_data="by_new_customer_report_table_data"></ByNewCustomerReport>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!--  ByBrandAvailabilityReport -->
+        <!--  -->
+
+        <!--  ByOpenCustomerReport  -->
         <div class="col-sm-4 p-2">
-          <div class="card h-100" v-if="show_by_brand_availability_report_content">
+          <div class="card h-100" v-if="show_by_open_customer_report_content">
             <div class="card-body p-0">
               <div class="row">
-                <div class="report_div by_brand_availability_report" id="by_brand_availability_report">
-                    <ByBrandAvailabilityReport  :key="by_brand_availability_report_chart_data"  :by_brand_availability_report_chart_data="by_brand_availability_report_chart_data"  :by_brand_availability_report_table_data="by_brand_availability_report_table_data"></ByBrandAvailabilityReport>
+                <div class="report_div by_open_customer_report" id="by_open_customer_report">
+                    <ByOpenCustomerReport :key="by_open_customer_report_chart_data" :by_open_customer_report_chart_data="by_open_customer_report_chart_data"  :by_open_customer_report_table_data="by_open_customer_report_table_data"></ByOpenCustomerReport>
                 </div>
               </div>
             </div>
@@ -150,21 +143,6 @@
 
       </div>
       <!--                -->
-
-      <!-- ByTelValidity        -->
-      <div class="row h-equal p-0 m-0">
-        <!--  ByTelValidityReport -->
-        <div class="col-sm-12 p-2">
-          <div class="card h-100" v-if="show_by_tel_validity_report_content">
-            <div class="card-body p-0">
-              <div class="report_div" id="by_tel_validity_report">
-                  <ByTelValidityReport  :key="by_tel_validity_report_chart_data"    :by_tel_validity_report_chart_data="by_tel_validity_report_chart_data"  :by_tel_validity_report_table_data="by_tel_validity_report_table_data"></ByTelValidityReport>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!--                      -->
 
       <!-- ByCityReport         -->
       <div class="row h-equal p-0 m-0">
@@ -208,7 +186,7 @@
           <div class="card h-100" v-if="show_data_census_report_content">
             <div class="card-body p-0">                
               <div class="report_div" id="data_census_report">
-                  <DataCensusReport ref="DataCensusReport" :key="data_census_report_table_data"  :data_census_report_table_data="data_census_report_table_data"></DataCensusReport>
+                  <DataCensusReport :key="data_census_report_table_data"  :data_census_report_table_data="data_census_report_table_data"></DataCensusReport>
               </div>
             </div>
           </div>
@@ -220,13 +198,13 @@
     </div>
     <!--                  -->
 
-    <!-- Modal Decoupe By Journee       -->
-    <ModalResume          ref="ModalResume"         :mode="'permanent'"             :id_route_import="route_link"></ModalResume>
-    <!--                                -->
+    <!-- Validate         -->
+    <modalValidateMap     ref="modalValidateMap"    :key="route_link+'_'+start_date+'_'+end_date"   :id_route_import="route_link"    :start_date="start_date"    :end_date="end_date"></modalValidateMap>
+    <!--                  -->
 
-    <!-- Update                         -->
-    <ModalClientUpdate    ref="ModalClientUpdate"   :update_type="update_type"      :id_route_import="route_link"   :mode="mode"    :validation_type="validation_type"></ModalClientUpdate>
-    <!--                                -->
+    <!-- Modal Update     -->
+    <modalClientUpdate    ref="modalClientUpdate"         ></modalClientUpdate>
+    <!--                  -->
 
   </div>
 
@@ -234,13 +212,13 @@
 
 <script>
 
-import CardDoublants                      from  "../../../routes/shared/operations/validations/CardDoublants.vue"
 import CardStats                          from  "./parts/CardStats.vue"
+import CardDoublants                      from  "./parts/CardDoublants.vue"
 
 import ByCustomerTypeReport               from  "./parts/ByCustomerTypeReport.vue"
-import ByBrandSourcePurchaseReport        from  "./parts/ByBrandSourcePurchaseReport.vue"
-import ByBrandAvailabilityReport          from  "./parts/ByBrandAvailabilityReport.vue"
-import ByTelValidityReport                from  "./parts/ByTelValidityReport.vue"
+import ByNewCustomerReport                from  "./parts/ByNewCustomerReport.vue"
+import ByOpenCustomerReport               from  "./parts/ByOpenCustomerReport.vue"
+
 import ByCityReport                       from  "./parts/ByCityReport.vue"
 
 import DailyReport                        from  "./parts/DailyReport.vue"
@@ -249,11 +227,11 @@ import DataCensusReport                   from  "./parts/DataCensusReport.vue"
 
 //
 
-import ModalResume                        from  "../../../routes/shared/operations/ModalResume.vue"
+import modalValidateMap                   from  "../routes/permanent/modalValidateMap.vue"
 
 //
 
-import ModalClientUpdate                  from  "../../../clients/shared/ModalClientUpdate.vue"
+import modalClientUpdate                  from  "../clients/permanent/modalClientUpdate.vue"
 
 //
 
@@ -272,11 +250,16 @@ export default {
       //
 
       show_card_stats                                           : false   ,
+      number_clients_tel_status_validated                       : null    ,
+      number_clients_confirmed                                  : null    ,
       number_clients_validated                                  : null    ,
       number_clients_pending                                    : null    ,
       number_clients_nonvalidated                               : null    ,
       number_clients_visible                                    : null    ,
       number_clients_ferme                                      : null    ,
+      number_clients_refus                                      : null    ,
+      number_clients_introuvable                                : null    ,
+      number_clients_non_visible                                : null    ,
       number_clients_total                                      : null    ,
       number_clients_expected                                   : null    ,
 
@@ -299,33 +282,19 @@ export default {
 
       //
 
-      show_by_brand_source_purchase_report_content              : false   ,
-      by_brand_source_purchase_report_chart_data                : null    ,
-      by_brand_source_purchase_report_table_data                : null    ,
+      show_by_new_customer_report_content                       : false   ,
+      by_new_customer_report_chart_data                         : null    ,
+      by_new_customer_report_table_data                         : null    ,
 
-      //
-
-      show_by_brand_availability_report_content                 : false   ,
-      by_brand_availability_report_chart_data                   : null    ,
-      by_brand_availability_report_table_data                   : null    ,
-
-      //
-
-      // show_by_open_customer_report_content                      : false   ,
-      // by_open_customer_report_chart_data                        : null    ,
-      // by_open_customer_report_table_data                        : null    ,
+      show_by_open_customer_report_content                      : false   ,
+      by_open_customer_report_chart_data                        : null    ,
+      by_open_customer_report_table_data                        : null    ,
 
       //
 
       show_daily_report_content                                 : false   ,
       daily_report_chart_data                                   : null    ,
       daily_report_table_data                                   : null    ,
-
-      //
-
-      show_by_tel_validity_report_content                       : false   ,
-      by_tel_validity_report_chart_data                         : null    ,
-      by_tel_validity_report_table_data                         : null    ,
 
       //
 
@@ -351,103 +320,23 @@ export default {
       start_date          :   "",
       end_date            :   "",
 
-      update_type         :   null,
-      mode                :   null,
-      validation_type     :   null,
-
       //
 
-      users_all           :   [],
-      districts_all       :   [],
-
-      //
-
-      workbook            :   null,
+      workbook            :   null
     }
   },
 
   async mounted() {
 
-    this.emitter.on("reSetValidationClientUpdate" , (validation_type) =>  {
-      this.update_type        =   'validation'
-      this.mode               =   'permanent'
-      this.validation_type    =   validation_type
-    })
-
-    this.emitter.on("reSetNormalClientUpdate"     , ()                =>  {
-      this.update_type        =   'normal_update'
-      this.mode               =   'permanent'
-      this.validation_type    =   null
-    })
-
-    //
-
-    this.emitter.on("reSetUpdate"                 , async (client)    =>  {
+    this.emitter.on("reSetUpdate"  , async (client)    =>  {
       await this.updateClientJSON(client)
     })
 
-    this.emitter.on("updateDoublesCustomerCode"   , async (client)    =>  {
-      await this.updateClientJSONDoublant(client)
-    })
-
-    this.emitter.on("updateDoublesCustomerNameE"  , async (client)    =>  {
-      await this.updateClientJSONDoublant(client)
-    })
-
-    this.emitter.on("updateDoublesTel"            , async (client)    =>  {
-      await this.updateClientJSONDoublant(client)
-    })
-
-    this.emitter.on("updateDoublesGPS"            , async (client)    =>  {
-      await this.updateClientJSONDoublant(client)
-    })
-
-    //
-
-    this.emitter.on("reSetDelete"                 , async (client)    =>  {
+    this.emitter.on("reSetDelete", async (client)    =>  {
       await this.deleteClientJSON(client)
     })
 
-    this.emitter.on("deleteDoublesCustomerCode"   , async (client)    =>  {
-        await this.deleteClientJSONDoublant(client)
-    })
-
-    this.emitter.on("deleteDoublesCustomerNameE"  , async (client)    =>  {
-        await this.deleteClientJSONDoublant(client)
-    })
-
-    this.emitter.on("deleteDoublesTel"            , async (client)    =>  {
-        await this.deleteClientJSONDoublant(client)
-    })
-
-    this.emitter.on("deleteDoublesGPS"            , async (client)    =>  {
-        await this.deleteClientJSONDoublant(client)
-    })
-
-    //
-
-    this.emitter.on('reSetClientsDecoupeByJourneeMap'   , async (clients)   =>  {
-        await this.getData();
-    })
-
-    //
-
     await this.fetchMaps()
-  },
-
-  unmounted() {
-
-    this.emitter.off('reSetUpdate')
-    this.emitter.off('reSetDelete')
-
-    this.emitter.off('show_by_customer_type_report_content_ready')
-    this.emitter.off('show_by_brand_source_purchase_report_content_ready')
-    this.emitter.off('show_by_brand_availability_report_content_ready')
-    this.emitter.off('show_daily_report_content_ready')
-    this.emitter.off('show_by_tel_validity_report_content_ready')
-    this.emitter.off('show_by_city_report_content_ready')
-    this.emitter.off('show_data_map_report_content_ready')
-    this.emitter.off('show_data_census_report_table_content_ready')
   },
 
   components : {
@@ -457,22 +346,23 @@ export default {
 
     //
 
-    ByBrandAvailabilityReport     :   ByBrandAvailabilityReport   ,
     ByCityReport                  :   ByCityReport                ,
+
     ByCustomerTypeReport          :   ByCustomerTypeReport        ,
-    ByBrandSourcePurchaseReport   :   ByBrandSourcePurchaseReport ,
-    ByTelValidityReport           :   ByTelValidityReport         ,
+    ByNewCustomerReport           :   ByNewCustomerReport         ,
+    ByOpenCustomerReport          :   ByOpenCustomerReport        ,
+
     DailyReport                   :   DailyReport                 ,
     DataMapReport                 :   DataMapReport               ,
     DataCensusReport              :   DataCensusReport            ,
 
     //
 
-    ModalResume                   :   ModalResume                 ,
+    modalValidateMap              :   modalValidateMap            ,
 
     //
 
-    ModalClientUpdate             :   ModalClientUpdate           ,
+    modalClientUpdate             :   modalClientUpdate           ,
 
     //
 
@@ -483,171 +373,145 @@ export default {
 
     async getData() {
 
-      if((this.start_date  !=  "")&&(this.end_date  !=  "")) {
+      try {
 
-          this.$showLoadingPage()
+        if((this.start_date  !=  "")&&(this.end_date  !=  "")) {
 
-          //
+            this.$showLoadingPage()
 
-          this.show_get_data_button                           =   false
-          this.show_export_data_button                        =   false
-          this.show_validate_data_button                      =   false
+            //
 
-          this.show_card_stats                                =   false
-          this.show_card_doublants                            =   false
-          this.show_by_customer_type_report_content           =   false
-          this.show_by_brand_source_purchase_report_content   =   false
-          this.show_by_brand_availability_report_content      =   false
-          // this.show_by_open_customer_report_content           =   false
-          this.show_daily_report_content                      =   false
-          this.show_by_tel_validity_report_content            =   false
-          this.show_by_city_report_content                    =   false
-          this.show_data_census_report_content                =   false
-          this.show_data_map_report_content                   =   false
+            this.show_get_data_button                           =   false
+            this.show_export_data_button                        =   false
+            this.show_validate_data_button                      =   false
 
-          //
+            this.show_card_stats                                =   false
+            this.show_card_doublants                            =   false
 
-          let formData    =   new FormData()
+            this.show_by_customer_type_report_content           =   false
+            this.show_by_new_customer_report_content            =   false
+            this.show_by_open_customer_report_content           =   false
 
-          formData.append("route_links"   , JSON.stringify([this.route_link]))
-          formData.append("start_date"    , this.start_date)
-          formData.append("end_date"      , this.end_date)
+            this.show_daily_report_content                      =   false
+            this.show_by_city_report_content                    =   false
+            this.show_data_census_report_content                =   false
+            this.show_data_map_report_content                   =   false
 
-          await this.$callApi("post",   "/statistics/standard",    formData)
-          .then(async (res)=> {
+            //
 
-              console.log(res)
+            let formData    =   new FormData()
 
-              //
-              this.$hideLoadingPage()
+            formData.append("route_links"   , JSON.stringify([this.route_link]))
+            formData.append("start_date"    , this.start_date)
+            formData.append("end_date"      , this.end_date)
 
-              //
-              this.number_clients_validated                     =   res.data.stats_details.number_clients_validated
-              this.number_clients_pending                       =   res.data.stats_details.number_clients_pending  
-              this.number_clients_nonvalidated                  =   res.data.stats_details.number_clients_nonvalidated
-              this.number_clients_visible                       =   res.data.stats_details.number_clients_visible 
-              this.number_clients_ferme                         =   res.data.stats_details.number_clients_ferme 
-              this.number_clients_total                         =   res.data.stats_details.number_clients_total
-              this.number_clients_expected                      =   res.data.stats_details.number_clients_expected
+            await this.$callApi("post",   "/statistics/details",    formData)
+            .then(async (res)=> {
 
-              this.show_card_stats                              =   true
+                console.log(res)
 
-              //
+                //
+                this.$hideLoadingPage()
 
-              this.total_clients                                =   res.data.stats_details.total_clients
+                //
+                this.number_clients_tel_status_validated          =   res.data.stats_details.number_clients_tel_status_validated
+                this.number_clients_confirmed                     =   res.data.stats_details.number_clients_confirmed
+                this.number_clients_validated                     =   res.data.stats_details.number_clients_validated
+                this.number_clients_pending                       =   res.data.stats_details.number_clients_pending  
+                this.number_clients_nonvalidated                  =   res.data.stats_details.number_clients_nonvalidated
+                this.number_clients_visible                       =   res.data.stats_details.number_clients_visible 
+                this.number_clients_ferme                         =   res.data.stats_details.number_clients_ferme 
+                this.number_clients_refus                         =   res.data.stats_details.number_clients_refus 
+                this.number_clients_introuvable                   =   res.data.stats_details.number_clients_introuvable
+                this.number_clients_non_visible                   =   res.data.stats_details.number_clients_non_visible
+                this.number_clients_total                         =   res.data.stats_details.number_clients_total
+                this.number_clients_expected                      =   res.data.stats_details.number_clients_expected
 
-              //
+                this.show_card_stats                              =   true
 
-              this.getDoublant                                  =   res.data.stats_details.getDoublant
+                //
 
-              //
+                this.total_clients                                =   res.data.stats_details.total_clients
 
-              this.show_card_doublants                          =   true
+                //
 
-              //
+                this.getDoublant                                  =   res.data.stats_details.getDoublant
 
-              //
-              this.by_customer_type_report_chart_data           =   res.data.stats_details.by_customer_type_report_chart_data
-              this.by_customer_type_report_table_data           =   res.data.stats_details.by_customer_type_report_table_data
+                this.show_card_doublants                          =   true
 
-              this.show_by_customer_type_report_content         =   true
+                //
 
-              this.emitter.on('show_by_customer_type_report_content_ready' , () =>  {
+                //
+                this.by_customer_type_report_chart_data           =   res.data.stats_details.by_customer_type_report_chart_data
+                this.by_customer_type_report_table_data           =   res.data.stats_details.by_customer_type_report_table_data
 
-                  //
-                  this.by_brand_source_purchase_report_chart_data   =   res.data.stats_details.by_brand_source_purchase_report_chart_data
-                  this.by_brand_source_purchase_report_table_data   =   res.data.stats_details.by_brand_source_purchase_report_table_data
+                this.show_by_customer_type_report_content         =   true
 
-                  this.show_by_brand_source_purchase_report_content =   true
+                this.emitter.on('show_by_customer_type_report_content_ready' , () =>  {
 
-                  this.emitter.on('show_by_brand_source_purchase_report_content_ready' , () =>  {
+                    this.by_new_customer_report_chart_data   =   res.data.stats_details.by_new_customer_report_chart_data
+                    this.by_new_customer_report_table_data   =   res.data.stats_details.by_new_customer_report_table_data
 
-                      //
-                      this.by_brand_availability_report_chart_data      =   res.data.stats_details.by_brand_availability_report_chart_data
-                      this.by_brand_availability_report_table_data      =   res.data.stats_details.by_brand_availability_report_table_data
+                    this.show_by_new_customer_report_content =   true
 
-                      this.show_by_brand_availability_report_content    =   true
+                    this.emitter.on('show_by_new_customer_report_content_ready' , () =>  {
+                            
+                        this.by_open_customer_report_chart_data           =   res.data.stats_details.by_open_customer_report_chart_data
+                        this.by_open_customer_report_table_data           =   res.data.stats_details.by_open_customer_report_table_data
 
-                      this.emitter.on('show_by_brand_availability_report_content_ready' , () =>  {
+                        this.show_by_open_customer_report_content         =   true
 
-                          //
-                          // this.by_open_customer_report_chart_data           =   res.data.stats_details.by_open_customer_report_chart_data
-                          // this.by_open_customer_report_table_data           =   res.data.stats_details.by_open_customer_report_table_data
+                        this.emitter.on('show_by_open_customer_report_content_ready' , () =>  {
+                                
+                            //
+                            this.daily_report_chart_data                      =   res.data.stats_details.daily_report_chart_data
+                            this.daily_report_table_data                      =   res.data.stats_details.daily_report_table_data
 
-                          // this.show_by_open_customer_report_content         =   true
+                            this.show_daily_report_content                    =   true
 
-                          // this.emitter.on('show_by_open_customer_report_content_ready' , () =>  {
+                            this.emitter.on('show_daily_report_content_ready' , () =>  {
 
-                              //
-                              this.daily_report_chart_data                      =   res.data.stats_details.daily_report_chart_data
-                              this.daily_report_table_data                      =   res.data.stats_details.daily_report_table_data
+                                //
+                                // this.by_city_report_chart_data                    =   res.data.stats_details.by_city_report_chart_data
+                                this.by_city_report_table_data                    =   res.data.stats_details.by_city_report_table_data
 
-                              this.show_daily_report_content                    =   true
+                                this.show_by_city_report_content                  =   true
 
-                              this.emitter.on('show_daily_report_content_ready' , () =>  {
-                                  //
-                                  this.by_tel_validity_report_chart_data            =   res.data.stats_details.by_tel_validity_report_chart_data
-                                  this.by_tel_validity_report_table_data            =   res.data.stats_details.by_tel_validity_report_table_data
+                                this.emitter.on('show_by_city_report_content_ready' , () =>  {
 
-                                  this.show_by_tel_validity_report_content          =   true
+                                    //
+                                    this.map_report_data                              =   res.data.stats_details.data_census_report_table_data
 
-                                  this.emitter.on('show_by_tel_validity_report_content_ready' , () =>  {
+                                    this.show_data_map_report_content                 =   true
 
-                                      //
-                                      // this.by_city_report_chart_data                    =   res.data.stats_details.by_city_report_chart_data
-                                      this.by_city_report_table_data                    =   res.data.stats_details.by_city_report_table_data
+                                    this.emitter.on('show_data_map_report_content_ready', () => {
 
-                                      this.show_by_city_report_content                  =   true
+                                        //
+                                        this.data_census_report_table_data                =   res.data.stats_details.data_census_report_table_data
 
-                                      this.emitter.on('show_by_city_report_content_ready' , () =>  {
+                                        this.show_data_census_report_content              =   true
 
-                                          //
-                                          this.map_report_data                              =   res.data.stats_details.data_census_report_table_data
+                                        this.emitter.on('show_data_census_report_content_ready' , () =>  {
 
-                                          this.show_data_map_report_content                 =   true
-
-                                          this.emitter.on('show_data_map_report_content_ready', () => {
-
-                                              //
-                                              this.data_census_report_table_data                =   res.data.stats_details.data_census_report_table_data
-
-                                              this.show_data_census_report_content              =   true
-
-                                              this.emitter.on('show_data_census_report_table_content_ready' , () =>  {
-
-                                                  this.show_get_data_button       =   true
-                                                  this.show_export_data_button    =   true
-                                                  this.show_validate_data_button  =   true
-                                              })
-                                          })
-                                      })
-                                  })
-                              })
-                          // })
-                      })
-                  })
-              })
-          })
-          .catch((err) => {
-            this.show_get_data_button   =   true
-          })
+                                            this.show_get_data_button       =   true
+                                            this.show_export_data_button    =   true
+                                            this.show_validate_data_button  =   true
+                                        })
+                                    })
+                                })
+                            })
+                        })
+                    })
+                    // })
+                })
+            })
+        }
       }
 
-      else {
-        this.$feedbackWarning("Warning !", "Please select a map, start and an end date !")
+      catch(e) {
+
+        console.log(e)
       }
-    },
-
-    //
-
-    async showResume() {
-
-      // ShowModal
-      var ModalResume    =   new Modal(document.getElementById("ModalResume"));
-      ModalResume.show();
-
-      //
-      await this.$refs.ModalResume.getClients(this.total_clients)
     },
 
     //
@@ -664,13 +528,20 @@ export default {
         let filename = "Reports ("+this.start_date+" __ "+this.end_date+").xlsx";
 
         //
+        console.log(1)
         this.exportByCustomerTypeReport()
-        this.exportByBrandSourcePurchaseReport()
-        this.exportByBrandAvailabilityReport()
+        console.log(2)
+        this.exportByNewCustomerReport()
+        console.log(3)
+        this.exportByOpenCustomerReport()
+        console.log(4)
         this.exportDailyReport()
-        this.exportByTelValidityReport()
+        this.exportDailyReportTotal()
+        console.log(5)
         this.exportByCityReport()
+        console.log(6)
         this.exportDataCensusReport()
+        console.log(7)
 
         // Write workbook to buffer then convert to Excel file and download
         this.workbook.xlsx.writeBuffer().then(data => {
@@ -765,18 +636,18 @@ export default {
 
     //
 
-    exportByBrandSourcePurchaseReport() {
+    exportByNewCustomerReport() {
 
         // Add a new worksheet to workbook variable
-        const worksheet = this.workbook.addWorksheet('By Brand Source Purchase Report');
+        const worksheet = this.workbook.addWorksheet('By New Customer Report');
 
         //
 
-        worksheet.columns =   this.getByBrandSourcePurchaseReportColumns()
+        worksheet.columns =   this.getByNewCustomerReportColumns()
 
         //
 
-        let rows          =   this.getByBrandSourcePurchaseReportRows()
+        let rows          =   this.getByNewCustomerReportRows()
 
         worksheet.addRows(rows)
 
@@ -786,7 +657,7 @@ export default {
         const lastRow = worksheet.lastRow.number;
 
         //
-        const canvas = document.getElementById("by_brand_source_purchase_report_chart")
+        const canvas = document.getElementById("by_customer_type_report_chart")
         const ctx = canvas.getContext('2d');
         const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
@@ -803,19 +674,19 @@ export default {
         });
     },
 
-    getByBrandSourcePurchaseReportRows() {
+    getByNewCustomerReportRows() {
 
       let rows  =   []
 
       let row   =   {}
 
-      for (let index = 0; index < this.by_brand_source_purchase_report_table_data.rows.length; index++) {
+      for (let index = 0; index < this.by_customer_type_report_table_data.rows.length; index++) {
 
         row                         =   {}
 
-        row["BrandSourcePurchase"]  =   this.by_brand_source_purchase_report_table_data.rows[index].label 
-        row["Clients"]              =   this.by_brand_source_purchase_report_table_data.rows[index].count_clients 
-        row["Total"]                =   parseInt(this.by_brand_source_purchase_report_table_data.rows[index].percentage_clients * 100) + "%"
+        row["NewCustomer"]         =   this.by_customer_type_report_table_data.rows[index].label 
+        row["Clients"]              =   this.by_customer_type_report_table_data.rows[index].count_clients 
+        row["Total"]                =   parseInt(this.by_customer_type_report_table_data.rows[index].percentage_clients * 100) + "%"
 
         rows.push(row)
       }
@@ -823,40 +694,41 @@ export default {
       // Set Total
       row                         =   {}
 
-      row["BrandSourcePurchase"]  =   this.by_brand_source_purchase_report_table_data.total_row.label
-      row["Clients"]              =   this.by_brand_source_purchase_report_table_data.total_row.count_clients
-      row["Total"]                =   parseInt(this.by_brand_source_purchase_report_table_data.total_row.percentage_clients * 100) + "%"
+      row["NewCustomer"]         =   this.by_customer_type_report_table_data.total_row.label
+      row["Clients"]              =   this.by_customer_type_report_table_data.total_row.count_clients
+      row["Total"]                =   parseInt(this.by_customer_type_report_table_data.total_row.percentage_clients * 100) + "%"
 
       rows.push(row)
 
       return rows
     },
 
-    getByBrandSourcePurchaseReportColumns() {
+    getByNewCustomerReportColumns() {
 
         let columns =   [
-                          {header: "BrandSourcePurchase"  , key: "BrandSourcePurchase"  , width: 10},
-                          {header: "Clients"              , key: "Clients"              , width: 10},
-                          {header: "Total"                , key: "Total"                , width: 10}
+                          {header: "NewCustomer"        , key: "NewCustomer"        , width: 10},
+                          {header: "Clients"            , key: "Clients"            , width: 10},
+                          {header: "Total"              , key: "Total"              , width: 10}
                         ]
 
+        //
         return columns
     },
 
     //
 
-    exportByBrandAvailabilityReport() {
+    exportByOpenCustomerReport() {
 
         // Add a new worksheet to workbook variable
-        const worksheet   =   this.workbook.addWorksheet('By Brand Availability Report');
+        const worksheet = this.workbook.addWorksheet('By Open Customer Report');
 
         //
 
-        worksheet.columns =   this.getByBrandAvailabilityReportColumns()
+        worksheet.columns =   this.getByOpenCustomerReportColumns()
 
         //
 
-        let rows          =   this.getByBrandAvailabilityReportRows()
+        let rows          =   this.getByOpenCustomerReportRows()
 
         worksheet.addRows(rows)
 
@@ -866,7 +738,7 @@ export default {
         const lastRow = worksheet.lastRow.number;
 
         //
-        const canvas = document.getElementById("by_brand_availability_report_chart")
+        const canvas = document.getElementById("by_customer_type_report_chart")
         const ctx = canvas.getContext('2d');
         const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
@@ -883,19 +755,19 @@ export default {
         });
     },
 
-    getByBrandAvailabilityReportRows() {
+    getByOpenCustomerReportRows() {
 
       let rows  =   []
 
       let row   =   {}
 
-      for (let index = 0; index < this.by_brand_availability_report_table_data.rows.length; index++) {
+      for (let index = 0; index < this.by_customer_type_report_table_data.rows.length; index++) {
 
         row                         =   {}
 
-        row["Brand Availability"]   =   this.by_brand_availability_report_table_data.rows[index].label 
-        row["Clients"]              =   this.by_brand_availability_report_table_data.rows[index].count_clients 
-        row["Total"]                =   parseInt(this.by_brand_availability_report_table_data.rows[index].percentage_clients * 100) + "%"
+        row["OpenCustomer"]         =   this.by_customer_type_report_table_data.rows[index].label 
+        row["Clients"]              =   this.by_customer_type_report_table_data.rows[index].count_clients 
+        row["Total"]                =   parseInt(this.by_customer_type_report_table_data.rows[index].percentage_clients * 100) + "%"
 
         rows.push(row)
       }
@@ -903,215 +775,347 @@ export default {
       // Set Total
       row                         =   {}
 
-      row["Brand Availability"]   =   this.by_brand_availability_report_table_data.total_row.label
-      row["Clients"]              =   this.by_brand_availability_report_table_data.total_row.count_clients
-      row["Total"]                =   parseInt(this.by_brand_availability_report_table_data.total_row.percentage_clients * 100) + "%"
+      row["OpenCustomer"]         =   this.by_customer_type_report_table_data.total_row.label
+      row["Clients"]              =   this.by_customer_type_report_table_data.total_row.count_clients
+      row["Total"]                =   parseInt(this.by_customer_type_report_table_data.total_row.percentage_clients * 100) + "%"
 
       rows.push(row)
 
       return rows
     },
 
-    getByBrandAvailabilityReportColumns() {
+    getByOpenCustomerReportColumns() {
 
         let columns =   [
-                          {header: "Brand Availability" , key: "Brand Availability" , width: 10},
+                          {header: "OpenCustomer"       , key: "OpenCustomer"       , width: 10},
                           {header: "Clients"            , key: "Clients"            , width: 10},
                           {header: "Total"              , key: "Total"              , width: 10}
                         ]
 
+        //
         return columns
     },
 
     //
 
     exportDailyReport() {
-
-        // Add a new worksheet to workbook variable
         const worksheet = this.workbook.addWorksheet('Daily Report');
+        const allDays = this.daily_report_table_data.allDays;
+        const N = allDays.length;
+        // The 4 sub-headers used for each day and the total
+        const subHeaders = ['Ouvert', 'Ferme', 'Refus', 'Total'];
 
-        //
+        // 1. Define Column Keys & Widths
+        // This MUST be done before addRows() to map the data keys correctly.
+        worksheet.columns = this.getDailyReportColumns();
 
-        worksheet.columns =   this.getDailyReportColumns()
+        // 2. Build Header Row 1 (e.g., [ ], [Day 1], [Day 2], [Total])
+        let headerRow1Values = ['']; // A1 is empty, will be merged
+        
+        // Add Day headers
+        for (const day of allDays) {
+            headerRow1Values.push(day); // This will be the top-left cell of the merge
+            // Add 3 empty placeholders for the 4-column merge
+            headerRow1Values.push('', '', ''); 
+        }
+        
+        // Add the "Total" header
+        headerRow1Values.push('Total');
+        // Add 3 empty placeholders for the 'Total' merge
+        headerRow1Values.push('', '', '');
+        
+        const headerRow1 = worksheet.addRow(headerRow1Values);
+        headerRow1.font = { bold: true };
+        headerRow1.alignment = { horizontal: 'center' };
 
-        //
+        // 3. Build Header Row 2 (e.g., [User], [Ouvert, Ferme, ...], [Ouvert, ...])
+        let headerRow2Values = ['User']; // A2
+        
+        // Add sub-headers for each day
+        for (let i = 0; i < N; i++) {
+            headerRow2Values.push(...subHeaders); // Adds ['Ouvert', 'Ferme', 'Refus', 'Total']
+        }
+        
+        // Add sub-headers for the Grand Total
+        headerRow2Values.push(...subHeaders); 
 
-        let rows          =   this.getDailyReportRows()
+        const headerRow2 = worksheet.addRow(headerRow2Values);
+        headerRow2.font = { bold: true };
+        headerRow2.alignment = { horizontal: 'center' };
 
-        worksheet.addRows(rows)
+        // 4. Apply Header Merges
+        // Merge A1:A2 and set shared value
+        worksheet.mergeCells('A1:A2');
+        worksheet.getCell('A1').value = 'User';
+        worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
 
-        //
-
-        // Determine the last row of the table
-        const lastRow = worksheet.lastRow.number;
-
-        //
-        const canvas  = document.getElementById("daily_report_chart")
-        const ctx     = canvas.getContext('2d');
-        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-        //
-        const imgId   = this.workbook.addImage({
-          base64      : this.imageDataToBase64(imgData),
-          extension   : 'png',
-        });
-
-        // Add the image to the worksheet
-        worksheet.addImage(imgId, {
-          tl  : { col: 1, row: lastRow + 2 },
-          ext : { width: canvas.width, height: canvas.height },
-        });
-    },
-
-    getDailyReportRows() {
-
-      let rows  = []
-
-      let row   = {}
-
-      // Set Rows
-      for (let index_1 = 0; index_1 < this.daily_report_table_data.rows.length; index_1++) {
-
-          row           =   {}
-
-          //
-          row["User"]   =   this.daily_report_table_data.rows[index_1].label
-
-          //
-          for (let index_2 = 0; index_2 < this.daily_report_table_data.rows[index_1].data.length; index_2++) {
-
-            row[this.daily_report_table_data.allDays[index_2]] = this.daily_report_table_data.rows[index_1].data[index_2]
-          }
-
-          //
-          row["Total"]  =   this.daily_report_table_data.rows[index_1].total
-
-          rows.push(row)
-      }
-
-      //  //  //  //  //  //  //  //  //  //  //  //  //
-
-      // Set Total
-      row           =   {}
-
-      //
-      row["User"]   =   "Total"
-
-      //
-      for (let index_2 = 0; index_2 < this.daily_report_table_data.total_by_day_object.data.length; index_2++) {
-
-        row[this.daily_report_table_data.allDays[index_2]] = this.daily_report_table_data.total_by_day_object.data[index_2]
-      }
-
-      //
-      row["Total"]   =   this.daily_report_table_data.total_by_day_object.total
-
-      rows.push(row)
-
-      //
-      return rows
-    },
-
-    getDailyReportColumns() {
-
-        let columns =   []
-
-        if(this.daily_report_table_data.allDays.length > 0) {
-
-            columns.push({header: "User", key: "User", width: 10})
-
-            for (let index = 0; index < this.daily_report_table_data.allDays.length; index++) {
-
-                columns.push({header: this.daily_report_table_data.allDays[index], key: this.daily_report_table_data.allDays[index], width: 10})
-            }
-
-            columns.push({header: "Total", key: "Total", width: 10})
+        // Merge Day headers (Row 1)
+        for (let i = 0; i < N; i++) {
+            // Calculate column range for each day
+            let startCol = 2 + (i * 4); // Col B, F, J, etc.
+            let endCol = startCol + 3;   // Col E, I, M, etc.
+            worksheet.mergeCells(1, startCol, 1, endCol); // (row, col, row, col)
         }
 
-        return columns
-    },
+        // Merge Grand Total header (Row 1)
+        let totalStartCol = 2 + (N * 4); // Column after the last day
+        let totalEndCol = totalStartCol + 3;
+        worksheet.mergeCells(1, totalStartCol, 1, totalEndCol);
+        
+        // 5. Add Data Rows (This function is also modified)
+        let rows = this.getDailyReportRows();
+        worksheet.addRows(rows);
 
-    //
-
-    exportByTelValidityReport() {
-
-        // Add a new worksheet to workbook variable
-        const worksheet = this.workbook.addWorksheet('By Tel Availability Report');
-
-        //
-
-        worksheet.columns =   this.getByTelValidityReportColumns()
-
-        //
-
-        let rows          =   this.getByTelValidityReportRows()
-
-        worksheet.addRows(rows)
-
-        //
+        // --- Your Image Code (Unchanged) ---
 
         // Determine the last row of the table
         const lastRow = worksheet.lastRow.number;
 
         //
-        const canvas = document.getElementById("by_tel_validity_report_chart")
+        const canvas = document.getElementById("daily_report_chart"); // Make sure this ID is correct
         const ctx = canvas.getContext('2d');
         const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
         //
         const imgId = this.workbook.addImage({
-          base64    : this.imageDataToBase64(imgData),
-          extension : 'png',
+            base64: this.imageDataToBase64(imgData),
+            extension: 'png',
         });
 
         // Add the image to the worksheet
         worksheet.addImage(imgId, {
-          tl  : { col: 1, row: lastRow + 2 },
-          ext : { width: canvas.width, height: canvas.height },
+            tl: { col: 1, row: lastRow + 2 },
+            ext: { width: canvas.width, height: canvas.height },
         });
     },
 
-    getByTelValidityReportRows() {
+    getDailyReportRows() {
+        let rows = [];
+        const allDays = this.daily_report_table_data.allDays;
+        const totalRowData = this.daily_report_table_data.total_by_day_object;
+        const userRowsData = this.daily_report_table_data.rows;
 
-      let rows  =   []
+        // 1. Build the "Total" Row (as seen first in your tbody)
+        let totalRow = { User: "Total" }; // First column
 
-      let row   =   {}
+        // Add data for each day
+        for (let i = 0; i < allDays.length; i++) {
+            const day = allDays[i];
+            const dayData = totalRowData.data[i];
+            
+            totalRow[`${day}_ouvert`] = dayData.count_ouvert;
+            totalRow[`${day}_ferme`]  = dayData.count_ferme;
+            totalRow[`${day}_refus`]  = dayData.count_refus;
+            totalRow[`${day}_total`]  = dayData.count_total;
+        }
 
-      for (let index = 0; index < this.by_tel_validity_report_table_data.rows.length; index++) {
+        // Add data for the final "Grand Total" block
+        totalRow["GrandTotal_ouvert"] = totalRowData.total_obj.count_ouvert;
+        totalRow["GrandTotal_ferme"]  = totalRowData.total_obj.count_ferme;
+        totalRow["GrandTotal_refus"]  = totalRowData.total_obj.count_refus;
+        totalRow["GrandTotal_total"]  = totalRowData.total_obj.count_total;
+        
+        rows.push(totalRow);
 
-        row                   =   {}
+        // 2. Build the User Rows
+        for (const userRow of userRowsData) {
+            let row = { User: userRow.label }; // First column
 
-        row["User"]           =   this.by_tel_validity_report_table_data.rows[index].label 
-        row["Validated"]      =   this.by_tel_validity_report_table_data.rows[index].count_validated
-        row["NonValidated"]   =   this.by_tel_validity_report_table_data.rows[index].count_nonvalidated
-        row["Total"]          =   this.by_tel_validity_report_table_data.rows[index].count_total
+            // Add data for each day
+            for (let i = 0; i < allDays.length; i++) {
+                const day = allDays[i];
+                const dayData = userRow.data[i];
 
-        rows.push(row)
-      }
+                row[`${day}_ouvert`] = dayData.count_ouvert;
+                row[`${day}_ferme`]  = dayData.count_ferme;
+                row[`${day}_refus`]  = dayData.count_refus;
+                row[`${day}_total`]  = dayData.count_total;
+            }
 
-      // Set Total
-      row                     =   {}
+            // Add data for the user's total ("Grand Total" block for that row)
+            row["GrandTotal_ouvert"] = userRow.total_obj.count_ouvert;
+            row["GrandTotal_ferme"]  = userRow.total_obj.count_ferme;
+            row["GrandTotal_refus"]  = userRow.total_obj.count_refus;
+            row["GrandTotal_total"]  = userRow.total_obj.count_total;
 
-      row["User"]             =   this.by_tel_validity_report_table_data.total_row.label 
-      row["Validated"]        =   this.by_tel_validity_report_table_data.total_row.count_validated 
-      row["NonValidated"]     =   this.by_tel_validity_report_table_data.total_row.count_nonvalidated
-      row["Total"]            =   this.by_tel_validity_report_table_data.total_row.count_total
+            rows.push(row);
+        }
 
-      rows.push(row)
-
-      return rows
+        return rows;
     },
 
-    getByTelValidityReportColumns() {
+    getDailyReportColumns() {
+        let columns = [];
+        const allDays = this.daily_report_table_data.allDays;
 
-        let columns =   [
-                          {header: "User"   , key: "User"   , width: 10},
-                          {header: "Yes"    , key: "Yes"    , width: 10},
-                          {header: "No"     , key: "No"     , width: 10},
-                          {header: "Total"  , key: "Total"  , width: 10}
-                        ]
+        if (allDays.length > 0) {
+            // 1. User Column
+            columns.push({ key: "User", width: 15 });
 
-        return columns
+            // 2. Columns for each day
+            for (const day of allDays) {
+                // We need unique keys for each sub-column
+                columns.push({ key: `${day}_ouvert`, width: 10 });
+                columns.push({ key: `${day}_ferme`, width: 10 });
+                columns.push({ key: `${day}_refus`, width: 10 });
+                columns.push({ key: `${day}_total`, width: 10, style: { font: { bold: true } } });
+            }
+
+            // 3. Columns for the Grand Total block
+            columns.push({ key: "GrandTotal_ouvert", width: 10 });
+            columns.push({ key: "GrandTotal_ferme", width: 10 });
+            columns.push({ key: "GrandTotal_refus", width: 10 });
+            columns.push({ key: "GrandTotal_total", width: 12, style: { font: { bold: true } } });
+        }
+        
+        return columns;
+    },
+
+    //
+
+    exportDailyReportTotal() {
+        const worksheet = this.workbook.addWorksheet('Daily Report (Total)');
+        const allDays = this.daily_report_table_data.allDays;
+        const N = allDays.length;
+        // The sub-header is now just 'Total'
+        const subHeaders = ['Total'];
+
+        // 1. Define Column Keys & Widths
+        // This calls the new getDailyReportTotalColumns() function
+        worksheet.columns = this.getDailyReportTotalColumns();
+
+        // 2. Build Header Row 1
+        // [EMPTY] | [Day 1] | [Day 2] | ... | [Total]
+        let headerRow1Values = ['']; // A1 is empty, will be merged
+        
+        // Add Day headers (now only 1 column each)
+        for (const day of allDays) {
+            headerRow1Values.push(day); 
+        }
+        
+        // Add the "Total" header
+        headerRow1Values.push('Total');
+        
+        const headerRow1 = worksheet.addRow(headerRow1Values);
+        headerRow1.font = { bold: true };
+        headerRow1.alignment = { horizontal: 'center' };
+
+        // 3. Build Header Row 2
+        // [User] | [Total] | [Total] | ... | [Total]
+        let headerRow2Values = ['User']; // A2
+        
+        // Add sub-headers ('Total') for each day
+        for (let i = 0; i < N; i++) {
+            headerRow2Values.push(...subHeaders); // Adds ['Total']
+        }
+        
+        // Add sub-header for the Grand Total
+        headerRow2Values.push(...subHeaders); // Adds ['Total']
+
+        const headerRow2 = worksheet.addRow(headerRow2Values);
+        headerRow2.font = { bold: true };
+        headerRow2.alignment = { horizontal: 'center' };
+
+        // 4. Apply Header Merges
+        // Merge A1:A2 for "User"
+        worksheet.mergeCells('A1:A2');
+        worksheet.getCell('A1').value = 'User';
+        worksheet.getCell('A1').alignment = { vertical: 'middle', horizontal: 'center' };
+
+        // Merge the final "Total" column
+        // It's the column at index N + 2 (1 for User, N for days, 1 for Total)
+        const totalColLetter = worksheet.getColumn(N + 2).letter; 
+        worksheet.mergeCells(`${totalColLetter}1:${totalColLetter}2`);
+        worksheet.getCell(`${totalColLetter}1`).value = 'Total';
+        worksheet.getCell(`${totalColLetter}1`).alignment = { vertical: 'middle', horizontal: 'center' };
+        
+        // 5. Add Data Rows
+        // This calls the new getDailyReportTotalRows() function
+        let rows = this.getDailyReportTotalRows();
+        worksheet.addRows(rows);
+
+        // --- Your Image Code (Unchanged) ---
+        const lastRow = worksheet.lastRow.number;
+        const canvas = document.getElementById("daily_report_chart");
+        const ctx = canvas.getContext('2d');
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+        const imgId = this.workbook.addImage({
+            base64: this.imageDataToBase64(imgData),
+            extension: 'png',
+        });
+
+        worksheet.addImage(imgId, {
+            tl: { col: 1, row: lastRow + 2 },
+            ext: { width: canvas.width, height: canvas.height },
+        });
+    },
+
+    getDailyReportTotalRows() {
+        let rows = [];
+        const allDays = this.daily_report_table_data.allDays;
+        const totalRowData = this.daily_report_table_data.total_by_day_object;
+        const userRowsData = this.daily_report_table_data.rows;
+
+        // 1. Build the "Total" Row
+        let totalRow = { User: "Total" }; // First column
+
+        // Add data for each day's total
+        for (let i = 0; i < allDays.length; i++) {
+            const day = allDays[i]; // The key, e.g., "Day 1"
+            const dayData = totalRowData.data[i];
+            
+            // Use the day name as the key
+            totalRow[day] = dayData.count_total;
+        }
+
+        // Add data for the final "Grand Total"
+        totalRow["GrandTotal"] = totalRowData.total_obj.count_total;
+        
+        rows.push(totalRow);
+
+        // 2. Build the User Rows
+        for (const userRow of userRowsData) {
+            let row = { User: userRow.label }; // First column
+
+            // Add data for each day's total
+            for (let i = 0; i < allDays.length; i++) {
+                const day = allDays[i]; // The key
+                const dayData = userRow.data[i];
+
+                // Use the day name as the key
+                row[day] = dayData.count_total;
+            }
+
+            // Add data for the user's total ("Grand Total" column)
+            row["GrandTotal"] = userRow.total_obj.count_total;
+
+            rows.push(row);
+        }
+
+        return rows;
+    },
+
+    getDailyReportTotalColumns() {
+        let columns = [];
+        const allDays = this.daily_report_table_data.allDays;
+
+        if (allDays.length > 0) {
+            // 1. User Column
+            columns.push({ key: "User", width: 15 });
+
+            // 2. Columns for each day's TOTAL
+            for (const day of allDays) {
+                // The key is the day's name (e.g., "Day 1", "Day 2")
+                // This key MUST match the keys created in getDailyReportTotalRows
+                columns.push({ key: day, width: 10, style: { font: { bold: true } } });
+            }
+
+            // 3. Column for the Grand Total
+            columns.push({ key: "GrandTotal", width: 12, style: { font: { bold: true } } });
+        }
+        
+        return columns;
     },
 
     //
@@ -1223,14 +1227,21 @@ export default {
         row["DistrictNameE"]        =   this.data_census_report_table_data.rows[index].DistrictNameE
         row["CityNameE"]            =   this.data_census_report_table_data.rows[index].CityNameE
         row["CustomerNameA"]        =   this.data_census_report_table_data.rows[index].CustomerNameA
-        row["BrandAvailability"]    =   this.data_census_report_table_data.rows[index].BrandAvailabilityText
         row["CustomerNameE"]        =   this.data_census_report_table_data.rows[index].CustomerNameE
-        row["TelValidity"]      =   this.data_census_report_table_data.rows[index].TelValidityText
+        row["TelValidity"]          =   this.data_census_report_table_data.rows[index].TelValidityText
         row["Tel"]                  =   this.data_census_report_table_data.rows[index].Tel
+
+        row["RvrsGeoAddress"]       =   this.data_census_report_table_data.rows[index].RvrsGeoAddress
         row["Address"]              =   this.data_census_report_table_data.rows[index].Address
         row["Neighborhood"]         =   this.data_census_report_table_data.rows[index].Neighborhood
         row["Landmark"]             =   this.data_census_report_table_data.rows[index].Landmark
+
+        row["JPlan"]                =   this.data_census_report_table_data.rows[index].JPlan
+        row["Journee"]              =   this.data_census_report_table_data.rows[index].Journee
+        row["BrandAvailability"]    =   this.data_census_report_table_data.rows[index].BrandAvailabilityText
         row["BrandSourcePurchase"]  =   this.data_census_report_table_data.rows[index].BrandSourcePurchase
+
+        row["CustomerBarCodeExiste"]=   this.data_census_report_table_data.rows[index].CustomerBarCodeExiste
         row["CustomerCode"]         =   this.data_census_report_table_data.rows[index].CustomerCode
         row["GPS"]                  =   this.data_census_report_table_data.rows[index].Latitude + ", " + this.data_census_report_table_data.rows[index].Longitude
         row["Comment"]              =   this.data_census_report_table_data.rows[index].Comment
@@ -1256,14 +1267,21 @@ export default {
                           {header: "DistrictNameE"          , key: "DistrictNameE"        , width: 10},
                           {header: "CityNameE"              , key: "CityNameE"            , width: 10},
                           {header: "CustomerNameA"          , key: "CustomerNameA"        , width: 10},
-                          {header: "BrandAvailability"      , key: "BrandAvailability"    , width: 10},
                           {header: "CustomerNameE"          , key: "CustomerNameE"        , width: 10},
-                          {header: "TelValidity"        , key: "TelValidity"      , width: 10},
+                          {header: "TelValidity"            , key: "TelValidity"          , width: 10},
                           {header: "Tel"                    , key: "Tel"                  , width: 10},
+
+                          {header: "RvrsGeoAddress"         , key: "RvrsGeoAddress"       , width: 10},
                           {header: "Address"                , key: "Address"              , width: 10},
                           {header: "Neighborhood"           , key: "Neighborhood"         , width: 10},
                           {header: "Landmark"               , key: "Landmark"             , width: 10},
+
+                          {header: "JPlan"                  , key: "JPlan"                , width: 10},
+                          {header: "Journee"                , key: "Journee"              , width: 10},
+                          {header: "BrandAvailability"      , key: "BrandAvailability"    , width: 10},
                           {header: "BrandSourcePurchase"    , key: "BrandSourcePurchase"  , width: 10},
+
+                          {header: "CustomerBarCodeExiste"  , key: "CustomerBarCodeExiste", width: 10},
                           {header: "CustomerCode"           , key: "CustomerCode"         , width: 10},
                           {header: "GPS"                    , key: "GPS"                  , width: 10},
                           {header: "Comment"                , key: "Comment"              , width: 10},
@@ -1292,13 +1310,20 @@ export default {
 
     async fetchMaps() {
 
-      this.$callApi("post",    "/route_import/stats", null)
-      .then((res)=> {
+      try {
 
-          this.liste_route_import = res.data
+          this.$callApi("post",    "/route_import/stats", null)
+          .then((res)=> {
 
-          this.prepareRouteLink()
-      })
+              this.liste_route_import = res.data
+
+              this.prepareRouteLink()
+          })
+      }
+      catch(e) {
+
+          console.log(e)
+      }
     },
 
     prepareRouteLink() {
@@ -1315,155 +1340,557 @@ export default {
     //  //  //  //  //
     //  //  //  //  //
 
+    async getDoubles() {
+
+        await this.$refs.modalValidateMap.getDoubles()
+    },
+
     async updateClientJSON(client) {
 
-      // Collections you need to update
-      const collections = [
-        this.total_clients,
-        this.map_report_data.rows,
-        this.data_census_report_table_data.rows,
-        this.getDoublant.getDoublantCustomerCode,
-        this.getDoublant.getDoublantCustomerNameE,
-        this.getDoublant.getDoublantTel,
-        this.getDoublant.getDoublantGPS,
-      ];
+        //      
+        for (let i = 0; i < this.total_clients.length; i++) {
+            
+            if(this.total_clients[i].id  ==  client.id) {
 
-      // List of fields to sync from the incoming client object
-      const fields = [
-        'NewCustomer', 'OpenCustomer', 'CustomerIdentifier', 'CustomerCode',
-        'CustomerNameE', 'CustomerNameA',
-        'Tel', 'tel_status', 'tel_comment',
-        'Latitude', 'Longitude',
-        'Address', 'Neighborhood', 'Landmark',
-        'DistrictNo', 'DistrictNameE',
-        'CityNo', 'CityNameE',
-        'CustomerType',
-        'BrandAvailability', 'BrandSourcePurchase',
-        'JPlan', 'Journee',
-        'Frequency', 'SuperficieMagasin', 'NbrAutomaticCheckouts',
-        'AvailableBrands', 'AvailableBrands_array_formatted', 'AvailableBrands_string_formatted',
-        'status', 'nonvalidated_details',
-        'owner', 
-        // 'owner_name',
-        'comment',
-        'facade_image', 'in_store_image',
-        'facade_image_original_name', 'in_store_image_original_name',
-        'CustomerBarCode_image', 'CustomerBarCode_image_original_name',
-      ];
+                // Update Client
+                this.total_clients[i].NewCustomer                             =   client.NewCustomer
+                this.total_clients[i].OpenCustomer                            =   client.OpenCustomer
+                this.total_clients[i].CustomerIdentifier                      =   client.CustomerIdentifier
 
-      for (const collection of collections) {
-        const item = collection.find(c => c.id === client.id);
-        if (item) {
-          // Copy only the listed fields
-          for (const key of fields) {
-            // Only copy if the property exists in client
-            if (client.hasOwnProperty(key)) {
-              item[key] = client[key];
+                this.total_clients[i].CustomerBarCodeExiste                   =   client.CustomerBarCodeExiste
+                this.total_clients[i].CustomerCode                            =   client.CustomerCode
+
+                this.total_clients[i].CustomerNameE                           =   client.CustomerNameE
+                this.total_clients[i].CustomerNameA                           =   client.CustomerNameA
+
+                this.total_clients[i].Tel                                     =   client.Tel
+                this.total_clients[i].tel_status                              =   client.tel_status
+                this.total_clients[i].tel_comment                             =   client.tel_comment
+
+                this.total_clients[i].Latitude                                =   client.Latitude         
+                this.total_clients[i].Longitude                               =   client.Longitude        
+
+                this.total_clients[i].RvrsGeoAddress                          =   client.RvrsGeoAddress
+                this.total_clients[i].Address                                 =   client.Address
+                this.total_clients[i].Neighborhood                            =   client.Neighborhood
+                this.total_clients[i].Landmark                                =   client.Landmark
+
+                this.total_clients[i].DistrictNo                              =   client.DistrictNo      
+                this.total_clients[i].DistrictNameE                           =   client.DistrictNameE  
+
+                this.total_clients[i].CityNo                                  =   client.CityNo           
+                this.total_clients[i].CityNameE                               =   client.CityNameE       
+
+                this.total_clients[i].CustomerType                            =   client.CustomerType     
+
+                this.total_clients[i].JPlan                                   =   client.JPlan            
+                this.total_clients[i].Journee                                 =   client.Journee        
+                this.total_clients[i].BrandAvailability                       =   client.BrandAvailability       
+                this.total_clients[i].BrandSourcePurchase                     =   client.BrandSourcePurchase       
+
+                this.total_clients[i].NbrVitrines                             =   client.NbrVitrines
+                this.total_clients[i].NbrAutomaticCheckouts                   =   client.NbrAutomaticCheckouts        
+
+                this.total_clients[i].SuperficieMagasin                       =   client.SuperficieMagasin        
+
+                this.total_clients[i].status                                  =   client.status            
+                this.total_clients[i].nonvalidated_details                    =   client.nonvalidated_details        
+
+                this.total_clients[i].owner                                   =   client.owner
+                this.total_clients[i].owner_name                              =   client.owner_name
+
+                this.total_clients[i].comment                                 =   client.comment        
+
+                this.total_clients[i].CustomerBarCodeExiste_image                   =   client.CustomerBarCodeExiste_image            
+                this.total_clients[i].CustomerBarCodeExiste_image_original_name     =   client.CustomerBarCodeExiste_image_original_name        
+
+                this.total_clients[i].facade_image                            =   client.facade_image            
+                this.total_clients[i].facade_image_original_name              =   client.facade_image_original_name            
+
+                this.total_clients[i].in_store_image                          =   client.in_store_image        
+                this.total_clients[i].in_store_image_original_name            =   client.in_store_image_original_name        
+
+                this.total_clients[i].CustomerBarCode_image                   =   client.CustomerBarCode_image            
+                this.total_clients[i].CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name        
+
+                break
             }
-          }
         }
-      }
 
-      //
+        //
+        for (let i = 0; i < this.map_report_data.rows.length; i++) {
+            
+            if(this.map_report_data.rows[i].id  ==  client.id) {
 
-      await this.$refs.DataCensusReport.setDataTable()
-    },
+                // Update Client
+                this.map_report_data.rows[i].NewCustomer                             =   client.NewCustomer
+                this.map_report_data.rows[i].OpenCustomer                            =   client.OpenCustomer
+                this.map_report_data.rows[i].CustomerIdentifier                      =   client.CustomerIdentifier
 
-    async updateClientJSONDoublant(client) {
+                this.map_report_data.rows[i].CustomerBarCodeExiste                   =   client.CustomerBarCodeExiste
+                this.map_report_data.rows[i].CustomerCode                            =   client.CustomerCode
 
-      // Collections you need to update
-      const collections = [
-        this.map_report_data.rows,
-        this.data_census_report_table_data.rows,
-      ];
+                this.map_report_data.rows[i].CustomerNameE                           =   client.CustomerNameE
+                this.map_report_data.rows[i].CustomerNameA                           =   client.CustomerNameA
 
-      // List of fields to sync from the incoming client object
-      const fields = [
-        'NewCustomer', 'OpenCustomer', 'CustomerIdentifier', 'CustomerCode',
-        'CustomerNameE', 'CustomerNameA',
-        'Tel', 'tel_status', 'tel_comment',
-        'Latitude', 'Longitude',
-        'Address', 'Neighborhood', 'Landmark',
-        'DistrictNo', 'DistrictNameE',
-        'CityNo', 'CityNameE',
-        'CustomerType',
-        'BrandAvailability', 'BrandSourcePurchase',
-        'JPlan', 'Journee',
-        'Frequency', 'SuperficieMagasin', 'NbrAutomaticCheckouts',
-        'AvailableBrands', 'AvailableBrands_array_formatted', 'AvailableBrands_string_formatted',
-        'status', 'nonvalidated_details',
-        'owner', 
-        // 'owner_name',
-        'comment',
-        'facade_image', 'in_store_image',
-        'facade_image_original_name', 'in_store_image_original_name',
-        'CustomerBarCode_image', 'CustomerBarCode_image_original_name',
-      ];
+                this.map_report_data.rows[i].Tel                                     =   client.Tel
+                this.map_report_data.rows[i].tel_status                              =   client.tel_status
+                this.map_report_data.rows[i].tel_comment                             =   client.tel_comment
 
-      for (const collection of collections) {
-        const item = collection.find(c => c.id === client.id);
-        if (item) {
-          // Copy only the listed fields
-          for (const key of fields) {
-            // Only copy if the property exists in client
-            if (client.hasOwnProperty(key)) {
-              item[key] = client[key];
+                this.map_report_data.rows[i].Latitude                                =   client.Latitude         
+                this.map_report_data.rows[i].Longitude                               =   client.Longitude        
+
+                this.map_report_data.rows[i].RvrsGeoAddress                          =   client.RvrsGeoAddress
+                this.map_report_data.rows[i].Address                                 =   client.Address
+                this.map_report_data.rows[i].Neighborhood                            =   client.Neighborhood
+                this.map_report_data.rows[i].Landmark                                =   client.Landmark
+
+                this.map_report_data.rows[i].DistrictNo                              =   client.DistrictNo      
+                this.map_report_data.rows[i].DistrictNameE                           =   client.DistrictNameE  
+
+                this.map_report_data.rows[i].CityNo                                  =   client.CityNo           
+                this.map_report_data.rows[i].CityNameE                               =   client.CityNameE       
+
+                this.map_report_data.rows[i].CustomerType                            =   client.CustomerType     
+
+                this.map_report_data.rows[i].JPlan                                   =   client.JPlan            
+                this.map_report_data.rows[i].Journee                                 =   client.Journee        
+                this.map_report_data.rows[i].BrandAvailability                       =   client.BrandAvailability       
+                this.map_report_data.rows[i].BrandSourcePurchase                     =   client.BrandSourcePurchase       
+
+                this.map_report_data.rows[i].NbrVitrines                             =   client.NbrVitrines    
+                this.map_report_data.rows[i].NbrAutomaticCheckouts                   =   client.NbrAutomaticCheckouts        
+
+                this.map_report_data.rows[i].SuperficieMagasin                       =   client.SuperficieMagasin        
+
+                this.map_report_data.rows[i].status                                  =   client.status            
+                this.map_report_data.rows[i].nonvalidated_details                    =   client.nonvalidated_details        
+
+                this.map_report_data.rows[i].owner                                   =   client.owner
+                this.map_report_data.rows[i].owner_name                              =   client.owner_name
+
+                this.map_report_data.rows[i].comment                                 =   client.comment        
+
+                this.map_report_data.rows[i].CustomerBarCodeExiste_image                  =   client.CustomerBarCodeExiste_image            
+                this.map_report_data.rows[i].CustomerBarCodeExiste_image_original_name    =   client.CustomerBarCodeExiste_image_original_name        
+
+                this.map_report_data.rows[i].facade_image                            =   client.facade_image            
+                this.map_report_data.rows[i].facade_image_original_name              =   client.facade_image_original_name            
+
+                this.map_report_data.rows[i].in_store_image                          =   client.in_store_image        
+                this.map_report_data.rows[i].in_store_image_original_name            =   client.in_store_image_original_name        
+
+                this.map_report_data.rows[i].CustomerBarCode_image                   =   client.CustomerBarCode_image            
+                this.map_report_data.rows[i].CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name        
+
+                break
             }
-          }
         }
-      }
 
-      //
+        //
+        for (let i = 0; i < this.data_census_report_table_data.rows.length; i++) {
+            
+            if(this.data_census_report_table_data.rows[i].id  ==  client.id) {
 
-      await this.$refs.DataCensusReport.setDataTable()
+                // Update Client
+                this.data_census_report_table_data.rows[i].NewCustomer                             =   client.NewCustomer
+                this.data_census_report_table_data.rows[i].OpenCustomer                            =   client.OpenCustomer
+                this.data_census_report_table_data.rows[i].CustomerIdentifier                      =   client.CustomerIdentifier
+
+                this.data_census_report_table_data.rows[i].CustomerBarCodeExiste                   =   client.CustomerBarCodeExiste
+                this.data_census_report_table_data.rows[i].CustomerCode                            =   client.CustomerCode
+
+                this.data_census_report_table_data.rows[i].CustomerNameE                           =   client.CustomerNameE
+                this.data_census_report_table_data.rows[i].CustomerNameA                           =   client.CustomerNameA
+
+                this.data_census_report_table_data.rows[i].Tel                                     =   client.Tel
+                this.data_census_report_table_data.rows[i].tel_status                              =   client.tel_status
+                this.data_census_report_table_data.rows[i].tel_comment                             =   client.tel_comment
+
+                this.data_census_report_table_data.rows[i].Latitude                                =   client.Latitude         
+                this.data_census_report_table_data.rows[i].Longitude                               =   client.Longitude        
+
+                this.data_census_report_table_data.rows[i].RvrsGeoAddress                          =   client.RvrsGeoAddress
+                this.data_census_report_table_data.rows[i].Address                                 =   client.Address
+                this.data_census_report_table_data.rows[i].Neighborhood                            =   client.Neighborhood
+                this.data_census_report_table_data.rows[i].Landmark                                =   client.Landmark
+
+                this.data_census_report_table_data.rows[i].DistrictNo                              =   client.DistrictNo      
+                this.data_census_report_table_data.rows[i].DistrictNameE                           =   client.DistrictNameE  
+
+                this.data_census_report_table_data.rows[i].CityNo                                  =   client.CityNo           
+                this.data_census_report_table_data.rows[i].CityNameE                               =   client.CityNameE       
+
+                this.data_census_report_table_data.rows[i].CustomerType                            =   client.CustomerType     
+
+                this.data_census_report_table_data.rows[i].JPlan                                   =   client.JPlan            
+                this.data_census_report_table_data.rows[i].Journee                                 =   client.Journee        
+                this.data_census_report_table_data.rows[i].BrandAvailability                       =   client.BrandAvailability       
+                this.data_census_report_table_data.rows[i].BrandSourcePurchase                     =   client.BrandSourcePurchase       
+
+                this.data_census_report_table_data.rows[i].NbrVitrines                             =   client.NbrVitrines     
+                this.data_census_report_table_data.rows[i].NbrAutomaticCheckouts                   =   client.NbrAutomaticCheckouts        
+
+                this.data_census_report_table_data.rows[i].SuperficieMagasin                       =   client.SuperficieMagasin        
+
+                this.data_census_report_table_data.rows[i].status                                  =   client.status            
+                this.data_census_report_table_data.rows[i].nonvalidated_details                    =   client.nonvalidated_details        
+
+                this.data_census_report_table_data.rows[i].owner                                   =   client.owner
+                this.data_census_report_table_data.rows[i].owner_name                              =   client.owner_name
+
+                this.data_census_report_table_data.rows[i].comment                                 =   client.comment        
+
+                this.data_census_report_table_data.rows[i].CustomerBarCodeExiste_image                   =   client.CustomerBarCodeExiste_image            
+                this.data_census_report_table_data.rows[i].CustomerBarCodeExiste_image_original_name     =   client.CustomerBarCodeExiste_image_original_name        
+
+                this.data_census_report_table_data.rows[i].facade_image                            =   client.facade_image            
+                this.data_census_report_table_data.rows[i].facade_image_original_name              =   client.facade_image_original_name            
+
+                this.data_census_report_table_data.rows[i].in_store_image                          =   client.in_store_image        
+                this.data_census_report_table_data.rows[i].in_store_image_original_name            =   client.in_store_image_original_name        
+
+                this.data_census_report_table_data.rows[i].CustomerBarCode_image                   =   client.CustomerBarCode_image            
+                this.data_census_report_table_data.rows[i].CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name        
+
+                break
+            }
+        }
+
+        //
+        for (let i = 0; i < this.getDoublant.getDoublantCustomerCode.length; i++) {
+            
+            if(this.getDoublant.getDoublantCustomerCode[i].id  ==  client.id) {
+
+                // Update Client
+                this.getDoublant.getDoublantCustomerCode[i].NewCustomer                             =   client.NewCustomer
+                this.getDoublant.getDoublantCustomerCode[i].OpenCustomer                            =   client.OpenCustomer
+                this.getDoublant.getDoublantCustomerCode[i].CustomerIdentifier                      =   client.CustomerIdentifier
+
+                this.getDoublant.getDoublantCustomerCode[i].CustomerBarCodeExiste                   =   client.CustomerBarCodeExiste
+                this.getDoublant.getDoublantCustomerCode[i].CustomerCode                            =   client.CustomerCode
+
+                this.getDoublant.getDoublantCustomerCode[i].CustomerNameE                           =   client.CustomerNameE
+                this.getDoublant.getDoublantCustomerCode[i].CustomerNameA                           =   client.CustomerNameA
+
+                this.getDoublant.getDoublantCustomerCode[i].Tel                                     =   client.Tel
+                this.getDoublant.getDoublantCustomerCode[i].tel_status                              =   client.tel_status
+                this.getDoublant.getDoublantCustomerCode[i].tel_comment                             =   client.tel_comment
+
+                this.getDoublant.getDoublantCustomerCode[i].Latitude                                =   client.Latitude         
+                this.getDoublant.getDoublantCustomerCode[i].Longitude                               =   client.Longitude        
+
+                this.getDoublant.getDoublantCustomerCode[i].RvrsGeoAddress                          =   client.RvrsGeoAddress
+                this.getDoublant.getDoublantCustomerCode[i].Address                                 =   client.Address
+                this.getDoublant.getDoublantCustomerCode[i].Neighborhood                            =   client.Neighborhood
+                this.getDoublant.getDoublantCustomerCode[i].Landmark                                =   client.Landmark
+
+                this.getDoublant.getDoublantCustomerCode[i].DistrictNo                              =   client.DistrictNo      
+                this.getDoublant.getDoublantCustomerCode[i].DistrictNameE                           =   client.DistrictNameE  
+
+                this.getDoublant.getDoublantCustomerCode[i].CityNo                                  =   client.CityNo           
+                this.getDoublant.getDoublantCustomerCode[i].CityNameE                               =   client.CityNameE       
+
+                this.getDoublant.getDoublantCustomerCode[i].CustomerType                            =   client.CustomerType     
+
+                this.getDoublant.getDoublantCustomerCode[i].JPlan                                   =   client.JPlan            
+                this.getDoublant.getDoublantCustomerCode[i].Journee                                 =   client.Journee        
+                this.getDoublant.getDoublantCustomerCode[i].BrandAvailability                       =   client.BrandAvailability       
+                this.getDoublant.getDoublantCustomerCode[i].BrandSourcePurchase                     =   client.BrandSourcePurchase       
+
+                this.getDoublant.getDoublantCustomerCode[i].NbrVitrines                             =   client.NbrVitrines       
+                this.getDoublant.getDoublantCustomerCode[i].NbrAutomaticCheckouts                   =   client.NbrAutomaticCheckouts        
+
+                this.getDoublant.getDoublantCustomerCode[i].SuperficieMagasin                       =   client.SuperficieMagasin        
+
+                this.getDoublant.getDoublantCustomerCode[i].status                                  =   client.status            
+                this.getDoublant.getDoublantCustomerCode[i].nonvalidated_details                    =   client.nonvalidated_details        
+
+                this.getDoublant.getDoublantCustomerCode[i].owner                                   =   client.owner
+                this.getDoublant.getDoublantCustomerCode[i].owner_name                              =   client.owner_name
+
+                this.getDoublant.getDoublantCustomerCode[i].comment                                 =   client.comment        
+
+                this.getDoublant.getDoublantCustomerCode[i].CustomerBarCodeExiste                            =   client.CustomerBarCodeExiste            
+                this.getDoublant.getDoublantCustomerCode[i].CustomerBarCodeExiste_original_name              =   client.CustomerBarCodeExiste_original_name            
+
+                this.getDoublant.getDoublantCustomerCode[i].facade_image                            =   client.facade_image            
+                this.getDoublant.getDoublantCustomerCode[i].facade_image_original_name              =   client.facade_image_original_name            
+
+                this.getDoublant.getDoublantCustomerCode[i].in_store_image                          =   client.in_store_image        
+                this.getDoublant.getDoublantCustomerCode[i].in_store_image_original_name            =   client.in_store_image_original_name        
+
+                this.getDoublant.getDoublantCustomerCode[i].CustomerBarCode_image                   =   client.CustomerBarCode_image            
+                this.getDoublant.getDoublantCustomerCode[i].CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name        
+
+                break
+            }
+        }
+
+        //
+        for (let i = 0; i < this.getDoublant.getDoublantCustomerNameE.length; i++) {
+            
+            if(this.getDoublant.getDoublantCustomerNameE[i].id  ==  client.id) {
+
+                // Update Client
+                this.getDoublant.getDoublantCustomerNameE[i].NewCustomer                             =   client.NewCustomer
+                this.getDoublant.getDoublantCustomerNameE[i].OpenCustomer                            =   client.OpenCustomer
+                this.getDoublant.getDoublantCustomerNameE[i].CustomerIdentifier                      =   client.CustomerIdentifier
+
+                this.getDoublant.getDoublantCustomerNameE[i].CustomerBarCodeExiste                   =   client.CustomerBarCodeExiste
+                this.getDoublant.getDoublantCustomerNameE[i].CustomerCode                            =   client.CustomerCode
+
+                this.getDoublant.getDoublantCustomerNameE[i].CustomerNameE                           =   client.CustomerNameE
+                this.getDoublant.getDoublantCustomerNameE[i].CustomerNameA                           =   client.CustomerNameA
+
+                this.getDoublant.getDoublantCustomerNameE[i].Tel                                     =   client.Tel
+                this.getDoublant.getDoublantCustomerNameE[i].tel_status                              =   client.tel_status
+                this.getDoublant.getDoublantCustomerNameE[i].tel_comment                             =   client.tel_comment
+
+                this.getDoublant.getDoublantCustomerNameE[i].Latitude                                =   client.Latitude         
+                this.getDoublant.getDoublantCustomerNameE[i].Longitude                               =   client.Longitude        
+
+                this.getDoublant.getDoublantCustomerNameE[i].RvrsGeoAddress                          =   client.RvrsGeoAddress
+                this.getDoublant.getDoublantCustomerNameE[i].Address                                 =   client.Address
+                this.getDoublant.getDoublantCustomerNameE[i].Neighborhood                            =   client.Neighborhood
+                this.getDoublant.getDoublantCustomerNameE[i].Landmark                                =   client.Landmark
+
+                this.getDoublant.getDoublantCustomerNameE[i].DistrictNo                              =   client.DistrictNo      
+                this.getDoublant.getDoublantCustomerNameE[i].DistrictNameE                           =   client.DistrictNameE  
+
+                this.getDoublant.getDoublantCustomerNameE[i].CityNo                                  =   client.CityNo           
+                this.getDoublant.getDoublantCustomerNameE[i].CityNameE                               =   client.CityNameE       
+
+                this.getDoublant.getDoublantCustomerNameE[i].CustomerType                            =   client.CustomerType     
+
+                this.getDoublant.getDoublantCustomerNameE[i].JPlan                                   =   client.JPlan            
+                this.getDoublant.getDoublantCustomerNameE[i].Journee                                 =   client.Journee        
+                this.getDoublant.getDoublantCustomerNameE[i].BrandAvailability                       =   client.BrandAvailability       
+                this.getDoublant.getDoublantCustomerNameE[i].BrandSourcePurchase                     =   client.BrandSourcePurchase       
+
+                this.getDoublant.getDoublantCustomerNameE[i].NbrVitrines                             =   client.NbrVitrines        
+                this.getDoublant.getDoublantCustomerNameE[i].NbrAutomaticCheckouts                   =   client.NbrAutomaticCheckouts        
+
+                this.getDoublant.getDoublantCustomerNameE[i].SuperficieMagasin                       =   client.SuperficieMagasin        
+
+                this.getDoublant.getDoublantCustomerNameE[i].status                                  =   client.status            
+                this.getDoublant.getDoublantCustomerNameE[i].nonvalidated_details                    =   client.nonvalidated_details        
+
+                this.getDoublant.getDoublantCustomerNameE[i].owner                                   =   client.owner
+                this.getDoublant.getDoublantCustomerNameE[i].owner_name                              =   client.owner_name
+
+                this.getDoublant.getDoublantCustomerNameE[i].comment                                 =   client.comment        
+
+                this.getDoublant.getDoublantCustomerNameE[i].CustomerBarCodeExiste                            =   client.CustomerBarCodeExiste            
+                this.getDoublant.getDoublantCustomerNameE[i].CustomerBarCodeExiste_original_name              =   client.CustomerBarCodeExiste_original_name            
+
+                this.getDoublant.getDoublantCustomerNameE[i].facade_image                            =   client.facade_image            
+                this.getDoublant.getDoublantCustomerNameE[i].facade_image_original_name              =   client.facade_image_original_name            
+
+                this.getDoublant.getDoublantCustomerNameE[i].in_store_image                          =   client.in_store_image        
+                this.getDoublant.getDoublantCustomerNameE[i].in_store_image_original_name            =   client.in_store_image_original_name        
+
+                this.getDoublant.getDoublantCustomerNameE[i].CustomerBarCode_image                   =   client.CustomerBarCode_image            
+                this.getDoublant.getDoublantCustomerNameE[i].CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name        
+
+                break
+            }
+        }
+
+        //
+        for (let i = 0; i < this.getDoublant.getDoublantTel.length; i++) {
+            
+            if(this.getDoublant.getDoublantTel[i].id  ==  client.id) {
+
+                // Update Client
+                this.getDoublant.getDoublantTel[i].NewCustomer                             =   client.NewCustomer
+                this.getDoublant.getDoublantTel[i].OpenCustomer                            =   client.OpenCustomer
+                this.getDoublant.getDoublantTel[i].CustomerIdentifier                      =   client.CustomerIdentifier
+
+                this.getDoublant.getDoublantTel[i].CustomerBarCodeExiste                   =   client.CustomerBarCodeExiste
+                this.getDoublant.getDoublantTel[i].CustomerCode                            =   client.CustomerCode
+
+                this.getDoublant.getDoublantTel[i].CustomerNameE                           =   client.CustomerNameE
+                this.getDoublant.getDoublantTel[i].CustomerNameA                           =   client.CustomerNameA
+
+                this.getDoublant.getDoublantTel[i].Tel                                     =   client.Tel
+                this.getDoublant.getDoublantTel[i].tel_status                              =   client.tel_status
+                this.getDoublant.getDoublantTel[i].tel_comment                             =   client.tel_comment
+
+                this.getDoublant.getDoublantTel[i].Latitude                                =   client.Latitude         
+                this.getDoublant.getDoublantTel[i].Longitude                               =   client.Longitude        
+
+                this.getDoublant.getDoublantTel[i].RvrsGeoAddress                          =   client.RvrsGeoAddress
+                this.getDoublant.getDoublantTel[i].Address                                 =   client.Address
+                this.getDoublant.getDoublantTel[i].Neighborhood                            =   client.Neighborhood
+                this.getDoublant.getDoublantTel[i].Landmark                                =   client.Landmark
+
+                this.getDoublant.getDoublantTel[i].DistrictNo                              =   client.DistrictNo      
+                this.getDoublant.getDoublantTel[i].DistrictNameE                           =   client.DistrictNameE  
+
+                this.getDoublant.getDoublantTel[i].CityNo                                  =   client.CityNo           
+                this.getDoublant.getDoublantTel[i].CityNameE                               =   client.CityNameE       
+
+                this.getDoublant.getDoublantTel[i].CustomerType                            =   client.CustomerType     
+
+                this.getDoublant.getDoublantTel[i].JPlan                                   =   client.JPlan            
+                this.getDoublant.getDoublantTel[i].Journee                                 =   client.Journee        
+                this.getDoublant.getDoublantTel[i].BrandAvailability                       =   client.BrandAvailability       
+                this.getDoublant.getDoublantTel[i].BrandSourcePurchase                     =   client.BrandSourcePurchase       
+
+                this.getDoublant.getDoublantTel[i].NbrVitrines                             =   client.NbrVitrines
+                this.getDoublant.getDoublantTel[i].NbrAutomaticCheckouts                   =   client.NbrAutomaticCheckouts        
+
+                this.getDoublant.getDoublantTel[i].SuperficieMagasin                       =   client.SuperficieMagasin        
+
+                this.getDoublant.getDoublantTel[i].status                                  =   client.status            
+                this.getDoublant.getDoublantTel[i].nonvalidated_details                    =   client.nonvalidated_details        
+
+                this.getDoublant.getDoublantTel[i].owner                                   =   client.owner
+                this.getDoublant.getDoublantTel[i].owner_name                              =   client.owner_name
+
+                this.getDoublant.getDoublantTel[i].comment                                 =   client.comment        
+
+                this.getDoublant.getDoublantTel[i].CustomerBarCodeExiste_image                   =   client.CustomerBarCodeExiste_image            
+                this.getDoublant.getDoublantTel[i].CustomerBarCodeExiste_image_original_name     =   client.CustomerBarCodeExiste_image_original_name        
+
+                this.getDoublant.getDoublantTel[i].facade_image                            =   client.facade_image   
+                this.getDoublant.getDoublantTel[i].facade_image_original_name              =   client.facade_image_original_name            
+
+                this.getDoublant.getDoublantTel[i].in_store_image                          =   client.in_store_image        
+                this.getDoublant.getDoublantTel[i].in_store_image_original_name            =   client.in_store_image_original_name        
+
+                this.getDoublant.getDoublantTel[i].CustomerBarCode_image                   =   client.CustomerBarCode_image            
+                this.getDoublant.getDoublantTel[i].CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name        
+
+                break
+            }
+        }
+
+        //
+        for (let i = 0; i < this.getDoublant.getDoublantLatitudeLongitude.length; i++) {
+            
+            if(this.getDoublant.getDoublantLatitudeLongitude[i].id  ==  client.id) {
+
+                // Update Client
+                this.getDoublant.getDoublantLatitudeLongitude[i].NewCustomer                             =   client.NewCustomer
+                this.getDoublant.getDoublantLatitudeLongitude[i].OpenCustomer                            =   client.OpenCustomer
+                this.getDoublant.getDoublantLatitudeLongitude[i].CustomerIdentifier                      =   client.CustomerIdentifier
+
+                this.getDoublant.getDoublantLatitudeLongitude[i].CustomerBarCodeExiste                   =   client.CustomerBarCodeExiste
+                this.getDoublant.getDoublantLatitudeLongitude[i].CustomerCode                            =   client.CustomerCode
+
+                this.getDoublant.getDoublantLatitudeLongitude[i].CustomerNameE                           =   client.CustomerNameE
+                this.getDoublant.getDoublantLatitudeLongitude[i].CustomerNameA                           =   client.CustomerNameA
+
+                this.getDoublant.getDoublantLatitudeLongitude[i].Tel                                     =   client.Tel
+                this.getDoublant.getDoublantLatitudeLongitude[i].tel_status                              =   client.tel_status
+                this.getDoublant.getDoublantLatitudeLongitude[i].tel_comment                             =   client.tel_comment
+
+                this.getDoublant.getDoublantLatitudeLongitude[i].Latitude                                =   client.Latitude         
+                this.getDoublant.getDoublantLatitudeLongitude[i].Longitude                               =   client.Longitude        
+
+                this.getDoublant.getDoublantLatitudeLongitude[i].RvrsGeoAddress                          =   client.RvrsGeoAddress
+                this.getDoublant.getDoublantLatitudeLongitude[i].Address                                 =   client.Address
+                this.getDoublant.getDoublantLatitudeLongitude[i].Neighborhood                            =   client.Neighborhood
+                this.getDoublant.getDoublantLatitudeLongitude[i].Landmark                                =   client.Landmark
+
+                this.getDoublant.getDoublantLatitudeLongitude[i].DistrictNo                              =   client.DistrictNo      
+                this.getDoublant.getDoublantLatitudeLongitude[i].DistrictNameE                           =   client.DistrictNameE  
+
+                this.getDoublant.getDoublantLatitudeLongitude[i].CityNo                                  =   client.CityNo           
+                this.getDoublant.getDoublantLatitudeLongitude[i].CityNameE                               =   client.CityNameE       
+
+                this.getDoublant.getDoublantLatitudeLongitude[i].CustomerType                            =   client.CustomerType     
+
+                this.getDoublant.getDoublantLatitudeLongitude[i].JPlan                                   =   client.JPlan            
+                this.getDoublant.getDoublantLatitudeLongitude[i].Journee                                 =   client.Journee        
+                this.getDoublant.getDoublantLatitudeLongitude[i].BrandAvailability                       =   client.BrandAvailability       
+                this.getDoublant.getDoublantLatitudeLongitude[i].BrandSourcePurchase                     =   client.BrandSourcePurchase       
+
+                this.getDoublant.getDoublantLatitudeLongitude[i].NbrVitrines                             =   client.NbrVitrines
+                this.getDoublant.getDoublantLatitudeLongitude[i].NbrAutomaticCheckouts                   =   client.NbrAutomaticCheckouts        
+
+                this.getDoublant.getDoublantLatitudeLongitude[i].SuperficieMagasin                       =   client.SuperficieMagasin        
+
+                this.getDoublant.getDoublantLatitudeLongitude[i].status                                  =   client.status            
+                this.getDoublant.getDoublantLatitudeLongitude[i].nonvalidated_details                    =   client.nonvalidated_details        
+
+                this.getDoublant.getDoublantLatitudeLongitude[i].owner                                   =   client.owner
+                this.getDoublant.getDoublantLatitudeLongitude[i].owner_name                              =   client.owner_name
+
+                this.getDoublant.getDoublantLatitudeLongitude[i].comment                                 =   client.comment        
+
+                this.getDoublant.getDoublantLatitudeLongitude[i].CustomerBarCodeExiste_image                   =   client.CustomerBarCodeExiste_image            
+                this.getDoublant.getDoublantLatitudeLongitude[i].CustomerBarCodeExiste_image_original_name     =   client.CustomerBarCodeExiste_image_original_name        
+
+                this.getDoublant.getDoublantLatitudeLongitude[i].facade_image                            =   client.facade_image            
+                this.getDoublant.getDoublantLatitudeLongitude[i].facade_image_original_name              =   client.facade_image_original_name            
+
+                this.getDoublant.getDoublantLatitudeLongitude[i].in_store_image                          =   client.in_store_image        
+                this.getDoublant.getDoublantLatitudeLongitude[i].in_store_image_original_name            =   client.in_store_image_original_name        
+
+                this.getDoublant.getDoublantLatitudeLongitude[i].CustomerBarCode_image                   =   client.CustomerBarCode_image            
+                this.getDoublant.getDoublantLatitudeLongitude[i].CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name        
+
+                break
+            }
+        }
     },
-
-    //
 
     async deleteClientJSON(client) {
 
-      // Collections you need to delete from
-      const collections = [
-        this.total_clients,
-        this.map_report_data.rows,
-        this.data_census_report_table_data.rows,
-        this.getDoublant.getDoublantCustomerCode,
-        this.getDoublant.getDoublantCustomerNameE,
-        this.getDoublant.getDoublantTel,
-        this.getDoublant.getDoublantGPS,
-      ];
+        let idx                               = -1
 
-      for (const collection of collections) {
-        const idx = collection.findIndex(c => c.id === client.id);
+        //      
+        idx = this.total_clients.findIndex(c => c.id === client.id);
+
         if (idx !== -1) {
-          collection.splice(idx, 1);
+          this.total_clients.splice(idx, 1);
         }
-      }
 
-      //
+        //
+        idx = this.map_report_data.rows.findIndex(c => c.id === client.id);
 
-      await this.$refs.DataCensusReport.setDataTable()
-    },
-
-    async deleteClientJSONDoublant(client) {
-
-      // Collections you need to delete from
-      const collections = [
-        this.map_report_data.rows,
-        this.data_census_report_table_data.rows,
-      ];
-
-      for (const collection of collections) {
-        const idx = collection.findIndex(c => c.id === client.id);
         if (idx !== -1) {
-          collection.splice(idx, 1);
+          this.map_report_data.rows.splice(idx, 1);
         }
-      }
 
-      //
+        //
+        idx = this.data_census_report_table_data.rows.findIndex(c => c.id === client.id);
 
-      await this.$refs.DataCensusReport.setDataTable()
-    },
+        if (idx !== -1) {
+          this.data_census_report_table_data.rows.splice(idx, 1);
+        }
+
+        //
+        idx = this.getDoublant.getDoublantCustomerCode.findIndex(c => c.id === client.id);
+
+        if (idx !== -1) {
+          this.getDoublant.getDoublantCustomerCode.splice(idx, 1);
+        }
+
+        //
+        idx = this.getDoublant.getDoublantCustomerNameE.findIndex(c => c.id === client.id);
+
+        if (idx !== -1) {
+          this.getDoublant.getDoublantCustomerNameE.splice(idx, 1);
+        }
+
+        //
+        idx = this.getDoublant.getDoublantTel.findIndex(c => c.id === client.id);
+
+        if (idx !== -1) {
+          this.getDoublant.getDoublantTel.splice(idx, 1);
+        }
+
+        //
+        idx = this.getDoublant.getDoublantLatitudeLongitude.findIndex(c => c.id === client.id);
+
+        if (idx !== -1) {
+          this.getDoublant.getDoublantLatitudeLongitude.splice(idx, 1);
+        }
+    }
   },
 }
 

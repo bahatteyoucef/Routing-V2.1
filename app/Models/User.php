@@ -512,7 +512,7 @@ class User extends Authenticatable
             $ownerIds = $selected_users;
         } else {
             // keep only owners that have the BackOffice role
-            $ownerIds = User::role('BackOffice')->pluck('id')->toArray();
+            $ownerIds = User::role(['BackOffice', 'BU Manager'])->pluck('id')->toArray();
         }
 
         // if no owners left, return empty
@@ -588,7 +588,7 @@ class User extends Authenticatable
             $clientsQuery = Client::where('clients.owner_bo', $owner)
                 ->whereBetween('clients.updated_at', [$startDate, $endDate])
                 ->join('users as bo', 'clients.owner_bo', '=', 'bo.id')
-                ->select('clients.*', 'bo.nom as owner_name');
+                ->select('clients.*', 'bo.username as owner_name');
 
             if (!empty($route_links)) {
                 $clientsQuery->whereIn('clients.id_route_import', $route_links);

@@ -26,47 +26,55 @@
             <form>
                 <div class="slideshow-container">
 
-                    <!-- OpenCustomer -->
+                    <!-- OpenCustomer --> <!-- CustomerIdentifier -->
                     <div v-show="false" class="mySlides slide_1 mt-3">
                         <div>
                             <div class="mb-1">
-                                <label for="NewCustomer"        class="form-label fw-bold">Nouveau Client</label>
-                                <select                         class="form-select"         id="NewCustomer"                 v-model="client.NewCustomer"       :disabled="client.status_original    ==  'validated'">
-                                    <option     value="Nouveau Client">Nouveau Client</option>
-                                    <option     value="Client Existant">Client Existant</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-1">
-                                <label for="text"               class="form-label fw-bold">Client Ouvert</label>
-                                <select                         class="form-select"         id="OpenCustomer"                 v-model="client.OpenCustomer"     @change="setStatus()"   :disabled="client.status_original    ==  'validated'"   >
-                                    <option     value="Ferme">Ferme</option>
+                                <label for="text"               class="form-label fw-bold">Quel est l'état du client ?</label>
+                                <select                         class="form-select"         id="OpenCustomer"                 v-model="client.OpenCustomer"     @change="setStatus()"   :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
                                     <option     value="Ouvert">Ouvert</option>
+                                    <option     value="Ferme">Ferme</option>
+                                    <option     value="refus">Refus</option>
+                                    <option     v-if="(client.NewCustomer   ==  'Client Existant')" value="Introuvable">Introuvable</option>
                                 </select>
                             </div>
                         </div>
 
-                        <!--  -->
+                        <div v-if="(client.NewCustomer   ==  'Client Existant')">
+                            <label for="CustomerIdentifier" class="form-label fw-bold">ID Client</label>
+                            <input type="text"              class="form-control"        id="CustomerIdentifier"          v-model="client.CustomerIdentifier"    disabled>
+                        </div>
 
                         <div class="mt-5">
                             <ul class="pl-3">
-                                <li>Sélectionnez si le client est ouvert ou non (exemple : <span class="fw-bold">Oui</span>).</li>
+                                <li>Sélectionnez si le client est ouvert ou non (exemple : <span class="fw-bold">Ouvert</span>).</li>
+                                <li>Saisissez l'identifiant du client (exemple : <span class="fw-bold">23</span>).</li>
                             </ul>
                         </div>
                     </div>
 
-                    <!-- CustomerIdentifier -->
-                    <div v-show="false" class="mySlides slide_2 mt-3">
+                    <!-- CustomerBarCodeExiste -->
+                    <div v-if="client.OpenCustomer  === 'Ouvert'" v-show="false" class="mySlides slide_1 mt-3">
                         <div>
-                            <label for="CustomerIdentifier" class="form-label fw-bold">ID Client</label>
-                            <input type="text"              class="form-control"        id="CustomerIdentifier"          v-model="client.CustomerIdentifier">
-                        </div>
+                            <div class="mb-1">
+                                <label for="text"               class="form-label fw-bold">CustomerBarCodeExiste</label>
+                                <select                         class="form-select"         id="CustomerBarCodeExiste"                 v-model="client.CustomerBarCodeExiste"   :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+                                    <option     value="Non">Non</option>
+                                    <option     value="Oui">Oui</option>
+                                </select>
+                            </div>
 
-                        <!--  -->
+                            <div>
+                                <label for="CustomerBarCodeExiste_image_update"  class="form-label fw-bold">CustomerBarCodeExiste Image</label>
+                                <button type="button"               class="btn btn-secondary w-100 mb-1" @click="$clickFile('CustomerBarCodeExiste_image_update')" :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"><i class="mdi mdi-camera"></i></button>
+
+                                <input type='file'                  id="CustomerBarCodeExiste_image_update"              style="display:none"    accept="image/*"    capture     @change="customerBarCodeExisteImage()"    :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+                                <img                                id="CustomerBarCodeExiste_image_display_update"      src=""                  style="width : 100%; height : auto; display: block; margin : auto">
+                            </div>
+                        </div>
 
                         <div class="mt-5">
                             <ul class="pl-3">
-                                <li>Saisissez l'identifiant du client (exemple : <span class="fw-bold">23</span>).</li>
                             </ul>
                         </div>
                     </div>
@@ -94,7 +102,7 @@
 
                         <div class="mt-1 mb-1 w-100">
                             <div class="w-100" id="refresh_client_barcode_button">
-                                <button type="button" class="btn btn-primary w-100"     @click="setBarCodeReader()"     :disabled="client.status_original    ==  'validated'">Capturer Code-Barre</button>
+                                <button type="button" class="btn btn-primary w-100"     @click="setBarCodeReader()"     :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">Capturer Code-Barre</button>
                             </div>
                         </div>
 
@@ -112,9 +120,9 @@
                     <div v-if="client.OpenCustomer  === 'Ouvert'" v-show="false" class="mySlides slide_4 mt-3">
                         <div>
                             <label for="CustomerBarCode_image_update"  class="form-label fw-bold">Code-Barre Image</label>
-                            <button type="button"                       class="btn btn-secondary w-100 mb-1" @click="$clickFile('CustomerBarCode_image_update')"        :disabled="client.status_original    ==  'validated'"><i class="mdi mdi-camera"></i></button>
+                            <button type="button"                       class="btn btn-secondary w-100 mb-1" @click="$clickFile('CustomerBarCode_image_update')"        :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"><i class="mdi mdi-camera"></i></button>
 
-                            <input type="file"                          class="form-control"    id="CustomerBarCode_image_update"                   accept="image/*"    capture         @change="customerBarCodeImage()"    :disabled="client.status_original    ==  'validated'"    style="display:none">
+                            <input type="file"                          class="form-control"    id="CustomerBarCode_image_update"                   accept="image/*"    capture         @change="customerBarCodeImage()"    :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"    style="display:none">
                             <img                                                                id="CustomerBarCode_image_display_update"           src=""              class="w-100">
                         </div>
 
@@ -131,7 +139,7 @@
                     <div v-if="client.OpenCustomer  === 'Ouvert'" v-show="false" class="mySlides slide_5 mt-3">
                         <div>
                             <label for="CustomerNameE"      class="form-label fw-bold">Nom et Prénom de l'Acheteur</label>
-                            <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE"  :disabled="client.status_original    ==  'validated'">
+                            <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE"  :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
                         </div>
 
                         <!--  -->
@@ -147,7 +155,7 @@
                     <div v-show="false" class="mySlides slide_6 mt-3">
                         <div>
                             <label for="CustomerNameA"      class="form-label fw-bold">Raison Sociale</label>
-                            <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA"  :disabled="client.status_original    ==  'validated'">
+                            <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA"  :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
                         </div>
 
                         <!--  -->
@@ -160,10 +168,10 @@
                     </div>
 
                     <!-- Tel -->
-                    <div v-if="client.OpenCustomer  === 'Ouvert'" v-show="false" class="mySlides slide_7 mt-3">
+                    <div v-if="client.OpenCustomer === 'Ouvert'" v-show="false" class="mySlides slide_7 mt-3">
                         <div>
                             <label for="Tel"                class="form-label fw-bold">Téléphone</label>
-                            <input type="text"              class="form-control"        id="Tel"                    v-model="client.Tel"            :disabled="client.status_original    ==  'validated'">
+                            <input type="text"              class="form-control"        id="Tel"                    v-model="client.Tel"            :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
                         </div>
 
                         <!--  -->
@@ -179,7 +187,7 @@
                     <div v-show="false" class="mySlides slide_8 mt-3">
                         <div>
                             <label for="Address"            class="form-label fw-bold">Adresse</label>
-                            <input type="text"              class="form-control"        id="Address"                v-model="client.Address"        :disabled="client.status_original    ==  'validated'">
+                            <input type="text"              class="form-control"        id="Address"                v-model="client.Address"        :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
                         </div>
 
                         <!--  -->
@@ -187,6 +195,7 @@
                         <div class="mt-5">
                             <ul class="pl-3">
                                 <li>Saisissez l'adresse du magasin (exemple : <span class=fw-bold>Rue Mohamed Belouizdad - Alger Centre</span>).</li>
+                                <li>Le nombre de charactere doit depasse 10 characteres.</li>
                             </ul>
                         </div>
                     </div>
@@ -195,7 +204,7 @@
                     <div v-show="false" class="mySlides slide_9 mt-3">
                         <div>
                             <label for="Neighborhood"       class="form-label fw-bold">Quartier</label>
-                            <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood"   :disabled="client.status_original    ==  'validated'">
+                            <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood"       :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
                         </div>
 
                         <!--  -->
@@ -211,7 +220,7 @@
                     <div v-show="false" class="mySlides slide_10 mt-3">
                         <div>
                             <label for="Landmark"           class="form-label fw-bold">Point de Repere</label>
-                            <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"       :disabled="client.status_original    ==  'validated'"></textarea>
+                            <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"       :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"></textarea>
                         </div>
 
                         <!--  -->
@@ -227,7 +236,7 @@
                     <div v-show="false" class="mySlides slide_11 mt-3">
                         <div>
                             <label for="DistrictNo"         class="form-label fw-bold">Willaya</label>
-                            <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()">
+                            <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()"    :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
                                 <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNameE}} ({{willaya.DistrictNo}})</option>
                             </select>
                         </div>
@@ -245,7 +254,7 @@
                     <div v-show="false" class="mySlides slide_12 mt-3">
                         <div>
                             <label for="CityNo"             class="form-label fw-bold">Commune</label>
-                            <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo"                                 :disabled="client.status_original    ==  'validated'">
+                            <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo"                                 :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
                                 <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CityNameE}} ({{cite.CITYNO}})</option>
                             </select>
                         </div>
@@ -263,7 +272,7 @@
                     <div v-show="false" class="mySlides slide_13 mt-3">
                         <div>
                             <label for="text"               class="form-label fw-bold">Type de Magasin</label>
-                            <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType"                     :disabled="client.status_original    ==  'validated'">
+                            <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType"                     :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
                                 <option     :value="'AG Self'">AG Self</option>
                                 <option     :value="'AG Tradi'">AG Tradi</option>
                                 <option     :value="'Superette'">Superette</option>
@@ -309,7 +318,7 @@
                     <div v-if="client.OpenCustomer  === 'Ouvert'" v-show="false" class="mySlides slide_14 mt-3">
                         <div>
                             <label for="text"               class="form-label fw-bold">Source d'Achat</label>
-                            <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase"       :disabled="client.status_original    ==  'validated'">
+                            <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase"       :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
                                 <option     value="DD">DD</option>
                                 <option     value="DI">DI</option>
                                 <option     value="Pas d'achat">Pas d'achat</option>
@@ -337,7 +346,7 @@
                         <div>
                             <label for="NbrAutomaticCheckouts"       class="form-label fw-bold">Nombre de caisses automatique</label>
 
-                            <select                         class="form-select"         id="NbrAutomaticCheckouts"                 v-model="client.NbrAutomaticCheckouts">
+                            <select                         class="form-select"         id="NbrAutomaticCheckouts"                 v-model="client.NbrAutomaticCheckouts"   :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
                                 <option     :value="'Plus de 1'">Plus de 1</option>
                                 <option     :value="'1'">1</option>
                                 <option     :value="'Pas de caisse automatique'">Pas de caisse automatique</option>
@@ -358,7 +367,7 @@
                         <div>
                             <label for="SuperficieMagasin"  class="form-label fw-bold">Superficie du magasin</label>
 
-                            <select                         class="form-select"         id="SuperficieMagasin"                 v-model="client.SuperficieMagasin">
+                            <select                         class="form-select"         id="SuperficieMagasin"                 v-model="client.SuperficieMagasin"       :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
                                 <option     :value="'Moins de 30 M'">Moins de 30 M</option>
                                 <option     :value="'DE 30 a 60'">DE 30 a 60</option>
                                 <option     :value="'DE 30 a 100'">DE 30 a 100</option>
@@ -380,7 +389,7 @@
                     <div v-show="false" class="mySlides slide_17 mt-3">
                         <div>
                             <label for="JPlan"              class="form-label fw-bold">Nom de Vendeur</label>
-                            <input type="text"              class="form-control"        id="JPlan"          v-model="client.JPlan"                                          :disabled="client.status_original    ==  'validated'">
+                            <input type="text"              class="form-control"        id="JPlan"          v-model="client.JPlan"                                          :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
                         </div>
 
                         <!--  -->
@@ -397,7 +406,7 @@
                         <div>
                             <label for="Frequency"          class="form-label fw-bold">Frequency</label>
 
-                            <select                         class="form-select"         id="Frequency"                 v-model="client.Frequency">
+                            <select                         class="form-select"         id="Frequency"                 v-model="client.Frequency"       :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
                                 <option     :value="'1 par Semaine(7J)'">1 par Semaine(7J)</option>
                                 <option     :value="'1 par 15J'">1 par 15J</option>
                             </select>
@@ -417,7 +426,7 @@
                         <div>
                             <label for="Journee"            class="form-label fw-bold">Journee</label>
 
-                            <select                         class="form-select"         id="Journee"    v-model="client.Journee"    :disabled="client.status_original    ==  'validated'">
+                            <select                         class="form-select"         id="Journee"    v-model="client.Journee"    :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
                                 <option     :value="'Dimanche 1'">Dimanche 1</option>
                                 <option     :value="'Lundi 1'">Lundi 1</option>
                                 <option     :value="'Mardi 1'">Mardi 1</option>
@@ -445,7 +454,7 @@
                         <div>
                             <div class="mb-1">
                                 <label for="text"               class="form-label fw-bold">Disponibilité Produits</label>
-                                <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability"           :disabled="client.status_original    ==  'validated'"   @change="brandAvailabilityChanged()">
+                                <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability"           :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"   @change="brandAvailabilityChanged()">
                                     <option     value='Non'>Non</option>
                                     <option     value='Oui'>Oui</option>
                                 </select>
@@ -504,9 +513,9 @@
 
                             <div class="mt-1"   v-show="client.BrandAvailability  ==  'Oui'">
                                 <label for="in_store_image_update"  class="form-label fw-bold">Image In-Store</label>
-                                <button type="button"               class="btn btn-secondary w-100 mb-1" @click="$clickFile('in_store_image_update')"   :disabled="client.status_original    ==  'validated'"><i class="mdi mdi-camera"></i></button>
+                                <button type="button"               class="btn btn-secondary w-100 mb-1" @click="$clickFile('in_store_image_update')"   :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"><i class="mdi mdi-camera"></i></button>
 
-                                <input type="file"                  class="form-control"    id="in_store_image_update"             accept="image/*"     capture  @change="inStoreImage()"    :disabled="client.status_original    ==  'validated'"    style="display:none">
+                                <input type="file"                  class="form-control"    id="in_store_image_update"             accept="image/*"     capture  @change="inStoreImage()"    :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"    style="display:none">
                                 <img                                                        id="in_store_image_display_update"     src=""                       class="w-100">
                             </div>
                         </div>
@@ -525,7 +534,7 @@
                     <div v-show="false" class="mySlides slide_21 mt-3">
                         <div>
                             <label      for="comment" class="form-label fw-bold">Commentaire</label>
-                            <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"    :disabled="client.status_original    ==  'validated'"></textarea>
+                            <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"    :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"></textarea>
                         </div>
 
                         <!--  -->
@@ -541,9 +550,9 @@
                     <div v-show="false" class="mySlides slide_22 mt-3">
                         <div>
                             <label for="facade_image_update"    class="form-label fw-bold">Image Facade</label>
-                            <button type="button"               class="btn btn-secondary w-100 mb-1" @click="$clickFile('facade_image_update')"     :disabled="client.status_original    ==  'validated'"><i class="mdi mdi-camera"></i></button>
+                            <button type="button"               class="btn btn-secondary w-100 mb-1" @click="$clickFile('facade_image_update')"     :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"><i class="mdi mdi-camera"></i></button>
 
-                            <input type="file"                  class="form-control"    id="facade_image_update"               accept="image/*"     capture  @change="facadeImage()"     :disabled="client.status_original    ==  'validated'"    style="display:none">
+                            <input type="file"                  class="form-control"    id="facade_image_update"               accept="image/*"     capture  @change="facadeImage()"     :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"    style="display:none">
                             <img                                                        id="facade_image_display_update"       src=""                       class="w-100">
                         </div>
 
@@ -559,7 +568,7 @@
                     <!-- GPS -->
                     <div v-show="false" class="mySlides slide_23 mt-3">
                         <div>
-                            <label for="CustomerCode"       class="form-label fw-bold">Detecter la Position Actuel <button class="btn btn-sm" @click.prevent="showPositionOnMap('show_map')"    :disabled="((client.status_original    ==  'validated')||(check_gps_clicked))"><i class="mdi mdi-reload"></i></button></label>
+                            <label for="CustomerCode"       class="form-label fw-bold">Detecter la Position Actuel <button class="btn btn-sm" @click.prevent="showPositionOnMap('show_map')"    :disabled="(((client.status_original    ==  'confirmed')||(client.status_original    ==  'validated'))||(check_gps_clicked))"><i class="mdi mdi-reload"></i></button></label>
                             <p class="text-secondary text-small mb-1">Latitude : {{ client.Latitude }}</p>
                             <p class="text-secondary text-small mb-1">Longitude : {{ client.Longitude }}</p>
 
@@ -681,7 +690,7 @@ export default {
                 CustomerNameA       :   '',
 
                 Tel                 :   '',
-                tel_status          :   'nonvalidated',
+                tel_status          :   'pending',
                 tel_comment         :   '',
 
                 Address             :   '',
@@ -744,6 +753,10 @@ export default {
             //
 
             total_questions                 :   23      ,
+
+            //
+
+            start_adding_date               :   ""      ,
 
             //
             check_gps_clicked               :   false   ,
@@ -897,7 +910,7 @@ export default {
                     formData.append("comment"                               ,   this.client.comment)
                 }
 
-                else {
+                if(this.client.OpenCustomer  === 'Ferme') {
                     formData.append("NewCustomer"                           ,   this.client.NewCustomer)
                     formData.append("OpenCustomer"                          ,   this.client.OpenCustomer)
 
@@ -941,6 +954,125 @@ export default {
                     formData.append("nonvalidated_details"                  ,   '')
 
                     formData.append("comment"                               ,   this.client.comment)
+                }
+
+                if(this.client.OpenCustomer  === 'refus') {
+                    formData.append("NewCustomer"                           ,   this.client.NewCustomer)
+                    formData.append("OpenCustomer"                          ,   this.client.OpenCustomer)
+
+                    formData.append("CustomerIdentifier"                    ,   this.client.CustomerIdentifier)
+                    formData.append("CustomerCode"                          ,   '')
+                    formData.append("CustomerNameE"                         ,   '')
+                    formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
+                    formData.append("Latitude"                              ,   this.client.Latitude)
+                    formData.append("Longitude"                             ,   this.client.Longitude)
+                    formData.append("Address"                               ,   this.client.Address)
+                    formData.append("Neighborhood"                          ,   this.client.Neighborhood)
+                    formData.append("Landmark"                              ,   this.client.Landmark)
+                    formData.append("DistrictNo"                            ,   this.client.DistrictNo)
+                    formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
+                    formData.append("CityNo"                                ,   this.client.CityNo)
+                    formData.append("CityNameE"                             ,   this.client.CityNameE)
+                    formData.append("Tel"                                   ,   '')
+                    formData.append("tel_status"                            ,   'nonvalidated')
+                    formData.append("tel_comment"                           ,   '')
+                    formData.append("CustomerType"                          ,   this.client.CustomerType)
+                    formData.append("BrandAvailability"                     ,   'Non')
+                    formData.append("BrandSourcePurchase"                   ,   '')
+
+                    formData.append("JPlan"                                 ,   this.client.JPlan)
+                    formData.append("Journee"                               ,   this.client.Journee)
+
+                    formData.append("Frequency"                             ,   this.client.Frequency)
+                    formData.append("SuperficieMagasin"                     ,   this.client.SuperficieMagasin)
+                    formData.append("NbrAutomaticCheckouts"                 ,   '')
+                    formData.append("AvailableBrands"                       ,   JSON.stringify([]))
+
+                    formData.append("CustomerBarCode_image"                 ,   '')
+                    formData.append("facade_image"                          ,   this.client.facade_image)
+                    formData.append("in_store_image"                        ,   '')
+
+                    formData.append("CustomerBarCode_image_original_name"   ,   '')
+                    formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
+                    formData.append("in_store_image_original_name"          ,   '')
+
+                    formData.append("status"                                ,   'pending')
+                    formData.append("nonvalidated_details"                  ,   '')
+
+                    formData.append("comment"                               ,   this.client.comment)
+                }
+
+                if(this.client.OpenCustomer  === 'Introuvable') {
+
+                    formData.append("NewCustomer"                           ,   this.client.NewCustomer)
+                    formData.append("OpenCustomer"                          ,   this.client.OpenCustomer)
+
+                    formData.append("CustomerIdentifier"                    ,   this.client.CustomerIdentifier)
+
+                    formData.append("CustomerBarCodeExiste"                 ,   '')
+
+                    formData.append("CustomerCode"                          ,   '')
+                    formData.append("CustomerNameE"                         ,   '')
+                    formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
+                    formData.append("Latitude"                              ,   this.client.Latitude)
+                    formData.append("Longitude"                             ,   this.client.Longitude)
+
+                    formData.append("RvrsGeoAddress"                        ,   this.client.RvrsGeoAddress)
+                    formData.append("Address"                               ,   this.client.Address)
+                    formData.append("Neighborhood"                          ,   this.client.Neighborhood)
+                    formData.append("Landmark"                              ,   this.client.Landmark)
+                    formData.append("DistrictNo"                            ,   this.client.DistrictNo)
+                    formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
+                    formData.append("CityNo"                                ,   this.client.CityNo)
+                    formData.append("CityNameE"                             ,   this.client.CityNameE)
+
+                    formData.append("Tel"                                   ,   this.client.Tel)
+                    formData.append("tel_status"                            ,   'nonvalidated')
+                    formData.append("tel_comment"                           ,   '')
+
+                    formData.append("CustomerType"                          ,   this.client.CustomerType)
+
+                    formData.append("NbrVitrines"                           ,   '')
+                    formData.append("NbrAutomaticCheckouts"                 ,   '')
+
+                    formData.append("SuperficieMagasin"                     ,   this.client.SuperficieMagasin)
+
+                    formData.append("CustomerBarCodeExiste_image_updated"   ,   true)
+                    formData.append("CustomerBarCode_image_updated"         ,   true)
+                    formData.append("facade_image_updated"                  ,   this.client.facade_image_updated)
+                    formData.append("in_store_image_updated"                ,   true)
+
+                    formData.append("CustomerBarCodeExiste_image"           ,   '')
+                    formData.append("CustomerBarCode_image"                 ,   '')
+                    formData.append("facade_image"                          ,   this.client.facade_image)
+                    formData.append("in_store_image"                        ,   '')
+
+                    formData.append("CustomerBarCodeExiste_image_original_name" ,   '')
+                    formData.append("CustomerBarCode_image_original_name"       ,   '')
+                    formData.append("facade_image_original_name"                ,   this.client.facade_image_original_name)
+                    formData.append("in_store_image_original_name"              ,   '')
+
+                    formData.append("CustomerBarCodeExiste_image_updated"   ,   true)
+                    formData.append("CustomerBarCode_image_updated"         ,   true)
+                    formData.append("facade_image_updated"                  ,   this.client.facade_image_updated)
+                    formData.append("in_store_image_updated"                ,   true)
+
+                    formData.append("status"                                ,   'pending')
+                    formData.append("nonvalidated_details"                  ,   '')
+
+                    formData.append("comment"                               ,   this.client.comment)
+
+                    formData.append("JPlan"                                 ,   this.client.JPlan)
+                    formData.append("Journee"                               ,   this.client.Journee)
+                    formData.append("BrandAvailability"                     ,   this.client.BrandAvailability)
+                    formData.append("BrandSourcePurchase"                   ,   this.client.BrandSourcePurchase)
+                }
+
+                //
+                if(this.client.status_original   ==  'visible') {
+
+                    formData.append("start_adding_date"                     ,   this.start_adding_date)
+                    formData.append("finish_adding_date"                    ,   moment(new Date()).format())
                 }
 
                 const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/update",   formData)
@@ -1069,6 +1201,14 @@ export default {
                 this.$createFile(client.in_store_image_original_name            ,   "in_store_image_update")
                 let in_store_image_display_update                               =   document.getElementById("in_store_image_display_update")
                 in_store_image_display_update.src                               =   "/uploads/clients/"+client.id+"/"+client.in_store_image
+            }
+
+            //  //  //  //  //
+
+            // Set Start ADDd
+            if(this.client.status   ==  "visible") {
+
+                this.start_adding_date  =   moment(new Date()).format()
             }
 
             //
@@ -1388,7 +1528,16 @@ export default {
                     this.client.Latitude                =   response.position.coords.latitude
                     this.client.Longitude               =   response.position.coords.longitude
 
-                    //
+                    // --- NEW: Get Address from LocationIQ ---
+                    // We await this so the address is ready before you save/check clients
+                    const address = await this.$getAddressFromLocationIQ(this.client.Latitude, this.client.Longitude);
+                    
+                    // Assuming 'this.client.Address' is where you want to store it
+                    if(address) {
+                        this.client.RvrsGeoAddress  =   address;
+                        console.log("Address found:", this.client.RvrsGeoAddress);
+                    }
+                    // ----------------------------------------
                     await this.$nextTick()
 
                     //

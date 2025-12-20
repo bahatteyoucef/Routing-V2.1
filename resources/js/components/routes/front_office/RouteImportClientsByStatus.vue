@@ -15,11 +15,13 @@
 
                         <div class="col-8 pl-1 pr-1">
                             <select         class="form-select"     id="filter_status"      v-model="filter_status"     @change="getClients()">
+                                <option     :value="'confirmed'">Confirmé</option>
                                 <option     :value="'validated'">Validé</option>
                                 <option     :value="'pending'">en Attente</option>
-                                <option     :value="'nonvalidated'">Refusé</option>
+                                <option     :value="'nonvalidated'">Non Valide</option>
                                 <option     :value="'visible'">Visible</option>
                                 <option     :value="'ferme'">Fermé</option>
+                                <option     :value="'refus'">Refusé</option>
                             </select>
                         </div>
                     </div>
@@ -109,7 +111,7 @@ export default {
             search_by_clientbarcode_value   : "",
             scanner                         : null,
             show_barcode_div                : false,
-            filter_status                   : "validated",
+            filter_status                   : "confirmed",
             
             //
             itemHeight: 120,

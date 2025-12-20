@@ -32,12 +32,15 @@
                                     <div class="col-sm-4">
                                         <label for="status"             class="form-label">Status</label>
                                         <select                         class="form-select"         id="status"                 v-model="client.status"                 :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                            <option v-if="client.OpenCustomer   !=  'Ferme'"    value="validated" selected>validated</option>
-                                            <option v-if="client.OpenCustomer   !=  'Ferme'"    value="pending">pending</option>
-                                            <option v-if="client.OpenCustomer   !=  'Ferme'"    value="nonvalidated">nonvalidated</option>
-                                            <option v-if="client.OpenCustomer   !=  'Ferme'"    value="visible">visible</option>
+                                            <option v-if="client.OpenCustomer   ==  'Ouvert'"   value="confirmed" selected>confirmed</option>
+                                            <option v-if="client.OpenCustomer   ==  'Ouvert'"   value="validated">validated</option>
+                                            <option v-if="client.OpenCustomer   ==  'Ouvert'"   value="pending">pending</option>
+                                            <option v-if="client.OpenCustomer   ==  'Ouvert'"   value="nonvalidated">nonvalidated</option>
+                                            <option v-if="client.OpenCustomer   ==  'Ouvert'"   value="visible">visible</option>
 
-                                            <option v-if="client.OpenCustomer   ==  'Ferme'"    value="ferme">ferme</option>
+                                            <option v-if="client.OpenCustomer   ==  'Ferme'"            value="ferme">ferme</option>
+                                            <option v-if="client.OpenCustomer   ==  'refus'"            value="refus">refus</option>
+                                            <option v-if="client.OpenCustomer   ==  'Introuvable'"      value="introuvable">introuvable</option>
                                         </select>
 
                                         <div v-if="client.status    ==  'nonvalidated'" class="mt-3">

@@ -71,11 +71,13 @@
                             <div class="col">
                                 <label for="status"             class="form-label">Status</label>
                                 <select                         class="form-select"         id="status"                         v-model="status">
-                                    <option value="validated" selected>validated</option>
+                                    <option value="confirmed" selected>confirmed</option>
+                                    <option value="validated">validated</option>
                                     <option value="pending">pending</option>
                                     <option value="nonvalidated">nonvalidated</option>
                                     <option value="visible">visible</option>
                                     <option value="ferme">ferme</option>
+                                    <option value="refus">refus</option>
                                 </select>
                             </div>
 
