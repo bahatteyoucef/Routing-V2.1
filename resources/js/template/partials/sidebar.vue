@@ -1,7 +1,7 @@
 <template>
     <section class="app-sidebar">
         <nav class="sidebar sidebar-offcanvas scrollbar scrollbar-deep-blue" id="sidebar">
-            <ul v-if="user.nom" class="nav">
+            <ul v-if="user.username" class="nav">
 
                 <!-- Profile        -->
                 <li v-if="user  !=  {}" class="nav-item nav-profile">
@@ -14,7 +14,7 @@
                         </div>
                         <div class="nav-profile-text d-flex flex-column">
                             <span class="font-weight-bold mb-2"
-                                >{{ user.nom }} </span
+                                >{{ user.first_name }} {{ user.last_name }}</span
                             >
                         </div>
                     </a>

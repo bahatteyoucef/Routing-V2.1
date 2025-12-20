@@ -170,6 +170,8 @@ export default {
 
             this.$callApi("post",   "/route_import/"+this.getUser.id_route_import+"/clients/by_status",     formData).then(async (res)=> { 
                 
+                console.log(res)
+
                 //
                 let clients             =   res.data
 

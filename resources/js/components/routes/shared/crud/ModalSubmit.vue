@@ -120,7 +120,7 @@ export default {
                                                                     { data: "adding_duration"                   , title: "adding_duration"                  },
                                                                     { data: "created_at"                        , title: "created_at"                       },
                                                                     { data: "status"                            , title: "status"                           },
-                                                                    // { data: "owner_name"                        , title: "owner_name"                       },
+                                                                    // { data: "owner_username"                        , title: "owner_username"                       },
                                                             ],
 
             datatable_submit_clients                        :   null    ,

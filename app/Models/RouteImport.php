@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -65,7 +66,7 @@ class RouteImport extends Model
 
             $route_import->clients      =   Client::where("id_route_import", $route_import->id)
                                                 ->join('users', 'clients.owner', '=', 'users.id')
-                                                ->select('clients.*', 'users.nom as owner_name')
+                                                ->select('clients.*', 'users.username as owner_username')
                                                 ->get();
 
             //
@@ -244,7 +245,7 @@ class RouteImport extends Model
 
         $route_import                       =   RouteImport::find($id);
 
-        $route_import->clients              =   Client::where("id_route_import", $id)->join('users', 'clients.owner', '=', 'users.id')->select('clients.*', 'users.nom as owner_name')->get();
+        $route_import->clients              =   Client::where("id_route_import", $id)->join('users', 'clients.owner', '=', 'users.id')->select('clients.*', 'users.username as owner_username')->get();
 
         //
         foreach ($route_import->clients as $client) {
@@ -264,7 +265,7 @@ class RouteImport extends Model
 
         $route_import                       =   RouteImport::find($id);
 
-        $route_import->clients              =   Client::where([["id_route_import", $id], ["clients.owner", Auth::user()->id]])->join('users', 'clients.owner', '=', 'users.id')->select('clients.*', 'users.nom as owner_name')->get();
+        $route_import->clients              =   Client::where([["id_route_import", $id], ["clients.owner", Auth::user()->id]])->join('users', 'clients.owner', '=', 'users.id')->select('clients.*', 'users.username as owner_username')->get();
 
         //
         foreach ($route_import->clients as $client) {
@@ -304,7 +305,7 @@ class RouteImport extends Model
 
         if($liste_user_territory_array  ==  []) {
 
-            $liste_user_territory           =   DB::table("user_territories")->select("user_territories.*"  ,   "users.nom   as  user")
+            $liste_user_territory           =   DB::table("user_territories")->select("user_territories.*"  ,   "users.username   as  user")
                                                 ->join("users", "user_territories.id_user", "users.id")
                                                 ->where('id_route_import', $id)
                                                 ->whereNotNull('latlngs')
@@ -314,11 +315,11 @@ class RouteImport extends Model
 
         else {
 
-            $liste_user_territory           =   DB::table("user_territories")->select("user_territories.*"  ,   "users.nom   as  user")
+            $liste_user_territory           =   DB::table("user_territories")->select("user_territories.*"  ,   "users.username   as  user")
                                                 ->join("users", "user_territories.id_user", "users.id")
                                                 ->where('id_route_import', $id)
                                                 ->whereNotNull('latlngs')
-                                                ->whereIn('users.nom', $liste_user_territory_array)
+                                                ->whereIn('users.username', $liste_user_territory_array)
                                                 ->orderBy("id_user")
                                                 ->get();
         }
@@ -503,7 +504,7 @@ class RouteImport extends Model
 
         $route_import           =   RouteImport::find($id);
 
-        $route_import->clients     =   Client::where("id_route_import", $id)->join('users', 'clients.owner', '=', 'users.id')->select('clients.*', 'users.nom as owner_name')->get();   
+        $route_import->clients     =   Client::where("id_route_import", $id)->join('users', 'clients.owner', '=', 'users.id')->select('clients.*', 'users.username as owner_username')->get();   
 
         //
         foreach ($route_import->clients as $client) {
@@ -534,7 +535,7 @@ class RouteImport extends Model
                                             });
                                         })
                                         ->join('users', 'clients.owner', '=', 'users.id')
-                                        ->select('clients.*', 'users.nom as owner_name')
+                                        ->select('clients.*', 'users.username as owner_username')
                                         ->get();
 
         //
@@ -554,18 +555,48 @@ class RouteImport extends Model
 
     public static function clients(int $id) {
 
-        $clients    =   Client::where("id_route_import", $id)
-                            ->join('users', 'clients.owner', '=', 'users.id')
-                            ->select('clients.*', 'users.nom as owner_name')
-                            ->get();
+        // Use the current request instance when $request wasn't provided
+        $request = $request ?? request();
 
         //
-        foreach ($clients as $client) {
 
-            $AvailableBrands_AssocArray                 =   json_decode($client->AvailableBrands, true); // Convert JSON to associative array
-            $client->AvailableBrands_array_formatted    =   array_values($AvailableBrands_AssocArray); // Extract values as an indexed array
-            $client->AvailableBrands_string_formatted   =   implode(", ", $client->AvailableBrands_array_formatted);
-        }
+        $start      =   $request->filled('start_date') ? Carbon::parse($request->start_date)->format('Y-m-d')   : null;
+        $end        =   $request->filled('end_date')   ? Carbon::parse($request->end_date)->format('Y-m-d')     : null;
+
+        //
+
+        $clients    =   Client::where("id_route_import", $id)
+                            ->when(
+                                $request->filled('status'),
+                                function ($q) use ($request) {
+                                    $q->where("clients.status", $request->get("status"));
+                                }
+                            )
+
+                            ->when($start || $end, function ($q) use ($start, $end) {
+                                if ($start && $end) $q->whereRaw("STR_TO_DATE(clients.created_at, '%d %M %Y') BETWEEN ? AND ?"  , [$start, $end]);
+                                elseif ($start)     $q->whereRaw("STR_TO_DATE(clients.created_at, '%d %M %Y') >= ?"             , [$start]);
+                                else                $q->whereRaw("STR_TO_DATE(clients.created_at, '%d %M %Y') <= ?"             , [$end]);
+                            })
+
+                            ->when($request->has('selected_CustomerTypes'), function ($q) use ($request) {
+                                $CustomerTypes  =   json_decode($request->get('selected_CustomerTypes'), true);
+                                return $q->whereIn('clients.CustomerType', $CustomerTypes);
+                            })
+
+                            ->when($request->has('selected_NbrVitrines'), function ($q) use ($request) {
+                                $NbrVitrines  =   json_decode($request->get('selected_NbrVitrines'), true);
+                                return $q->whereIn('clients.NbrRideauxFacade', $NbrVitrines);
+                            })
+
+                            ->when($request->has('selected_SuperficieMagasins'), function ($q) use ($request) {
+                                $SuperficieMagasins  =   json_decode($request->get('selected_SuperficieMagasins'), true);
+                                return $q->whereIn('clients.SuperficieMagasin', $SuperficieMagasins);
+                            })
+
+                            ->join('users', 'clients.owner', 'users.id')
+                            ->select('clients.*', 'users.username as owner_name')
+                            ->get();
 
         //
         return $clients;
@@ -1004,7 +1035,9 @@ class RouteImport extends Model
                         ->select([ 
                             'users.id                               as  id'                 , 
 
-                            'users.nom                              as  nom'                ,
+                            'users.username                         as  username'           ,
+                            'users.first_name                       as  first_name'         ,
+                            'users.last_name                        as  last_name'          ,
                             'users.email                            as  email'              ,
 
                             'users.tel                              as  tel'                ,
@@ -1038,7 +1071,9 @@ class RouteImport extends Model
                             ->select([ 
                                 'users.id                               as  id'                 , 
 
-                                'users.nom                              as  nom'                ,
+                                'users.username                         as  username'           ,
+                                'users.first_name                       as  first_name'         ,
+                                'users.last_name                        as  last_name'          ,
                                 'users.email                            as  email'              ,
 
                                 'users.tel                              as  tel'                ,
@@ -1089,7 +1124,7 @@ class RouteImport extends Model
                                     })
                                 )
                                 ->join('users', 'clients.owner', '=', 'users.id')
-                                ->select('clients.*', 'users.nom as owner_name')
+                                ->select('clients.*', 'users.username as owner_username')
                                 ->get();
 
         //

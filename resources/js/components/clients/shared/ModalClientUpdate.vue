@@ -358,7 +358,7 @@
                                         <label for="owner"          class="form-label">Owner</label>
                                         <select                     class="form-select"     id="owner"          v-model="client.owner">
                                             <option value=""></option>
-                                            <option v-for="user in users"                   :key="user.id"      :value="user.id">{{user.nom}}</option>
+                                            <option v-for="user in users"                   :key="user.id"      :value="user.id">{{user.username}}</option>
                                         </select>
                                     </div>
 
@@ -567,7 +567,7 @@ export default {
 
                 //
                 owner                                   :   '',
-                owner_name                              :   ''
+                owner_username                              :   ''
             },
 
             cites                           :   []      ,
@@ -618,7 +618,7 @@ export default {
             // Set Client
             this.client.DistrictNameE   =   this.getDistrictNameE(this.client.DistrictNo)
             this.client.CityNameE       =   this.getCityNameE(this.client.CityNo)
-            this.client.owner_name      =   this.getOwnerName(this.client.owner)
+            this.client.owner_username      =   this.getOwnerUsername(this.client.owner)
 
             //
 
@@ -705,7 +705,7 @@ export default {
                 if(res.status===200){
 
                     let client          =   res.data.client
-                    client.owner_name   =   this.client.owner_name
+                    client.owner_username   =   this.client.owner_username
 
                     // Send Feedback
                     this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
@@ -749,7 +749,7 @@ export default {
                     if(res.status===200){
 
                         let client          =   res.data.client
-                        client.owner_name   =   this.client.owner_name
+                        client.owner_username   =   this.client.owner_username
 
                         // Send Feedback
                         this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
@@ -1012,7 +1012,7 @@ export default {
                 this.client.in_store_image_original_name            =   '',
 
                 this.client.owner                                   =   '',
-                this.client.owner_name                              =   '',
+                this.client.owner_username                              =   '',
                 this.client.comment                                 =   '',
 
                 //
@@ -1201,13 +1201,13 @@ export default {
             }
         },
 
-        getOwnerName(owner) {
+        getOwnerUsername(owner) {
 
             for (let i = 0; i < this.users.length; i++) {
 
                 if(this.users[i].id  ==  owner) {
 
-                    return this.users[i].nom
+                    return this.users[i].username
                 }                
             }
         },

@@ -151,11 +151,11 @@ class Client extends Model
         if (empty($clientsData)) return;
 
         // --- Optimization 1: Batch User Lookup (Saves thousands of queries) ---
-        $ownerNames = array_column($clientsData, 'owner');
-        $ownerNames = array_filter(array_unique($ownerNames)); // Get unique, non-empty names
+        $ownerUserNames = array_column($clientsData, 'owner');
+        $ownerUserNames = array_filter(array_unique($ownerUserNames)); // Get unique, non-empty names
         
-        // Map of 'OwnerName' => User ID
-        $userMap = User::whereIn('nom', $ownerNames)->pluck('id', 'nom')->toArray();
+        // Map of 'ownerUserName' => User ID
+        $userMap = User::whereIn('username', $ownerUserNames)->pluck('id', 'username')->toArray();
         $defaultUserId = Auth::check() ? Auth::user()->id : null;
 
         $now = Carbon::now();
@@ -693,7 +693,7 @@ class Client extends Model
         if ($client) {
             // Assuming you have a relationship defined in Client model: public function ownerUser() { return $this->belongsTo(User::class, 'owner'); }
             if ($client->ownerUser) {
-                $client->owner_name = $client->ownerUser->nom;
+                $client->owner_username = $client->ownerUser->username;
             }
             
             // Use helper to format brands
@@ -791,7 +791,7 @@ class Client extends Model
         foreach ($clients as $client) {
             // Map owner name manually if not using API Resource
             if ($client->ownerUser) {
-                $client->owner = $client->ownerUser->nom; 
+                $client->owner = $client->ownerUser->username; 
             }
             self::appendFormattedBrands($client);
         }

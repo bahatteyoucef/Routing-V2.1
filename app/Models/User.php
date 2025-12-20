@@ -55,7 +55,9 @@ class User extends Authenticatable
                             ->select([ 
                                 'users.id                   as  id'                     , 
 
-                                'users.nom                  as  nom'                    ,
+                                'users.username             as  username'               ,
+                                'users.first_name           as  first_name'             ,
+                                'users.last_name            as  last_name'              ,
                                 'users.email                as  email'                  ,
 
                                 'users.tel                  as  tel'                    ,
@@ -91,7 +93,9 @@ class User extends Authenticatable
         $query  =   DB::table('users')
                         ->select([
                             'users.id                   as id',
-                            'users.nom                  as nom',
+                            'users.username             as username',
+                            'users.first_name           as  first_name',
+                            'users.last_name            as  last_name',
                             'users.email                as email',
                             'users.tel                  as tel',
                             'users.company              as company',
@@ -131,7 +135,9 @@ class User extends Authenticatable
         $query  =   DB::table('users')
                         ->select([
                             'users.id as id',
-                            'users.nom as nom',
+                            'users.username as username',
+                            'users.first_name as  first_name',
+                            'users.last_name as  last_name',
                             'users.email as email',
                             'users.tel as tel',
                             'users.company as company',
@@ -165,7 +171,9 @@ class User extends Authenticatable
     public static function validateStore(Request $request) {
 
         $validator = Validator::make($request->all(), [
-            'nom'               =>  ["required", "alpha_num", Rule::unique('users', 'nom')],
+            'username'          =>  ["required", "alpha_num", Rule::unique('users', 'username')         ],
+            'first_name'        =>  ["required", "max:255"                                              ],
+            'last_name'         =>  ["required", "max:255"                                              ],
             'email'             =>  ["required", Rule::unique('users')  , "email", "max:255"            ],
             'tel'               =>  ["required", "max:255"                                              ],
             'company'           =>  ["required", "max:255"                                              ],
@@ -190,7 +198,9 @@ class User extends Authenticatable
     public static function storeUser(Request $request) {
         
         $user = new User([
-            'nom'                   =>  $request->input('nom')                  ,
+            'username'              =>  $request->input('username')             ,
+            'first_name'            =>  $request->input('first_name')           ,
+            'last_name'             =>  $request->input('last_name')            ,
             'email'                 =>  $request->input('email')                ,
             'tel'                   =>  $request->input('tel')                  ,
             'company'               =>  $request->input('company')              ,
@@ -302,7 +312,9 @@ class User extends Authenticatable
     public static function validateUpdate(Request $request, int $id) {
 
         $validator = Validator::make($request->all(), [
-            'nom'               =>  ["required", "alpha_num", Rule::unique('users', 'nom')->ignore($id)],
+            'username'          =>  ["required", "alpha_num", Rule::unique('users', 'username')->ignore($id)],
+            'first_name'        =>  ["required", "max:255"                                              ],
+            'last_name'         =>  ["required", "max:255"                                              ],
             'email'             =>  ["required", Rule::unique('users')->ignore($id), "email", "max:255" ],
             'tel'               =>  ["required", "max:255"                                              ],
             'company'           =>  ["required", "max:255"                                              ],
@@ -326,7 +338,9 @@ class User extends Authenticatable
 
         $user                       =   User::find($id);
 
-        $user->nom                  =   $request->input('nom');
+        $user->username             =   $request->input('username');
+        $user->first_name           =   $request->input('first_name');
+        $user->last_name            =   $request->input('last_name');
         $user->email                =   $request->input('email');
         $user->tel                  =   $request->input('tel');
         $user->company              =   $request->input('company');
@@ -588,7 +602,7 @@ class User extends Authenticatable
             $clientsQuery = Client::where('clients.owner_bo', $owner)
                 ->whereBetween('clients.updated_at', [$startDate, $endDate])
                 ->join('users as bo', 'clients.owner_bo', '=', 'bo.id')
-                ->select('clients.*', 'bo.username as owner_name');
+                ->select('clients.*', 'bo.username as owner_username');
 
             if (!empty($route_links)) {
                 $clientsQuery->whereIn('clients.id_route_import', $route_links);

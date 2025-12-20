@@ -211,7 +211,7 @@ export default {
                 "nonvalidated_details"              ,
 
                 "owner"                             ,
-                "owner_name"                        ,
+                "owner_username"                        ,
 
                 "comment"                           ,
 

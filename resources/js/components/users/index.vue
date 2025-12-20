@@ -71,7 +71,9 @@ export default {
             index_users_data                :   []      ,
             index_users_columns             :   [
                                                     { data: "id"                    , title: "ID"           },
-                                                    { data: "nom"                   , title: "Name"         },
+                                                    { data: "username"              , title: "Username"     },
+                                                    { data: "first_name"            , title: "First Name"   },
+                                                    { data: "last_name"             , title: "Last Name"    },
                                                     { data: "email"                 , title: "Email"        },
                                                     { data: "tel"                   , title: "Tel"          },
                                                     { data: "company"               , title: "Company"      },

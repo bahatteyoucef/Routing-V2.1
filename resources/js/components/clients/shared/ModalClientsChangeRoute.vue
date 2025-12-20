@@ -40,7 +40,7 @@
                                     <label for="owner"          class="form-label">Owner (Owner)</label>
                                     <select                     class="form-select"     id="owner"          v-model="owner">
                                         <option value=""></option>
-                                        <option v-for="user in users"                   :key="user.id"      :value="user.id">{{user.nom}}</option>
+                                        <option v-for="user in users"                   :key="user.id"      :value="user.id">{{user.username}}</option>
                                     </select>
                                 </div>
                             </div>
@@ -305,7 +305,7 @@ export default {
                 if(this.owner      !=  "") {
 
                     clients_copy[i].owner           =   this.owner
-                    clients_copy[i].owner_name      =   this.getOwnerName(this.owner)
+                    clients_copy[i].owner_username      =   this.getOwnerUsername(this.owner)
                 }
 
                 // Set District City
@@ -585,13 +585,13 @@ export default {
 
         //
 
-        getOwnerName(owner) {
+        getOwnerUsername(owner) {
 
             for (let i = 0; i < this.users.length; i++) {
 
                 if(this.users[i].id     ==  owner) {
 
-                    return this.users[i].nom
+                    return this.users[i].username
                 }                
             }
         },
@@ -622,7 +622,7 @@ export default {
 
         clientMapRightProperties(clients) {
 
-            const fields = ['owner', 'owner_name', 'DistrictNo', 'DistrictNameE', 'CityNo', 'CityNameE', 'CustomerType', 'JPlan', 'Journee', 'status'];
+            const fields = ['owner', 'owner_username', 'DistrictNo', 'DistrictNameE', 'CityNo', 'CityNameE', 'CustomerType', 'JPlan', 'Journee', 'status'];
             
             return clients.map(obj => {
                 let result = { id: obj.id };

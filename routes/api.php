@@ -61,6 +61,18 @@ Route::middleware(['auth:api', 'isEnabledUser'])->group(function () {
                     ->get();
     });
 
+    // Get Cities
+    Route::post('/route_import/{id_route_import}/cities'     ,   function($id_route_import)  { 
+
+        return  DB::table("RTM_City")
+                    ->select("RTM_City.*")
+                    ->join("RTM_Willaya"            , "RTM_City.DistrictNo"         , "RTM_Willaya.DistrictNo")
+                    ->join("route_import_districts" , "RTM_Willaya.DistrictNo"      , "route_import_districts.DistrictNo")
+                    ->where('route_import_districts.id_route_import', $id_route_import)
+                    ->orderByRaw('CAST(RTM_City.CITYNO AS SIGNED INTEGER)')
+                    ->get();
+    });
+
     // 
     Route::post('/rtm_willayas/rtm_cites/details/indexedDB'     ,   function()  { 
 

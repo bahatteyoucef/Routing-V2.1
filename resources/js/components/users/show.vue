@@ -11,11 +11,23 @@
 
                     <div class="mb-3 mt-3">
                         <div class="row">
-                            <label for="nom"                    class="form-label font-weight-bold col-sm-2">Name : </label>
-                            <label                              class="form-label col-sm-4">{{ user.nom }}</label>
+                            <label for="username"               class="form-label font-weight-bold col-sm-2">Username : </label>
+                            <label                              class="form-label col-sm-4">{{ user.username }}</label>
 
                             <label for="email"                  class="form-label font-weight-bold col-sm-2">Email : </label>
                             <label                              class="form-label col-sm-4">{{ user.email }}</label>
+                        </div>
+                    </div>
+
+                    <!--  -->
+
+                    <div class="mb-3 mt-3">
+                        <div class="row">
+                            <label for="first_name"               class="form-label font-weight-bold col-sm-2">First Name : </label>
+                            <label                              class="form-label col-sm-4">{{ user.first_name }}</label>
+
+                            <label for="last_name"                  class="form-label font-weight-bold col-sm-2">Last Name : </label>
+                            <label                              class="form-label col-sm-4">{{ user.last_name }}</label>
                         </div>
                     </div>
 
@@ -65,10 +77,13 @@ export default {
     data() {
         return {
             user            :   {
-                nom_original                :   '',
+                username_original           :   '',
 
                 id                          :   '',
-                nom                         :   '',
+                username                    :   '',
+                first_name                  :   '',
+                last_name                   :   '',
+
                 email                       :   '',
                 tel                         :   '',
                 company                     :   '',
@@ -109,10 +124,13 @@ export default {
             const res                   =   await this.$callApi("post"  ,   "/users/"+this.$route.params.id_user+"/show"    ,   null)
             console.log(res)
 
-            this.user.nom_original          =   res.data.nom
+            this.user.username_original     =   res.data.username
 
             this.user.id                    =   res.data.id                 
-            this.user.nom                   =   res.data.nom                 
+            this.user.username              =   res.data.username                 
+            this.user.first_name            =   res.data.first_name                 
+            this.user.last_name             =   res.data.last_name                 
+
             this.user.email                 =   res.data.email   
             this.user.tel                   =   res.data.tel                 
             this.user.company               =   res.data.company    

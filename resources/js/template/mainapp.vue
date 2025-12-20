@@ -144,7 +144,7 @@
 
                 this.user   =   this.getUser
 
-                if(this.user.nom) {
+                if(this.user.username) {
 
                     this.component_login        =   false
                     this.component_dashboard    =   true
@@ -275,7 +275,7 @@
 
             getUser(newUser, oldUser) {
 
-                if(newUser.nom) {
+                if(newUser.username) {
 
                     this.component_login        =   false
                     this.component_dashboard    =   true

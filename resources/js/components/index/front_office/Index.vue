@@ -9,7 +9,7 @@
                             class="mdi mdi-dice-1 mr-1 ml-1 fw-bold"
                             style="color: #2c78bd"
                         ></i
-                        ><span class="fw-bold mb-1">{{ getUser.nom }}</span>
+                        ><span class="fw-bold mb-1">{{ getUser.first_name }} {{ getUser.last_name }}</span>
                     </div>
                 </div>
             </div>

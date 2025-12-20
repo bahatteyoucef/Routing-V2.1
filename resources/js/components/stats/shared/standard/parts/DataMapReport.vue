@@ -135,7 +135,7 @@ export default {
             // this.cites                              =   this.route_import.clients.map(client => client.CityNo)      .filter((CityNo, index, self)       => self.indexOf(CityNo)         === index)
             // this.liste_type_client                  =   this.route_import.clients.map(client => client.CustomerType).filter((CustomerType, index, self) => self.indexOf(CustomerType)   === index)
             // this.liste_journee                      =   this.route_import.clients.map(client => client.Journee)     .filter((Journee, index, self)      => self.indexOf(Journee)        === index)
-            // this.owners                             =   this.route_import.clients.map(client => client.owner_name)  .filter((owner_name, index, self)   => self.indexOf(owner_name)     === index)
+            // this.owners                             =   this.route_import.clients.map(client => client.owner_username)  .filter((owner_username, index, self)   => self.indexOf(owner_username)     === index)
             // this.liste_status                       =   this.route_import.clients.map(client => client.status)      .filter((status, index, self)       => self.indexOf(status)         === index)
 
             // Colors
@@ -223,9 +223,9 @@ export default {
                     journee_util[this.route_import.clients[i].Journee]                      =   this.route_import.clients[i].Journee
                 }
 
-                if(typeof owner_util[this.route_import.clients[i].owner_name]                ==  "undefined") {
+                if(typeof owner_util[this.route_import.clients[i].owner_username]                ==  "undefined") {
 
-                    owner_util[this.route_import.clients[i].owner_name]                     =   this.route_import.clients[i].owner_name
+                    owner_util[this.route_import.clients[i].owner_username]                     =   this.route_import.clients[i].owner_username
                 }
 
                 if(typeof status_util[this.route_import.clients[i].status]              ==  "undefined") {
@@ -345,12 +345,12 @@ export default {
                 }
 
                 // Owner
-                owner_existe              =   this.checkExistOwner(this.owners, this.route_import.clients[i].owner_name) 
+                owner_existe              =   this.checkExistOwner(this.owners, this.route_import.clients[i].owner_username) 
 
                 if(!owner_existe) {
 
-                    this.owners[this.route_import.clients[i].owner_name]             =   {owner_name :   ""}
-                    this.owners[this.route_import.clients[i].owner_name].owner_name  =   this.route_import.clients[i].owner_name 
+                    this.owners[this.route_import.clients[i].owner_username]             =   {owner_username :   ""}
+                    this.owners[this.route_import.clients[i].owner_username].owner_username  =   this.route_import.clients[i].owner_username 
 
                     if(Object.keys(owners_colors).length    >   0) {
 
@@ -360,7 +360,7 @@ export default {
                         }
                     }
 
-                    this.owners[this.route_import.clients[i].owner_name].color      =   this.$colors[owner_count % this.$colors.length]
+                    this.owners[this.route_import.clients[i].owner_username].color      =   this.$colors[owner_count % this.$colors.length]
                     owner_count                                                     =   owner_count +   1
                 }
 
@@ -618,11 +618,11 @@ export default {
             return false
         },
 
-        checkExistOwner(owners, owner_name) {
+        checkExistOwner(owners, owner_username) {
 
             for (const [key, value] of Object.entries(owners)) {
                 
-                if(key  ==  owner_name) {
+                if(key  ==  owner_username) {
 
                     return true
                 }

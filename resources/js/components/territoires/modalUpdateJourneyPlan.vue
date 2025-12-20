@@ -39,7 +39,7 @@
                             <div class="mb-3">
                                 <label for="type_user"          class="form-label">User</label>
                                 <select                         class="form-select"         id="type_user"          v-model="territoire.id_user">
-                                    <option v-for="user, index in users" :key="index"   :value="user.id">{{ user.nom }}</option>
+                                    <option v-for="user, index in users" :key="index"   :value="user.id">{{ user.username }}</option>
                                 </select>
                             </div>
                         </div>

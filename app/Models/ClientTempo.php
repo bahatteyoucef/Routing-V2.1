@@ -35,7 +35,7 @@ class ClientTempo extends Model
 
         $clients        =   ClientTempo::where("id_route_import_tempo", $id_route_import_tempo)
                                 ->join('users', 'clients_tempo.owner', '=', 'users.id')
-                                ->select('clients_tempo.*', 'users.nom as owner_name')
+                                ->select('clients_tempo.*', 'users.username as owner_username')
                                 ->get();
 
         //
@@ -66,7 +66,7 @@ class ClientTempo extends Model
         foreach ($clients as $client_elem) {
 
             if(isset($client_elem->owner)) {
-                $user   =   User::where('nom', $client_elem->owner)->first();
+                $user   =   User::where('username', $client_elem->owner)->first();
             }
 
             //

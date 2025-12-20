@@ -15,8 +15,18 @@
                     <form>
 
                         <div class="mb-3">
-                            <label for="nom"                    class="form-label">Name</label>
-                            <input type="text"                  class="form-control"        id="nom"                        v-model="user.nom">
+                            <label for="username"               class="form-label">Username</label>
+                            <input type="text"                  class="form-control"        id="username"                        v-model="user.username">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="first_name"             class="form-label">First Name</label>
+                            <input type="text"                  class="form-control"        id="first_name"                        v-model="user.first_name">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="last_name"              class="form-label">Last Name</label>
+                            <input type="text"                  class="form-control"        id="last_name"                        v-model="user.last_name">
                         </div>
 
                         <div class="mb-3">
@@ -199,7 +209,10 @@ export default {
 
             user            :   {
 
-                nom                     :   ''      ,
+                username                :   ''      ,
+                first_name              :   ''      ,
+                last_name               :   ''      ,
+
                 email                   :   ''      ,
                 tel                     :   ''      ,
                 company                 :   ''      ,
@@ -243,7 +256,10 @@ export default {
 
             let formData = new FormData();
 
-            formData.append("nom"                       , this.user.nom)
+            formData.append("username"                  , this.user.username)
+            formData.append("first_name"                , this.user.first_name)
+            formData.append("last_name"                 , this.user.last_name)
+
             formData.append("email"                     , this.user.email)
             formData.append("tel"                       , this.user.tel)
             formData.append("company"                   , this.user.company)
@@ -295,7 +311,10 @@ export default {
 
             $(id_modal).on("hidden.bs.modal",   ()  => {
 
-                this.user.nom                       =   ''
+                this.user.username                  =   ''
+                this.user.first_name                =   ''
+                this.user.last_name                 =   ''
+
                 this.user.email                     =   ''
                 this.user.tel                       =   ''
                 this.user.company                   =   ''

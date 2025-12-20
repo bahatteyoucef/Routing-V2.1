@@ -1,461 +1,432 @@
 <template>
-
     <div class="p-3 m-2 h-100" style="background-color: #f2edf3; padding : 15px;">
-        <!-- Filters            -->
         <div class="col-sm-12 p-2" id="stats_filters">
-            <div class="card">
+             <div class="card">
                 <div class="card-body p-0">
                     <div class="row align-content-middle justify-content-center">
-
-                        <!-- Title  -->
-                        <!-- 
-                            <div class="col-sm-6">
-                                <h4 class="card-title mt-2">List of clients 'pending' of route import : {{ route_import.libelle }}</h4>
-                            </div> 
-                        -->
-                        <!--        -->
-
-                        <!-- CustomerType -->
                         <div class="col">
-                            <Multiselect
-                                v-model     =   "selected_CustomerTypes"
-                                :options    =   "[
-                                                    {value: 'Alimentation Generale' , label: 'Alimentation Generale'}   , 
-                                                    {value: 'Petit Superette'       , label: 'Petit Superette'}         ,  
-                                                    {value: 'Grande Superette'      , label: 'Grande Superette'}        , 
-                                                    {value: 'HyperMarché'           , label: 'HyperMarché'}             ,
-                                                    {value: 'Special Detergent'     , label: 'Special Detergent'}  
-                                                ]"
-
-                                mode        =   "tags"
-                                placeholder =   "Filter By CustomerType"
-                                class       =   ""
-
-                                :close-on-select    =   "false"
-                                :searchable         =   "true"
-                                :create-option      =   "false"
-                            />
+                            <Multiselect v-model="selected_CustomerTypes"
+                                :options="[{value: 'Alimentation Generale' , label: 'Alimentation Generale'}, {value: 'Petit Superette', label: 'Petit Superette'}, {value: 'Grande Superette', label: 'Grande Superette'}, {value: 'HyperMarché', label: 'HyperMarché'}, {value: 'Special Detergent', label: 'Special Detergent'}]"
+                                mode="tags" placeholder="Filter By CustomerType" :close-on-select="false" :searchable="true" :create-option="false" />
                         </div>
-
-                        <!-- NbrVitrines -->
                         <div class="col">
-                            <Multiselect
-                                v-model     =   "selected_NbrVitrines"
-                                :options    =   "[
-                                                    {value: '1', label: '1'}    , 
-                                                    {value: '2', label: '2'}    ,  
-                                                    {value: '3', label: '3'}    , 
-                                                    {value: '4', label: '4'}    ,
-                                                    {value: '5', label: '5'}    , 
-                                                    {value: '6', label: '6'}    , 
-                                                    {value: '7', label: '7'}    , 
-                                                    {value: '8', label: '8'}    , 
-                                                    {value: '9', label: '9'}    , 
-                                                    {value: '10', label: '10'}
-                                                ]"
-                                mode        =   "tags"
-                                placeholder =   "Filter By NbrVitrines"
-                                class       =   ""
-
-                                :close-on-select    =   "false"
-                                :searchable         =   "true"
-                                :create-option      =   "false"
-                            />
+                            <Multiselect v-model="selected_NbrVitrines"
+                                :options="[{value: '1', label: '1'}, {value: '2', label: '2'}, {value: '3', label: '3'}, {value: '4', label: '4'}, {value: '5', label: '5'}, {value: '6', label: '6'}, {value: '7', label: '7'}, {value: '8', label: '8'}, {value: '9', label: '9'}, {value: '10', label: '10'}]"
+                                mode="tags" placeholder="Filter By NbrVitrines" :close-on-select="false" :searchable="true" :create-option="false" />
                         </div>
-
-                        <!-- SuperficieMagasin -->
                         <div class="col">
-                            <Multiselect
-                                v-model     =   "selected_SuperficieMagasins"
-                                :options    =   "[
-                                                    {value: 'Moins de 20 M'  , label: 'Moins de 20 Metres'}     , 
-                                                    {value: 'DE 20 a 50'     , label: 'DE 20 a 50 Metres'}      ,  
-                                                    {value: 'DE 50 a 100'    , label: 'DE 50 a 100 Metres'}     , 
-                                                    {value: 'Plus de 100'    , label: 'Plus de 100 Metres'}
-                                                ]"
-                                mode        =   "tags"
-                                placeholder =   "Filter By SuperficieMagasins"
-                                class       =   ""
-
-                                :close-on-select    =   "false"
-                                :searchable         =   "true"
-                                :create-option      =   "false"
-                            />
+                            <Multiselect v-model="selected_SuperficieMagasins"
+                                :options="[{value: 'Moins de 20 M', label: 'Moins de 20 Metres'}, {value: 'DE 20 a 50', label: 'DE 20 a 50 Metres'}, {value: 'DE 50 a 100', label: 'DE 50 a 100 Metres'}, {value: 'Plus de 100', label: 'Plus de 100 Metres'}]"
+                                mode="tags" placeholder="Filter By SuperficieMagasins" :close-on-select="false" :searchable="true" :create-option="false" />
                         </div>
-
-                        <!-- Select Date Range  -->
                         <div class="col">
-                            <input type="date"                        class="form-control" v-model="start_date"/>
+                            <input type="date" class="form-control" v-model="start_date"/>
                         </div>
-                        <!--  -->
-
-                        <!-- Select Date Range  -->
                         <div class="col">
-                            <input type="date"                        class="form-control" v-model="end_date"/>
+                            <input type="date" class="form-control" v-model="end_date"/>
                         </div>
-                        <!--  -->
-
-                        <!-- Get Range      -->
                         <div class="col">
-                            <button class="btn primary w-100"   @click="getData()">Get Data</button>
+                            <button class="btn primary w-100" @click="getData()">Get Data</button>
                         </div>
-                        <!--  -->
-
                     </div>
                 </div>
             </div>
         </div>
-        <!--                    -->
 
-        <!--                    -->
         <div v-if="route_import" class="mt-3">
-            <div v-for="client, index in clients" :key="index" :id="'client_'+client.id" class="mb-2 shadow-sm rounded">
-                <div class="card">
-                    <div class="card-body p-0">
+            <DynamicScroller 
+                class="scroller mt-2 mb-2"
+                :items="clients"
+                :min-item-size="200"
+                key-field="id"
+                page-mode
+                ref="clientsScroller"
+            >
+                <template v-slot="{ item: client, index, active }">
+                    <DynamicScrollerItem
+                        :item="client"
+                        :active="active"
+                        :size-dependencies="[
+                                                client.OpenCustomer                                                 ,
+                                                client.NewCustomer                                                  ,
+                                                client.status                                                       ,
+                                                client.tel_status                                                   ,
+                                                (client.nonvalidated_details    || '').length > 0 ? 'nv'    : ''    ,
+                                                (client.tel_comment             || '').length > 0 ? 'telc'  : ''    ,
+                                                (client.comment                 || '').length > 0 ? 'c'     : ''    ,
+                                                (client.Landmark                || '').length > 0 ? 'lm'    : ''    ,
+                                                (client.RvrsGeoAddress          || '').length > 0 ? 'rga'   : ''    ,
+                                                (client.CustomerNameE           || '').length > 0 ? 'name'  : ''    ,
+                                                (client.Address                 || '').length > 0 ? 'addr'  : ''    ,
+                                                client.imagesLoadedCount        || 0                                ,
 
-                        <div class="mb-5 text-center">
-                            <u><h5 class="card-title mt-2">{{ client.CustomerIdentifier }} - {{ client.CustomerNameE }} ({{ client.created_at }})</h5></u>
-                        </div>
+                                                client.CustomerBarCode_image        ? 'bcimg'   : ''                ,
+                                                client.facade_image                 ? 'facimg'  : ''                ,
+                                                client.in_store_image               ? 'instore' : ''                ,
+                                                client.CustomerBarCodeExiste_image  ? 'bcex'    : ''
+                                            ]"
+                        :data-index="index"
+                    >
+                        <div :id="'client_'+client.id" class="client-item shadow-sm rounded">
+                            <div class="card mb-0">
+                                <div class="card-body p-0">
+                                    <div class="mb-5 text-center">
+                                        <u><h5 class="card-title mt-2">{{ client.CustomerIdentifier }} - {{ client.CustomerNameE }} ({{ client.created_at }})</h5></u>
+                                    </div>
 
-                        <div class="row">
-                            <div class="col-sm-5">
-                                <div class="row mt-3 mb-3">
-                                    <div class="col-sm-4">
-                                        <div v-if="(client.NewCustomer   ==  'Client Existant')">
-                                            <label for="CustomerIdentifier" class="form-label">ID Client</label>
-                                            <input type="text"              class="form-control"        :id="'CustomerIdentifier_'+client.id"       v-model="client.CustomerIdentifier"                                 :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                    <div class="row">
+                                        <div class="col-sm-5">
+                                            <div class="row mt-3 mb-3">
+                                                <div class="col-sm-4">
+                                                    <div v-if="(client.NewCustomer   ==  'Client Existant')">
+                                                        <label for="CustomerIdentifier" class="form-label">ID Client</label>
+                                                        <input type="text"              class="form-control"        :id="'CustomerIdentifier_'+client.id"       v-model="client.CustomerIdentifier"                                 :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-4">
+                                                    <label for="text"               class="form-label">Client Ouvert</label>
+                                                    <select                         class="form-select"             :id="'OpenCustomer_'+client.id"             v-model="client.OpenCustomer"           @change="setStatus(index)"  :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                        <option     value="Ouvert">Ouvert</option>
+                                                        <option     value="Ferme">Ferme</option>
+                                                        <option     value="refus">refus</option>
+                                                        <option     v-if="(client.NewCustomer   ==  'Client Existant')" value="Introuvable">Introuvable</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-sm-4">
+                                                    <label for="status"             class="form-label">Status</label>
+                                                    <select                         class="form-select"             :id="'status_'+client.id"                   v-model="client.status"                                             :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                        <option v-if="client.OpenCustomer   ==  'Ouvert'"           value="confirmed" selected>confirmed</option>
+                                                        <option v-if="client.OpenCustomer   ==  'Ouvert'"           value="validated">validated</option>
+                                                        <option v-if="client.OpenCustomer   ==  'Ouvert'"           value="pending">pending</option>
+                                                        <option v-if="client.OpenCustomer   ==  'Ouvert'"           value="nonvalidated">nonvalidated</option>
+                                                        <option v-if="client.OpenCustomer   ==  'Ouvert'"           value="visible">visible</option>
+
+                                                        <option v-if="client.OpenCustomer   ==  'Ferme'"            value="ferme">ferme</option>
+                                                        <option v-if="client.OpenCustomer   ==  'refus'"            value="refus">refus</option>
+                                                        <option v-if="client.OpenCustomer   ==  'Introuvable'"      value="introuvable">introuvable</option>
+                                                    </select>
+
+                                                    <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
+                                                        <div class="form-group">
+                                                            <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
+                                                            <textarea   class="form-control"                        :id="'nonvalidated_details_'+client.id" rows="3"             v-model="client.nonvalidated_details"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!--  -->
+
+                                            <div class="row mt-3 mb-3">
+                                                <div class="col-sm-3">
+                                                    <div v-if="client.OpenCustomer  === 'Ouvert'">
+                                                        <label for="text"               class="form-label">CustomerBarCodeExiste</label>
+                                                        <select                         class="form-select"         :id="'CustomerCode_'+client.id"                 v-model="client.CustomerBarCodeExiste"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                            <option     value="Non">Non</option>
+                                                            <option     value="Oui">Oui</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-3">
+                                                    <div v-if="client.OpenCustomer  === 'Ouvert'">
+                                                        <label for="CustomerCode"      class="form-label">Code-Barre</label>
+                                                        <input type="text"              class="form-control"        :id="'CustomerCode_'+client.id"               v-model="client.CustomerCode"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-3">
+                                                    <div v-if="client.OpenCustomer  === 'Ouvert'">
+                                                        <label for="CustomerNameE"      class="form-label">Nom et Prénom de l'Acheteur</label>
+                                                        <input type="text"              class="form-control"        :id="'CustomerNameE_'+client.id"        v-model="client.CustomerNameE"                          :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-3">
+                                                    <label for="CustomerNameA"      class="form-label">Raison Sociale</label>
+                                                    <input type="text"              class="form-control"            :id="'CustomerNameA_'+client.id"        v-model="client.CustomerNameA"                          :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                </div>
+                                            </div>
+
+                                            <!--  -->
+
+                                            <div class="row mt-3 mb-3">
+                                                <div class="col-sm-4">
+                                                    <div v-if="(((client.NewCustomer === 'Nouveau Client')&&(client.OpenCustomer === 'Ouvert'))||(client.NewCustomer === 'Client Existant'))">
+                                                        <label for="Tel"            class="form-label">Téléphone</label>
+                                                        <input type="text"          class="form-control"            :id="'Tel_'+client.id"            v-model="client.Tel"                :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-4">
+                                                    <div v-if="(((client.NewCustomer === 'Nouveau Client')&&(client.OpenCustomer === 'Ouvert'))||(client.NewCustomer === 'Client Existant'))">
+                                                        <label for="tel_status"         class="form-label">Téléphone Status</label>
+                                                        <select                         class="form-select"         :id="'tel_status_'+client.id"     v-model="client.tel_status"         :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                            <option value="validated" selected>validated</option>
+                                                            <option value="pending">pending</option>
+                                                            <option value="nonvalidated">nonvalidated</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div v-if="client.tel_status    ==  'nonvalidated'" class="col-sm-4">
+                                                    <div v-if="(((client.NewCustomer === 'Nouveau Client')&&(client.OpenCustomer === 'Ouvert'))||(client.NewCustomer === 'Client Existant'))">
+                                                        <label      for="tel_comment">Téléphone Commentaire</label>
+                                                        <textarea   class="form-control"                            :id="'tel_comment_'+client.id"    rows="3"                v-model="client.tel_comment"        :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!--  -->
+
+                                            <div class="row mt-3 mb-3">
+                                                <div class="col-sm-4">
+                                                    <label for="text"               class="form-label">Type de Magasin</label>
+                                                    <select                         class="form-select"             :id="'CustomerType_'+client.id"                 v-model="client.CustomerType"                     :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                        <option     :value="'Alimentation Generale'">Alimentation Generale</option>
+                                                        <option     :value="'Petit Superette'">Petit Superette</option>
+                                                        <option     :value="'Grande Superette'">Grande Superette</option>
+                                                        <option     :value="'HyperMarché'">HyperMarché</option>
+                                                        <option     :value="'Special Detergent'">Special Detergent</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-sm-4">
+                                                    <div v-if="(client.OpenCustomer  === 'Ouvert')">
+                                                        <label for="text"               class="form-label">Nombre de Vitrines</label>
+                                                        <select                         class="form-select"         :id="'NbrVitrines_'+client.id"                 v-model="client.NbrVitrines"           :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                            <option     value="1">1</option>
+                                                            <option     value="2">2</option>
+                                                            <option     value="3">3</option>
+                                                            <option     value="4">4</option>
+                                                            <option     value="5">5</option>
+                                                            <option     value="6">6</option>
+                                                            <option     value="7">7</option>
+                                                            <option     value="8">8</option>
+                                                            <option     value="9">9</option>
+                                                            <option     value="10">10</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-4">
+                                                    <div v-if="client.OpenCustomer  === 'Ouvert'">
+                                                        <label for="NbrAutomaticCheckouts"  class="form-label">Nombre de caisses automatique</label>
+                                                        <select                             class="form-select"         :id="'NbrAutomaticCheckouts_'+client.id"          v-model="client.NbrAutomaticCheckouts"  :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                            <option     :value="'Plus de 1'">Plus de 1</option>
+                                                            <option     :value="'1'">1</option>
+                                                            <option     :value="'Pas de caisse automatique'">Pas de caisse automatique</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mt-3 mb-3">
+                                                <div class="col-sm-3">
+                                                    <div v-if="client.OpenCustomer  === 'Ouvert'">
+                                                        <!-- <label for="text"               class="form-label">Source d'Achat</label>
+                                                        <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                            <option     value="DD">DD</option>
+                                                            <option     value="DI">DI</option>
+                                                            <option     value="Pas d'achat">Pas d'achat</option>
+                                                        </select> -->
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-3">
+                                                    <div v-if="client.OpenCustomer  === 'Ouvert'">
+                                                        <!-- <label for="text"               class="form-label">Disponibilité Produits</label>
+                                                        <select                         class="form-select"         id="BrandAvailability"              v-model="client.BrandAvailability"      :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                            <option     value="Non">No</option>
+                                                            <option     value="Oui">Yes</option>
+                                                        </select> -->
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-3">
+                                                    <!-- <label for="JPlan"      class="form-label">JPlan</label>
+                                                    <Multiselect
+                                                        v-model             =   "client.JPlan"
+                                                        :options            =   "salesmen"
+                                                        mode                =   "single" 
+                                                        placeholder         =   "Select Salesman"
+                                                        class               =   "mt-1"
+                                                        id                  =   "JPlan"
+
+                                                        :close-on-select    =   "true"
+                                                        :searchable         =   "true"
+                                                        :create-option      =   "false"
+
+                                                        :canDeselect        =   "true"
+                                                        :canClear           =   "true"
+                                                        :allowAbsent        =   "false"
+
+                                                        :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"
+                                                    /> -->
+                                                </div>
+
+                                                <div class="col-sm-3">
+                                                    <!-- <label for="Journee"            class="form-label">Journee</label>
+                                                    <select                         class="form-select"         id="Journee"                v-model="client.Journee"                    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                        <option     :value="'Samedi 1'">Samedi 1</option>
+                                                        <option     :value="'Dimanche 1'">Dimanche 1</option>
+                                                        <option     :value="'Lundi 1'">Lundi 1</option>
+                                                        <option     :value="'Mardi 1'">Mardi 1</option>
+                                                        <option     :value="'Mercredi 1'">Mercredi 1</option>
+                                                        <option     :value="'Jeudi 1'">Jeudi 1</option>
+                                                        <option     :value="'Samedi 2'">Samedi 2</option>
+                                                        <option     :value="'Dimanche 2'">Dimanche 2</option>
+                                                        <option     :value="'Lundi 2'">Lundi 2</option>
+                                                        <option     :value="'Mardi 2'">Mardi 2</option>
+                                                        <option     :value="'Mercredi 2'">Mercredi 2</option>
+                                                        <option     :value="'Jeudi 2'">Jeudi 2</option>
+                                                    </select> -->
+                                                </div>
+                                            </div>
+
+                                            <div class="row mt-3 mb-3">
+                                                <div class="col-sm-4">
+                                                    <div v-if="client.OpenCustomer  === 'Ouvert'">
+                                                        <label for="SuperficieMagasin"  class="form-label">Superficie du magasin</label>
+
+                                                        <select                         class="form-select"         :id="'SuperficieMagasin_'+client.id"              v-model="client.SuperficieMagasin"      :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                            <option     :value="'Moins de 20 M'">Moins de 20 Metres</option>
+                                                            <option     :value="'DE 20 a 50'">DE 20 a 50 Metres</option>
+                                                            <option     :value="'DE 50 a 100'">DE 50 a 100 Metres</option>
+                                                            <option     :value="'Plus de 100'">Plus de 100 Metres</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-4">
+                                                    <label for="DistrictNo"         class="form-label">Willaya</label>
+                                                    <select                         class="form-select"             :id="'DistrictNo_'+client.id"             v-model="client.DistrictNo"     :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                        <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-sm-4">
+                                                    <label for="CityNo"             class="form-label">Commune</label>
+                                                    <select                         class="form-select"             :id="'CityNo_'+client.id"                 v-model="client.CityNo"                                 :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                        <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CITYNO}}- {{cite.CityNameE}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="row mt-3 mb-3">
+                                                <div class="col-sm-4">
+                                                    <label for="Address"            class="form-label">Adresse</label>
+                                                    <input type="text"              class="form-control"            :id="'Address_'+client.id"                v-model="client.Address"                              :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                </div>
+
+                                                <div class="col-sm-4">
+                                                    <label for="Neighborhood"       class="form-label">Quartier</label>
+                                                    <input type="text"              class="form-control"        :id="'Neighborhood_'+client.id"           v-model="client.Neighborhood"                             :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                </div>
+
+                                                <div class="col-sm-4">
+                                                    <label for="Landmark"           class="form-label">Point de Repere</label>
+                                                    <textarea                       class="form-control"        :id="'Landmark_'+client.id"   rows="3"    v-model="client.Landmark"                                 :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-7">
+                                            <div class="row">
+                                                <div v-if="client.OpenCustomer  === 'Ouvert'"   class="col">
+                                                    <label for="CustomerBarCode_image_update"   class="form-label">Image Code-Barre :</label>
+                                                    <button type="button"                       class="btn btn-secondary w-100 mb-1"    @click="$clickFile('CustomerBarCode_image_update_'+client.id)"                                                              :disabled="((client.status_original    ==  'confirmed')||(client.status_original    ==  'validated'))"><i class="mdi mdi-camera"></i></button>
+
+                                                    <input type="file"                          class="form-control"        :id="'CustomerBarCode_image_update_'+client.id"                       accept="image/*"    capture     @change="customerBarCodeImage(index)"         style="display:none"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                    <img                                        class="mt-1 w-100"          :id="'CustomerBarCode_image_display_update_'+client.id"               :src="'/uploads/clients/'+client.id+'/'+client.CustomerBarCode_image">
+                                                </div>
+
+                                                <div class="col">
+                                                    <label for="facade_image_update"            class="form-label">Image Facade :</label>
+                                                    <button type="button"                       class="btn btn-secondary w-100 mb-1"    @click="$clickFile('facade_image_update_'+client.id)"                                                                           :disabled="((client.status_original    ==  'confirmed')||(client.status_original    ==  'validated'))"><i class="mdi mdi-camera"></i></button>
+
+                                                    <input type="file"                          class="form-control"        :id="'facade_image_update_'+client.id"                      accept="image/*"    @change="facadeImage(index)"                                style="display:none"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                    <img                                        class="mt-1 w-100"          :id="'facade_image_display_update_'+client.id"              :src="'/uploads/clients/'+client.id+'/'+client.facade_image">
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div v-if="client.OpenCustomer  === 'Ouvert'"   class="col">
+                                                    <label for="in_store_image_update"          class="form-label">Image In-Store :</label>
+                                                    <button type="button"                       class="btn btn-secondary w-100 mb-1"    @click="$clickFile('in_store_image_update_'+client.id)"                                                                         :disabled="((client.status_original    ==  'confirmed')||(client.status_original    ==  'validated'))"><i class="mdi mdi-camera"></i></button>
+
+                                                    <input type="file"                          class="form-control"        :id="'in_store_image_update_'+client.id"                    accept="image/*"    @change="inStoreImage(index)"                               style="display:none"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                    <img                                        class="mt-1 w-100"          :id="'in_store_image_display_update_'+client.id"            :src="'/uploads/clients/'+client.id+'/'+client.in_store_image">
+                                                </div>
+
+                                                <div v-if="client.OpenCustomer  === 'Ouvert'"   class="col">
+                                                    <label for="CustomerBarCodeExiste_image_update"          class="form-label">Image CustomerBarCodeExiste :</label>
+                                                    <button type="button"                       class="btn btn-secondary w-100 mb-1"    @click="$clickFile('CustomerBarCodeExiste_image_update_'+client.id)"                                                                         :disabled="((client.status_original    ==  'confirmed')||(client.status_original    ==  'validated'))"><i class="mdi mdi-camera"></i></button>
+
+                                                    <input type="file"                          class="form-control"        :id="'CustomerBarCodeExiste_image_update_'+client.id"                    accept="image/*"    @change="customerBarCodeExisteImage(index)"                               style="display:none"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                    <img                                        class="mt-1 w-100"          :id="'CustomerBarCodeExiste_image_display_update_'+client.id"            :src="'/uploads/clients/'+client.id+'/'+client.CustomerBarCodeExiste_image">
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div class="col-sm-4">
-                                        <label for="text"               class="form-label">Client Ouvert</label>
-                                        <select                         class="form-select"             :id="'OpenCustomer_'+client.id"             v-model="client.OpenCustomer"           @change="setStatus(index)"  :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                            <option     value="Ouvert">Ouvert</option>
-                                            <option     value="Ferme">Ferme</option>
-                                            <option     value="refus">refus</option>
-                                            <option     v-if="(client.NewCustomer   ==  'Client Existant')" value="Introuvable">Introuvable</option>
-                                        </select>
-                                    </div>
+                                    <div class="row">
+                                        <div class="row mt-3 mb-3">
+                                            <div class="col-sm-3">
+                                                <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
+                                                <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                            </div>
 
-                                    <div class="col-sm-4">
-                                        <label for="status"             class="form-label">Status</label>
-                                        <select                         class="form-select"             :id="'status_'+client.id"                   v-model="client.status"                                             :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                            <option v-if="client.OpenCustomer   ==  'Ouvert'"           value="confirmed" selected>confirmed</option>
-                                            <option v-if="client.OpenCustomer   ==  'Ouvert'"           value="validated">validated</option>
-                                            <option v-if="client.OpenCustomer   ==  'Ouvert'"           value="pending">pending</option>
-                                            <option v-if="client.OpenCustomer   ==  'Ouvert'"           value="nonvalidated">nonvalidated</option>
-                                            <option v-if="client.OpenCustomer   ==  'Ouvert'"           value="visible">visible</option>
+                                            <div class="col-sm-3">
+                                                <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
+                                                <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                            </div>
 
-                                            <option v-if="client.OpenCustomer   ==  'Ferme'"            value="ferme">ferme</option>
-                                            <option v-if="client.OpenCustomer   ==  'refus'"            value="refus">refus</option>
-                                            <option v-if="client.OpenCustomer   ==  'Introuvable'"      value="introuvable">introuvable</option>
-                                        </select>
+                                            <div class="col-sm-3">
+                                                <label for="RvrsGeoAddress"     class="form-label">RvrsGeoAddress</label>
+                                                <textarea                       class="form-control"        :id="'RvrsGeoAddress_'+client.id"   rows="3"    v-model="client.RvrsGeoAddress"                     :disabled="(true)||(!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice'))))"></textarea>
+                                            </div>
 
-                                        <div v-if="client.status    ==  'nonvalidated'" class="mt-3">
-                                            <div class="form-group">
-                                                <label      for="nonvalidated_details" class="form-label">NonValidated Details</label>
-                                                <textarea   class="form-control"                        :id="'nonvalidated_details_'+client.id" rows="3"             v-model="client.nonvalidated_details"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
+                                            <div class="col-sm-3">
+                                                <button type="button"           class="btn btn-primary w-100"   @click="getRvrsGeoAddress(index)">Get RvrsAddress</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-3 mb-3">
+                                            <div class="col-sm-5">
+                                                <label for="owner"          class="form-label">Owner</label>
+                                                <select                     class="form-select"     id="owner"          v-model="client.owner">
+                                                    <option value=""></option>
+                                                    <option v-for="user in users"                   :key="user.id"      :value="user.id">{{user.username}}</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-sm-5">
+                                                <label      for="comment">Commentaire</label>
+                                                <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
+                                            </div>
+
+                                            <div class="col-sm-2">
+                                                <button type="button"           class="btn btn-success w-100"   style="margin-top: 30px;"   @click="sendData(index)">Validate</button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                <!--  -->
-
-                                <div class="row mt-3 mb-3">
-                                    <div class="col-sm-3">
-                                        <div v-if="client.OpenCustomer  === 'Ouvert'">
-                                            <label for="text"               class="form-label">CustomerBarCodeExiste</label>
-                                            <select                         class="form-select"         :id="'CustomerCode_'+client.id"                 v-model="client.CustomerBarCodeExiste"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                                <option     value="Non">Non</option>
-                                                <option     value="Oui">Oui</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        <div v-if="client.OpenCustomer  === 'Ouvert'">
-                                            <label for="CustomerCode"      class="form-label">Code-Barre</label>
-                                            <input type="text"              class="form-control"        :id="'CustomerCode_'+client.id"               v-model="client.CustomerCode"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        <div v-if="client.OpenCustomer  === 'Ouvert'">
-                                            <label for="CustomerNameE"      class="form-label">Nom et Prénom de l'Acheteur</label>
-                                            <input type="text"              class="form-control"        :id="'CustomerNameE_'+client.id"        v-model="client.CustomerNameE"                          :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        <label for="CustomerNameA"      class="form-label">Raison Sociale</label>
-                                        <input type="text"              class="form-control"            :id="'CustomerNameA_'+client.id"        v-model="client.CustomerNameA"                          :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                    </div>
-                                </div>
-
-                                <!--  -->
-
-                                <div class="row mt-3 mb-3">
-                                    <div class="col-sm-4">
-                                        <div v-if="(((client.NewCustomer === 'Nouveau Client')&&(client.OpenCustomer === 'Ouvert'))||(client.NewCustomer === 'Client Existant'))">
-                                            <label for="Tel"            class="form-label">Téléphone</label>
-                                            <input type="text"          class="form-control"            :id="'Tel_'+client.id"            v-model="client.Tel"                :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-4">
-                                        <div v-if="(((client.NewCustomer === 'Nouveau Client')&&(client.OpenCustomer === 'Ouvert'))||(client.NewCustomer === 'Client Existant'))">
-                                            <label for="tel_status"         class="form-label">Téléphone Status</label>
-                                            <select                         class="form-select"         :id="'tel_status_'+client.id"     v-model="client.tel_status"         :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                                <option value="validated" selected>validated</option>
-                                                <option value="pending">pending</option>
-                                                <option value="nonvalidated">nonvalidated</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div v-if="client.tel_status    ==  'nonvalidated'" class="col-sm-4">
-                                        <div v-if="(((client.NewCustomer === 'Nouveau Client')&&(client.OpenCustomer === 'Ouvert'))||(client.NewCustomer === 'Client Existant'))">
-                                            <label      for="tel_comment">Téléphone Commentaire</label>
-                                            <textarea   class="form-control"                            :id="'tel_comment_'+client.id"    rows="3"                v-model="client.tel_comment"        :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!--  -->
-
-                                <div class="row mt-3 mb-3">
-                                    <div class="col-sm-4">
-                                        <label for="text"               class="form-label">Type de Magasin</label>
-                                        <select                         class="form-select"             :id="'CustomerType_'+client.id"                 v-model="client.CustomerType"                     :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                            <option     :value="'Alimentation Generale'">Alimentation Generale</option>
-                                            <option     :value="'Petit Superette'">Petit Superette</option>
-                                            <option     :value="'Grande Superette'">Grande Superette</option>
-                                            <option     :value="'HyperMarché'">HyperMarché</option>
-                                            <option     :value="'Special Detergent'">Special Detergent</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-sm-4">
-                                        <div v-if="(client.OpenCustomer  === 'Ouvert')">
-                                            <label for="text"               class="form-label">Nombre de Vitrines</label>
-                                            <select                         class="form-select"         :id="'NbrVitrines_'+client.id"                 v-model="client.NbrVitrines"           :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                                <option     value="1">1</option>
-                                                <option     value="2">2</option>
-                                                <option     value="3">3</option>
-                                                <option     value="4">4</option>
-                                                <option     value="5">5</option>
-                                                <option     value="6">6</option>
-                                                <option     value="7">7</option>
-                                                <option     value="8">8</option>
-                                                <option     value="9">9</option>
-                                                <option     value="10">10</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-4">
-                                        <div v-if="client.OpenCustomer  === 'Ouvert'">
-                                            <label for="NbrAutomaticCheckouts"  class="form-label">Nombre de caisses automatique</label>
-                                            <select                             class="form-select"         :id="'NbrAutomaticCheckouts_'+client.id"          v-model="client.NbrAutomaticCheckouts"  :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                                <option     :value="'Plus de 1'">Plus de 1</option>
-                                                <option     :value="'1'">1</option>
-                                                <option     :value="'Pas de caisse automatique'">Pas de caisse automatique</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row mt-3 mb-3">
-                                    <div class="col-sm-3">
-                                        <div v-if="client.OpenCustomer  === 'Ouvert'">
-                                            <!-- <label for="text"               class="form-label">Source d'Achat</label>
-                                            <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                                <option     value="DD">DD</option>
-                                                <option     value="DI">DI</option>
-                                                <option     value="Pas d'achat">Pas d'achat</option>
-                                            </select> -->
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        <div v-if="client.OpenCustomer  === 'Ouvert'">
-                                            <!-- <label for="text"               class="form-label">Disponibilité Produits</label>
-                                            <select                         class="form-select"         id="BrandAvailability"              v-model="client.BrandAvailability"      :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                                <option     value="Non">No</option>
-                                                <option     value="Oui">Yes</option>
-                                            </select> -->
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        <!-- <label for="JPlan"      class="form-label">JPlan</label>
-                                        <Multiselect
-                                            v-model             =   "client.JPlan"
-                                            :options            =   "salesmen"
-                                            mode                =   "single" 
-                                            placeholder         =   "Select Salesman"
-                                            class               =   "mt-1"
-                                            id                  =   "JPlan"
-
-                                            :close-on-select    =   "true"
-                                            :searchable         =   "true"
-                                            :create-option      =   "false"
-
-                                            :canDeselect        =   "true"
-                                            :canClear           =   "true"
-                                            :allowAbsent        =   "false"
-
-                                            :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"
-                                        /> -->
-                                    </div>
-
-                                    <div class="col-sm-3">
-                                        <!-- <label for="Journee"            class="form-label">Journee</label>
-                                        <select                         class="form-select"         id="Journee"                v-model="client.Journee"                    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                            <option     :value="'Samedi 1'">Samedi 1</option>
-                                            <option     :value="'Dimanche 1'">Dimanche 1</option>
-                                            <option     :value="'Lundi 1'">Lundi 1</option>
-                                            <option     :value="'Mardi 1'">Mardi 1</option>
-                                            <option     :value="'Mercredi 1'">Mercredi 1</option>
-                                            <option     :value="'Jeudi 1'">Jeudi 1</option>
-                                            <option     :value="'Samedi 2'">Samedi 2</option>
-                                            <option     :value="'Dimanche 2'">Dimanche 2</option>
-                                            <option     :value="'Lundi 2'">Lundi 2</option>
-                                            <option     :value="'Mardi 2'">Mardi 2</option>
-                                            <option     :value="'Mercredi 2'">Mercredi 2</option>
-                                            <option     :value="'Jeudi 2'">Jeudi 2</option>
-                                        </select> -->
-                                    </div>
-                                </div>
-
-                                <div class="row mt-3 mb-3">
-                                    <div class="col-sm-4">
-                                        <div v-if="client.OpenCustomer  === 'Ouvert'">
-                                            <label for="SuperficieMagasin"  class="form-label">Superficie du magasin</label>
-
-                                            <select                         class="form-select"         :id="'SuperficieMagasin_'+client.id"              v-model="client.SuperficieMagasin"      :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                                <option     :value="'Moins de 20 M'">Moins de 20 Metres</option>
-                                                <option     :value="'DE 20 a 50'">DE 20 a 50 Metres</option>
-                                                <option     :value="'DE 50 a 100'">DE 50 a 100 Metres</option>
-                                                <option     :value="'Plus de 100'">Plus de 100 Metres</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-sm-4">
-                                        <label for="DistrictNo"         class="form-label">Willaya</label>
-                                        <select                         class="form-select"             :id="'DistrictNo_'+client.id"             v-model="client.DistrictNo"     :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                            <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNo}}- {{willaya.DistrictNameE}}</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-sm-4">
-                                        <label for="CityNo"             class="form-label">Commune</label>
-                                        <select                         class="form-select"             :id="'CityNo_'+client.id"                 v-model="client.CityNo"                                 :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                            <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CITYNO}}- {{cite.CityNameE}}</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="row mt-3 mb-3">
-                                    <div class="col-sm-4">
-                                        <label for="Address"            class="form-label">Adresse</label>
-                                        <input type="text"              class="form-control"            :id="'Address_'+client.id"                v-model="client.Address"                                :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                    </div>
-
-                                    <div class="col-sm-4">
-                                        <label for="Neighborhood"       class="form-label">Quartier</label>
-                                        <input type="text"              class="form-control"        :id="'Neighborhood_'+client.id"           v-model="client.Neighborhood"                           :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                    </div>
-
-                                    <div class="col-sm-4">
-                                        <label for="Landmark"           class="form-label">Point de Repere</label>
-                                        <textarea                       class="form-control"        :id="'Landmark_'+client.id"   rows="3"    v-model="client.Landmark"                               :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-sm-7">
-                                <div class="row">
-                                    <div v-if="client.OpenCustomer  === 'Ouvert'"   class="col">
-                                        <label for="CustomerBarCode_image_update"   class="form-label">Image Code-Barre :</label>
-                                        <button type="button"                       class="btn btn-secondary w-100 mb-1"    @click="$clickFile('CustomerBarCode_image_update_'+client.id)"                                                              :disabled="((client.status_original    ==  'confirmed')||(client.status_original    ==  'validated'))"><i class="mdi mdi-camera"></i></button>
-
-                                        <input type="file"                          class="form-control"        :id="'CustomerBarCode_image_update_'+client.id"                       accept="image/*"    capture     @change="customerBarCodeImage(index)"         style="display:none"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                        <img                                        class="mt-1 w-100"          :id="'CustomerBarCode_image_display_update_'+client.id"               :src="'/uploads/clients/'+client.id+'/'+client.CustomerBarCode_image">
-                                    </div>
-
-                                    <div class="col">
-                                        <label for="facade_image_update"            class="form-label">Image Facade :</label>
-                                        <button type="button"                       class="btn btn-secondary w-100 mb-1"    @click="$clickFile('facade_image_update_'+client.id)"                                                                           :disabled="((client.status_original    ==  'confirmed')||(client.status_original    ==  'validated'))"><i class="mdi mdi-camera"></i></button>
-
-                                        <input type="file"                          class="form-control"        :id="'facade_image_update_'+client.id"                      accept="image/*"    @change="facadeImage(index)"                                style="display:none"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                        <img                                        class="mt-1 w-100"          :id="'facade_image_display_update_'+client.id"              :src="'/uploads/clients/'+client.id+'/'+client.facade_image">
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div v-if="client.OpenCustomer  === 'Ouvert'"   class="col">
-                                        <label for="in_store_image_update"          class="form-label">Image In-Store :</label>
-                                        <button type="button"                       class="btn btn-secondary w-100 mb-1"    @click="$clickFile('in_store_image_update_'+client.id)"                                                                         :disabled="((client.status_original    ==  'confirmed')||(client.status_original    ==  'validated'))"><i class="mdi mdi-camera"></i></button>
-
-                                        <input type="file"                          class="form-control"        :id="'in_store_image_update_'+client.id"                    accept="image/*"    @change="inStoreImage(index)"                               style="display:none"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                        <img                                        class="mt-1 w-100"          :id="'in_store_image_display_update_'+client.id"            :src="'/uploads/clients/'+client.id+'/'+client.in_store_image">
-                                    </div>
-
-                                    <div v-if="client.OpenCustomer  === 'Ouvert'"   class="col">
-                                        <label for="CustomerBarCodeExiste_image_update"          class="form-label">Image CustomerBarCodeExiste :</label>
-                                        <button type="button"                       class="btn btn-secondary w-100 mb-1"    @click="$clickFile('CustomerBarCodeExiste_image_update_'+client.id)"                                                                         :disabled="((client.status_original    ==  'confirmed')||(client.status_original    ==  'validated'))"><i class="mdi mdi-camera"></i></button>
-
-                                        <input type="file"                          class="form-control"        :id="'CustomerBarCodeExiste_image_update_'+client.id"                    accept="image/*"    @change="customerBarCodeExisteImage(index)"                               style="display:none"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                        <img                                        class="mt-1 w-100"          :id="'CustomerBarCodeExiste_image_display_update_'+client.id"            :src="'/uploads/clients/'+client.id+'/'+client.CustomerBarCodeExiste_image">
-                                    </div>
-                                </div>
                             </div>
                         </div>
-
-                        <div class="row">
-                            <div class="row mt-3 mb-3">
-                                <div class="col-sm-2">
-                                    <label for="Latitude"           class="form-label">Latitude (Latitude)</label>
-                                    <input type="text"              class="form-control"        id="Latitude"               v-model="client.Latitude"   :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                </div>
-
-                                <div class="col-sm-2">
-                                    <label for="Longitude"          class="form-label">Longitude (Longitude)</label>
-                                    <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                </div>
-
-                                <div class="col-sm-2">
-                                    <label for="owner"          class="form-label">Owner</label>
-                                    <select                     class="form-select"     id="owner"          v-model="client.owner">
-                                        <option value=""></option>
-                                        <option v-for="user in users"                   :key="user.id"      :value="user.id">{{user.nom}}</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-sm-4">
-                                    <label      for="comment">Commentaire</label>
-                                    <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
-                                </div>
-
-                                <div class="col-sm-2">
-                                    <button type="button"           class="btn btn-success w-100"   style="margin-top: 30px;"   @click="sendData(index)">Validate</button>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
+                    </DynamicScrollerItem>
+                </template>
+            </DynamicScroller>
         </div>
-        <!--                    -->
     </div>
-
 </template>
 
 <script>
+
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+import { RecycleScroller, DynamicScroller, DynamicScrollerItem }    from    'vue-virtual-scroller'
 
 import Multiselect              from '@vueform/multiselect'
 
@@ -506,7 +477,10 @@ export default {
     },
 
     components: {
-        Multiselect,
+        RecycleScroller,
+        DynamicScroller,
+        DynamicScrollerItem,
+        Multiselect
     },
 
     methods : {
@@ -520,7 +494,7 @@ export default {
 
             client.DistrictNameE    =   this.getDistrictNameE(client.DistrictNo)
             client.CityNameE        =   this.getCityNameE(client.CityNo)
-            client.owner_name       =   this.getOwnerName(client.owner)
+            client.owner_username   =   this.getOwnerUsername(client.owner)
 
             let formData            =   new FormData();
 
@@ -1141,25 +1115,16 @@ export default {
             const res_1     =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/users/frontOffice"    ,   null)
             const res_2     =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/districts"            ,   null)
             const res_3     =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/cities"               ,   null)
-            const res_4     =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/salesmen"             ,   null)
 
             this.users      =   res_1.data
             this.willayas   =   res_2.data
             this.cites      =   res_3.data
 
             //
-            let salesmen                        =   res_4.data
-            this.salesmen_all                   =   salesmen
 
-            //
-
-            this.salesmen                       =   []
-            this.salesmen.push({value : "NA"    , label : "NA"})
-
-            for (let i = 0; i < salesmen.length; i++) {
-
-                this.salesmen.push({ value : salesmen[i].SalesmanNo , label : salesmen[i].SalesmanNo})
-            }
+            console.log(res_1.data)
+            console.log(res_2.data)
+            console.log(res_3.data)
         },
 
         //
@@ -1186,13 +1151,13 @@ export default {
             }
         },
 
-        getOwnerName(owner) {
+        getOwnerUsername(owner) {
 
             for (let i = 0; i < this.users.length; i++) {
 
                 if(this.users[i].id  ==  owner) {
 
-                    return this.users[i].nom
+                    return this.users[i].username
                 }                
             }
         },
@@ -1220,7 +1185,6 @@ export default {
                 this.$callApi("post",   "/route_import/"+this.$route.params.id_route_import+"/clients",   formData)
                 .then(async (res)=> {
 
-                    console.log(this.$route.params.id_route_import)
                     console.log(res)
 
                     this.route_import   =   res.data.route_import
@@ -1515,3 +1479,17 @@ export default {
 };
 
 </script>
+
+<style scoped>
+
+.client-item {
+    box-sizing: border-box;     /* ensure padding is counted */
+    padding-bottom: 30px;       /* the gap you want */
+}
+
+/* remove card default bottom margin so there is no duplicate spacing */
+.client-item .card {
+    margin-bottom: 0;
+}
+
+</style>

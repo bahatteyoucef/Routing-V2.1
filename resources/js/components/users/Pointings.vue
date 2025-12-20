@@ -144,10 +144,10 @@
                 <!-- User Pointing Start Time + Days -->
                 <div class="row h-equal p-0 pl-2 m-0">
                     <div class="col-sm-2 p-1">
-                        <div v-if="user_pointing.nom   !=  null" class="card h-100 card-img-holder p-3">
+                        <div v-if="user_pointing.username   !=  null" class="card h-100 card-img-holder p-3">
                             <div class="card-body p-1">
                                 <h4 class="font-weight-normal mb-3">User<i class="mdi mdi-account-outline mdi-24px float-right"></i></h4>
-                                <h2 class="mb-1">{{user_pointing.nom}}</h2>
+                                <h2 class="mb-1">{{user_pointing.username}}</h2>
                             </div>
                         </div>
                     </div>
@@ -308,7 +308,7 @@ export default {
                                                     { data: "id"                        , title: "Id"                   },
                                                     { data: "created_at"                , title: "Created At"           },
                                                     { data: "status"                    , title: "Status"               },
-                                                    { data: "owner_name"                , title: "Owner"                },
+                                                    { data: "owner_username"            , title: "Owner"                },
                                                     { data: "CustomerIdentifier"        , title: "CustomerIdentifier"   },
                                                     // { data: "CustomerBarCodeExiste"     , title: "CustomerBarCodeExiste"},
                                                     { data: "CustomerCode"              , title: "CustomerCode"         },
@@ -434,7 +434,7 @@ export default {
 
             for (let i = 0; i < this.users_all.length; i++) {
 
-                this.users.push({ value : this.users_all[i].id , label : this.users_all[i].nom})
+                this.users.push({ value : this.users_all[i].id , label : this.users_all[i].username })
             }
 
             //

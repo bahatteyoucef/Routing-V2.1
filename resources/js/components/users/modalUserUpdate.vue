@@ -5,7 +5,7 @@
         <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Update The User : {{ user.nom_original }}</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Update The User : {{ user.username_original }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
@@ -14,8 +14,18 @@
                     <form>
 
                         <div class="mb-3">
-                            <label for="nom"                    class="form-label">Name</label>
-                            <input type="text"                  class="form-control"        id="nom"                       v-model="user.nom">
+                            <label for="username"               class="form-label">Username</label>
+                            <input type="text"                  class="form-control"        id="username"                       v-model="user.username">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="first_name"             class="form-label">First Name</label>
+                            <input type="text"                  class="form-control"        id="first_name"                       v-model="user.first_name">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="last_name"              class="form-label">Last Name</label>
+                            <input type="text"                  class="form-control"        id="last_name"                       v-model="user.last_name">
                         </div>
 
                         <div class="mb-3">
@@ -197,10 +207,13 @@ export default {
         return {
 
             user            :   {
-                nom_original            :   ''      ,
+                username_original       :   ''      ,
 
                 id                      :   ''      ,
-                nom                     :   ''      ,
+                username                :   ''      ,
+                first_name              :   ''      ,
+                last_name               :   ''      ,
+
                 email                   :   ''      ,
                 tel                     :   ''      ,
                 company                 :   ''      ,
@@ -243,7 +256,10 @@ export default {
 
             let formData = new FormData();
 
-            formData.append("nom"                       , this.user.nom)
+            formData.append("username"                  , this.user.username)
+            formData.append("first_name"                , this.user.first_name)
+            formData.append("last_name"                 , this.user.last_name)
+
             formData.append("email"                     , this.user.email)
             formData.append("tel"                       , this.user.tel)
             formData.append("company"                   , this.user.company)
@@ -297,8 +313,11 @@ export default {
 
             $(id_modal).on("hidden.bs.modal",   ()  => {
 
-                this.user.nom_original              =   ''
-                this.user.nom                       =   ''
+                this.user.username_original         =   ''
+                this.user.username                  =   ''
+                this.user.first_name                =   ''
+                this.user.last_name                 =   ''
+
                 this.user.email                     =   ''
                 this.user.tel                       =   ''
                 this.user.company                   =   ''
@@ -336,10 +355,13 @@ export default {
 
             const res                   =   await this.$callApi("post"  ,   "/users/"+user.id+"/show"    ,   null)
 
-            this.user.nom_original          =   res.data.nom
+            this.user.username_original     =   res.data.username
 
             this.user.id                    =   res.data.id                 
-            this.user.nom                   =   res.data.nom                 
+            this.user.username              =   res.data.username                 
+            this.user.first_name            =   res.data.first_name   
+            this.user.last_name             =   res.data.last_name   
+
             this.user.email                 =   res.data.email   
             this.user.tel                   =   res.data.tel                 
             this.user.company               =   res.data.company    

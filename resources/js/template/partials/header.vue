@@ -1,5 +1,5 @@
 <template>
-    <nav v-if="user.nom" class="navbar navbar default-layout-navbar col-sm-lg-12 col-sm-12 p-0 fixed-top d-flex flex-row navbar-light navbar-expand-lg" id="template-header">
+    <nav v-if="user.username" class="navbar navbar default-layout-navbar col-sm-lg-12 col-sm-12 p-0 fixed-top d-flex flex-row navbar-light navbar-expand-lg" id="template-header">
         
         <!-- Logo -->
         <div class="text-center navbar-brand-wrapper d-flex align-items-top justify-content-center" id="logo_div_parent">
@@ -104,7 +104,7 @@
 
                     <div class="nav-profile-text mt-1">
                         <p class="mb-1 text-black">
-                            {{user.nom}}
+                            {{user.first_name}} {{user.last_name}}
                         </p>
                     </div>
 
@@ -183,6 +183,7 @@ export default {
     async mounted() {
 
         this.user = this.getUser
+        console.log(this.getUser)
 
         await this.getRouteTempo()
         await this.fetchMaps()

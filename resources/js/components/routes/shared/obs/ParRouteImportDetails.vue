@@ -858,7 +858,7 @@ export default {
                                         { listName: 'cites'                 , prop: 'CityNo'        , complete: c => `${c.CityNameE}`                               , completeProp: 'CityNameComplete'      },
                                         { listName: 'liste_type_client'     , prop: 'CustomerType'                                                                                                          },
                                         { listName: 'liste_journee'         , prop: 'Journee'                                                                                                               },
-                                        { listName: 'owners'                , prop: 'owner_name'                                                                                                            },
+                                        { listName: 'owners'                , prop: 'owner_username'                                                                                                            },
                                         { listName: 'liste_status'          , prop: 'status'                                                                                                                },
                                         { listName: 'clients_ids'           , prop: 'id'            , complete: c => `${c.CustomerNameA} (${c.CustomerCode})`       , completeProp: 'CustomerNameComplete'  }
                                     ];
@@ -956,7 +956,7 @@ export default {
             this.cityOptions            =   buildOptions(this.cites                 ,   'CityNo'        ,   'CityNameComplete'      );
             this.customerTypeOptions    =   buildOptions(this.liste_type_client     ,   'CustomerType'  ,   'CustomerType'          );
             this.journeeOptions         =   buildOptions(this.liste_journee         ,   'Journee'       ,   'Journee'               );
-            this.ownerOptions           =   buildOptions(this.owners                ,   'owner_name'    ,   'owner_name'            );
+            this.ownerOptions           =   buildOptions(this.owners                ,   'owner_username'    ,   'owner_username'            );
             this.statusOptions          =   buildOptions(this.liste_status          ,   'status'        ,   'status'                );
             this.clientIdOptions        =   buildOptions(this.clients_ids           ,   'id'            ,   'CustomerNameComplete'  );
         },
@@ -1110,11 +1110,11 @@ export default {
 
             let sortedArray                 =   Object.values(this.owners);
             
-            sortedArray.sort((a, b)         =>  a.owner_name.localeCompare(b.owner_name));
+            sortedArray.sort((a, b)         =>  a.owner_username.localeCompare(b.owner_username));
             
             let sortedObject                =   sortedArray.reduce((acc, owner, index) => {
 
-                acc[owner.owner_name]       =   owner;
+                acc[owner.owner_username]       =   owner;
                 return acc;
             }, {});
 
@@ -1203,11 +1203,11 @@ export default {
             }
         },
 
-        getOwner(owner_name) {
+        getOwner(owner_username) {
 
             for (const [key, value] of Object.entries(this.owners)) {
 
-                if(this.owners[key].owner_name            ==  owner_name) {
+                if(this.owners[key].owner_username            ==  owner_username) {
 
                     return key
                 }
@@ -1244,7 +1244,7 @@ export default {
                 if (cityFilter.size         && !cityFilter.has(client.CityNo.toString()))           return false;
                 if (typeFilter.size         && !typeFilter.has(client.CustomerType.toString()))     return false;
                 if (jourFilter.size         && !jourFilter.has(client.Journee.toString()))          return false;
-                if (ownerFilter.size        && !ownerFilter.has(client.owner_name.toString()))      return false;
+                if (ownerFilter.size        && !ownerFilter.has(client.owner_username.toString()))      return false;
                 if (statusFilter.size       && !statusFilter.has(client.status.toString()))         return false;
                 if (clientIdsFilter.size    && !clientIdsFilter.has(client.id.toString()))          return false;
 
@@ -1258,7 +1258,7 @@ export default {
                 3: { list: this.route_import.cites                  , prop: 'CityNo'                    , labelKey: 'CityNameE'     , labelFull: 'CityNo'               },
                 4: { list: this.route_import.liste_type_client      , prop: 'CustomerType'              , labelKey: 'CustomerType'  , labelFull: 'CustomerType'         },
                 5: { list: this.route_import.liste_journee          , prop: 'Journee'                   , labelKey: 'Journee'       , labelFull: 'Journee'              },
-                6: { list: this.route_import.owners                 , prop: 'owner_name'                , labelKey: 'owner_name'    , labelFull: 'owner_name'           },
+                6: { list: this.route_import.owners                 , prop: 'owner_username'                , labelKey: 'owner_username'    , labelFull: 'owner_username'           },
                 7: { list: this.route_import.liste_status           , prop: 'status'                    , labelKey: 'status'        , labelFull: 'status'               }
             };
 
@@ -1336,7 +1336,7 @@ export default {
                 if (cityFilter.size         && !cityFilter.has(client.CityNo.toString()))           return false;
                 if (typeFilter.size         && !typeFilter.has(client.CustomerType.toString()))     return false;
                 if (jourFilter.size         && !jourFilter.has(client.Journee.toString()))          return false;
-                if (ownerFilter.size        && !ownerFilter.has(client.owner_name.toString()))      return false;
+                if (ownerFilter.size        && !ownerFilter.has(client.owner_username.toString()))      return false;
                 if (statusFilter.size       && !statusFilter.has(client.status.toString()))         return false;
                 if (clientIdsFilter.size    && !clientIdsFilter.has(client.id.toString()))          return false;
 
@@ -1350,7 +1350,7 @@ export default {
                 3: { list: this.route_import.cites                  , prop: 'CityNo'                    , labelKey: 'CityNameE'     , labelFull: 'CityNo'               },
                 4: { list: this.route_import.liste_type_client      , prop: 'CustomerType'              , labelKey: 'CustomerType'  , labelFull: 'CustomerType'         },
                 5: { list: this.route_import.liste_journee          , prop: 'Journee'                   , labelKey: 'Journee'       , labelFull: 'Journee'              },
-                6: { list: this.route_import.owners                 , prop: 'owner_name'                , labelKey: 'owner_name'    , labelFull: 'owner_name'           },
+                6: { list: this.route_import.owners                 , prop: 'owner_username'                , labelKey: 'owner_username'    , labelFull: 'owner_username'           },
                 7: { list: this.route_import.liste_status           , prop: 'status'                    , labelKey: 'status'        , labelFull: 'status'               }
             };
 
@@ -1793,7 +1793,7 @@ export default {
             const new_client = {
                 ...client,
                 owner: this.getUser.id,
-                owner_name: this.getUser.nom,
+                owner_username: this.getUser.username,
             };
 
             //
@@ -1829,7 +1829,7 @@ export default {
                 if (!dest) return;
 
                 // Only overwrite when src field is non-empty
-                if (src.owner)          { dest.owner        = src.owner; dest.owner_name = src.owner_name; }
+                if (src.owner)          { dest.owner        = src.owner; dest.owner_username = src.owner_username; }
                 if (src.DistrictNo)     { dest.DistrictNo   = src.DistrictNo; dest.DistrictNameE = src.DistrictNameE; }
                 if (src.CityNo)         { dest.CityNo       = src.CityNo; dest.CityNameE = src.CityNameE; }
                 if (src.JPlan)          { dest.JPlan        = src.JPlan; }

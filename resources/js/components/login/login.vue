@@ -26,7 +26,7 @@
                                         <div class="form-row mb-1">
                                             <div class="form-group col-md-12">
                                                 <label class="label_above_input text-secondary form-label">Username</label>
-                                                <input v-model="nom" type="text" class="form-control form-control-sm"/>
+                                                <input v-model="username" type="text" class="form-control form-control-sm"/>
                                             </div>
                                         </div>
 
@@ -67,7 +67,7 @@
         
         data() {
             return {
-                nom         :   "",
+                username    :   "",
                 password    :   ""
             }
         },
@@ -89,7 +89,7 @@
 
                 let formData = new FormData()
 
-                formData.append("nom"       ,   this.nom)
+                formData.append("username"  ,   this.username)
                 formData.append("password"  ,   this.password)
 
                 let response = await this.$callApi('post',  '/login',   formData)

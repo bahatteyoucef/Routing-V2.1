@@ -1737,7 +1737,7 @@ class Statistic extends Model
                                         // DB::raw('CASE WHEN clients.BrandAvailability = "Oui" THEN "Yes" ELSE "No" END AS BrandAvailabilityText'), 
                                         DB::raw('clients.BrandAvailability AS BrandAvailabilityText'), 
                                         DB::raw('CASE WHEN clients.Tel IS NOT NULL AND clients.Tel != "" THEN "Yes" ELSE "No" END AS TelValidityText'),
-                                        "users.username as OwnerName")
+                                        "users.username as owner_username")
                                 ->join("users", "clients.owner", "users.id")
                                 ->whereIn('clients.id_route_import', $route_links)
                                 ->whereBetween(DB::raw('STR_TO_DATE(clients.created_at, "%d %M %Y")'), [$startDate, $endDate]) // Use Y-m-d format for comparison
@@ -1752,9 +1752,9 @@ class Statistic extends Model
         return $data_census_table;
     }
 
-    //
+    //  //  //  //  //  //  //
 
-    public static function statsDetails(Request $request) {
+    public static function standardStatistics(Request $request) {
 
         $stats_details  =   new stdClass();
 

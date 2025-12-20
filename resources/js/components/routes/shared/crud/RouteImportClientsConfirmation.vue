@@ -315,7 +315,7 @@ export default {
 
             client.DistrictNameE    =   this.getDistrictNameE(client.DistrictNo)
             client.CityNameE        =   this.getCityNameE(client.CityNo)
-            client.owner_name       =   this.getOwnerName(client.owner)
+            client.owner_username       =   this.getOwnerUsername(client.owner)
 
             let formData            =   new FormData();
 
@@ -672,13 +672,13 @@ export default {
             }
         },
 
-        getOwnerName(owner) {
+        getOwnerUsername(owner) {
 
             for (let i = 0; i < this.users.length; i++) {
 
                 if(this.users[i].id  ==  owner) {
 
-                    return this.users[i].nom
+                    return this.users[i].username
                 }                
             }
         },

@@ -31,7 +31,7 @@ class UserController extends Controller
     public function login(Request $request) {
 
         $validator      =   Validator::make($request->all(), [
-            'nom'       =>  'required|alpha_num|max:255',
+            'username'  =>  'required|alpha_num|max:255',
             'password'  =>  'required'
         ]);
 
@@ -43,7 +43,7 @@ class UserController extends Controller
 
         //  //  //
 
-        $credentials    =   $request->only('nom', 'password');
+        $credentials    =   $request->only('username', 'password');
 
         if (Auth::attempt($credentials)) {
 
