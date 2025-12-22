@@ -1,23 +1,31 @@
-/*  */
+:root{
+  --header-pl: 15px;
+  --mini-logo-pl: 27px;
+  --mini-logo-size: 32px;
+  --success: #10B981;
+}
 
+/* Header paddings */
 #header_custom {
-    padding-left        :   15px !important;
+  padding-left: var(--header-pl) !important;
 }
 
 #mini_logo_custom {
-    padding-left        :   27px !important;
+  padding-left: var(--mini-logo-pl) !important;
 }
 
+/* Mini logo image (keeps original square size and stable rendering) */
 #mini_logo_custom_image {
-    width               :   32px  !important;
-    height              :   32px  !important;
+  width: var(--mini-logo-size) !important;
+  height: var(--mini-logo-size) !important;
+  display: block;
+  object-fit: cover;
 }
 
-/*  */
-
+/* Route select label */
 #header_select_route .multiselect-single-label-text {
-
-    color               :   #10B981             ;
-    font-family         :   ubuntu-bold,sans-serif;
-    font-weight         :   700         !important;
+  color: var(--success);
+  font-family: ubuntu-bold, sans-serif;
+  font-weight: 700 !important;
+  line-height: 1; /* prevents vertical alignment shifts */
 }

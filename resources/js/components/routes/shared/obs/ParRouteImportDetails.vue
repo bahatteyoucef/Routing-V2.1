@@ -696,6 +696,8 @@ export default {
             this.$showLoadingPage()
                 
             const res                   =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.id_route_import+"/details",   null)
+            console.log(res)
+
             this.route_import           =   res.data.route_import
 
             //
@@ -736,6 +738,8 @@ export default {
 
                 // reAffiche Markers
                 if(mode == "switch_marker_cluster_mode") {
+
+                    console.log(1)
 
                     // Show Markers
                     this.setRouteMarkers(mode, this.clients_markers_affiche)
@@ -1419,8 +1423,12 @@ export default {
             //
             this.clearRouteMarkers()
 
+            console.log(2)
+
             // Set Markers
             this.addMarkers(clients_markers_affiche)
+
+            console.log(4)
 
             // Focus
             this.focuseMarkers()
@@ -1435,6 +1443,8 @@ export default {
         },
 
         addMarkers(clients_markers_affiche) {
+
+            console.log(clients_markers_affiche)
 
             // Set Markers
             for (let index = 0; index < clients_markers_affiche.length; index++) {

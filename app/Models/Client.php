@@ -30,6 +30,17 @@ class Client extends Model
 
     //
 
+    protected $casts = [
+        'AvailableBrands' => 'array',
+    ];
+
+    public function ownerUser()
+    {
+        return $this->belongsTo(User::class, 'owner');
+    }
+
+    //
+
     protected static function boot() {
         parent::boot();
 
@@ -876,13 +887,11 @@ class Client extends Model
         return $rows;
     }
 
-    private static function appendFormattedBrands($client) {
-        // Handle both Object (Eloquent) and Array (DB::table)
-        $brandsJson = is_array($client) ? ($client['AvailableBrands'] ?? '{}') : $client->AvailableBrands;
-        
-        $assoc = json_decode($brandsJson, true) ?? [];
+    public static function appendFormattedBrands($client) {
+        $brandsJson = is_array($client) ? ($client['AvailableBrands'] ?? '{}') : ($client->AvailableBrands ?? '{}');
+        $assoc = is_array($brandsJson) ? $brandsJson : (json_decode($brandsJson, true) ?? []);
         $values = array_values($assoc);
-        
+
         if (is_array($client)) {
             $client['AvailableBrands_array_formatted'] = $values;
             $client['AvailableBrands_string_formatted'] = implode(", ", $values);
@@ -890,7 +899,52 @@ class Client extends Model
             $client->AvailableBrands_array_formatted = $values;
             $client->AvailableBrands_string_formatted = implode(", ", $values);
         }
-        
         return $client;
+    }
+
+    //  //  //
+
+    // Available brands as indexed array
+    public function getAvailableBrandsArrayAttribute()
+    {
+        // if casted, $this->AvailableBrands may already be array
+        $assoc = $this->attributes['AvailableBrands'] ?? ($this->AvailableBrands ?? '[]');
+        if (is_array($assoc)) {
+            $arr = $assoc;
+        } else {
+            $arr = json_decode($assoc ?? '{}', true) ?: [];
+        }
+        return array_values($arr);
+    }
+
+    // Available brands as comma-separated string
+    public function getAvailableBrandsStringAttribute()
+    {
+        return implode(', ', $this->available_brands_array);
+    }
+
+    //  //  //
+
+    public static function saveBase64Image(?string $base64Image, string $targetDir): ?string
+    {
+        if (empty($base64Image)) return null;
+
+        // Remove data header if present
+        $base64 = preg_replace('#^data:image/[^;]+;base64,#', '', $base64Image);
+        // Normalize spaces
+        $base64 = str_replace(' ', '+', $base64);
+
+        $fileName = uniqid() . '.png';
+        $targetPath = public_path(trim($targetDir, '/') . '/' . $fileName);
+
+        // Ensure directory exists
+        $dir = dirname($targetPath);
+        if (! File::isDirectory($dir)) {
+            File::makeDirectory($dir, 0775, true);
+        }
+
+        file_put_contents($targetPath, base64_decode($base64));
+
+        return $fileName;
     }
 }

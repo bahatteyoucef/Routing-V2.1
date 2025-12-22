@@ -1,108 +1,71 @@
 @media screen and (max-width:650px) {
+  /* small helpers */
+  :root {
+    --mobile-mini-logo-size: 35px;
+    --mobile-padding-left-main: 10px;
+    --map-button-left: 45%;
+    --map-button-bottom: 53%;
+  }
 
-    #main_content {
+  /* main content */
+  #main_content {
+    margin-top: 0;
+    transition: margin 0.3s ease-in-out;
+  }
 
-        margin-top  : 0px;
-        transition  : margin 0.3s ease-in-out;
-    }
+  /* logo / header */
+  #mini_logo_custom { padding-left: var(--mobile-padding-left-main) !important; }
+  #mini_logo_custom_image {
+    float: left;
+    width: var(--mobile-mini-logo-size) !important;
+    height: var(--mobile-mini-logo-size) !important;
+  }
+  #mini_logo_custom_image,
+  #mini_logo_custom { display: inline-block; }
 
-    #mini_logo_custom {
-        
-        padding-left: 10px   !important;
-    }
+  #logo_div_parent { width: 100% !important; }
 
-    #logo_div_parent {
+  /* header menu */
+  #header_menu_buttons_div { display: block !important; margin-top: 21px !important; }
+  #header_menu { width: 100%; display: none; }
 
-        width       : 100%  !important;
-    }
+  /* modal */
+  .modal { height: 90% !important; }
 
-    #mini_logo_custom_image {
+  /* Map / floating controls — grouped to avoid repetition */
+  #show_datatable_route_import_obs_clients_div,
+  #show_route_datatable_icon_div {
+    left: var(--map-button-left);
+    /* bottom commented out in original — leaving omitted */
+  }
 
-        float       : left;
-        width       : 35px !important;
-        height      : 35px  !important;
-    }
+  #hide_datatable_route_import_obs_clients_div,
+  #hide_route_datatable_icon_div {
+    bottom: var(--map-button-bottom);
+    /* left commented out in original — leaving omitted */
+  }
 
-    #header_menu_buttons_div {
+  /* top map buttons layout */
+  .map_top_buttons_parent_div {
+    display: block;
+    width: 100%;
+    left: 0;
+    top: 64px;
+    padding: 15px 0;
+  }
 
-        display     : block !important;
-        margin-top  : 21px  !important;
-    }
+  .map_top_buttons_div {
+    width: 95%;
+    margin: 0 auto;
+  }
 
-    #header_menu {
+  #map_options_buttons_div { display: block !important; }
 
-        width       : 100%; 
-        display     : none
-    }
-
-    .modal {
-
-        height      : 90%   !important;
-    }
-
-    /* Map */
-
-    #show_datatable_route_import_obs_clients_div {
-
-        left        :   45% ;
-        /* bottom      :   15% ; */
-    }
-
-    #hide_datatable_route_import_obs_clients_div {
-
-        bottom      :   53% ;
-        /* left        :   46% ; */
-    }
-
-    #show_route_datatable_icon_div {
-
-        left        :   45% ;
-        /* bottom      :   15% ; */
-    }
-
-    #hide_route_datatable_icon_div {
-
-        bottom      :   53% ;
-        /* left        :   46% ; */
-    }
-
-    /* #map_top_middle_options_div {
-
-        left        :   31%     ;
-        top         :   85px    ;
-    } */
-
-    .map_top_buttons_parent_div {
-
-        display             :   block    ;
-        width               :   100%    ;
-        left                :   0px     ;
-        top                 :   64px   ;
-        padding-top         :   15px    ;
-        padding-bottom      :   15px    ;
-    }
-
-    .map_top_buttons_div {
-
-        width       :   95%     ;
-        margin      :   auto    ;
-    }
-
-    #map_options_buttons_div {
-
-        display     : block !important;
-    }
-
-    /*  */
-
-    .navbar.default-layout-navbar .navbar-brand-wrapper .navbar-brand {
-
-        width           :   20%;
-    }
-
-    .navbar.default-layout-navbar .navbar-brand-wrapper .navbar-brand img {
-
-        width           :   35px;
-        height          :   35px;
-    }
+  /* brand / navbar compacting */
+  .navbar.default-layout-navbar .navbar-brand-wrapper .navbar-brand { width: 20%; }
+  .navbar.default-layout-navbar .navbar-brand-wrapper .navbar-brand img {
+    width: var(--mobile-mini-logo-size);
+    height: var(--mobile-mini-logo-size);
+    object-fit: contain;
+  }
 }

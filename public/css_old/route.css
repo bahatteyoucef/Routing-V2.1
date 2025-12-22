@@ -1,0 +1,403 @@
+
+/*  */
+
+@media only screen and (min-device-width: 768px) {
+    #sidebar_route
+    {
+        position    :   fixed   ;
+        overflow-x  :   hidden  ;
+    }
+}
+
+/*  */
+
+#map_parent_div {
+    position    :   relative            ;
+
+    width       :   100%                ;
+    height      :   calc(100vh - 70px)  ;
+
+    transition  :   width 0.5s ease-in-out;
+}
+
+#map {
+    width       :   100%    ;
+    height      :   100%    ;
+}
+
+/*  */
+
+#page_route {
+    height      :   100%;
+    width       :   100%;
+}
+
+/*  */
+
+#content_route { 
+    position    :   fixed               ;
+
+    top         :   70px                ;
+    left        :   0                   ;
+
+    width       :   100%                ;
+    height      :   calc(100vh - 70px)  ;
+
+    transition  :   width 0.5s ease-in-out;
+}
+
+#datatable_route_import_obs_clients_parent {
+
+    position    :   absolute    ;
+    bottom      :   0           ;
+    left        :   0           ;
+
+    width       :   100%        ;
+    height      :   60%         ;
+
+    overflow    :   auto        ;
+
+    z-index     :   999         ;
+}
+
+#show_datatable_route_import_obs_clients_div {
+
+    position    :   absolute    ;
+    bottom      :   3%          ;
+    left        :   50%         ;
+    z-index     :   999         ;
+}
+
+#hide_datatable_route_import_obs_clients_div {
+
+    position    :   absolute    ;
+    bottom      :   62%         ;
+    left        :   50%         ;
+    z-index     :   999         ;
+}
+
+/*  */
+
+.map_top_buttons_parent_div {
+    position        :   fixed;
+    top             :   75px;
+    right           :   1cqh;
+    z-index         :   999;
+    width           :   14%;
+}
+
+.map_top_infos_div {
+    z-index         :   999;
+}
+
+.map_top_infos_div td, .map_top_infos_div th {
+
+    font-size       :   13px;
+    color           : #FFFFFF;
+}
+
+/*  */
+
+path.leaflet-interactive.animate {
+    stroke-dasharray: 1920;
+    stroke-dashoffset: 1920;
+    animation: dash 20s linear 3s forwards;
+}
+
+@keyframes dash {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+/*  */
+
+.leaflet-routing-container {
+    display: none;
+}
+
+.leaflet-top {
+    margin-top: 15px;
+}
+
+/*  */
+
+.canvas-marker:hover {
+    transform: scale(1.2);
+}
+
+/*  */
+
+.marker-cluster-custom-small {
+    opacity : 0.9;
+    background-color: none;
+}
+
+.marker-cluster-custom-small div {
+    opacity : 0.9;
+    background-color: none;
+}
+
+/*  */
+
+.marker-cluster-custom-medium {
+    opacity : 0.9;
+    background-color: none;
+}
+
+.marker-cluster-custom-medium div {
+    opacity : 0.9;
+    background-color: none;
+}
+
+/*  */
+
+.marker-cluster-custom-large {
+    opacity : 0.9;
+    background-color: none;
+}
+
+.marker-cluster-custom-large div {
+    opacity : 0.9;
+    background-color: none;
+}
+
+.marker-cluster div {
+    width           : 45px;
+    height          : 45px;
+    padding         : 15px;
+    margin-left     : 0px;
+    margin-top      : 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius   : 50%;
+    font            : 19px "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+/*  */
+
+/* Toggle */
+
+#map_top_middle_options_div {
+    position: absolute;
+    left: 48%;
+    z-index: 999;
+}
+
+#toggle_div div.btn-container, #show_hide_values_toggle_div div.btn-container {
+    display         : table-cell;
+    vertical-align  : middle;
+    text-align      : center;
+}
+
+#toggle_div div.btn-container i, #show_hide_values_toggle_div div.btn-container i {
+    display     : inline-block;
+    position    : relative;
+    top         : -9px;
+}
+
+#toggle_div label, #show_hide_values_toggle_div label {
+    font-size       : 13px;
+    color           : #424242;
+    font-weight     : 500;
+}
+
+#toggle_div .btn-color-mode-switch, #show_hide_values_toggle_div .btn-color-mode-switch {
+    display         : inline-block;
+    margin          : 0px;
+    position        : relative;
+}
+
+#toggle_div .btn-color-mode-switch > label.btn-color-mode-switch-inner, #show_hide_values_toggle_div .btn-color-mode-switch > label.btn-color-mode-switch-inner {
+    margin          : 0px;
+    width           : 140px;
+    height          : 35px;
+    background      : #E0E0E0;
+    border-radius   : 26px;
+    overflow        : hidden;
+    position        : relative;
+    transition      : all 0.3s ease;
+    display         : block;
+    cursor: pointer;
+}
+
+#toggle_div .btn-color-mode-switch > label.btn-color-mode-switch-inner:before, #show_hide_values_toggle_div .btn-color-mode-switch > label.btn-color-mode-switch-inner:before {
+    content         : attr(data-on);
+    position        : absolute;
+    font-size       : 12px;
+    font-weight     : 500;
+    top             : 7px;
+    right           : 20px;
+}
+
+#toggle_div .btn-color-mode-switch > label.btn-color-mode-switch-inner:after, #show_hide_values_toggle_div .btn-color-mode-switch > label.btn-color-mode-switch-inner:after {
+    content         : attr(data-off);
+    width           : 70px;
+    height          : 32px;
+    background      : #fff;
+    border-radius   : 26px;
+    position        : absolute;
+    left            : 2px;
+    top             : 2px;
+    text-align      : center;
+    transition      : all 0.3s ease;
+    box-shadow      : 0px 0px 6px -2px #111;
+    padding         : 5px 0px;
+}
+
+#toggle_div .btn-color-mode-switch > .alert, #show_hide_values_toggle_div .btn-color-mode-switch > .alert {
+    display         : none;
+    background      : #FF9800;
+    border          : none;
+    color           : #fff;
+}
+
+#toggle_div .btn-color-mode-switch input[type="checkbox"], #show_hide_values_toggle_div .btn-color-mode-switch input[type="checkbox"] {
+    cursor          : pointer;
+    width           : 50px;
+    height          : 35px;
+    opacity         : 0;
+    position        : absolute;
+    top             : 0;
+    z-index         : 1;
+    margin          : 0px;
+}
+
+#toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner, #show_hide_values_toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner {
+    background      : #2c78bd;
+    color           : #fff;
+}
+
+#toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:after, #show_hide_values_toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:after {
+    content         : attr(data-on);
+    left            : 68px;
+    background      : #3c3c3c;
+}
+
+#toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:before, #show_hide_values_toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner:before {
+    content         : attr(data-off);
+    right           : auto;
+    left            : 20px;
+}
+
+#toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner, #show_hide_values_toggle_div .btn-color-mode-switch input[type="checkbox"]:checked + label.btn-color-mode-switch-inner {
+    /*background: #66BB6A; */
+    /*color: #fff;*/
+}
+
+#toggle_div .btn-color-mode-switch input[type="checkbox"]:checked ~ .alert, #show_hide_values_toggle_div .btn-color-mode-switch input[type="checkbox"]:checked ~ .alert {
+    display         : #2c78bd;
+}
+
+/*mode preview*/
+#toggle_div .dark-preview, #show_hide_values_toggle_div .dark-preview {
+    background      : #2c78bd;
+}
+
+#toggle_div .dark-preview div.btn-container i.fa-sun-o, #show_hide_values_toggle_div .dark-preview div.btn-container i.fa-sun-o {
+    color           : #777;
+}
+
+#toggle_div .dark-preview div.btn-container i.fa-moon-o, #show_hide_values_toggle_div .dark-preview div.btn-container i.fa-moon-o {
+    color           : #fff;
+    text-shadow     : 0px 0px 11px #fff;
+}
+
+#toggle_div .white-preview, #show_hide_values_toggle_div .white-preview {
+    background      : #fff;
+}
+
+#toggle_div .white-preview div.btn-container i.fa-sun-o, #show_hide_values_toggle_div .white-preview div.btn-container i.fa-sun-o {
+    color           : #ffa500;
+    text-shadow     : 0px 0px 16px #ffa500;
+}
+
+#toggle_div.white-preview div.btn-container i.fa-moon-o, #show_hide_values_toggle_div .white-preview div.btn-container i.fa-moon-o {
+    color           : #777;
+}
+
+#toggle_div p.by a, #show_hide_values_toggle_div p.by a {
+    text-decoration : none;
+    color           : #000;
+}
+
+#toggle_div .dark-preview p.by a, #show_hide_values_toggle_div .dark-preview p.by a {
+    color           : #777;
+}
+
+#toggle_div .white-preview p.by a, #show_hide_values_toggle_div .white-preview p.by a {
+    color           : #000;
+}
+
+#show_position_button {
+
+    position        : fixed;
+    top             : 75px;
+    right           : 7px;
+}
+
+/*  */
+
+#show_map .leaflet-top {
+
+    margin-top      : 5px !important;
+}
+
+/*  */
+
+@media only screen and (max-device-width: 767px) {
+    
+    #show_position_button {
+
+        position        : fixed;
+        top             : 10px;
+        right           : 7px;
+    }
+
+    #map_top_middle_options_div {
+
+        left        : 31%;
+        top         : 20px;
+    }
+
+    .leaflet-top {
+
+        margin-top: 5px;
+    }
+}
+
+.map_primary_icon {
+    color: #2c78bd; 
+    font-size: 55px;
+}
+
+.map_primary_small_icon {
+    color: #2c78bd; 
+    font-size: 35px;
+}
+
+/*  */
+
+#show_hide_map_filters_button_div {
+    position        :   absolute;
+    right           :   1cqh;
+    z-index         :   999;
+}
+
+/*  */
+
+.map_shrink {
+    width           :   85% !important;
+    /* transition      :   width 0.5s ease-in-out !important; */
+}
+
+/*  */
+
+#map_operations_filters_div {
+    position        :   absolute;
+    width           :   15% !important;
+    transition      :   width 0.5s ease-in-out !important;
+    overflow-y      :   auto;
+    height          :   100%;
+}

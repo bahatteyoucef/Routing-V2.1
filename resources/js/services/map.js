@@ -194,53 +194,58 @@ export default class Map {
 
     $addCluster(group, color) {
 
-        if(typeof this.clusters_icons[group]    ==  "undefined") {
-
-            this.clusters_icons[group]              =   L.markerClusterGroup({
-        
-                iconCreateFunction: (cluster)   =>  {
-        
-                    var childCount  =   cluster.getChildCount();
-
-                    //
-                    var c           =   'marker-cluster-custom-';
-
-                    //
-                    if (childCount < 10) {
-                        c += 'small';
-                    } 
-
-                    else if (childCount < 100) {
-                        c += 'medium';
-                    } 
-
-                    else {
-                        c += 'large';
-                    }
-
-                    // 
-
-                    var div                     =   document.createElement("div");
-
-                    div.style.backgroundColor   =   color
-                    div.style.border            =   "3px solid #FFFFFF"
-                    div.style.color             =   "white"
-                    div.style.borderRadius      =   "50%"
-
-                    div.innerHTML               =   "<span>" + childCount + "</span>"
-
-                    // 
-
-                    return new L.DivIcon({ html: div, className: 'marker-cluster ' + c, iconSize: new L.Point(50, 50) });
+        // 1. CHECK FOR COLOR CHANGE
+        // If the group exists, check if the color stored on it matches the new color.
+        if (this.clusters_icons[group]) {
+            if (this.clusters_icons[group].options.customColor !== color) {
+                // The color changed! Remove the old group entirely.
+                if (this.map.hasLayer(this.clusters_icons[group])) {
+                    this.map.removeLayer(this.clusters_icons[group]);
                 }
-            })
+                delete this.clusters_icons[group];
+                delete this.clusters[group];
+            }
         }
 
-        //
-        this.clusters[group]    =   this.clusters_icons[group]  
+        // 2. CREATE GROUP (If it doesn't exist or was just deleted above)
+        if (typeof this.clusters_icons[group] == "undefined") {
 
-        //
-        this.map.addLayer(this.clusters[group])
+            this.clusters_icons[group] = L.markerClusterGroup({
+                // Store the color in the options so we can compare it later (see step 1)
+                customColor: color, 
+
+                iconCreateFunction: (cluster) => {
+                    var childCount = cluster.getChildCount();
+                    var c = 'marker-cluster-custom-';
+
+                    if (childCount < 10) { c += 'small'; } 
+                    else if (childCount < 100) { c += 'medium'; } 
+                    else { c += 'large'; }
+
+                    var div = document.createElement("div");
+                    
+                    // This 'color' variable is now the NEW color because 
+                    // we forced the recreation of this function
+                    div.style.backgroundColor = color; 
+                    div.style.border = "3px solid #FFFFFF";
+                    div.style.color = "white";
+                    div.style.borderRadius = "50%";
+                    div.innerHTML = "<span>" + childCount + "</span>";
+
+                    return new L.DivIcon({
+                        html: div,
+                        className: 'marker-cluster ' + c,
+                        iconSize: new L.Point(50, 50)
+                    });
+                }
+            });
+            
+            // Ensure the map actually adds the layer
+            this.map.addLayer(this.clusters_icons[group]);
+        }
+
+        // Link references
+        this.clusters[group] = this.clusters_icons[group];
     }
 
     $addClusterMarkers(clients, group, color) {
@@ -485,42 +490,6 @@ export default class Map {
             }
 
             // finally clean up your lookup entries for this marker
-            delete this.markers[c.id];
-            delete this.markers_lat_lng[c.id];
-        });
-    }
-
-    $deleteRouteMarkers_old(clients) {
-
-        clients.forEach(c => {
-
-            const entry             =   this.markers[c.id];
-            if (!entry) return;
-
-            const { marker, group } =   entry;
-
-            if (this.marker_cluster_mode === 'cluster') {
-                // remove from the cluster group
-                const cg = this.clusters[group];
-
-                if (cg) {
-                    cg.removeLayer(marker);
-                }
-            }
-
-            else {
-                // remove from the plain-marker FeatureGroup
-                const lg = this.markerGroups[group];
-                if (lg) {
-                    lg.removeLayer(marker);
-                    if (Object.keys(lg._layers).length === 0) {
-                        this.map.removeLayer(lg);
-                        delete this.markerGroups[group];
-                    }
-                }
-            }
-
-            // finally clean up your lookup
             delete this.markers[c.id];
             delete this.markers_lat_lng[c.id];
         });

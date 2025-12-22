@@ -10,737 +10,357 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Throwable;
-
 use Illuminate\Support\Facades\Response;
 
 class RouteImportController extends Controller
 {
-    
-    public function index() {
-
+    public function index()
+    {
         try {
-
-            $liste_route_import     =   RouteImport::indexRouteImport();
-            return $liste_route_import;
-        }
-
-        catch(Throwable $erreur) {
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
+            $liste_route_import = RouteImport::indexRouteImport();
+            return response()->json($liste_route_import, 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
     }
 
-    public function combo() {
-
+    public function combo()
+    {
         try {
-
-            $liste_route_import     =   RouteImport::comboRouteImport();
-            return $liste_route_import;
-        }
-
-        catch(Throwable $erreur) {
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
+            $liste_route_import = RouteImport::comboRouteImport();
+            return response()->json($liste_route_import, 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
     }
 
-    public function store(Request $request) {
-
+    public function store(Request $request)
+    {
         try {
-
-            //
-            DB::beginTransaction();
-            //
-
-            // validate
-            $validator      =   RouteImport::validateStore($request);
-            
+            // Validation
+            $validator = RouteImport::validateStore($request);
             if ($validator->fails()) {
-                return response()->json([
-                    'errors'    =>  $validator->errors(),
-                ],422);
+                return response()->json(['errors' => $validator->errors()], 422);
             }
 
-            // store 
-            $route_import   =   RouteImport::storeRouteImport($request);
-
-            //
-            DB::commit();
-            //
+            // NOTE: RouteImport::storeRouteImport() performs its own transaction internally.
+            $route_import = RouteImport::storeRouteImport($request);
 
             return response()->json([
-                "header"            =>  "Route Added !"                             ,
-                "message"           =>  "a new route has been added successfuly!"   ,
-                "route_import"      =>  $route_import
-            ]);
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
+                "header"       => "Route Added !",
+                "message"      => "a new route has been added successfuly!",
+                "route_import" => $route_import
+            ], 201);
+        } catch (Throwable $erreur) {
+            // If the model already handled transaction rollback, this just returns error.
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
     }
 
-    public function update(Request $request, int $id) {
-
+    public function update(Request $request, int $id)
+    {
         try {
-
-            //
             DB::beginTransaction();
-            //
 
-            // validate
-            $validator      =   RouteImport::validateUpdate($request);
-            
+            $validator = RouteImport::validateUpdate($request);
             if ($validator->fails()) {
-                return response()->json([
-                    'errors'    =>  $validator->errors(),
-                ],422);
+                return response()->json(['errors' => $validator->errors()], 422);
             }
 
-            // store 
-            $clients    =   RouteImport::updateRouteImport($request, $id);
+            RouteImport::updateRouteImport($request, $id);
 
-            //
             DB::commit();
-            //
 
             return response()->json([
-                "header"            =>  "Route Updated !"                           ,
-                "message"           =>  "a route has been updated successfuly!"     
-            ]);
-        }
-
-        catch(Throwable $erreur) {
-
-            //
+                "header"  => "Route Updated !",
+                "message" => "a route has been updated successfuly!"
+            ], 200);
+        } catch (Throwable $erreur) {
             DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
     }
 
-    public function show(int $id) {
-
+    public function show(int $id)
+    {
         try {
-
-            $route_import   =   RouteImport::showRouteImport($id);
-            return $route_import;
-        }
-
-        catch(Throwable $erreur) {
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
+            $route_import = RouteImport::showRouteImport($id);
+            return response()->json($route_import, 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
     }
 
-    public function indexedDBShow(int $id) {
-
+    public function indexedDBShow(int $id)
+    {
         try {
-
-            $route_import   =   RouteImport::indexedDBShowRouteImport($id);
-            return $route_import;
-        }
-
-        catch(Throwable $erreur) {
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
+            $route_import = RouteImport::indexedDBShowRouteImport($id);
+            return response()->json($route_import, 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
     }
 
-    public function delete(int $id) {
-
+    public function delete(int $id)
+    {
         try {
-
-            //
-            DB::beginTransaction();
-            //
-            
-            // store 
+            // NOTE: RouteImport::deleteRouteImport() runs its own DB transaction internally.
             RouteImport::deleteRouteImport($id);
 
-            //
-            DB::commit();
-            //
-
             return response()->json([
-                "header"            =>  "Route Deleted !"             ,
-                "message"           =>  "a route has been deleted successfuly!" 
-            ]);
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
+                "header"  => "Route Deleted !",
+                "message" => "a route has been deleted successfuly!"
+            ], 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
     }
 
-    //
-
-    public function userTerritory(int $id) {
-
+    // User Territory (read-only; no transaction)
+    public function userTerritory(int $id)
+    {
         try {
+            $liste_user_territory = RouteImport::userTerritory($id);
+            return response()->json($liste_user_territory, 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
+        }
+    }
 
-            //
+    public function userTerritoryUtil(Request $request, int $id)
+    {
+        try {
+            $liste_user_territory = RouteImport::userTerritoryUtil($request, $id);
+            return response()->json($liste_user_territory, 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
+        }
+    }
+
+    // Journey Plan endpoints (read-only)
+    public function journeyPlan(int $id)
+    {
+        try {
+            $liste_journey_plan = RouteImport::journeyPlan($id);
+            return response()->json($liste_journey_plan, 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
+        }
+    }
+
+    public function journeyPlanUtil(Request $request, int $id)
+    {
+        try {
+            $liste_journey_plan = RouteImport::journeyPlanUtil($request, $id);
+            return response()->json($liste_journey_plan, 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
+        }
+    }
+
+    // Journees (read-only)
+    public function journees(int $id)
+    {
+        try {
+            $journees = RouteImport::journees($id);
+            return response()->json($journees, 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
+        }
+    }
+
+    public function journeesUtil(Request $request, int $id)
+    {
+        try {
+            $journees = RouteImport::journeesUtil($request, $id);
+            return response()->json($journees, 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
+        }
+    }
+
+    public function setWillayasCites(Request $request)
+    {
+        try {
+            $clients = RouteImport::setWillayasCites($request);
+            return response()->json($clients, 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
+        }
+    }
+
+    public function obsDetailsRouteImport(int $id)
+    {
+        try {
+            $route_import = RouteImport::obsDetailsRouteImport($id);
+            return response()->json(['route_import' => $route_import], 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
+        }
+    }
+
+    public function obsDetailsRouteImportFrontOffice(int $id)
+    {
+        try {
+            $route_import = RouteImport::obsDetailsRouteImportFrontOffice($id);
+            return response()->json(['route_import' => $route_import], 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
+        }
+    }
+
+    public function clients(int $id)
+    {
+        try {
+            $clients = RouteImport::clients($id);
+            $route_import = RouteImport::find($id);
+
+            return response()->json([
+                'clients'      => $clients,
+                'route_import' => $route_import
+            ], 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
+        }
+    }
+
+    public function sync(Request $request)
+    {
+        try {
             DB::beginTransaction();
-            //
 
-            // store 
-            $liste_user_territory =   RouteImport::userTerritory($id);
-
-            //
-            DB::commit();
-            //
-
-            return $liste_user_territory;
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
-    }
-
-    public function userTerritoryUtil(Request $request, int $id) {
-
-        try {
-
-            //
-            DB::beginTransaction();
-            //
-
-            // store 
-            $liste_user_territory   =   RouteImport::userTerritoryUtil($request, $id);
-
-            //
-            DB::commit();
-            //
-
-            return $liste_user_territory;
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
-    }
-
-    //
-
-    public function journeyPlan(int $id) {
-
-        try {
-
-            //
-            DB::beginTransaction();
-            //
-
-            // store 
-            $liste_journey_plan =   RouteImport::journeyPlan($id);
-
-            //
-            DB::commit();
-            //
-
-            return $liste_journey_plan;
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
-    }
-
-    public function journeyPlanUtil(Request $request, int $id) {
-
-        try {
-
-            //
-            DB::beginTransaction();
-            //
-
-            // store 
-            $liste_journey_plan =   RouteImport::journeyPlanUtil($request, $id);
-
-            //
-            DB::commit();
-            //
-
-            return $liste_journey_plan;
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
-    }
-
-    //
-
-    public function journees(int $id) {
-
-        try {
-
-            //
-            DB::beginTransaction();
-            //
-
-            // store 
-            $journees   =   RouteImport::journees($id);
-
-            //
-            DB::commit();
-            //
-
-            return $journees;
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
-    }
-
-    public function journeesUtil(Request $request, int $id) {
-
-        try {
-
-            //
-            DB::beginTransaction();
-            //
-
-            // store 
-            $journees   =   RouteImport::journeesUtil($request, $id);
-
-            //
-            DB::commit();
-            //
-
-            return $journees;
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
-    }
-
-    //
-
-    public function setWillayasCites(Request $request) {
-
-        try {
-
-            //
-            DB::beginTransaction();
-            //
-
-            // store 
-            $clients    =   RouteImport::setWillayasCites($request);
-
-            //
-            DB::commit();
-            //
-
-            return $clients;
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
-    }
-
-    //
-
-    public function obsDetailsRouteImport(int $id) {
-
-        try {
-
-            $route_import       =   RouteImport::obsDetailsRouteImport($id);
-
-            return response()->json([
-                "route_import"  =>  $route_import   
-            ]);
-
-            return $route_import;
-        }
-
-        catch(Throwable $erreur) {
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
-    }
-
-    //
-
-    public function obsDetailsRouteImportFrontOffice(int $id) {
-
-        try {
-
-            $route_import       =   RouteImport::obsDetailsRouteImportFrontOffice($id);
-            // $willayas           =   RTMWillaya::index();
-
-            return response()->json([
-                "route_import"  =>  $route_import,
-                // "willayas"      =>  $willayas
-            ]);
-
-            return $route_import;
-        }
-
-        catch(Throwable $erreur) {
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
-    }
-
-    //
-
-    public function clients(int $id) {
-
-        try {
-
-            $clients        =   RouteImport::clients($id);
-            $route_import   =   RouteImport::find($id);
-
-            return response()->json([
-                'clients'           =>  $clients,
-                'route_import'      =>  $route_import
-            ],200);
-        }
-
-        catch(Throwable $erreur) {
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
-    }
-
-    //
-
-    public function sync(Request $request) {
-    
-        try {
-
-            //
-            DB::beginTransaction();
-            //
-
-            // store 
             RouteImport::sync($request);
 
-            //
             DB::commit();
-            //
 
             return response()->json([
-                "header"            =>  "Synchronisation Perfomed !"                        ,
-                "message"           =>  "a synchronisation has been performed successfuly!"     
-            ]);
-        }
-
-        catch(Throwable $erreur) {
-
-            //
+                "header"  => "Synchronisation Perfomed !",
+                "message" => "a synchronisation has been performed successfuly!"
+            ], 200);
+        } catch (Throwable $erreur) {
             DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
-
-    }
-
-    //
-
-    public function headerRouteImports() {
-
-        try {
-
-            $liste_route_import     =   RouteImport::headerRouteImports();
-            return $liste_route_import;
-        }
-
-        catch(Throwable $erreur) {
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
     }
 
-    public function indexRouteImports() {
-
+    public function headerRouteImports()
+    {
         try {
-
-            $liste_route_import     =   RouteImport::indexRouteImports();
-            return $liste_route_import;
-        }
-
-        catch(Throwable $erreur) {
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
+            $liste_route_import = RouteImport::headerRouteImports();
+            return response()->json($liste_route_import, 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
     }
 
-    public function statsRouteImports() {
-
+    public function indexRouteImports()
+    {
         try {
-
-            $liste_route_import     =   RouteImport::statsRouteImports();
-            return $liste_route_import;
-        }
-
-        catch(Throwable $erreur) {
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
+            $liste_route_import = RouteImport::indexRouteImports();
+            return response()->json($liste_route_import, 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
     }
 
-    //
-
-    public static function frontOffice(int $id_route_import) {
-
+    public function statsRouteImports()
+    {
         try {
-
-            $users      =   RouteImport::frontOffice($id_route_import);
-            return $users;
-        }
-
-        catch(Throwable $erreur) {
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
+            $liste_route_import = RouteImport::statsRouteImports();
+            return response()->json($liste_route_import, 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
     }
 
-    public static function users(int $id_route_import) {
-
+    public static function frontOffice(int $id_route_import)
+    {
         try {
-
-            $users      =   RouteImport::users($id_route_import);
-            return $users;
-        }
-
-        catch(Throwable $erreur) {
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
+            $users = RouteImport::frontOffice($id_route_import);
+            return response()->json($users, 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
     }
 
-    //
-
-    public static function clientsByStatus(Request $request, int $id_route_import) {
-
+    public static function users(int $id_route_import)
+    {
         try {
-
-            $clients    =   RouteImport::clientsByStatus($request, $id_route_import);
-
-            return $clients;
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
+            $users = RouteImport::users($id_route_import);
+            return response()->json($users, 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
     }
 
-    //
-
-    public static function routeImportCities(int $id_route_import, string $DistrictNo) {
-
+    public static function clientsByStatus(Request $request, int $id_route_import)
+    {
         try {
-
-            $route_import_cities    =   RouteImport::RouteImportCities($id_route_import, $DistrictNo);
-
-            return response()->json([
-                'route_import_cities'   =>  $route_import_cities
-            ],200);
-        }
-
-        catch(Throwable $erreur) {
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
+            $clients = RouteImport::clientsByStatus($request, $id_route_import);
+            return response()->json($clients, 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
     }
 
-    //  //  //  //  //  //  //  //  //
-
-    //  //  //  //  //  //  //  //  //
-
-    //  //  //  //  //  //  //  //  //
-
-    public function downloadData(Request $request) {
-
+    public static function routeImportCities(int $id_route_import, string $DistrictNo)
+    {
         try {
-
-            $clients    =   RouteImport::downloadData($request);
-
-            return response()->json([
-                'clients'    =>  $clients
-            ],200);
-        }
-
-        catch(Throwable $erreur) {
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
+            $route_import_cities = RouteImport::routeImportCities($id_route_import, $DistrictNo);
+            return response()->json(['route_import_cities' => $route_import_cities], 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
     }
 
-    public function downloadImages(Request $request) {
-
+    // Download and zip helpers (use model-level zipper)
+    public function downloadData(Request $request)
+    {
         try {
+            $clients = RouteImport::downloadData($request);
+            return response()->json(['clients' => $clients], 200);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
+        }
+    }
 
-            $filePath   =   RouteImport::downloadImages($request);
-
+    public function downloadImages(Request $request)
+    {
+        try {
+            $filePath = RouteImport::downloadImages($request);
             return Response::download($filePath)->deleteFileAfterSend(true);
-        }
-
-        catch(Throwable $erreur) {
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
     }
 
-    public function downloadCustomerCodeImages(Request $request) {
-
+    public function downloadCustomerCodeImages(Request $request)
+    {
         try {
-
-            $filePath   =   RouteImport::downloadCustomerCodeImages($request);
-
+            $filePath = RouteImport::downloadCustomerCodeImages($request);
             return Response::download($filePath)->deleteFileAfterSend(true);
-        }
-
-        catch(Throwable $erreur) {
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
     }
 
-    public function downloadFacadeImages(Request $request) {
-
+    public function downloadFacadeImages(Request $request)
+    {
         try {
-
-            $filePath   =   RouteImport::downloadFacadeImages($request);
-
+            $filePath = RouteImport::downloadFacadeImages($request);
             return Response::download($filePath)->deleteFileAfterSend(true);
-        }
-
-        catch(Throwable $erreur) {
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
     }
 
-    public function downloadInStoreImages(Request $request) {
-
+    public function downloadInStoreImages(Request $request)
+    {
         try {
-
-            $filePath   =   RouteImport::downloadInStoreImages($request);
-
+            $filePath = RouteImport::downloadInStoreImages($request);
             return Response::download($filePath)->deleteFileAfterSend(true);
-        }
-
-        catch(Throwable $erreur) {
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
+        } catch (Throwable $erreur) {
+            return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
     }
 }

@@ -21,19 +21,16 @@ use Illuminate\Support\Fluent;
 use Illuminate\Validation\Rule;
 
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\Permission\Models\Role;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
-    protected $guarded      =   [];
-
-    protected $table        =   'users';
-    protected $primaryKey   =   'id';
-
-    public    $timestamps   =   false;
-
-    // 
+    protected $guarded      = [];
+    protected $table        = 'users';
+    protected $primaryKey   = 'id';
+    public    $timestamps   = false;
 
     protected $hidden = [
         'password',
@@ -44,462 +41,401 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    //
+    /*********************
+     * Relationships
+     *********************/
 
-    public static function indexUser() {
-    
-        if((Auth::user()->hasRole("Super Admin"))||(Auth::user()->hasRole("BU Manager"))) {
-
-            $query  =   DB::table('users')
-
-                            ->select([ 
-                                'users.id                   as  id'                     , 
-
-                                'users.username             as  username'               ,
-                                'users.first_name           as  first_name'             ,
-                                'users.last_name            as  last_name'              ,
-                                'users.email                as  email'                  ,
-
-                                'users.tel                  as  tel'                    ,
-                                'users.company              as  company'                ,
-
-                                'users.type_user            as  type_user'              ,
-
-                                'users.accuracy             as  accuracy'               ,
-
-                                'users.max_route_import     as  max_route_import'       ,
-
-                                'users.password_non_hashed  as  password_non_hashed'    ,
-
-                                'users.owner                as  owner'   
-                            ]);
-
-            if(Auth::user()->hasRole("BU Manager")) {
-
-                $query  =   $query->where("owner", Auth::user()->id);
-            }
-
-            return $query->get();
-        }
-
-        else {
-
-            throw new Exception("Unauthorized", 403);
-        }
+    // pivot users_route_import: id_user, id_route_import
+    public function routeImports()
+    {
+        return $this->belongsToMany(RouteImport::class, 'users_route_import', 'id_user', 'id_route_import');
     }
 
-    public static function comboUser() {
-    
-        $query  =   DB::table('users')
-                        ->select([
-                            'users.id                   as id',
-                            'users.username             as username',
-                            'users.first_name           as  first_name',
-                            'users.last_name            as  last_name',
-                            'users.email                as email',
-                            'users.tel                  as tel',
-                            'users.company              as company',
-                            'users.type_user            as type_user',
-                            'users.accuracy             as accuracy',
-                            'users.max_route_import     as max_route_import',
-                            'users.password_non_hashed  as password_non_hashed',
-                            'users.owner                as owner',
-                        ]);
-
-        //
-        if (Auth::user()->hasRole('BU Manager')) {
-            $query->where('users.owner', Auth::user()->id);
-        }
-
-        elseif (Auth::user()->hasRole('BackOffice')) {
-
-            $routeIds   =   DB::table('users_route_import')
-                                ->where('id_user', Auth::user()->id)
-                                ->pluck('id_route_import');
-
-            //
-            $query
-                ->join('users_route_import as uri', 'uri.id_user', '=', 'users.id')
-                ->whereIn('uri.id_route_import', $routeIds)
-                ->groupBy('users.id');
-        }
-
-        //
-        $users = $query->get();
-
-        //
-        return $users;
+    public function userRouteImports()
+    {
+        return $this->hasMany(UserRouteImport::class, 'id_user', 'id');
     }
 
-    public static function comboBackOffice() {
-        $query  =   DB::table('users')
-                        ->select([
-                            'users.id as id',
-                            'users.username as username',
-                            'users.first_name as  first_name',
-                            'users.last_name as  last_name',
-                            'users.email as email',
-                            'users.tel as tel',
-                            'users.company as company',
-                            'users.type_user as type_user',
-                            'users.accuracy as accuracy',
-                            'users.max_route_import as max_route_import',
-                            'users.password_non_hashed as password_non_hashed',
-                            'users.owner as owner',
-                        ])
-                        ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
-                        ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
-                        ->where([['roles.name', 'BackOffice'], ['model_has_roles.model_type', 'App\Models\User']]);
+    /*********************
+     * Index & combos
+     *********************/
 
-        // Keep your existing logic if you still need to filter by owner/routes
-        if (Auth::user()->hasRole('BU Manager')) {
-            $query->where('users.owner', Auth::user()->id);
-
-        } elseif (Auth::user()->hasRole('BackOffice')) {
-            $routeIds   =   DB::table('users_route_import')
-                                ->where('id_user', Auth::user()->id)
-                                ->pluck('id_route_import');
-
-            $query->join('users_route_import as uri', 'uri.id_user', '=', 'users.id')
-                ->whereIn('uri.id_route_import', $routeIds);
+    public static function indexUser()
+    {
+        $me = Auth::user();
+        if (! $me || (! $me->hasRole('Super Admin') && ! $me->hasRole('BU Manager'))) {
+            throw new Exception('Unauthorized', 403);
         }
 
-        // Group by ID to avoid duplicates if a user has multiple roles (unlikely here but safe)
+        // Build base select to reuse
+        $select = [
+            'users.id',
+            'users.username',
+            'users.first_name',
+            'users.last_name',
+            'users.email',
+            'users.tel',
+            'users.company',
+            'users.type_user',
+            'users.accuracy',
+            'users.max_route_import',
+            'users.password_non_hashed',
+            'users.owner',
+        ];
+
+        $query = DB::table('users')->select($select);
+
+        if ($me->hasRole('BU Manager')) {
+            $query->where('users.owner', $me->id);
+        }
+
         return $query->get();
     }
 
-    public static function validateStore(Request $request) {
+    public static function comboUser()
+    {
+        $me = Auth::user();
 
+        $select = [
+            'users.id',
+            'users.username',
+            'users.first_name',
+            'users.last_name',
+            'users.email',
+            'users.tel',
+            'users.company',
+            'users.type_user',
+            'users.accuracy',
+            'users.max_route_import',
+            'users.password_non_hashed',
+            'users.owner',
+        ];
+
+        $query = DB::table('users')->select($select);
+
+        if ($me && $me->hasRole('BU Manager')) {
+            $query->where('users.owner', $me->id);
+        } elseif ($me && $me->hasRole('BackOffice')) {
+            // Get route ids once
+            $routeIds = DB::table('users_route_import')->where('id_user', $me->id)->pluck('id_route_import')->toArray();
+            if (empty($routeIds)) {
+                return collect(); // no accessible users
+            }
+
+            $query->join('users_route_import as uri', 'uri.id_user', '=', 'users.id')
+                  ->whereIn('uri.id_route_import', $routeIds)
+                  ->groupBy('users.id');
+        }
+
+        return $query->get();
+    }
+
+    public static function comboBackOffice()
+    {
+        $me = Auth::user();
+
+        // Start from users with BackOffice role via role table join (keeps original intent)
+        $select = [
+            'users.id',
+            'users.username',
+            'users.first_name',
+            'users.last_name',
+            'users.email',
+            'users.tel',
+            'users.company',
+            'users.type_user',
+            'users.accuracy',
+            'users.max_route_import',
+            'users.password_non_hashed',
+            'users.owner',
+        ];
+
+        $query = DB::table('users')
+            ->select($select)
+            ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+            ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+            ->where([['roles.name', 'BackOffice'], ['model_has_roles.model_type', 'App\Models\User']]);
+
+        if ($me && $me->hasRole('BU Manager')) {
+            $query->where('users.owner', $me->id);
+        } elseif ($me && $me->hasRole('BackOffice')) {
+            // Limit to route imports assigned to this backoffice user
+            $routeIds = DB::table('users_route_import')->where('id_user', $me->id)->pluck('id_route_import')->toArray();
+            if (! empty($routeIds)) {
+                $query->join('users_route_import as uri', 'uri.id_user', '=', 'users.id')
+                      ->whereIn('uri.id_route_import', $routeIds);
+            } else {
+                return collect();
+            }
+        }
+
+        return $query->get();
+    }
+
+    /*********************
+     * Validation & store/update
+     *********************/
+
+    public static function validateStore(Request $request)
+    {
         $validator = Validator::make($request->all(), [
-            'username'          =>  ["required", "alpha_num", Rule::unique('users', 'username')         ],
-            'first_name'        =>  ["required", "max:255"                                              ],
-            'last_name'         =>  ["required", "max:255"                                              ],
-            'email'             =>  ["required", Rule::unique('users')  , "email", "max:255"            ],
-            'tel'               =>  ["required", "max:255"                                              ],
-            'company'           =>  ["required", "max:255"                                              ],
-            'type_user'         =>  ["required", "max:255"                                              ],
-            'password'          =>  ["required", "confirmed"            , "min:6", "max:255"            ]
+            'username' => ['required', 'alpha_num', Rule::unique('users', 'username')],
+            'first_name' => ['required', 'max:255'],
+            'last_name' => ['required', 'max:255'],
+            'email' => ['required', Rule::unique('users')->whereNotNull('email'), 'email', 'max:255'],
+            'tel' => ['required', 'max:255'],
+            'company' => ['required', 'max:255'],
+            'type_user' => ['required', 'max:255'],
+            'password' => ['required', 'confirmed', 'min:6', 'max:255'],
         ]);
 
-        $validator->sometimes('max_route_import',  ["required", "integer"] , function (Fluent $input) {
-    
-            return ($input->type_user    ==  "BU Manager");
+        $validator->sometimes('max_route_import', ['required', 'integer'], function (Fluent $input) {
+            return ($input->type_user == 'BU Manager');
         });
 
-        $validator->sometimes('accuracy',  ["required", "numeric", "min:0"] , function (Fluent $input) {
-    
-            return ($input->type_user    ==  "FrontOffice");
+        $validator->sometimes('accuracy', ['required', 'numeric', 'min:0'], function (Fluent $input) {
+            return ($input->type_user == 'FrontOffice');
         });
 
-        //
         return $validator;
     }
 
-    public static function storeUser(Request $request) {
-        
-        $user = new User([
-            'username'              =>  $request->input('username')             ,
-            'first_name'            =>  $request->input('first_name')           ,
-            'last_name'             =>  $request->input('last_name')            ,
-            'email'                 =>  $request->input('email')                ,
-            'tel'                   =>  $request->input('tel')                  ,
-            'company'               =>  $request->input('company')              ,
-            'type_user'             =>  $request->input('type_user')            ,
+    public static function storeUser(Request $request)
+    {
+        $me = Auth::user();
+        if (! $me) throw new Exception('Unauthorized', 403);
 
-            'password_non_hashed'   =>  $request->input('password')             ,
-            'password'              =>  Hash::make($request->input('password')) ,
-            'owner'                 =>  Auth::user()->id
-        ]);
+        DB::transaction(function () use ($request, $me) {
+            $userData = [
+                'username' => $request->input('username'),
+                'first_name' => $request->input('first_name'),
+                'last_name' => $request->input('last_name'),
+                'email' => $request->input('email'),
+                'tel' => $request->input('tel'),
+                'company' => $request->input('company'),
+                'type_user' => $request->input('type_user'),
+                'password_non_hashed' => $request->input('password'),
+                'password' => Hash::make($request->input('password')),
+                'owner' => $me->id,
+            ];
 
-        $user->save();
+            $user = self::create($userData);
 
-        //
-
-        if($request->get("type_user")   ==  "BU Manager") {
-
-            $liste_route_import     =   json_decode($request->get("liste_route_import"));
-
-            if($liste_route_import  !=  null) {
-
-                foreach ($liste_route_import as $route_import_elem) {
-
-                    $route_import           =   new UserRouteImport([
-
-                        'id_user'           =>  $user->id           ,
-                        'id_route_import'   =>  $route_import_elem
-                    ]);
-
-                    $route_import->save();
-                } 
+            // Handle assignment of route imports in bulk (if provided)
+            $liste_route_import = $request->input('liste_route_import');
+            $routeIds = [];
+            if ($liste_route_import) {
+                // Accept JSON string or array
+                $routeIds = is_string($liste_route_import) ? json_decode($liste_route_import, true) : (array)$liste_route_import;
+                $routeIds = array_filter($routeIds);
             }
 
-            $BUManagerRole = Role::findByName('BU Manager');
-            $user->assignRole($BUManagerRole);
+            // Role assignment and specific attributes per type_user
+            $type = $request->input('type_user');
 
-            //
-            $user->max_route_import     =   $request->input('max_route_import');
-            $user->save();
-        }
+            switch ($type) {
+                case 'BU Manager':
+                    $user->syncRoles(['BU Manager']);
+                    // set max_route_import if provided
+                    if ($request->has('max_route_import')) {
+                        $user->max_route_import = (int) $request->input('max_route_import');
+                        $user->save();
+                    }
+                    // assign route imports pivot in bulk
+                    if (! empty($routeIds)) {
+                        $insert = [];
+                        foreach ($routeIds as $rid) {
+                            $insert[] = ['id_user' => $user->id, 'id_route_import' => $rid];
+                        }
+                        UserRouteImport::insert($insert);
+                    }
+                    break;
 
-        if($request->get("type_user")   ==  "BackOffice") {
+                case 'BackOffice':
+                    $user->syncRoles(['BackOffice']);
+                    if (! empty($routeIds)) {
+                        $insert = [];
+                        foreach ($routeIds as $rid) {
+                            $insert[] = ['id_user' => $user->id, 'id_route_import' => $rid];
+                        }
+                        UserRouteImport::insert($insert);
+                    }
+                    break;
 
-            $liste_route_import     =   json_decode($request->get("liste_route_import"));
+                case 'Viewer':
+                    $user->syncRoles(['Viewer']);
+                    if (! empty($routeIds)) {
+                        $insert = [];
+                        foreach ($routeIds as $rid) {
+                            $insert[] = ['id_user' => $user->id, 'id_route_import' => $rid];
+                        }
+                        UserRouteImport::insert($insert);
+                    }
+                    break;
 
-            if($liste_route_import  !=  null) {
+                case 'FrontOffice':
+                    $user->syncRoles(['FrontOffice']);
+                    if ($request->filled('selected_route_import') && $request->input('selected_route_import') !== 'null') {
+                        UserRouteImport::create([
+                            'id_user' => $user->id,
+                            'id_route_import' => $request->input('selected_route_import'),
+                        ]);
+                    }
+                    if ($request->has('accuracy')) {
+                        $user->accuracy = $request->input('accuracy');
+                        $user->save();
+                    }
+                    break;
 
-                foreach ($liste_route_import as $route_import_elem) {
-
-                    $route_import           =   new UserRouteImport([
-
-                        'id_user'           =>  $user->id           ,
-                        'id_route_import'   =>  $route_import_elem
-                    ]);
-
-                    $route_import->save();
-                } 
+                default:
+                    // If an unknown type is passed, leave role assignment empty (or handle accordingly)
+                    break;
             }
-
-            $BackOfficeRole = Role::findByName('BackOffice');
-            $user->assignRole($BackOfficeRole);
-        }
-
-        if($request->get("type_user")   ==  "Viewer") {
-
-            $liste_route_import     =   json_decode($request->get("liste_route_import"));
-
-            if($liste_route_import  !=  null) {
-
-                foreach ($liste_route_import as $route_import_elem) {
-
-                    $route_import           =   new UserRouteImport([
-
-                        'id_user'           =>  $user->id           ,
-                        'id_route_import'   =>  $route_import_elem
-                    ]);
-
-                    $route_import->save();
-                } 
-            }
-
-            $ViewerRole = Role::findByName('Viewer');
-            $user->assignRole($ViewerRole);
-        }
-
-        if($request->get("type_user")   ==  "FrontOffice") {
-
-            if($request->get("selected_route_import")   !=  "null") {
-
-                $route_import           =   new UserRouteImport([
-
-                    'id_user'           =>  $user->id                                   ,
-                    'id_route_import'   =>  $request->get("selected_route_import")
-                ]);
-
-                $route_import->save();
-            }
-
-            $FrontOfficeRole = Role::findByName('FrontOffice');
-            $user->assignRole($FrontOfficeRole);
-
-            //
-            $user->accuracy     =   $request->input('accuracy');
-            $user->save();
-        }
-
-        //
+        });
     }
 
-    public static function validateUpdate(Request $request, int $id) {
-
+    public static function validateUpdate(Request $request, int $id)
+    {
         $validator = Validator::make($request->all(), [
-            'username'          =>  ["required", "alpha_num", Rule::unique('users', 'username')->ignore($id)],
-            'first_name'        =>  ["required", "max:255"                                              ],
-            'last_name'         =>  ["required", "max:255"                                              ],
-            'email'             =>  ["required", Rule::unique('users')->ignore($id), "email", "max:255" ],
-            'tel'               =>  ["required", "max:255"                                              ],
-            'company'           =>  ["required", "max:255"                                              ],
-            'type_user'         =>  ["required", "max:255"                                              ]
+            'username' => ['required', 'alpha_num', Rule::unique('users', 'username')->ignore($id)],
+            'first_name' => ['required', 'max:255'],
+            'last_name' => ['required', 'max:255'],
+            'email' => ['required', Rule::unique('users')->ignore($id), 'email', 'max:255'],
+            'tel' => ['required', 'max:255'],
+            'company' => ['required', 'max:255'],
+            'type_user' => ['required', 'max:255'],
         ]);
 
-        $validator->sometimes('max_route_import',  ["required", "integer"] , function (Fluent $input) {
-    
-            return ($input->type_user    ==  "BU Manager");
+        $validator->sometimes('max_route_import', ['required', 'integer'], function (Fluent $input) {
+            return ($input->type_user == 'BU Manager');
         });
 
-        $validator->sometimes('accuracy',  ["required", "numeric", "min:0"] , function (Fluent $input) {
-    
-            return ($input->type_user    ==  "FrontOffice");
+        $validator->sometimes('accuracy', ['required', 'numeric', 'min:0'], function (Fluent $input) {
+            return ($input->type_user == 'FrontOffice');
         });
-    
+
         return $validator;
     }
 
-    public static function updateUser(Request $request, int $id) {
+    public static function updateUser(Request $request, int $id)
+    {
+        $user = self::findOrFail($id);
 
-        $user                       =   User::find($id);
-
-        $user->username             =   $request->input('username');
-        $user->first_name           =   $request->input('first_name');
-        $user->last_name            =   $request->input('last_name');
-        $user->email                =   $request->input('email');
-        $user->tel                  =   $request->input('tel');
-        $user->company              =   $request->input('company');
-        $user->type_user            =   $request->input('type_user');
-        $user->status               =   $request->input('status');
-
-        $user->save();
-
-        //
-
-        UserRouteImport::where("id_user", $user->id)->delete();
-
-        //
-
-        if($request->get("type_user")   ==  "BU Manager") {
-
-            $liste_route_import     =   json_decode($request->get("liste_route_import"));
-
-            if($liste_route_import  !=  null) {
-
-                foreach ($liste_route_import as $route_import_elem) {
-                    
-                    $route_import           =   new UserRouteImport([
-
-                        'id_user'           =>  $user->id               ,
-                        'id_route_import'   =>  $route_import_elem
-                    ]);
-
-                    $route_import->save();
-                }
+        DB::transaction(function () use ($request, $user) {
+            // mass assign safe properties explicitly
+            $fields = ['username', 'first_name', 'last_name', 'email', 'tel', 'company', 'type_user', 'status'];
+            foreach ($fields as $f) {
+                if ($request->has($f)) $user->{$f} = $request->input($f);
             }
-
-            //
-            $user->syncRoles(['BU Manager']);
-
-            //
-            $user->max_route_import     =   $request->input('max_route_import');
             $user->save();
-        }
 
-        if($request->get("type_user")   ==  "BackOffice") {
+            // Reset user->route_import relations
+            UserRouteImport::where('id_user', $user->id)->delete();
 
-            $liste_route_import     =   json_decode($request->get("liste_route_import"));
+            // Re-attach according to type_user
+            $type = $request->input('type_user');
 
-            if($liste_route_import  !=  null) {
-
-                foreach ($liste_route_import as $route_import_elem) {
-                    
-                    $route_import           =   new UserRouteImport([
-
-                        'id_user'           =>  $user->id               ,
-                        'id_route_import'   =>  $route_import_elem
-                    ]);
-
-                    $route_import->save();
-                }
+            $liste_route_import = $request->input('liste_route_import');
+            $routeIds = [];
+            if ($liste_route_import) {
+                $routeIds = is_string($liste_route_import) ? json_decode($liste_route_import, true) : (array)$liste_route_import;
+                $routeIds = array_filter($routeIds);
             }
 
-            //
-            $user->syncRoles(['BackOffice']);
-        }
+            switch ($type) {
+                case 'BU Manager':
+                    if (!empty($routeIds)) {
+                        $insert = array_map(fn($rid) => ['id_user' => $user->id, 'id_route_import' => $rid], $routeIds);
+                        UserRouteImport::insert($insert);
+                    }
+                    $user->syncRoles(['BU Manager']);
+                    if ($request->has('max_route_import')) {
+                        $user->max_route_import = (int)$request->input('max_route_import');
+                        $user->save();
+                    }
+                    break;
 
-        if($request->get("type_user")   ==  "Viewer") {
+                case 'BackOffice':
+                    if (!empty($routeIds)) {
+                        $insert = array_map(fn($rid) => ['id_user' => $user->id, 'id_route_import' => $rid], $routeIds);
+                        UserRouteImport::insert($insert);
+                    }
+                    $user->syncRoles(['BackOffice']);
+                    break;
 
-            $liste_route_import     =   json_decode($request->get("liste_route_import"));
+                case 'Viewer':
+                    if (!empty($routeIds)) {
+                        $insert = array_map(fn($rid) => ['id_user' => $user->id, 'id_route_import' => $rid], $routeIds);
+                        UserRouteImport::insert($insert);
+                    }
+                    $user->syncRoles(['Viewer']);
+                    break;
 
-            if($liste_route_import  !=  null) {
+                case 'FrontOffice':
+                    if ($request->filled('selected_route_import') && $request->input('selected_route_import') !== 'null') {
+                        UserRouteImport::create([
+                            'id_user' => $user->id,
+                            'id_route_import' => $request->input('selected_route_import'),
+                        ]);
+                    }
+                    $user->syncRoles(['FrontOffice']);
+                    if ($request->has('accuracy')) {
+                        $user->accuracy = $request->input('accuracy');
+                        $user->save();
+                    }
+                    break;
 
-                foreach ($liste_route_import as $route_import_elem) {
-                    
-                    $route_import           =   new UserRouteImport([
-
-                        'id_user'           =>  $user->id               ,
-                        'id_route_import'   =>  $route_import_elem
-                    ]);
-
-                    $route_import->save();
-                }
+                default:
+                    // no special handling
+                    break;
             }
-
-            //
-            $user->syncRoles(['Viewer']);
-        }
-
-        if($request->get("type_user")   ==  "FrontOffice") {
-
-            if($request->get("selected_route_import")   !=  "null") {
-
-                $route_import           =   new UserRouteImport([
-
-                    'id_user'           =>  $user->id                                   ,
-                    'id_route_import'   =>  $request->get("selected_route_import")
-                ]);
-
-                $route_import->save();
-            }
-
-            $user->syncRoles(['FrontOffice']);
-
-            //
-            $user->accuracy     =   $request->input('accuracy');
-            $user->save();
-        }
+        });
     }
 
-    public static function showUser(int $id) {
-    
-        //
-        $user                       =   User::find($id);
-
-        //
-        $user->liste_route_import   =   DB::table('route_import')
-                                            // ->pluck('users_route_import.id_route_import') 
-                                            // ->toArray();
-                                            ->select('route_import.*')
-                                            ->join('users_route_import', 'route_import.id', 'users_route_import.id_route_import')
-                                            ->where('users_route_import.id_user', $user->id) 
-                                            ->get();
-
+    public static function showUser(int $id)
+    {
+        $user = self::findOrFail($id);
+        // use the belongsToMany relation to retrieve route imports
+        $user->liste_route_import = $user->routeImports()->get();
         return $user;
     }
 
-    //
+    /*********************
+     * Password helpers
+     *********************/
 
-    public static function validatechangePassword(Request $request) {
-
+    public static function validatechangePassword(Request $request)
+    {
         $validator = Validator::make($request->all(), [
-            'old_password'          =>  ["required", "current_password:api"             ],
-            'new_password'          =>  ["required", "confirmed"    , "min:6", "max:255"]
+            'old_password' => ['required', 'current_password:api'],
+            'new_password' => ['required', 'confirmed', 'min:6', 'max:255'],
         ]);
-    
         return $validator;
     }
 
-    public static function changePassword(Request $request, int $id) {
-
-        $user                   =   User::find($id);
-
-        $user->password         =   Hash::make($request->input('new_password'));
-
+    public static function changePassword(Request $request, int $id)
+    {
+        $user = self::findOrFail($id);
+        $user->password = Hash::make($request->input('new_password'));
         $user->save();
     }
 
-    //
+    /*********************
+     * Pointings (report)
+     *********************/
 
-    public static function pointings(Request $request) {
-
-        // decode optional JSON inputs (FormData gives them as strings)
-        $route_links_raw    = $request->get('route_links');
+    public static function pointings(Request $request)
+    {
+        // parse filters
+        $route_links_raw = $request->get('route_links');
         $selected_users_raw = $request->get('selected_users');
 
-        $route_links    = $route_links_raw ? (array) json_decode($route_links_raw, true) : [];
+        $route_links = $route_links_raw ? (array) json_decode($route_links_raw, true) : [];
         $selected_users = $selected_users_raw ? (array) json_decode($selected_users_raw, true) : [];
 
-        // normalize and remove empty values
-        $route_links    = array_values(array_filter($route_links, fn($v) => $v !== null && $v !== ''));
+        $route_links = array_values(array_filter($route_links, fn($v) => $v !== null && $v !== ''));
         $selected_users = array_values(array_filter($selected_users, fn($v) => $v !== null && $v !== ''));
 
-        // parse dates
         try {
             $startDate = Carbon::parse($request->get('start_date'))->startOfDay();
             $endDate   = Carbon::parse($request->get('end_date'))->endOfDay();
@@ -507,39 +443,29 @@ class User extends Authenticatable
             return response()->json([], 200);
         }
 
-        // Build base clients query for the given date range
-        $clientsBaseQuery = Client::query()
-            ->whereBetween('updated_at', [$startDate, $endDate]);
+        // Build base client query
+        $baseClientQuery = Client::query()
+            ->whereBetween('clients.updated_at', [$startDate, $endDate]);
 
-        // Apply filters only if they are NOT empty (i.e. optional filters)
         if (!empty($route_links)) {
-            $clientsBaseQuery->whereIn('id_route_import', $route_links);
+            $baseClientQuery->whereIn('id_route_import', $route_links);
         }
 
         if (!empty($selected_users)) {
-            $clientsBaseQuery->whereIn('owner_bo', $selected_users);
-        }
-
-        // If selected_users were explicitly provided, use them.
-        // Otherwise derive owner IDs from clients and keep only those with role "BackOffice".
-        if (!empty($selected_users)) {
+            $baseClientQuery->whereIn('owner_bo', $selected_users);
             $ownerIds = $selected_users;
         } else {
-            // keep only owners that have the BackOffice role
+            // determine owners with BackOffice or BU Manager roles (limit scope)
             $ownerIds = User::role(['BackOffice', 'BU Manager'])->pluck('id')->toArray();
         }
 
-        // if no owners left, return empty
         if (empty($ownerIds)) {
             return response()->json([], 200);
         }
 
-        // fetch the user rows for these owners
-        $users = User::whereIn('id', $ownerIds)->get();
-
-        // 1) per-user totals (grouped by owner_bo) using the same filters
-        $perUserTotals = (clone $clientsBaseQuery)
-            ->groupBy('owner_bo')
+        // per-user totals
+        $totalsQuery = (clone $baseClientQuery)
+            ->whereIn('owner_bo', $ownerIds)
             ->select([
                 'owner_bo',
                 DB::raw("SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as number_clients_pending"),
@@ -550,56 +476,60 @@ class User extends Authenticatable
                 DB::raw("SUM(CASE WHEN status = 'ferme' THEN 1 ELSE 0 END) as number_clients_ferme"),
                 DB::raw("SUM(CASE WHEN status = 'refus' THEN 1 ELSE 0 END) as number_clients_refus"),
                 DB::raw("SUM(CASE WHEN status = 'introuvable' THEN 1 ELSE 0 END) as number_clients_introuvable"),
-                DB::raw("TIME_FORMAT(TIME(MIN(updated_at)), '%H:%i:%s') as start_time"),
-                DB::raw("TIME_FORMAT(TIME(MAX(updated_at)), '%H:%i:%s') as end_time"),
+                DB::raw("TIME_FORMAT(TIME(MIN(clients.updated_at)), '%H:%i:%s') as start_time"),
+                DB::raw("TIME_FORMAT(TIME(MAX(clients.updated_at)), '%H:%i:%s') as end_time"),
             ])
-            ->get()
-            ->keyBy('owner_bo');
-
-        // 2) per-user per-day aggregated stats (same filters)
-        $perUserPerDay = (clone $clientsBaseQuery)
-            ->groupBy('owner_bo', DB::raw('DATE(updated_at)'))
-            ->select([
-                'owner_bo',
-                DB::raw('DATE(updated_at) as day'),
-                DB::raw("SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as number_clients_pending"),
-                DB::raw("SUM(CASE WHEN status = 'confirmed' THEN 1 ELSE 0 END) as number_clients_confirmed"),
-                DB::raw("SUM(CASE WHEN status = 'validated' THEN 1 ELSE 0 END) as number_clients_validated"),
-                DB::raw("SUM(CASE WHEN status = 'nonvalidated' THEN 1 ELSE 0 END) as number_clients_nonvalidated"),
-                DB::raw("SUM(CASE WHEN status = 'visible' THEN 1 ELSE 0 END) as number_clients_visible"),
-                DB::raw("SUM(CASE WHEN status = 'ferme' THEN 1 ELSE 0 END) as number_clients_ferme"),
-                DB::raw("SUM(CASE WHEN status = 'refus' THEN 1 ELSE 0 END) as number_clients_refus"),
-                DB::raw("SUM(CASE WHEN status = 'introuvable' THEN 1 ELSE 0 END) as number_clients_introuvable"),
-                DB::raw("TIME_FORMAT(TIME(MIN(updated_at)), '%H:%i:%s') as start_time"),
-                DB::raw("TIME_FORMAT(TIME(MAX(updated_at)), '%H:%i:%s') as end_time"),
-            ])
-            ->get()
             ->groupBy('owner_bo');
 
-        // Build the period once
+        $perUserTotals = $totalsQuery->get()->keyBy('owner_bo');
+
+        // per-user per-day
+        $perDayQuery = (clone $baseClientQuery)
+            ->whereIn('owner_bo', $ownerIds)
+            ->select([
+                'owner_bo',
+                DB::raw('DATE(clients.updated_at) as day'),
+                DB::raw("SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as number_clients_pending"),
+                DB::raw("SUM(CASE WHEN status = 'confirmed' THEN 1 ELSE 0 END) as number_clients_confirmed"),
+                DB::raw("SUM(CASE WHEN status = 'validated' THEN 1 ELSE 0 END) as number_clients_validated"),
+                DB::raw("SUM(CASE WHEN status = 'nonvalidated' THEN 1 ELSE 0 END) as number_clients_nonvalidated"),
+                DB::raw("SUM(CASE WHEN status = 'visible' THEN 1 ELSE 0 END) as number_clients_visible"),
+                DB::raw("SUM(CASE WHEN status = 'ferme' THEN 1 ELSE 0 END) as number_clients_ferme"),
+                DB::raw("SUM(CASE WHEN status = 'refus' THEN 1 ELSE 0 END) as number_clients_refus"),
+                DB::raw("SUM(CASE WHEN status = 'introuvable' THEN 1 ELSE 0 END) as number_clients_introuvable"),
+                DB::raw("TIME_FORMAT(TIME(MIN(clients.updated_at)), '%H:%i:%s') as start_time"),
+                DB::raw("TIME_FORMAT(TIME(MAX(clients.updated_at)), '%H:%i:%s') as end_time"),
+            ])
+            ->groupBy('owner_bo', DB::raw('DATE(clients.updated_at)'));
+
+        $perUserPerDay = $perDayQuery->get()->groupBy('owner_bo');
+
+        // determine owners to include as User models
+        $users = self::whereIn('id', $ownerIds)->get();
+
+        // Build date period
         $period = CarbonPeriod::create($startDate, $endDate)->toArray();
 
-        // Map into pointings
-        $pointings = $users->map(function ($pointing) use ($perUserTotals, $perUserPerDay, $period, $route_links, $startDate, $endDate) {
-            $owner = $pointing->id;
+        // Map into final pointings
+        $pointings = $users->map(function ($u) use ($perUserTotals, $perUserPerDay, $period, $route_links, $startDate, $endDate) {
+            $owner = $u->id;
 
-            // attach totals (or defaults)
             $tot = $perUserTotals->get($owner);
-            $pointing->details = $tot ? $tot : (object)[
-                'number_clients_pending'        =>  0,
-                'number_clients_confirmed'      =>  0,
-                'number_clients_validated'      =>  0,
-                'number_clients_nonvalidated'   =>  0,
-                'number_clients_visible'        =>  0,
-                'number_clients_ferme'          =>  0,
-                'number_clients_refus'          =>  0,
-                'number_clients_introuvable'    =>  0,
-                'start_time'                    =>  null,
-                'end_time'                      =>  null
+            $u->details = $tot ? $tot : (object)[
+                'number_clients_pending' => 0,
+                'number_clients_confirmed' => 0,
+                'number_clients_validated' => 0,
+                'number_clients_nonvalidated' => 0,
+                'number_clients_visible' => 0,
+                'number_clients_ferme' => 0,
+                'number_clients_refus' => 0,
+                'number_clients_introuvable' => 0,
+                'start_time' => null,
+                'end_time' => null,
             ];
 
-            // clients (respect same optional route filter)
-            $clientsQuery = Client::where('clients.owner_bo', $owner)
+            // fetch clients for this owner (apply route filter if present)
+            $clientsQuery = Client::where('owner_bo', $owner)
                 ->whereBetween('clients.updated_at', [$startDate, $endDate])
                 ->join('users as bo', 'clients.owner_bo', '=', 'bo.id')
                 ->select('clients.*', 'bo.username as owner_username');
@@ -608,64 +538,60 @@ class User extends Authenticatable
                 $clientsQuery->whereIn('clients.id_route_import', $route_links);
             }
 
-            $pointing->clients = $clientsQuery->get();
+            $u->clients = $clientsQuery->get();
 
-            // build days (fill missing)
+            // days fill
             $ownerDays = $perUserPerDay->has($owner) ? $perUserPerDay->get($owner)->keyBy('day') : collect();
             $days = [];
-
             foreach ($period as $date) {
                 $d = $date->format('Y-m-d');
-
                 if ($ownerDays->has($d)) {
                     $r = $ownerDays->get($d);
                     $days[] = (object)[
-                        'day'                           =>  $d,
-                        'number_clients_pending'        =>  (int)$r->number_clients_pending,
-                        'number_clients_confirmed'      =>  (int)$r->number_clients_confirmed,
-                        'number_clients_validated'      =>  (int)$r->number_clients_validated,
-                        'number_clients_nonvalidated'   =>  (int)$r->number_clients_nonvalidated,
-                        'number_clients_visible'        =>  (int)$r->number_clients_visible,
-                        'number_clients_ferme'          =>  (int)$r->number_clients_ferme,
-                        'number_clients_refus'          =>  (int)$r->number_clients_refus,
-                        'number_clients_introuvable'    =>  (int)$r->number_clients_introuvable,
-                        'start_time'                    =>  $r->start_time,
-                        'end_time'                      =>  $r->end_time,
+                        'day' => $d,
+                        'number_clients_pending' => (int)$r->number_clients_pending,
+                        'number_clients_confirmed' => (int)$r->number_clients_confirmed,
+                        'number_clients_validated' => (int)$r->number_clients_validated,
+                        'number_clients_nonvalidated' => (int)$r->number_clients_nonvalidated,
+                        'number_clients_visible' => (int)$r->number_clients_visible,
+                        'number_clients_ferme' => (int)$r->number_clients_ferme,
+                        'number_clients_refus' => (int)$r->number_clients_refus,
+                        'number_clients_introuvable' => (int)$r->number_clients_introuvable,
+                        'start_time' => $r->start_time,
+                        'end_time' => $r->end_time,
                     ];
                 } else {
                     $days[] = (object)[
                         'day' => $d,
-                        'number_clients_pending'        => 0,
-                        'number_clients_confirmed'      => 0,
-                        'number_clients_validated'      => 0,
-                        'number_clients_nonvalidated'   => 0,
-                        'number_clients_visible'        => 0,
-                        'number_clients_ferme'          => 0,
-                        'number_clients_refus'          => 0,
-                        'number_clients_introuvable'    => 0,
-                        'start_time'                    => null,
-                        'end_time'                      => null,
+                        'number_clients_pending' => 0,
+                        'number_clients_confirmed' => 0,
+                        'number_clients_validated' => 0,
+                        'number_clients_nonvalidated' => 0,
+                        'number_clients_visible' => 0,
+                        'number_clients_ferme' => 0,
+                        'number_clients_refus' => 0,
+                        'number_clients_introuvable' => 0,
+                        'start_time' => null,
+                        'end_time' => null,
                     ];
                 }
             }
 
-            $pointing->days = $days;
+            $u->days = $days;
 
-            //
-            $pointing->total_clients = 
-                (int)($pointing->details->number_clients_pending        ?? 0)   +
-                (int)($pointing->details->number_clients_confirmed      ?? 0)   +
-                (int)($pointing->details->number_clients_validated      ?? 0)   +
-                (int)($pointing->details->number_clients_nonvalidated   ?? 0)   +
-                (int)($pointing->details->number_clients_visible        ?? 0)   +
-                (int)($pointing->details->number_clients_ferme          ?? 0)   +
-                (int)($pointing->details->number_clients_refus          ?? 0)   +
-                (int)($pointing->details->number_clients_introuvable    ?? 0);
+            $u->total_clients =
+                (int)($u->details->number_clients_pending ?? 0) +
+                (int)($u->details->number_clients_confirmed ?? 0) +
+                (int)($u->details->number_clients_validated ?? 0) +
+                (int)($u->details->number_clients_nonvalidated ?? 0) +
+                (int)($u->details->number_clients_visible ?? 0) +
+                (int)($u->details->number_clients_ferme ?? 0) +
+                (int)($u->details->number_clients_refus ?? 0) +
+                (int)($u->details->number_clients_introuvable ?? 0);
 
-            //
-            return $pointing;
-        })->sortByDesc('total_clients');
+            return $u;
+        })->sortByDesc('total_clients')->values();
 
-        return $pointings->values();
+        return $pointings;
     }
 }

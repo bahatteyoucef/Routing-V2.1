@@ -5,129 +5,204 @@ namespace App\Models;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class RouteImportTempo extends Model
 {
-
-    //
-
     use HasFactory;
 
-    protected $guarded      =   [];
+    protected $guarded      = [];
+    protected $table        = 'route_import_tempo';
+    protected $primaryKey   = 'id';
+    public    $timestamps   = false;
 
-    protected $table        =   'route_import_tempo';
-    protected $primaryKey   =   'id';
-
-    public    $timestamps   =   false;
-
-    //
-
-    public static function lastTempo() {
-
-        $last_route_import              =   RouteImportTempo::where('owner', Auth::user()->id)->first();
-
-        if($last_route_import) {
-
-            $last_route_import->clients     =   ClientTempo::index($last_route_import->id);
-            
-            $last_route_import->districts   =   RouteImportTempoDistrict::select('RTM_Willaya.DistrictNo', 'RTM_Willaya.DistrictNameE')
-                                                    ->join('RTM_Willaya', 'route_import_tempo_districts.DistrictNo', 'RTM_Willaya.DistrictNo')
-                                                    ->where('route_import_tempo_districts.id_route_import_tempo', $last_route_import->id)
-                                                    ->orderBy('RTM_Willaya.DistrictNameE')
-                                                    ->get();
+    /**
+     * Return the last tempo for the authenticated user, including clients & districts.
+     *
+     * @return RouteImportTempo|null
+     * @throws Exception
+     */
+    public static function lastTempo()
+    {
+        $user = Auth::user();
+        if (! $user) {
+            throw new Exception('Unauthorized', 403);
         }
 
-        else {
+        $last = self::where('owner', $user->id)->latest('id')->first();
 
-            throw new Exception("Unauthorized !", 403);
+        if (! $last) {
+            throw new Exception('Unauthorized !', 403);
         }
 
-        return $last_route_import;
+        // Eagerly load clients and districts (ClientTempo::index returns formatted collection)
+        $last->clients = ClientTempo::index($last->id);
+
+        $last->districts = RouteImportTempoDistrict::select('RTM_Willaya.DistrictNo', 'RTM_Willaya.DistrictNameE')
+            ->join('RTM_Willaya', 'route_import_tempo_districts.DistrictNo', '=', 'RTM_Willaya.DistrictNo')
+            ->where('route_import_tempo_districts.id_route_import_tempo', $last->id)
+            ->orderBy('RTM_Willaya.DistrictNameE')
+            ->get();
+
+        return $last;
     }
 
-    public static function validateStore(Request $request) {
-
-        $validator = Validator::make($request->all(), [
-            'libelle'           =>  ["required", "max:255"                                                                                                      ],
-            'data'              =>  ["required", "json"                                                                                                         ],
-            'file'              =>  ["required", "file", "mimetypes:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/octet-stream" ]
+    /**
+     * Validate incoming request for store.
+     *
+     * @param Request $request
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public static function validateStore(Request $request)
+    {
+        return Validator::make($request->all(), [
+            'libelle'   => ['required', 'max:255'],
+            'data'      => ['required', 'json'],
+            'districts' => ['required'], // accept JSON/array, validated further below
+            'file'      => ['required', 'file', 'mimetypes:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/octet-stream'],
         ]);
-
-        return $validator;
     }
 
-    public static function storeRouteImportTempo(Request $request) {
+    /**
+     * Create a new route import tempo, save the uploaded file, districts and client data.
+     *
+     * @param Request $request
+     * @return self
+     * @throws Exception
+     */
+    public static function storeRouteImportTempo(Request $request)
+    {
+        $user = Auth::user();
+        if (! $user) {
+            throw new Exception('Unauthorized', 403);
+        }
 
-        if(Auth::user()->hasRole("BU Manager")) {
-
-            $liste_route_import    =   RouteImport::where("owner", Auth::user()->id)->get();
-
-            if(count($liste_route_import)   >=  Auth::user()->max_route_import) {
-
-                throw new Exception("You have achieved the maximum nombre of route imports !");
+        // If BU Manager limit applies
+        if ($user->hasRole('BU Manager')) {
+            $count = RouteImport::where('owner', $user->id)->count();
+            if ($count >= (int)$user->max_route_import) {
+                throw new Exception('You have achieved the maximum number of route imports !');
             }
         }
 
-        RouteImportTempo::deleteRouteImportTempo();
-
-        $route_import_tempo =   new RouteImportTempo([
-            'libelle'       =>  $request->get("libelle")    ,
-            'owner'         =>  Auth::user()->id
-        ]);
-
-        $route_import_tempo->save();
-
-        //  //  //  //  //
-
-        $districts      =   json_decode($request->get("districts"));   
-
-        foreach ($districts as $district) {
-
-            $route_import_tempo_district    =   new RouteImportTempoDistrict([
-                'DistrictNo'                    =>  $district                   ,
-                'id_route_import_tempo'         =>  $route_import_tempo->id     ,
-                'owner'                         =>  Auth::user()->id
-            ]);
-
-            $route_import_tempo_district->save();
+        $validator = self::validateStore($request);
+        if ($validator->fails()) {
+            throw new Exception($validator->errors()->first());
         }
 
-        //  //  //  //  //
+        // Normalize districts input (can be JSON string or array)
+        $districtsInput = $request->input('districts');
+        if (is_string($districtsInput)) {
+            $districtsDecoded = json_decode($districtsInput, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new Exception('Invalid districts JSON.');
+            }
+            $districts = $districtsDecoded;
+        } else {
+            $districts = (array)$districtsInput;
+        }
 
-        $fileName                   =   uniqid().'.'.$request->file->getClientOriginalExtension();
-        $request->file->move(public_path('uploads/route_import_tempo/'.Auth::user()->id), $fileName);
+        if (empty($districts) || !is_array($districts)) {
+            throw new Exception('districts is required and must be an array or JSON array.');
+        }
 
-        $route_import_tempo->file                   =   $fileName;
-        $route_import_tempo->file_original_name     =   $request->file->getClientOriginalName();
+        // Transaction: create tempo, file move, district inserts, and store client data.
+        $routeImportTempo = null;
 
-        $route_import_tempo->save();
+        DB::transaction(function () use ($request, $user, $districts, &$routeImportTempo) {
 
-        // Store Data
-        RouteImportTempo::storeData($request, $route_import_tempo->id);
+            // Create tempo header
+            $routeImportTempo = self::create([
+                'libelle' => $request->get('libelle'),
+                'owner' => $user->id,
+            ]);
+
+            // Bulk insert districts (prepare rows)
+            $districtRows = [];
+            foreach ($districts as $d) {
+                // accept object or array
+                $districtNo = is_array($d) ? ($d['DistrictNo'] ?? $d['DistrictNo'] ?? null) : ($d->DistrictNo ?? $d->DistrictNo ?? null);
+                // if the payload is just the DistrictNo value (not object), handle it
+                if ($districtNo === null) {
+                    $districtNo = is_scalar($d) ? $d : null;
+                }
+                if ($districtNo === null) continue;
+
+                $districtRows[] = [
+                    'DistrictNo'           => $districtNo,
+                    'id_route_import_tempo'=> $routeImportTempo->id,
+                    'owner'                => $user->id,
+                ];
+            }
+
+            if (!empty($districtRows)) {
+                // Use chunk insert to avoid very large single inserts
+                $chunks = array_chunk($districtRows, 500);
+                foreach ($chunks as $chunk) {
+                    RouteImportTempoDistrict::insert($chunk);
+                }
+            }
+
+            // Save uploaded file (ensure destination dir)
+            $uploaded = $request->file('file');
+            $userDir = public_path('uploads/route_import_tempo/' . $user->id);
+            if (! File::isDirectory($userDir)) {
+                File::makeDirectory($userDir, 0755, true);
+            }
+
+            $fileName = uniqid() . '.' . $uploaded->getClientOriginalExtension();
+            $uploaded->move($userDir, $fileName);
+
+            $routeImportTempo->file = $fileName;
+            $routeImportTempo->file_original_name = $uploaded->getClientOriginalName();
+            $routeImportTempo->save();
+
+            // Ensure clients payload (data) passed properly to ClientTempo::storeClients
+            // ClientTempo::storeClients expects request->get('data') to be JSON text or array depending on its implementation.
+            // If the controller already provided 'data' as JSON string, keep it. Otherwise, if there's 'data' field as array/object, pass it through.
+            // We don't modify request param here; we call storeData which delegates to ClientTempo::storeClients
+            self::storeData($request, $routeImportTempo->id);
+        });
+
+        return $routeImportTempo;
     }
 
-    public static function deleteRouteImportTempo() {
+    /**
+     * Delete all tempo records for current user and remove uploaded files/directory.
+     */
+    public static function deleteRouteImportTempo()
+    {
+        $user = Auth::user();
+        if (! $user) return;
 
-        RouteImportTempo::where('owner', Auth::user()->id)->delete();
-        ClientTempo::where('owner', Auth::user()->id)->delete();
-        RouteImportTempoDistrict::where('owner', Auth::user()->id)->delete();
+        // Delete DB records
+        self::where('owner', $user->id)->delete();
+        ClientTempo::where('owner', $user->id)->delete();
+        RouteImportTempoDistrict::where('owner', $user->id)->delete();
 
-        // File::deleteDirectory(public_path('uploads/route_import_tempo/'.Auth::user()->id));
+        // Delete tempo directory for the user (if exists)
+        $userDir = public_path('uploads/route_import_tempo/' . $user->id);
+        if (File::exists($userDir)) {
+            // Recursively delete directory
+            File::deleteDirectory($userDir);
+        }
     }
 
-    //
-
-    // Clients
-
-    public static function storeData(Request $request, int $id) {
-
-        //  Clients
+    /**
+     * Store data (delegate to ClientTempo)
+     *
+     * @param Request $request
+     * @param int $id
+     * @return void
+     */
+    public static function storeData(Request $request, int $id)
+    {
+        // Delegate to ClientTempo (ClientTempo::storeClients handles data normalization)
         ClientTempo::storeClients($request, $id);
     }
 }
