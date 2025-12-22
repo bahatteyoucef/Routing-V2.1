@@ -101,211 +101,148 @@
 
         <!--                    -->
         <div v-if="route_import" class="mt-3">
-            <DynamicScroller
-                class="scroller mt-2 mb-2"
-                :items="clients"
-                :min-item-size="480"
-                key-field="id"
-                page-mode
-                ref="clientsScroller"
-            >
-                <template v-slot="{ item: client, index, active }">
-                    <DynamicScrollerItem
-                        :item="client"
-                        :active="active"
-                        :size-dependencies="[ client.sizeKey ]"
-                        :data-index="index"
-                    >
-                        <div :id="'client_'+client.id" class="client-item shadow-sm rounded">
-                            <div class="card mb-0">
-                                <div class="card-body p-0">
+            <div v-for="client, index in clients" :key="index" :id="'client_'+client.id" class="mb-2 shadow-sm rounded">
+                <div class="card">
+                    <div class="card-body p-0">
 
-                                <div class="mb-5 text-center">
-                                    <u><h5 class="card-title mt-2">{{ client.CustomerNameE }} ({{ client.created_at }})</h5></u>
+                        <div class="mb-5 text-center">
+                            <u><h5 class="card-title mt-2">{{ client.CustomerNameE }} ({{ client.created_at }})</h5></u>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="row mt-3 mb-3">
+                                            <div class="col-sm-12">
+                                                <div v-if="client.OpenCustomer  === 'Ouvert'">
+                                                    <label for="CustomerNameE"      class="form-label">Nom et Prénom de l'Acheteur</label>
+                                                    <input type="text"              class="form-control"        :id="'CustomerNameE_'+client.id"        v-model="client.CustomerNameE"                          :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-3 mb-3">
+                                            <div class="col-sm-12">
+                                                <label for="CustomerNameA"      class="form-label">Raison Sociale</label>
+                                                <input type="text"              class="form-control"            :id="'CustomerNameA_'+client.id"        v-model="client.CustomerNameA"                          :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                            </div>
+                                        </div>
+
+                                        <!--  -->
+
+                                        <div class="row mt-3 mb-3">
+                                            <div class="col-sm-12">
+                                                <div v-if="(((client.NewCustomer === 'Nouveau Client')&&(client.OpenCustomer === 'Ouvert'))||(client.NewCustomer === 'Client Existant'))">
+                                                    <label for="Tel"            class="form-label">Téléphone</label>
+                                                    <input type="text"          class="form-control"            :id="'Tel_'+client.id"            v-model="client.Tel"                :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!--  -->
+
+                                        <div class="row mt-3 mb-3">
+                                            <div class="col-sm-12">
+                                                <label for="Address"            class="form-label">Adresse</label>
+                                                <input type="text"              class="form-control"            :id="'Address_'+client.id"                v-model="client.Address"                                :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-3 mb-3">
+                                            <div class="col-sm-12">
+                                                <label for="Neighborhood"       class="form-label">Quartier</label>
+                                                <input type="text"              class="form-control"        :id="'Neighborhood_'+client.id"           v-model="client.Neighborhood"                           :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-3 mb-3">
+                                            <div class="col-sm-12">
+                                                <label for="Landmark"           class="form-label">Point de Repere</label>
+                                                <textarea                       class="form-control"        :id="'Landmark_'+client.id"   rows="3"    v-model="client.Landmark"                               :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-7 d-flex">
+                                        <div class="col">
+                                            <label for="facade_image_update"            class="form-label">Image Facade :</label>
+                                            <button type="button"                       class="btn btn-secondary w-100 mb-1"    @click="$clickFile('facade_image_update_'+client.id)"                                                                           :disabled="((client.status_original    ==  'confirmed')||(client.status_original    ==  'validated'))"><i class="mdi mdi-camera"></i></button>
+
+                                            <input type="file"                          class="form-control"        :id="'facade_image_update_'+client.id"                      accept="image/*"    @change="facadeImage(index)"                                style="display:none"    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                            <img                                        class="mt-1 w-100"          :id="'facade_image_display_update_'+client.id"              :src="'/uploads/clients/'+client.id+'/'+client.facade_image">
+                                        </div>
+                                    </div>
+
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-sm-6">
-                                        <div class="row">
-                                            <div class="col-sm-5">
-                                                <div class="row mt-3 mb-3">
-                                                    <div class="col-sm-12">
-                                                        <div v-if="client.OpenCustomer === 'Ouvert'">
-                                                            <label for="CustomerNameE" class="form-label">Nom et Prénom de l'Acheteur</label>
-                                                            <input type="text"
-                                                                class="form-control"
-                                                                :id="'CustomerNameE_'+client.id"
-                                                                v-model="client.CustomerNameE"
-                                                                @input="updateSizeKey(client)"
-                                                                :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                    <div class="col-sm-12">
+                                        <button type="button"           class="btn btn-success w-100"   style="margin-top: 30px;"   @click="sendData(index)">Validate</button>
+                                    </div>
+                                </div>
+                            </div>
 
-                                            <div class="row mt-3 mb-3">
-                                                <div class="col-sm-12">
-                                                    <label for="CustomerNameA" class="form-label">Raison Sociale</label>
-                                                    <input type="text"
-                                                            class="form-control"
-                                                            :id="'CustomerNameA_'+client.id"
-                                                            v-model="client.CustomerNameA"
-                                                            @input="updateSizeKey(client)"
-                                                            :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                            <div class="col-sm-6">
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="row mt-3 mb-3">
+                                            <div class="col-sm-12">
+                                                <div v-if="client.OpenCustomer  === 'Ouvert'">
+                                                    <label for="CustomerNameE"      class="form-label">Nom et Prénom de l'Acheteur : <b>{{ client.old_CustomerNameE }}</b></label>
                                                 </div>
                                             </div>
-
-                                            <div class="row mt-3 mb-3">
-                                                <div class="col-sm-12">
-                                                    <div v-if="(((client.NewCustomer === 'Nouveau Client')&&(client.OpenCustomer === 'Ouvert'))||(client.NewCustomer === 'Client Existant'))">
-                                                        <label for="Tel" class="form-label">Téléphone</label>
-                                                        <input type="text"
-                                                            class="form-control"
-                                                            :id="'Tel_'+client.id"
-                                                            v-model="client.Tel"
-                                                            @input="updateSizeKey(client)"
-                                                            :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row mt-3 mb-3">
-                                                <div class="col-sm-12">
-                                                    <label for="Address" class="form-label">Adresse</label>
-                                                    <input type="text"
-                                                            class="form-control"
-                                                            :id="'Address_'+client.id"
-                                                            v-model="client.Address"
-                                                            @input="updateSizeKey(client)"
-                                                            :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                                </div>
-                                            </div>
-
-                                            <div class="row mt-3 mb-3">
-                                                <div class="col-sm-12">
-                                                    <label for="Neighborhood" class="form-label">Quartier</label>
-                                                    <input type="text"
-                                                            class="form-control"
-                                                            :id="'Neighborhood_'+client.id"
-                                                            v-model="client.Neighborhood"
-                                                            @input="updateSizeKey(client)"
-                                                            :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                                </div>
-                                            </div>
-
-                                            <div class="row mt-3 mb-3">
-                                                <div class="col-sm-12">
-                                                    <label for="Landmark" class="form-label">Point de Repere</label>
-                                                    <textarea class="form-control"
-                                                                :id="'Landmark_'+client.id"
-                                                                rows="3"
-                                                                v-model="client.Landmark"
-                                                                @input="updateSizeKey(client)"
-                                                                :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
-                                                </div>
-                                            </div>
-                                            </div>
-
-                                            <div class="col-sm-7 d-flex">
-                                                <div class="col">
-                                                    <label for="facade_image_update" class="form-label">Image Facade :</label>
-                                                    <button type="button"
-                                                            class="btn btn-secondary w-100 mb-1"
-                                                            @click="$clickFile('facade_image_update_'+client.id)"
-                                                            :disabled="((client.status_original == 'confirmed')||(client.status_original == 'validated'))">
-                                                    <i class="mdi mdi-camera"></i>
-                                                    </button>
-
-                                                    <input type="file"
-                                                        class="form-control"
-                                                        :id="'facade_image_update_'+client.id"
-                                                        accept="image/*"
-                                                        @change="facadeImage(index)"
-                                                        style="display:none"
-                                                        :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-
-                                                    <img class="mt-1 w-100"
-                                                        :id="'facade_image_display_update_'+client.id"
-                                                        :key="client.facade_image_display || client.facade_image || client.id"
-                                                        :src="client.facade_image_display || ('/uploads/clients/'+client.id+'/'+client.facade_image || '')"
-                                                        @load="onImageLoad(client)"
-                                                        @error="onImageLoad(client)"
-                                                        alt="facade" />
-
-                                                </div>
-                                            </div>
-
                                         </div>
 
-                                        <div class="row">
+                                        <div class="row mt-3 mb-3">
                                             <div class="col-sm-12">
-                                                <button type="button" class="btn btn-success w-100" style="margin-top: 30px;" @click="sendData(index)">Validate</button>
+                                                <label for="CustomerNameA"      class="form-label">Raison Sociale : <b>{{ client.old_CustomerNameA }}</b></label>
+                                            </div>
+                                        </div>
+
+                                        <!--  -->
+
+                                        <div class="row mt-3 mb-3">
+                                            <div class="col-sm-12">
+                                                <div v-if="(((client.NewCustomer === 'Nouveau Client')&&(client.OpenCustomer === 'Ouvert'))||(client.NewCustomer === 'Client Existant'))">
+                                                    <label for="Tel"            class="form-label">Téléphone : <b>{{ client.old_Tel }}</b></label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!--  -->
+
+                                        <div class="row mt-3 mb-3">
+                                            <div class="col-sm-12">
+                                                <label for="Address"            class="form-label">Adresse : <b>{{ client.old_Address }}</b></label>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-3 mb-3">
+                                            <div class="col-sm-12">
+                                                <label for="Neighborhood"       class="form-label">Quartier : <b>{{ client.old_Neighborhood }}</b></label>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-3 mb-3">
+                                            <div class="col-sm-12">
+                                                <label for="Landmark"           class="form-label">Point de Repere : <b>{{ client.old_Landmark }}</b></label>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="col-sm-6">
-                                        <!-- right column (old_* display) -->
-                                        <div class="row">
-                                            <div class="col-sm-5">
-                                                <div class="row mt-3 mb-3">
-                                                    <div class="col-sm-12">
-                                                    <div v-if="client.OpenCustomer === 'Ouvert'">
-                                                        <label class="form-label">Nom et Prénom de l'Acheteur : <b>{{ client.old_CustomerNameE }}</b></label>
-                                                    </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="row mt-3 mb-3">
-                                                    <div class="col-sm-12">
-                                                    <label class="form-label">Raison Sociale : <b>{{ client.old_CustomerNameA }}</b></label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="row mt-3 mb-3">
-                                                    <div class="col-sm-12">
-                                                    <div v-if="(((client.NewCustomer === 'Nouveau Client')&&(client.OpenCustomer === 'Ouvert'))||(client.NewCustomer === 'Client Existant'))">
-                                                        <label class="form-label">Téléphone : <b>{{ client.old_Tel }}</b></label>
-                                                    </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="row mt-3 mb-3">
-                                                    <div class="col-sm-12">
-                                                    <label class="form-label">Adresse : <b>{{ client.old_Address }}</b></label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="row mt-3 mb-3">
-                                                    <div class="col-sm-12">
-                                                    <label class="form-label">Quartier : <b>{{ client.old_Neighborhood }}</b></label>
-                                                    </div>
-                                                </div>
-
-                                                <div class="row mt-3 mb-3">
-                                                    <div class="col-sm-12">
-                                                    <label class="form-label">Point de Repere : <b>{{ client.old_Landmark }}</b></label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-sm-7 d-flex">
-                                                <div class="col">
-                                                    <label class="form-label">Image Old Facade :</label>
-                                                    <img class="mt-1 w-100"
-                                                        :id="'old_facade_image_display_update_'+client.id"
-                                                        :src="'/uploads/clients/'+client.id+'/'+client.old_facade_image" />
-                                                </div>
-                                            </div>
+                                    <div class="col-sm-7 d-flex">
+                                        <div class="col">
+                                            <label for="old_facade_image_update"        class="form-label">Image Old Facade :</label>
+                                            <img                                        class="mt-1 w-100"          :id="'old_facade_image_display_update_'+client.id"              :src="'/uploads/clients/'+client.id+'/'+client.old_facade_image">
                                         </div>
                                     </div>
                                 </div>
-
-                                </div> <!-- card-body -->
-                            </div> <!-- card -->
-                        </div> <!-- client-item -->
-                    </DynamicScrollerItem>
-                </template>
-            </DynamicScroller>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <!--                    -->
     </div>
@@ -314,8 +251,7 @@
 
 <script>
 
-import { DynamicScroller, DynamicScrollerItem } from    'vue-virtual-scroller';
-import Multiselect                              from    '@vueform/multiselect';
+import Multiselect              from '@vueform/multiselect'
 
 export default {
 
@@ -365,9 +301,7 @@ export default {
     },
 
     components: {
-        Multiselect         ,
-        DynamicScroller     ,
-        DynamicScrollerItem
+        Multiselect,
     },
 
     methods : {
@@ -541,63 +475,149 @@ export default {
 
         //
 
+        async customerBarCodeExisteImage(index) {
+
+            const CustomerBarCodeExiste_image  =   document.getElementById("CustomerBarCodeExiste_image_update_"+this.clients[index].id).files[0];
+
+            if(CustomerBarCodeExiste_image) {
+
+                this.clients[index].CustomerBarCodeExiste_image_updated            =   true
+
+                this.clients[index].CustomerBarCodeExiste_image_original_name      =   CustomerBarCodeExiste_image.name
+                this.clients[index].CustomerBarCodeExiste_image                    =   await this.$compressImage(CustomerBarCodeExiste_image)
+
+                //
+
+                let CustomerBarCodeExiste_image_base64                            =   await this.$imageToBase64(this.clients[index].CustomerBarCodeExiste_image)
+
+                let CustomerBarCodeExiste_image_display                           =   document.getElementById("CustomerBarCodeExiste_image_display_update_"+this.clients[index].id)
+                this.base64ToImage(CustomerBarCodeExiste_image_base64, CustomerBarCodeExiste_image_display)
+            }
+
+            else {
+
+                this.clients[index].CustomerBarCodeExiste_image_original_name     =   ""
+                this.clients[index].CustomerBarCodeExiste_image                   =   ""
+
+                this.clients[index].CustomerBarCodeExiste_image_updated           =   true
+
+                const CustomerBarCodeExiste_image_display_update                  =   document.getElementById("CustomerBarCodeExiste_image_display_update_"+this.clients[index].id)
+
+                if(CustomerBarCodeExiste_image_display_update) {
+
+                    CustomerBarCodeExiste_image_display_update.src                    =   ""
+                }
+            }
+        },
+
+        async customerBarCodeImage(index) {
+
+            const CustomerBarCode_image  =   document.getElementById("CustomerBarCode_image_update_"+this.clients[index].id).files[0];
+
+            if(CustomerBarCode_image) {
+
+                this.clients[index].CustomerBarCode_image_updated            =   true
+
+                this.clients[index].CustomerBarCode_image_original_name      =   CustomerBarCode_image.name
+                this.clients[index].CustomerBarCode_image                    =   await this.$compressImage(CustomerBarCode_image)
+
+                //
+
+                let CustomerBarCode_image_base64                            =   await this.$imageToBase64(this.clients[index].CustomerBarCode_image)
+
+                let CustomerBarCode_image_display                           =   document.getElementById("CustomerBarCode_image_display_update_"+this.clients[index].id)
+                this.base64ToImage(CustomerBarCode_image_base64, CustomerBarCode_image_display)
+            }
+
+            else {
+
+                this.clients[index].CustomerBarCode_image_original_name     =   ""
+                this.clients[index].CustomerBarCode_image                   =   ""
+
+                this.clients[index].CustomerBarCode_image_updated           =   true
+
+                const CustomerBarCode_image_display_update                  =   document.getElementById("CustomerBarCode_image_display_update_"+this.clients[index].id)
+
+                if(CustomerBarCode_image_display_update) {
+
+                    CustomerBarCode_image_display_update.src                    =   ""
+                }
+            }
+        },
+
         async facadeImage(index) {
-            const input = document.getElementById("facade_image_update_" + this.clients[index].id);
-            const file = input?.files?.[0];
-            const client = this.clients[index];
 
-            // revoke previous object URL if exists
-            if (client._facade_object_url) {
-                try { URL.revokeObjectURL(client._facade_object_url); } catch(e) {}
-                client._facade_object_url = null;
+            const facade_image  =   document.getElementById("facade_image_update_"+this.clients[index].id).files[0];
+
+            if(facade_image) {
+
+                this.clients[index].facade_image_updated            =   true
+
+                this.clients[index].facade_image_original_name      =   facade_image.name
+                this.clients[index].facade_image                    =   await this.$compressImage(facade_image)
+
+                //
+
+                let facade_image_base64                             =   await this.$imageToBase64(this.clients[index].facade_image)
+
+                let facade_image_display                            =   document.getElementById("facade_image_display_update_"+this.clients[index].id)
+                this.base64ToImage(facade_image_base64, facade_image_display)
             }
 
-            // Clear display immediately to avoid showing previous image in recycled DOM
-            client.facade_image_display = '';   // or null
-            client.facade_image_updated = true;
+            else {
 
-            if (!file) {
-                client.facade_image_original_name = "";
-                client.facade_image = "";
-                this.updateSizeKey(client);
-                return;
-            }
+                this.clients[index].facade_image_original_name      =   ""
+                this.clients[index].facade_image                    =   ""
 
-            // Optionally create a temporary preview synchronously (fast)
-            // Preferred: use createObjectURL so preview is immediate
-            const tempUrl = URL.createObjectURL(file);
-            client.facade_image_display = tempUrl;   // immediate preview
-            client._facade_object_url = tempUrl;
+                this.clients[index].facade_image_updated            =   true
 
-            // update measurement so scroller doesn't show overlap while compressing
-            this.updateSizeKey(client);
+                const facade_image_display_update                   =   document.getElementById("facade_image_display_update_"+this.clients[index].id)
 
-            // Now do async compression/upload preparation (still keep preview)
-            try {
-                const compressed = await this.$compressImage(file); // your helper
-                client.facade_image = compressed;
-                // revoke previous tempUrl and replace with object URL for compressed blob if desired
-                if (client._facade_object_url) {
-                try { URL.revokeObjectURL(client._facade_object_url); } catch(e) {}
-                client._facade_object_url = null;
+                if(facade_image_display_update) {
+
+                    facade_image_display_update.src                     =   ""
                 }
-                if (compressed instanceof Blob) {
-                const objUrl = URL.createObjectURL(compressed);
-                client.facade_image_display = objUrl;
-                client._facade_object_url = objUrl;
-                } else {
-                // fallback if compress returns base64
-                let data = await this.$imageToBase64(compressed);
-                if (!data.startsWith('data:')) data = 'data:image/jpeg;base64,' + data;
-                client.facade_image_display = data;
-                }
-            } catch (err) {
-                // compression failed — keep the temporary preview or clear it
-                console.error(err);
+            }
+        },
+
+        async inStoreImage(index) {
+
+            const in_store_image  =   document.getElementById("in_store_image_update_"+this.clients[index].id).files[0];
+
+            if(in_store_image) {
+
+                this.clients[index].in_store_image_updated          =   true
+
+                this.clients[index].in_store_image_original_name    =   in_store_image.name
+                this.clients[index].in_store_image                  =   await this.$compressImage(in_store_image)
+                
+                //
+
+                let in_store_image_base64                           =   await this.$imageToBase64(this.clients[index].in_store_image)
+
+                let in_store_image_display                          =   document.getElementById("in_store_image_display_update_"+this.clients[index].id)
+                this.base64ToImage(in_store_image_base64, in_store_image_display)
             }
 
-            // final measurement update
-            this.updateSizeKey(client);
+            else {
+
+                this.clients[index].in_store_image_original_name    =   ""
+                this.clients[index].in_store_image                  =   ""
+
+                this.clients[index].in_store_image_updated          =   true
+
+                const in_store_image_display_update                 =   document.getElementById("in_store_image_display_update_"+this.clients[index].id)
+
+                if(in_store_image_display_update) {
+
+                    in_store_image_display_update.src                   =   ""
+                }
+            }
+        },
+
+        base64ToImage(image_base64, image_display_div) {
+
+            this.$base64ToImage(image_base64, image_display_div)
         },
 
         //
@@ -689,8 +709,8 @@ export default {
                     console.log(this.$route.params.id_route_import)
                     console.log(res)
 
-                    this.route_import = res.data.route_import;
-                    this.initClients(res.data.clients);
+                    this.route_import   =   res.data.route_import
+                    this.clients        =   res.data.clients
 
                     //
                     await this.getComboData()
@@ -768,65 +788,7 @@ export default {
             // Prints any errors to the console
             console.error("");
         },
-
-        //  //  //  //  //
-
-        // initialize sizeKey and image count after clients are fetched
-        initClients(receivedClients) {
-            if (!Array.isArray(receivedClients)) return;
-
-            // Prefer to create a fresh array so Vue reactivity picks it up reliably
-            this.clients = receivedClients.map(c => {
-                // keep existing props and add our helper props
-                return Object.assign({}, c, {
-                imagesLoadedCount: 0,
-                sizeKey: this.computeSizeKey(Object.assign({}, c, { imagesLoadedCount: 0 })),
-                // initialize preview fields if you want them present
-                facade_image_display: c.facade_image_display || '',
-                CustomerBarCode_image_display: c.CustomerBarCode_image_display || '',
-                CustomerBarCodeExiste_image_display: c.CustomerBarCodeExiste_image_display || ''
-                });
-            });
-        },
-
-        computeSizeKey(client) {
-            return [
-                client.OpenCustomer,
-                client.NewCustomer,
-                client.status,
-                client.tel_status,
-                (client.CustomerNameE || '').length ? 'n' : '',
-                (client.Address || '').length ? 'a' : '',
-                (client.Landmark || '').length ? 'l' : '',
-                client.facade_image ? 'facimg' : '',
-                client.old_facade_image ? 'oldfac' : '',
-                client.imagesLoadedCount || 0
-            ].join('|');
-        },
-
-        updateSizeKey(client) {
-            client.sizeKey = this.computeSizeKey(client);
-        },
-
-        onImageLoad(client) {
-            client.imagesLoadedCount = (client.imagesLoadedCount || 0) + 1;
-            this.updateSizeKey(client);
-        },
     }
 };
 
 </script>
-
-<style scoped>
-
-/* include in component <style> or global css */
-.client-item {
-    box-sizing: border-box;
-    padding-bottom: 16px; /* gap between items — change to taste */
-}
-
-.client-item .card {
-    margin-bottom: 0; /* avoid double spacing */
-}
-
-</style>
