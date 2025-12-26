@@ -492,6 +492,10 @@ class Client extends Model
             'nonvalidated_details'          =>  $request->input("nonvalidated_details")                     ?? ''   ,
             'tel_status'                    =>  $request->get("tel_status")                                 ?? ''   , // Assuming these are NOT in the mass assignment $fillable array
             'tel_comment'                   =>  $request->get("tel_comment")                                ?? ''   ,
+
+            'facade_image_original_name'           => $request->input("facade_image_original_name")             ?? '',
+            'CustomerBarCode_image_original_name'  => $request->input("CustomerBarCode_image_original_name")    ?? '',
+            'in_store_image_original_name'         => $request->input("in_store_image_original_name")           ?? '',
         ]);
         
         // Apply role-specific overrides after mass assignment
@@ -659,7 +663,7 @@ class Client extends Model
             return;
         }
 
-        $oldFileName = $client->$field;
+        // $oldFileName = $client->$field;
         $type = strtoupper(str_replace('_image', '', $field)); // e.g. "FACADE"
 
         // 2. Handle New File Upload
@@ -682,12 +686,12 @@ class Client extends Model
 
         // 4. Cleanup Old File (Only for Update scenarios)
         // If we had a filename, and it has changed (or become empty), delete the physical old file.
-        if (!empty($oldFileName) && $oldFileName !== $client->$field) {
-            $oldFilePath = public_path("uploads/clients/{$client->id}/{$oldFileName}");
-            if (File::exists($oldFilePath)) {
-                File::delete($oldFilePath);
-            }
-        }
+        // if (!empty($oldFileName) && $oldFileName !== $client->$field) {
+            // $oldFilePath = public_path("uploads/clients/{$client->id}/{$oldFileName}");
+            // if (File::exists($oldFilePath)) {
+            //     File::delete($oldFilePath);
+            // }
+        // }
     }
 
     //

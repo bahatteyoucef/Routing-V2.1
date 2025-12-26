@@ -652,7 +652,7 @@ class RouteImport extends Model
             });
         }
 
-        $clients = $query->get();
+        $clients = $query->orderBy('id', 'desc')->get();
 
         $clients->each(function ($client) {
             $client->owner_username = $client->ownerUser->username ?? null;

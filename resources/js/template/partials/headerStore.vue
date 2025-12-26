@@ -1,5 +1,5 @@
 <template>
-    <nav id="template-header" class="header_navigation_div">
+    <nav v-if="$route.fullPath" id="template-header" class="header_navigation_div">
         <div class="row pt-1">
             <div v-if="logo_buzz_image" class="col-6 d-flex align-items-center">
                 <img :src="logo_buzz_image"         style="height: 40px; width: auto"   @click="showIndex()" />

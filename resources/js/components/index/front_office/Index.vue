@@ -12,91 +12,90 @@
                         ><span class="fw-bold mb-1">{{ getUser.first_name }} {{ getUser.last_name }}</span>
                     </div>
                 </div>
+
+                <!-- Index Options -->
+                <div class="row justify-content-center h-100 mt-4 align-items-stretch">
+                    <div
+                        class="card col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
+                        @click="addClient()"
+                    >
+                        <div class="text-center" style="height: 50px">
+                            <img
+                                class="card-img-top"
+                                :src="'/images/front_office_images/store.png'"
+                                style="height: 100%; width: auto"
+                            />
+                        </div>
+                        <div class="card-body p-0 mt-3">
+                            <p class="card-text font-weight-bold">New Client</p>
+                        </div>
+                    </div>
+
+                    <div
+                        class="card col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
+                        @click="showProfile()"
+                    >
+                        <div class="text-center" style="height: 50px">
+                            <img
+                                class="card-img-top"
+                                :src="'/images/front_office_images/profile.png'"
+                                style="height: 100%; width: auto"
+                            />
+                        </div>
+                        <div class="card-body p-0 mt-3">
+                            <p class="card-text font-weight-bold">Profile</p>
+                        </div>
+                    </div>
+
+                    <div
+                        class="card col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
+                        @click="goToMap()"
+                    >
+                        <div class="text-center" style="height: 50px">
+                            <img
+                                class="card-img-top"
+                                :src="'/images/front_office_images/map_marker.png'"
+                                style="height: 100%; width: auto"
+                            />
+                        </div>
+                        <div class="card-body p-0 mt-3">
+                            <p class="card-text font-weight-bold">Map</p>
+                        </div>
+                    </div>
+
+                    <div
+                        class="card col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
+                        @click="showClientsByStatus()"
+                    >
+                        <div class="text-center" style="height: 50px">
+                            <img
+                                class="card-img-top"
+                                :src="'/images/front_office_images/group_clients.png'"
+                                style="height: 100%; width: auto"
+                            />
+                        </div>
+                        <div class="card-body p-0 mt-3">
+                            <p class="card-text font-weight-bold">Clients</p>
+                        </div>
+                    </div>
+
+                    <div
+                        class="card col-10 m-1 shadow-sm rounded min_card_height text-center h-100"
+                        @click="logOut()"
+                    >
+                        <div class="text-center" style="height: 50px">
+                            <img
+                                class="card-img-top"
+                                :src="'/images/front_office_images/logout.png'"
+                                style="height: 100%; width: auto"
+                            />
+                        </div>
+                        <div class="card-body p-0 mt-3">
+                            <p class="card-text font-weight-bold">Log Out</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-            <!-- Index Options -->
-            <div class="row justify-content-center h-100 mt-4 align-items-stretch">
-                <div
-                    class="card col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
-                    @click="addClient()"
-                >
-                    <div class="text-center" style="height: 50px">
-                        <img
-                            class="card-img-top"
-                            :src="'/images/front_office_images/store.png'"
-                            style="height: 100%; width: auto"
-                        />
-                    </div>
-                    <div class="card-body p-0 mt-3">
-                        <p class="card-text font-weight-bold">New Client</p>
-                    </div>
-                </div>
-
-                <div
-                    class="card col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
-                    @click="showProfile()"
-                >
-                    <div class="text-center" style="height: 50px">
-                        <img
-                            class="card-img-top"
-                            :src="'/images/front_office_images/profile.png'"
-                            style="height: 100%; width: auto"
-                        />
-                    </div>
-                    <div class="card-body p-0 mt-3">
-                        <p class="card-text font-weight-bold">Profile</p>
-                    </div>
-                </div>
-
-                <div
-                    class="card col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
-                    @click="goToMap()"
-                >
-                    <div class="text-center" style="height: 50px">
-                        <img
-                            class="card-img-top"
-                            :src="'/images/front_office_images/map_marker.png'"
-                            style="height: 100%; width: auto"
-                        />
-                    </div>
-                    <div class="card-body p-0 mt-3">
-                        <p class="card-text font-weight-bold">Map</p>
-                    </div>
-                </div>
-
-                <div
-                    class="card col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
-                    @click="showClientsByStatus()"
-                >
-                    <div class="text-center" style="height: 50px">
-                        <img
-                            class="card-img-top"
-                            :src="'/images/front_office_images/group_clients.png'"
-                            style="height: 100%; width: auto"
-                        />
-                    </div>
-                    <div class="card-body p-0 mt-3">
-                        <p class="card-text font-weight-bold">Clients</p>
-                    </div>
-                </div>
-
-                <div
-                    class="card col-10 m-1 shadow-sm rounded min_card_height text-center h-100"
-                    @click="logOut()"
-                >
-                    <div class="text-center" style="height: 50px">
-                        <img
-                            class="card-img-top"
-                            :src="'/images/front_office_images/logout.png'"
-                            style="height: 100%; width: auto"
-                        />
-                    </div>
-                    <div class="card-body p-0 mt-3">
-                        <p class="card-text font-weight-bold">Log Out</p>
-                    </div>
-                </div>
-            </div>
-
         </section>
 
         <div class="row mt-3" style="position: fixed; bottom: 10px;">

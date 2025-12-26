@@ -32,14 +32,15 @@
                 </div>
 
                 <!-- FrontOffice -->
-                <div v-if="$isRole('FrontOffice')">
-                    <header-store-part></header-store-part>
+                <div v-if="$isRole('FrontOffice')" class="vh-100">
+                    <header-store-part v-if="!isObsRoute"></header-store-part>
 
-                    <div class="container-fluid pt-2">
-                        <div class="main-panel" id="main_content">
-                            <router-view :key="$route.path"></router-view>
-                        </div>
+                    <!-- <div class="container-fluid pt-2"> -->
+                    <!-- <div class="main-panel" id="main_content"> -->
+                    <div id="main_content_fo" class="h-100">
+                        <router-view :key="$route.path"></router-view>
                     </div>
+                    <!-- </div> -->
                 </div>
 
             </div>
@@ -108,6 +109,11 @@
 
                 getIsOnline                 :   'internet/getIsOnline'                   
             }),
+
+            isObsRoute () {
+                const p = this.$route && this.$route.path ? this.$route.path : ''
+                return p.startsWith('/route/frontoffice/obs')
+            }
         },
 
         beforeMount() {

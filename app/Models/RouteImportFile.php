@@ -23,24 +23,24 @@ class RouteImportFile extends Model
 
     public static function deleteRouteImportFile($fileName, $directory = "uploads/route_import") {
 
-        if (File::exists($directory)) {
+        // if (File::exists($directory)) {
 
-            $fullPath = public_path($directory . '/' . $fileName); // Build full path
+            // $fullPath = public_path($directory . '/' . $fileName); // Build full path
 
-            if (File::exists($fullPath)) {
+            // if (File::exists($fullPath)) {
 
-                File::delete($fullPath);
+            //     File::delete($fullPath);
 
-                return true;
-            }
+            //     return true;
+            // }
 
-            $subdirectories = File::directories($directory);
+            // $subdirectories = File::directories($directory);
 
-            foreach ($subdirectories as $dir) {
+            // foreach ($subdirectories as $dir) {
 
-                RouteImportFile::deleteRouteImportFile($fileName, $dir); // Recursive call with subdirectory path
-            }
-        }
+            //     RouteImportFile::deleteRouteImportFile($fileName, $dir); // Recursive call with subdirectory path
+            // }
+        // }
 
         return false;
     }

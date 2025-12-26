@@ -1,51 +1,50 @@
 <template>
-
-    <div class="content-wrapper" style="padding : 5px;">
-        <section class="mt-4">
-            <div class="image d-flex flex-column justify-content-center align-items-center">
-
-                <img    id="facade_image_display_update"    :src="'/uploads/clients/'+client.id+'/'+client.facade_image"  class="w-100">
-
-                <div class="mt-3">
-                    <div class="d-flex flex-row justify-content-center gap-2">
-                        <span class="idd">Code-Barre : {{ client.CustomerCode }}</span>
-                    </div>
-
-                    <div class="d-flex flex-row justify-content-center gap-2">
-                        <span class="idd">Raison Social : {{ client.CustomerNameA }}</span>
-                    </div>
-
-                    <div class="d-flex flex-row justify-content-center gap-2">
-                        <span class="idd">Adresse : {{ client.Address }} - {{ client.CityNameE }}</span>
-                    </div>
-
-                    <div class="d-flex flex-row justify-content-center gap-2">
-                        <span class="idd">Type de Magasin : {{ client.CustomerType }}</span>
-                    </div>
-
-                    <div class="d-flex flex-row justify-content-center gap-2">
-                        <span class="idd">Téléphone : {{ client.Tel }}</span>
-                    </div>
-                </div>
-
-                <div class="mt-5 p-0 w-100 text-center">
-                    <div v-if="getIsOnline" class="text-center m-1 p-0">
-                        <button class="rounded btn btn-primary text-white w-100 p-1" @click="updateInformations()">Modifier <i class="mdi mdi-pencil-box-outline"></i></button>
-                    </div>
-
-                    <div v-if="getIsOnline" class="text-center m-1 p-0">
-                        <button class="rounded btn btn-secondary text-white w-100 p-1" @click="openDirectionsInGoogleMaps()">Itinéraire <i class="mdi mdi-map-marker-circle"></i></button>
-                    </div>
-
-                    <div v-if="((getIsOnline)&&(show_delete_button))" class="text-center m-1 p-0">
-                        <button class="rounded btn btn-danger text-white w-100 p-1" @click="deleteClient()">Supprimer <i class="mdi mdi-delete"></i></button>
-                    </div>
-                </div>
-
+    <div class="h-100 p-3">
+        <div class="card w-100 shadow-lg">
+            <div class="card-img-container" style="height: 35%; width: 100%; overflow: hidden"> 
+                <img id="facade_image_display" :src="'/uploads/clients/'+client.id+'/'+client.facade_image"     class="card-img-top">
             </div>
-        </section>
-    </div>
 
+            <div class="card-body" style="height: 35%; overflow-y: auto;">
+                <h5 class="card-title fw-bold text-center text-decoration-underline">{{ client.CustomerCode }}</h5>
+                <div>
+                    <div class="d-flex flex-row justify-content-center gap-2">
+                        <span class="fw-bold fst-italic">Raison Social :</span>
+                        <span>{{ client.CustomerNameA }}</span>
+                    </div>
+
+                    <div class="d-flex flex-row justify-content-center gap-2">
+                        <span class="fw-bold fst-italic">Adresse :</span>
+                        <span>{{ client.Address }} - {{ client.CityNameE }}</span>
+                    </div>
+
+                    <div class="d-flex flex-row justify-content-center gap-2">
+                        <span class="fw-bold fst-italic">Type de Magasin :</span>
+                        <span>{{ client.CustomerType }}</span>
+                    </div>
+
+                    <div class="d-flex flex-row justify-content-center gap-2">
+                        <span class="fw-bold fst-italic">Téléphone :</span>
+                        <span>{{ client.Tel }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer bg-white" style="height: 30%;">
+                <div v-if="getIsOnline" class="text-center m-1 p-0">
+                    <button class="rounded btn btn-primary text-white w-100 p-1" @click="updateInformations()">Modifier <i class="mdi mdi-pencil-box-outline"></i></button>
+                </div>
+
+                <div v-if="getIsOnline" class="text-center m-1 p-0">
+                    <button class="rounded btn btn-secondary text-white w-100 p-1" @click="openDirectionsInGoogleMaps()">Itinéraire <i class="mdi mdi-map-marker-circle"></i></button>
+                </div>
+
+                <div v-if="((getIsOnline)&&(show_delete_button))" class="text-center m-1 p-0">
+                    <button class="rounded btn btn-danger text-white w-100 p-1" @click="deleteClient()">Supprimer <i class="mdi mdi-delete"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -231,3 +230,38 @@ export default {
 };
 
 </script>
+
+<style scoped>
+
+/* Ensure the card takes full height of the parent container */
+.card {
+    height: 100% !important; 
+    border: none; /* Optional: removes border to look cleaner */
+}
+
+/* 1. Image Section: 35% */
+.card-img-container {
+    height: 35%;
+    overflow: hidden;
+}
+
+/* Make sure the image inside fills the container properly */
+.card-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Key property: prevents image distortion */
+}
+
+/* 2. Body Section: 35% */
+.card-body {
+    height: 35%;
+    overflow-y: auto; /* Enables scroll ONLY here */
+}
+
+/* 3. Footer Section: 30% */
+.card-footer {
+    height: 30%;
+    overflow-y: hidden; /* Prevents scroll in footer */
+}
+
+</style>

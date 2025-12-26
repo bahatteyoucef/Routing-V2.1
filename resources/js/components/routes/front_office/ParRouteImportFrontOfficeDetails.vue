@@ -1,43 +1,29 @@
 <template>
 
-    <div>
-        <div id="content_route">
-            <div id="map"></div>
+    <div id="content_route_fo" class="h-100">
+        <div id="map_parent_div" class="d-inline-block h-100">
+            <div id="show_hide_map_filters_button_div" class="text-right">
+                <button class="btn btn-primary"   @click="showCurrentPosition()"><i class="mdi mdi-crosshairs-gps"></i></button>
+            </div>
+
             <div id="map_top_middle_options_div">
                 <div class="row">
                     <!-- Toggle -->
-                    <div class="col p-0 ml-4">
-                        <div id="toggle_div">
+                    <div v-if="$isRole('FrontOffice')" class="col p-0 ml-1 d-flex align-items-center">
+                        <div id="toggle_div" class="mb-2">
                             <div class="btn-container" id="marker_cluster_mode_div">
                                 <label class="switch btn-color-mode-switch">
-                                    <input type="checkbox" name="marker_cluster_mode" id="marker_cluster_mode" @change="switchMarkerClusterMode()">
+                                    <input type="checkbox" name="marker_cluster_mode" id="marker_cluster_mode" @change="switchMarkerClusterMode()" true-value="marker" false-value="cluster" v-model="marker_cluster_mode">
                                     <label for="marker_cluster_mode" data-on="Marker" data-off="Cluster" class="btn-color-mode-switch-inner"></label>
                                 </label>
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-2 float-right mt-1 p-0" id="show_position_button">
-                        <button class="btn btn-primary w-100 m-0 mt-1 pr-0 pl-0"    @click="showCurrentPosition()"><i class="mdi mdi-crosshairs-gps"></i></button>
-                    </div>
                 </div>
             </div>
+
+            <div id="map"></div>
         </div>
-
-        <!--  -->
-
-        <!-- Buttons and Filter -->
-        <!-- <div id="tableau_data">
-            <div class="map_top_buttons_parent_div animate__animated" id="map_top_buttons_parent_div">
-                <div class="map_top_buttons_div" id="map_top_buttons_div">
-                    <div class="row">
-                        <div class="col-2 float-right mt-1 p-0" id="show_position_button">
-                            <button class="btn btn-primary w-100 m-0 mt-1 pr-0 pl-0"    @click="showCurrentPosition()"><i class="mdi mdi-crosshairs-gps"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div> -->
     </div>
 
 </template>
@@ -46,10 +32,16 @@
 
 import {mapGetters, mapActions} from "vuex"
 
+import Map                      from '@/services/map'
+
 export default {
     
     data() {
         return {
+
+            map_instance                :   null                        ,
+
+            //
 
             column_group                :   1                           ,
 
@@ -116,9 +108,12 @@ export default {
             client_owner_refus              :   [],
 
             //
-            is_database_clients_map         :   false
+            is_database_clients_map         :   false,
+
+            //
+            marker_cluster_mode             :   "marker"
         }
-    },  
+    },
 
     computed: {
         ...mapGetters({
@@ -133,6 +128,9 @@ export default {
 
     async mounted() {
 
+        this.map_instance               =   new Map()
+
+        //
         const pattern                   =   /^\/route\/frontoffice\/obs\/route_import\/\d+\/details$/;
         this.is_database_clients_map    =   pattern.test(this.$route.path);
 
@@ -141,9 +139,6 @@ export default {
 
         //
         this.showUserBDTerritoriesFront()
-
-        // 
-        this.setValues()
 
         // 
         await this.getData()
@@ -157,10 +152,6 @@ export default {
 
         //
 
-        setValues() {
-            this.id_route_import    =   this.$route.params.id_route_import
-        },
-
         async getData() {
 
             // Show Loading Page
@@ -168,7 +159,7 @@ export default {
 
             if(this.is_database_clients_map) {
 
-                const res                   =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.id_route_import+"/details/for_front_office",   null)
+                const res                   =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.$route.params.id_route_import+"/details/for_front_office",   null)
                 console.log(res)
 
                 this.route_import           =   res.data.route_import
@@ -195,75 +186,77 @@ export default {
             this.$hideLoadingPage()
         }, 
 
-        //
+        //  //  //  //  //  //  //  //  //  //
+
+        addMap() {
+            this.map_instance.$createMap(this.$role(), "map", false, false, this.marker_cluster_mode)
+        },
+
+        async showUserBDTerritoriesFront() {
+
+            // Show BD Territories
+            this.map_instance.$showUserBDTerritoriesFront(this.getUser.user_territories)
+        },
+
+        switchMarkerClusterMode() {
+
+            if(this.marker_cluster_mode ==  "marker") {
+
+                // Show Markers
+                this.map_instance.$switchMarkerClusterMode("marker")
+
+                // Show Markers
+                this.reAfficherClientsAndMarkers()
+            }
+
+            else {
+
+                if(this.marker_cluster_mode ==  "cluster") {
+
+                    // Show Markers
+                    this.map_instance.$switchMarkerClusterMode("cluster")
+
+                    // Show Markers
+                    this.reAfficherClientsAndMarkers()
+                }
+            }
+        },
 
         reAfficherClientsAndMarkers() {
 
             // Show Loading Page
             this.$showLoadingPage()
 
-            setTimeout(async () => {
+            //
+            this.clearRouteMarkers()
 
-                // reAffiche Markers
-                this.setRouteMarkers()
+            // Show Markers
+            this.setRouteMarkers(this.clients_markers_affiche)
 
-                // Hide Loading Page
-                this.$hideLoadingPage()
-
-            }, 0);
+            // Hide Loading Page
+            this.$hideLoadingPage()
         },
 
-        //
+        clearRouteMarkers() {
+            this.map_instance.$clearRouteMarkers()
+        },
 
         setRouteMarkers() {
 
-            // Clear Route Data
-            this.clearRouteMarkers()
+            this.setClientsArrays()
 
-            // Set Markers
-            this.setMarkers()
+            // this.map_instance.$setRouteMarkers(this.clients_non_owner               , 1, "#000000")
+            this.map_instance.$setRouteMarkers(this.clients_introuvable             , 1, "#000000") // Black 
+            this.map_instance.$setRouteMarkers(this.clients_owner_confirmed         , 2, "#0F9D58") // Green
+            this.map_instance.$setRouteMarkers(this.clients_owner_validated         , 3, "#0F9D58") // Green
+            this.map_instance.$setRouteMarkers(this.clients_owner_pending           , 4, "#F57C00") // Orange
+            this.map_instance.$setRouteMarkers(this.clients_owner_non_validated     , 5, "#F70000") // Red
+            this.map_instance.$setRouteMarkers(this.clients_owner_visible           , 6, "#3949AB") // Purple
+            this.map_instance.$setRouteMarkers(this.clients_owner_ferme             , 7, "#0288D1") // Blue
+            this.map_instance.$setRouteMarkers(this.clients_owner_refus             , 8, "#880E4F") // Blue
 
             // Focus
             this.focuseMarkers()
-        },
-
-        //
-
-        clearRouteMarkers() {
-
-            // Clear Route Data
-            this.$map.$clearRouteMarkers()
-        },
-
-        async showUserBDTerritoriesFront() {
-
-            // Show BD Territories
-            this.$map.$showUserBDTerritoriesFront(this.getUser.user_territories)
-        },
-
-        //
-
-        showCurrentPosition() {
-
-            // Clear Route Data
-            this.$map.$showCurrentPosition()
-        },
-
-        //
-
-        setMarkers() {
-
-            this.setClientsArrays()
-
-            // this.$map.$setRouteMarkers(this.clients_non_owner               , 1, "#000000")
-            this.$map.$setRouteMarkers(this.clients_introuvable             , 1, "#000000") // Black 
-            this.$map.$setRouteMarkers(this.clients_owner_confirmed         , 2, "#0F9D58") // Green
-            this.$map.$setRouteMarkers(this.clients_owner_validated         , 3, "#0F9D58") // Green
-            this.$map.$setRouteMarkers(this.clients_owner_pending           , 4, "#F57C00") // Orange
-            this.$map.$setRouteMarkers(this.clients_owner_non_validated     , 5, "#F70000") // Red
-            this.$map.$setRouteMarkers(this.clients_owner_visible           , 6, "#3949AB") // Purple
-            this.$map.$setRouteMarkers(this.clients_owner_ferme             , 7, "#0288D1") // Blue
-            this.$map.$setRouteMarkers(this.clients_owner_refus             , 8, "#880E4F") // Blue
         },
 
         setClientsArrays() {
@@ -343,44 +336,17 @@ export default {
             }
         },
 
-        //
-
         focuseMarkers() {
-            this.$map.$focuseMarkers()
+            setTimeout(() => {
+                this.map_instance.$focuseMarkers()
+            }, 0);
         },
 
-        //
+        showCurrentPosition() {
 
-        // Map
-
-        addMap() {
-            this.$map.$createMap(this.$role(), "map", false, false)
+            // Clear Route Data
+            this.map_instance.$showCurrentPosition()
         },
-
-        //
-
-        switchMarkerClusterMode() {
-
-            const marker_cluster_mode   =   document.getElementById("marker_cluster_mode")
-
-            if(marker_cluster_mode.checked) {
-
-                // Show Markers
-                this.$map.$switchMarkerClusterMode("marker")
-
-                // Show Markers
-                this.reAfficherClientsAndMarkers()
-            }
-
-            else {
-
-                // Show Markers
-                this.$map.$switchMarkerClusterMode("cluster")
-
-                // Show Markers
-                this.reAfficherClientsAndMarkers()
-            }
-        }
     },
 
     watch: {
@@ -396,3 +362,11 @@ export default {
 }
 
 </script>
+
+<style scoped>
+
+#show_hide_map_filters_button_div {
+    margin-top: 15px;
+}
+
+</style>

@@ -321,75 +321,74 @@ class User extends Authenticatable
     {
         $user = self::findOrFail($id);
 
-        DB::transaction(function () use ($request, $user) {
-            // mass assign safe properties explicitly
-            $fields = ['username', 'first_name', 'last_name', 'email', 'tel', 'company', 'type_user', 'status'];
-            foreach ($fields as $f) {
-                if ($request->has($f)) $user->{$f} = $request->input($f);
-            }
-            $user->save();
+        // mass assign safe properties explicitly
+        $fields = ['username', 'first_name', 'last_name', 'email', 'tel', 'company', 'type_user', 'status'];
+        foreach ($fields as $f) {
+            if ($request->has($f)) $user->{$f} = $request->input($f);
+        }
+        $user->save();
 
-            // Reset user->route_import relations
-            UserRouteImport::where('id_user', $user->id)->delete();
+        // Reset user->route_import relations
+        UserRouteImport::where('id_user', $user->id)->delete();
 
-            // Re-attach according to type_user
-            $type = $request->input('type_user');
+        // Re-attach according to type_user
+        $type = $request->input('type_user');
 
-            $liste_route_import = $request->input('liste_route_import');
-            $routeIds = [];
-            if ($liste_route_import) {
-                $routeIds = is_string($liste_route_import) ? json_decode($liste_route_import, true) : (array)$liste_route_import;
-                $routeIds = array_filter($routeIds);
-            }
+        $liste_route_import = $request->input('liste_route_import');
 
-            switch ($type) {
-                case 'BU Manager':
-                    if (!empty($routeIds)) {
-                        $insert = array_map(fn($rid) => ['id_user' => $user->id, 'id_route_import' => $rid], $routeIds);
-                        UserRouteImport::insert($insert);
-                    }
-                    $user->syncRoles(['BU Manager']);
-                    if ($request->has('max_route_import')) {
-                        $user->max_route_import = (int)$request->input('max_route_import');
-                        $user->save();
-                    }
-                    break;
+        $routeIds = [];
+        if ($liste_route_import) {
+            $routeIds = is_string($liste_route_import) ? json_decode($liste_route_import, true) : (array)$liste_route_import;
+            $routeIds = array_filter($routeIds);
+        }
 
-                case 'BackOffice':
-                    if (!empty($routeIds)) {
-                        $insert = array_map(fn($rid) => ['id_user' => $user->id, 'id_route_import' => $rid], $routeIds);
-                        UserRouteImport::insert($insert);
-                    }
-                    $user->syncRoles(['BackOffice']);
-                    break;
+        switch ($type) {
+            case 'BU Manager':
+                if (!empty($routeIds)) {
+                    $insert = array_map(fn($rid) => ['id_user' => $user->id, 'id_route_import' => $rid], $routeIds);
+                    UserRouteImport::insert($insert);
+                }
+                $user->syncRoles(['BU Manager']);
+                if ($request->has('max_route_import')) {
+                    $user->max_route_import = (int)$request->input('max_route_import');
+                    $user->save();
+                }
+                break;
 
-                case 'Viewer':
-                    if (!empty($routeIds)) {
-                        $insert = array_map(fn($rid) => ['id_user' => $user->id, 'id_route_import' => $rid], $routeIds);
-                        UserRouteImport::insert($insert);
-                    }
-                    $user->syncRoles(['Viewer']);
-                    break;
+            case 'BackOffice':
+                if (!empty($routeIds)) {
+                    $insert = array_map(fn($rid) => ['id_user' => $user->id, 'id_route_import' => $rid], $routeIds);
+                    UserRouteImport::insert($insert);
+                }
+                $user->syncRoles(['BackOffice']);
+                break;
 
-                case 'FrontOffice':
-                    if ($request->filled('selected_route_import') && $request->input('selected_route_import') !== 'null') {
-                        UserRouteImport::create([
-                            'id_user' => $user->id,
-                            'id_route_import' => $request->input('selected_route_import'),
-                        ]);
-                    }
-                    $user->syncRoles(['FrontOffice']);
-                    if ($request->has('accuracy')) {
-                        $user->accuracy = $request->input('accuracy');
-                        $user->save();
-                    }
-                    break;
+            case 'Viewer':
+                if (!empty($routeIds)) {
+                    $insert = array_map(fn($rid) => ['id_user' => $user->id, 'id_route_import' => $rid], $routeIds);
+                    UserRouteImport::insert($insert);
+                }
+                $user->syncRoles(['Viewer']);
+                break;
 
-                default:
-                    // no special handling
-                    break;
-            }
-        });
+            case 'FrontOffice':
+                if ($request->filled('selected_route_import') && $request->input('selected_route_import') !== 'null') {
+                    UserRouteImport::create([
+                        'id_user' => $user->id,
+                        'id_route_import' => $request->input('selected_route_import'),
+                    ]);
+                }
+                $user->syncRoles(['FrontOffice']);
+                if ($request->has('accuracy')) {
+                    $user->accuracy = $request->input('accuracy');
+                    $user->save();
+                }
+                break;
+
+            default:
+                // no special handling
+                break;
+        }
     }
 
     public static function showUser(int $id)

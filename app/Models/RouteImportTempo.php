@@ -186,11 +186,11 @@ class RouteImportTempo extends Model
         RouteImportTempoDistrict::where('owner', $user->id)->delete();
 
         // Delete tempo directory for the user (if exists)
-        $userDir = public_path('uploads/route_import_tempo/' . $user->id);
-        if (File::exists($userDir)) {
+        // $userDir = public_path('uploads/route_import_tempo/' . $user->id);
+        // if (File::exists($userDir)) {
             // Recursively delete directory
-            File::deleteDirectory($userDir);
-        }
+            // File::deleteDirectory($userDir);
+        // }
     }
 
     /**

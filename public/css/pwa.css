@@ -5,4 +5,5 @@
     bottom          : 0;
 
     background-color: #2c78bd;
+    z-index: 9999;
 }

@@ -266,14 +266,20 @@ export default {
             formData.append("type_user"                 , this.user.type_user)
             formData.append("status"                    , this.user.status)            
 
-            formData.append("accuracy"                  , this.user.accuracy)
-            formData.append("max_route_import"          , this.user.max_route_import)
-
-            formData.append("selected_route_import"     , this.user.selected_route_import)
-            formData.append("liste_route_import"        , JSON.stringify(this.user.liste_route_import))
-
             formData.append("selected_district"         , this.user.selected_district)
             formData.append("selected_cities"           , JSON.stringify(this.user.selected_cities))
+
+            // FO
+            if(this.user.type_user  ==  'FrontOffice') {
+                formData.append("accuracy"                  , this.user.accuracy)
+                formData.append("selected_route_import"     , this.user.selected_route_import)
+            }
+
+            // Viewer BO BUManager 
+            if((this.user.type_user  ==  'Viewer')||(this.user.type_user  ==  'BackOffice')||(this.user.type_user  ==  'BU Manager')) {
+                formData.append("max_route_import"          , this.user.max_route_import)
+                formData.append("liste_route_import"        , JSON.stringify(this.user.liste_route_import))
+            }
 
             formData.append("password"                  , this.user.password)
             formData.append("password_confirmation"     , this.user.password_confirmation)

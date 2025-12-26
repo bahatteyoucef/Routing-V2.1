@@ -1,645 +1,364 @@
 <template>
-
-    <GPSErrorComponent v-show="show_gps_error"></GPSErrorComponent>
-
-    <div class="mt-3">
-
-        <div class="page-header mb-2">
-            <div class="container w-100">
-                <h6 class="text-center mb-0">
-                    Modifier le Client : {{ client.old_CustomerNameE }} 
-                </h6>
-            </div>
+  <div class="page-shell d-flex flex-column">
+    <!-- Header -->
+    <div class="flex-shrink-0 bg-white shadow-sm z-index-1">
+      <GPSErrorComponent v-show="show_gps_error"></GPSErrorComponent>
+      <div class="page-header py-3 border-bottom">
+        <div class="container">
+          <h6 class="text-center mb-0 text_primary fw-bold">
+            Ajouter un Nouveau Client ({{ slideIndex }} / {{ total_questions }})
+          </h6>
+          <div class="progress mt-2" style="height: 4px;">
+            <div class="progress-bar" role="progressbar" :style="{ width: (slideIndex / total_questions) * 100 + '%' }"></div>
+          </div>
         </div>
-
-        <div class="page-header mb-0">
-            <div class="container w-100">
-                <div v-if="client.status_original   ==  'nonvalidated'">
-                    <span class="text-small text-danger">{{ client.nonvalidated_details }}</span>
-                </div>
-            </div>
-        </div>
-
-        <hr />
-
-        <div class="container"  style="height : 60vh; overflow : auto;">
-            <form>
-                <div class="slideshow-container">
-
-                    <!-- OpenCustomer --> <!-- CustomerIdentifier -->
-                    <div v-show="false" class="mySlides slide_1 mt-3">
-                        <div>
-                            <div class="mb-1">
-                                <label for="text"               class="form-label fw-bold">Quel est l'état du client ?</label>
-                                <select                         class="form-select"         id="OpenCustomer"                 v-model="client.OpenCustomer"     @change="setStatus()"   :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
-                                    <option     value="Ouvert">Ouvert</option>
-                                    <option     value="Ferme">Ferme</option>
-                                    <option     value="refus">Refus</option>
-                                    <option     v-if="(client.NewCustomer   ==  'Client Existant')" value="Introuvable">Introuvable</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div v-if="(client.NewCustomer   ==  'Client Existant')">
-                            <label for="CustomerIdentifier" class="form-label fw-bold">ID Client</label>
-                            <input type="text"              class="form-control"        id="CustomerIdentifier"          v-model="client.CustomerIdentifier"    disabled>
-                        </div>
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Sélectionnez si le client est ouvert ou non (exemple : <span class="fw-bold">Ouvert</span>).</li>
-                                <li>Saisissez l'identifiant du client (exemple : <span class="fw-bold">23</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- CustomerBarCodeExiste -->
-                    <div v-if="client.OpenCustomer  === 'Ouvert'" v-show="false" class="mySlides slide_1 mt-3">
-                        <div>
-                            <div class="mb-1">
-                                <label for="text"               class="form-label fw-bold">CustomerBarCodeExiste</label>
-                                <select                         class="form-select"         id="CustomerBarCodeExiste"                 v-model="client.CustomerBarCodeExiste"   :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
-                                    <option     value="Non">Non</option>
-                                    <option     value="Oui">Oui</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="CustomerBarCodeExiste_image_update"  class="form-label fw-bold">CustomerBarCodeExiste Image</label>
-                                <button type="button"               class="btn btn-secondary w-100 mb-1" @click="$clickFile('CustomerBarCodeExiste_image_update')" :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"><i class="mdi mdi-camera"></i></button>
-
-                                <input type='file'                  id="CustomerBarCodeExiste_image_update"              style="display:none"    accept="image/*"    capture     @change="customerBarCodeExisteImage()"    :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
-                                <img                                id="CustomerBarCodeExiste_image_display_update"      src=""                  style="width : 100%; height : auto; display: block; margin : auto">
-                            </div>
-                        </div>
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- CustomerCode -->
-                    <div v-if="client.OpenCustomer  === 'Ouvert'" v-show="false" class="mySlides slide_3 mt-3">
-                        <div>
-                            <label for="CustomerBarCode_image"  class="form-label fw-bold">Code-Barre</label>
-                            <div v-show="client.CustomerCode   ==  ''"     class="mt-1 p-0">
-                                <div    id="reader" class="scanner_reader w-100"></div>
-                            </div>
-
-                            <div v-show="client.CustomerCode   !=  ''"     class="mt-1 p-0">
-                                <div    id="result"></div>
-                            </div>
-
-                            <div v-show="client.CustomerCode   !=  ''"     class="mt-1 p-0">
-                                <div    id="customerCode_value"              class="text-center">
-                                    <span class="">Code-Barre : {{ client.CustomerCode }}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-1 mb-1 w-100">
-                            <div class="w-100" id="refresh_client_barcode_button">
-                                <button type="button" class="btn btn-primary w-100"     @click="setBarCodeReader()"     :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">Capturer Code-Barre</button>
-                            </div>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li class="mt-3">Cliquez sur le bouton <button type="button" class="btn btn-primary p-1" style="font-size : 11px">Capturer Code-Barre</button> pour scanner le code-barre à l'aide de la caméra de votre téléphone.</li>
-                                <li class="mt-3">🚨 Attention : Veuillez ne pas scanner de code-barres contenant les caractères suivants :<span class="restricted-chars">>/ \ : * ? " &lt; &gt; | &amp; (espace)</span></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- CustomerBarCode_image -->
-                    <div v-if="client.OpenCustomer  === 'Ouvert'" v-show="false" class="mySlides slide_4 mt-3">
-                        <div>
-                            <label for="CustomerBarCode_image_update"  class="form-label fw-bold">Code-Barre Image</label>
-                            <button type="button"                       class="btn btn-secondary w-100 mb-1" @click="$clickFile('CustomerBarCode_image_update')"        :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"><i class="mdi mdi-camera"></i></button>
-
-                            <input type="file"                          class="form-control"    id="CustomerBarCode_image_update"                   accept="image/*"    capture         @change="customerBarCodeImage()"    :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"    style="display:none">
-                            <img                                                                id="CustomerBarCode_image_display_update"           src=""              class="w-100">
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li class="mt-3">Cliquez sur le bouton <button type="button" class="btn btn-secondary p-1" style="font-size : 11px"><i class="mdi mdi-camera"></i></button> pour ajouter la photo du "code-barre".</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- CustomerNameE -->
-                    <div v-if="client.OpenCustomer  === 'Ouvert'" v-show="false" class="mySlides slide_5 mt-3">
-                        <div>
-                            <label for="CustomerNameE"      class="form-label fw-bold">Nom et Prénom de l'Acheteur</label>
-                            <input type="text"              class="form-control"        id="CustomerNameE"          v-model="client.CustomerNameE"  :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Saisissez le nom et prénom du client en <span class="fw-bold">MAJISCULE</span> (exemple : <span class="fw-bold">BAKHNACH IMAD</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- CustomerNameA -->
-                    <div v-show="false" class="mySlides slide_6 mt-3">
-                        <div>
-                            <label for="CustomerNameA"      class="form-label fw-bold">Raison Sociale</label>
-                            <input type="text"              class="form-control"        id="CustomerNameA"          v-model="client.CustomerNameA"  :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Saisissez le nom du magasin en <span class="fw-bold">MAJISCULE</span>, généralement affiché sur sa façade (exemple : <span class="fw-bold">SUPERETTE ESSALEM</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Tel -->
-                    <div v-if="client.OpenCustomer === 'Ouvert'" v-show="false" class="mySlides slide_7 mt-3">
-                        <div>
-                            <label for="Tel"                class="form-label fw-bold">Téléphone</label>
-                            <input type="text"              class="form-control"        id="Tel"                    v-model="client.Tel"            :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Saisissez le numéro de téléphone du client au format correct (10 chiffres, commençant par 0) (exemple : <span class="fw-bold">0654123487</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Address -->
-                    <div v-show="false" class="mySlides slide_8 mt-3">
-                        <div>
-                            <label for="Address"            class="form-label fw-bold">Adresse</label>
-                            <input type="text"              class="form-control"        id="Address"                v-model="client.Address"        :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Saisissez l'adresse du magasin (exemple : <span class=fw-bold>Rue Mohamed Belouizdad - Alger Centre</span>).</li>
-                                <li>Le nombre de charactere doit depasse 10 characteres.</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Neighborhood -->
-                    <div v-show="false" class="mySlides slide_9 mt-3">
-                        <div>
-                            <label for="Neighborhood"       class="form-label fw-bold">Quartier</label>
-                            <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood"       :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Saisissez le nom du quartier du magasin (exemple : <span class="fw-bold">Belcourt</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Landmark -->
-                    <div v-show="false" class="mySlides slide_10 mt-3">
-                        <div>
-                            <label for="Landmark"           class="form-label fw-bold">Point de Repere</label>
-                            <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"       :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"></textarea>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Saisissez un point de repère pour le client (exemple : <span class="fw-bold">à côté de la Grande Poste</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- DistrictNo --> 
-                    <div v-show="false" class="mySlides slide_11 mt-3">
-                        <div>
-                            <label for="DistrictNo"         class="form-label fw-bold">Willaya</label>
-                            <select                         class="form-select"         id="DistrictNo"             v-model="client.DistrictNo"     @change="getCites()"    :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
-                                <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">{{willaya.DistrictNameE}} ({{willaya.DistrictNo}})</option>
-                            </select>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>La willaya où se situe le magasin du client est sélectionnée automatiquement (exemple : <span class="fw-bold">Alger</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- CityNo -->
-                    <div v-show="false" class="mySlides slide_12 mt-3">
-                        <div>
-                            <label for="CityNo"             class="form-label fw-bold">Commune</label>
-                            <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo"                                 :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
-                                <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CityNameE}} ({{cite.CITYNO}})</option>
-                            </select>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Saisissez la commune où se situe le magasin (exemple : <span class="fw-bold">Saoula</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- CustomerType -->
-                    <div v-show="false" class="mySlides slide_13 mt-3">
-                        <div>
-                            <label for="text"               class="form-label fw-bold">Type de Magasin</label>
-                            <select                         class="form-select"         id="CustomerType"                 v-model="client.CustomerType"                     :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
-                                <option     :value="'AG Self'">AG Self</option>
-                                <option     :value="'AG Tradi'">AG Tradi</option>
-                                <option     :value="'Superette'">Superette</option>
-
-                                <option     :value="'Gros Mix'">Gros Mix</option>
-                                <option     :value="'Gros Sec'">Gros Sec</option>
-                                <option     :value="'Gros Frais'">Gros Frais</option>
-
-                                <option     :value="'Demis Gros Mix'">Demis Gros Mix</option>
-                                <option     :value="'Demis Gros Sec'">Demis Gros Sec</option>
-                                <option     :value="'Demis Gros Frais'">Demis Gros Frais</option>
-
-                                <option     :value="'Produit laitier et lben'">Produit laitier et lben</option>
-                                <option     :value="'Produit Patisseries'">Produit Patisseries</option>
-
-                                <option     :value="'Fast Food'">Fast Food</option>
-                                <option     :value="'Restaurant'">Restaurant</option>
-                                <option     :value="'Cafeteria'">Cafeteria</option>
-                                <option     :value="'HyperMarché'">HyperMarché</option>
-                            </select>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Selectionnez le type de magasin (exemple : <span class="fw-bold">AG Self</span>).</li>
-                                <li><span class="fw-bold">AG Self</span> : </li>	Se référer au frigo du fromage : Se sert soi-même en libre-service
-                                <li><span class="fw-bold">AG Tradi</span> : </li>	Se référer au frigo du fromage : Frigo traditionnel le vendeur qui distribue au client 
-                                <li><span class="fw-bold">Superette</span> : </li> 	Condition :  il faut minimum 2 caisses ACTIVE 
-                                <li><span class="fw-bold">Gros Mix</span> : </li>	Condition : le pdv n'ouvre pas les cartons et vends uniquement aux détaillants
-                                <li><span class="fw-bold">Gros Sec</span> : </li>	Condition : le pdv n'ouvre pas les cartons et vends uniquement aux détaillants
-                                <li><span class="fw-bold">Gros frais</span> : </li>	Condition : le pdv n'ouvre pas les cartons et vends uniquement aux détaillants
-                                <li><span class="fw-bold">Demis Gros Mix</span> : </li>	Condition : le pdv ouvre les carton pour vendre à l'unité
-                                <li><span class="fw-bold">Demis Gros Sec</span> : </li>	Condition : le pdv ouvre les carton pour vendre à l'unité
-                                <li><span class="fw-bold">Demis Gros frais</span> : </li>	Condition : le pdv ouvre les carton pour vendre à l'unité
-                                <li><span class="fw-bold">Demis Gros frais</span> : </li>x	Changer le type en : Produit laitier et lben
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- BrandSourcePurchase -->
-                    <div v-if="client.OpenCustomer  === 'Ouvert'" v-show="false" class="mySlides slide_14 mt-3">
-                        <div>
-                            <label for="text"               class="form-label fw-bold">Source d'Achat</label>
-                            <select                         class="form-select"         id="BrandSourcePurchase"                 v-model="client.BrandSourcePurchase"       :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
-                                <option     value="DD">DD</option>
-                                <option     value="DI">DI</option>
-                                <option     value="Pas d'achat">Pas d'achat</option>
-                            </select>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Selectionnez la source d'achat du client.
-
-                                    <ul class="pt-3">
-                                        <li><span class="fw-bold">DD</span> : Achat directement auprès du distributeur.</li>
-                                        <li><span class="fw-bold">DI</span> : Achat auprès d'un grossiste ou de vendeurs mobiles.</li>
-                                        <li><span class="fw-bold">Pas d'achat</span> : Le produit n'est pas disponible dans le magasin et le client ne l'achète pas.</li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- NbrAutomaticCheckouts -->
-                    <div v-if="client.OpenCustomer  === 'Ouvert'" v-show="false" class="mySlides slide_15 mt-3">
-                        <div>
-                            <label for="NbrAutomaticCheckouts"       class="form-label fw-bold">Nombre de caisses automatique</label>
-
-                            <select                         class="form-select"         id="NbrAutomaticCheckouts"                 v-model="client.NbrAutomaticCheckouts"   :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
-                                <option     :value="'Plus de 1'">Plus de 1</option>
-                                <option     :value="'1'">1</option>
-                                <option     :value="'Pas de caisse automatique'">Pas de caisse automatique</option>
-                            </select>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Sélectionnez le nombre de caisses automatiques dans le magasin (exemple : <span class="fw-bold">1</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- SuperficieMagasin -->
-                    <div v-if="client.OpenCustomer  === 'Ouvert'" v-show="false" class="mySlides slide_16 mt-3">
-                        <div>
-                            <label for="SuperficieMagasin"  class="form-label fw-bold">Superficie du magasin</label>
-
-                            <select                         class="form-select"         id="SuperficieMagasin"                 v-model="client.SuperficieMagasin"       :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
-                                <option     :value="'Moins de 30 M'">Moins de 30 M</option>
-                                <option     :value="'DE 30 a 60'">DE 30 a 60</option>
-                                <option     :value="'DE 30 a 100'">DE 30 a 100</option>
-                                <option     :value="'DE 100 a 200'">DE 100 a 200</option>
-                                <option     :value="'Plus de 200'">Plus de 200</option>
-                            </select>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Sélectionnez la superficie du magasin (exemple : <span class="fw-bold">Moins de 30 M</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- JPlan -->
-                    <div v-show="false" class="mySlides slide_17 mt-3">
-                        <div>
-                            <label for="JPlan"              class="form-label fw-bold">Nom de Vendeur</label>
-                            <input type="text"              class="form-control"        id="JPlan"          v-model="client.JPlan"                                          :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Saisissez le nom du vendeur habituel qui visite le magasin, en <span class="fw-bold">MAJISCULE</span> (exemple : <span class="fw-bold">BOULEKRINAT Omar</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Frequency -->
-                    <div v-show="false" class="mySlides slide_18 mt-3">
-                        <div>
-                            <label for="Frequency"          class="form-label fw-bold">Frequency</label>
-
-                            <select                         class="form-select"         id="Frequency"                 v-model="client.Frequency"       :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
-                                <option     :value="'1 par Semaine(7J)'">1 par Semaine(7J)</option>
-                                <option     :value="'1 par 15J'">1 par 15J</option>
-                            </select>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Selectionnez la frequence de visite du client (exemple : <span class="fw-bold">1 par 15J</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Journee -->
-                    <div v-show="false" class="mySlides slide_19 mt-3">
-                        <div>
-                            <label for="Journee"            class="form-label fw-bold">Journee</label>
-
-                            <select                         class="form-select"         id="Journee"    v-model="client.Journee"    :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
-                                <option     :value="'Dimanche 1'">Dimanche 1</option>
-                                <option     :value="'Lundi 1'">Lundi 1</option>
-                                <option     :value="'Mardi 1'">Mardi 1</option>
-                                <option     :value="'Mercredi 1'">Mercredi 1</option>
-                                <option     :value="'Jeudi 1'">Jeudi 1</option>
-                                <option     :value="'Dimanche 2'">Dimanche 2</option>
-                                <option     :value="'Lundi 2'">Lundi 2</option>
-                                <option     :value="'Mardi 2'">Mardi 2</option>
-                                <option     :value="'Mercredi 2'">Mercredi 2</option>
-                                <option     :value="'Jeudi 2'">Jeudi 2</option>
-                            </select>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Selectionnez la journée de visite du client (exemple : <span class="fw-bold">Samedi 1 (Jour 1)</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- BrandAvailability + AvailableBrands + In-Store Image -->
-                    <div v-if="client.OpenCustomer  === 'Ouvert'" v-show="false" class="mySlides slide_20 mt-3">
-                        <div>
-                            <div class="mb-1">
-                                <label for="text"               class="form-label fw-bold">Disponibilité Produits</label>
-                                <select                         class="form-select"         id="BrandAvailability"                 v-model="client.BrandAvailability"           :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"   @change="brandAvailabilityChanged()">
-                                    <option     value='Non'>Non</option>
-                                    <option     value='Oui'>Oui</option>
-                                </select>
-                            </div>
-
-                            <div class="mt-1"   v-show="client.BrandAvailability  ==  'Oui'">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="Loya Lait" id="Loya Lait"  v-model="client.AvailableBrands">
-                                    <label class="form-check-label" for="Loya Lait">
-                                        Loya Lait
-                                    </label>
-                                </div>
-
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="Loya Fromage" id="Loya Fromage"  v-model="client.AvailableBrands"  >
-                                    <label class="form-check-label" for="Loya Fromage">
-                                        Loya Fromage
-                                    </label>
-                                </div>
-
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="Berbere" id="Berbere"  v-model="client.AvailableBrands">
-                                    <label class="form-check-label" for="Berbere">
-                                        Berbere
-                                    </label>
-                                </div>
-
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="Cowbell" id="Cowbell"  v-model="client.AvailableBrands">
-                                    <label class="form-check-label" for="Cowbell">
-                                        Cowbell
-                                    </label>
-                                </div>
-
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="Twisco" id="Twisco"  v-model="client.AvailableBrands"  >
-                                    <label class="form-check-label" for="Twisco">
-                                        Twisco
-                                    </label>
-                                </div>
-
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="PromaCafé" id="PromaCafé"  v-model="client.AvailableBrands">
-                                    <label class="form-check-label" for="PromaCafé">
-                                        PromaCafé
-                                    </label>
-                                </div>
-
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="Amila" id="Amila"  v-model="client.AvailableBrands"    >
-                                    <label class="form-check-label" for="Amila">
-                                        Amila
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="mt-1"   v-show="client.BrandAvailability  ==  'Oui'">
-                                <label for="in_store_image_update"  class="form-label fw-bold">Image In-Store</label>
-                                <button type="button"               class="btn btn-secondary w-100 mb-1" @click="$clickFile('in_store_image_update')"   :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"><i class="mdi mdi-camera"></i></button>
-
-                                <input type="file"                  class="form-control"    id="in_store_image_update"             accept="image/*"     capture  @change="inStoreImage()"    :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"    style="display:none">
-                                <img                                                        id="in_store_image_display_update"     src=""                       class="w-100">
-                            </div>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Sélectionnez si le produit est disponible ou non (exemple : <span class="fw-bold">Oui</span>).</li>
-                                <li>Si le produit est disponible, veuillez prendre une photo du rayon où le produit est placé dans le magasin en cliquant sur le bouton <button type="button" class="btn btn-secondary p-1" style="font-size : 11px"><i class="mdi mdi-camera"></i></button></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Comment -->
-                    <div v-show="false" class="mySlides slide_21 mt-3">
-                        <div>
-                            <label      for="comment" class="form-label fw-bold">Commentaire</label>
-                            <textarea   class="form-control"    id="comment"    rows="3"    v-model="client.comment"    :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"></textarea>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Ajoutez un commentaire si vous souhaitez préciser quelque chose (exemple : <span class="fw-bold">Le magasin sera en rénovation à partir de demain, retour prévu dans deux semaines.</span>).</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- facade_image -->
-                    <div v-show="false" class="mySlides slide_22 mt-3">
-                        <div>
-                            <label for="facade_image_update"    class="form-label fw-bold">Image Facade</label>
-                            <button type="button"               class="btn btn-secondary w-100 mb-1" @click="$clickFile('facade_image_update')"     :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"><i class="mdi mdi-camera"></i></button>
-
-                            <input type="file"                  class="form-control"    id="facade_image_update"               accept="image/*"     capture  @change="facadeImage()"     :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"    style="display:none">
-                            <img                                                        id="facade_image_display_update"       src=""                       class="w-100">
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Prenez une photo bien cadrée de la façade du magasin en cliquant sur le bouton <button type="button" class="btn btn-secondary p-1" style="font-size : 11px"><i class="mdi mdi-camera"></i></button></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- GPS -->
-                    <div v-show="false" class="mySlides slide_23 mt-3">
-                        <div>
-                            <label for="CustomerCode"       class="form-label fw-bold">Detecter la Position Actuel <button class="btn btn-sm" @click.prevent="showPositionOnMap('show_map')"    :disabled="(((client.status_original    ==  'confirmed')||(client.status_original    ==  'validated'))||(check_gps_clicked))"><i class="mdi mdi-reload"></i></button></label>
-                            <p class="text-secondary text-small mb-1">Latitude : {{ client.Latitude }}</p>
-                            <p class="text-secondary text-small mb-1">Longitude : {{ client.Longitude }}</p>
-
-                            <div id="show_map" style="width: 100%; height: 200px;"></div>
-
-                            <hr />
-
-                            <h5>Clients a Proximité</h5>
-
-                            <hr />
-
-                            <table class="table table-bordered mt-1">
-                                <thead>
-                                    <tr>
-                                        <th class="text-wrap">Acheteur</th>
-                                        <th class="text-wrap">Raison Social</th>
-                                        <th class="text-wrap">Type</th>
-                                    </tr>
-                                </thead>
-                                
-                                <tbody>
-                                    <tr v-for="client in close_clients" :key="client">
-                                        <td class="text-wrap">{{client.CustomerNameE}}</td>
-                                        <td class="text-wrap">{{client.CustomerNameA}}</td>
-                                        <td class="text-wrap">{{client.CustomerType}}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!--  -->
-
-                        <div class="mt-5">
-                            <ul class="pl-3">
-                                <li>Vérifiez si votre position GPS est correcte. Si ce n'est pas le cas, cliquez sur <i class="mdi mdi-reload"></i> pour l'actualiser.</li>
-                                <li>Le tableau affiche la liste des clients proches de votre position actuelle.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-
-        <!--  -->
-
-        <div v-if="point_is_inside_user_polygons">
-
-            <div class="container start-0 w-100"          style="bottom: 65px;">
-                <div class="row justify-content-center">
-                    <div class="col-6 mt-3">
-                        <button v-if="((slideIndex    >   1)&&(getIsOnline))"                   type="button" class="btn btn-secondary w-100"   @click="plusSlides(-1)">Precedent</button>
-                    </div>
-
-                    <div class="col-6 mt-3">
-                        <button v-if="((slideIndex    <   total_questions)&&(getIsOnline))"     type="button" class="btn btn-primary w-100"     @click="plusSlides(1)">Suivant</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="container start-0 w-100 mb-3"     style="bottom: 0px;">
-                <div class="row justify-content-center">
-                    <div class="col mt-3">
-                        <button v-if="((slideIndex  ==  total_questions)&&(client.status_original   !=  'validated')&&(getIsOnline))"      type="button" class="btn btn-primary w-100"     @click="sendData()">Confirmer</button>
-                    </div>
-                </div>
-            </div>            
-
-        </div>
-
+      </div>
     </div>
 
+    <!-- Scrollable main -->
+    <div class="page-content flex-grow-1 overflow-auto">
+      <!-- add padding-bottom to avoid last item being hidden by footer -->
+      <div class="container py-4" style="padding-bottom: 88px;">
+        <form @submit.prevent>
+          
+            <div v-show="slideIndex === 1" class="mt-3">
+              <div>
+                <div class="mb-1">
+                  <label for="NewCustomer" class="form-label fw-bold">Nouveau Client</label>
+                  <select class="form-select" id="NewCustomer" v-model="client.NewCustomer"     :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+                    <option value="Nouveau Client">Nouveau Client</option>
+                    <option value="Client Existant">Client Existant</option>
+                  </select>
+                </div>
+                <div class="mb-1">
+                  <label for="OpenCustomer" class="form-label fw-bold">Client Ouvert</label>
+                  <select class="form-select" id="OpenCustomer" v-model="client.OpenCustomer"   :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+                    <option value="Ouvert">Ouvert</option>
+                    <option value="Ferme">Ferme</option>
+                    <option value="refus">Refus</option>
+                  </select>
+                </div>
+              </div>
+              <div class="mt-5"><ul class="pl-3"><li>Sélectionnez si le client est ouvert ou non.</li></ul></div>
+            </div>
+
+            <div v-show="slideIndex === 2" class="mt-3">
+              <div>
+                <label for="CustomerIdentifier" class="form-label fw-bold">ID Client</label>
+                <input type="text" class="form-control" id="CustomerIdentifier" v-model="client.CustomerIdentifier" :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+              </div>
+              <div class="mt-5"><ul class="pl-3"><li>Saisissez l'identifiant du client.</li></ul></div>
+            </div>
+
+            <div v-show="slideIndex === 3" class="mt-3">
+              <div v-if="client.OpenCustomer === 'Ouvert'">
+                  <div>
+                    <label class="form-label fw-bold">Code-Barre</label>
+                    <div v-show="!client.CustomerCode" class="mt-1 p-0">
+                      <div v-show="show_reader" id="reader" class="scanner_reader w-100"></div>
+                    </div>
+                    <div v-show="client.CustomerCode" class="mt-1 p-0 text-center">
+                       <span class="fw-bold fs-5">Code-Barre : {{ client.CustomerCode }}</span>
+                    </div>
+                  </div>
+                  <div class="mt-3 w-100">
+                    <button type="button" class="btn btn-primary w-100" @click="setBarCodeReader()" :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">Capturer Code-Barre</button>
+                  </div>
+                  <div class="mt-5">
+                    <ul class="pl-3">
+                       <li>Cliquez sur "Capturer" pour scanner.</li>
+                       <li class="text-danger">🚨 Pas de caractères spéciaux.</li>
+                    </ul>
+                  </div>
+              </div>
+              <div v-else class="text-center mt-5">
+                  <h5>Non applicable (Client Fermé/Refus)</h5>
+                  <p class="text-muted">Cliquez sur Suivant</p>
+              </div>
+            </div>
+
+            <div v-show="slideIndex === 4" class="mt-3">
+              <div v-if="client.OpenCustomer === 'Ouvert'">
+                  <label class="form-label">Code-Barre Image</label>
+                  <button type="button" class="btn btn-secondary w-100 mb-1" @click="$clickFile('CustomerBarCode_image')"   :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"><i class="mdi mdi-camera"></i></button>
+                  
+                  <input type='file' id="CustomerBarCode_image" style="display:none" accept="image/*" capture 
+                         @change="handleImageUpload($event, 'CustomerBarCode_image')"   :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+                  
+                  <img :src="client.CustomerBarCode_image_currentObjectURL" 
+                       v-show="client.CustomerBarCode_image_currentObjectURL"
+                       style="width: 100%; height: auto; display: block; margin: auto; border-radius: 8px;">
+              </div>
+              <div v-else class="text-center mt-5"><h5>Non applicable</h5></div>
+            </div>
+
+            <div v-show="slideIndex === 5" class="mt-3">
+               <div v-if="client.OpenCustomer === 'Ouvert'">
+                  <label for="CustomerNameE" class="form-label fw-bold">Nom et Prénom (Acheteur)</label>
+                  <input type="text" class="form-control" id="CustomerNameE" v-model="client.CustomerNameE" :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+                  <div class="mt-5"><ul class="pl-3"><li>MAJUSCULE (ex: BAKHNACH IMAD).</li></ul></div>
+               </div>
+               <div v-else class="text-center mt-5"><h5>Non applicable</h5></div>
+            </div>
+
+            <div v-show="slideIndex === 6" class="mt-3">
+              <div>
+                <label for="CustomerNameA" class="form-label fw-bold">Raison Sociale</label>
+                <input type="text" class="form-control" id="CustomerNameA" v-model="client.CustomerNameA"   :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+              </div>
+              <div class="mt-5"><ul class="pl-3"><li>Nom du magasin (ex: SUPERETTE ESSALEM).</li></ul></div>
+            </div>
+
+            <div v-show="slideIndex === 7" class="mt-3">
+               <div v-if="client.OpenCustomer === 'Ouvert'">
+                  <label for="Tel" class="form-label fw-bold">Téléphone</label>
+                  <input type="string" class="form-control" id="Tel" v-model="client.Tel"   :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+                  <div class="mt-5"><ul class="pl-3"><li>10 chiffres (ex: 0654123487).</li></ul></div>
+               </div>
+               <div v-else class="text-center mt-5"><h5>Non applicable</h5></div>
+            </div>
+
+            <div v-show="slideIndex === 8" class="mt-3">
+              <div>
+                <label for="Address" class="form-label fw-bold">Adresse</label>
+                <input type="text" class="form-control" id="Address" v-model="client.Address"   :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+              </div>
+            </div>
+
+            <div v-show="slideIndex === 9" class="mt-3">
+              <div>
+                <label for="Neighborhood" class="form-label fw-bold">Quartier</label>
+                <input type="text" class="form-control" id="Neighborhood" v-model="client.Neighborhood" :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+              </div>
+            </div>
+
+            <div v-show="slideIndex === 10" class="mt-3">
+              <div>
+                <label for="Landmark" class="form-label fw-bold">Point de Repère</label>
+                <textarea class="form-control" id="Landmark" rows="3" v-model="client.Landmark" :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"></textarea>
+              </div>
+            </div>
+
+            <div v-show="slideIndex === 11" class="mt-3">
+              <div>
+                <label for="DistrictNo" class="form-label fw-bold">Willaya</label>
+                <select class="form-select" id="DistrictNo" v-model="client.DistrictNo" @change="getCites()"    :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+                  <option v-for="willaya in willayas" :key="willaya.DistrictNo" :value="willaya.DistrictNo">
+                    {{willaya.DistrictNameE}} ({{willaya.DistrictNo}})
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div v-show="slideIndex === 12" class="mt-3">
+              <div>
+                <label for="CityNo" class="form-label fw-bold">Commune</label>
+                <select class="form-select" id="CityNo" v-model="client.CityNo" :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+                  <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">
+                    {{cite.CityNameE}} ({{cite.CITYNO}})
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div v-show="slideIndex === 13" class="mt-3">
+              <div>
+                <label for="CustomerType" class="form-label fw-bold">Type de Magasin</label>
+                <select class="form-select" id="CustomerType" v-model="client.CustomerType" :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+                   <option v-for="type in liste_type_client_options" :key="type" :value="type">{{ type }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div v-show="slideIndex === 14" class="mt-3">
+               <div v-if="client.OpenCustomer === 'Ouvert'">
+                  <label class="form-label fw-bold">Source d'Achat</label>
+                  <select class="form-select" v-model="client.BrandSourcePurchase"  :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+                    <option value="DD">DD (Distributeur)</option>
+                    <option value="DI">DI (Grossiste)</option>
+                    <option value="Pas d'achat">Pas d'achat</option>
+                  </select>
+               </div>
+               <div v-else class="text-center mt-5"><h5>Non applicable</h5></div>
+            </div>
+
+            <div v-show="slideIndex === 15" class="mt-3">
+               <div v-if="client.OpenCustomer === 'Ouvert'">
+                  <label class="form-label fw-bold">Nombre de caisses auto</label>
+                  <select class="form-select" v-model="client.NbrAutomaticCheckouts"    :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+                    <option value="Plus de 1">Plus de 1</option>
+                    <option value="1">1</option>
+                    <option value="Pas de caisse automatique">Pas de caisse automatique</option>
+                  </select>
+               </div>
+               <div v-else class="text-center mt-5"><h5>Non applicable</h5></div>
+            </div>
+
+             <div v-show="slideIndex === 16" class="mt-3">
+               <div v-if="client.OpenCustomer === 'Ouvert'">
+                  <label class="form-label fw-bold">Superficie</label>
+                  <select class="form-select" v-model="client.SuperficieMagasin"    :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+                    <option value="Moins de 30 M">Moins de 30 M</option>
+                    <option value="DE 30 a 60">DE 30 a 60</option>
+                    <option value="DE 30 a 100">DE 30 a 100</option>
+                    <option value="DE 100 a 200">DE 100 a 200</option>
+                    <option value="Plus de 200">Plus de 200</option>
+                  </select>
+               </div>
+               <div v-else class="text-center mt-5"><h5>Non applicable</h5></div>
+            </div>
+
+            <div v-show="slideIndex === 17" class="mt-3">
+              <div>
+                <label for="JPlan" class="form-label fw-bold">Nom de Vendeur</label>
+                <input type="text" class="form-control" id="JPlan" v-model="client.JPlan"   :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+              </div>
+            </div>
+
+            <div v-show="slideIndex === 18" class="mt-3">
+              <div>
+                <label for="Frequency" class="form-label fw-bold">Fréquence</label>
+                <select class="form-select" id="Frequency" v-model="client.Frequency"   :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+                  <option value="1 par Semaine(7J)">1 par Semaine(7J)</option>
+                  <option value="1 par 15J">1 par 15J</option>
+                </select>
+              </div>
+            </div>
+
+            <div v-show="slideIndex === 19" class="mt-3">
+              <div>
+                <label for="Journee" class="form-label fw-bold">Journée</label>
+                <select class="form-select" id="Journee" v-model="client.Journee"   :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+                  <option v-for="day in ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi']" :key="day+'1'" :value="day+' 1'">{{day}} 1</option>
+                  <option v-for="day in ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi']" :key="day+'2'" :value="day+' 2'">{{day}} 2</option>
+                </select>
+              </div>
+            </div>
+
+            <div v-show="slideIndex === 20" class="mt-3">
+               <div v-if="client.OpenCustomer === 'Ouvert'">
+                  <div class="mb-1">
+                    <label class="form-label fw-bold">Disponibilité Produits</label>
+                    <select class="form-select" v-model="client.BrandAvailability" @change="brandAvailabilityChanged()" :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+                      <option value="Non">Non</option>
+                      <option value="Oui">Oui</option>
+                    </select>
+                  </div>
+                  
+                  <div class="mt-1" v-if="client.BrandAvailability === 'Oui'">
+                    <div class="form-check" v-for="brand in ['Loya Lait', 'Loya Fromage', 'Berbere', 'Cowbell', 'Twisco', 'PromaCafé', 'Amila']" :key="brand">
+                        <input class="form-check-input" type="checkbox" :value="brand" :id="brand" v-model="client.AvailableBrands" :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+                        <label class="form-check-label" :for="brand">{{ brand }}</label>
+                    </div>
+
+                    <label class="form-label fw-bold mt-2">Image In-Store</label>
+                    <button type="button" class="btn btn-secondary w-100 mb-1" @click="$clickFile('in_store_image')"    :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"><i class="mdi mdi-camera"></i></button>
+                    
+                    <input type='file' id="in_store_image" style="display:none" accept="image/*" capture 
+                           @change="handleImageUpload($event, 'in_store_image')"    :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+                           
+                    <img :src="client.in_store_image_currentObjectURL" 
+                         v-show="client.in_store_image_currentObjectURL"
+                         style="width: 100%; height: auto; display: block; margin: auto; border-radius: 8px;">
+                  </div>
+               </div>
+               <div v-else class="text-center mt-5"><h5>Non applicable</h5></div>
+            </div>
+
+            <div v-show="slideIndex === 21" class="mt-3">
+              <div>
+                <label for="comment" class="form-label fw-bold">Commentaire</label>
+                <textarea class="form-control" id="comment" rows="3" v-model="client.comment"   :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"></textarea>
+              </div>
+            </div>
+
+            <div v-show="slideIndex === 22" class="mt-3">
+              <div>
+                <label class="form-label fw-bold">Image Facade</label>
+                <button type="button" class="btn btn-secondary w-100 mb-1" @click="$clickFile('facade_image')"  :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')"><i class="mdi mdi-camera"></i></button>
+                
+                <input type='file' id="facade_image" style="display:none" accept="image/*" capture 
+                       @change="handleImageUpload($event, 'facade_image')"  :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
+                       
+                <img :src="client.facade_image_currentObjectURL" 
+                     v-show="client.facade_image_currentObjectURL"
+                     style="width: 100%; height: auto; display: block; margin: auto; border-radius: 8px;">
+              </div>
+            </div>
+
+            <div v-show="slideIndex === 23" class="mt-3">
+              <div>
+                <label class="form-label fw-bold">
+                    Position Actuelle 
+                    <button class="btn btn-sm" @click.prevent="refreshGPS()" :disabled="check_gps_clicked"><i class="mdi mdi-reload"></i></button>
+                </label>
+                <p class="text-secondary text-small mb-1">Lat: {{ client.Latitude }} | Long: {{ client.Longitude }}</p>
+                
+                <div id="show_map" style="width: 100%; height: 200px; background-color: #eee;"></div>
+                
+                <hr />
+                <h5>Clients à Proximité</h5>
+                <table class="table table-bordered table-sm mt-1">
+                  <thead>
+                    <tr>
+                      <th>Acheteur</th>
+                      <th>Raison Sociale</th>
+                      <th>Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(c, index) in close_clients" :key="index">
+                      <td>{{c.CustomerNameE}}</td>
+                      <td>{{c.CustomerNameA}}</td>
+                      <td>{{c.CustomerType}}</td>
+                    </tr>
+                    <tr v-if="close_clients.length === 0">
+                        <td colspan="3" class="text-center text-muted">Aucun client proche</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+        </form>
+      </div>
+    </div>
+
+    <div class="page-footer flex-shrink-0 bg-white border-top pb-3 pt-3 w-100">
+      <div class="container">
+        <div class="row g-2">
+          <div class="col-6">
+            <button 
+              v-if="((slideIndex > 1) && (getIsOnline) && (client.status_original   !=  'confirmed') && (client.status_original     !=  'validated'))"
+            
+              type="button" 
+              class="btn btn-secondary w-100 py-2 fw-bold" 
+              @click="changeSlide(-1)">
+              Précédent
+            </button>
+          </div>
+
+          <div class="col-6">
+            <button 
+              v-if="((slideIndex < total_questions) && (getIsOnline) && (client.status_original   !=  'confirmed') && (client.status_original     !=  'validated'))"
+              type="button" 
+              class="btn btn-primary w-100 py-2 fw-bold shadow-sm" 
+              @click="changeSlide(1)">
+              Suivant
+            </button>
+
+            <button 
+              v-if="((slideIndex === total_questions) && (getIsOnline) && (client.status_original   !=  'confirmed') && (client.status_original     !=  'validated'))" 
+              type="button" 
+              class="btn btn-success w-100 py-2 fw-bold shadow-sm" 
+              @click="sendData()">
+              Confirmer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -649,119 +368,89 @@ import {mapGetters, mapActions} from    "vuex"
 //
 
 import GPSErrorComponent        from    "@/template/partials/GPSErrorComponent.vue"
+import moment                   from    "moment"; // Ensure moment is installed
 
 export default {
 
     data() {
         return {
+            client: {
+                NewCustomer: 'Nouveau Client', // Set default
+                OpenCustomer: 'Ouvert',        // Set default
+                
+                // Details
+                CustomerIdentifier: '',
+                CustomerCode: '',
+                CustomerNameE: '',
+                CustomerNameA: '',
+                Tel: '',
+                Address: '',
+                Neighborhood: '',
+                Landmark: '',
+                DistrictNo: '',
+                DistrictNameE: '',
+                CityNo: '',
+                CityNameE: '',
+                CustomerType: '',
+                
+                // Merchandising / Business logic
+                BrandSourcePurchase: '',
+                NbrAutomaticCheckouts: '',
+                SuperficieMagasin: '',
+                JPlan: '',
+                Frequency: '',
+                Journee: '',
+                BrandAvailability: 'Non',
+                AvailableBrands: [],
+                comment: '',
 
-            client      :   {
+                // Images (Data & Preview)
+                // CustomerBarCode_image: '',
+                CustomerBarCode_image_currentObjectURL: null,
+                CustomerBarCode_image_original_name: '',
 
-                // Images   
-                CustomerBarCode_image                   :   '',
-                facade_image                            :   '',
-                in_store_image                          :   '',
+                // in_store_image: '',
+                in_store_image_currentObjectURL: null,
+                in_store_image_original_name: '',
 
-                CustomerBarCode_image_original_name     :   '',
-                facade_image_original_name              :   '',
-                in_store_image_original_name            :   '',
+                // facade_image: '',
+                facade_image_currentObjectURL: null,
+                facade_image_original_name: '',
 
-                CustomerBarCode_image_currentObjectURL  :   null,
-                facade_image_currentObjectURL           :   null,
-                in_store_image_currentObjectURL         :   null,
-
-                //  
-                CustomerBarCode_image_updated           :   false,
-                facade_image_updated                    :   false,
-                in_store_image_updated                  :   false,
-
-                // Client
-                id                  :   '',
-
-                NewCustomer         :   '',
-
-                OpenCustomer        :   '',
-
-                CustomerCode        :   '',
-
-                old_CustomerNameE   :   '',
-
-                CustomerNameE       :   '',
-                CustomerNameA       :   '',
-
-                Tel                 :   '',
-                tel_status          :   'pending',
-                tel_comment         :   '',
-
-                Address             :   '',
-                Neighborhood        :   '',
-                Landmark            :   '',
-
-                DistrictNo          :   '',
-                DistrictNameE       :   '',
-
-                CityNo              :   '',
-                CityNameE           :   '',
-
-                Latitude            :   '',
-                Longitude           :   '',
-
-                // Type
-                CustomerType        :   '',
-                BrandAvailability   :   'Non',
-                BrandSourcePurchase :   '',
-
-                // Journey Plan
-                JPlan               :   '',
-                Journee             :   '',
-
-                // 
-                status                  :   'pending',
-                status_original         :   '',
-                nonvalidated_details    :   '', 
-
-                // Comment
-                comment                 :   ''
+                // Location & Status
+                Latitude: '',
+                Longitude: '',
+                id: '',
+                status: 'pending',
+                nonvalidated_details: ''
             },
 
-            willayas                        :   []      ,
-            cites                           :   []      ,
+            // Configuration Options
+            willayas: [],
+            cites: [],
+            liste_type_client_options: [
+                'AG Self', 'AG Tradi', 'Superette', 'Gros Mix', 'Gros Sec', 
+                'Gros Frais', 'Demis Gros Mix', 'Demis Gros Sec', 'Demis Gros Frais', 
+                'Produit laitier et lben', 'Produit Patisseries', 'Fast Food', 
+                'Restaurant', 'Cafeteria', 'HyperMarché'
+            ],
 
-            // 
-            liste_journey_plan              :   []      ,
-            liste_journee                   :   []      ,
-            liste_type_client               :   []      ,
+            // App State
+            all_clients: [],
+            close_clients: [],
+            min_distance: 0.05,
+            scanner: null,
+            point_is_inside_user_polygons: true,
+            
+            slideIndex: 1,
+            total_questions: 23, // Matches template
+            
+            start_adding_date: "",
+            check_gps_clicked: false,
+            show_gps_error: false,
+            watchGPS: null,
 
-            //
-
-            all_clients                     :   []      ,
-            close_clients                   :   []      ,
-            min_distance                    :   0.05    ,
-
-            //
-
-            scanner                         :   null    ,
-
-            //
-
-            point_is_inside_user_polygons   :   true    ,
-
-            //
-
-            slideIndex                      :   1       ,
-
-            //
-
-            total_questions                 :   23      ,
-
-            //
-
-            start_adding_date               :   ""      ,
-
-            //
-            check_gps_clicked               :   false   ,
-            show_gps_error                  :   false   ,
-            watchGPS                        :   null
+            show_reader: false
         }
     },
 
@@ -778,52 +467,35 @@ export default {
         GPSErrorComponent   :   GPSErrorComponent
     },
 
-    beforeDestroy() {
-
-        // Clean up when component is destroyed
-        if (this.client.CustomerBarCode_image_currentObjectURL) {
-            URL.revokeObjectURL(this.client.CustomerBarCode_image_currentObjectURL);
-        }
-
-        // Clean up when component is destroyed
-        if (this.client.facade_image_currentObjectURL) {
-            URL.revokeObjectURL(this.client.facade_image_currentObjectURL);
-        }
-
-        // Clean up when component is destroyed
-        if (this.client.in_store_image_currentObjectURL) {
-            URL.revokeObjectURL(this.client.in_store_image_currentObjectURL);
-        }
+    beforeUnmount() {
+        this.cleanupScanner();
+        if (this.watchGPS) navigator.geolocation.clearWatch(this.watchGPS);
     },
 
-    beforeUnmount() {
+    // 2. Ensure cleanup if the user leaves the page
+    beforeDestroy() { // Use 'beforeUnmount' if you are on Vue 3
+        const fields = ['CustomerBarCode_image', 'facade_image', 'in_store_image'];
+        fields.forEach(field => this.revokeImage(field));
+    }, 
 
-        if(this.scanner) {
-
-            this.scanner.clear().then(_ => {
-
-            }).catch(error => {
-
-            });
-        }
-
-        if (this.watchGPS) {
-            navigator.geolocation.clearWatch(this.watchGPS);
-            this.watchGPS = null; // Reset the variable to null after clearing
-        }
+    // 1. Non-reactive storage for heavy binary blobs
+    created() {
+        this._rawFiles = {
+            CustomerBarCode_image: null,
+            facade_image: null,
+            in_store_image: null
+        };
     },
 
     async mounted() {
-
-        //
-        this.slideIndex     =   this.$showSlides(this.slideIndex, this.slideIndex);
-
-        //
-        await this.getData()
-
-        //
-        this.setTotalQuestions()
-    },  
+        this.$showLoadingPage();
+        try {
+            await Promise.all([this.getComboData(), this.getClientData()]);
+            this.total_questions = document.getElementsByClassName("mySlides").length || 23;
+        } finally {
+            this.$hideLoadingPage();
+        }
+    },
 
     methods : {
 
@@ -833,7 +505,7 @@ export default {
 
         //
 
-        async sendData() {
+        async sendData_old() {
 
             // Validation de la question
             let validation          =   this.validationQuestion()
@@ -1105,134 +777,250 @@ export default {
             }
         },
 
+        async sendData() {
+            // 1. Validation
+            const validation = this.validationQuestion();
+            if (!validation) {
+                this.$showErrors("Error !", ["Veuillez répondre en respectant les conditions des questions avant de valider !"]);
+                return;
+            }
+
+            this.$showLoadingPage();
+
+            // 2. Refresh Names
+            if (this.willayas.length > 0) this.client.DistrictNameE = this.getDistrictNameE(this.client.DistrictNo);
+            if (this.cites.length > 0) this.client.CityNameE = this.getCityNameE(this.client.CityNo);
+
+            // 3. Prepare Payload based on Status
+            let payload = {};
+            const status = this.client.OpenCustomer; // Ouvert, Ferme, Refus, Introuvable
+
+            // --- A. Base Fields (Common to almost all) ---
+            const baseFields = {
+                NewCustomer: this.client.NewCustomer,
+                OpenCustomer: this.client.OpenCustomer,
+                CustomerIdentifier: this.client.CustomerIdentifier,
+                CustomerNameA: this.client.CustomerNameA,
+                Latitude: this.client.Latitude,
+                Longitude: this.client.Longitude,
+                Address: this.client.Address,
+                Neighborhood: this.client.Neighborhood,
+                Landmark: this.client.Landmark,
+                DistrictNo: this.client.DistrictNo,
+                DistrictNameE: this.client.DistrictNameE,
+                CityNo: this.client.CityNo,
+                CityNameE: this.client.CityNameE,
+                CustomerType: this.client.CustomerType,
+                // Default Images Logic
+                facade_image: this.client.facade_image,
+                facade_image_original_name: this.client.facade_image_original_name,
+                facade_image_updated: this.client.facade_image_updated,
+                comment: this.client.comment
+            };
+
+            // --- B. Status Specific Logic ---
+            if (status === 'Ouvert') {
+                payload = {
+                    ...baseFields,
+                    CustomerCode: this.client.CustomerCode,
+                    CustomerNameE: this.client.CustomerNameE,
+                    Tel: this.client.Tel,
+                    tel_status: this.client.tel_status,
+                    tel_comment: this.client.tel_comment,
+                    BrandAvailability: this.client.BrandAvailability,
+                    BrandSourcePurchase: this.client.BrandSourcePurchase,
+                    JPlan: this.client.JPlan,
+                    Journee: this.client.Journee,
+                    Frequency: this.client.Frequency,
+                    SuperficieMagasin: this.client.SuperficieMagasin,
+                    NbrAutomaticCheckouts: this.client.NbrAutomaticCheckouts,
+                    AvailableBrands: JSON.stringify(this.client.AvailableBrands), // Specific serialization
+                    
+                    // Images
+                    CustomerBarCode_image_updated: this.client.CustomerBarCode_image_updated,
+                    in_store_image_updated: this.client.in_store_image_updated,
+                    CustomerBarCode_image: this.client.CustomerBarCode_image,
+                    in_store_image: this.client.in_store_image,
+                    CustomerBarCode_image_original_name: this.client.CustomerBarCode_image_original_name,
+                    in_store_image_original_name: this.client.in_store_image_original_name,
+                    
+                    status: this.client.status,
+                    nonvalidated_details: this.client.nonvalidated_details
+                };
+            } 
+            else if (status === 'Ferme' || status === 'refus') {
+                payload = {
+                    ...baseFields,
+                    // Empty/Default overrides
+                    CustomerCode: '',
+                    CustomerNameE: '',
+                    Tel: '',
+                    tel_status: 'nonvalidated',
+                    tel_comment: '',
+                    BrandAvailability: 'Non',
+                    BrandSourcePurchase: '',
+                    JPlan: this.client.JPlan,
+                    Journee: this.client.Journee,
+                    Frequency: this.client.Frequency,
+                    SuperficieMagasin: this.client.SuperficieMagasin,
+                    NbrAutomaticCheckouts: '',
+                    AvailableBrands: JSON.stringify([]),
+
+                    // Images (Clear others, keep facade)
+                    CustomerBarCode_image: '',
+                    in_store_image: '',
+                    CustomerBarCode_image_original_name: '',
+                    in_store_image_original_name: '',
+                    
+                    // Specific Updates for Refus/Ferme
+                    CustomerBarCodeExiste_image_updated: true, // Note: You had this in 'refus'
+                    CustomerBarCode_image_updated: true,
+                    in_store_image_updated: true,
+                    
+                    status: 'pending',
+                    nonvalidated_details: ''
+                };
+            }
+            else if (status === 'Introuvable') {
+                 payload = {
+                    ...baseFields,
+                    CustomerBarCodeExiste: '',
+                    CustomerCode: '',
+                    CustomerNameE: '',
+                    RvrsGeoAddress: this.client.RvrsGeoAddress, // Specific to Introuvable
+                    Tel: this.client.Tel,
+                    tel_status: 'nonvalidated',
+                    tel_comment: '',
+                    NbrVitrines: '',
+                    NbrAutomaticCheckouts: '',
+                    SuperficieMagasin: this.client.SuperficieMagasin,
+                    BrandAvailability: this.client.BrandAvailability,
+                    BrandSourcePurchase: this.client.BrandSourcePurchase,
+                    
+                    // Images logic (Clear all except facade)
+                    CustomerBarCodeExiste_image_updated: true,
+                    CustomerBarCode_image_updated: true,
+                    in_store_image_updated: true,
+                    CustomerBarCodeExiste_image: '',
+                    CustomerBarCode_image: '',
+                    in_store_image: '',
+                    
+                    JPlan: this.client.JPlan,
+                    Journee: this.client.Journee,
+                    
+                    status: 'pending',
+                    nonvalidated_details: ''
+                 };
+            }
+
+            // 4. Timer Logic
+            if (this.client.status_original === 'visible') {
+                payload.start_adding_date = this.start_adding_date;
+                payload.finish_adding_date = moment(new Date()).format();
+            }
+
+            // 5. Build FormData
+            const formData = new FormData();
+            for (const key in payload) {
+                let value = payload[key];
+                if (value === null || value === undefined) value = '';
+                formData.append(key, value);
+            }
+
+            // 6. Send Request
+            try {
+                const res = await this.$callApi("post", `/route_import/${this.$route.params.id_route_import}/clients/${this.client.id}/update`, formData);
+
+                if (res.status === 200) {
+                    this.$hideLoadingPage();
+                    this.$feedbackSuccess(res.data["header"], res.data["message"]);
+                    this.$goBack();
+                } else {
+                    this.$hideLoadingPage();
+                    this.$showErrors("Error !", res.data.errors);
+                }
+            } catch (error) {
+                this.$hideLoadingPage();
+                this.$showErrors("System Error", ["An unexpected error occurred."]);
+                console.error(error);
+            }
+        },
+
         //
 
         async getData() {
+            this.$showLoadingPage();
 
-            // Show Loading Page
-            this.$showLoadingPage()
+            try {
+                // 1. Get Route Details
+                const res = await this.$callApi("post", `/route/obs/route_import/${this.$route.params.id_route_import}/details`, null);
+                if(res.data && res.data.route_import) {
+                    this.all_clients = res.data.route_import.clients;
+                }
 
-            const res           =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.$route.params.id_route_import+"/details",   null)
-            this.all_clients    =   res.data.route_import.clients
+                // 2. Get Client & Combo Data
+                await Promise.all([
+                    this.getClientData(),
+                    this.getComboData()
+                ]);
 
-            await this.getClientData()  
-            await this.getComboData()
-
-            // Hide Loading Page
-            this.$hideLoadingPage()
+            } catch (error) {
+                console.error("Error fetching data", error);
+                this.$showErrors("Error", ["Failed to load data."]);
+            } finally {
+                this.$hideLoadingPage();
+            }
         },
 
-        async getClientData() {
+        async getClientData_old() {
+            const res = await this.$callApi("post", `/route_import/${this.$route.params.id_route_import}/clients/${this.$route.params.id_client}/show`, null);
+            const apiData = res.data;
 
-            const res                                           =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.$route.params.id_client+"/show",   null)
-            let client                                          =   res.data
+            // 1. Merge API data into client object (replaces 50 lines of manual assignment)
+            this.client = {
+                ...this.client,
+                ...apiData,
+                // Handle specific field transformations immediately
+                AvailableBrands: apiData.AvailableBrands_array_formatted || []
+            };
 
-            this.client.id                                      =   client.id
+            // 2. Handle Image Previews
+            // Note: In your HTML, use <img :src="client.CustomerBarCode_image_currentObjectURL">
+            this.setImagePreview('CustomerBarCode', apiData.id, apiData.CustomerBarCode_image, apiData.CustomerBarCode_image_original_name);
+            this.setImagePreview('facade', apiData.id, apiData.facade_image, apiData.facade_image_original_name);
+            this.setImagePreview('in_store', apiData.id, apiData.in_store_image, apiData.in_store_image_original_name);
 
-            this.client.NewCustomer                             =   client.NewCustomer
-            this.client.OpenCustomer                            =   client.OpenCustomer
-
-            this.client.CustomerIdentifier                      =   client.CustomerIdentifier
-            this.client.CustomerCode                            =   client.CustomerCode
-
-            this.client.old_CustomerNameE                       =   client.CustomerNameE
-
-            this.client.CustomerNameE                           =   client.CustomerNameE
-            this.client.CustomerNameA                           =   client.CustomerNameA
-            this.client.Latitude                                =   client.Latitude
-            this.client.Longitude                               =   client.Longitude
-
-            this.client.Address                                 =   client.Address
-            this.client.Neighborhood                            =   client.Neighborhood
-            this.client.Landmark                                =   client.Landmark
-
-            this.client.DistrictNo                              =   client.DistrictNo
-            this.client.DistrictNameE                           =   client.DistrictNameE
-
-            await this.getCites()
-
-            this.client.CityNo                                  =   client.CityNo
-            this.client.CityNameE                               =   client.CityNameE
-
-            this.client.Tel                                     =   client.Tel
-            this.client.tel_status                              =   client.tel_status
-            this.client.tel_comment                             =   client.tel_comment
-
-            this.client.CustomerType                            =   client.CustomerType
-            this.client.BrandAvailability                       =   client.BrandAvailability
-            this.client.BrandSourcePurchase                     =   client.BrandSourcePurchase
-
-            this.client.JPlan                                   =   client.JPlan
-            this.client.Journee                                 =   client.Journee
-
-            this.client.Frequency                               =   client.Frequency
-            this.client.AvailableBrands                         =   client.AvailableBrands_array_formatted // client.AvailableBrands
-            this.client.NbrAutomaticCheckouts                   =   client.NbrAutomaticCheckouts
-            this.client.SuperficieMagasin                       =   client.SuperficieMagasin
-
-            // this.client.status                                  =   client.status
-            this.client.status_original                         =   client.status
-            this.client.nonvalidated_details                    =   client.nonvalidated_details
-
-            this.client.comment                                 =   client.comment
-
-            this.client.CustomerBarCode_image                   =   client.CustomerBarCode_image
-            this.client.facade_image                            =   client.facade_image
-            this.client.in_store_image                          =   client.in_store_image
-
-            this.client.CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name
-            this.client.facade_image_original_name              =   client.facade_image_original_name
-            this.client.in_store_image_original_name            =   client.in_store_image_original_name
-
-            // 
-            if(this.client.CustomerBarCode_image_original_name) {
-                this.$createFile(client.CustomerBarCode_image_original_name     ,   "CustomerBarCode_image_update")
-                let CustomerBarCode_image_display_update                        =   document.getElementById("CustomerBarCode_image_display_update")
-                CustomerBarCode_image_display_update.src                        =   "/uploads/clients/"+client.id+"/"+client.CustomerBarCode_image
+            // 3. Set timer if visible
+            if (this.client.status === "visible") {
+                this.start_adding_date = moment(new Date()).format();
             }
 
-            if(this.client.facade_image_original_name) {
-                this.$createFile(client.facade_image_original_name              ,   "facade_image_update")
-                let facade_image_display_update                                 =   document.getElementById("facade_image_display_update")
-                facade_image_display_update.src                                 =   "/uploads/clients/"+client.id+"/"+client.facade_image
-            }
-
-            if(this.client.in_store_image_original_name) {
-                this.$createFile(client.in_store_image_original_name            ,   "in_store_image_update")
-                let in_store_image_display_update                               =   document.getElementById("in_store_image_display_update")
-                in_store_image_display_update.src                               =   "/uploads/clients/"+client.id+"/"+client.in_store_image
-            }
-
-            //  //  //  //  //
-
-            // Set Start ADDd
-            if(this.client.status   ==  "visible") {
-
-                this.start_adding_date  =   moment(new Date()).format()
-            }
-
-            //
-            this.checkClients()
+            this.checkClients(); // Existing logic check
         },
 
-        async getComboData() {
-
-            const res_3                     =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/districts" ,   null)
-            this.willayas                   =   res_3.data
+        setImagePreview(prefix, clientId, imageName, originalName) {
+            if (originalName && imageName) {
+                const url = `/uploads/clients/${clientId}/${imageName}`;
+                this.client[`${prefix}_image_currentObjectURL`] = url;
+                
+                // If you are using a file creation utility
+                this.$createFile(originalName, `${prefix}_image_update`);
+            }
         },
 
-        async getCites() {
+        async getComboData_old() {
+            const res = await this.$callApi("post", `/route_import/${this.$route.params.id_route_import}/districts`, null);
+            this.willayas = res.data;
+        },
 
-            // Show Loading Page
-            this.$showLoadingPage()
-
-            const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
-            this.cites                      =   res_3.data
-
-            this.client.CityNo              =   ""
-
-            // Hide Loading Page
-            this.$hideLoadingPage()
+        async getCites_old() {
+            if(!this.client.DistrictNo) return;
+            
+            this.$showLoadingPage();
+            const res = await this.$callApi("post", `/rtm_willayas/${this.client.DistrictNo}/rtm_cites`, null);
+            this.cites = res.data;
+            this.client.CityNo = ""; // Reset city selection
+            this.$hideLoadingPage();
         },
 
         //
@@ -1530,15 +1318,15 @@ export default {
 
                     // --- NEW: Get Address from LocationIQ ---
                     // We await this so the address is ready before you save/check clients
-                    const address = await this.$getAddressFromLocationIQ(this.client.Latitude, this.client.Longitude);
+                    // const address = await this.$getAddressFromLocationIQ(this.client.Latitude, this.client.Longitude);
                     
                     // Assuming 'this.client.Address' is where you want to store it
-                    if(address) {
-                        this.client.RvrsGeoAddress  =   address;
-                        console.log("Address found:", this.client.RvrsGeoAddress);
-                    }
+                    // if(address) {
+                    //     this.client.RvrsGeoAddress  =   address;
+                    //     console.log("Address found:", this.client.RvrsGeoAddress);
+                    // }
                     // ----------------------------------------
-                    await this.$nextTick()
+                    // await this.$nextTick()
 
                     //
                     let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
@@ -2306,8 +2094,7 @@ export default {
         //
 
         setTotalQuestions() {
-
-            this.total_questions    =   document.getElementsByClassName("mySlides").length
+            this.total_questions = document.getElementsByClassName("mySlides").length;
         },
 
         setStatus() {
@@ -2321,8 +2108,189 @@ export default {
             }
 
             this.setTotalQuestions()
-        }
+        },
+
+        //  //  //  //  //  //  //
+        //  //  //  //  //  //  //
+        //  //  //  //  //  //  //
+
+        // --- Navigation ---
+        changeSlide(step) {
+            const nextIndex = this.slideIndex + step;
+            
+            // Logic for "Next"
+            if (step > 0) {
+                if (!this.validationQuestion()) {
+                    this.$showErrors("Erreur !", ["Veuillez remplir les champs obligatoires correctement."]);
+                    return;
+                }
+                
+                // If moving TO the map slide (last slide)
+                if (nextIndex === this.total_questions) {
+                    this.point_is_inside_user_polygons = false;
+                    setTimeout(() => {
+                        this.showPositionOnMap('show_map'); 
+                    }, 200); // Small delay to ensure DIV is rendered via v-show
+                }
+            }
+
+            // Logic for "Previous"
+            if (nextIndex < 1) return;
+            if (nextIndex > this.total_questions) return;
+
+            this.slideIndex = nextIndex;
+        },
+
+        async handleImageUpload(event, fieldKey) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Revoke old URL to free memory
+            this.revokeImage(fieldKey);
+
+            try {
+                const compressedFile = await this.$compressImage(file);
+                const objectUrl = URL.createObjectURL(compressedFile);
+
+                // Update non-reactive storage
+                this._rawFiles[fieldKey] = compressedFile;
+
+                // Update Vue state with metadata only
+                this.client[`${fieldKey}_currentObjectURL`] = objectUrl;
+                this.client[`${fieldKey}_original_name`] = file.name;
+                this.client[`${fieldKey}_updated`] = true;
+
+                // Clear input so same file can be re-selected if needed
+                event.target.value = ''; 
+            } catch (e) {
+                console.error("Upload Error:", e);
+            }
+        },
+
+        revokeImage(fieldKey) {
+            if (this.client[`${fieldKey}_currentObjectURL`]?.startsWith('blob:')) {
+                URL.revokeObjectURL(this.client[`${fieldKey}_currentObjectURL`]);
+            }
+        },
+
+        async getClientData() {
+            const res = await this.$callApi("post", `/route_import/${this.$route.params.id_route_import}/clients/${this.$route.params.id_client}/show`);
+            const data = res.data;
+
+            // Bulk assign properties
+            Object.assign(this.client, data);
+            
+            // Format specific fields
+            this.client.AvailableBrands = data.AvailableBrands_array_formatted || [];
+            
+            // Set Initial Previews from Server
+            const imgFields = ['CustomerBarCode_image', 'facade_image', 'in_store_image'];
+            imgFields.forEach(field => {
+                if (data[field]) {
+                    this.client[`${field}_currentObjectURL`] = `/uploads/clients/${data.id}/${data[field]}`;
+                }
+            });
+
+            if (this.client.status === "visible") {
+                this.start_adding_date = moment().format();
+            }
+            
+            if (this.client.DistrictNo) this.getCites();
+        },
+
+        async getComboData() {
+            const res = await this.$callApi("post", `/route_import/${this.$route.params.id_route_import}/districts`);
+            this.willayas = res.data;
+        },
+
+        async getCites() {
+            const res = await this.$callApi("post", `/rtm_willayas/${this.client.DistrictNo}/rtm_cites`);
+            this.cites = res.data;
+        },
+
+        async sendData() {
+            this.$showLoadingPage();
+            
+            const formData = new FormData();
+            
+            // Logic to determine what to send based on OpenCustomer status
+            const isOuvert = this.client.OpenCustomer === 'Ouvert';
+
+            // 1. Build Payload Object
+            const payload = {
+                ...this.client,
+                AvailableBrands: JSON.stringify(this.client.AvailableBrands),
+                finish_adding_date: moment().format(),
+                start_adding_date: this.start_adding_date,
+                // Override status if not open
+                status: isOuvert ? this.client.status : 'pending'
+            };
+
+            // 2. Append text fields
+            Object.keys(payload).forEach(key => {
+                if (typeof payload[key] !== 'object' || Array.isArray(payload[key])) {
+                    formData.append(key, payload[key] ?? '');
+                }
+            });
+
+            // 3. Append Heavy Files from non-reactive storage
+            Object.keys(this._rawFiles).forEach(key => {
+                if (this._rawFiles[key]) {
+                    formData.append(key, this._rawFiles[key]);
+                }
+            });
+
+            try {
+                const res = await this.$callApi("post", `/route_import/${this.$route.params.id_route_import}/clients/${this.client.id}/update`, formData);
+                this.$feedbackSuccess(res.data.header, res.data.message);
+                this.$goBack();
+            } catch (err) {
+                this.$showErrors("Error", ["Update failed"]);
+            } finally {
+                this.$hideLoadingPage();
+            }
+        },
+
+        cleanupScanner() {
+             if (this.scanner) {
+                 this.scanner.clear().catch(e => {});
+             }
+        },
+
+        refreshGPS() {
+            this.check_gps_clicked = true;
+            this.showPositionOnMap('show_map');
+            setTimeout(() => { this.check_gps_clicked = false; }, 2000);
+        },
     }
 };
 
 </script>
+
+<style scoped>
+.page-shell {
+  height: calc(100dvh - 60px);
+  min-height: 0;    /* ALLOWS children to shrink and let overflow work correctly */
+  display: flex;
+  flex-direction: column;
+}
+
+/* the scrollable area must allow overflow and shrink correctly */
+.page-content {
+  flex: 1 1 auto;
+  min-height: 0;    /* important for overflow:auto inside flex columns */
+  overflow: auto;
+}
+
+/* optional: make footer visually distinct and ensure it's on top if needed */
+.page-footer {
+  flex: 0 0 auto;
+  z-index: 10;
+  background: #fff;
+}
+
+.progress .progress-bar {
+    background-color: #157347;
+}
+
+</style>

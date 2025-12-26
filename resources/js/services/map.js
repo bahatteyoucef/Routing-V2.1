@@ -73,7 +73,7 @@ export default class Map {
 
     //  //  Create/Destroy Map  //  //
 
-    $createMap(role, map_id, left_tools = true, right_tools = true) {
+    $createMap(role, map_id, left_tools = true, right_tools = true, marker_cluster_mode = 'cluster') {
 
         //
         this.left_tools     =   left_tools
@@ -112,7 +112,8 @@ export default class Map {
         this.map.addLayer(this.canvasRenderer);
 
         // User Role
-        this.user_role      =   role
+        this.user_role              =   role
+        this.marker_cluster_mode    =   marker_cluster_mode
 
         if((this.user_role == "Super Admin")||(this.user_role   ==  "BU Manager")||(this.user_role == "BackOffice")) {
 
