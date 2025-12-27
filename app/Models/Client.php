@@ -109,6 +109,7 @@ class Client extends Model
                     'Latitude'                  =>  $client_elem['Latitude']                                ??  0               ,
                     'Longitude'                 =>  $client_elem['Longitude']                               ??  0               ,
                     'Address'                   =>  $client_elem['Address']                                 ??  ''              ,
+                    'RvrsGeoAddress'            =>  $client_elem['RvrsGeoAddress']                          ??  ''              ,
                     'DistrictNo'                =>  $client_elem['DistrictNo']                              ??  ''              ,
                     'DistrictNameE'             =>  $client_elem['DistrictNameE']                           ??  ''              ,
                     'CityNo'                    =>  $client_elem['CityNo']                                  ??  ''              ,
@@ -214,6 +215,7 @@ class Client extends Model
                     'AvailableBrands'           =>  $AvailableBrands,
 
                     'Address'                   =>  $client_elem['Address']                                     ?? ''           ,
+                    'RvrsGeoAddress'            =>  $client_elem['RvrsGeoAddress']                              ?? ''           ,
                     'DistrictNo'                =>  $client_elem['DistrictNo']                                  ?? ''           ,
                     'DistrictNameE'             =>  $client_elem['DistrictNameE']                               ?? ''           ,
                     'CityNo'                    =>  $client_elem['CityNo']                                      ?? ''           ,
@@ -268,7 +270,7 @@ class Client extends Model
     //
 
     // polygon change multiple informations for clients
-    public static function changeRouteClients(Request $request, int $id_route_import) {
+    public static function multiUpdateClients(Request $request, int $id_route_import) {
         // Ensure clients is decoded as an associative array for consistency
         $clientsToUpdate    =   json_decode($request->get("clients"), true); 
         if (empty($clientsToUpdate)) return;
@@ -391,6 +393,7 @@ class Client extends Model
             'Latitude'              =>  ["required", "max:255"],
             'Longitude'             =>  ["required", "max:255"],
             'Address'               =>  ["required", "max:255"],
+            'RvrsGeoAddress'        =>  ["required", "max:255"],
             'DistrictNo'            =>  ["required", "max:255"],
             'DistrictNameE'         =>  ["required", "max:255"],
             'CityNo'                =>  ["required", "max:255"],
@@ -464,6 +467,7 @@ class Client extends Model
             'Latitude'                      =>  $request->input("Latitude")                                 ?? ''   ,
             'Longitude'                     =>  $request->input("Longitude")                                ?? ''   ,
             'Address'                       =>  $request->input("Address")                                  ?? ''   ,
+            'RvrsGeoAddress'                =>  $request->input("RvrsGeoAddress")                           ?? ''   ,
             'DistrictNo'                    =>  $request->input("DistrictNo")                               ?? ''   ,
             'DistrictNameE'                 =>  $request->input("DistrictNameE")                            ?? ''   ,
             'CityNo'                        =>  $request->input("CityNo")                                   ?? ''   ,
@@ -539,6 +543,7 @@ class Client extends Model
             'Latitude'              =>  ["required", "max:255"],
             'Longitude'             =>  ["required", "max:255"],
             'Address'               =>  ["required", "max:255"],
+            'RvrsGeoAddress'        =>  ["required", "max:255"],
             'DistrictNo'            =>  ["required", "max:255"],
             'DistrictNameE'         =>  ["required", "max:255"],
             'CityNo'                =>  ["required", "max:255"],
@@ -607,7 +612,7 @@ class Client extends Model
         // 2. Mass Assignment (Fill simple fields)
         $client->fill($request->only([
             'NewCustomer', 'OpenCustomer', 'CustomerIdentifier', 'CustomerCode',
-            'Latitude', 'Longitude', 'Address', 'DistrictNo', 'DistrictNameE',
+            'Latitude', 'Longitude', 'Address', 'RvrsGeoAddress', 'DistrictNo', 'DistrictNameE',
             'CityNo', 'CityNameE', 'Tel', 'CustomerType', 'Neighborhood', 
             'Landmark', 'BrandAvailability', 'BrandSourcePurchase', 'Frequency', 
             'SuperficieMagasin', 'NbrAutomaticCheckouts', 'comment', 'status', 

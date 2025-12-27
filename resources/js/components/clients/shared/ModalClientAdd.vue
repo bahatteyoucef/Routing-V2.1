@@ -287,17 +287,22 @@
                                 </div>
 
                                 <div class="row mt-3 mb-3">
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-3">
+                                        <label for="RvrsGeoAddress"     class="form-label">RvrsGeoAddress</label>
+                                        <textarea                       class="form-control"        :id="'RvrsGeoAddress'"      rows="3"    v-model="client.RvrsGeoAddress"></textarea>
+                                    </div>
+
+                                    <div class="col-sm-3">
                                         <label for="Address"            class="form-label">Adresse</label>
                                         <input type="text"              class="form-control"        id="Address"                v-model="client.Address">
                                     </div>
 
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <label for="Neighborhood"       class="form-label">Quartier</label>
                                         <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood">
                                     </div>
 
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <label for="Landmark"           class="form-label">Point de Repere</label>
                                         <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"></textarea>
                                     </div>
@@ -504,6 +509,7 @@ export default {
 
                 // Slide 7
                 Address                                 :   '',
+                RvrsGeoAddress                          :   '',
 
                 // Slide 8
                 Neighborhood                            :   '',
@@ -662,6 +668,7 @@ export default {
             formData.append("Latitude"                              ,   this.client.Latitude)
             formData.append("Longitude"                             ,   this.client.Longitude)
             formData.append("Address"                               ,   this.client.Address)
+            formData.append("RvrsGeoAddress"                        ,   this.client.RvrsGeoAddress)
             formData.append("Neighborhood"                          ,   this.client.Neighborhood)
             formData.append("Landmark"                              ,   this.client.Landmark)
 
@@ -837,6 +844,7 @@ export default {
 
                 // Slide 7
                 this.client.Address                                 =   '',
+                this.client.RvrsGeoAddress                          =   '',
 
                 // Slide 8
                 this.client.Neighborhood                            =   '',

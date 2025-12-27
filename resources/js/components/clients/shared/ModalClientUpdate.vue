@@ -285,17 +285,22 @@
                                 </div>
 
                                 <div class="row mt-3 mb-3">
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-3">
+                                        <label for="RvrsGeoAddress"     class="form-label">RvrsGeoAddress</label>
+                                        <textarea                       class="form-control"        :id="'RvrsGeoAddress_'+client.id"   rows="3"    v-model="client.RvrsGeoAddress"     :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
+                                    </div>
+
+                                    <div class="col-sm-3">
                                         <label for="Address"            class="form-label">Adresse</label>
                                         <input type="text"              class="form-control"        id="Address"                v-model="client.Address"                                :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                     </div>
 
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <label for="Neighborhood"       class="form-label">Quartier</label>
                                         <input type="text"              class="form-control"        id="Neighborhood"           v-model="client.Neighborhood"                           :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                     </div>
 
-                                    <div class="col-sm-4">
+                                    <div class="col-sm-3">
                                         <label for="Landmark"           class="form-label">Point de Repere</label>
                                         <textarea                       class="form-control"        id="Landmark"   rows="3"    v-model="client.Landmark"                               :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
                                     </div>
@@ -502,6 +507,7 @@ export default {
 
                 // Slide 7
                 Address                                 :   '',
+                RvrsGeoAddress                          :   '',
 
                 // Slide 8
                 Neighborhood                            :   '',
@@ -603,6 +609,15 @@ export default {
         this.clearData("#ModalClientUpdate")
     },
 
+    // 1. Non-reactive storage for heavy binary blobs
+    created() {
+        this._rawFiles = {
+            CustomerBarCode_image: null,
+            facade_image: null,
+            in_store_image: null
+        };
+    },
+
     methods : {
 
         ...mapActions("client" ,  [
@@ -612,170 +627,172 @@ export default {
         //
 
         async sendData() {
-
-            this.$showLoadingPage()
-
-            // Set Client
-            this.client.DistrictNameE   =   this.getDistrictNameE(this.client.DistrictNo)
-            this.client.CityNameE       =   this.getCityNameE(this.client.CityNo)
-            this.client.owner_username      =   this.getOwnerUsername(this.client.owner)
-
-            //
-
-            if(this.client.OpenCustomer  === 'Ouvert') {
+            // 1. Validation
+            const validation = this.validationQuestion();
+            if (!validation) {
+                this.$showErrors("Error !", ["Veuillez répondre en respectant les conditions des questions avant de valider !"]);
+                return;
             }
 
-            else {
-                this.client.CustomerCode                                =   ''
-                this.client.CustomerNameE                               =   ''
-                this.client.Tel                                         =   ''
-                this.client.tel_status                                  =   'nonvalidated'
-                this.client.tel_comment                                 =   ''
-                this.client.BrandAvailability                           =   'Non'
-                this.client.BrandSourcePurchase                         =   ''
-                this.client.NbrAutomaticCheckouts                       =   ''
-                this.client.AvailableBrands                             =   []
-                this.client.CustomerBarCode_image                       =   ''
-                this.client.in_store_image                              =   ''
-                this.client.CustomerBarCode_image_original_name         =   ''
-                this.client.in_store_image_original_name                =   ''
-                this.client.status                                      =   'ferme'
-                this.client.nonvalidated_details                        =   ''
-            }
+            this.$showLoadingPage();
 
-            //
-            let formData = new FormData();
+            // 2. Refresh Names
+            if (this.willayas.length > 0) this.client.DistrictNameE = this.getDistrictNameE(this.client.DistrictNo);
+            if (this.cites.length > 0) this.client.CityNameE = this.getCityNameE(this.client.CityNo);
 
-            formData.append("NewCustomer"                           ,   this.client.NewCustomer)
-            formData.append("OpenCustomer"                          ,   this.client.OpenCustomer)
+            // 3. Prepare Payload based on Status
+            let payload = {};
+            const status = this.client.OpenCustomer; // Ouvert, Ferme, Refus, Introuvable
 
-            formData.append("CustomerIdentifier"                    ,   this.client.CustomerIdentifier)
-            formData.append("CustomerCode"                          ,   this.client.CustomerCode)
-            formData.append("CustomerNameE"                         ,   this.client.CustomerNameE)
-            formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
-            formData.append("Latitude"                              ,   this.client.Latitude)
-            formData.append("Longitude"                             ,   this.client.Longitude)
-            formData.append("Address"                               ,   this.client.Address)
-            formData.append("Neighborhood"                          ,   this.client.Neighborhood)
-            formData.append("Landmark"                              ,   this.client.Landmark)
+            // --- A. Base Fields (Common to almost all) ---
+            const baseFields = {
+                NewCustomer: this.client.NewCustomer,
+                OpenCustomer: this.client.OpenCustomer,
+                CustomerIdentifier: this.client.CustomerIdentifier,
+                CustomerNameA: this.client.CustomerNameA,
+                Latitude: this.client.Latitude,
+                Longitude: this.client.Longitude,
+                Address: this.client.Address,
+                RvrsGeoAddress: this.client.RvrsGeoAddress,
+                Neighborhood: this.client.Neighborhood,
+                Landmark: this.client.Landmark,
+                DistrictNo: this.client.DistrictNo,
+                DistrictNameE: this.client.DistrictNameE,
+                CityNo: this.client.CityNo,
+                CityNameE: this.client.CityNameE,
+                CustomerType: this.client.CustomerType,
+                // Default Images Logic
+                facade_image: this.client.facade_image,
+                facade_image_original_name: this.client.facade_image_original_name,
+                facade_image_updated: this.client.facade_image_updated,
+                comment: this.client.comment
+            };
 
-            formData.append("DistrictNo"                            ,   this.client.DistrictNo)
-            formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
-            formData.append("CityNo"                                ,   this.client.CityNo)
-            formData.append("CityNameE"                             ,   this.client.CityNameE)
-            formData.append("Tel"                                   ,   this.client.Tel)
-            formData.append("tel_status"                            ,   this.client.tel_status)
-            formData.append("tel_comment"                           ,   this.client.tel_comment)
-            formData.append("CustomerType"                          ,   this.client.CustomerType)
-            formData.append("BrandAvailability"                     ,   this.client.BrandAvailability)
-            formData.append("BrandSourcePurchase"                   ,   this.client.BrandSourcePurchase)
-
-            formData.append("JPlan"                                 ,   this.client.JPlan)
-            formData.append("Journee"                               ,   this.client.Journee)
-
-            formData.append("Frequency"                             ,   this.client.Frequency)
-            formData.append("SuperficieMagasin"                     ,   this.client.SuperficieMagasin)
-            formData.append("NbrAutomaticCheckouts"                 ,   this.client.NbrAutomaticCheckouts)
-            formData.append("AvailableBrands"                       ,   JSON.stringify(this.client.AvailableBrands))
-
-            formData.append("CustomerBarCode_image_updated"         ,   this.client.CustomerBarCode_image_updated)
-            formData.append("facade_image_updated"                  ,   this.client.facade_image_updated)
-            formData.append("in_store_image_updated"                ,   this.client.in_store_image_updated)
-
-            formData.append("CustomerBarCode_image"                 ,   this.client.CustomerBarCode_image)
-            formData.append("facade_image"                          ,   this.client.facade_image)
-            formData.append("in_store_image"                        ,   this.client.in_store_image)
-
-            formData.append("CustomerBarCode_image_original_name"   ,   this.client.CustomerBarCode_image_original_name)
-            formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
-            formData.append("in_store_image_original_name"          ,   this.client.in_store_image_original_name)
-
-            formData.append("status"                                ,   this.client.status)
-            formData.append("nonvalidated_details"                  ,   this.client.nonvalidated_details)
-
-            formData.append("owner"                                 ,   this.client.owner)
-            formData.append("comment"                               ,   this.client.comment)
-
-            //
-            if(this.mode    ==  "permanent") {
-
-                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.id_route_import+"/clients/"+this.client.id+"/update",   formData)
-                console.log(res)
-
-                if(res.status===200){
-
-                    let client          =   res.data.client
-                    client.owner_username   =   this.client.owner_username
-
-                    // Send Feedback
-                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
-
-                    // 5) Now hide the spinner
-                    this.$hideLoadingPage();
-
-                    // Validation
-                    if(this.update_type ==  "validation") {
-                        this.emitter.emit("updateDoubles"+this.validation_type    , client)
-                    }
-
-                    // Update Data
-                    else {
-                        if(this.update_type ==  "normal_update") {
-
-                            this.emitter.emit('reSetUpdate' , client)
-                        }
-                    }
-
-                    // Close Modal
-                    await this.$hideModal("ModalClientUpdate")
-                }
-                
-                else{
-
-                    // Send Errors
-                    this.$showErrors("Error !", res.data.errors)
-
-                    // 5) Now hide the spinner
-                    this.$hideLoadingPage();
-                }
-            }
-
-            else {
-
-                if(this.mode    ==  "temporary") {
-
-                    const res                   =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.id_route_import_tempo+"/clients_tempo/"+this.client.id+"/update",   formData)
-
-                    if(res.status===200){
-
-                        let client          =   res.data.client
-                        client.owner_username   =   this.client.owner_username
-
-                        // Send Feedback
-                        this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
-
-                        // 5) Now hide the spinner
-                        this.$hideLoadingPage();
-
-                        // Validation
-                        if(this.update_type ==  "validation") {
-
-                            this.emitter.emit("updateDoubles"+this.validation_type    , client)
-                        }
-
-                        // Close Modal
-                        await this.$hideModal("ModalClientUpdate")
-                    }
+            // --- B. Status Specific Logic ---
+            if (status === 'Ouvert') {
+                payload = {
+                    ...baseFields,
+                    CustomerCode: this.client.CustomerCode,
+                    CustomerNameE: this.client.CustomerNameE,
+                    Tel: this.client.Tel,
+                    tel_status: this.client.tel_status,
+                    tel_comment: this.client.tel_comment,
+                    BrandAvailability: this.client.BrandAvailability,
+                    BrandSourcePurchase: this.client.BrandSourcePurchase,
+                    JPlan: this.client.JPlan,
+                    Journee: this.client.Journee,
+                    Frequency: this.client.Frequency,
+                    SuperficieMagasin: this.client.SuperficieMagasin,
+                    NbrAutomaticCheckouts: this.client.NbrAutomaticCheckouts,
+                    AvailableBrands: JSON.stringify(this.client.AvailableBrands), // Specific serialization
                     
-                    else{
+                    // Images
+                    CustomerBarCode_image_updated: this.client.CustomerBarCode_image_updated,
+                    in_store_image_updated: this.client.in_store_image_updated,
+                    CustomerBarCode_image: this.client.CustomerBarCode_image,
+                    in_store_image: this.client.in_store_image,
+                    CustomerBarCode_image_original_name: this.client.CustomerBarCode_image_original_name,
+                    in_store_image_original_name: this.client.in_store_image_original_name,
+                    
+                    status: this.client.status,
+                    nonvalidated_details: this.client.nonvalidated_details
+                };
+            } 
+            else if (status === 'Ferme' || status === 'refus') {
+                payload = {
+                    ...baseFields,
+                    // Empty/Default overrides
+                    CustomerCode: '',
+                    CustomerNameE: '',
+                    Tel: '',
+                    tel_status: 'nonvalidated',
+                    tel_comment: '',
+                    BrandAvailability: 'Non',
+                    BrandSourcePurchase: '',
+                    JPlan: this.client.JPlan,
+                    Journee: this.client.Journee,
+                    Frequency: this.client.Frequency,
+                    SuperficieMagasin: this.client.SuperficieMagasin,
+                    NbrAutomaticCheckouts: '',
+                    AvailableBrands: JSON.stringify([]),
 
-                        // Send Errors
-                        this.$showErrors("Error !", res.data.errors)
+                    // Images (Clear others, keep facade)
+                    CustomerBarCode_image: '',
+                    in_store_image: '',
+                    CustomerBarCode_image_original_name: '',
+                    in_store_image_original_name: '',
+                    
+                    // Specific Updates for Refus/Ferme
+                    CustomerBarCodeExiste_image_updated: true, // Note: You had this in 'refus'
+                    CustomerBarCode_image_updated: true,
+                    in_store_image_updated: true,
+                    
+                    status: 'pending',
+                    nonvalidated_details: ''
+                };
+            }
+            else if (status === 'Introuvable') {
+                 payload = {
+                    ...baseFields,
+                    CustomerBarCodeExiste: '',
+                    CustomerCode: '',
+                    CustomerNameE: '',
+                    RvrsGeoAddress: this.client.RvrsGeoAddress, // Specific to Introuvable
+                    Tel: this.client.Tel,
+                    tel_status: 'nonvalidated',
+                    tel_comment: '',
+                    NbrVitrines: '',
+                    NbrAutomaticCheckouts: '',
+                    SuperficieMagasin: this.client.SuperficieMagasin,
+                    BrandAvailability: this.client.BrandAvailability,
+                    BrandSourcePurchase: this.client.BrandSourcePurchase,
+                    
+                    // Images logic (Clear all except facade)
+                    CustomerBarCodeExiste_image_updated: true,
+                    CustomerBarCode_image_updated: true,
+                    in_store_image_updated: true,
+                    CustomerBarCodeExiste_image: '',
+                    CustomerBarCode_image: '',
+                    in_store_image: '',
+                    
+                    JPlan: this.client.JPlan,
+                    Journee: this.client.Journee,
+                    
+                    status: 'pending',
+                    nonvalidated_details: ''
+                 };
+            }
 
-                        // 5) Now hide the spinner
-                        this.$hideLoadingPage();
-                    }
+            // 4. Timer Logic
+            if (this.client.status_original === 'visible') {
+                payload.start_adding_date = this.start_adding_date;
+                payload.finish_adding_date = moment(new Date()).format();
+            }
+
+            // 5. Build FormData
+            const formData = new FormData();
+            for (const key in payload) {
+                let value = payload[key];
+                if (value === null || value === undefined) value = '';
+                formData.append(key, value);
+            }
+
+            // 6. Send Request
+            try {
+                const res = await this.$callApi("post", `/route_import/${this.$route.params.id_route_import}/clients/${this.client.id}/update`, formData);
+
+                if (res.status === 200) {
+                    this.$hideLoadingPage();
+                    this.$feedbackSuccess(res.data["header"], res.data["message"]);
+                    this.$goBack();
+                } else {
+                    this.$hideLoadingPage();
+                    this.$showErrors("Error !", res.data.errors);
                 }
+            } catch (error) {
+                this.$hideLoadingPage();
+                this.$showErrors("System Error", ["An unexpected error occurred."]);
+                console.error(error);
             }
         },
 
@@ -963,6 +980,7 @@ export default {
 
                 // Slide 7
                 this.client.Address                                 =   '',
+                this.client.RvrsGeoAddress                          =   '',
 
                 // Slide 8
                 this.client.Neighborhood                            =   '',
@@ -1078,6 +1096,7 @@ export default {
             this.client.Longitude                       =   client.Longitude
 
             this.client.Address                         =   client.Address
+            this.client.RvrsGeoAddress                  =   client.RvrsGeoAddress
             this.client.Neighborhood                    =   client.Neighborhood
             this.client.Landmark                        =   client.Landmark
 

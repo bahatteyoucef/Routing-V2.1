@@ -315,7 +315,7 @@
     <ModalClientUpdate                                              ref="ModalClientUpdate"         :id_route_import="id_route_import"      :update_type="'normal_update'"      :mode="'permanent'"     :users_all="users_all"      :districts_all="districts_all"  >   </ModalClientUpdate>
 
     <!-- Modal Change Route             -->
-    <ModalClientsChangeRoute                                        ref="ModalClientsChangeRoute"                                                                                                       :users_all="users_all"      :districts_all="districts_all"  >   </ModalClientsChangeRoute>
+    <ModalClientsMultiUpdate                                        ref="ModalClientsMultiUpdate"                                                                                                       :users_all="users_all"      :districts_all="districts_all"  >   </ModalClientsMultiUpdate>
 
     <!-- Modal Decoupe By Journee       -->
     <ModalResume                                                    ref="ModalResume"               :id_route_import="id_route_import"      :mode="'permanent'"                                                                                                     >   </ModalResume>
@@ -337,7 +337,7 @@ import Multiselect                  from    '@vueform/multiselect'
 
 import ModalClientAdd               from    "@/components/clients/shared/ModalClientAdd.vue"
 import ModalClientUpdate            from    "@/components/clients/shared/ModalClientUpdate.vue"
-import ModalClientsChangeRoute      from    "@/components/clients/shared/ModalClientsChangeRoute.vue"
+import ModalClientsMultiUpdate      from    "@/components/clients/shared/ModalClientsMultiUpdate.vue"
 
 import ModalAddJourneyPlan          from    "@/components/territoires/ModalAddJourneyPlan.vue"
 import ModalUpdateJourneyPlan       from    "@/components/territoires/ModalUpdateJourneyPlan.vue"
@@ -520,7 +520,7 @@ export default {
 
         ModalClientAdd              ,
         ModalClientUpdate           ,
-        ModalClientsChangeRoute     ,
+        ModalClientsMultiUpdate     ,
         ModalResume                 ,
 
         ModalAddJourneyPlan         ,
@@ -1785,7 +1785,7 @@ export default {
 
         async updateClientsRoute(clients) {
 
-            await this.$refs.ModalClientsChangeRoute.getData(clients)
+            await this.$refs.ModalClientsMultiUpdate.getData(clients)
         },
 
         addJourneyPlan(LatLngs) {
@@ -1891,8 +1891,8 @@ export default {
             if((newValue != null)&&(newValue != {})) {
                 
                 // ShowModal
-                var ModalClientsChangeRoute     =   new Modal(document.getElementById("ModalClientsChangeRoute"));
-                ModalClientsChangeRoute.show();
+                var ModalClientsMultiUpdate     =   new Modal(document.getElementById("ModalClientsMultiUpdate"));
+                ModalClientsMultiUpdate.show();
 
                 // Send DATA To Modal
                 await this.updateClientsRoute(newValue)

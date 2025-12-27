@@ -593,8 +593,10 @@ export default {
                     navigator.geolocation.getCurrentPosition(
                         (position) => {
                             const accuracy = position.coords.accuracy;
-
                             console.log(accuracy);
+                            console.log(accuracy_max);
+                            console.log(Math.ceil(accuracy) <= accuracy_max);
+                            console.log(attempts);
 
                             if (Math.ceil(accuracy) <= accuracy_max) {
                                 resolve({ success: true, position });
@@ -624,6 +626,29 @@ export default {
 
                 attemptPosition(); // Start
             });
+        },
+
+        async $getAddressFromLocationIQ(lat, lon) {
+            try {
+                const API_KEY = 'pk.56eb8094c2dc89cbf79dfd7fdb7ab6ef'; 
+                
+                // Added '&accept-language=fr' to the end of the URL
+                const url = `https://us1.locationiq.com/v1/reverse?key=${API_KEY}&lat=${lat}&lon=${lon}&format=json&accept-language=fr`;
+
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`LocationIQ API error: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                
+                // This will now return the address in French (e.g. "Paris, France" instead of "Paris, France")
+                return data.display_name; 
+            } catch (error) {
+                console.error("Failed to get address:", error);
+                return "Adresse introuvable"; // Updated error message to French as well
+            }
         },
 
         //

@@ -351,7 +351,7 @@ export default {
 
             formData.append("clients", JSON.stringify(clients))
 
-            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/change_route",   formData)
+            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/multi_update",   formData)
 
             if(res.status===200){
 

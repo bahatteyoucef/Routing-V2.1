@@ -125,6 +125,7 @@ class ClientTempo extends Model
                 'Latitude'                  => $clientElem['Latitude']               ?? 0,
                 'Longitude'                 => $clientElem['Longitude']              ?? 0,
                 'Address'                   => $clientElem['Address']                ?? '',
+                'RvrsGeoAddress'            => $clientElem['RvrsGeoAddress']         ?? '',
                 'DistrictNo'                => $clientElem['DistrictNo']             ?? '',
                 'DistrictNameE'             => $clientElem['DistrictNameE']          ?? '',
                 'CityNo'                    => $clientElem['CityNo']                 ?? '',
@@ -183,6 +184,7 @@ class ClientTempo extends Model
             'Latitude'              =>  ["required", "max:255"],
             'Longitude'             =>  ["required", "max:255"],
             'Address'               =>  ["required", "max:255"],
+            'RvrsGeoAddress'        =>  ["required", "max:255"],
             'DistrictNo'            =>  ["required", "max:255"],
             'DistrictNameE'         =>  ["required", "max:255"],
             'CityNo'                =>  ["required", "max:255"],
@@ -239,7 +241,7 @@ class ClientTempo extends Model
         // Mass assign simple fields (explicit list)
         $fields = [
             'NewCustomer', 'OpenCustomer', 'CustomerIdentifier', 'CustomerCode',
-            'Latitude', 'Longitude', 'Address', 'DistrictNo', 'DistrictNameE',
+            'Latitude', 'Longitude', 'Address', 'RvrsGeoAddress', 'DistrictNo', 'DistrictNameE',
             'CityNo', 'CityNameE', 'Tel', 'CustomerType', 'Neighborhood',
             'Landmark', 'BrandAvailability', 'BrandSourcePurchase', 'Frequency',
             'SuperficieMagasin', 'NbrAutomaticCheckouts', 'comment', 'Journee',

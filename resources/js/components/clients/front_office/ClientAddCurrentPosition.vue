@@ -388,6 +388,7 @@ export default {
                 CustomerNameA: '',
                 Tel: '',
                 Address: '',
+                RvrsGeoAddress: '',
                 Neighborhood: '',
                 Landmark: '',
                 DistrictNo: '',
@@ -498,260 +499,10 @@ export default {
 
     methods : {
 
-        async sendData_old() {
-
-            // Validation de la question
-            let validation          =   this.validationQuestion()
-
-            if(validation   ==  true)  {
-
-                this.$showLoadingPage()
-
-                // Set Client
-                this.client.DistrictNameE   =   this.getDistrictNameE(this.client.DistrictNo)
-                this.client.CityNameE       =   this.getCityNameE(this.client.CityNo)
-
-                let formData = new FormData();
-
-                if(this.client.OpenCustomer === 'Ouvert') {
-                    formData.append("NewCustomer"                           ,   this.client.NewCustomer)
-                    formData.append("OpenCustomer"                          ,   this.client.OpenCustomer)
-
-                    formData.append("CustomerIdentifier"                    ,   this.client.CustomerIdentifier)
-                    formData.append("CustomerCode"                          ,   this.client.CustomerCode)
-                    formData.append("CustomerNameE"                         ,   this.client.CustomerNameE)
-                    formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
-                    formData.append("Latitude"                              ,   this.client.Latitude)
-                    formData.append("Longitude"                             ,   this.client.Longitude)
-                    formData.append("Address"                               ,   this.client.Address)
-                    formData.append("Neighborhood"                          ,   this.client.Neighborhood)
-                    formData.append("Landmark"                              ,   this.client.Landmark)
-                    formData.append("DistrictNo"                            ,   this.client.DistrictNo)
-                    formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
-                    formData.append("CityNo"                                ,   this.client.CityNo)
-                    formData.append("CityNameE"                             ,   this.client.CityNameE)
-                    formData.append("Tel"                                   ,   this.client.Tel)
-                    formData.append("CustomerType"                          ,   this.client.CustomerType)
-                    formData.append("BrandAvailability"                     ,   this.client.BrandAvailability)
-                    formData.append("BrandSourcePurchase"                   ,   this.client.BrandSourcePurchase)
-
-                    formData.append("JPlan"                                 ,   this.client.JPlan)
-                    formData.append("Journee"                               ,   this.client.Journee)
-
-                    formData.append("Frequency"                             ,   this.client.Frequency)
-                    formData.append("SuperficieMagasin"                     ,   this.client.SuperficieMagasin)
-                    formData.append("NbrAutomaticCheckouts"                 ,   this.client.NbrAutomaticCheckouts)
-                    formData.append("AvailableBrands"                       ,   JSON.stringify(this.client.AvailableBrands))
-
-                    formData.append("CustomerBarCode_image"                 ,   this.client.CustomerBarCode_image)
-                    formData.append("facade_image"                          ,   this.client.facade_image)
-                    formData.append("in_store_image"                        ,   this.client.in_store_image)
-
-                    formData.append("CustomerBarCode_image_original_name"   ,   this.client.CustomerBarCode_image_original_name)
-                    formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
-                    formData.append("in_store_image_original_name"          ,   this.client.in_store_image_original_name)
-
-                    formData.append("status"                                ,   this.client.status)
-                    formData.append("nonvalidated_details"                  ,   this.client.nonvalidated_details)
-
-                    formData.append("comment"                               ,   this.client.comment)
-
-                    formData.append("start_adding_date"                     ,   this.start_adding_date)
-                    formData.append("finish_adding_date"                    ,   moment(new Date()).format())
-                }
-
-                if(this.client.OpenCustomer === 'Ferme') {
-                    formData.append("NewCustomer"                           ,   this.client.NewCustomer)
-                    formData.append("OpenCustomer"                          ,   this.client.OpenCustomer)
-
-                    formData.append("CustomerIdentifier"                    ,   this.client.CustomerIdentifier)
-                    formData.append("CustomerCode"                          ,   '')
-                    formData.append("CustomerNameE"                         ,   '')
-                    formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
-                    formData.append("Latitude"                              ,   this.client.Latitude)
-                    formData.append("Longitude"                             ,   this.client.Longitude)
-                    formData.append("Address"                               ,   this.client.Address)
-                    formData.append("Neighborhood"                          ,   this.client.Neighborhood)
-                    formData.append("Landmark"                              ,   this.client.Landmark)
-                    formData.append("DistrictNo"                            ,   this.client.DistrictNo)
-                    formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
-                    formData.append("CityNo"                                ,   this.client.CityNo)
-                    formData.append("CityNameE"                             ,   this.client.CityNameE)
-                    formData.append("Tel"                                   ,   '')
-                    formData.append("CustomerType"                          ,   this.client.CustomerType)
-                    formData.append("BrandAvailability"                     ,   'Non')
-                    formData.append("BrandSourcePurchase"                   ,   '')
-
-                    formData.append("JPlan"                                 ,   this.client.JPlan)
-                    formData.append("Journee"                               ,   this.client.Journee)
-
-                    formData.append("Frequency"                             ,   this.client.Frequency)
-                    formData.append("SuperficieMagasin"                     ,   this.client.SuperficieMagasin)
-                    formData.append("NbrAutomaticCheckouts"                 ,   '')
-                    formData.append("AvailableBrands"                       ,   JSON.stringify([]))
-
-                    formData.append("CustomerBarCode_image"                 ,   '')
-                    formData.append("facade_image"                          ,   this.client.facade_image)
-                    formData.append("in_store_image"                        ,   '')
-
-                    formData.append("CustomerBarCode_image_original_name"   ,   '')
-                    formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
-                    formData.append("in_store_image_original_name"          ,   '')
-
-                    formData.append("status"                                ,   'pending')
-                    formData.append("nonvalidated_details"                  ,   '')
-
-                    formData.append("comment"                               ,   this.client.comment)
-
-                    formData.append("start_adding_date"                     ,   this.start_adding_date)
-                    formData.append("finish_adding_date"                    ,   moment(new Date()).format())
-                }
-
-                if(this.client.OpenCustomer === 'refus') {
-
-                    formData.append("CustomerIdentifier"                    ,   this.client.CustomerIdentifier)
-
-                    formData.append("NewCustomer"                           ,   this.client.NewCustomer)
-                    formData.append("OpenCustomer"                          ,   this.client.OpenCustomer)
-
-                    formData.append("CustomerBarCodeExiste"                 ,   '')
-
-                    formData.append("CustomerCode"                          ,   '')
-                    formData.append("CustomerNameE"                         ,   '')
-                    formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
-                    formData.append("Latitude"                              ,   this.client.Latitude)
-                    formData.append("Longitude"                             ,   this.client.Longitude)
-                    formData.append("RvrsGeoAddress"                        ,   this.client.RvrsGeoAddress)
-                    formData.append("Address"                               ,   this.client.Address)
-                    formData.append("Neighborhood"                          ,   this.client.Neighborhood)
-                    formData.append("Landmark"                              ,   this.client.Landmark)
-                    formData.append("DistrictNo"                            ,   this.client.DistrictNo)
-                    formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
-                    formData.append("CityNo"                                ,   this.client.CityNo)
-                    formData.append("CityNameE"                             ,   this.client.CityNameE)
-
-                    formData.append("Tel"                                   ,   '')
-                    formData.append("tel_status"                            ,   'nonvalidated')
-                    formData.append("tel_comment"                           ,   '')
-
-                    formData.append("CustomerType"                          ,   this.client.CustomerType)
-
-                    formData.append("NbrVitrines"                           ,   '')
-                    formData.append("NbrAutomaticCheckouts"                 ,   '')
-
-                    formData.append("SuperficieMagasin"                     ,   '')
-
-                    formData.append("CustomerBarCodeExiste_image"           ,   '')
-                    formData.append("CustomerBarCode_image"                 ,   '')
-                    formData.append("facade_image"                          ,   this.client.facade_image)
-                    formData.append("in_store_image"                        ,   '')
-
-                    formData.append("CustomerBarCodeExiste_image_original_name" ,   '')
-                    formData.append("CustomerBarCode_image_original_name"       ,   '')
-                    formData.append("facade_image_original_name"                ,   this.client.facade_image_original_name)
-                    formData.append("in_store_image_original_name"              ,   '')
-
-                    formData.append("status"                                ,   'pending')
-                    formData.append("nonvalidated_details"                  ,   '')
-
-                    formData.append("comment"                               ,   this.client.comment)
-
-                    formData.append("JPlan"                                 ,   this.client.JPlan)
-                    formData.append("Journee"                               ,   this.client.Journee)
-                    formData.append("BrandAvailability"                     ,   this.client.BrandAvailability)
-                    formData.append("BrandSourcePurchase"                   ,   this.client.BrandSourcePurchase)
-
-                    formData.append("start_adding_date"                     ,   this.start_adding_date)
-                    formData.append("finish_adding_date"                    ,   moment(new Date()).format())
-                }
-
-                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/store",   formData)
-
-                if(res.status===200){
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
-                    // Send Feedback
-                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
-
-                    // 
-                    this.$goBack()
-                }
-                
-                else{
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
-                    // Send Errors
-                    this.$showErrors("Error !", res.data.errors)
-                }   
-            }
-        },
-
-        //
-
-        async getData_old() {
-
-            // Show Loading Page
-            this.$showLoadingPage()
-
-            // Set Start Added
-            this.start_adding_date              =   moment(new Date()).format()
-
-            const res                           =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.$route.params.id_route_import+"/details",   null)
-
-            this.all_clients                    =   res.data.route_import.data
-
-            await this.getComboData()
-
-            // Hide Loading Page
-            this.$hideLoadingPage()
-        },
-
         async getComboData() {
 
             const res_3                     =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/districts"         ,   null)
             this.willayas                   =   res_3.data
-        },
-
-        async getCites_old() {
-
-            // Show Loading Page
-            this.$showLoadingPage()
-
-            const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
-            this.cites                      =   res_3.data
-
-            this.client.CityNo              =   ""
-
-            // Hide Loading Page
-            this.$hideLoadingPage()
-        },
-
-        //
-
-        getDistrictNameE_old(DistrictNo) {
-
-            for (let i = 0; i < this.willayas.length; i++) {
-
-                if(this.willayas[i].DistrictNo  ==  DistrictNo) {
-
-                    return this.willayas[i].DistrictNameE
-                }                
-            }
-        },
-
-        getCityNameE_old(CityNo) {
-
-            for (let i = 0; i < this.cites.length; i++) {
-
-                if(this.cites[i].CITYNO  ==  CityNo) {
-
-                    return this.cites[i].CityNameE
-                }                
-            }
         },
 
         //
@@ -902,26 +653,6 @@ export default {
 
         //
 
-        brandAvailabilityChanged_old() {
-
-            if(this.client.BrandAvailability   === 'Non') {
-
-                this.client.AvailableBrands                 =   []
-
-                this.client.in_store_image_original_name    =   ""
-                this.client.in_store_image                  =   ""
-
-                const in_store_image_display                =   document.getElementById("in_store_image_display")
-
-                if(in_store_image_display) {
-
-                    in_store_image_display.src                  =   ""
-                }
-            }
-        },
-
-        //
-
         base64ToImage(image_base64, image_display_div) {
 
             this.$base64ToImage(image_base64, image_display_div)
@@ -954,51 +685,6 @@ export default {
         },
 
         //
-
-        async setBarCodeReader_old() {
-
-            const reader    =   document.getElementById('reader')
-
-            // 
-            this.client.CustomerCode    =   ""
-
-            if(reader) {
-
-                reader.style.display        =   "block";
-
-                //
-                const requestCamera = async () => {
-                    const devices       = await navigator.mediaDevices.enumerateDevices();
-                    const videoDevices  = devices.filter(device => device.kind === 'videoinput');
-                    const backCamera    = videoDevices.find(device => device.label.includes('back') || device.label.includes('rear'));
-                    
-                    if (backCamera) {
-
-                        return { exact: backCamera.deviceId };
-                    }
-                    
-                    return undefined;
-                };
-
-                //
-                this.scanner = new Html5QrcodeScanner('reader', {
-
-                    qrbox   : window.innerWidth < 500 ? { width: 200, height: 200 } : { width: 250, height: 250 },
-
-                    fps     : navigator.hardwareConcurrency > 4 ? 20 : 10,
-
-                    // supportedScanTypes  : [
-                    //     Html5QrcodeScanType.SCAN_TYPE_CAMERA
-                    // ],
-                });
-
-                try {
-                    await this.scanner.render(this.success, this.error, requestCamera);
-                } catch (error) {
-                    console.error('Error rendering scanner:', error);
-                }
-            }
-        },
 
         success(result) {
              
@@ -1077,86 +763,12 @@ export default {
             }
         },
 
-        async showPositionOnMap_old(map_id) {
-
-            if(!this.check_gps_clicked) {
-
-                this.check_gps_clicked              =   true
-
-                //
-                this.point_is_inside_user_polygons  =   false
-
-                //
-                let response                        =   await this.$currentPosition(this.getUser.accuracy)
-                console.log(response)
-
-                if(response.success) {
-
-                    //
-                    this.show_gps_error                 =   false
-
-                    //
-                    this.client.Latitude                =   response.position.coords.latitude
-                    this.client.Longitude               =   response.position.coords.longitude
-
-                    //
-                    let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
-
-                    //
-                    this.checkClients()
-
-                    //
-                    // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
-                    this.point_is_inside_user_polygons  =   true
-
-                    // Send Feedback
-                    this.$feedbackSuccess('Success !'   ,   'Le GPS a été pris avec succès ')
-
-                    //
-                    this.check_gps_clicked              =   false
-                }
-
-                else {
-
-                    //
-                    this.show_gps_error                 =   true
-
-                    //
-                    this.client.Latitude                =   0
-                    this.client.Longitude               =   0
-
-                    //
-                    await this.$nextTick()
-
-                    //
-                    let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
-
-                    //
-                    this.checkClients()
-
-                    //
-                    // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
-                    this.point_is_inside_user_polygons  =   false
-
-                    //
-                    this.$customMessages("GPS Error", "Vérifiez si votre GPS est activée", "error", "OK", "", "", "")
-
-                    //
-                    this.check_gps_clicked              =   false
-
-                    //
-                    this.checkGPS(map_id)
-                }
-            }
-        },
-
         checkGPS(map_id) {
 
             if (this.watchGPS) return;
 
             this.watchGPS   =   navigator.geolocation.watchPosition(
                 async (pos) => {
-
                     const accuracy  =   pos.coords.accuracy;
 
                     //
@@ -1266,709 +878,6 @@ export default {
 
         //
 
-        validationQuestion_old() {
-
-            //Slide 1
-            if(this.slideIndex  ==  1) {
-
-                if(((this.client.NewCustomer    === "Nouveau Client")||(this.client.NewCustomer    === "Client Existant"))&&((this.client.OpenCustomer    === "Ferme")||(this.client.OpenCustomer   === "Ouvert"))||(this.client.OpenCustomer === 'Refus')) {
-
-                    return true
-                }
-
-                else {
-
-                    return false
-                }
-            }
-
-            else {
-                if(this.client.OpenCustomer     === "Refus") {
-
-                    // Slide 2
-                    if(this.slideIndex  ==  2) {
-
-                        if(this.client.CustomerIdentifier !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 3
-                    if(this.slideIndex  ==  3) {
-
-                        if((this.client.CustomerNameA !== "")&&(this.$isUppercase(this.client.CustomerNameA))) {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 4
-                    if(this.slideIndex  ==  4) {
-
-                        if(this.client.Address !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 5
-                    if(this.slideIndex  ==  5) {
-
-                        if(this.client.Neighborhood !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 6
-                    if(this.slideIndex  ==  6) {
-
-                        if(this.client.Landmark !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 7
-                    if(this.slideIndex  ==  7) {
-
-                        if(this.client.DistrictNo !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 8
-                    if(this.slideIndex  ==  8) {
-
-                        if(this.client.CityNo !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 9
-                    if(this.slideIndex  ==  9) {
-
-                        if(this.client.CustomerType !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 10
-                    if(this.slideIndex  ==  10) {
-
-                        if((this.client.JPlan !== "")&&(this.$isUppercase(this.client.JPlan))) {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 11
-                    if(this.slideIndex  ==  11) {
-
-                        if(this.client.Frequency !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 12
-                    if(this.slideIndex  ==  12) {
-
-                        if(this.client.Journee !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 14
-                    if(this.slideIndex  ==  14) {
-
-                        if((this.client.facade_image !==  "")&&(this.client.facade_image_original_name   !==  "")) {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 15
-                    if(this.slideIndex  ==  15) {
-
-                        if( ((!isNaN(this.client.Latitude)) &&(this.client.Latitude     !== "") &&(isFinite(Number(this.client.Latitude))))   &&
-                            ((!isNaN(this.client.Longitude))&&(this.client.Longitude    !== "") &&(isFinite(Number(this.client.Longitude))))   ) {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    return true;
-                }
-
-                if(this.client.OpenCustomer     === "Ferme") {
-
-                    // Slide 2
-                    if(this.slideIndex  ==  2) {
-
-                        if(this.client.CustomerIdentifier !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 3
-                    if(this.slideIndex  ==  3) {
-
-                        if((this.client.CustomerNameA !== "")&&(this.$isUppercase(this.client.CustomerNameA))) {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 4
-                    if(this.slideIndex  ==  4) {
-
-                        if(this.client.Address !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 5
-                    if(this.slideIndex  ==  5) {
-
-                        if(this.client.Neighborhood !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 6
-                    if(this.slideIndex  ==  6) {
-
-                        if(this.client.Landmark !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 7
-                    if(this.slideIndex  ==  7) {
-
-                        if(this.client.DistrictNo !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 8
-                    if(this.slideIndex  ==  8) {
-
-                        if(this.client.CityNo !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 9
-                    if(this.slideIndex  ==  9) {
-
-                        if(this.client.CustomerType !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 10
-                    if(this.slideIndex  ==  10) {
-
-                        if((this.client.JPlan !== "")&&(this.$isUppercase(this.client.JPlan))) {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 11
-                    if(this.slideIndex  ==  11) {
-
-                        if(this.client.Frequency !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 12
-                    if(this.slideIndex  ==  12) {
-
-                        if(this.client.Journee !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 14
-                    if(this.slideIndex  ==  14) {
-
-                        if((this.client.facade_image !==  "")&&(this.client.facade_image_original_name   !==  "")) {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 15
-                    if(this.slideIndex  ==  15) {
-
-                        if( ((!isNaN(this.client.Latitude)) &&(this.client.Latitude     !== "") &&(isFinite(Number(this.client.Latitude))))   &&
-                            ((!isNaN(this.client.Longitude))&&(this.client.Longitude    !== "") &&(isFinite(Number(this.client.Longitude))))   ) {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    return true;
-                }
-
-                if(this.client.OpenCustomer     === "Ouvert") {
-
-                    // Slide 2
-                    if(this.slideIndex  ==  2) {
-
-                        if(this.client.CustomerIdentifier !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 3
-                    if(this.slideIndex  ==  3) {
-
-                        if(this.client.CustomerCode !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 4
-                    if(this.slideIndex  ==  4) {
-
-                        if((this.client.CustomerBarCode_image !==  "")&&(this.client.CustomerBarCode_image_original_name  !==  "")) {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 5
-                    if(this.slideIndex  ==  5) {
-
-                        if((this.client.CustomerNameE !== "")&&(this.$isUppercase(this.client.CustomerNameE))) {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 6
-                    if(this.slideIndex  ==  6) {
-
-                        if((this.client.CustomerNameA !== "")&&(this.$isUppercase(this.client.CustomerNameA))) {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 7
-                    if(this.slideIndex  ==  7) {
-
-                        if((this.client.Tel !== "")&&((this.client.Tel.startsWith('05'))||(this.client.Tel.startsWith('06'))||(this.client.Tel.startsWith('07')))&&(!isNaN(parseInt(this.client.Tel)))&&(this.client.Tel.length == 10)){
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 8
-                    if(this.slideIndex  ==  8) {
-
-                        if(this.client.Address !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 9
-                    if(this.slideIndex  ==  9) {
-
-                        if(this.client.Neighborhood !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 10
-                    if(this.slideIndex  ==  10) {
-
-                        if(this.client.Landmark !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 11
-                    if(this.slideIndex  ==  11) {
-
-                        if(this.client.DistrictNo !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 12
-                    if(this.slideIndex  ==  12) {
-
-                        if(this.client.CityNo !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 13
-                    if(this.slideIndex  ==  13) {
-
-                        if(this.client.CustomerType !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 14
-                    if(this.slideIndex  ==  14) {
-
-                        if(this.client.BrandSourcePurchase !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 15
-                    if(this.slideIndex  ==  15) {
-
-                        if(this.client.NbrAutomaticCheckouts !== "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 16
-                    if(this.slideIndex  ==  16) {
-
-                        if(this.client.SuperficieMagasin !== "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 17
-                    if(this.slideIndex  ==  17) {
-
-                        if((this.client.JPlan !== "")&&(this.$isUppercase(this.client.JPlan))) {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 18
-                    if(this.slideIndex  ==  18) {
-
-                        if(this.client.Frequency !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 19
-                    if(this.slideIndex  ==  19) {
-
-                        if(this.client.Journee !==  "") {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 20
-                    if(this.slideIndex  ==  20) {
-
-                        if(this.client.BrandAvailability   === 'Non') {
-
-                            return true
-                        }
-
-                        else {
-
-                            if((this.client.in_store_image !==  "")&&(this.client.in_store_image_original_name   !==  "")&&
-                                (this.client.AvailableBrands.length >   0)) {
-
-                                return true
-                            }
-
-                            else {
-
-                                return false
-                            }
-                        }
-                    }
-
-                    // Slide 22
-                    if(this.slideIndex  ==  22) {
-
-                        if((this.client.facade_image !==  "")&&(this.client.facade_image_original_name   !==  "")) {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    // Slide 23
-                    if(this.slideIndex  ==  23) {
-
-                        if( ((!isNaN(this.client.Latitude)) &&(this.client.Latitude     !== "") &&(isFinite(Number(this.client.Latitude))))   &&
-                            ((!isNaN(this.client.Longitude))&&(this.client.Longitude    !== "") &&(isFinite(Number(this.client.Longitude))))   ) {
-
-                            return true;
-                        }
-
-                        else {
-
-                            return false
-                        }
-                    }
-
-                    return true;
-                }
-            }
-        },
-
         setTotalQuestions() {
 
             this.total_questions    =   document.getElementsByClassName("mySlides").length
@@ -1992,10 +901,6 @@ export default {
 
             this.setTotalQuestions()
         },
-
-        //  //  //  //  //  //  //  //  //
-        //  //  //  //  //  //  //  //  //
-        //  //  //  //  //  //  //  //  //
 
         // --- Navigation ---
         changeSlide(step) {
@@ -2132,9 +1037,10 @@ export default {
 
         // --- GPS Logic ---
         refreshGPS() {
-            this.check_gps_clicked = true;
-            this.showPositionOnMap('show_map');
-            setTimeout(() => { this.check_gps_clicked = false; }, 2000);
+            this.point_is_inside_user_polygons  =   false;
+            setTimeout(() => {
+                this.showPositionOnMap('show_map'); 
+            }, 200); // Small delay to ensure DIV is rendered via v-show
         },
 
         // --- Submission Logic ---
@@ -2153,7 +1059,7 @@ export default {
             // 1. & 2. Define all fields
             const allFields = [
                 'CustomerIdentifier', 'NewCustomer', 'OpenCustomer', 'CustomerCode', 
-                'CustomerNameE', 'CustomerNameA', 'Latitude', 'Longitude', 'Address', 
+                'CustomerNameE', 'CustomerNameA', 'Latitude', 'Longitude', 'RvrsGeoAddress', 'Address', 
                 'Neighborhood', 'Landmark', 'DistrictNo', 'DistrictNameE', 'CityNo', 
                 'CityNameE', 'Tel', 'CustomerType', 'JPlan', 'Journee', 'comment',
                 'BrandAvailability', 'BrandSourcePurchase', 'Frequency', 
@@ -2914,74 +1820,61 @@ export default {
         },
         
         // --- Mock Map Function (Since implementation wasn't provided) ---
-        async showPositionOnMap(elementId) {
-            if(!this.check_gps_clicked) {
+        async showPositionOnMap(map_id) {
+            if (!this.check_gps_clicked) {
+                this.check_gps_clicked = true;
+                this.point_is_inside_user_polygons = false;
 
-                this.check_gps_clicked              =   true
+                let response = await this.$currentPosition(this.getUser.accuracy);
 
-                //
-                this.point_is_inside_user_polygons  =   false
+                if (response.success) {
+                    this.show_gps_error = false;
 
-                //
-                let response                        =   await this.$currentPosition(this.getUser.accuracy)
-                console.log(response)
+                    // Set Coordinates
+                    this.client.Latitude = response.position.coords.latitude;
+                    this.client.Longitude = response.position.coords.longitude;
 
-                if(response.success) {
+                    // --- NEW: Get Address from LocationIQ ---
+                    // We await this so the address is ready before you save/check clients
+                    const address = await this.$getAddressFromLocationIQ(this.client.Latitude, this.client.Longitude);
+                    
+                    // Assuming 'this.client.Address' is where you want to store it
+                    if(address) {
+                        this.client.RvrsGeoAddress  =   address;
+                        console.log("Address found:", this.client.RvrsGeoAddress);
+                    }
+                    // ----------------------------------------
 
-                    //
-                    this.show_gps_error                 =   false
+                    await this.$nextTick();
 
-                    //
-                    this.client.Latitude                =   response.position.coords.latitude
-                    this.client.Longitude               =   response.position.coords.longitude
+                    let position_marker = this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories);
+                    console.log(position_marker)
 
-                    //
-                    let position_marker                 =   this.$showPositionOnMap(elementId, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
+                    this.checkClients();
 
-                    //
-                    this.checkClients()
-
-                    //
-                    // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
-                    this.point_is_inside_user_polygons  =   true
+                    // this.point_is_inside_user_polygons = this.$checkMarkerInsideUserPolygons(position_marker)
+                    this.point_is_inside_user_polygons = true;
 
                     // Send Feedback
-                    this.$feedbackSuccess('Success !'   ,   'Le GPS a été pris avec succès ')
+                    this.$feedbackSuccess('Success !', 'Le GPS a été pris avec succès. Adresse mise à jour.');
 
-                    //
-                    this.check_gps_clicked              =   false
-                }
+                    this.check_gps_clicked = false;
+                } else {
+                    // Error Handling
+                    this.show_gps_error = true;
+                    this.client.Latitude = 0;
+                    this.client.Longitude = 0;
 
-                else {
+                    await this.$nextTick();
 
-                    //
-                    this.show_gps_error                 =   true
+                    let position_marker = this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories);
 
-                    //
-                    this.client.Latitude                =   0
-                    this.client.Longitude               =   0
+                    this.checkClients();
+                    this.point_is_inside_user_polygons = false;
 
-                    //
-                    await this.$nextTick()
-
-                    //
-                    let position_marker                 =   this.$showPositionOnMap(elementId, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
-
-                    //
-                    this.checkClients()
-
-                    //
-                    // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
-                    this.point_is_inside_user_polygons  =   false
-
-                    //
-                    this.$customMessages("GPS Error", "Vérifiez si votre GPS est activée", "error", "OK", "", "", "")
-
-                    //
-                    this.check_gps_clicked              =   false
-
-                    //
-                    this.checkGPS(elementId)
+                    this.$customMessages("GPS Error", "Vérifiez si votre GPS est activée", "error", "OK", "", "", "");
+                    this.checkGPS(map_id);
+                    this.check_gps_clicked = false;
                 }
             }
         },

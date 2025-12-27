@@ -112,12 +112,12 @@
 
                 <ul tabindex="-1" class="dropdown-menu dropdown-menu-right" id="profile_header_list">
 
-                    <li role="presentation" class="preview-item mt-1" @click="showProfile()">
+                    <!-- <li role="presentation" class="preview-item mt-1" @click="showProfile()">
                         <span  role="button" class="dropdown-item">
                           <i class="mdi mdi-account mr-2 text_primary"></i>
                           Profile
                         </span>
-                    </li>
+                    </li> -->
 
                     <li role="presentation" class="preview-item mt-1" @click="logOut()">
                         <span  role="button" class="dropdown-item">

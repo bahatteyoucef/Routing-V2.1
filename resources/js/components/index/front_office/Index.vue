@@ -1,5 +1,5 @@
 <template>
-    <div class="content-wrapper" style="padding : 5px;">
+    <div class="content-wrapper h-100" style="padding : 5px;">
         <section class="dashboard mt-4">
             <!-- Header Options -->
             <div class="container">

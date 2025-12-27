@@ -501,7 +501,7 @@ class RouteImport extends Model
             // Bulk assign allowed fields only (avoid mass assignment of unsafe fields)
             $assignable = [
                 'NewCustomer','CustomerIdentifier','CustomerCode','OpenCustomer','CustomerNameE','CustomerNameA',
-                'Latitude','Longitude','Address','CityNo','DistrictNo','CityNameE','DistrictNameE','Tel','CustomerType',
+                'Latitude','Longitude','Address','RvrsGeoAddress','CityNo','DistrictNo','CityNameE','DistrictNameE','Tel','CustomerType',
                 'Neighborhood','Landmark','BrandAvailability','BrandSourcePurchase','Frequency','SuperficieMagasin',
                 'NbrAutomaticCheckouts','AvailableBrands','id_route_import'
             ];
@@ -544,7 +544,7 @@ class RouteImport extends Model
         foreach ($added_clients as $client_elem) {
             $data = collect($client_elem)->only([
                 'NewCustomer','CustomerIdentifier','CustomerCode','OpenCustomer','CustomerNameE','CustomerNameA',
-                'Latitude','Longitude','Address','CityNo','DistrictNo','CityNameE','DistrictNameE','Tel','CustomerType',
+                'Latitude','Longitude','Address','RvrsGeoAddress','CityNo','DistrictNo','CityNameE','DistrictNameE','Tel','CustomerType',
                 'Neighborhood','Landmark','BrandAvailability','BrandSourcePurchase','Frequency','SuperficieMagasin',
                 'NbrAutomaticCheckouts','AvailableBrands','id_route_import','status'
             ])->toArray();

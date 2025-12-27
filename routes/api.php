@@ -200,7 +200,7 @@ Route::middleware(['auth:api', 'isEnabledUser'])->group(function () {
     Route::post('/route_import/{id_route_import}/clients/{id}/update'                                   ,   [ClientController::class                , 'updateClient'                            ]);
     Route::post('/route_import/{id_route_import}/clients/{id}/delete'                                   ,   [ClientController::class                , 'deleteClient'                            ])->middleware('SuperAdmin');
 
-    Route::post('/route_import/{id_route_import}/clients/change_route'                                  ,   [ClientController::class                , 'changeRouteClients'                      ])->middleware('BackOffice');
+    Route::post('/route_import/{id_route_import}/clients/multi_update'                                  ,   [ClientController::class                , 'multiUpdateClients'                      ])->middleware('BackOffice');
     Route::post('/route_import/{id_route_import}/clients/delete'                                        ,   [ClientController::class                , 'deleteClients'                           ])->middleware('SuperAdmin');
 
     Route::post('/clients/resume/update'                                                                ,   [ClientController::class                , 'updateResumeClients'                     ])->middleware('BackOffice');

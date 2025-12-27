@@ -401,6 +401,7 @@ export default {
                     formData.append("Latitude"                              ,   client.Latitude)
                     formData.append("Longitude"                             ,   client.Longitude)
                     formData.append("Address"                               ,   client.Address)
+                    formData.append("RvrsGeoAddress"                        ,   client.RvrsGeoAddress)
                     formData.append("Neighborhood"                          ,   client.Neighborhood)
                     formData.append("Landmark"                              ,   client.Landmark)
                     formData.append("DistrictNo"                            ,   client.DistrictNo)
@@ -462,6 +463,7 @@ export default {
                     formData.append("Latitude"                              ,   client.Latitude)
                     formData.append("Longitude"                             ,   client.Longitude)
                     formData.append("Address"                               ,   client.Address)
+                    formData.append("RvrsGeoAddress"                        ,   client.RvrsGeoAddress)
                     formData.append("Neighborhood"                          ,   client.Neighborhood)
                     formData.append("Landmark"                              ,   client.Landmark)
                     formData.append("DistrictNo"                            ,   client.DistrictNo)
@@ -797,6 +799,7 @@ export default {
                 client.tel_status,
                 (client.CustomerNameE || '').length ? 'n' : '',
                 (client.Address || '').length ? 'a' : '',
+                (client.RvrsGeoAddress || '').length ? 'r' : '',
                 (client.Landmark || '').length ? 'l' : '',
                 client.facade_image ? 'facimg' : '',
                 client.old_facade_image ? 'oldfac' : '',

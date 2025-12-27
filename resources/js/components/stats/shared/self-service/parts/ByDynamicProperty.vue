@@ -1138,6 +1138,7 @@ export default {
           { header: 'DistrictNameE', key: 'DistrictNameE', width: 20 },
           { header: 'CityNameE', key: 'CityNameE', width: 20 },
           { header: 'Address', key: 'Address', width: 30 },
+          { header: 'RvrsGeoAddress', key: 'RvrsGeoAddress', width: 30},
           { header: 'Tel', key: 'Tel', width: 14 },
           { header: 'CustomerType', key: 'CustomerType', width: 16 },
           { header: 'JPlan', key: 'JPlan', width: 12 },
@@ -1156,6 +1157,7 @@ export default {
           c.DistrictNameE ?? '',
           c.CityNameE ?? '',
           c.Address ?? '',
+          c.RvrsGeoAddress ?? '',
           c.Tel ?? '',
           c.CustomerType ?? '',
           c.JPlan ?? '',
@@ -1263,6 +1265,7 @@ export default {
               c.DistrictNameE ?? '',
               c.CityNameE ?? '',
               c.Address ?? '',
+              c.RvrsGeoAddress ?? '',
               c.Tel ?? '',
               c.CustomerType ?? '',
               c.JPlan ?? '',
@@ -1415,56 +1418,6 @@ export default {
     },
 
     //  //  //  //  //
-
-    // Clicked the label area (or stacked area) — aggregate across datasets
-    async openForAllDatasetsAtIndex_old(labelIndex) {
-      // FIX: Use original label
-      const rawLabel = this.chartDataNormalized.labels[labelIndex];
-
-      // collect all dataset keys
-      const keys = this.chartInstance.data.datasets.map(d => d.clientKey || d.key || d.label);
-
-      // filter clients
-      if(this.secondary_property) {
-          this.selectedClients = this.statistic_details_clients.filter(c => 
-              (String(c[this.primary_property]) === String(rawLabel)) && 
-              (keys.includes(c[this.secondary_property]))
-          );
-      } else {
-          this.selectedClients = this.statistic_details_clients.filter(c => 
-              (String(c[this.primary_property]) === String(rawLabel))
-          );
-      }
-
-      // ShowModal
-      var ModalSelfServiceChartClients = new Modal(document.getElementById("ModalSelfServiceChartClients"));
-      ModalSelfServiceChartClients.show();
-
-      this.$refs.ModalSelfServiceChartClients.setDataTable(this.selectedClients);
-    },
-
-    // Clicked a single dataset segment (labelIndex + datasetIndex)
-    async openForDatasetAtIndex_old(labelIndex, datasetIndex) {
-      const rawLabel = this.chartDataNormalized.labels[labelIndex]; 
-      
-      const dataset = this.chartInstance.data.datasets[datasetIndex];
-      
-      // Ensure we are checking the correct key property. 
-      // Sometimes users use 'key', 'id', or 'clientKey'.
-      const key = dataset.clientKey || dataset.key || dataset.label; 
-
-      console.log("Filtering by:", { rawLabel, key }); // Debugging aid
-
-      this.selectedClients = this.getClientsByLabelAndDatasetKey(rawLabel, key);
-      
-      await this.$nextTick();
-
-      // ShowModal
-      var ModalSelfServiceChartClients = new Modal(document.getElementById("ModalSelfServiceChartClients"));
-      ModalSelfServiceChartClients.show();
-
-      await this.$refs.ModalSelfServiceChartClients.setDataTable(this.selectedClients);
-    },
 
     //
     getClientsByLabelAndDatasetKey(label, key) {

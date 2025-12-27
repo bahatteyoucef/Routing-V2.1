@@ -182,6 +182,7 @@ export default {
                 "Longitude"                 ,
 
                 "Address"                   ,
+                "RvrsGeoAddress"            ,
                 "Neighborhood"              ,
                 "Landmark"                  ,
 

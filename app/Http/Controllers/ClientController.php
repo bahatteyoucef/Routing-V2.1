@@ -198,7 +198,7 @@ class ClientController extends Controller
 
     //
 
-    public function changeRouteClients(Request $request, int $id_route_import)
+    public function multiUpdateClients(Request $request, int $id_route_import)
     {
 
         try {
@@ -208,7 +208,7 @@ class ClientController extends Controller
             //
 
             // delete 
-            Client::changeRouteClients($request, $id_route_import);
+            Client::multiUpdateClients($request, $id_route_import);
 
             //
             DB::commit();

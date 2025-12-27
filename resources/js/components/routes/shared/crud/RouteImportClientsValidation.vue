@@ -379,6 +379,7 @@ export default {
                     formData.append("Latitude"                              ,   client.Latitude)
                     formData.append("Longitude"                             ,   client.Longitude)
                     formData.append("Address"                               ,   client.Address)
+                    formData.append("RvrsGeoAddress"                        ,   client.RvrsGeoAddress)
                     formData.append("Neighborhood"                          ,   client.Neighborhood)
                     formData.append("Landmark"                              ,   client.Landmark)
                     formData.append("DistrictNo"                            ,   client.DistrictNo)
@@ -438,6 +439,7 @@ export default {
                     formData.append("Latitude"                              ,   client.Latitude)
                     formData.append("Longitude"                             ,   client.Longitude)
                     formData.append("Address"                               ,   client.Address)
+                    formData.append("RvrsGeoAddress"                        ,   client.RvrsGeoAddress)
                     formData.append("Neighborhood"                          ,   client.Neighborhood)
                     formData.append("Landmark"                              ,   client.Landmark)
                     formData.append("DistrictNo"                            ,   client.DistrictNo)
@@ -497,6 +499,7 @@ export default {
                     formData.append("Latitude"                              ,   client.Latitude)
                     formData.append("Longitude"                             ,   client.Longitude)
                     formData.append("Address"                               ,   client.Address)
+                    formData.append("RvrsGeoAddress"                        ,   client.RvrsGeoAddress)
                     formData.append("Neighborhood"                          ,   client.Neighborhood)
                     formData.append("Landmark"                              ,   client.Landmark)
                     formData.append("DistrictNo"                            ,   client.DistrictNo)
@@ -558,6 +561,7 @@ export default {
                     formData.append("Latitude"                              ,   client.Latitude)
                     formData.append("Longitude"                             ,   client.Longitude)
                     formData.append("Address"                               ,   client.Address)
+                    formData.append("RvrsGeoAddress"                        ,   client.RvrsGeoAddress)
                     formData.append("Neighborhood"                          ,   client.Neighborhood)
                     formData.append("Landmark"                              ,   client.Landmark)
                     formData.append("DistrictNo"                            ,   client.DistrictNo)
@@ -623,6 +627,7 @@ export default {
                     formData.append("Latitude"                              ,   client.Latitude)
                     formData.append("Longitude"                             ,   client.Longitude)
                     formData.append("Address"                               ,   client.Address)
+                    formData.append("RvrsGeoAddress"                        ,   client.RvrsGeoAddress)
                     formData.append("Neighborhood"                          ,   client.Neighborhood)
                     formData.append("Landmark"                              ,   client.Landmark)
                     formData.append("DistrictNo"                            ,   client.DistrictNo)
@@ -686,6 +691,7 @@ export default {
                     formData.append("Latitude"                              ,   client.Latitude)
                     formData.append("Longitude"                             ,   client.Longitude)
                     formData.append("Address"                               ,   client.Address)
+                    formData.append("RvrsGeoAddress"                        ,   client.RvrsGeoAddress)
                     formData.append("Neighborhood"                          ,   client.Neighborhood)
                     formData.append("Landmark"                              ,   client.Landmark)
                     formData.append("DistrictNo"                            ,   client.DistrictNo)
@@ -749,6 +755,7 @@ export default {
                     formData.append("Latitude"                              ,   client.Latitude)
                     formData.append("Longitude"                             ,   client.Longitude)
                     formData.append("Address"                               ,   client.Address)
+                    formData.append("RvrsGeoAddress"                        ,   client.RvrsGeoAddress)
                     formData.append("Neighborhood"                          ,   client.Neighborhood)
                     formData.append("Landmark"                              ,   client.Landmark)
                     formData.append("DistrictNo"                            ,   client.DistrictNo)
@@ -863,9 +870,9 @@ export default {
             (client.tel_comment || '').length > 0 ? 'telc' : '',
             (client.comment || '').length > 0 ? 'c' : '',
             (client.Landmark || '').length > 0 ? 'lm' : '',
-            (client.RvrsGeoAddress || '').length > 0 ? 'rga' : '',
             (client.CustomerNameE || '').length > 0 ? 'name' : '',
             (client.Address || '').length > 0 ? 'addr' : '',
+            (client.RvrsGeoAddress || '').length > 0 ? 'ra' : '',
             client.imagesLoadedCount || 0,
             client.CustomerBarCode_image ? 'bcimg' : '',
             client.facade_image ? 'facimg' : '',

@@ -385,6 +385,7 @@ export default {
                 CustomerNameA: '',
                 Tel: '',
                 Address: '',
+                RvrsGeoAddress: '',
                 Neighborhood: '',
                 Landmark: '',
                 DistrictNo: '',
@@ -505,278 +506,6 @@ export default {
 
         //
 
-        async sendData_old() {
-
-            // Validation de la question
-            let validation          =   this.validationQuestion()
-
-            if(validation   ==  true)  {
-
-                this.$showLoadingPage()
-
-                if(typeof this.willayas != "undefined") {
-
-                    // Set Client
-                    this.client.DistrictNameE   =   this.getDistrictNameE(this.client.DistrictNo)
-                }
-
-                if(typeof this.cites != "undefined") {
-
-                    // Set 
-                    this.client.CityNameE       =   this.getCityNameE(this.client.CityNo)
-                }
-
-                let formData = new FormData();
-
-                if(this.client.OpenCustomer  === 'Ouvert') {
-
-                    formData.append("NewCustomer"                           ,   this.client.NewCustomer)
-                    formData.append("OpenCustomer"                          ,   this.client.OpenCustomer)
-
-                    formData.append("CustomerIdentifier"                    ,   this.client.CustomerIdentifier)
-
-                    formData.append("CustomerCode"                          ,   this.client.CustomerCode)
-                    formData.append("CustomerNameE"                         ,   this.client.CustomerNameE)
-                    formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
-                    formData.append("Latitude"                              ,   this.client.Latitude)
-                    formData.append("Longitude"                             ,   this.client.Longitude)
-                    formData.append("Address"                               ,   this.client.Address)
-
-                    formData.append("Neighborhood"                          ,   this.client.Neighborhood)
-                    formData.append("Landmark"                              ,   this.client.Landmark)
-
-                    formData.append("DistrictNo"                            ,   this.client.DistrictNo)
-                    formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
-                    formData.append("CityNo"                                ,   this.client.CityNo)
-                    formData.append("CityNameE"                             ,   this.client.CityNameE)
-                    formData.append("Tel"                                   ,   this.client.Tel)
-                    formData.append("tel_status"                            ,   this.client.tel_status)
-                    formData.append("tel_comment"                           ,   this.client.tel_comment)
-                    formData.append("CustomerType"                          ,   this.client.CustomerType)
-                    formData.append("BrandAvailability"                     ,   this.client.BrandAvailability)
-                    formData.append("BrandSourcePurchase"                   ,   this.client.BrandSourcePurchase)
-
-                    formData.append("JPlan"                                 ,   this.client.JPlan)
-                    formData.append("Journee"                               ,   this.client.Journee)
-
-                    formData.append("Frequency"                             ,   this.client.Frequency)
-                    formData.append("SuperficieMagasin"                     ,   this.client.SuperficieMagasin)
-                    formData.append("NbrAutomaticCheckouts"                 ,   this.client.NbrAutomaticCheckouts)
-                    formData.append("AvailableBrands"                       ,   JSON.stringify(this.client.AvailableBrands))
-
-                    formData.append("CustomerBarCode_image_updated"         ,   this.client.CustomerBarCode_image_updated)
-                    formData.append("facade_image_updated"                  ,   this.client.facade_image_updated)
-                    formData.append("in_store_image_updated"                ,   this.client.in_store_image_updated)
-
-                    formData.append("CustomerBarCode_image"                 ,   this.client.CustomerBarCode_image)
-                    formData.append("facade_image"                          ,   this.client.facade_image)
-                    formData.append("in_store_image"                        ,   this.client.in_store_image)
-
-                    formData.append("CustomerBarCode_image_original_name"   ,   this.client.CustomerBarCode_image_original_name)
-                    formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
-                    formData.append("in_store_image_original_name"          ,   this.client.in_store_image_original_name)
-
-                    formData.append("status"                                ,   this.client.status)
-                    formData.append("nonvalidated_details"                  ,   this.client.nonvalidated_details)
-
-                    formData.append("comment"                               ,   this.client.comment)
-                }
-
-                if(this.client.OpenCustomer  === 'Ferme') {
-                    formData.append("NewCustomer"                           ,   this.client.NewCustomer)
-                    formData.append("OpenCustomer"                          ,   this.client.OpenCustomer)
-
-                    formData.append("CustomerIdentifier"                    ,   this.client.CustomerIdentifier)
-                    formData.append("CustomerCode"                          ,   '')
-                    formData.append("CustomerNameE"                         ,   '')
-                    formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
-                    formData.append("Latitude"                              ,   this.client.Latitude)
-                    formData.append("Longitude"                             ,   this.client.Longitude)
-                    formData.append("Address"                               ,   this.client.Address)
-                    formData.append("Neighborhood"                          ,   this.client.Neighborhood)
-                    formData.append("Landmark"                              ,   this.client.Landmark)
-                    formData.append("DistrictNo"                            ,   this.client.DistrictNo)
-                    formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
-                    formData.append("CityNo"                                ,   this.client.CityNo)
-                    formData.append("CityNameE"                             ,   this.client.CityNameE)
-                    formData.append("Tel"                                   ,   '')
-                    formData.append("tel_status"                            ,   'nonvalidated')
-                    formData.append("tel_comment"                           ,   '')
-                    formData.append("CustomerType"                          ,   this.client.CustomerType)
-                    formData.append("BrandAvailability"                     ,   'Non')
-                    formData.append("BrandSourcePurchase"                   ,   '')
-
-                    formData.append("JPlan"                                 ,   this.client.JPlan)
-                    formData.append("Journee"                               ,   this.client.Journee)
-
-                    formData.append("Frequency"                             ,   this.client.Frequency)
-                    formData.append("SuperficieMagasin"                     ,   this.client.SuperficieMagasin)
-                    formData.append("NbrAutomaticCheckouts"                 ,   '')
-                    formData.append("AvailableBrands"                       ,   JSON.stringify([]))
-
-                    formData.append("CustomerBarCode_image"                 ,   '')
-                    formData.append("facade_image"                          ,   this.client.facade_image)
-                    formData.append("in_store_image"                        ,   '')
-
-                    formData.append("CustomerBarCode_image_original_name"   ,   '')
-                    formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
-                    formData.append("in_store_image_original_name"          ,   '')
-
-                    formData.append("status"                                ,   'pending')
-                    formData.append("nonvalidated_details"                  ,   '')
-
-                    formData.append("comment"                               ,   this.client.comment)
-                }
-
-                if(this.client.OpenCustomer  === 'refus') {
-                    formData.append("NewCustomer"                           ,   this.client.NewCustomer)
-                    formData.append("OpenCustomer"                          ,   this.client.OpenCustomer)
-
-                    formData.append("CustomerIdentifier"                    ,   this.client.CustomerIdentifier)
-                    formData.append("CustomerCode"                          ,   '')
-                    formData.append("CustomerNameE"                         ,   '')
-                    formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
-                    formData.append("Latitude"                              ,   this.client.Latitude)
-                    formData.append("Longitude"                             ,   this.client.Longitude)
-                    formData.append("Address"                               ,   this.client.Address)
-                    formData.append("Neighborhood"                          ,   this.client.Neighborhood)
-                    formData.append("Landmark"                              ,   this.client.Landmark)
-                    formData.append("DistrictNo"                            ,   this.client.DistrictNo)
-                    formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
-                    formData.append("CityNo"                                ,   this.client.CityNo)
-                    formData.append("CityNameE"                             ,   this.client.CityNameE)
-                    formData.append("Tel"                                   ,   '')
-                    formData.append("tel_status"                            ,   'nonvalidated')
-                    formData.append("tel_comment"                           ,   '')
-                    formData.append("CustomerType"                          ,   this.client.CustomerType)
-                    formData.append("BrandAvailability"                     ,   'Non')
-                    formData.append("BrandSourcePurchase"                   ,   '')
-
-                    formData.append("JPlan"                                 ,   this.client.JPlan)
-                    formData.append("Journee"                               ,   this.client.Journee)
-
-                    formData.append("Frequency"                             ,   this.client.Frequency)
-                    formData.append("SuperficieMagasin"                     ,   this.client.SuperficieMagasin)
-                    formData.append("NbrAutomaticCheckouts"                 ,   '')
-                    formData.append("AvailableBrands"                       ,   JSON.stringify([]))
-
-                    formData.append("CustomerBarCode_image"                 ,   '')
-                    formData.append("facade_image"                          ,   this.client.facade_image)
-                    formData.append("in_store_image"                        ,   '')
-
-                    formData.append("CustomerBarCode_image_original_name"   ,   '')
-                    formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
-                    formData.append("in_store_image_original_name"          ,   '')
-
-                    formData.append("status"                                ,   'pending')
-                    formData.append("nonvalidated_details"                  ,   '')
-
-                    formData.append("comment"                               ,   this.client.comment)
-                }
-
-                if(this.client.OpenCustomer  === 'Introuvable') {
-
-                    formData.append("NewCustomer"                           ,   this.client.NewCustomer)
-                    formData.append("OpenCustomer"                          ,   this.client.OpenCustomer)
-
-                    formData.append("CustomerIdentifier"                    ,   this.client.CustomerIdentifier)
-
-                    formData.append("CustomerBarCodeExiste"                 ,   '')
-
-                    formData.append("CustomerCode"                          ,   '')
-                    formData.append("CustomerNameE"                         ,   '')
-                    formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
-                    formData.append("Latitude"                              ,   this.client.Latitude)
-                    formData.append("Longitude"                             ,   this.client.Longitude)
-
-                    formData.append("RvrsGeoAddress"                        ,   this.client.RvrsGeoAddress)
-                    formData.append("Address"                               ,   this.client.Address)
-                    formData.append("Neighborhood"                          ,   this.client.Neighborhood)
-                    formData.append("Landmark"                              ,   this.client.Landmark)
-                    formData.append("DistrictNo"                            ,   this.client.DistrictNo)
-                    formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
-                    formData.append("CityNo"                                ,   this.client.CityNo)
-                    formData.append("CityNameE"                             ,   this.client.CityNameE)
-
-                    formData.append("Tel"                                   ,   this.client.Tel)
-                    formData.append("tel_status"                            ,   'nonvalidated')
-                    formData.append("tel_comment"                           ,   '')
-
-                    formData.append("CustomerType"                          ,   this.client.CustomerType)
-
-                    formData.append("NbrVitrines"                           ,   '')
-                    formData.append("NbrAutomaticCheckouts"                 ,   '')
-
-                    formData.append("SuperficieMagasin"                     ,   this.client.SuperficieMagasin)
-
-                    formData.append("CustomerBarCodeExiste_image_updated"   ,   true)
-                    formData.append("CustomerBarCode_image_updated"         ,   true)
-                    formData.append("facade_image_updated"                  ,   this.client.facade_image_updated)
-                    formData.append("in_store_image_updated"                ,   true)
-
-                    formData.append("CustomerBarCodeExiste_image"           ,   '')
-                    formData.append("CustomerBarCode_image"                 ,   '')
-                    formData.append("facade_image"                          ,   this.client.facade_image)
-                    formData.append("in_store_image"                        ,   '')
-
-                    formData.append("CustomerBarCodeExiste_image_original_name" ,   '')
-                    formData.append("CustomerBarCode_image_original_name"       ,   '')
-                    formData.append("facade_image_original_name"                ,   this.client.facade_image_original_name)
-                    formData.append("in_store_image_original_name"              ,   '')
-
-                    formData.append("CustomerBarCodeExiste_image_updated"   ,   true)
-                    formData.append("CustomerBarCode_image_updated"         ,   true)
-                    formData.append("facade_image_updated"                  ,   this.client.facade_image_updated)
-                    formData.append("in_store_image_updated"                ,   true)
-
-                    formData.append("status"                                ,   'pending')
-                    formData.append("nonvalidated_details"                  ,   '')
-
-                    formData.append("comment"                               ,   this.client.comment)
-
-                    formData.append("JPlan"                                 ,   this.client.JPlan)
-                    formData.append("Journee"                               ,   this.client.Journee)
-                    formData.append("BrandAvailability"                     ,   this.client.BrandAvailability)
-                    formData.append("BrandSourcePurchase"                   ,   this.client.BrandSourcePurchase)
-                }
-
-                //
-                if(this.client.status_original   ==  'visible') {
-
-                    formData.append("start_adding_date"                     ,   this.start_adding_date)
-                    formData.append("finish_adding_date"                    ,   moment(new Date()).format())
-                }
-
-                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/update",   formData)
-
-                if(res.status===200){
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
-                    // Send Feedback
-                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
-
-                    // Go Back
-                    this.$goBack()
-                }
-                
-                else{
-
-                    // Hide Loading Page
-                    this.$hideLoadingPage()
-
-                    // Send Errors
-                    this.$showErrors("Error !", res.data.errors)
-                }
-            }
-
-            else {
-
-                this.$showErrors("Error !"  ,   ["Veuillez répondre en respectant les conditions des questions avant de valider !"])
-            }
-        },
-
         async sendData() {
             // 1. Validation
             const validation = this.validationQuestion();
@@ -804,6 +533,7 @@ export default {
                 Latitude: this.client.Latitude,
                 Longitude: this.client.Longitude,
                 Address: this.client.Address,
+                RvrsGeoAddress: this.client.RvrsGeoAddress,
                 Neighborhood: this.client.Neighborhood,
                 Landmark: this.client.Landmark,
                 DistrictNo: this.client.DistrictNo,
@@ -972,57 +702,6 @@ export default {
             }
         },
 
-        async getClientData_old() {
-            const res = await this.$callApi("post", `/route_import/${this.$route.params.id_route_import}/clients/${this.$route.params.id_client}/show`, null);
-            const apiData = res.data;
-
-            // 1. Merge API data into client object (replaces 50 lines of manual assignment)
-            this.client = {
-                ...this.client,
-                ...apiData,
-                // Handle specific field transformations immediately
-                AvailableBrands: apiData.AvailableBrands_array_formatted || []
-            };
-
-            // 2. Handle Image Previews
-            // Note: In your HTML, use <img :src="client.CustomerBarCode_image_currentObjectURL">
-            this.setImagePreview('CustomerBarCode', apiData.id, apiData.CustomerBarCode_image, apiData.CustomerBarCode_image_original_name);
-            this.setImagePreview('facade', apiData.id, apiData.facade_image, apiData.facade_image_original_name);
-            this.setImagePreview('in_store', apiData.id, apiData.in_store_image, apiData.in_store_image_original_name);
-
-            // 3. Set timer if visible
-            if (this.client.status === "visible") {
-                this.start_adding_date = moment(new Date()).format();
-            }
-
-            this.checkClients(); // Existing logic check
-        },
-
-        setImagePreview(prefix, clientId, imageName, originalName) {
-            if (originalName && imageName) {
-                const url = `/uploads/clients/${clientId}/${imageName}`;
-                this.client[`${prefix}_image_currentObjectURL`] = url;
-                
-                // If you are using a file creation utility
-                this.$createFile(originalName, `${prefix}_image_update`);
-            }
-        },
-
-        async getComboData_old() {
-            const res = await this.$callApi("post", `/route_import/${this.$route.params.id_route_import}/districts`, null);
-            this.willayas = res.data;
-        },
-
-        async getCites_old() {
-            if(!this.client.DistrictNo) return;
-            
-            this.$showLoadingPage();
-            const res = await this.$callApi("post", `/rtm_willayas/${this.client.DistrictNo}/rtm_cites`, null);
-            this.cites = res.data;
-            this.client.CityNo = ""; // Reset city selection
-            this.$hideLoadingPage();
-        },
-
         //
 
         getDistrictNameE(DistrictNo) {
@@ -1076,164 +755,6 @@ export default {
 
         //
 
-        async customerBarCodeImage() {
-
-            const input     =   document.getElementById("CustomerBarCode_image_update");
-            const display   =   document.getElementById("CustomerBarCode_image_display_update");
-            const file      =   input.files[0];
-
-            // Clear previous resources
-            if (this.client.CustomerBarCode_image_currentObjectURL) {
-
-                URL.revokeObjectURL(this.client.CustomerBarCode_image_currentObjectURL);
-                this.client.CustomerBarCode_image_currentObjectURL  =   null;
-            }
-
-            if (!file) {
-
-                this.client.CustomerBarCode_image_original_name     =   "";
-                this.client.CustomerBarCode_image                   =   "";
-
-                this.client.CustomerBarCode_image_updated           =   true;
-
-                display.src                                         =   "";
-
-                return;
-            }
-
-            try {
-                // 1. Use lighter compression
-                const compressedFile                                =   await this.$compressImage(file);
-                
-                // 2. Use object URL instead of base64
-                const objectUrl                                     =   URL.createObjectURL(compressedFile);
-                this.client.CustomerBarCode_image_currentObjectURL  =   objectUrl;
-                display.src                                         =   objectUrl;
-
-                // 3. Store compressed file instead of base64 string
-                this.client.CustomerBarCode_image_updated           =   true;
-                this.client.CustomerBarCode_image_original_name     =   file.name;
-                this.client.CustomerBarCode_image                   =   compressedFile;
-            } 
-
-            catch (error) {
-
-                console.error("Image processing failed:", error);
-
-                this.client.CustomerBarCode_image_original_name     =   "";
-                this.client.CustomerBarCode_image                   =   "";
-                this.client.CustomerBarCode_image_updated           =   true;
-
-                display.src = "";
-            }
-        },
-
-        async facadeImage() {
-
-            const input     =   document.getElementById("facade_image_update");
-            const display   =   document.getElementById("facade_image_display_update");
-            const file      =   input.files[0];
-
-            // Clear previous resources
-            if (this.client.facade_image_currentObjectURL) {
-
-                URL.revokeObjectURL(this.client.facade_image_currentObjectURL);
-                this.client.facade_image_currentObjectURL   =   null;
-            }
-
-            if (!file) {
-
-                this.client.facade_image_original_name      =   "";
-                this.client.facade_image                    =   "";
-
-                this.client.facade_image_updated            =   true;
-
-                display.src                                 =   "";
-
-                return;
-            }
-
-            try {
-                // 1. Use lighter compression
-                const compressedFile                                =   await this.$compressImage(file);
-                
-                // 2. Use object URL instead of base64
-                const objectUrl                                     =   URL.createObjectURL(compressedFile);
-                this.client.facade_image_currentObjectURL           =   objectUrl;
-                display.src                                         =   objectUrl;
-
-                // 3. Store compressed file instead of base64 string
-                this.client.facade_image_updated                    =   true;
-                this.client.facade_image_original_name              =   file.name;
-                this.client.facade_image                            =   compressedFile;
-            } 
-
-            catch (error) {
-
-                console.error("Image processing failed:", error);
-
-                this.client.facade_image_original_name      =   "";
-                this.client.facade_image                    =   "";
-                this.client.facade_image_updated            =   true;
-
-                display.src = "";
-            }
-        },
-
-        async inStoreImage() {
-
-            const input     =   document.getElementById("in_store_image_update");
-            const display   =   document.getElementById("in_store_image_display_update");
-            const file      =   input.files[0];
-
-            // Clear previous resources
-            if (this.client.in_store_image_currentObjectURL) {
-
-                URL.revokeObjectURL(this.client.in_store_image_currentObjectURL);
-                this.client.in_store_image_currentObjectURL =   null;
-            }
-
-            if (!file) {
-
-                this.client.in_store_image_original_name    =   "";
-                this.client.in_store_image                  =   "";
-
-                this.client.in_store_image_updated          =   true;
-
-                display.src                                 =   "";
-
-                return;
-            }
-
-            try {
-                // 1. Use lighter compression
-                const compressedFile                                =   await this.$compressImage(file);
-                
-                // 2. Use object URL instead of base64
-                const objectUrl                                     =   URL.createObjectURL(compressedFile);
-                this.client.in_store_image_currentObjectURL         =   objectUrl;
-                display.src                                         =   objectUrl;
-
-                // 3. Store compressed file instead of base64 string
-                this.client.in_store_image_updated                  =   true;
-                this.client.in_store_image_original_name            =   file.name;
-                this.client.in_store_image                          =   compressedFile;
-            } 
-
-            catch (error) {
-
-                console.error("Image processing failed:", error);
-
-                this.client.in_store_image_original_name    =   "";
-                this.client.in_store_image                  =   "";
-                this.client.in_store_image_updated          =   true;
-
-                display.src = "";
-            }
-        },
-
-        //
-
         brandAvailabilityChanged() {
 
             if(this.client.BrandAvailability   === 'Non') {
@@ -1255,45 +776,6 @@ export default {
         },
 
         //     
-
-        base64ToImage(image_base64, image_display_div) {
-
-            this.$base64ToImage(image_base64, image_display_div)
-        },
-
-        //
-
-        async checkInsidePolygon() {
-
-            let response                        =   await this.$currentPosition(this.getUser.accuracy)
-
-            if(response.success) {
-
-                //
-                this.show_gps_error                 =   false
-
-                //
-                this.point_is_inside_user_polygons  =   true
-            }
-
-            else {
-
-                //
-                this.show_gps_error                 =   true
-
-                //
-                await this.$nextTick()
-
-                //
-                this.point_is_inside_user_polygons  =   false
-
-                //
-                this.$customMessages("GPS Error", "Vérifiez si votre GPS est activée", "error", "OK", "", "", "")
-
-                //
-                this.checkGPS()
-            }
-        },
 
         async showPositionOnMap(map_id) {
 
@@ -1318,15 +800,16 @@ export default {
 
                     // --- NEW: Get Address from LocationIQ ---
                     // We await this so the address is ready before you save/check clients
-                    // const address = await this.$getAddressFromLocationIQ(this.client.Latitude, this.client.Longitude);
+                    const address = await this.$getAddressFromLocationIQ(this.client.Latitude, this.client.Longitude);
                     
                     // Assuming 'this.client.Address' is where you want to store it
-                    // if(address) {
-                    //     this.client.RvrsGeoAddress  =   address;
-                    //     console.log("Address found:", this.client.RvrsGeoAddress);
-                    // }
+                    if(address) {
+                        this.client.RvrsGeoAddress  =   address;
+                        console.log("Address found:", this.client.RvrsGeoAddress);
+                    }
                     // ----------------------------------------
-                    // await this.$nextTick()
+
+                    await this.$nextTick()
 
                     //
                     let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
@@ -1387,8 +870,6 @@ export default {
                 async (pos) => {
                     const accuracy  =   pos.coords.accuracy;
                     
-                    console.log(accuracy)
-
                     //
                     if (Math.ceil(accuracy) <= this.getUser.accuracy) {
 
@@ -1526,52 +1007,6 @@ export default {
 
             // Prints any errors to the console
             console.error("");
-        },
-
-        //
-
-        plusSlides(current_slide) {
-
-            // Go Next
-            if(current_slide    ==  1) {
-
-                // Validation de la question
-                let validation          =   this.validationQuestion()
-
-                if(validation   ==  true)  {
-
-                    this.slideIndex     =   this.$plusSlides(this.slideIndex += current_slide, this.slideIndex)
-                }
-
-                else {
-
-                    this.$showErrors("Error !"  ,   ["Veuillez répondre en respectant les conditions des questions avant de passer à la page suivante !"])
-                    return false;
-                }
-                //
-
-                // Verifier Si La Question GPS
-                if(this.slideIndex  ==  this.total_questions) {
-
-                    //
-                    let position_marker                 =   this.$showPositionOnMap("show_map", this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
-
-                    //
-                    // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
-                    this.point_is_inside_user_polygons  =   true
-                }
-                //
-            }
-
-            else {
-
-                this.slideIndex     =   this.$plusSlides(this.slideIndex += current_slide, this.slideIndex)
-            }
-        },
-
-        currentSlide(current_slide) {
-
-            this.slideIndex     =   this.$currentSlide(this.slideIndex = current_slide, this.slideIndex)
         },
 
         //
@@ -2110,10 +1545,6 @@ export default {
             this.setTotalQuestions()
         },
 
-        //  //  //  //  //  //  //
-        //  //  //  //  //  //  //
-        //  //  //  //  //  //  //
-
         // --- Navigation ---
         changeSlide(step) {
             const nextIndex = this.slideIndex + step;
@@ -2258,9 +1689,10 @@ export default {
         },
 
         refreshGPS() {
-            this.check_gps_clicked = true;
-            this.showPositionOnMap('show_map');
-            setTimeout(() => { this.check_gps_clicked = false; }, 2000);
+            this.point_is_inside_user_polygons  =   false;
+            setTimeout(() => {
+                this.showPositionOnMap('show_map'); 
+            }, 200); // Small delay to ensure DIV is rendered via v-show
         },
     }
 };

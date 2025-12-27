@@ -1,70 +1,53 @@
 <template>
-    <div class="content-wrapper p-3">
-        <div class="card">
-            <div class="card-body">
+    <div class="p-3" style="height: 90%;">
+        <div class="card w-100 shadow-lg">
+            <div class="card-img-container" style="height: 45%; width: 100%; overflow: hidden"> 
+                <img id="profile_image_display"     src="/images/front_office_images/profile_page_image.png"   class="card-img-top">
+            </div>
 
-                <!-- Header -->
-                <h3 class="fw-bold"><u>Profile Details</u></h3>
-
-                <!-- Details -->
-                <form class="mt-5">
-
-                    <div class="mb-3 mt-3">
-                        <div class="row">
-                            <label for="username"               class="form-label font-weight-bold col-sm-2">Username : </label>
-                            <label                              class="form-label col-sm-4">{{ user.username }}</label>
-
-                            <label for="email"                  class="form-label font-weight-bold col-sm-2">Email : </label>
-                            <label                              class="form-label col-sm-4">{{ user.email }}</label>
-                        </div>
+            <div v-if="user" class="card-body" style="overflow-y: auto;">
+                <div>
+                    <div class="d-flex flex-row justify-content-center gap-2">
+                        <span class="fw-bold fst-italic">Username :</span>
+                        <span>{{ user.username }}</span>
                     </div>
 
-                    <!--  -->
-
-                    <div class="mb-3 mt-3">
-                        <div class="row">
-                            <label for="first_name"               class="form-label font-weight-bold col-sm-2">First Name : </label>
-                            <label                              class="form-label col-sm-4">{{ user.first_name }}</label>
-
-                            <label for="last_name"                  class="form-label font-weight-bold col-sm-2">Last Name : </label>
-                            <label                              class="form-label col-sm-4">{{ user.last_name }}</label>
-                        </div>
+                    <div class="d-flex flex-row justify-content-center gap-2">
+                        <span class="fw-bold fst-italic">Email :</span>
+                        <span>{{ user.email }}</span>
                     </div>
 
-                    <!--  -->
-
-                    <div class="mb-3 mt-3">
-                        <div class="row">
-                            <label for="tel"                    class="form-label font-weight-bold col-sm-2">Tel : </label>
-                            <label                              class="form-label col-sm-4">{{ user.tel }}</label>
-
-                            <label for="company"                class="form-label font-weight-bold col-sm-2">Company : </label>
-                            <label                              class="form-label col-sm-4">{{ user.company }}</label>
-                        </div>
+                    <div class="d-flex flex-row justify-content-center gap-2">
+                        <span class="fw-bold fst-italic">First Name :</span>
+                        <span>{{ user.first_name }}</span>
                     </div>
 
-                    <!--  -->
-
-                    <div class="mb-3 mt-3">
-                        <div class="row">
-                            <label for="type_user"              class="form-label font-weight-bold col-sm-2">Type User : </label>
-                            <label                              class="form-label col-sm-4">{{ user.type_user }}</label>
-
-                            <label for="max_route_import"       class="form-label font-weight-bold col-sm-2">Max Route Import : </label>
-                            <label                              class="form-label col-sm-4">{{ user.max_route_import }}</label>
-                        </div>
+                    <div class="d-flex flex-row justify-content-center gap-2">
+                        <span class="fw-bold fst-italic">Last Name :</span>
+                        <span>{{ user.last_name }}</span>
                     </div>
 
-                    <!--  -->
-
-                    <div class="mb-3 mt-3">
-                        <div class="row">
-                            <label for="max_route_import"       class="form-label font-weight-bold col-sm-2">Liste Route Import : </label>
-                            <label                              class="form-label col-sm-10">{{ user.liste_route_import_string }}</label>
-                        </div>
+                    <div class="d-flex flex-row justify-content-center gap-2">
+                        <span class="fw-bold fst-italic">Tel :</span>
+                        <span>{{ user.tel }}</span>
                     </div>
 
-                </form>
+                    <div class="d-flex flex-row justify-content-center gap-2">
+                        <span class="fw-bold fst-italic">Company :</span>
+                        <span>{{ user.company }}</span>
+                    </div>
+
+                    <div class="d-flex flex-row justify-content-center gap-2">
+                        <span class="fw-bold fst-italic">Type User :</span>
+                        <span>{{ user.type_user }}</span>
+                    </div>
+
+                    <div class="d-flex flex-row justify-content-center gap-2">
+                        <span class="fw-bold fst-italic">Route Imports :</span>
+                        <span>{{ user.liste_route_import_string }}</span>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
@@ -165,3 +148,38 @@ export default {
     }
 };
 </script>
+
+<style scoped>
+
+/* Ensure the card takes full height of the parent container */
+.card {
+    height: 100% !important; 
+    border: none; /* Optional: removes border to look cleaner */
+}
+
+/* 1. Image Section: 35% */
+.card-img-container {
+    height: 35%;
+    overflow: hidden;
+}
+
+/* Make sure the image inside fills the container properly */
+.card-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Key property: prevents image distortion */
+}
+
+/* 2. Body Section: 35% */
+.card-body {
+    height: 35%;
+    overflow-y: auto; /* Enables scroll ONLY here */
+}
+
+/* 3. Footer Section: 30% */
+.card-footer {
+    height: 30%;
+    overflow-y: hidden; /* Prevents scroll in footer */
+}
+
+</style>

@@ -97,6 +97,7 @@ export default {
                                                                     { data: "CityNameE"                         , title: "CityNameE"                        },
 
                                                                     { data: "Address"                           , title: "Address"                          },
+                                                                    { data: "RvrsGeoAddress"                    , title: "RvrsGeoAddress"                   },
                                                                     { data: "Neighborhood"                      , title: "Neighborhood"                     },
                                                                     { data: "Landmark"                          , title: "Landmark"                         },
 

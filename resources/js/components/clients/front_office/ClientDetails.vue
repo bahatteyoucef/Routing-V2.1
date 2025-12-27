@@ -1,12 +1,12 @@
 <template>
-    <div class="h-100 p-3">
+    <div class="p-3" style="height: 90%;">
         <div class="card w-100 shadow-lg">
-            <div class="card-img-container" style="height: 35%; width: 100%; overflow: hidden"> 
+            <div class="card-img-container" style="height: 45%; width: 100%; overflow: hidden"> 
                 <img id="facade_image_display" :src="'/uploads/clients/'+client.id+'/'+client.facade_image"     class="card-img-top">
             </div>
 
             <div class="card-body" style="height: 35%; overflow-y: auto;">
-                <h5 class="card-title fw-bold text-center text-decoration-underline">{{ client.CustomerCode }}</h5>
+                <h5 class="card-title fw-bold text-center text-decoration-underline">{{ client.CustomerCode }} ({{ client.status }})</h5>
                 <div>
                     <div class="d-flex flex-row justify-content-center gap-2">
                         <span class="fw-bold fst-italic">Raison Social :</span>
@@ -30,17 +30,13 @@
                 </div>
             </div>
 
-            <div class="card-footer bg-white" style="height: 30%;">
+            <div class="card-footer bg-white" style="height: 20%;">
                 <div v-if="getIsOnline" class="text-center m-1 p-0">
                     <button class="rounded btn btn-primary text-white w-100 p-1" @click="updateInformations()">Modifier <i class="mdi mdi-pencil-box-outline"></i></button>
                 </div>
 
                 <div v-if="getIsOnline" class="text-center m-1 p-0">
                     <button class="rounded btn btn-secondary text-white w-100 p-1" @click="openDirectionsInGoogleMaps()">Itinéraire <i class="mdi mdi-map-marker-circle"></i></button>
-                </div>
-
-                <div v-if="((getIsOnline)&&(show_delete_button))" class="text-center m-1 p-0">
-                    <button class="rounded btn btn-danger text-white w-100 p-1" @click="deleteClient()">Supprimer <i class="mdi mdi-delete"></i></button>
                 </div>
             </div>
         </div>
@@ -71,6 +67,7 @@ export default {
                 DistrictNo                      : '',
                 CityNo                          : '',
                 Address                         : '',
+                RvrsGeoAddress                  : '',
 
                 DistrictNameE                   : '',
                 CityNameE                       : '',
@@ -130,6 +127,7 @@ export default {
             this.client.DistrictNo                      =   res.data.DistrictNo
             this.client.CityNo                          =   res.data.CityNo
             this.client.Address                         =   res.data.Address
+            this.client.RvrsGeoAddress                  =   res.data.RvrsGeoAddress
 
             this.client.AddressA                        =   res.data.AddressA                 
             this.client.CityNameE                       =   res.data.CityNameE
