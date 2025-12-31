@@ -2,19 +2,20 @@
 
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ClientTempoController;
-use App\Http\Controllers\DistrictController;
-use App\Http\Controllers\JourneeController;
-use App\Http\Controllers\JourneyPlanController;
-use App\Http\Controllers\RouteImportController;
-use App\Http\Controllers\RouteImportTempoController;
-use App\Http\Controllers\StatisticController;
-use App\Http\Controllers\UserController;
+
+use App\Http\Controllers\JourneeTerritoryController;
+use App\Http\Controllers\JourneyPlanTerritoryController;
 use App\Http\Controllers\UserTerritoryController;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\RouteImportController;
+use App\Http\Controllers\RouteImportTempoController;
+use App\Http\Controllers\RTMWillayaController;
+use App\Http\Controllers\StatisticController;
+
+use App\Http\Controllers\UserController;
+
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 //  //  //  //  //  //  //  //  //  //  // //  //  //  //  //  //  //  //
 
@@ -34,199 +35,189 @@ Route::middleware('auth:api')->group(function () {
     });
 });
 
-// Get Authentificated User Info
-Route::middleware(['auth:api', 'isEnabledUser'])->group(function () {
-
-    Route::post('/user', function(Request $request) {
-
-        return Auth::user();
-    });
-});
-
 // Check if Authentificated
-Route::post('/user/isAuthentificated', [UserController::class, 'isAuthentificated']);
+Route::post('/users/is-authentificated', [UserController::class, 'isAuthentificated']);
 
 //  //  //  //  //  //  //  //  //  //  // //  //  //  //  //  //  //  //
 
 // Dashboard
 Route::middleware(['auth:api', 'isEnabledUser'])->group(function () {
 
-    // Get Districts
-    Route::post('/route_import/{id_route_import}/districts'     ,   function($id_route_import)  { 
+    //  //  //  //  //
+    //  //  //  //  //  RTM Willayas
+    //  //  //  //  //
 
-        return  DB::table("RTM_Willaya")
-                    ->join("route_import_districts" , "RTM_Willaya.DistrictNo"          , "route_import_districts.DistrictNo")
-                    ->where('route_import_districts.id_route_import', $id_route_import)
-                    ->orderBy('RTM_Willaya.DistrictNameE')
-                    ->get();
-    });
+    // Listings
+    Route::post('/rtm-willayas'                                                                         ,   [RTMWillayaController::class, 'index'                   ])->middleware('Viewer');
+    Route::post('/rtm-willayas/rtm-cities/details'                                                      ,   [RTMWillayaController::class, 'willayasCities'          ])->middleware('Viewer');
 
-    // Get Cities
-    Route::post('/route_import/{id_route_import}/cities'     ,   function($id_route_import)  { 
+    // Cities
+    Route::post('/rtm-willayas/{DistrictNo}/rtm-cities'                                                 ,   [RTMWillayaController::class, 'cities'                  ])->middleware('Viewer');
+  
+    // Set Expected
+    Route::post('/rtm-willayas/{DistrictNo}/rtm-cities/expected_clients/update'                         ,   [RTMWillayaController::class, 'updateExpectedClients'   ])->middleware('BUManager');
 
-        return  DB::table("RTM_City")
-                    ->select("RTM_City.*")
-                    ->join("RTM_Willaya"            , "RTM_City.DistrictNo"         , "RTM_Willaya.DistrictNo")
-                    ->join("route_import_districts" , "RTM_Willaya.DistrictNo"      , "route_import_districts.DistrictNo")
-                    ->where('route_import_districts.id_route_import', $id_route_import)
-                    ->orderByRaw('CAST(RTM_City.CITYNO AS SIGNED INTEGER)')
-                    ->get();
-    });
+    //  //  //  //  //
+    //  //  //  //  //  Users
+    //  //  //  //  //
 
-    // 
-    Route::post('/rtm_willayas/rtm_cites/details/indexedDB'     ,   function()  { 
-
-        $willayas   =   DB::table("RTM_Willaya")->orderBy('DistrictNameE')->get();
-
-        foreach ($willayas as $willaya) {
-
-            $willaya->cites =   DB::table("RTM_City")->where('DistrictNo', $willaya->DistrictNo)->orderBy('CityNameE')->get();
-        }
-
-        return $willayas;
-    });
-    Route::post('/rtm_willayas/rtm_cites/details'               ,   function()  { 
-
-        $willayas   =   DB::table("RTM_Willaya")->orderBy('DistrictNameE')->get();
-
-        foreach ($willayas as $willaya) {
-
-            $willaya->cites =   DB::table("RTM_City")->where('DistrictNo', $willaya->DistrictNo)->orderBy('CityNameE')->get();
-        }
-
-        return $willayas;
-    });
-    Route::post('/rtm_willayas'                                                         ,   function()                  { return DB::table("RTM_Willaya")->orderBy('DistrictNameE')->get();                             })->middleware('BackOffice');
-    Route::post('/rtm_willayas/{DistrictNo}/rtm_cites'                                  ,   function($DistrictNo)       { return DB::table("RTM_City")->where('DistrictNo', $DistrictNo)->orderBy('CityNameE')->get();  });
-    Route::post('/rtm_willayas/{DistrictNo}/rtm_cites/expected_clients/update'          ,   [DistrictController::class  , 'updateExpectedClients'                                                                       ])->middleware('BUManager');
-
-    //
-
-    // Users
-
+    // Listings
     Route::post('/users'                                                                                ,   [UserController::class                  , 'index'                                   ])->middleware('BUManager');
+
+    // Combo
     Route::post('/users/combo'                                                                          ,   [UserController::class                  , 'combo'                                   ])->middleware('BUManager');
     Route::post('/users/combo/backoffice'                                                               ,   [UserController::class                  , 'comboBackOffice'                         ])->middleware('BUManager');
-    Route::post('/users/{id}/show'                                                                      ,   [UserController::class                  , 'show'                                    ]);
 
+    // CRUD
     Route::post('/users/store'                                                                          ,   [UserController::class                  , 'store'                                   ])->middleware('BUManager');
-    Route::post('/users/{id}/update'                                                                    ,   [UserController::class                  , 'update'                                  ])->middleware('BUManager');
+    Route::post('/users/{id_user}/update'                                                               ,   [UserController::class                  , 'update'                                  ])->middleware('BUManager');
+    Route::post('/users/{id_user}/show'                                                                 ,   [UserController::class                  , 'show'                                    ]);
 
+    // Pointings
     Route::post('/users/pointings'                                                                      ,   [UserController::class                  , 'pointings'                               ])->middleware('BUManager');
 
-    //
+    // is Auth
+    Route::post('/users'                                                                                ,   function() { return Auth::user();                                                   })->middleware('Viewer');
 
-    // Route Import Tempo
+    //  //  //  //  //
+    //  //  //  //  //  Route Imports
+    //  //  //  //  //
 
-    Route::post('/route_import_tempo/last'                                                              ,   [RouteImportTempoController::class      , 'lastTempo'                               ])->middleware('BUManager');
-    Route::post('/route_import_tempo/store'                                                             ,   [RouteImportTempoController::class      , 'store'                                   ])->middleware('BUManager');
-    Route::post('/route_import_tempo/file'                                                              ,   [RouteImportTempoController::class      , 'getFile'                                 ])->middleware('BUManager');
+    // Listings
+    Route::post('/route-imports'                                                                        ,   [RouteImportController::class           , 'index'                                   ])->middleware('Viewer');
+    Route::post('/route-imports/details'                                                                ,   [RouteImportController::class           , 'details'                                 ])->middleware('Viewer');
 
-    //
+    // Combo
+    Route::post('/route-imports/combo'                                                                  ,   [RouteImportController::class           , 'combo'                                   ])->middleware('Viewer');
 
-    Route::post('/route_import_tempo/{id_route_import_tempo}/clients_tempo'                             ,   [ClientTempoController::class           , 'clients'                                 ])->middleware('BUManager');
-    Route::post('/route_import_tempo/{id_route_import_tempo}/clients_tempo/store'                       ,   [ClientTempoController::class           , 'storeClients'                            ])->middleware('BUManager');
-    Route::post('/route_import_tempo/{id_route_import_tempo}/clients_tempo/{id}/update'                 ,   [ClientTempoController::class           , 'updateClient'                            ])->middleware('BUManager');
-    Route::post('/route_import_tempo/{id_route_import_tempo}/clients_tempo/{id}/delete'                 ,   [ClientTempoController::class           , 'deleteClient'                            ])->middleware('BUManager');
+    // CRUD
+    Route::post('/route-imports/store'                                                                  ,   [RouteImportController::class           , 'store'                                   ])->middleware('BUManager');
+    Route::post('/route-imports/{id_route_import}/update'                                               ,   [RouteImportController::class           , 'update'                                  ])->middleware('BackOffice');
+    Route::post('/route-imports/{id_route_import}/delete'                                               ,   [RouteImportController::class           , 'delete'                                  ])->middleware('SuperAdmin');    
+    Route::post('/route-imports/{id_route_import}/show'                                                 ,   [RouteImportController::class           , 'show'                                    ])->middleware('BUManager');
 
-    Route::post('/clients_tempo/resume/update'                                                          ,   [ClientTempoController::class           , 'updateResumeClients'                     ])->middleware('BUManager');
+    // Clients
+    Route::post('/route-imports/{id_route_import}/clients'                                              ,   [RouteImportController::class           , 'clients'                                 ])->middleware('Viewer');
+    Route::post('/route-imports/{id_route_import}/clients/by-status'                                    ,   [RouteImportController::class           , 'clientsByStatus'                         ])->middleware('FrontOffice');
 
-    Route::post('/route_import_tempo/{id_route_import_tempo}/clients_tempo/doubles'                     ,   [ClientTempoController::class           , 'getDoublesClients'                       ])->middleware('BUManager');
-    Route::post('/route_import_tempo/{id_route_import_tempo}/clients_tempo/doubles/Tel'                 ,   [ClientTempoController::class           , 'getDoublesTelClients'                    ])->middleware('BUManager');
-    Route::post('/route_import_tempo/{id_route_import_tempo}/clients_tempo/doubles/CustomerCode'        ,   [ClientTempoController::class           , 'getDoublesCustomerCodeClients'           ])->middleware('BUManager');
-    Route::post('/route_import_tempo/{id_route_import_tempo}/clients_tempo/doubles/CustomerNameE'       ,   [ClientTempoController::class           , 'getDoublesCustomerNameEClients'          ])->middleware('BUManager');
-    Route::post('/route_import_tempo/{id_route_import_tempo}/clients_tempo/doubles/GPS'                 ,   [ClientTempoController::class           , 'getDoublesGPSClients'                    ])->middleware('BUManager');
+    // Users
+    Route::post('/route-imports/{id_route_import}/users/frontOffice'                                    ,   [RouteImportController::class           , 'frontOffice'                             ])->middleware('BackOffice');
+    Route::post('/route-imports/{id_route_import}/users'                                                ,   [RouteImportController::class           , 'users'                                   ])->middleware('BackOffice');
 
-    //
+    // Districts
+    Route::post('/route-imports/{id_route_import}/districts'                                            ,   [RouteImportController::class           , 'routeImportDistricts'                    ])->middleware('Viewer');
 
-    // Route Import
-    Route::post('/route_import'                                                                         ,   [RouteImportController::class           , 'index'                                   ])->middleware('Viewer');
-    Route::post('/route_import/combo'                                                                   ,   [RouteImportController::class           , 'combo'                                   ])->middleware('Viewer');
-    Route::post('/route_import/store'                                                                   ,   [RouteImportController::class           , 'store'                                   ])->middleware('BUManager');
-    Route::post('/route_import/{id}/update'                                                             ,   [RouteImportController::class           , 'update'                                  ])->middleware('BackOffice');
-    Route::post('/route_import/{id}/delete'                                                             ,   [RouteImportController::class           , 'delete'                                  ])->middleware('SuperAdmin');
-    
-    Route::post('/route_import/{id}/show'                                                               ,   [RouteImportController::class           , 'show'                                    ])->middleware('BUManager');
-    Route::post('/route_import/{id}/indexedDB/show'                                                     ,   [RouteImportController::class           , 'indexedDBShow'                           ])->middleware('BUManager');
+    // Cities
+    Route::post('/route-imports/{id_route_import}/cities'                                               ,   [RouteImportController::class           , 'cities'                                  ])->middleware('Viewer');
 
-    Route::post('/route_import/{id}/clients'                                                            ,   [RouteImportController::class           , 'clients'                                 ])->middleware('Viewer');
+    // Export Data and Images
+    Route::post('/route-imports/all_data'                                                               ,   [RouteImportController::class           , 'downloadData'                            ])->middleware('Viewer');
+    Route::post('/route-imports/all_data/images'                                                        ,   [RouteImportController::class           , 'downloadImages'                          ])->middleware('Viewer');
+    Route::post('/route-imports/all_data/images/customer-code'                                          ,   [RouteImportController::class           , 'downloadCustomerCodeImages'              ])->middleware('Viewer');
+    Route::post('/route-imports/all_data/images/facade'                                                 ,   [RouteImportController::class           , 'downloadFacadeImages'                    ])->middleware('Viewer');
+    Route::post('/route-imports/all_data/images/in-store'                                               ,   [RouteImportController::class           , 'downloadInStoreImages'                   ])->middleware('Viewer');
 
-    Route::post('/route_import/header'                                                                  ,   [RouteImportController::class           , 'headerRouteImports'                      ])->middleware('Viewer');
-    Route::post('/route_import/index'                                                                   ,   [RouteImportController::class           , 'indexRouteImports'                       ])->middleware('Viewer');
+    // Journey Plan Territories
+    Route::post('/route-imports/{id_route_import}/journey-plan-territories'                             ,   [RouteImportController::class           , 'journeyPlan'                             ])->middleware('Viewer');
+    Route::post('/route-imports/{id_route_import}/journey-plan-territories/util'                        ,   [RouteImportController::class           , 'journeyPlanUtil'                         ])->middleware('Viewer');
 
-    Route::post('/route_import/{id}/users/frontOffice'                                                  ,   [RouteImportController::class           , 'frontOffice'                             ])->middleware('BackOffice');
-    Route::post('/route_import/{id}/users'                                                              ,   [RouteImportController::class           , 'users'                                   ])->middleware('BackOffice');
+    // Journee Territories
+    Route::post('/route-imports/{id_route_import}/journee-territories'                                  ,   [RouteImportController::class           , 'journeeTerritories'                      ])->middleware('Viewer');
+    Route::post('/route-imports/{id_route_import}/journee-territories/util'                             ,   [RouteImportController::class           , 'journeeTerritoriesUtil'                  ])->middleware('Viewer');
 
-    //
+    // User Territories
+    Route::post('/route-imports/{id_route_import}/user-territories'                                     ,   [RouteImportController::class           , 'userTerritory'                           ])->middleware('Viewer');
+    Route::post('/route-imports/{id_route_import}/user-territories/util'                                ,   [RouteImportController::class           , 'userTerritoryUtil'                       ])->middleware('Viewer');
 
-    Route::post('/route_import/{id_route_import}/clients/doubles'                                       ,   [ClientController::class                , 'getDoublesClients'                       ])->middleware('BackOffice');
-    Route::post('/route_import/{id_route_import}/clients/doubles/Tel'                                   ,   [ClientController::class                , 'getDoublesTelClients'                    ])->middleware('BackOffice');
-    Route::post('/route_import/{id_route_import}/clients/doubles/CustomerCode'                          ,   [ClientController::class                , 'getDoublesCustomerCodeClients'           ])->middleware('BackOffice');
-    Route::post('/route_import/{id_route_import}/clients/doubles/CustomerNameE'                         ,   [ClientController::class                , 'getDoublesCustomerNameEClients'          ])->middleware('BackOffice');
-    Route::post('/route_import/{id_route_import}/clients/doubles/GPS'                                   ,   [ClientController::class                , 'getDoublesGPSClients'                    ])->middleware('BackOffice');
+    // OBS
+    Route::post('/route/obs/route-imports/{id_route_import}/details'                                    ,   [RouteImportController::class           , 'obsDetailsRouteImport'                   ])->middleware('BackOffice');
+    Route::post('/route/obs/route-imports/{id_route_import}/details/for-front-office'                   ,   [RouteImportController::class           , 'obsDetailsRouteImportFrontOffice'        ])->middleware('FrontOffice');
 
-    //
+    //  //  //  //  //
+    //  //  //  //  //  Route Imports Tempo
+    //  //  //  //  //
 
-    Route::post('/route_import/{id}/user_territories'                                                   ,   [RouteImportController::class           , 'userTerritory'                           ])->middleware('Viewer');
-    Route::post('/route_import/{id}/user_territories/util'                                              ,   [RouteImportController::class           , 'userTerritoryUtil'                       ])->middleware('Viewer');
+    // Show/Store
+    Route::post('/route-imports-tempo/last'                                                             ,   [RouteImportTempoController::class      , 'lastTempo'                               ])->middleware('BUManager');
+    Route::post('/route-imports-tempo/store'                                                            ,   [RouteImportTempoController::class      , 'store'                                   ])->middleware('BUManager');
 
-    Route::post('/route_import/{id}/user_territories/store'                                             ,   [UserTerritoryController::class         , 'storeUserTerritory'                      ])->middleware('Viewer');
-    Route::post('/route_import/{id}/user_territories/{id_user_territory}/update'                        ,   [UserTerritoryController::class         , 'updateUserTerritory'                     ])->middleware('Viewer');
-    Route::post('/route_import/{id}/user_territories/{id_user_territory}/delete'                        ,   [UserTerritoryController::class         , 'deleteUserTerritory'                     ])->middleware('Viewer');
+    // Route::post('/route-imports-tempo/file'                                                              ,   [RouteImportTempoController::class      , 'getFile'                                 ])->middleware('BUManager');
 
-    //
+    //  //  //  //  //
+    //  //  //  //  //  Clients
+    //  //  //  //  //
 
-    Route::post('/route_import/{id}/journey_plan'                                                       ,   [RouteImportController::class           , 'journeyPlan'                             ])->middleware('Viewer');
-    Route::post('/route_import/{id}/journey_plan/util'                                                  ,   [RouteImportController::class           , 'journeyPlanUtil'                         ])->middleware('Viewer');
-
-    Route::post('/route_import/{id}/journey_plan/store'                                                 ,   [JourneyPlanController::class           , 'storeJourneyPlan'                        ])->middleware('Viewer');
-    Route::post('/route_import/{id}/journey_plan/{id_journey_plan}/update'                              ,   [JourneyPlanController::class           , 'updateJourneyPlan'                       ])->middleware('Viewer');
-    Route::post('/route_import/{id}/journey_plan/{id_journey_plan}/delete'                              ,   [JourneyPlanController::class           , 'deleteJourneyPlan'                       ])->middleware('Viewer');
-
-    //
-
-    Route::post('/route_import/{id}/journees'                                                           ,   [RouteImportController::class           , 'journees'                                ])->middleware('Viewer');
-    Route::post('/route_import/{id}/journees/util'                                                      ,   [RouteImportController::class           , 'journeesUtil'                            ])->middleware('Viewer');
-
-    Route::post('/route_import/{id}/journees/store'                                                     ,   [JourneeController::class               , 'storeJournee'                            ])->middleware('Viewer');
-    Route::post('/route_import/{id}/journees/{id_journee}/update'                                       ,   [JourneeController::class               , 'updateJournee'                           ])->middleware('Viewer');
-    Route::post('/route_import/{id}/journees/{id_journee}/delete'                                       ,   [JourneeController::class               , 'deleteJournee'                           ])->middleware('Viewer');
-
-    //
-
-    Route::post('/route_import/{id_route_import}/clients/{id}/show'                                     ,   [ClientController::class                , 'showClient'                              ]);
-
-    Route::post('/route_import/{id_route_import}/clients/store'                                         ,   [ClientController::class                , 'storeClient'                             ]);
-    Route::post('/route_import/{id_route_import}/clients/{id}/update'                                   ,   [ClientController::class                , 'updateClient'                            ]);
-    Route::post('/route_import/{id_route_import}/clients/{id}/delete'                                   ,   [ClientController::class                , 'deleteClient'                            ])->middleware('SuperAdmin');
-
-    Route::post('/route_import/{id_route_import}/clients/multi_update'                                  ,   [ClientController::class                , 'multiUpdateClients'                      ])->middleware('BackOffice');
-    Route::post('/route_import/{id_route_import}/clients/delete'                                        ,   [ClientController::class                , 'deleteClients'                           ])->middleware('SuperAdmin');
-
+    // Resume
     Route::post('/clients/resume/update'                                                                ,   [ClientController::class                , 'updateResumeClients'                     ])->middleware('BackOffice');
 
-    Route::post('/route/obs/route_import/{id}/details'                                                  ,   [RouteImportController::class           , 'obsDetailsRouteImport'                   ])->middleware('BackOffice');
-    Route::post('/route/obs/route_import/{id}/details/for_front_office'                                 ,   [RouteImportController::class           , 'obsDetailsRouteImportFrontOffice'        ])->middleware('FrontOffice');
+    // Multi Update/Multi Delete
+    Route::post('/route-imports/{id_route_import}/clients/update'                                       ,   [ClientController::class                , 'updateClients'                           ])->middleware('BackOffice');
+    Route::post('/route-imports/{id_route_import}/clients/delete'                                       ,   [ClientController::class                , 'deleteClients'                           ])->middleware('SuperAdmin');
 
-    //
+    // CRUD
+    Route::post('/route-imports/{id_route_import}/clients/store'                                        ,   [ClientController::class                , 'storeClient'                             ]);
+    Route::post('/route-imports/{id_route_import}/clients/{id_client}/update'                           ,   [ClientController::class                , 'updateClient'                            ]);
+    Route::post('/route-imports/{id_route_import}/clients/{id_client}/delete'                           ,   [ClientController::class                , 'deleteClient'                            ])->middleware('SuperAdmin');
+    Route::post('/route-imports/{id_route_import}/clients/{id_client}/show'                             ,   [ClientController::class                , 'showClient'                              ]);
 
-    Route::post('/route_import/{id_route_import}/clients/by_status'                                     ,   [RouteImportController::class           , 'clientsByStatus'                         ])->middleware('FrontOffice');
+    // Doubles
+    Route::post('/route-imports/{id_route_import}/clients/doubles'                                      ,   [ClientController::class                , 'getDoublesClients'                       ])->middleware('BackOffice');
+    Route::post('/route-imports/{id_route_import}/clients/doubles/Tel'                                  ,   [ClientController::class                , 'getDoublesTelClients'                    ])->middleware('BackOffice');
+    Route::post('/route-imports/{id_route_import}/clients/doubles/CustomerCode'                         ,   [ClientController::class                , 'getDoublesCustomerCodeClients'           ])->middleware('BackOffice');
+    Route::post('/route-imports/{id_route_import}/clients/doubles/CustomerNameE'                        ,   [ClientController::class                , 'getDoublesCustomerNameEClients'          ])->middleware('BackOffice');
+    Route::post('/route-imports/{id_route_import}/clients/doubles/GPS'                                  ,   [ClientController::class                , 'getDoublesGPSClients'                    ])->middleware('BackOffice');
 
-    //
+    //  //  //  //  //
+    //  //  //  //  //  Client Tempo
+    //  //  //  //  //
 
-    Route::post('/route_import/stats'                                                                   ,   [RouteImportController::class           , 'statsRouteImports'                       ])->middleware('Viewer');
+    // Resume
+    Route::post('/clients-tempo/resume/update'                                                          ,   [ClientTempoController::class           , 'updateResumeClients'                     ])->middleware('BUManager');
 
-    //
+    // CRUD
+    Route::post('/route-imports-tempo/{id_route_import_tempo}/clients-tempo'                            ,   [ClientTempoController::class           , 'clients'                                 ])->middleware('BUManager');
+    Route::post('/route-imports-tempo/{id_route_import_tempo}/clients-tempo/store'                      ,   [ClientTempoController::class           , 'storeClients'                            ])->middleware('BUManager');
+    Route::post('/route-imports-tempo/{id_route_import_tempo}/clients-tempo/{id_client_tempo}/update'   ,   [ClientTempoController::class           , 'updateClient'                            ])->middleware('BUManager');
+    Route::post('/route-imports-tempo/{id_route_import_tempo}/clients-tempo/{id_client_tempo}/delete'   ,   [ClientTempoController::class           , 'deleteClient'                            ])->middleware('BUManager');
+
+    // Doubles
+    Route::post('/route-imports-tempo/{id_route_import_tempo}/clients-tempo/doubles'                    ,   [ClientTempoController::class           , 'getDoublesClients'                       ])->middleware('BUManager');
+    Route::post('/route-imports-tempo/{id_route_import_tempo}/clients-tempo/doubles/Tel'                ,   [ClientTempoController::class           , 'getDoublesTelClients'                    ])->middleware('BUManager');
+    Route::post('/route-imports-tempo/{id_route_import_tempo}/clients-tempo/doubles/CustomerCode'       ,   [ClientTempoController::class           , 'getDoublesCustomerCodeClients'           ])->middleware('BUManager');
+    Route::post('/route-imports-tempo/{id_route_import_tempo}/clients-tempo/doubles/CustomerNameE'      ,   [ClientTempoController::class           , 'getDoublesCustomerNameEClients'          ])->middleware('BUManager');
+    Route::post('/route-imports-tempo/{id_route_import_tempo}/clients-tempo/doubles/GPS'                ,   [ClientTempoController::class           , 'getDoublesGPSClients'                    ])->middleware('BUManager');
+
+    //  //  //  //  //
+    //  //  //  //  //  JourneyPlan Territories
+    //  //  //  //  //
+
+    // CRUD
+    Route::post('/route-imports/{id_route_import}/journey-plan-territories/store'                               ,   [JourneyPlanTerritoryController::class  , 'storeJourneyPlan'                        ])->middleware('Viewer');
+    Route::post('/route-imports/{id_route_import}/journey-plan-territories/{id_journey_plan_territory}/update'  ,   [JourneyPlanTerritoryController::class  , 'updateJourneyPlan'                       ])->middleware('Viewer');
+    Route::post('/route-imports/{id_route_import}/journey-plan-territories/{id_journey_plan_territory}/delete'  ,   [JourneyPlanTerritoryController::class  , 'deleteJourneyPlan'                       ])->middleware('Viewer');
+
+    //  //  //  //  //
+    //  //  //  //  //  Journee Territories
+    //  //  //  //  //
+
+    // CRUD
+    Route::post('/route-imports/{id_route_import}/journee-territories/store'                                    ,   [JourneeTerritoryController::class      , 'storeJourneeTerritory'                   ])->middleware('Viewer');
+    Route::post('/route-imports/{id_route_import}/journee-territories/{id_journee_territory}/update'            ,   [JourneeTerritoryController::class      , 'updateJourneeTerritory'                  ])->middleware('Viewer');
+    Route::post('/route-imports/{id_route_import}/journee-territories/{id_journee_territory}/delete'            ,   [JourneeTerritoryController::class      , 'deleteJourneeTerritory'                  ])->middleware('Viewer');
+
+    //  //  //  //  //
+    //  //  //  //  //  User Territories
+    //  //  //  //  //
+
+    // CRUD
+    Route::post('/route-imports/{id_route_import}/user-territories/store'                                       ,   [UserTerritoryController::class         , 'storeUserTerritory'                      ])->middleware('Viewer');
+    Route::post('/route-imports/{id_route_import}/user-territories/{id_user_territory}/update'                  ,   [UserTerritoryController::class         , 'updateUserTerritory'                     ])->middleware('Viewer');
+    Route::post('/route-imports/{id_route_import}/user-territories/{id_user_territory}/delete'                  ,   [UserTerritoryController::class         , 'deleteUserTerritory'                     ])->middleware('Viewer');
+
+    //  //  //  //  //
+    //  //  //  //  //  Statistics
+    //  //  //  //  //
 
     Route::post('/statistics/standard'                                                                  ,   [StatisticController::class             , 'standardStatistics'                      ])->middleware('Viewer');
     Route::post('/statistics/self-service'                                                              ,   [StatisticController::class             , 'selfServiceStatistics'                   ])->middleware('Viewer');
-
-    //
-
-    Route::post('/route_import/all_data'                                                                ,   [RouteImportController::class           , 'downloadData'                            ])->middleware('Viewer');
-    Route::post('/route_import/all_data/images'                                                         ,   [RouteImportController::class           , 'downloadImages'                          ])->middleware('Viewer');
-
-    Route::post('/route_import/all_data/images/customer_code'                                           ,   [RouteImportController::class           , 'downloadCustomerCodeImages'              ])->middleware('Viewer');
-    Route::post('/route_import/all_data/images/facade'                                                  ,   [RouteImportController::class           , 'downloadFacadeImages'                    ])->middleware('Viewer');
-    Route::post('/route_import/all_data/images/in_store'                                                ,   [RouteImportController::class           , 'downloadInStoreImages'                   ])->middleware('Viewer');
 });

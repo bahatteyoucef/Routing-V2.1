@@ -12,9 +12,7 @@ class City extends Model {
     protected $guarded      =   [];
 
     protected $table        =   'RTM_City';
-    protected $primaryKey   =   'CITYNO';
+    protected $primaryKey   =   'CityNo';
 
     public    $timestamps   =   false;
-
-    //
 }

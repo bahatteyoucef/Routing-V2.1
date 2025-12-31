@@ -11,8 +11,6 @@ use Throwable;
 
 class RouteImportTempoController extends Controller
 {
-    //
-
     public function lastTempo()
     {
 
@@ -72,8 +70,6 @@ class RouteImportTempoController extends Controller
             ],422);
         }
     }
-
-    //
 
     public function getFile()
     {

@@ -154,8 +154,8 @@
               <div>
                 <label for="CityNo" class="form-label fw-bold">Commune</label>
                 <select class="form-select" id="CityNo" v-model="client.CityNo" :disabled="(client.status_original    ==  'confirmed')||(client.status_original    ==  'validated')">
-                  <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">
-                    {{cite.CityNameE}} ({{cite.CITYNO}})
+                  <option v-for="city in cities" :key="city.CityNo" :value="city.CityNo">
+                    {{city.CityNameE}} ({{city.CityNo}})
                   </option>
                 </select>
               </div>
@@ -428,7 +428,7 @@ export default {
 
             // Configuration Options
             willayas: [],
-            cites: [],
+            cities: [],
             liste_type_client_options: [
                 'AG Self', 'AG Tradi', 'Superette', 'Gros Mix', 'Gros Sec', 
                 'Gros Frais', 'Demis Gros Mix', 'Demis Gros Sec', 'Demis Gros Frais', 
@@ -518,7 +518,7 @@ export default {
 
             // 2. Refresh Names
             if (this.willayas.length > 0) this.client.DistrictNameE = this.getDistrictNameE(this.client.DistrictNo);
-            if (this.cites.length > 0) this.client.CityNameE = this.getCityNameE(this.client.CityNo);
+            if (this.cities.length > 0) this.client.CityNameE = this.getCityNameE(this.client.CityNo);
 
             // 3. Prepare Payload based on Status
             let payload = {};
@@ -659,7 +659,7 @@ export default {
 
             // 6. Send Request
             try {
-                const res = await this.$callApi("post", `/route_import/${this.$route.params.id_route_import}/clients/${this.client.id}/update`, formData);
+                const res = await this.$callApi("post", `/route-imports/${this.$route.params.id_route_import}/clients/${this.client.id}/update`, formData);
 
                 if (res.status === 200) {
                     this.$hideLoadingPage();
@@ -683,7 +683,7 @@ export default {
 
             try {
                 // 1. Get Route Details
-                const res = await this.$callApi("post", `/route/obs/route_import/${this.$route.params.id_route_import}/details`, null);
+                const res = await this.$callApi("post", `/route/obs/route-imports/${this.$route.params.id_route_import}/details`, null);
                 if(res.data && res.data.route_import) {
                     this.all_clients = res.data.route_import.clients;
                 }
@@ -717,11 +717,11 @@ export default {
 
         getCityNameE(CityNo) {
 
-            for (let i = 0; i < this.cites.length; i++) {
+            for (let i = 0; i < this.cities.length; i++) {
 
-                if(this.cites[i].CITYNO  ==  CityNo) {
+                if(this.cities[i].CityNo  ==  CityNo) {
 
-                    return this.cites[i].CityNameE
+                    return this.cities[i].CityNameE
                 }                
             }
         },
@@ -1605,7 +1605,7 @@ export default {
         },
 
         async getClientData() {
-            const res = await this.$callApi("post", `/route_import/${this.$route.params.id_route_import}/clients/${this.$route.params.id_client}/show`);
+            const res = await this.$callApi("post", `/route-imports/${this.$route.params.id_route_import}/clients/${this.$route.params.id_client}/show`);
             const data = res.data;
 
             // Bulk assign properties
@@ -1630,13 +1630,13 @@ export default {
         },
 
         async getComboData() {
-            const res = await this.$callApi("post", `/route_import/${this.$route.params.id_route_import}/districts`);
+            const res = await this.$callApi("post", `/route-imports/${this.$route.params.id_route_import}/districts`);
             this.willayas = res.data;
         },
 
         async getCites() {
-            const res = await this.$callApi("post", `/rtm_willayas/${this.client.DistrictNo}/rtm_cites`);
-            this.cites = res.data;
+            const res = await this.$callApi("post", `/rtm-willayas/${this.client.DistrictNo}/rtm_cities`);
+            this.cities = res.data;
         },
 
         async sendData() {
@@ -1672,7 +1672,7 @@ export default {
             });
 
             try {
-                const res = await this.$callApi("post", `/route_import/${this.$route.params.id_route_import}/clients/${this.client.id}/update`, formData);
+                const res = await this.$callApi("post", `/route-imports/${this.$route.params.id_route_import}/clients/${this.client.id}/update`, formData);
                 this.$feedbackSuccess(res.data.header, res.data.message);
                 this.$goBack();
             } catch (err) {

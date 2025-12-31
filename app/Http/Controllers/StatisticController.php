@@ -13,7 +13,9 @@ class StatisticController extends Controller {
 
     public function __construct(private StatisticsService $statisticsService) {}
 
-    //  //  //
+    //  //  //  //  //
+    //  //  //  //  //
+    //  //  //  //  //
 
     public static function standardStatistics(Request $request) {
 
@@ -47,6 +49,4 @@ class StatisticController extends Controller {
             return response()->json(['errors' => [$e->getMessage()]], 422);
         }
     }
-
-    //  //  //
 }

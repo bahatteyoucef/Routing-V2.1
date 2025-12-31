@@ -98,7 +98,7 @@ export default {
 
             if((this.$isRole("BackOffice"))||(this.$isRole('BU Manager'))||(this.$isRole("Super Admin"))||(this.$isRole('Viewer'))) {
 
-                this.$callApi("post",    "/route_import/index",     null)
+                this.$callApi("post",    "/route-imports",     null)
                 .then((res)=> {
 
                     console.log(res)
@@ -110,7 +110,7 @@ export default {
 
         navToMap(id_route_import) {
             
-            this.$router.push('/route/obs/route_import/'+id_route_import+'/details')
+            this.$router.push('/route/obs/route-imports/'+id_route_import+'/details')
         },
 
         async setRouteImportDelete(id_route_import) {
@@ -120,17 +120,17 @@ export default {
 
         getClientsValidation(id_route_import) {
 
-            this.$router.push('/route_import/'+id_route_import+'/clients/validation')
+            this.$router.push('/route-imports/'+id_route_import+'/clients/validation')
         },
 
         getClientsConfirmation(id_route_import) {
 
-            this.$router.push('/route_import/'+id_route_import+'/clients/confirmation')
+            this.$router.push('/route-imports/'+id_route_import+'/clients/confirmation')
         },
 
         getClients(id_route_import) {
 
-            this.$router.push('/route_import/'+id_route_import+'/clients')
+            this.$router.push('/route-imports/'+id_route_import+'/clients')
         },
     }
 }

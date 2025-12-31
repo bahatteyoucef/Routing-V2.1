@@ -153,7 +153,7 @@ export default {
             formData.append("districts"             ,   JSON.stringify(districts))
             
             //
-            const res   = await this.$callApi('post'    ,   '/route_import/store'   ,   formData)         
+            const res   = await this.$callApi('post'    ,   '/route-imports/store'   ,   formData)         
 
             if(res.status===200){
 
@@ -170,7 +170,7 @@ export default {
                 await this.$hideModal("ModalSubmit")
 
                 // Add Route Import
-                this.$router.push("/route/obs/route_import/"+res.data.route_import.id+"/details")
+                this.$router.push("/route/obs/route-imports/"+res.data.route_import.id+"/details")
 			}
             
             else{

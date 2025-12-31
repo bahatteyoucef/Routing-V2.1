@@ -217,7 +217,7 @@ export default {
             // Initialisation 
             this.route_import_clients_data  =   [];
 
-            this.$callApi("post",   "/route_import/"+this.$route.params.id_route_import+"/clients",     null)
+            this.$callApi("post",   "/route-imports/"+this.$route.params.id_route_import+"/clients",     null)
             .then(async (res)=> {
 
                 this.route_import                       =   res.data.route_import
@@ -262,7 +262,7 @@ export default {
             formData.append("status"            ,   this.status)
             formData.append("id_route_import"   ,   this.$route.params.id_route_import)
 
-            this.$callApiResponse('post', '/route_import/all_data/images/customer_code', formData, 'blob')
+            this.$callApiResponse('post', '/route-imports/all-data/images/customer-code', formData, 'blob')
             .then(response => {
 
                 if(response.status  ==  200) {
@@ -307,7 +307,7 @@ export default {
             formData.append("status"            ,   this.status)
             formData.append("id_route_import"   ,   this.$route.params.id_route_import)
 
-            this.$callApiResponse('post', '/route_import/all_data/images/facade', formData, 'blob')
+            this.$callApiResponse('post', '/route-imports/all-data/images/facade', formData, 'blob')
             .then(response => {
 
                 if(response.status  ==  200) {
@@ -352,7 +352,7 @@ export default {
             formData.append("status"            ,   this.status)
             formData.append("id_route_import"   ,   this.$route.params.id_route_import)
 
-            this.$callApiResponse('post', '/route_import/all_data/images/in_store', formData, 'blob')
+            this.$callApiResponse('post', '/route-imports/all-data/images/in-store', formData, 'blob')
             .then(response => {
 
                 if(response.status  ==  200) {
@@ -402,7 +402,7 @@ export default {
             formData.append("status"      ,   this.status)
             formData.append("id_route_import"   ,   this.$route.params.id_route_import)
 
-            this.$callApi("post",   "/route_import/all_data", formData)
+            this.$callApi("post",   "/route-imports/all-data", formData)
             .then(async (res)=> {
 
                 this.route_import_clients_data_export  =   res.data.clients;

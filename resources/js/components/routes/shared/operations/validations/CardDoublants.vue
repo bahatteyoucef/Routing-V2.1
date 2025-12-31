@@ -208,12 +208,12 @@ export default {
             this.$showLoadingPage()
 
             if(this.mode    ==  "temporary") {
-                const res                                   =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.id_route_import_tempo+"/clients_tempo/doubles/CustomerCode"     , null)
+                const res                                   =   await this.$callApi("post"  ,   "/route-imports-tempo/"+this.id_route_import_tempo+"/clients-tempo/doubles/CustomerCode"     , null)
                 this.getDoublant.getDoublantCustomerCode    =   res.data
             }
 
             if(this.mode    ==  "permanent") {
-                const res                                   =   await this.$callApi("post"  ,   "/route_import/"+this.id_route_import+"/clients/doubles/CustomerCode"                       , null)
+                const res                                   =   await this.$callApi("post"  ,   "/route-imports/"+this.id_route_import+"/clients/doubles/CustomerCode"                       , null)
                 this.getDoublant.getDoublantCustomerCode    =   res.data
             }
 
@@ -242,12 +242,12 @@ export default {
             this.$showLoadingPage()
 
             if(this.mode    ==  "temporary") {
-                const res                                   =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.id_route_import_tempo+"/clients_tempo/doubles/CustomerNameE"    , null)
+                const res                                   =   await this.$callApi("post"  ,   "/route-imports-tempo/"+this.id_route_import_tempo+"/clients-tempo/doubles/CustomerNameE"    , null)
                 this.getDoublant.getDoublantCustomerNameE   =   res.data
             }
 
             if(this.mode    ==  "permanent") {
-                const res                                   =   await this.$callApi("post"  ,   "/route_import/"+this.id_route_import+"/clients/doubles/CustomerNameE"                      , null)
+                const res                                   =   await this.$callApi("post"  ,   "/route-imports/"+this.id_route_import+"/clients/doubles/CustomerNameE"                      , null)
                 this.getDoublant.getDoublantCustomerNameE   =   res.data
             }
 
@@ -276,12 +276,12 @@ export default {
             this.$showLoadingPage()
 
             if(this.mode    ==  "temporary") {
-                const res                           =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.id_route_import_tempo+"/clients_tempo/doubles/Tel"  , null)
+                const res                           =   await this.$callApi("post"  ,   "/route-imports-tempo/"+this.id_route_import_tempo+"/clients-tempo/doubles/Tel"  , null)
                 this.getDoublant.getDoublantTel     =   res.data
             }
 
             if(this.mode    ==  "permanent") {
-                const res                           =   await this.$callApi("post"  ,   "/route_import/"+this.id_route_import+"/clients/doubles/Tel"                    , null)
+                const res                           =   await this.$callApi("post"  ,   "/route-imports/"+this.id_route_import+"/clients/doubles/Tel"                    , null)
                 this.getDoublant.getDoublantTel     =   res.data
             }
 
@@ -310,12 +310,12 @@ export default {
             this.$showLoadingPage()
 
             if(this.mode    ==  "temporary") {
-                const res                                       =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.id_route_import_tempo+"/clients_tempo/doubles/GPS"  , null)
+                const res                                       =   await this.$callApi("post"  ,   "/route-imports-tempo/"+this.id_route_import_tempo+"/clients-tempo/doubles/GPS"  , null)
                 this.getDoublant.getDoublantGPS   =   res.data
             }
 
             if(this.mode    ==  "permanent") {
-                const res                                       =   await this.$callApi("post"  ,   "/route_import/"+this.id_route_import+"/clients/doubles/GPS"                    , null)
+                const res                                       =   await this.$callApi("post"  ,   "/route-imports/"+this.id_route_import+"/clients/doubles/GPS"                    , null)
                 this.getDoublant.getDoublantGPS   =   res.data
             }
 

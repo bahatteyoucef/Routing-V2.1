@@ -198,7 +198,7 @@ export default class MobileClientIndexedDB {
             if(willayas.length  ==  0) {
 
                 // Fill Liste Willayas
-                axios.post("/rtm_willayas/rtm_cites/details/indexedDB", null)
+                axios.post("/rtm_willayas/rtm_cities/details/indexedDB", null)
                 .then((res)=> {
 
                     // Add to indexedDB
@@ -772,7 +772,7 @@ c
 
         for (let i = 0; i < willayas.length; i++) {
 
-            willayas[i].cites.map((cite) => ({ ...cite }));
+            willayas[i].cities.map((city) => ({ ...city }));
 
             this.store_willayas.put(willayas[i])
         }
@@ -887,11 +887,15 @@ c
     //
 
     async $callApi(method, url, dataObj ){
-        return await axios({
-            method: method,
-            url: url,
-            data: dataObj
-        });
+        try {
+            return await axios({
+                method: method,
+                url: url,
+                data: dataObj
+            });
+        } catch (e) {
+            return e.response
+        }
     }
 
 }

@@ -1380,7 +1380,7 @@ export default {
 
     async fetchMaps() {
 
-      this.$callApi("post",    "/route_import/stats", null)
+      this.$callApi("post",    "/route-imports", null)
       .then((res)=> {
 
           this.liste_route_import = res.data

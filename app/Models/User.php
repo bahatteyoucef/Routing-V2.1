@@ -32,6 +32,10 @@ class User extends Authenticatable
     protected $primaryKey   = 'id';
     public    $timestamps   = false;
 
+    //  //  //  //  //
+    //  //  //  //  //  Hidden/Casts
+    //  //  //  //  //
+
     protected $hidden = [
         'password',
         'remember_token',
@@ -41,11 +45,10 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    /*********************
-     * Relationships
-     *********************/
+    //  //  //  //  //
+    //  //  //  //  //  Relationships
+    //  //  //  //  //
 
-    // pivot users_route_import: id_user, id_route_import
     public function routeImports()
     {
         return $this->belongsToMany(RouteImport::class, 'users_route_import', 'id_user', 'id_route_import');
@@ -56,9 +59,9 @@ class User extends Authenticatable
         return $this->hasMany(UserRouteImport::class, 'id_user', 'id');
     }
 
-    /*********************
-     * Index & combos
-     *********************/
+    //  //  //  //  //
+    //  //  //  //  //  Listings
+    //  //  //  //  //
 
     public static function indexUser()
     {
@@ -172,9 +175,17 @@ class User extends Authenticatable
         return $query->get();
     }
 
-    /*********************
-     * Validation & store/update
-     *********************/
+    public static function showUser(int $id_user)
+    {
+        $user = self::findOrFail($id_user);
+        // use the belongsToMany relation to retrieve route imports
+        $user->liste_route_import = $user->routeImports()->get();
+        return $user;
+    }
+
+    //  //  //  //  //
+    //  //  //  //  //  Store/Update
+    //  //  //  //  //
 
     public static function validateStore(Request $request)
     {
@@ -294,13 +305,13 @@ class User extends Authenticatable
         });
     }
 
-    public static function validateUpdate(Request $request, int $id)
+    public static function validateUpdate(Request $request, int $id_user)
     {
         $validator = Validator::make($request->all(), [
-            'username' => ['required', 'alpha_num', Rule::unique('users', 'username')->ignore($id)],
+            'username' => ['required', 'alpha_num', Rule::unique('users', 'username')->ignore($id_user)],
             'first_name' => ['required', 'max:255'],
             'last_name' => ['required', 'max:255'],
-            'email' => ['required', Rule::unique('users')->ignore($id), 'email', 'max:255'],
+            'email' => ['required', Rule::unique('users')->ignore($id_user), 'email', 'max:255'],
             'tel' => ['required', 'max:255'],
             'company' => ['required', 'max:255'],
             'type_user' => ['required', 'max:255'],
@@ -317,9 +328,9 @@ class User extends Authenticatable
         return $validator;
     }
 
-    public static function updateUser(Request $request, int $id)
+    public static function updateUser(Request $request, int $id_user)
     {
-        $user = self::findOrFail($id);
+        $user = self::findOrFail($id_user);
 
         // mass assign safe properties explicitly
         $fields = ['username', 'first_name', 'last_name', 'email', 'tel', 'company', 'type_user', 'status'];
@@ -391,37 +402,9 @@ class User extends Authenticatable
         }
     }
 
-    public static function showUser(int $id)
-    {
-        $user = self::findOrFail($id);
-        // use the belongsToMany relation to retrieve route imports
-        $user->liste_route_import = $user->routeImports()->get();
-        return $user;
-    }
-
-    /*********************
-     * Password helpers
-     *********************/
-
-    public static function validatechangePassword(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'old_password' => ['required', 'current_password:api'],
-            'new_password' => ['required', 'confirmed', 'min:6', 'max:255'],
-        ]);
-        return $validator;
-    }
-
-    public static function changePassword(Request $request, int $id)
-    {
-        $user = self::findOrFail($id);
-        $user->password = Hash::make($request->input('new_password'));
-        $user->save();
-    }
-
-    /*********************
-     * Pointings (report)
-     *********************/
+    //  //  //  //  //
+    //  //  //  //  //  Pointings
+    //  //  //  //  //
 
     public static function pointings(Request $request)
     {

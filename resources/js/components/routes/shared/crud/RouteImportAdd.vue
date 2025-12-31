@@ -177,7 +177,7 @@ export default {
 
         async getComboData() {
 
-            const res           =   await this.$callApi("post",     "/rtm_willayas",    null)
+            const res           =   await this.$callApi("post",     "/rtm-willayas",    null)
 
             this.districts_full =   res.data
 
@@ -391,16 +391,17 @@ export default {
 
                 formData.append("libelle"   ,   this.route_import.libelle)
                 formData.append("districts" ,   JSON.stringify(this.route_import.districts))
-                formData.append("file"      ,   this.route_import.file)
                 formData.append("data"      ,   JSON.stringify(this.clients))
 
-                const res   = await this.$callApi('post' ,   '/route_import_tempo/store'    ,   formData)         
+                // formData.append("file"      ,   this.route_import.file)
+
+                const res   = await this.$callApi('post' ,   '/route-imports-tempo/store'    ,   formData)         
 
                 if(res.status===200){
 
                     //
 
-                    this.$goTo('/route/obs/route_import_tempo')
+                    this.$goTo('/route/obs/route-imports-tempo')
 
                     //
 

@@ -21,49 +21,16 @@ class RouteImport extends Model
 {
     use HasFactory;
 
-    protected $table = 'route_import';
-    protected $primaryKey = 'id';
+    protected $table        =   'route_import';
+    protected $primaryKey   =   'id';
+    protected $guarded      =   [];
 
-    // For guarded/mass assignment: prefer fillable in future if you want stricter control
-    protected $guarded = [];
+    public $timestamps      =   false;
 
-    public $timestamps = false;
+    //  //  //  //  //
+    //  //  //  //  //  Scopes
+    //  //  //  //  //
 
-    /*
-     |--------------------------------------------------------------------------
-     | Relationships
-     |--------------------------------------------------------------------------
-     */
-    public function clientsRelation()
-    {
-        return $this->hasMany(Client::class, 'id_route_import', 'id');
-    }
-
-    public function files()
-    {
-        return $this->hasMany(RouteImportFile::class, 'id_route_import', 'id');
-    }
-
-    public function districts()
-    {
-        return $this->hasMany(RouteImportDistrict::class, 'id_route_import', 'id');
-    }
-
-    public function journeyPlans()
-    {
-        return $this->hasMany(JourneyPlan::class, 'id_route_import', 'id');
-    }
-
-    public function journees()
-    {
-        return $this->hasMany(Journee::class, 'id_route_import', 'id');
-    }
-
-    /*
-     |--------------------------------------------------------------------------
-     | Scopes
-     |--------------------------------------------------------------------------
-     */
     public function scopePermittedByRole(Builder $query, string $type = 'id')
     {
         $user = Auth::user();
@@ -96,18 +63,56 @@ class RouteImport extends Model
         return $query->whereRaw('0 = 1');
     }
 
-    /*
-     |--------------------------------------------------------------------------
-     | Listing / show helpers (use eager loading and avoid N+1)
-     |--------------------------------------------------------------------------
-     */
-    public static function listForIndex(): \Illuminate\Database\Eloquent\Collection
+    //  //  //  //  //
+    //  //  //  //  //  Relationships
+    //  //  //  //  //
+
+    public function clientsRelation()
+    {
+        return $this->hasMany(Client::class, 'id_route_import', 'id');
+    }
+
+    public function files()
+    {
+        return $this->hasMany(RouteImportFile::class, 'id_route_import', 'id');
+    }
+
+    public function districts()
+    {
+        return $this->hasMany(RouteImportDistrict::class, 'id_route_import', 'id');
+    }
+
+    public function journeyPlanTerritories()
+    {
+        return $this->hasMany(JourneyPlanTerritory::class, 'id_route_import', 'id');
+    }
+
+    public function journeeTerritories()
+    {
+        return $this->hasMany(JourneeTerritory::class, 'id_route_import', 'id');
+    }
+
+    //  //  //  //  //
+    //  //  //  //  //  Listings
+    //  //  //  //  //
+
+    public static function indexRouteImport()
+    {
+        return self::orderBy('id', 'desc')->permittedByRole()->get();
+    }
+
+    public static function comboRouteImport()
+    {
+        return self::orderBy('id', 'desc')->permittedByRole()->get();
+    }
+
+    public static function detailsRouteImport()
     {
         // Eager load clients and owner username via join to avoid N+1
-        $routeImports = self::with(['clientsRelation' => function ($q) {
-            $q->join('users', 'clients.owner', '=', 'users.id')
-                ->select('clients.*', 'users.username as owner_username');
-        }])->orderBy('id', 'desc')->permittedByRole()->get();
+        $routeImports   =   self::with(['clientsRelation' => function ($q) {
+                                $q->join('users', 'clients.owner', '=', 'users.id')
+                                    ->select('clients.*', 'users.username as owner_username');
+                            }])->orderBy('id', 'desc')->permittedByRole()->get();
 
         // Format AvailableBrands using collection mapping rather than modifying DB model consistently
         $routeImports->each(function ($ri) {
@@ -119,37 +124,32 @@ class RouteImport extends Model
         return $routeImports;
     }
 
-    // Backwards-compatible wrappers
-    public static function indexRouteImport()
+    public static function showRouteImport(int $id_route_import)
     {
-        return self::listForIndex();
+        $routeImport = self::with(['files'])->findOrFail($id_route_import);
+
+        // Eager load clients with owner username
+        $clients    =   Client::where('id_route_import', $id_route_import)
+                            ->with('ownerUser')   // ownerUser relationship on Client (add in Client.php)
+                            ->get();
+
+        $clients->each(function ($client) {
+            $client->owner_username = $client->ownerUser->username ?? null;
+            Client::appendFormattedBrands($client);
+        });
+
+        $routeImport->clients = $clients;
+        $routeImport->liste_journey_plan = JourneyPlanTerritory::where('id_route_import', $id_route_import)->get();
+        $routeImport->liste_journee = JourneeTerritory::where('id_route_import', $id_route_import)->get();
+
+        return $routeImport;
     }
 
-    public static function headerRouteImports()
-    {
-        return self::orderBy('id', 'desc')->permittedByRole()->get();
-    }
+    //  //  //  //  //
+    //  //  //  //  //  Store/Update/Delete
+    //  //  //  //  //
 
-    public static function statsRouteImports()
-    {
-        return self::headerRouteImports();
-    }
 
-    public static function indexRouteImports()
-    {
-        return self::headerRouteImports();
-    }
-
-    public static function comboRouteImport()
-    {
-        return self::headerRouteImports();
-    }
-
-    /*
-     |--------------------------------------------------------------------------
-     | Validation helpers
-     |--------------------------------------------------------------------------
-     */
     public static function validateStore(Request $request)
     {
         return Validator::make($request->all(), [
@@ -159,18 +159,6 @@ class RouteImport extends Model
         ]);
     }
 
-    public static function validateUpdate(Request $request)
-    {
-        return Validator::make($request->all(), [
-            'file' => ['required', 'file', 'mimes:xlsx,xls'],
-        ]);
-    }
-
-    /*
-     |--------------------------------------------------------------------------
-     | Create / update / delete operations with transaction safety and helper
-     |--------------------------------------------------------------------------
-     */
     public static function storeRouteImport(Request $request)
     {
         $userId = Auth::id();
@@ -182,27 +170,27 @@ class RouteImport extends Model
 
         // Move uploaded file from tempo to route_import directory (use Storage when possible)
         $tempoId = $request->get('id_route_import_tempo');
-        $tempo = RouteImportTempo::find($tempoId);
+        // $tempo = RouteImportTempo::find($tempoId);
 
-        if ($tempo && $tempo->file) {
-            $from = public_path("uploads/route_import_tempo/{$userId}/{$tempo->file}");
-            $toDir = public_path("uploads/route_import/{$userId}");
+        // if ($tempo && $tempo->file) {
+        //     $from = public_path("uploads/route_import_tempo/{$userId}/{$tempo->file}");
+        //     $toDir = public_path("uploads/route_import/{$userId}");
 
-            if (! File::exists($toDir)) {
-                File::makeDirectory($toDir, 0755, true);
-            }
+        //     if (! File::exists($toDir)) {
+        //         File::makeDirectory($toDir, 0755, true);
+        //     }
 
-            $to = $toDir . '/' . $tempo->file;
+        //     $to = $toDir . '/' . $tempo->file;
 
-            if (File::exists($from)) {
-                File::move($from, $to);
-            }
+        //     if (File::exists($from)) {
+        //         File::move($from, $to);
+        //     }
 
-            RouteImportFile::create([
-                'id_route_import' => $routeImport->id,
-                'file' => $tempo->file,
-            ]);
-        }
+        //     RouteImportFile::create([
+        //         'id_route_import' => $routeImport->id,
+        //         'file' => $tempo->file,
+        //     ]);
+        // }
 
         // Districts
         $districts = json_decode($request->get('districts'), true) ?: [];
@@ -234,168 +222,89 @@ class RouteImport extends Model
         return $routeImport;
     }
 
-    public static function updateRouteImport(Request $request, int $id)
+    public static function validateUpdate(Request $request)
     {
-        $fileName = uniqid() . '.' . $request->file->getClientOriginalExtension();
-        $request->file->move(public_path("uploads/route_import/" . Auth::id()), $fileName);
-
-        RouteImportFile::create([
-            'id_route_import' => $id,
-            'file' => $fileName,
+        return Validator::make($request->all(), [
+            // 'file' => ['required', 'file', 'mimes:xlsx,xls'],
         ]);
+    }
+
+    public static function updateRouteImport(Request $request, int $id_route_import)
+    {
+        // $fileName = uniqid() . '.' . $request->file->getClientOriginalExtension();
+        // $request->file->move(public_path("uploads/route_import/" . Auth::id()), $fileName);
+
+        // RouteImportFile::create([
+        //     'id_route_import' => $id,
+        //     'file' => $fileName,
+        // ]);
 
         $request->merge([
             'clients' => json_decode($request->get('data'), true),
         ]);
 
-        self::updateData($request, $id);
+        self::updateData($request, $id_route_import);
     }
 
-    public static function showRouteImport(int $id)
+    public static function deleteRouteImport(int $id_route_import)
     {
-        $routeImport = self::with(['files'])->findOrFail($id);
+        $routeImport = self::findOrFail($id_route_import);
 
-        // Eager load clients with owner username
-        $clients    =   Client::where('id_route_import', $id)
-                            ->with('ownerUser')   // ownerUser relationship on Client (add in Client.php)
-                            ->get();
-
-        $clients->each(function ($client) {
-            $client->owner_username = $client->ownerUser->username ?? null;
-            Client::appendFormattedBrands($client);
-        });
-
-        $routeImport->clients = $clients;
-        $routeImport->liste_journey_plan = JourneyPlan::where('id_route_import', $id)->get();
-        $routeImport->liste_journee = Journee::where('id_route_import', $id)->get();
-
-        return $routeImport;
-    }
-
-    public static function indexedDBShowRouteImport(int $id)
-    {
-        $routeImport = self::findOrFail($id);
-
-        $clients    =   Client::where('id_route_import', $id)
-                            ->with('ownerUser')   // ownerUser relationship on Client (add in Client.php)
-                            ->get();
-
-        $clients->each(function ($client) {
-            $client->owner_username = $client->ownerUser->username ?? null;
-            Client::appendFormattedBrands($client);
-        });
-
-        $routeImport->clients = $clients;
-
-        return $routeImport;
-    }
-
-    public static function deleteRouteImport(int $id)
-    {
-        $routeImport = self::findOrFail($id);
-
-        DB::transaction(function () use ($routeImport, $id) {
+        DB::transaction(function () use ($routeImport, $id_route_import) {
             $routeImport->delete();
-            self::deleteData($id);
+            self::deleteData($id_route_import);
         });
     }
 
-    /*
-     |--------------------------------------------------------------------------
-     | deleteData: ensure actual deletion of related records and files
-     |--------------------------------------------------------------------------
-     */
-    public static function deleteData(int $id)
-    {
-        $routeImportFiles = RouteImportFile::where('id_route_import', $id)->get();
+    //  //  //  //  //
+    //  //  //  //  //  Delete Clients
+    //  //  //  //  //
 
-        foreach ($routeImportFiles as $file) {
-            if ($file->file) {
-                RouteImportFile::deleteRouteImportFile($file->file);
-            }
-            $file->delete();
-        }
+    public static function deleteData(int $id_route_import)
+    {
+        // $routeImportFiles = RouteImportFile::where('id_route_import', $id)->get();
+
+        // foreach ($routeImportFiles as $file) {
+        //     if ($file->file) {
+        //         RouteImportFile::deleteRouteImportFile($file->file);
+        //     }
+        //     $file->delete();
+        // }
 
         // Delete clients and related assets in chunks
-        Client::where('id_route_import', $id)->chunkById(100, function ($clients) {
+        Client::where('id_route_import', $id_route_import)->chunkById(100, function ($clients) {
             foreach ($clients as $client) {
                 // If you want to delete uploaded directories, use Storage or File::deleteDirectory
                 $client->delete();
             }
         });
 
-        RouteImportDistrict::where('id_route_import', $id)->delete();
-        JourneyPlan::where('id_route_import', $id)->delete();
-        Journee::where('id_route_import', $id)->delete();
+        RouteImportDistrict::where('id_route_import', $id_route_import)->delete();
+        JourneyPlanTerritory::where('id_route_import', $id_route_import)->delete();
+        JourneeTerritory::where('id_route_import', $id_route_import)->delete();
     }
 
-    /*
-     |--------------------------------------------------------------------------
-     | Helpers: set willayas / cites - optimized by using associative mapping
-     |--------------------------------------------------------------------------
-     */
-    public static function setWillayasCites(Request $request)
+    //  //  //  //  //
+    //  //  //  //  //  Obs
+    //  //  //  //  //
+
+    public static function obsDetailsRouteImport(int $id_route_import)
     {
-        $clients = json_decode($request->get('clients'), true) ?: [];
-
-        // Preload willayas and cites to avoid queries in the loop
-        $districtNames = collect($clients)->pluck('DistrictNameE')->unique()->filter()->values();
-        $willayas = RTMWillaya::whereIn('DistrictNameE', $districtNames)->get()->keyBy('DistrictNameE');
-
-        $cityTuples = collect($clients)->map(function ($c) {
-            return isset($c['CityNameE'], $c['DistrictNameE']) ? [$c['CityNameE'], $c['DistrictNameE']] : null;
-        })->filter()->unique()->values();
-
-        $cites = RTMCite::whereIn('CityNameE', $cityTuples->pluck(0)->unique()->values())
-            ->whereIn('DistrictNo', $willayas->pluck('DistrictNo')->unique()->values())
-            ->get()
-            ->groupBy(function ($row) { return $row->CityNameE . '||' . $row->DistrictNo; });
-
-        foreach ($clients as &$client) {
-            $districtName = $client['DistrictNameE'] ?? null;
-            $cityName = $client['CityNameE'] ?? null;
-
-            if ($districtName && isset($willayas[$districtName])) {
-                $client['DistrictNo'] = $willayas[$districtName]->DistrictNo;
-
-                $key = ($cityName ?? '') . '||' . $client['DistrictNo'];
-
-                if (isset($cites[$key]) && $cites[$key]->first()) {
-                    $client['CityNo'] = $cites[$key]->first()->CITYNO;
-                } else {
-                    $client['CityNo'] = 'UND';
-                }
-            } else {
-                $client['DistrictNo'] = 'UND';
-                $client['CityNo'] = 'UND';
-            }
-        }
-
-        return $clients;
+        return self::showRouteImport($id_route_import);
     }
 
-    /*
-     |--------------------------------------------------------------------------
-     | Routing / Observability helpers
-     |--------------------------------------------------------------------------
-     */
-    public static function obsDetailsRouteImport(string $id)
+    public static function obsDetailsRouteImportFrontOffice(int $id_route_import)
     {
-        return self::showRouteImport((int) $id);
-    }
-
-    public static function obsDetailsRouteImportFrontOffice(string $id)
-    {
-        $routeImport = self::findOrFail($id);
+        $routeImport = self::findOrFail($id_route_import);
 
         $data = Client::query()
-            ->where('clients.id_route_import', $id)
+            ->where('clients.id_route_import', $id_route_import)
             ->where(function ($q) {
                 $q->where('clients.owner', Auth::id())
                     ->orWhere(function ($q2) {
                         $q2->where('clients.status', 'visible')
                             ->whereIn('clients.CityNo', function ($sub) {
-                                $sub->select('CITYNO')
+                                $sub->select('CityNo')
                                     ->from('users_cities')
                                     ->where('id_user', Auth::id());
                             });
@@ -414,19 +323,18 @@ class RouteImport extends Model
         return $routeImport;
     }
 
-    /*
-     |--------------------------------------------------------------------------
-     | Clients listing with filters: avoid repeated json_decode and use when/closure
-     |--------------------------------------------------------------------------
-     */
-    public static function clients(int $id)
+    //  //  //  //  //
+    //  //  //  //  //  Clients
+    //  //  //  //  //
+
+    public static function clients(int $id_route_import)
     {
         $request = request();
 
         $start = $request->filled('start_date') ? Carbon::parse($request->start_date)->format('Y-m-d') : null;
         $end = $request->filled('end_date') ? Carbon::parse($request->end_date)->format('Y-m-d') : null;
 
-        $query = Client::where('id_route_import', $id);
+        $query = Client::where('id_route_import', $id_route_import);
 
         if ($request->filled('status')) {
             $query->where('clients.status', $request->get('status'));
@@ -465,125 +373,36 @@ class RouteImport extends Model
         return $clients;
     }
 
-    /*
-     |--------------------------------------------------------------------------
-     | sync / storeData / updateData: centralized image helper and chunking
-     |--------------------------------------------------------------------------
-     */
-    protected static function saveBase64Image(?string $base64, string $targetDir): ?string
+    public static function clientsByStatus(Request $request, int $id_route_import)
     {
-        if (empty($base64)) return null;
+        $status = $request->get('status');
 
-        $base64 = preg_replace('#^data:image/[^;]+;base64,#', '', $base64);
-        $base64 = str_replace(' ', '+', $base64);
+        $query  =   Client::where('clients.id_route_import', $id_route_import)
+                        ->where('clients.status', $status)
+                        ->with('ownerUser');   // ownerUser relationship on Client (add in Client.php)
 
-        $fileName = uniqid() . '.png';
-        $targetPath = public_path(trim($targetDir, '/') . '/' . $fileName);
-
-        if (! File::isDirectory(dirname($targetPath))) {
-            File::makeDirectory(dirname($targetPath), 0775, true);
+        if ($status !== 'visible') {
+            $query->where('clients.owner', Auth::id());
+        } else {
+            $query->whereIn('clients.CityNo', function ($sub) {
+                $sub->select('CityNo')->from('users_cities')->where('id_user', Auth::id());
+            });
         }
 
-        file_put_contents($targetPath, base64_decode($base64));
+        $clients = $query->orderBy('id', 'desc')->get();
 
-        return $fileName;
+        $clients->each(function ($client) {
+            $client->owner_username = $client->ownerUser->username ?? null;
+            Client::appendFormattedBrands($client);
+        });
+
+        return $clients;
     }
 
-    public static function sync(Request $request)
-    {
-        $updated_clients = json_decode($request->get('updated_clients'), true) ?: [];
+    //  //  //  //  //
+    //  //  //  //  //  Users
+    //  //  //  //  //
 
-        foreach ($updated_clients as $client_elem) {
-            $client = Client::find($client_elem['id']);
-
-            if (! $client) continue;
-
-            // Bulk assign allowed fields only (avoid mass assignment of unsafe fields)
-            $assignable = [
-                'NewCustomer','CustomerIdentifier','CustomerCode','OpenCustomer','CustomerNameE','CustomerNameA',
-                'Latitude','Longitude','Address','RvrsGeoAddress','CityNo','DistrictNo','CityNameE','DistrictNameE','Tel','CustomerType',
-                'Neighborhood','Landmark','BrandAvailability','BrandSourcePurchase','Frequency','SuperficieMagasin',
-                'NbrAutomaticCheckouts','AvailableBrands','id_route_import'
-            ];
-
-            foreach ($assignable as $field) {
-                if (array_key_exists($field, $client_elem)) {
-                    $client->{$field} = $client_elem[$field];
-                }
-            }
-
-            $client->owner = Auth::id();
-
-            $client->CustomerBarCode_image_original_name = $client_elem['CustomerBarCode_image_original_name'] ?? '';
-            $client->facade_image_original_name = $client_elem['facade_image_original_name'] ?? '';
-            $client->in_store_image_original_name = $client_elem['in_store_image_original_name'] ?? '';
-
-            // Images: only if flagged as updated
-            if (($client_elem['CustomerBarCode_image_updated'] ?? '') === 'true') {
-                $client->CustomerBarCode_image = self::saveBase64Image($client_elem['CustomerBarCode_image'] ?? null, 'uploads/clients/' . $client->id) ?? '';
-            }
-
-            if (($client_elem['facade_image_updated'] ?? '') === 'true') {
-                $client->facade_image = self::saveBase64Image($client_elem['facade_image'] ?? null, 'uploads/clients/' . $client->id) ?? '';
-            }
-
-            if (($client_elem['in_store_image_updated'] ?? '') === 'true') {
-                $client->in_store_image = self::saveBase64Image($client_elem['in_store_image'] ?? null, 'uploads/clients/' . $client->id) ?? '';
-            }
-
-            $client->nonvalidated_details = $client_elem['nonvalidated_details'] ?? '';
-            $client->JPlan = $client_elem['JPlan'] ?? '';
-            $client->Journee = $client_elem['Journee'] ?? '';
-
-            $client->save();
-        }
-
-        // Added clients
-        $added_clients = json_decode($request->get('added_clients'), true) ?: [];
-
-        foreach ($added_clients as $client_elem) {
-            $data = collect($client_elem)->only([
-                'NewCustomer','CustomerIdentifier','CustomerCode','OpenCustomer','CustomerNameE','CustomerNameA',
-                'Latitude','Longitude','Address','RvrsGeoAddress','CityNo','DistrictNo','CityNameE','DistrictNameE','Tel','CustomerType',
-                'Neighborhood','Landmark','BrandAvailability','BrandSourcePurchase','Frequency','SuperficieMagasin',
-                'NbrAutomaticCheckouts','AvailableBrands','id_route_import','status'
-            ])->toArray();
-
-            $data['owner'] = Auth::id();
-
-            $client = Client::create($data);
-
-            $client->CustomerBarCode_image_original_name = $client_elem['CustomerBarCode_image_original_name'] ?? '';
-            $client->facade_image_original_name = $client_elem['facade_image_original_name'] ?? '';
-            $client->in_store_image_original_name = $client_elem['in_store_image_original_name'] ?? '';
-
-            $client->CustomerBarCode_image = self::saveBase64Image($client_elem['CustomerBarCode_image'] ?? null, 'uploads/clients/' . $client->id) ?? '';
-            $client->facade_image = self::saveBase64Image($client_elem['facade_image'] ?? null, 'uploads/clients/' . $client->id) ?? '';
-            $client->in_store_image = self::saveBase64Image($client_elem['in_store_image'] ?? null, 'uploads/clients/' . $client->id) ?? '';
-
-            $client->nonvalidated_details = $client_elem['nonvalidated_details'] ?? '';
-            $client->JPlan = $client_elem['JPlan'] ?? '';
-            $client->Journee = $client_elem['Journee'] ?? '';
-
-            $client->save();
-        }
-
-        // Deleted clients
-        $deleted_clients = json_decode($request->get('deleted_clients'), true) ?: [];
-
-        foreach ($deleted_clients as $client_elem) {
-            if (isset($client_elem['id'])) {
-                $client = Client::find($client_elem['id']);
-                if ($client) $client->delete();
-            }
-        }
-    }
-
-    /*
-     |--------------------------------------------------------------------------
-     | Front / Users helpers
-     |--------------------------------------------------------------------------
-     */
     public static function frontOffice(int $id_route_import)
     {
         return DB::table('users')
@@ -631,73 +450,120 @@ class RouteImport extends Model
         return $query->get();
     }
 
-    /*
-     |--------------------------------------------------------------------------
-     | clientsByStatus: unified conditional logic
-     |--------------------------------------------------------------------------
-     */
-    public static function clientsByStatus(Request $request, int $id_route_import)
+    //  //  //  //  //
+    //  //  //  //  //  Cities/Willayas
+    //  //  //  //  //
+
+    public static function routeImportCities(int $id_route_import)
     {
-        $status = $request->get('status');
+        return  DB::table("RTM_City")
+                    ->select("RTM_City.*")
+                    ->join("RTM_Willaya"            , "RTM_City.DistrictNo"         , "RTM_Willaya.DistrictNo")
+                    ->join("route_import_districts" , "RTM_Willaya.DistrictNo"      , "route_import_districts.DistrictNo")
+                    ->where('route_import_districts.id_route_import', $id_route_import)
+                    ->orderByRaw('CAST(RTM_City.CityNo AS SIGNED INTEGER)')
+                    ->get();
+    }
 
-        $query  =   Client::where('clients.id_route_import', $id_route_import)
-                        ->where('clients.status', $status)
-                        ->with('ownerUser');   // ownerUser relationship on Client (add in Client.php)
+    public static function routeImportDistricts(int $id_route_import)
+    {
+        return  DB::table("RTM_Willaya")
+                    ->join("route_import_districts" , "RTM_Willaya.DistrictNo"          , "route_import_districts.DistrictNo")
+                    ->where('route_import_districts.id_route_import', $id_route_import)
+                    ->orderBy('RTM_Willaya.DistrictNameE')
+                    ->get();
+    }
 
-        if ($status !== 'visible') {
-            $query->where('clients.owner', Auth::id());
-        } else {
-            $query->whereIn('clients.CityNo', function ($sub) {
-                $sub->select('CITYNO')->from('users_cities')->where('id_user', Auth::id());
+    //  //  //  //  //
+    //  //  //  //  //  Downloads
+    //  //  //  //  //
+
+    public static function downloadImages(Request $request, string $type = 'all')
+    {
+        // Configuration mapping for handling different image types
+        $IMAGE_CONFIG = [
+            'all' => [
+                'columns' => ['CustomerBarCode_image', 'in_store_image', 'facade_image'],
+                'zip_suffix' => 'Images',
+                'folder_prefix' => 'Images'
+            ],
+            'customer_code' => [
+                'columns' => ['CustomerBarCode_image'],
+                'zip_suffix' => 'Customer Code Images',
+                'folder_prefix' => 'CustomerBarCode Images'
+            ],
+            'facade' => [
+                'columns' => ['facade_image'],
+                'zip_suffix' => 'Facade Images',
+                'folder_prefix' => 'Facade Images'
+            ],
+            'in_store' => [
+                'columns' => ['in_store_image'],
+                'zip_suffix' => 'In Store Images',
+                'folder_prefix' => 'In Store Images'
+            ],
+        ];
+
+        // 1. Validate Type
+        $config = $IMAGE_CONFIG[$type] ?? $IMAGE_CONFIG['all'];
+
+        // 2. Fetch Route Info
+        $routeImport = self::findOrFail($request->get('id_route_import'));
+        
+        // 3. Gather Paths from DB
+        $paths = self::gatherImagePaths($request->get('id_route_import'), $config['columns']);
+
+        // 4. Generate Zip Name
+        $zipFileName = $routeImport->libelle . ' ' . $config['zip_suffix'] . '.zip';
+
+        // 5. Create Zip
+        return self::makeZipFromPaths($paths, $zipFileName, $config['folder_prefix']);
+    }
+
+    protected static function gatherImagePaths(int $routeId, array $columns): array
+    {
+        $validPaths = [];
+
+        // Always select ID plus the dynamic columns requested
+        $selectColumns = array_merge(['id'], $columns);
+
+        // chunkById is used to prevent memory exhaustion on large datasets
+        Client::where('id_route_import', $routeId)
+            ->select($selectColumns)
+            ->chunkById(500, function ($clients) use ($columns, &$validPaths) {
+                foreach ($clients as $client) {
+                    foreach ($columns as $col) {
+                        // Check if DB column has value
+                        if (!empty($client->$col)) {
+                            $path = '/uploads/clients/' . $client->id . '/' . $client->$col;
+                            // Check if physical file exists (expensive operation, handle with care)
+                            if (file_exists(public_path($path))) {
+                                $validPaths[] = $path;
+                            }
+                        }
+                    }
+                }
             });
-        }
 
-        $clients = $query->orderBy('id', 'desc')->get();
-
-        $clients->each(function ($client) {
-            $client->owner_username = $client->ownerUser->username ?? null;
-            Client::appendFormattedBrands($client);
-        });
-
-        return $clients;
+        return $validPaths;
     }
 
-    /*
-     |--------------------------------------------------------------------------
-     | City helpers (left join with route_import_cities)
-     |--------------------------------------------------------------------------
-     */
-    public static function routeImportCities(int $id_route_import, string $DistrictNo)
-    {
-        return DB::table('RTM_City')
-            ->select('RTM_City.*', 'route_import_cities.expected_clients', 'route_import_cities.id_route_import')
-            ->leftJoin('route_import_cities', function ($join) use ($id_route_import) {
-                $join->on('RTM_City.CityNo', '=', 'route_import_cities.CityNo')
-                    ->where('route_import_cities.id_route_import', $id_route_import);
-            })
-            ->where('RTM_City.DistrictNo', $DistrictNo)
-            ->get();
-    }
-
-    /*
-     |--------------------------------------------------------------------------
-     | Downloads / Images: unified generic zipper for types
-     |--------------------------------------------------------------------------
-     */
     protected static function makeZipFromPaths(array $paths, string $zipFile, string $folderNamePrefix = ''): string
     {
         $zip = new ZipArchive();
-
         $zipPath = public_path($zipFile);
 
-        if ($zip->open($zipPath, ZipArchive::CREATE) !== true) {
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
             throw new Exception('Unable to create zip file: ' . $zipPath);
         }
 
         foreach ($paths as $path) {
             $abs = public_path($path);
-            if (! file_exists($abs)) continue;
+            // We already checked file_exists in gatherImagePaths, but a double check doesn't hurt
+            if (!file_exists($abs)) continue;
+            
             $name = basename($abs);
+            // Ensure clean folder path inside zip
             $pathInZip = trim($folderNamePrefix, '/') . '/' . $name;
             $zip->addFile($abs, $pathInZip);
         }
@@ -705,131 +571,5 @@ class RouteImport extends Model
         $zip->close();
 
         return $zipPath;
-    }
-
-    public static function downloadImages(Request $request)
-    {
-        $routeImport = self::findOrFail($request->get('id_route_import'));
-        $images = self::prepareImagesExport($request);
-
-        $paths = array_merge($images->customer_bar_code_images, $images->in_store_images, $images->facade_images);
-
-        $zipFile = $routeImport->libelle . ' Images.zip';
-
-        return self::makeZipFromPaths($paths, $zipFile, 'Images');
-    }
-
-    // Specifics
-    public static function downloadCustomerCodeImages(Request $request)
-    {
-        $routeImport = self::findOrFail($request->get('id_route_import'));
-        $images = self::prepareCustomerCodeImagesExport($request);
-
-        $zipFile = $routeImport->libelle . ' Customer Code Images.zip';
-
-        return self::makeZipFromPaths($images->customer_bar_code_images, $zipFile, 'CustomerBarCode Images');
-    }
-
-    public static function downloadFacadeImages(Request $request)
-    {
-        $routeImport = self::findOrFail($request->get('id_route_import'));
-        $images = self::prepareFacadeImagesExport($request);
-
-        $zipFile = $routeImport->libelle . ' Facade Images.zip';
-
-        return self::makeZipFromPaths($images->facade_images, $zipFile, 'Facade Images');
-    }
-
-    public static function downloadInStoreImages(Request $request)
-    {
-        $routeImport = self::findOrFail($request->get('id_route_import'));
-        $images = self::prepareInStoreImagesExport($request);
-
-        $zipFile = $routeImport->libelle . ' In Store Images.zip';
-
-        return self::makeZipFromPaths($images->in_store_images, $zipFile, 'In Store Images');
-    }
-
-    // Prepare helpers unchanged except array initialization simplified
-    public static function prepareImagesExport(Request $request)
-    {
-        $images = new stdClass();
-        $images->customer_bar_code_images = [];
-        $images->in_store_images = [];
-        $images->facade_images = [];
-
-        $routeId = $request->get('id_route_import');
-
-        Client::where('id_route_import', $routeId)
-            ->select(['id','CustomerBarCode_image','in_store_image','facade_image'])
-            ->chunkById(500, function($clients) use (&$images) {
-                foreach ($clients as $client) {
-                    if (!empty($client->CustomerBarCode_image)) {
-                        $path = '/uploads/clients/'.$client->id.'/'.$client->CustomerBarCode_image;
-                        if (file_exists(public_path($path))) $images->customer_bar_code_images[] = $path;
-                    }
-                    if (!empty($client->in_store_image)) {
-                        $path = '/uploads/clients/'.$client->id.'/'.$client->in_store_image;
-                        if (file_exists(public_path($path))) $images->in_store_images[] = $path;
-                    }
-                    if (!empty($client->facade_image)) {
-                        $path = '/uploads/clients/'.$client->id.'/'.$client->facade_image;
-                        if (file_exists(public_path($path))) $images->facade_images[] = $path;
-                    }
-                }
-            });
-
-        return $images;
-    }
-
-    public static function prepareCustomerCodeImagesExport(Request $request)
-    {
-        $images = new stdClass();
-        $images->customer_bar_code_images = [];
-
-        $clients = Client::clientsExport($request);
-
-        foreach ($clients as $client) {
-            if ($client->CustomerBarCode_image) {
-                $path = '/uploads/clients/' . $client->id . '/' . $client->CustomerBarCode_image;
-                if (file_exists(public_path($path))) $images->customer_bar_code_images[] = $path;
-            }
-        }
-
-        return $images;
-    }
-
-    public static function prepareFacadeImagesExport(Request $request)
-    {
-        $images = new stdClass();
-        $images->facade_images = [];
-
-        $clients = Client::clientsExport($request);
-
-        foreach ($clients as $client) {
-            if ($client->facade_image) {
-                $path = '/uploads/clients/' . $client->id . '/' . $client->facade_image;
-                if (file_exists(public_path($path))) $images->facade_images[] = $path;
-            }
-        }
-
-        return $images;
-    }
-
-    public static function prepareInStoreImagesExport(Request $request)
-    {
-        $images = new stdClass();
-        $images->in_store_images = [];
-
-        $clients = Client::clientsExport($request);
-
-        foreach ($clients as $client) {
-            if ($client->in_store_image) {
-                $path = '/uploads/clients/' . $client->id . '/' . $client->in_store_image;
-                if (file_exists(public_path($path))) $images->in_store_images[] = $path;
-            }
-        }
-
-        return $images;
     }
 }

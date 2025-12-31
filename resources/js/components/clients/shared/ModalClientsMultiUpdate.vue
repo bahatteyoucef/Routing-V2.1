@@ -62,7 +62,7 @@
                                     <label for="CityNo"             class="form-label">CityNo (CityNo)</label>
                                     <select                         class="form-select"         id="CityNo"                     v-model="CityNo">
                                         <option value=""></option>
-                                        <option v-for="cite in cites"           :key="cite.CITYNO"    :value="cite.CITYNO">{{cite.CityNameE}} ({{cite.CITYNO}})</option>
+                                        <option v-for="city in cities"           :key="city.CityNo"    :value="city.CityNo">{{city.CityNameE}} ({{city.CityNo}})</option>
                                     </select>
                                 </div>
                             </div>
@@ -244,7 +244,7 @@ export default {
             //
 
             districts                       :   []  ,
-            cites                           :   []  ,
+            cities                           :   []  ,
             users                           :   []  ,
 
             //
@@ -351,7 +351,7 @@ export default {
 
             formData.append("clients", JSON.stringify(clients))
 
-            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/multi_update",   formData)
+            const res                   =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/clients/update",   formData)
 
             if(res.status===200){
 
@@ -442,7 +442,7 @@ export default {
 
             //
 
-            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/delete",   formData)
+            const res                   =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/clients/delete",   formData)
 
             if(res.status===200){
 
@@ -489,7 +489,7 @@ export default {
                 //
 
                 this.districts                      =   []  
-                this.cites                          =   []  
+                this.cities                          =   []  
                 this.users                          =   []  
             });
         },
@@ -542,7 +542,7 @@ export default {
             }
 
             else {
-                const res_2         =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
+                const res_2         =   await this.$callApi("post"  ,   "/rtm-willayas"         ,   null)
                 this.districts      =   res_2.data
             }
         },
@@ -552,8 +552,8 @@ export default {
             // Show Loading Page
             this.$showLoadingPage()
 
-            const res_3                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.DistrictNo+"/rtm_cites"         ,   null)
-            this.cites                      =   res_3.data
+            const res_3                     =   await this.$callApi("post"  ,   "/rtm-willayas/"+this.DistrictNo+"/rtm-cities"         ,   null)
+            this.cities                      =   res_3.data
 
             // Hide Loading Page
             this.$hideLoadingPage()
@@ -609,11 +609,11 @@ export default {
 
         getCityNameE(CityNo) {
 
-            for (let i = 0; i < this.cites.length; i++) {
+            for (let i = 0; i < this.cities.length; i++) {
 
-                if(this.cites[i].CITYNO  ==  CityNo) {
+                if(this.cities[i].CityNo  ==  CityNo) {
 
-                    return this.cites[i].CityNameE
+                    return this.cities[i].CityNameE
                 }                
             }
         },

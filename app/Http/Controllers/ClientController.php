@@ -10,38 +10,30 @@ use Throwable;
 
 class ClientController extends Controller
 {
-    //
 
-    public function showClient(Request $request, int $id_route_import, int $id)
-    {
+    public function showClient(Request $request, int $id_route_import, int $id_client) {
 
         try {
-
-            // update 
-            $client =   Client::showClient($request, $id_route_import, $id);
-
-            return $client;
+            $client =   Client::showClient($request, $id_route_import, $id_client);
+            return response()->json([   
+                "client"            =>  $client
+            ]);
         }
 
         catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
             return response()->json([
                 'errors'    =>  [$erreur->getMessage()],
             ],422);
         }
     }
 
-    //
+    //  //  //  //  //
+    //  //  //  //  //
+    //  //  //  //  //
 
-    public function storeClient(Request $request, int $id_route_import)
-    {
+    public function storeClient(Request $request, int $id_route_import) {
 
         try {
-
             //
             DB::beginTransaction();
             //
@@ -82,7 +74,7 @@ class ClientController extends Controller
 
     }
 
-    public function updateClient(Request $request, int $id_route_import, int $id)
+    public function updateClient(Request $request, int $id_route_import, int $id_client)
     {
 
         try {
@@ -101,7 +93,7 @@ class ClientController extends Controller
             }
 
             // update
-            $client     =   Client::updateClient($request, $id_route_import, $id);
+            $client     =   Client::updateClient($request, $id_route_import, $id_client);
             
             //
             DB::commit();
@@ -126,8 +118,7 @@ class ClientController extends Controller
         }
     }
 
-    public function deleteClient(int $id_route_import, int $id)
-    {
+    public function deleteClient(int $id_route_import, int $id_client) {
 
         try {
 
@@ -136,7 +127,7 @@ class ClientController extends Controller
             //
 
             // delete 
-            Client::deleteClient($id_route_import, $id);
+            Client::deleteClient($id_route_import, $id_client);
 
             //
             DB::commit();
@@ -160,10 +151,11 @@ class ClientController extends Controller
         }
     }
 
-    //
+    //  //  //  //  //
+    //  //  //  //  //
+    //  //  //  //  //
 
-    public function updateResumeClients(Request $request)
-    {
+    public function updateResumeClients(Request $request) {
 
         try {
 
@@ -196,10 +188,11 @@ class ClientController extends Controller
         }
     }
 
-    //
+    //  //  //  //  //
+    //  //  //  //  //
+    //  //  //  //  //
 
-    public function multiUpdateClients(Request $request, int $id_route_import)
-    {
+    public function updateClients(Request $request, int $id_route_import) {
 
         try {
 
@@ -208,7 +201,7 @@ class ClientController extends Controller
             //
 
             // delete 
-            Client::multiUpdateClients($request, $id_route_import);
+            Client::updateClients($request, $id_route_import);
 
             //
             DB::commit();
@@ -232,10 +225,11 @@ class ClientController extends Controller
         }
     }
 
-    //
+    //  //  //  //  //
+    //  //  //  //  //
+    //  //  //  //  //
 
-    public function deleteClients(Request $request, int $id_route_import)
-    {
+    public function deleteClients(Request $request, int $id_route_import) {
 
         try {
 
@@ -268,110 +262,32 @@ class ClientController extends Controller
         }
     }
 
-    //
+    //  //  //  //  //
+    //  //  //  //  //
+    //  //  //  //  //
 
-    public function getDoublesClients(Request $request, int $id_route_import) {
-
-        try {
-
-            $getDoublant    =   Client::getDoublesClients($request, $id_route_import);
-
-            return $getDoublant;
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
+    public function getDoublesClients(Request $request, $id_route_import) {
+        $data = Client::getDoublesClients($request, $id_route_import);        
+        return $data;
     }
 
-    public function getDoublesTelClients(Request $request, int $id_route_import) {
-
-        try {
-
-            $getDoublant    =   Client::getDoublesTelClients($request, $id_route_import);
-
-            return $getDoublant;
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
+    public function getDoublesTelClients(Request $request, $id_route_import) {
+        $data = Client::findDuplicates($request, $id_route_import, 'Tel');
+        return $data;
     }
 
-    public function getDoublesCustomerCodeClients(Request $request, int $id_route_import) {
-
-        try {
-
-            $getDoublant    =   Client::getDoublesCustomerCodeClients($request, $id_route_import);
-
-            return $getDoublant;
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
+    public function getDoublesCustomerCodeClients(Request $request, $id_route_import) {
+        $data = Client::findDuplicates($request, $id_route_import, 'CustomerCode');        
+        return $data;
     }
 
-    public function getDoublesCustomerNameEClients(Request $request, int $id_route_import) {
-
-        try {
-
-            $getDoublant    =   Client::getDoublesCustomerNameEClients($request, $id_route_import);
-
-            return $getDoublant;
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
+    public function getDoublesCustomerNameEClients(Request $request, $id_route_import) {
+        $data = Client::findDuplicates($request, $id_route_import, 'CustomerNameE');        
+        return $data;
     }
 
-    public function getDoublesGPSClients(Request $request, int $id_route_import) {
-
-        try {
-
-            $getDoublant    =   Client::getDoublesGPSClients($request, $id_route_import);
-
-            return $getDoublant;
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
+    public function getDoublesGPSClients(Request $request, $id_route_import) {
+        $data = Client::findDuplicates($request, $id_route_import, 'GPS'); 
+        return $data;
     }
 }

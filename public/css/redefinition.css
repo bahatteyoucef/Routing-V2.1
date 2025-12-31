@@ -133,3 +133,7 @@ html, * {
 .multiselect-tag { white-space: normal !important; }
 
 /* ---------- End of optimized stylesheet ---------- */
+
+.dropdown-item {
+  font-size: 15px;
+}

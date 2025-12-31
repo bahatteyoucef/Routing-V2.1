@@ -21,7 +21,9 @@ class UserTerritory extends Model
 
     public    $timestamps   =   false;
 
-    //
+    //  //  //  //  //
+    //  //  //  //  //  Store/Update/Delete User Territory
+    //  //  //  //  //
 
     public static function validateStore(Request $request) {
 
@@ -48,8 +50,6 @@ class UserTerritory extends Model
 
         $user_territory->save();
     }
-
-    //
 
     public static function validateUpdate(Request $request) {
 
@@ -78,8 +78,6 @@ class UserTerritory extends Model
             $user_territory->save();
         }
     }
-
-    //
 
     public static function deleteUserTerritory(int $id_user_territory) {
 

@@ -695,7 +695,7 @@ export default {
             // Show Loading Page
             this.$showLoadingPage()
                 
-            const res                   =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.id_route_import+"/details",   null)
+            const res                   =   await this.$callApi("post"  ,   "/route/obs/route-imports/"+this.id_route_import+"/details",   null)
             console.log(res)
 
             this.route_import           =   res.data.route_import
@@ -709,7 +709,7 @@ export default {
             this.$showLoadingPage()
 
             const res_1         =   await this.$callApi("post"  ,   "/users/combo"      ,   null)
-            const res_2         =   await this.$callApi("post"  ,   "/rtm_willayas"     ,   null)
+            const res_2         =   await this.$callApi("post"  ,   "/rtm-willayas"     ,   null)
 
             this.users_all      =   res_1.data
             this.districts_all  =   res_2.data
@@ -1412,6 +1412,9 @@ export default {
 
         selectRow(selected_row, selected_row_id) {
 
+            console.log(selected_row)
+            console.log(selected_row_id)
+
             this.selected_row       =   selected_row
             this.selected_row_id    =   selected_row_id
         },
@@ -1499,7 +1502,7 @@ export default {
 
             formData.append("liste_journey_plan", JSON.stringify(this.journey_plan_filter_value)) 
 
-            const res   = await this.$callApi('post'    ,   '/route_import/'+this.route_import.id+'/journey_plan/util'   ,   formData)      
+            const res   = await this.$callApi('post'    ,   '/route-imports/'+this.route_import.id+'/journey-plan-territories/util'   ,   formData)      
 
             if(res.status===200){
 
@@ -1530,7 +1533,7 @@ export default {
             formData.append("liste_journey_plan"    , JSON.stringify(this.journey_plan_filter_value)) 
             formData.append("journees"              , JSON.stringify(this.journee_filter_value)) 
 
-            const res   = await this.$callApi('post'    ,   '/route_import/'+this.route_import.id+'/journees/util'   ,   formData)      
+            const res   = await this.$callApi('post'    ,   '/route-imports/'+this.route_import.id+'/journee-territories/util'   ,   formData)      
 
             if(res.status===200){
 
@@ -1560,7 +1563,7 @@ export default {
 
             formData.append("liste_user_territory"  ,   JSON.stringify(this.owner_filter_value)) 
 
-            const res   = await this.$callApi('post'    ,   '/route_import/'+this.route_import.id+'/user_territories/util'   ,   formData)      
+            const res   = await this.$callApi('post'    ,   '/route-imports/'+this.route_import.id+'/user-territories/util'   ,   formData)      
 
             if(res.status===200){
 

@@ -727,7 +727,7 @@ export default {
     // ------------------------------
     async getComboData() {
       try {
-        const res = await this.$callApi("post", "/route_import/combo", null)
+        const res = await this.$callApi("post", "/route-imports/combo", null)
         this.liste_route_import_all = res.data || []
         this.liste_route_link = (this.liste_route_import_all || []).map(i => ({ value: i.id, label: i.libelle }))
       } catch (e) {

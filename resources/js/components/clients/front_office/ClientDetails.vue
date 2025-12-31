@@ -110,7 +110,7 @@ export default {
 
         async getCustomerData() {
 
-            const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.$route.params.id_client+"/show" ,   null)
+            const res                   =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/clients/"+this.$route.params.id_client+"/show" ,   null)
 
             this.client.id                              =   res.data.id
 
@@ -160,7 +160,7 @@ export default {
 
         updateInformations() {
 
-            this.$router.push('/route_import/'+this.$route.params.id_route_import+'/clients/'+this.$route.params.id_client+'/update')
+            this.$router.push('/route-imports/'+this.$route.params.id_route_import+'/clients/'+this.$route.params.id_client+'/update')
         },
 
         async openDirectionsInGoogleMaps() {
@@ -200,7 +200,7 @@ export default {
 
                 this.$showLoadingPage()
 
-                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/delete",   null)
+                const res                   =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/delete",   null)
 
                 if(res.status===200){
 

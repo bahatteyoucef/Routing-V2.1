@@ -80,7 +80,7 @@ export default {
             // Show Loading Page
             this.$showLoadingPage()
 
-            const res_3                             =   await this.$callApi("post"  ,   "/route_import/"+this.route_import.id_route_import+"/show"      ,   null)
+            const res_3                             =   await this.$callApi("post"  ,   "/route-imports/"+this.route_import.id_route_import+"/show"      ,   null)
 
             this.route_import.clients               =   res_3.data.clients
             this.route_import.liste_journey_plan    =   res_3.data.liste_journey_plan
@@ -97,7 +97,7 @@ export default {
             // Show Loading Page
             this.$showLoadingPage()
 
-            const res   = await this.$callApi('post'    ,   '/route_import/'+this.route_import.id_route_import+'/delete'    ,   null)      
+            const res   = await this.$callApi('post'    ,   '/route-imports/'+this.route_import.id_route_import+'/delete'    ,   null)      
 
             if(res.status===200){
 

@@ -358,7 +358,7 @@ export default {
 
         async getComboData() {
 
-            const res               =   await this.$callApi("post",       "/route_import/combo",        null)
+            const res               =   await this.$callApi("post",       "/route-imports/combo",        null)
 
             let liste_route_import  =   res.data
 
@@ -376,7 +376,7 @@ export default {
 
             if(this.user.selected_route_import) {
 
-                const res_3         =   await this.$callApi("post"  ,   "/route_import/"+this.user.selected_route_import+"/districts"   ,   null)
+                const res_3         =   await this.$callApi("post"  ,   "/route-imports/"+this.user.selected_route_import+"/districts"   ,   null)
                 let districts       =   res_3.data
 
                 this.districts      =   []
@@ -408,12 +408,12 @@ export default {
 
             this.$showLoadingPage()
 
-            const res_3         =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.user.selected_district+"/rtm_cites"       ,   null)
+            const res_3         =   await this.$callApi("post"  ,   "/rtm-willayas/"+this.user.selected_district+"/rtm-cities"       ,   null)
             let cities          =   res_3.data
 
             for (let i = 0; i < cities.length; i++) {
 
-                this.cities.push({ value : cities[i].CITYNO , label : cities[i].CITYNO +   "- "    +   cities[i].CityNameE})
+                this.cities.push({ value : cities[i].CityNo , label : cities[i].CityNo +   "- "    +   cities[i].CityNameE})
             }
 
             this.user.cities            =   []

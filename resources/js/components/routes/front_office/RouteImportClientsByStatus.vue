@@ -173,7 +173,7 @@ export default {
 
             formData.append("status", this.filter_status)
 
-            this.$callApi("post",   "/route_import/"+this.getUser.id_route_import+"/clients/by_status",     formData).then(async (res)=> { 
+            this.$callApi("post",   "/route-imports/"+this.getUser.id_route_import+"/clients/by-status",     formData).then(async (res)=> { 
                 
                 console.log(res)
 
@@ -195,14 +195,14 @@ export default {
 
             this.setUpdateClientAction(client)      
 
-            this.$router.push('/route_import/'+client.id_route_import+'/clients/'+client.id+'/details')
+            this.$router.push('/route-imports/'+client.id_route_import+'/clients/'+client.id+'/details')
         },
 
         showMap() {
 
             this.setSelectedClientsAction(this.clients_filtered)
 
-            this.$router.push('/route/frontoffice/obs/route_import/'+this.$route.params.id_route_import+'/details')
+            this.$router.push('/route/frontoffice/obs/route-imports/'+this.$route.params.id_route_import+'/details')
         },
 
         // searchByCustomerNameA (No changes needed here)

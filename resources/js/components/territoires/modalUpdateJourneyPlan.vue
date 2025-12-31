@@ -129,7 +129,7 @@ export default {
 
             if(this.territoire.type_territoire    ==  '1') {
 
-                const res                       =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/journey_plan/"+this.territoire.id+"/update"   ,   formData)
+                const res                       =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/journey-plan-territories/"+this.territoire.id+"/update"   ,   formData)
 
                 if(res.status===200){
 
@@ -155,7 +155,7 @@ export default {
 
             if(this.territoire.type_territoire    ==  '2') {
 
-                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/journees/"+this.territoire.id+"/update"       ,   formData)
+                const res                   =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/journee-territories/"+this.territoire.id+"/update"       ,   formData)
 
                 if(res.status===200){
 
@@ -181,7 +181,7 @@ export default {
 
             if(this.territoire.type_territoire    ==  '3') {
 
-                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/user_territories/"+this.territoire.id+"/update"       ,   formData)
+                const res                   =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/user-territories/"+this.territoire.id+"/update"       ,   formData)
 
                 if(res.status===200){
 
@@ -221,7 +221,7 @@ export default {
 
             if(this.territoire.type_territoire    ==  '1') {
 
-                const res                       =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/journey_plan/"+this.territoire.id+"/delete"    ,   formData)
+                const res                       =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/journey-plan-territories/"+this.territoire.id+"/delete"    ,   formData)
 
                 if(res.status===200){
 
@@ -247,7 +247,7 @@ export default {
 
             if(this.territoire.type_territoire    ==  '2') {
 
-                const res                       =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/journees/"+this.territoire.id+"/delete"      ,   formData)
+                const res                       =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/journee-territories/"+this.territoire.id+"/delete"      ,   formData)
 
                 if(res.status===200){
 
@@ -273,7 +273,7 @@ export default {
 
             if(this.territoire.type_territoire    ==  '3') {
 
-                const res                       =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/user_territories/"+this.territoire.id+"/delete"      ,   formData)
+                const res                       =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/user-territories/"+this.territoire.id+"/delete"      ,   formData)
 
                 if(res.status===200){
 
@@ -335,7 +335,7 @@ export default {
 
         async getComboData() {
 
-            const res       =   await this.$callApi("post",     "/route_import/"+this.$route.params.id_route_import+"/users/frontOffice",     null)
+            const res       =   await this.$callApi("post",     "/route-imports/"+this.$route.params.id_route_import+"/users/frontOffice",     null)
 
             this.users      =   res.data
         },

@@ -215,7 +215,7 @@
 
             async checkIfUserIsAuthentificated() {
 
-                const res                   =   await this.$callApi("post"  ,   "/user/isAuthentificated",   null)
+                const res                   =   await this.$callApi("post"  ,   "/users/is-authentificated",   null)
                 
                 if(res.data    ==  "") {
 

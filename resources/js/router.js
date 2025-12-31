@@ -54,27 +54,27 @@ const routes = [
     { path: "/stats/standard"                                                               , component: StatsStandardShared                        },
     { path: "/stats/self-service"                                                           , component: StatsSelfServiceShared                     },
 
-    { path: "/route_import/:id_route_import/clients"                                        , component: RouteImportClientsShared                   },
+    { path: "/route-imports/:id_route_import/clients"                                        , component: RouteImportClientsShared                   },
 
-    { path: "/route/obs/route_import/add"                                                   , component: RouteImportAddShared                       },
+    { path: "/route/obs/route-imports/add"                                                   , component: RouteImportAddShared                       },
     { path: "/route/obs/route_import_tempo"                                                 , component: RouteImportTempoShared                     },
-    { path: "/route/obs/route_import/:id_route_import/details"                              , component: ParRouteImportDetailsShared                },
+    { path: "/route/obs/route-imports/:id_route_import/details"                              , component: ParRouteImportDetailsShared                },
 
     //  //  //
-    { path: "/route/frontoffice/obs/route_import/:id_route_import/details"                  , component: ParRouteImportFrontOfficeDetails           },
-    { path: "/route/frontoffice/obs/route_import/:id_route_import/clients/selected"         , component: ParRouteImportFrontOfficeDetails           },
+    { path: "/route/frontoffice/obs/route-imports/:id_route_import/details"                  , component: ParRouteImportFrontOfficeDetails           },
+    { path: "/route/frontoffice/obs/route-imports/:id_route_import/clients/selected"         , component: ParRouteImportFrontOfficeDetails           },
 
-    { path: "/route_import/:id_route_import/clients/:id_client/details"                     , component: ClientDetailsFrontOffice                   },
-    { path: "/route_import/:id_route_import/clients/add"                                    , component: ClientAddCurrentPositionFrontOffice        },
-    { path: "/route_import/:id_route_import/clients/:id_client/update"                      , component: ClientUpdateFrontOffice                    },
-    { path: "/route_import/:id_route_import/clients/confirmation"                           , component: RouteImportClientsConfirmation             },
-    { path: "/route_import/:id_route_import/clients/validation"                             , component: RouteImportClientsValidation               },
+    { path: "/route-imports/:id_route_import/clients/:id_client/details"                     , component: ClientDetailsFrontOffice                   },
+    { path: "/route-imports/:id_route_import/clients/add"                                    , component: ClientAddCurrentPositionFrontOffice        },
+    { path: "/route-imports/:id_route_import/clients/:id_client/update"                      , component: ClientUpdateFrontOffice                    },
+    { path: "/route-imports/:id_route_import/clients/confirmation"                           , component: RouteImportClientsConfirmation             },
+    { path: "/route-imports/:id_route_import/clients/validation"                             , component: RouteImportClientsValidation               },
 
-    { path: "/route_import/:id_route_import/clients/by_status"                              , component: RouteImportClientsByStatusFrontOffice      },
+    { path: "/route-imports/:id_route_import/clients/by-status"                              , component: RouteImportClientsByStatusFrontOffice      },
 
-    { path: "/front_office"                                                                 , component: IndexFrontOffice                           },
+    { path: "/front-office"                                                                 , component: IndexFrontOffice                           },
 
-    { path: "/districts/expected_clients"                                                   , component: ExpectedClients                            }
+    { path: "/districts/expected-clients"                                                   , component: ExpectedClients                            }
 ];
 
 const router = createRouter({
@@ -98,11 +98,11 @@ router.beforeEach((to, from, next) => {
             let route_obs_frontOffice = pattern.test(to.path);
 
             if (route_obs_frontOffice) {
-                next("/front_office");
+                next("/front-office");
             } 
 
             else {
-                initialRoute ? (initialRoute = false, next("/front_office")) : next();
+                initialRoute ? (initialRoute = false, next("/front-office")) : next();
             }
         }
 

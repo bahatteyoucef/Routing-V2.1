@@ -19,7 +19,9 @@ class RouteImportFile extends Model
 
     public    $timestamps   =   false;
 
-    //
+    //  //  //  //  //
+    //  //  //  //  //  Delete Route Import Files
+    //  //  //  //  //
 
     public static function deleteRouteImportFile($fileName, $directory = "uploads/route_import") {
 

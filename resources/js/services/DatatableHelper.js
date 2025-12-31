@@ -71,6 +71,9 @@ class DataTableHelper {
             this.$setDataTable();
 
             //
+            this.$bindTableEvents()
+
+            //
             this.$setSearchColumn();
 
             //
@@ -190,41 +193,32 @@ class DataTableHelper {
 
         $(row).attr('id', this.$tableId + '_' + (dataIndex + 1));
         $(row).attr('role', 'button');
+    }
 
-        //
-        $(row).on('click', (event) => {
+    $bindTableEvents() {
+        // Attach ONE listener to the tbody
+        $('#' + this.$tableId + ' tbody').on('click', 'tr', (event) => {
+            const tr = event.currentTarget;
+            
+            // Logic copied from your previous code
+            if (tr.classList.contains('active_row')) {
+                this.$selectedRow = null;
+                this.$selectedRowID = null;
+                tr.classList.remove('active_row');
+                if (this.$selectRowFn) this.$selectRowFn(null, null);
+            } else {
+                const rowData = this.$datatable.row(tr).data();
+                const rowId = $(tr).attr('id');
 
-            if(event.currentTarget.classList.contains('active_row')) {
+                this.$selectedRow = rowData;
+                this.$selectedRowID = rowId;
 
-                this.$selectedRow    =   null;
-                this.$selectedRowID  =   null;
+                if (this.$selectRowFn) this.$selectRowFn(this.$selectedRow, this.$selectedRowID);
 
-                event.currentTarget.classList.remove('active_row')
-
-                //
-                if(this.$selectRowFn) this.$selectRowFn(null, null)
-            }
-
-            else {
-
-                const rowData       =   this.$datatable.row(event.currentTarget).data();
-                const row           =   $(event.currentTarget);
-                const rowId         =   row.attr('id');
-
-                // add selection
-                this.$selectedRow    =   rowData;
-                this.$selectedRowID  =   rowId;
-
-                //
-                if(this.$selectRowFn) this.$selectRowFn(this.$selectedRow, this.$selectedRowID)
-
-                // remove active class from all rows
                 $('#' + this.$tableId + ' tbody tr').removeClass('active_row');
-
-                // add active class to the clicked row
-                row.addClass('active_row');
+                $(tr).addClass('active_row');
             }
-        })
+        });
     }
 
     //  //  //  //  //
@@ -399,17 +393,27 @@ class DataTableHelper {
     //
     $adjustTableBodyAndHeaderAlignement() {
 
-        // Select the element that changes size (e.g., the table container)
-        const tableContainer    =   document.getElementById(this.$tableId+'_container'); // adjust the selector as needed
+        const tableContainer = document.getElementById(this.$tableId + '_container');
+        
+        // Debounce function to limit execution rate
+        let timeoutId;
+        const debouncedAdjust = () => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                // Only adjust columns after 100ms of silence (animation finished)
+                if (this.$datatable) {
+                    this.$datatable.columns.adjust();
+                }
+            }, 100);
+        };
 
-        const resizeObserver    =   new ResizeObserver(() => {
-
-            // Recalculate column widths whenever a resize is detected
-            $('#' + this.$tableId).DataTable().columns.adjust();
+        const resizeObserver = new ResizeObserver(() => {
+            debouncedAdjust();
         });
 
-        // Start observing the container for size changes
-        resizeObserver.observe(tableContainer);
+        if (tableContainer) {
+            resizeObserver.observe(tableContainer);
+        }
     }
 
     // Adjust Styling

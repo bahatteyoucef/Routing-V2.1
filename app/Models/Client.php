@@ -15,8 +15,6 @@ use Illuminate\Support\Facades\File;
 
 use Illuminate\Support\Fluent;
 
-use stdClass;
-
 class Client extends Model
 {
     use HasFactory;
@@ -28,18 +26,17 @@ class Client extends Model
 
     public    $timestamps   =   false;
 
-    //
+    //  //  //  //  //
+    //  //  //  //  //  Casts
+    //  //  //  //  //
 
     protected $casts = [
         'AvailableBrands' => 'array',
     ];
 
-    public function ownerUser()
-    {
-        return $this->belongsTo(User::class, 'owner');
-    }
-
-    //
+    //  //  //  //  //
+    //  //  //  //  //  Boot
+    //  //  //  //  //
 
     protected static function boot() {
         parent::boot();
@@ -73,307 +70,147 @@ class Client extends Model
         });
     }
 
-    //
+    //  //  //  //  //
+    //  //  //  //  //  Relationships
+    //  //  //  //  //
 
-    // when user add new map
-    public static function storeClients(Request $request, int $id_route_import) {
-
-        // Assume clients is a JSON string/array, not an array of objects for simplicity.
-        // If it's an array of objects, convert it using array_map or json_decode(true).
-        $clientsData    =   json_decode($request->get('clients'), true);
-        if (empty($clientsData)) return;
-
-        $now            =   Carbon::now();
-        $createdAt      =   $now->format('d F Y'); // Custom format from boot()
-        $updatedAt      =   $now->format('Y-m-d H:i:s');
-        $ownerBo        =   Auth::check() && !Auth::user()->hasRole('FrontOffice') ? Auth::user()->id : null;
-        
-        $dataToInsert   =   [];
-
-        DB::transaction(function () use ($clientsData, $id_route_import, $createdAt, $updatedAt, $ownerBo, &$dataToInsert) {
-            foreach ($clientsData as $client_elem) {
-                // 1. Validation and Error Check (Moved to top for efficiency)
-                if (isset($client_elem['CustomerCode']) && preg_match('/[\/\\\\:*?"<>|& ]/', $client_elem['CustomerCode'])) {
-                    // Must throw here as per original logic, stops the batch insert.
-                    throw new \Exception("Le champ CustomerCode contient des caractères interdits : ".$client_elem['CustomerCode']);
-                }
-                
-                // 2. Data Transformation (using null coalescing ?? and strtoupper)
-                $dataToInsert[] = [
-                    'NewCustomer'               =>  $client_elem['NewCustomer']                             ??  ''              ,
-                    'CustomerIdentifier'        =>  $client_elem['CustomerIdentifier']                      ??  ''              ,
-                    'CustomerCode'              =>  $client_elem['CustomerCode']                            ??  ''              ,
-                    'OpenCustomer'              =>  $client_elem['OpenCustomer']                            ??  ''              ,
-                    'CustomerNameE'             =>  mb_strtoupper($client_elem['CustomerNameE'], 'UTF-8')   ??  ''              ,
-                    'CustomerNameA'             =>  mb_strtoupper($client_elem['CustomerNameA'], 'UTF-8')   ??  ''              ,
-                    'Latitude'                  =>  $client_elem['Latitude']                                ??  0               ,
-                    'Longitude'                 =>  $client_elem['Longitude']                               ??  0               ,
-                    'Address'                   =>  $client_elem['Address']                                 ??  ''              ,
-                    'RvrsGeoAddress'            =>  $client_elem['RvrsGeoAddress']                          ??  ''              ,
-                    'DistrictNo'                =>  $client_elem['DistrictNo']                              ??  ''              ,
-                    'DistrictNameE'             =>  $client_elem['DistrictNameE']                           ??  ''              ,
-                    'CityNo'                    =>  $client_elem['CityNo']                                  ??  ''              ,
-                    'CityNameE'                 =>  $client_elem['CityNameE']                               ??  ''              ,
-                    'Tel'                       =>  $client_elem['Tel']                                     ??  ''              ,
-                    'tel_comment'               =>  $client_elem['tel_comment']                             ??  ''              ,
-                    'tel_status'                =>  $client_elem['tel_status']                              ??  ''              ,
-                    'CustomerType'              =>  $client_elem['CustomerType']                            ??  ''              ,
-
-                    'status'                    =>  $client_elem['status']                                  ??  ''              ,
-
-                    'Neighborhood'              =>  $client_elem['Neighborhood']                            ??  ''              ,
-                    'Landmark'                  =>  $client_elem['Landmark']                                ??  ''              ,
-                    'BrandAvailability'         =>  $client_elem['BrandAvailability']                       ??  ''              ,
-                    'BrandSourcePurchase'       =>  $client_elem['BrandSourcePurchase']                     ??  ''              ,
-
-                    'Frequency'                 =>  $client_elem['Frequency']                               ??  ''              ,
-                    'SuperficieMagasin'         =>  $client_elem['SuperficieMagasin']                       ??  ''              ,
-                    'NbrAutomaticCheckouts'     =>  $client_elem['NbrAutomaticCheckouts']                   ??  ''              ,
-
-                    'AvailableBrands'           =>  $client_elem['AvailableBrands']                         ??  ''              ,
-
-                    'start_adding_time'         =>  $client_elem['start_adding_time']                       ??  ''              ,
-                    'adding_duration'           =>  $client_elem['adding_duration']                         ??  ''              ,
-
-                    'JPlan'                     =>  $client_elem['JPlan']                                   ??  ''              ,
-                    'Journee'                   =>  $client_elem['Journee']                                 ??  ''              ,
-
-                    'comment'                   =>  $client_elem['comment']                                 ??  ''              ,
-                    
-                    // Manually include the event/auth data
-                    'created_at'                =>  $client_elem['created_at']                              ??  $createdAt      ,
-                    'updated_at'                =>  $updatedAt                                                                  , // set on insert
-                    'owner_bo'                  =>  $ownerBo                                                                    ,
-                    'id_route_import'           =>  $id_route_import                                                            ,
-                    'owner'                     =>  $client_elem['owner']                                   ??  (Auth::check() ? Auth::user()->id : null) // Assuming 'owner' is the request owner field
-                ];
-            }
-
-            // 3. Batch Insert (Use chunking for large datasets, e.g., 500 records per query)
-            $chunks     =   array_chunk($dataToInsert, 500);
-            foreach ($chunks as $chunk) {
-                Client::insert($chunk); // Use insert() which is much faster than save()
-            }
-        });
+    public function ownerUser()
+    {
+        return $this->belongsTo(User::class, 'owner');
     }
 
-    // when user upload new clients file in route import
-    public static function storeClientsUpdateRouteImport(Request $request, int $id_route_import) {
-        $clientsData = json_decode($request->get('clients'), true);
-        if (empty($clientsData)) return;
+    //  //  //  //  //
+    //  //  //  //  //  Store/Update/Delete/Show Client
+    //  //  //  //  //
 
-        // --- Optimization 1: Batch User Lookup (Saves thousands of queries) ---
-        $ownerUserNames = array_column($clientsData, 'owner');
-        $ownerUserNames = array_filter(array_unique($ownerUserNames)); // Get unique, non-empty names
-        
-        // Map of 'ownerUserName' => User ID
-        $userMap = User::whereIn('username', $ownerUserNames)->pluck('id', 'username')->toArray();
-        $defaultUserId = Auth::check() ? Auth::user()->id : null;
+    public static function validateUpdate(Request $request) {
 
-        $now = Carbon::now();
-        $createdAt = $now->format('d F Y');
-        $updatedAt = $now->format('Y-m-d H:i:s');
-        $ownerBo = Auth::check() && !Auth::user()->hasRole('FrontOffice') ? Auth::user()->id : null;
-
-        $dataToUpsert = [];
-
-        DB::transaction(function () use ($clientsData, $id_route_import, $userMap, $defaultUserId, $createdAt, $updatedAt, $ownerBo, &$dataToUpsert) {
-            foreach ($clientsData as $client_elem) {
-                
-                // --- Logic for 'owner' (Optimized) ---
-                $ownerId = $defaultUserId;
-                if (isset($client_elem['owner'])) {
-                    // Use the pre-queried map, fallback to default user if name not found
-                    $ownerId = $userMap[$client_elem['owner']] ?? $defaultUserId;
+        $validator = Validator::make($request->all(), [
+            'NewCustomer'           =>  ["required", "max:255"],
+            'OpenCustomer'          =>  ["required", "max:255"],
+            'CustomerIdentifier'    =>  ["required", "max:255"],
+            'CustomerCode'          =>  ["required_if:OpenCustomer,Ouvert", "max:255", function ($attribute, $value, $fail) {
+                if (preg_match('/[\/\\\\:*?"<>|& ]/', $value)) {
+                    $fail("Le champ $attribute contient des caractères interdits.");
                 }
+            }],
+            'CustomerNameE'         =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+            'CustomerNameA'         =>  ["required", "max:255"],
+            'Tel'                   =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+            'Latitude'              =>  ["required", "max:255"],
+            'Longitude'             =>  ["required", "max:255"],
+            'Address'               =>  ["required", "max:255"],
+            'RvrsGeoAddress'        =>  ["required", "max:255"],
+            'DistrictNo'            =>  ["required", "max:255"],
+            'DistrictNameE'         =>  ["required", "max:255"],
+            'CityNo'                =>  ["required", "max:255"],
+            'CityNameE'             =>  ["required", "max:255"],
+            'CustomerType'          =>  ["required", "max:255"],
+            'status'                =>  ["required", "max:255"],
 
-                // 1. Validation (Same as above)
-                if (isset($client_elem['CustomerCode']) && preg_match('/[\/\\\\:*?"<>|& ]/', $client_elem['CustomerCode'])) {
-                    throw new \Exception("Le champ CustomerCode contient des caractères interdits : ".$client_elem['CustomerCode']);
-                }
-                
-                // 2. Brand Mapping (Simplified and more readable)
-                $brands = array_map('trim', explode(',', $client_elem['AvailableBrands'] ?? ''));
-                $AvailableBrands = json_encode(array_combine(
-                    array_map(fn($index) => "brand_$index", array_keys($brands)),
-                    $brands
-                ), JSON_UNESCAPED_UNICODE);
+            'Frequency'             =>  ["required", "max:255"],
+            'SuperficieMagasin'     =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+            'NbrAutomaticCheckouts' =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+        ]);
 
-                // 3. Build Upsert Row
-                $dataToUpsert[] = [
-                    // ... (include all other fields, similar to storeClients, but using $client_elem['key'])
-                    'NewCustomer'               =>  $client_elem['NewCustomer']                                 ?? ''           ,
-                    'CustomerIdentifier'        =>  $client_elem['CustomerIdentifier']                          ?? ''           ,
-                    'CustomerCode'              =>  $client_elem['CustomerCode']                                ?? ''           ,
-                    'OpenCustomer'              =>  $client_elem['OpenCustomer']                                ?? ''           ,
-                    'CustomerNameE'             =>  mb_strtoupper($client_elem['CustomerNameE']                 ?? '', 'UTF-8') ,
-                    'CustomerNameA'             =>  mb_strtoupper($client_elem['CustomerNameA']                 ?? '', 'UTF-8') ,
-
-                    'Latitude'                  =>  $client_elem['Latitude']                                    ?? 0            ,
-                    'Longitude'                 =>  $client_elem['Longitude']                                   ?? 0            ,
-
-                    'AvailableBrands'           =>  $AvailableBrands,
-
-                    'Address'                   =>  $client_elem['Address']                                     ?? ''           ,
-                    'RvrsGeoAddress'            =>  $client_elem['RvrsGeoAddress']                              ?? ''           ,
-                    'DistrictNo'                =>  $client_elem['DistrictNo']                                  ?? ''           ,
-                    'DistrictNameE'             =>  $client_elem['DistrictNameE']                               ?? ''           ,
-                    'CityNo'                    =>  $client_elem['CityNo']                                      ?? ''           ,
-                    'CityNameE'                 =>  $client_elem['CityNameE']                                   ?? ''           ,
-                    'Tel'                       =>  $client_elem['Tel']                                         ?? ''           ,
-                    'tel_comment'               =>  $client_elem['tel_comment']                                 ?? ''           ,
-                    'tel_status'                =>  $client_elem['tel_status']                                  ?? ''           ,
-                    'CustomerType'              =>  $client_elem['CustomerType']                                ?? ''           ,
-
-                    'status'                    =>  $client_elem['status']                                      ?? ''           ,
-
-                    'Neighborhood'              =>  $client_elem['Neighborhood']                                ?? ''           ,
-                    'Landmark'                  =>  $client_elem['Landmark']                                    ?? ''           ,
-                    'BrandAvailability'         =>  $client_elem['BrandAvailability']                           ?? ''           ,
-                    'BrandSourcePurchase'       =>  $client_elem['BrandSourcePurchase']                         ?? ''           ,
-
-                    'Frequency'                 =>  $client_elem['Frequency']                                   ?? ''           ,
-                    'SuperficieMagasin'         =>  $client_elem['SuperficieMagasin']                           ?? ''           ,
-                    'NbrAutomaticCheckouts'     =>  $client_elem['NbrAutomaticCheckouts']                       ?? ''           ,
-
-                    'start_adding_time'         =>  $client_elem['start_adding_time']                           ?? ''           ,
-                    'adding_duration'           =>  $client_elem['adding_duration']                             ?? ''           ,
-
-                    'JPlan'                     =>  $client_elem['JPlan']                                       ?? ''           ,
-                    'Journee'                   =>  $client_elem['Journee']                                     ?? ''           ,
-
-                    'comment'                   =>  $client_elem['comment']                                     ?? ''           ,
-
-                    // Manually include event/auth data
-                    'created_at'                =>  $client_elem['created_at'] ?? $createdAt,
-                    'updated_at'                =>  $updatedAt,
-                    'owner_bo'                  =>  $ownerBo,
-                    'id_route_import'           =>  $id_route_import,
-                    'owner'                     =>  $ownerId,
-                ];
-            }
-
-            // --- Optimization 2: Batch Upsert (Requires a unique key, likely CustomerCode + id_route_import) ---
-            // Assuming (CustomerCode, id_route_import) is a unique key for upserting
-            $chunks = array_chunk($dataToUpsert, 500);
-            
-            foreach ($chunks as $chunk) {
-                Client::upsert(
-                    $chunk,
-                    ['CustomerCode', 'id_route_import'], // Unique columns to identify the row
-                    array_keys(head($chunk)) // Update all columns except the unique keys
-                );
-            }
+        $validator->sometimes('nonvalidated_details',  ["required"] , function (Fluent $input) {
+    
+            return $input->status    ==  "nonvalidated";
         });
+
+        //
+
+        $validator->sometimes(['AvailableBrands'],  ["required_if:OpenCustomer,Ouvert"] , function (Fluent $input) {
+    
+            return $input->BrandAvailability    ==  "";
+        });
+
+        //
+
+        $validator->sometimes(['CustomerBarCode_image'],  ["required_if:OpenCustomer,Ouvert"] , function (Fluent $input) {
+    
+            return (($input->CustomerBarCode_image_original_name    !=  "")&&($input->CustomerBarCode_image_updated     ==  "true"));
+        });
+        
+        $validator->sometimes(['facade_image'],  ["file"] , function (Fluent $input) {
+    
+            return (($input->facade_image_original_name             !=  "")&&($input->facade_image_updated              ==  "true"));
+        });
+
+        $validator->sometimes(['in_store_image'],  ["required_if:OpenCustomer,Ouvert"] , function (Fluent $input) {
+    
+            return (($input->in_store_image_original_name           !=  "")&&($input->in_store_image_updated            ==  "true"));
+        });
+
+        //
+
+        return $validator;
     }
 
-    //
+    public static function updateClient(Request $request, int $id_route_import, int $id_client) {
+        $client = Client::find($id_client);
+        if (!$client) return null;
 
-    // polygon change multiple informations for clients
-    public static function multiUpdateClients(Request $request, int $id_route_import) {
-        // Ensure clients is decoded as an associative array for consistency
-        $clientsToUpdate    =   json_decode($request->get("clients"), true); 
-        if (empty($clientsToUpdate)) return;
-
-        $createdAt          =   Carbon::now()->format('d F Y');
-        $updatedAt          =   Carbon::now()->format('Y-m-d H:i:s');
-        $ownerBo            =   Auth::check() && !Auth::user()->hasRole('FrontOffice') ? Auth::user()->id : null;
-
-        $dataToUpsert       =   [];
-        $updateColumns      =   ['created_at', 'updated_at', 'owner_bo'];
+        // Security Check
+        $user = Auth::user();
+        $isFrontOffice = $user->hasRole("FrontOffice");
         
-        foreach ($clientsToUpdate as $client_elem) {
-            $row    =   [
-                'id'            =>  $client_elem['id']  ,
-                'created_at'    =>  $createdAt          ,
-                'updated_at'    =>  $updatedAt          ,
-                'owner_bo'      =>  $ownerBo            , // Update owner_bo on modification
-            ];
-            
-            // Add optional fields and track which ones need to be updated
-            if (isset($client_elem['owner'])) {
-                $row['owner']   =   $client_elem['owner'];
-
-                if (!in_array('owner', $updateColumns))         $updateColumns[]    =   'owner';
-            }
-
-            if (isset($client_elem['JPlan'])) {
-                $row['JPlan']   =   mb_strtoupper($client_elem['JPlan'], 'UTF-8');
-                if (!in_array('JPlan', $updateColumns))         $updateColumns[]    =   'JPlan';
-            }
-
-            if (isset($client_elem['DistrictNo']) && isset($client_elem['DistrictNameE'])) {
-                $row['DistrictNo']      =   $client_elem['DistrictNo'];
-                $row['DistrictNameE']   =   $client_elem['DistrictNameE'];
-
-                if (!in_array('DistrictNo'      , $updateColumns)) $updateColumns[] =   'DistrictNo';
-                if (!in_array('DistrictNameE'   , $updateColumns)) $updateColumns[] =   'DistrictNameE';
-            }
-
-            if (isset($client_elem['CityNo']) && isset($client_elem['CityNameE'])) {
-                $row['CityNo']      =   $client_elem['CityNo'];
-                $row['CityNameE']   =   $client_elem['CityNameE'];
-
-                if (!in_array('CityNo'      , $updateColumns))  $updateColumns[]    =   'CityNo';
-                if (!in_array('CityNameE'   , $updateColumns))  $updateColumns[]    =   'CityNameE';
-            }
-
-            if (isset($client_elem['CustomerType'])) {
-                $row['CustomerType']    =   $client_elem['CustomerType'];
-                if (!in_array('CustomerType', $updateColumns))  $updateColumns[]    =   'CustomerType';
-            }
-
-            if (isset($client_elem['status'])) {
-                $row['status']          =   $client_elem['status'];
-                if (!in_array('status', $updateColumns))        $updateColumns[]    =   'status';
-            }
-
-            if (isset($client_elem['Journee'])) {
-                $row['Journee']         =   $client_elem['Journee'];
-                if (!in_array('Journee', $updateColumns))       $updateColumns[]    =   'Journee';
-            }
-
-            $dataToUpsert[]     =   $row;
+        if ($isFrontOffice && ($client->status == "validated" || $client->status == "confirmed" || ($client->status != "visible" && $client->owner != $user->id))) {
+            throw new Exception("Unauthorized", 403);
         }
 
-        // --- Batch Update ---
-        $chunks = array_chunk($dataToUpsert, 500);
-        foreach ($chunks as $chunk) {
-            Client::upsert(
-                $chunk,
-                ['id'], // Unique by ID (Primary Key)
-                // Use the dynamically built list of columns to update
-                array_unique($updateColumns) 
-            );
+        // 1. Formatting Brands
+        $brandsArray = json_decode($request->input("AvailableBrands"), true) ?? [];
+        $formattedBrands = [];
+        foreach ($brandsArray as $index => $value) {
+            $formattedBrands["brand_$index"] = $value;
         }
-    }
 
-    public static function deleteClients(Request $request, int $id_route_import) {
-        $liste_clients_ids  =   json_decode($request->get("clients"), true);
-        if (empty($liste_clients_ids)) return;
+        // 2. Mass Assignment (Fill simple fields)
+        $client->fill($request->only([
+            'NewCustomer', 'OpenCustomer', 'CustomerIdentifier', 'CustomerCode',
+            'Latitude', 'Longitude', 'Address', 'RvrsGeoAddress', 'DistrictNo', 'DistrictNameE',
+            'CityNo', 'CityNameE', 'Tel', 'CustomerType', 'Neighborhood', 
+            'Landmark', 'BrandAvailability', 'BrandSourcePurchase', 'Frequency', 
+            'SuperficieMagasin', 'NbrAutomaticCheckouts', 'comment', 'status', 
+            'nonvalidated_details'
+        ]));
 
-        // --- Optimization 1: Efficient Bulk Fetch for File Cleanup ---
-        // Fetch only the IDs (or just the ID and the data needed for the directory path)
-        // We still need the IDs for file cleanup
-        $clientsToDelete    =   Client::whereIn('id', $liste_clients_ids)->get(['id']);
-                    
-        $ids                =   $clientsToDelete->pluck('id')->toArray();
+        // 3. Set Complex Fields
+        $client->CustomerNameE = mb_strtoupper($request->get("CustomerNameE") ?? '', 'UTF-8');
+        $client->CustomerNameA = mb_strtoupper($request->get("CustomerNameA") ?? '', 'UTF-8');
+        $client->AvailableBrands = json_encode($formattedBrands, JSON_UNESCAPED_UNICODE);
+        $client->id_route_import = $id_route_import;
         
-        // 1. Delete all database records in one query
-        Client::whereIn('id', $ids)->delete(); // One efficient query!
+        // JPlan Logic
+        $client->JPlan = $request->has("JPlan") ? mb_strtoupper($request->input("JPlan"), 'UTF-8') : "";
+        $client->Journee = $request->input("Journee") ?? "";
 
-        // 2. Handle File Deletion (less critical, but still necessary)
-        // Note: File operations are slow and should not be in the DB transaction if possible.
-        // Since the original logic had it inside, we keep it here but acknowledge it's slow.
-        // foreach ($clientsToDelete as $client) {
-        //     $directory = public_path('uploads/clients/' . $client->id);
-        //     if (File::exists($directory)) {
-        //         File::deleteDirectory($directory); 
-        //     }
-        // }
+        // Owner Logic
+        if (Auth::user()->hasRole('FrontOffice')) {
+            $client->owner = Auth::user()->id;
+        } else {
+            $client->owner = $request->get("owner");
+            $client->tel_status = $request->get("tel_status");
+            $client->tel_comment = $request->get("tel_comment");
+        }
+
+        // 4. IMAGE HANDLING (Reuse the helper!)
+        self::handleClientImageUpload($request, $client, 'CustomerBarCode_image');
+        self::handleClientImageUpload($request, $client, 'facade_image');
+        self::handleClientImageUpload($request, $client, 'in_store_image');
+
+        // 5. Handle Original Names (Simple string assignment)
+        $client->CustomerBarCode_image_original_name = $request->input("CustomerBarCode_image_original_name") ?? "";
+        $client->facade_image_original_name          = $request->input("facade_image_original_name") ?? "";
+        $client->in_store_image_original_name        = $request->input("in_store_image_original_name") ?? "";
+
+        // 6. Save
+        $client->save();
+
+        // 7. Format Response
+        return self::appendFormattedBrands($client);
     }
-
-    //
 
     public static function validateStore(Request $request) {
 
@@ -524,191 +361,14 @@ class Client extends Model
         return $client;
     }
 
-    //
-
-    public static function validateUpdate(Request $request) {
-
-        $validator = Validator::make($request->all(), [
-            'NewCustomer'           =>  ["required", "max:255"],
-            'OpenCustomer'          =>  ["required", "max:255"],
-            'CustomerIdentifier'    =>  ["required", "max:255"],
-            'CustomerCode'          =>  ["required_if:OpenCustomer,Ouvert", "max:255", function ($attribute, $value, $fail) {
-                if (preg_match('/[\/\\\\:*?"<>|& ]/', $value)) {
-                    $fail("Le champ $attribute contient des caractères interdits.");
-                }
-            }],
-            'CustomerNameE'         =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
-            'CustomerNameA'         =>  ["required", "max:255"],
-            'Tel'                   =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
-            'Latitude'              =>  ["required", "max:255"],
-            'Longitude'             =>  ["required", "max:255"],
-            'Address'               =>  ["required", "max:255"],
-            'RvrsGeoAddress'        =>  ["required", "max:255"],
-            'DistrictNo'            =>  ["required", "max:255"],
-            'DistrictNameE'         =>  ["required", "max:255"],
-            'CityNo'                =>  ["required", "max:255"],
-            'CityNameE'             =>  ["required", "max:255"],
-            'CustomerType'          =>  ["required", "max:255"],
-            'status'                =>  ["required", "max:255"],
-
-            'Frequency'             =>  ["required", "max:255"],
-            'SuperficieMagasin'     =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
-            'NbrAutomaticCheckouts' =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
-        ]);
-
-        $validator->sometimes('nonvalidated_details',  ["required"] , function (Fluent $input) {
-    
-            return $input->status    ==  "nonvalidated";
-        });
-
-        //
-
-        $validator->sometimes(['AvailableBrands'],  ["required_if:OpenCustomer,Ouvert"] , function (Fluent $input) {
-    
-            return $input->BrandAvailability    ==  "";
-        });
-
-        //
-
-        $validator->sometimes(['CustomerBarCode_image'],  ["required_if:OpenCustomer,Ouvert"] , function (Fluent $input) {
-    
-            return (($input->CustomerBarCode_image_original_name    !=  "")&&($input->CustomerBarCode_image_updated     ==  "true"));
-        });
-        
-        $validator->sometimes(['facade_image'],  ["file"] , function (Fluent $input) {
-    
-            return (($input->facade_image_original_name             !=  "")&&($input->facade_image_updated              ==  "true"));
-        });
-
-        $validator->sometimes(['in_store_image'],  ["required_if:OpenCustomer,Ouvert"] , function (Fluent $input) {
-    
-            return (($input->in_store_image_original_name           !=  "")&&($input->in_store_image_updated            ==  "true"));
-        });
-
-        //
-
-        return $validator;
-    }
-
-    public static function updateClient(Request $request, int $id_route_import, int $id) {
-        $client = Client::find($id);
-        if (!$client) return null;
-
-        // Security Check
-        $user = Auth::user();
-        $isFrontOffice = $user->hasRole("FrontOffice");
-        
-        if ($isFrontOffice && ($client->status == "validated" || $client->status == "confirmed" || ($client->status != "visible" && $client->owner != $user->id))) {
-            throw new Exception("Unauthorized", 403);
-        }
-
-        // 1. Formatting Brands
-        $brandsArray = json_decode($request->input("AvailableBrands"), true) ?? [];
-        $formattedBrands = [];
-        foreach ($brandsArray as $index => $value) {
-            $formattedBrands["brand_$index"] = $value;
-        }
-
-        // 2. Mass Assignment (Fill simple fields)
-        $client->fill($request->only([
-            'NewCustomer', 'OpenCustomer', 'CustomerIdentifier', 'CustomerCode',
-            'Latitude', 'Longitude', 'Address', 'RvrsGeoAddress', 'DistrictNo', 'DistrictNameE',
-            'CityNo', 'CityNameE', 'Tel', 'CustomerType', 'Neighborhood', 
-            'Landmark', 'BrandAvailability', 'BrandSourcePurchase', 'Frequency', 
-            'SuperficieMagasin', 'NbrAutomaticCheckouts', 'comment', 'status', 
-            'nonvalidated_details'
-        ]));
-
-        // 3. Set Complex Fields
-        $client->CustomerNameE = mb_strtoupper($request->get("CustomerNameE") ?? '', 'UTF-8');
-        $client->CustomerNameA = mb_strtoupper($request->get("CustomerNameA") ?? '', 'UTF-8');
-        $client->AvailableBrands = json_encode($formattedBrands, JSON_UNESCAPED_UNICODE);
-        $client->id_route_import = $id_route_import;
-        
-        // JPlan Logic
-        $client->JPlan = $request->has("JPlan") ? mb_strtoupper($request->input("JPlan"), 'UTF-8') : "";
-        $client->Journee = $request->input("Journee") ?? "";
-
-        // Owner Logic
-        if (Auth::user()->hasRole('FrontOffice')) {
-            $client->owner = Auth::user()->id;
-        } else {
-            $client->owner = $request->get("owner");
-            $client->tel_status = $request->get("tel_status");
-            $client->tel_comment = $request->get("tel_comment");
-        }
-
-        // 4. IMAGE HANDLING (Reuse the helper!)
-        self::handleClientImageUpload($request, $client, 'CustomerBarCode_image');
-        self::handleClientImageUpload($request, $client, 'facade_image');
-        self::handleClientImageUpload($request, $client, 'in_store_image');
-
-        // 5. Handle Original Names (Simple string assignment)
-        $client->CustomerBarCode_image_original_name = $request->input("CustomerBarCode_image_original_name") ?? "";
-        $client->facade_image_original_name          = $request->input("facade_image_original_name") ?? "";
-        $client->in_store_image_original_name        = $request->input("in_store_image_original_name") ?? "";
-
-        // 6. Save
-        $client->save();
-
-        // 7. Format Response
-        return self::appendFormattedBrands($client);
-    }
-
-    //
-
-    private static function handleClientImageUpload(Request $request, Client $client, string $field) {
-        // 1. Check if this field needs processing
-        // For 'Store', we usually just check hasFile.
-        // For 'Update', the frontend sends a specific flag (e.g. "facade_image_updated")
-        $isUpdated = $request->input($field.'_updated') === 'true';
-        
-        // If not updated and no file sent, do nothing.
-        if (!$request->hasFile($field) && !$isUpdated) {
-            return;
-        }
-
-        // $oldFileName = $client->$field;
-        $type = strtoupper(str_replace('_image', '', $field)); // e.g. "FACADE"
-
-        // 2. Handle New File Upload
-        if ($request->hasFile($field)) {
-            $file = $request->file($field);
-            $extension = $file->getClientOriginalExtension();
-            
-            // Standard Naming: DISTRICT_CITY_ID_TYPE_CODE.ext
-            $fileName = "{$client->DistrictNo}_{$client->CityNo}_{$client->id}_{$type}_{$client->CustomerCode}.{$extension}";
-            
-            $path = public_path("uploads/clients/{$client->id}");
-            $file->move($path, $fileName);
-            
-            $client->$field = $fileName;
-        } 
-        // 3. Handle clearing the image (User deleted it in frontend without uploading new one)
-        else if ($isUpdated) {
-            $client->$field = "";
-        }
-
-        // 4. Cleanup Old File (Only for Update scenarios)
-        // If we had a filename, and it has changed (or become empty), delete the physical old file.
-        // if (!empty($oldFileName) && $oldFileName !== $client->$field) {
-            // $oldFilePath = public_path("uploads/clients/{$client->id}/{$oldFileName}");
-            // if (File::exists($oldFilePath)) {
-            //     File::delete($oldFilePath);
-            // }
-        // }
-    }
-
-    //
-
-    public static function deleteClient(int $id_route_import, int $id) {
+    public static function deleteClient(int $id_route_import, int $id_client) {
         // If you need file deletion, uncomment the directory logic here
-        Client::destroy($id);
+        Client::destroy($id_client);
     }
 
-    public static function showClient(Request $request, int $id_route_import, int $id) {
+    public static function showClient(Request $request, int $id_route_import, int $id_client) {
         // Eager load 'owner' relationship if 'User' model is related via 'owner' field
-        $client = Client::with('ownerUser')->find($id); 
+        $client = Client::with('ownerUser')->find($id_client); 
         
         if ($client) {
             // Assuming you have a relationship defined in Client model: public function ownerUser() { return $this->belongsTo(User::class, 'owner'); }
@@ -723,9 +383,198 @@ class Client extends Model
         return $client;
     }
 
-    //
+    //  //  //  //  //
+    //  //  //  //  //  Store/Update/Delete Clients
+    //  //  //  //  //
 
-    // Resume Clients
+    public static function storeClients(Request $request, int $id_route_import) {
+
+        // Assume clients is a JSON string/array, not an array of objects for simplicity.
+        // If it's an array of objects, convert it using array_map or json_decode(true).
+        $clientsData    =   json_decode($request->get('clients'), true);
+        if (empty($clientsData)) return;
+
+        $now            =   Carbon::now();
+        $createdAt      =   $now->format('d F Y'); // Custom format from boot()
+        $updatedAt      =   $now->format('Y-m-d H:i:s');
+        $ownerBo        =   Auth::check() && !Auth::user()->hasRole('FrontOffice') ? Auth::user()->id : null;
+        
+        $dataToInsert   =   [];
+
+        DB::transaction(function () use ($clientsData, $id_route_import, $createdAt, $updatedAt, $ownerBo, &$dataToInsert) {
+            foreach ($clientsData as $client_elem) {
+                // 1. Validation and Error Check (Moved to top for efficiency)
+                if (isset($client_elem['CustomerCode']) && preg_match('/[\/\\\\:*?"<>|& ]/', $client_elem['CustomerCode'])) {
+                    // Must throw here as per original logic, stops the batch insert.
+                    throw new \Exception("Le champ CustomerCode contient des caractères interdits : ".$client_elem['CustomerCode']);
+                }
+                
+                // 2. Data Transformation (using null coalescing ?? and strtoupper)
+                $dataToInsert[] = [
+                    'NewCustomer'               =>  $client_elem['NewCustomer']                             ??  ''              ,
+                    'CustomerIdentifier'        =>  $client_elem['CustomerIdentifier']                      ??  ''              ,
+                    'CustomerCode'              =>  $client_elem['CustomerCode']                            ??  ''              ,
+                    'OpenCustomer'              =>  $client_elem['OpenCustomer']                            ??  ''              ,
+                    'CustomerNameE'             =>  mb_strtoupper($client_elem['CustomerNameE'], 'UTF-8')   ??  ''              ,
+                    'CustomerNameA'             =>  mb_strtoupper($client_elem['CustomerNameA'], 'UTF-8')   ??  ''              ,
+                    'Latitude'                  =>  $client_elem['Latitude']                                ??  0               ,
+                    'Longitude'                 =>  $client_elem['Longitude']                               ??  0               ,
+                    'Address'                   =>  $client_elem['Address']                                 ??  ''              ,
+                    'RvrsGeoAddress'            =>  $client_elem['RvrsGeoAddress']                          ??  ''              ,
+                    'DistrictNo'                =>  $client_elem['DistrictNo']                              ??  ''              ,
+                    'DistrictNameE'             =>  $client_elem['DistrictNameE']                           ??  ''              ,
+                    'CityNo'                    =>  $client_elem['CityNo']                                  ??  ''              ,
+                    'CityNameE'                 =>  $client_elem['CityNameE']                               ??  ''              ,
+                    'Tel'                       =>  $client_elem['Tel']                                     ??  ''              ,
+                    'tel_comment'               =>  $client_elem['tel_comment']                             ??  ''              ,
+                    'tel_status'                =>  $client_elem['tel_status']                              ??  ''              ,
+                    'CustomerType'              =>  $client_elem['CustomerType']                            ??  ''              ,
+
+                    'status'                    =>  $client_elem['status']                                  ??  ''              ,
+
+                    'Neighborhood'              =>  $client_elem['Neighborhood']                            ??  ''              ,
+                    'Landmark'                  =>  $client_elem['Landmark']                                ??  ''              ,
+                    'BrandAvailability'         =>  $client_elem['BrandAvailability']                       ??  ''              ,
+                    'BrandSourcePurchase'       =>  $client_elem['BrandSourcePurchase']                     ??  ''              ,
+
+                    'Frequency'                 =>  $client_elem['Frequency']                               ??  ''              ,
+                    'SuperficieMagasin'         =>  $client_elem['SuperficieMagasin']                       ??  ''              ,
+                    'NbrAutomaticCheckouts'     =>  $client_elem['NbrAutomaticCheckouts']                   ??  ''              ,
+
+                    'AvailableBrands'           =>  $client_elem['AvailableBrands']                         ??  ''              ,
+
+                    'start_adding_time'         =>  $client_elem['start_adding_time']                       ??  ''              ,
+                    'adding_duration'           =>  $client_elem['adding_duration']                         ??  ''              ,
+
+                    'JPlan'                     =>  $client_elem['JPlan']                                   ??  ''              ,
+                    'Journee'                   =>  $client_elem['Journee']                                 ??  ''              ,
+
+                    'comment'                   =>  $client_elem['comment']                                 ??  ''              ,
+                    
+                    // Manually include the event/auth data
+                    'created_at'                =>  $client_elem['created_at']                              ??  $createdAt      ,
+                    'updated_at'                =>  $updatedAt                                                                  , // set on insert
+                    'owner_bo'                  =>  $ownerBo                                                                    ,
+                    'id_route_import'           =>  $id_route_import                                                            ,
+                    'owner'                     =>  $client_elem['owner']                                   ??  (Auth::check() ? Auth::user()->id : null) // Assuming 'owner' is the request owner field
+                ];
+            }
+
+            // 3. Batch Insert (Use chunking for large datasets, e.g., 500 records per query)
+            $chunks     =   array_chunk($dataToInsert, 500);
+            foreach ($chunks as $chunk) {
+                Client::insert($chunk); // Use insert() which is much faster than save()
+            }
+        });
+    }
+
+    public static function updateClients(Request $request, int $id_route_import) {
+        // Ensure clients is decoded as an associative array for consistency
+        $clientsToUpdate    =   json_decode($request->get("clients"), true); 
+        if (empty($clientsToUpdate)) return;
+
+        $createdAt          =   Carbon::now()->format('d F Y');
+        $updatedAt          =   Carbon::now()->format('Y-m-d H:i:s');
+        $ownerBo            =   Auth::check() && !Auth::user()->hasRole('FrontOffice') ? Auth::user()->id : null;
+
+        $dataToUpsert       =   [];
+        $updateColumns      =   ['created_at', 'updated_at', 'owner_bo'];
+        
+        foreach ($clientsToUpdate as $client_elem) {
+            $row    =   [
+                'id'            =>  $client_elem['id']  ,
+                'created_at'    =>  $createdAt          ,
+                'updated_at'    =>  $updatedAt          ,
+                'owner_bo'      =>  $ownerBo            , // Update owner_bo on modification
+            ];
+            
+            // Add optional fields and track which ones need to be updated
+            if (isset($client_elem['owner'])) {
+                $row['owner']   =   $client_elem['owner'];
+
+                if (!in_array('owner', $updateColumns))         $updateColumns[]    =   'owner';
+            }
+
+            if (isset($client_elem['JPlan'])) {
+                $row['JPlan']   =   mb_strtoupper($client_elem['JPlan'], 'UTF-8');
+                if (!in_array('JPlan', $updateColumns))         $updateColumns[]    =   'JPlan';
+            }
+
+            if (isset($client_elem['DistrictNo']) && isset($client_elem['DistrictNameE'])) {
+                $row['DistrictNo']      =   $client_elem['DistrictNo'];
+                $row['DistrictNameE']   =   $client_elem['DistrictNameE'];
+
+                if (!in_array('DistrictNo'      , $updateColumns)) $updateColumns[] =   'DistrictNo';
+                if (!in_array('DistrictNameE'   , $updateColumns)) $updateColumns[] =   'DistrictNameE';
+            }
+
+            if (isset($client_elem['CityNo']) && isset($client_elem['CityNameE'])) {
+                $row['CityNo']      =   $client_elem['CityNo'];
+                $row['CityNameE']   =   $client_elem['CityNameE'];
+
+                if (!in_array('CityNo'      , $updateColumns))  $updateColumns[]    =   'CityNo';
+                if (!in_array('CityNameE'   , $updateColumns))  $updateColumns[]    =   'CityNameE';
+            }
+
+            if (isset($client_elem['CustomerType'])) {
+                $row['CustomerType']    =   $client_elem['CustomerType'];
+                if (!in_array('CustomerType', $updateColumns))  $updateColumns[]    =   'CustomerType';
+            }
+
+            if (isset($client_elem['status'])) {
+                $row['status']          =   $client_elem['status'];
+                if (!in_array('status', $updateColumns))        $updateColumns[]    =   'status';
+            }
+
+            if (isset($client_elem['Journee'])) {
+                $row['Journee']         =   $client_elem['Journee'];
+                if (!in_array('Journee', $updateColumns))       $updateColumns[]    =   'Journee';
+            }
+
+            $dataToUpsert[]     =   $row;
+        }
+
+        // --- Batch Update ---
+        $chunks = array_chunk($dataToUpsert, 500);
+        foreach ($chunks as $chunk) {
+            Client::upsert(
+                $chunk,
+                ['id'], // Unique by ID (Primary Key)
+                // Use the dynamically built list of columns to update
+                array_unique($updateColumns) 
+            );
+        }
+    }
+
+    public static function deleteClients(Request $request, int $id_route_import) {
+        $liste_clients_ids  =   json_decode($request->get("clients"), true);
+        if (empty($liste_clients_ids)) return;
+
+        // --- Optimization 1: Efficient Bulk Fetch for File Cleanup ---
+        // Fetch only the IDs (or just the ID and the data needed for the directory path)
+        // We still need the IDs for file cleanup
+        $clientsToDelete    =   Client::whereIn('id', $liste_clients_ids)->get(['id']);
+                    
+        $ids                =   $clientsToDelete->pluck('id')->toArray();
+        
+        // 1. Delete all database records in one query
+        Client::whereIn('id', $ids)->delete(); // One efficient query!
+
+        // 2. Handle File Deletion (less critical, but still necessary)
+        // Note: File operations are slow and should not be in the DB transaction if possible.
+        // Since the original logic had it inside, we keep it here but acknowledge it's slow.
+        // foreach ($clientsToDelete as $client) {
+        //     $directory = public_path('uploads/clients/' . $client->id);
+        //     if (File::exists($directory)) {
+        //         File::deleteDirectory($directory); 
+        //     }
+        // }
+    }
+
+    //  //  //  //  //
+    //  //  //  //  //  Update Resume
+    //  //  //  //  // 
+
     public static function updateResumeClients(Request $request) {
 
         $clientsData    =   json_decode($request->get("data"), true);
@@ -779,9 +628,10 @@ class Client extends Model
         }
     }
 
-    //
+    //  //  //  //  //
+    //  //  //  //  //  Export Clients
+    //  //  //  //  //
 
-    // Export Clients
     public static function clientsExport(Request $request) {
         $status = $request->get("status");
         $routeId = $request->get("id_route_import");
@@ -819,9 +669,10 @@ class Client extends Model
         return $clients;
     }
 
-    //  //  //
+    //  //  //  //  //
+    //  //  //  //  //  Duplicates
+    //  //  //  //  //
 
-    // Wrapper
     public static function getDoublesClients(Request $request, int $id_route_import) {
         return [
             'getDoublantCustomerCode'  => self::findDuplicates($request, $id_route_import, 'CustomerCode'),
@@ -831,62 +682,88 @@ class Client extends Model
         ];
     }
 
-    // GENERIC DUPLICATE FINDER
-    private static function findDuplicates(Request $request, int $idRoute, string $type) {
+    //  //  //  //  //
+    //  //  //  //  //  Helpers
+    //  //  //  //  //
+
+    private static function handleClientImageUpload(Request $request, Client $client, string $field) {
+        // 1. Check if this field needs processing
+        // For 'Store', we usually just check hasFile.
+        // For 'Update', the frontend sends a specific flag (e.g. "facade_image_updated")
+        $isUpdated = $request->input($field.'_updated') === 'true';
+        
+        // If not updated and no file sent, do nothing.
+        if (!$request->hasFile($field) && !$isUpdated) {
+            return;
+        }
+
+        // $oldFileName = $client->$field;
+        $type = strtoupper(str_replace('_image', '', $field)); // e.g. "FACADE"
+
+        // 2. Handle New File Upload
+        if ($request->hasFile($field)) {
+            $file = $request->file($field);
+            $extension = $file->getClientOriginalExtension();
+            
+            // Standard Naming: DISTRICT_CITY_ID_TYPE_CODE.ext
+            $fileName = "{$client->DistrictNo}_{$client->CityNo}_{$client->id}_".uniqid()."_{$type}_{$client->CustomerCode}.{$extension}";
+            
+            $path = public_path("uploads/clients/{$client->id}");
+            $file->move($path, $fileName);
+            
+            $client->$field = $fileName;
+        } 
+        // 3. Handle clearing the image (User deleted it in frontend without uploading new one)
+        else if ($isUpdated) {
+            $client->$field = "";
+        }
+
+        // 4. Cleanup Old File (Only for Update scenarios)
+        // If we had a filename, and it has changed (or become empty), delete the physical old file.
+        // if (!empty($oldFileName) && $oldFileName !== $client->$field) {
+            // $oldFilePath = public_path("uploads/clients/{$client->id}/{$oldFileName}");
+            // if (File::exists($oldFilePath)) {
+            //     File::delete($oldFilePath);
+            // }
+        // }
+    }
+
+    private static function findDuplicates(Request $request, int $id_route_import, string $type) {
         $startDate = Carbon::parse($request->get('start_date'))->format('Y-m-d');
         $endDate = Carbon::parse($request->get('end_date'))->format('Y-m-d');
 
-        // Base Query: Filter by Route and Status
-        $query = DB::table('clients')
-            ->where('id_route_import', $idRoute)
-            ->whereIn('status', ['validated', 'confirmed']);
-
-        // 1. DATE FILTERING IN SQL (Much faster than PHP)
-        // Assumes created_at is stored as '06 December 2023'. 
-        // We convert it to SQL Date for comparison.
-        $query->whereRaw("STR_TO_DATE(created_at, '%d %M %Y') BETWEEN ? AND ?", [$startDate, $endDate]);
-
-        // 2. IDENTIFY DUPLICATES
-        // We need to find which values appear more than once
+        // 1. Define columns based on type
         if ($type === 'GPS') {
             $groupBy = ['Latitude', 'Longitude'];
-            $select = [DB::raw("CONCAT(Latitude, '-', Longitude) as match_key")];
         } else {
             $groupBy = [$type];
-            $select = [$type];
         }
 
-        // Subquery to get the duplicate keys
-        $duplicates = DB::table('clients')
+        // 2. Build the Subquery (Identical to Approach 2, but dynamic)
+        $duplicatesSub = DB::table('clients')
             ->select($groupBy)
-            ->where('id_route_import', $idRoute)
-            ->where('status', ['validated', 'confirmed'])
+            ->where('id_route_import', $id_route_import)
+            ->whereIn('status', ['validated', 'confirmed'])
+            // Keep your date logic (though converting column to real Date type is better)
             ->whereRaw("STR_TO_DATE(created_at, '%d %M %Y') BETWEEN ? AND ?", [$startDate, $endDate])
             ->groupBy($groupBy)
-            ->havingRaw('COUNT(*) > 1')
-            ->get();
+            ->havingRaw('COUNT(*) > 1');
 
-        if ($duplicates->isEmpty()) {
-            return [];
-        }
+        // 3. Join the subquery (Fast SQL, no PHP looping)
+        $query = DB::table('clients as c')
+            ->joinSub($duplicatesSub, 'd', function ($join) use ($type) {
+                if ($type === 'GPS') {
+                    $join->on('c.Latitude', '=', 'd.Latitude')
+                        ->on('c.Longitude', '=', 'd.Longitude');
+                } else {
+                    $join->on('c.'.$type, '=', 'd.'.$type);
+                }
+            })
+            ->where('c.id_route_import', $id_route_import)
+            ->whereIn('c.status', ['validated', 'confirmed']);
 
-        // 3. FETCH FULL ROWS FOR THOSE DUPLICATES
-        if ($type === 'GPS') {
-            // Logic for GPS is trickier in SQL, doing a simple PHP filter on the small result set is okay here
-            // or join on lat/long. 
-            // For simplicity, let's execute the main query and filter by the lat/longs we found.
-            $latLongs = $duplicates->map(function($d) { return $d->Latitude . '|' . $d->Longitude; })->toArray();
-            
-            // This part fetches the rows
-            $rows = $query->get()->filter(function($row) use ($latLongs) {
-                return in_array($row->Latitude . '|' . $row->Longitude, $latLongs);
-            })->values();
-            
-        } else {
-            // Standard WhereIn
-            $keys = $duplicates->pluck($type)->toArray();
-            $rows = $query->whereIn($type, $keys)->get();
-        }
+        // Fetch results
+        $rows = $query->get();
 
         // 4. Format Brands
         foreach ($rows as $client) {
@@ -909,51 +786,5 @@ class Client extends Model
             $client->AvailableBrands_string_formatted = implode(", ", $values);
         }
         return $client;
-    }
-
-    //  //  //
-
-    // Available brands as indexed array
-    public function getAvailableBrandsArrayAttribute()
-    {
-        // if casted, $this->AvailableBrands may already be array
-        $assoc = $this->attributes['AvailableBrands'] ?? ($this->AvailableBrands ?? '[]');
-        if (is_array($assoc)) {
-            $arr = $assoc;
-        } else {
-            $arr = json_decode($assoc ?? '{}', true) ?: [];
-        }
-        return array_values($arr);
-    }
-
-    // Available brands as comma-separated string
-    public function getAvailableBrandsStringAttribute()
-    {
-        return implode(', ', $this->available_brands_array);
-    }
-
-    //  //  //
-
-    public static function saveBase64Image(?string $base64Image, string $targetDir): ?string
-    {
-        if (empty($base64Image)) return null;
-
-        // Remove data header if present
-        $base64 = preg_replace('#^data:image/[^;]+;base64,#', '', $base64Image);
-        // Normalize spaces
-        $base64 = str_replace(' ', '+', $base64);
-
-        $fileName = uniqid() . '.png';
-        $targetPath = public_path(trim($targetDir, '/') . '/' . $fileName);
-
-        // Ensure directory exists
-        $dir = dirname($targetPath);
-        if (! File::isDirectory($dir)) {
-            File::makeDirectory($dir, 0775, true);
-        }
-
-        file_put_contents($targetPath, base64_decode($base64));
-
-        return $fileName;
     }
 }

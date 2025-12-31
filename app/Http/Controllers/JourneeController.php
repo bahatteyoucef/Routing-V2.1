@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Journee;
+use App\Models\JourneeTerritory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class JourneeController extends Controller
+class JourneeTerritoryController extends Controller
 {
-    //
-
-    public function storeJournee(Request $request, int $id_route_import)
+    public function storeJourneeTerritory(Request $request, int $id_route_import)
     {
 
         try {
@@ -21,7 +19,7 @@ class JourneeController extends Controller
             //
 
             // validate
-            $validator    =   Journee::validateStore($request);
+            $validator    =   JourneeTerritory::validateStore($request);
             
             if ($validator->fails()) {
                 return response()->json([
@@ -30,15 +28,15 @@ class JourneeController extends Controller
             }
 
             // store 
-            Journee::storeJournee($request, $id_route_import);
+            JourneeTerritory::storeJourneeTerritory($request, $id_route_import);
 
             //
             DB::commit();
             //
 
             return response()->json([
-                "header"            =>  "Journee Added !"              ,
-                "message"           =>  "a new journee has been added successfuly!"
+                "header"            =>  "JourneeTerritory Added !"              ,
+                "message"           =>  "a new journee_territory has been added successfuly!"
             ]);
         }
 
@@ -55,7 +53,7 @@ class JourneeController extends Controller
 
     }
 
-    public function updateJournee(Request $request, int $id_route_import, int $id_journee)
+    public function updateJourneeTerritory(Request $request, int $id_route_import, int $id_journee_territory)
     {
 
         try {
@@ -65,7 +63,7 @@ class JourneeController extends Controller
             //
 
             // validate
-            $validator    =   Journee::validateUpdate($request);
+            $validator    =   JourneeTerritory::validateUpdate($request);
             
             if ($validator->fails()) {
                 return response()->json([
@@ -74,15 +72,15 @@ class JourneeController extends Controller
             }
 
             // update 
-            Journee::updateJournee($request, $id_route_import, $id_journee);
+            JourneeTerritory::updateJourneeTerritory($request, $id_route_import, $id_journee_territory);
 
             //
             DB::commit();
             //
 
             return response()->json([
-                "header"            =>  "Journee Updated !"                     ,
-                "message"           =>  "a journee has been updated successfuly!"
+                "header"            =>  "JourneeTerritory Updated !"                     ,
+                "message"           =>  "a journee_territory has been updated successfuly!"
             ]);
         }
 
@@ -99,7 +97,7 @@ class JourneeController extends Controller
 
     }
 
-    public function deleteJournee(Request $request, int $id_route_import, int $id_journee)
+    public function deleteJourneeTerritory(Request $request, int $id_route_import, int $id_journee_territory)
     {
 
         try {
@@ -109,15 +107,15 @@ class JourneeController extends Controller
             //
 
             // delete 
-            Journee::deleteJournee($id_journee);
+            JourneeTerritory::deleteJourneeTerritory($id_journee_territory);
 
             //
             DB::commit();
             //
 
             return response()->json([
-                "header"            =>  "Journee Deleted !"                     ,
-                "message"           =>  "a journee has been deleted successfuly!"
+                "header"            =>  "JourneeTerritory Deleted !"                     ,
+                "message"           =>  "a journee_territory has been deleted successfuly!"
             ]);
         }
 
@@ -133,6 +131,4 @@ class JourneeController extends Controller
         }
 
     }
-
-    //
 }

@@ -9,8 +9,6 @@ use Throwable;
 
 class UserTerritoryController extends Controller
 {
-    //
-
     public function storeUserTerritory(Request $request, int $id_route_import)
     {
 
@@ -133,6 +131,4 @@ class UserTerritoryController extends Controller
         }
 
     }
-
-    //
 }

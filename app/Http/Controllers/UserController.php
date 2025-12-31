@@ -25,9 +25,6 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-
-    // Authentification
-
     public function login(Request $request) {
 
         $validator      =   Validator::make($request->all(), [
@@ -172,7 +169,9 @@ class UserController extends Controller
         }
     }
 
-    // 
+    //  //  //  //  //
+    //  //  //  //  //
+    //  //  //  //  //
 
     public function index()
     {
@@ -225,6 +224,10 @@ class UserController extends Controller
         }
     }
 
+    //  //  //  //  //
+    //  //  //  //  //
+    //  //  //  //  //
+
     public function store(Request $request) 
     {    
 
@@ -268,7 +271,7 @@ class UserController extends Controller
         }
     }
 
-    public function update(Request $request, int $id) 
+    public function update(Request $request, int $id_user) 
     {
 
         try {
@@ -278,7 +281,7 @@ class UserController extends Controller
             //
 
             // validate
-            $validator    =   User::validateUpdate($request, $id);
+            $validator    =   User::validateUpdate($request, $id_user);
             
             if ($validator->fails()) {
                 return response()->json([
@@ -287,7 +290,7 @@ class UserController extends Controller
             }
 
             // update
-            User::updateUser($request, $id);
+            User::updateUser($request, $id_user);
 
             //
             DB::commit();
@@ -312,12 +315,12 @@ class UserController extends Controller
         }
     }
     
-    public function show(int $id)
+    public function show(int $id_user)
     {
 
         try {
 
-            $user  =   User::showUser($id);
+            $user  =   User::showUser($id_user);
             return $user;
         }
 
@@ -329,51 +332,9 @@ class UserController extends Controller
         }
     }
 
-    //
-
-    public function changePassword(Request $request, int $id) 
-    {
-
-        try {
-
-            //
-            DB::beginTransaction();
-            //
-
-            // validate
-            $validator    =   User::validateChangePassword($request, $id);
-            
-            if ($validator->fails()) {
-                return response()->json([
-                    'errors'    =>  $validator->errors(),
-                ],422);
-            }
-
-            // update
-            User::changePassword($request, $id);
-
-            //
-            DB::commit();
-            //
-
-            return response()->json([
-                "header"        =>  "Password Updated !",
-                "message"       =>  "You need to login again !"
-            ]);
-
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
-    }
+    //  //  //  //  //
+    //  //  //  //  //
+    //  //  //  //  //
 
     public static function pointings(Request $request)
     {

@@ -38,7 +38,7 @@
             <ul class="navbar-nav navbar-nav-right ml-5 container m-0 mt-1 animate__animated pr-0" id="header_menu">
 
               <!-- Route -->
-              <li class="col-sm-3 nav-item" >
+              <li class="col-sm-5 nav-item" >
                 <Multiselect
                     v-model             =   "route_link"
                     :options            =   "liste_route_link"
@@ -58,35 +58,15 @@
               <!--                -->
 
               <!-- Buttons        -->
-              <li class="col-sm-7 nav-item">
+              <li class="col-sm-5 nav-item">
 
                 <div class="row justify-content-end">
-                  <div class="col mt-1">
-                    <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToSelfServiceStats()">Self-Service Stats</button>
-                  </div>
-
-                  <div class="col mt-1">
-                    <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToStats()">Standard Stats</button>
-                  </div>
-
-                  <div class="col mt-1"  v-if="$isRole('Super Admin')||$isRole('BU Manager')">
-                    <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToUsers()">Users</button>
-                  </div>
-
-                  <div class="col mt-1"  v-if="$isRole('Super Admin')">
-                    <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToDistricts()">Districts</button>
-                  </div>
-
-                  <div class="col mt-1"  v-if="$isRole('Super Admin')">
-                    <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToUsersPointings()">Pointings</button>
-                  </div>
-
                   <div class="col mt-1"  v-if="$isRole('Super Admin')||$isRole('BU Manager')">
                     <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="AddRouteImport()">New Import</button>
                   </div>
 
-                  <div class="col mt-1"  v-if="(route_import_existe)">
-                    <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToRouteTempo()">Suspended Import</button>
+                  <div class="col mt-1">
+                    <button v-if="(route_import_existe)" class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToRouteTempo()">Suspended Import</button>
                   </div>
                 </div>
 
@@ -111,23 +91,50 @@
                 </span>
 
                 <ul tabindex="-1" class="dropdown-menu dropdown-menu-right" id="profile_header_list">
-
-                    <!-- <li role="presentation" class="preview-item mt-1" @click="showProfile()">
-                        <span  role="button" class="dropdown-item">
-                          <i class="mdi mdi-account mr-2 text_primary"></i>
-                          Profile
+                    <li class="preview-item" @click="goToSelfServiceStats()">
+                        <span  role="button" class="dropdown-item py-1">
+                          <i class="mdi mdi-chart-bar mr-2 text_primary"></i>
+                          Self-Service Stats
                         </span>
-                    </li> -->
+                    </li>
 
-                    <li role="presentation" class="preview-item mt-1" @click="logOut()">
-                        <span  role="button" class="dropdown-item">
+                    <li class="preview-item" @click="goToStats()">
+                        <span  role="button" class="dropdown-item py-1">
+                          <i class="mdi mdi-chart-pie mr-2 text_primary"></i>
+                          Standard Stats
+                        </span>
+                    </li>
+
+                    <li v-if="$isRole('Super Admin')||$isRole('BU Manager')" class="preview-item" @click="goToUsers()">
+                        <span  role="button" class="dropdown-item py-1">
+                          <i class="mdi mdi-account-circle mr-2 text_primary"></i>
+                          Users
+                        </span>
+                    </li>
+
+                    <li v-if="$isRole('Super Admin')||$isRole('BU Manager')" class="preview-item" @click="goToDistricts()">
+                        <span  role="button" class="dropdown-item py-1">
+                          <i class="mdi mdi-map mr-2 text_primary"></i>
+                          Districts
+                        </span>
+                    </li>
+
+                    <li v-if="$isRole('Super Admin')" class="preview-item" @click="goToUsersPointings()">
+                        <span  role="button" class="dropdown-item py-1">
+                          <i class="mdi mdi-timer mr-2 text_primary"></i>
+                          Pointings
+                        </span>
+                    </li>
+
+                    <li class="preview-item" @click="logOut()">
+                        <span  role="button" class="dropdown-item py-1">
                           <i class="mdi mdi-logout mr-2 text_primary"></i>
                           Log Out
                         </span>
                     </li>
 
                     <li class="m-3 text-secondary">
-                        <span  role="button">
+                        <span>
                           software version : V2.1
                         </span>
                     </li>
@@ -215,7 +222,7 @@ export default {
 
         async getRouteTempo() {
 
-            this.$callApi("post",    "/route_import_tempo/last", null)
+            this.$callApi("post",    "/route-imports-tempo/last", null)
             .then((res)=> {
 
               if(res.data) {
@@ -227,8 +234,10 @@ export default {
 
         async fetchMaps() {
 
-            this.$callApi("post",    "/route_import/header", null)
+            this.$callApi("post",    "/route-imports", null)
             .then((res)=> {
+
+                console.log(res)
 
                 this.liste_route_import = res.data
 
@@ -267,7 +276,7 @@ export default {
         AddRouteImport() {
     
             // Go To Route
-            this.$router.push('/route/obs/route_import/add')
+            this.$router.push('/route/obs/route-imports/add')
         },
 
         //
@@ -293,7 +302,7 @@ export default {
         goToDistricts() {
 
             // Go To Route
-            this.$router.push('/districts/expected_clients')
+            this.$router.push('/districts/expected-clients')
         },
 
         goToUsersPointings() {
@@ -306,13 +315,13 @@ export default {
 
             if(this.route_link  !=  null) {
 
-              this.$goTo('/route/obs/route_import/'+this.route_link+'/details')
+              this.$goTo('/route/obs/route-imports/'+this.route_link+'/details')
             }
         },
 
         goToRouteTempo() {
 
-            this.$goTo('/route/obs/route_import_tempo')
+            this.$goTo('/route/obs/route-imports-tempo')
         },
 
         //
@@ -356,7 +365,7 @@ export default {
 
           if(response.success) {
 
-            this.$router.push('/route_import/'+this.getUser.id_route_import+'/clients/add/'+response.position.coords.latitude+'/'+response.position.coords.longitude)
+            this.$router.push('/route-imports/'+this.getUser.id_route_import+'/clients/add/'+response.position.coords.latitude+'/'+response.position.coords.longitude)
           }
 
           else {
@@ -370,13 +379,13 @@ export default {
 
           if(this.getUpdateClient) {
 
-            this.$router.push('/route_import/'+this.getUser.id_route_import+'/clients/'+this.getUpdateClient.id+'/update')
+            this.$router.push('/route-imports/'+this.getUser.id_route_import+'/clients/'+this.getUpdateClient.id+'/update')
           }
         },
 
         getClients() {
 
-          this.$router.push('/route_import/'+this.getUser.id_route_import+'/clients')
+          this.$router.push('/route-imports/'+this.getUser.id_route_import+'/clients')
         },
 
         //

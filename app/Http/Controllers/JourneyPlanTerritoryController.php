@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\JourneyPlan;
+use App\Models\JourneyPlanTerritory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class JourneyPlanController extends Controller
+class JourneyPlanTerritoryController extends Controller
 {
-    //
-
-    public function storeJourneyPlan(Request $request, int $id_route_import)
+    public function storeJourneyPlanTerritory(Request $request, int $id_route_import)
     {
 
         try {
@@ -21,7 +19,7 @@ class JourneyPlanController extends Controller
             //
 
             // validate
-            $validator    =   JourneyPlan::validateStore($request);
+            $validator    =   JourneyPlanTerritory::validateStore($request);
             
             if ($validator->fails()) {
                 return response()->json([
@@ -30,7 +28,7 @@ class JourneyPlanController extends Controller
             }
 
             // store 
-            JourneyPlan::storeJourneyPlan($request, $id_route_import);
+            JourneyPlanTerritory::storeJourneyPlanTerritory($request, $id_route_import);
 
             //
             DB::commit();
@@ -55,7 +53,7 @@ class JourneyPlanController extends Controller
 
     }
 
-    public function updateJourneyPlan(Request $request, int $id_route_import, int $id_journey_plan)
+    public function updateJourneyPlanTerritory(Request $request, int $id_route_import, int $id_journey_plan_territory)
     {
 
         try {
@@ -65,7 +63,7 @@ class JourneyPlanController extends Controller
             //
 
             // validate
-            $validator    =   JourneyPlan::validateUpdate($request);
+            $validator    =   JourneyPlanTerritory::validateUpdate($request);
             
             if ($validator->fails()) {
                 return response()->json([
@@ -74,7 +72,7 @@ class JourneyPlanController extends Controller
             }
 
             // update 
-            JourneyPlan::updateJourneyPlan($request, $id_route_import, $id_journey_plan);
+            JourneyPlanTerritory::updateJourneyPlanTerritory($request, $id_route_import, $id_journey_plan_territory);
 
             //
             DB::commit();
@@ -99,7 +97,7 @@ class JourneyPlanController extends Controller
 
     }
 
-    public function deleteJourneyPlan(Request $request, int $id_route_import, int $id_journey_plan)
+    public function deleteJourneyPlanTerritory(Request $request, int $id_route_import, int $id_journey_plan_territory)
     {
 
         try {
@@ -109,7 +107,7 @@ class JourneyPlanController extends Controller
             //
 
             // delete 
-            JourneyPlan::deleteJourneyPlan($id_journey_plan);
+            JourneyPlanTerritory::deleteJourneyPlanTerritory($id_journey_plan_territory);
 
             //
             DB::commit();
@@ -133,6 +131,4 @@ class JourneyPlanController extends Controller
         }
 
     }
-
-    //
 }

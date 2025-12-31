@@ -132,15 +132,15 @@ export default {
         ]),
 
         async addClient() {
-            this.$router.push('/route_import/'+this.getUser.id_route_import+'/clients/add')
+            this.$router.push('/route-imports/'+this.getUser.id_route_import+'/clients/add')
         },
 
         goToMap() {
-            this.$router.push('/route/frontoffice/obs/route_import/'+this.getUser.id_route_import+'/details')
+            this.$router.push('/route/frontoffice/obs/route-imports/'+this.getUser.id_route_import+'/details')
         },
 
         showClientsByStatus() {
-            this.$router.push('/route_import/'+this.getUser.id_route_import+'/clients/by_status')
+            this.$router.push('/route-imports/'+this.getUser.id_route_import+'/clients/by-status')
         },
 
         async showProfile() {

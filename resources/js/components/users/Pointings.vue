@@ -418,7 +418,7 @@ export default {
             //
             this.$showLoadingPage()
 
-            const res_1                     =   await this.$callApi("post",     "/route_import/combo"       ,   null)
+            const res_1                     =   await this.$callApi("post",     "/route-imports/combo"       ,   null)
             const res_2                     =   await this.$callApi("post",     "/users/combo/backoffice"   ,   null)
 
             console.log(res_1)

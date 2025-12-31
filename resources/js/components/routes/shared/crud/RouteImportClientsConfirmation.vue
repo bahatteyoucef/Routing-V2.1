@@ -515,7 +515,7 @@ export default {
                 }
             }
 
-            const res                   =   await this.$callApi("post"  ,   "/route_import/"+client.id_route_import+"/clients/"+client.id+"/update",   formData)
+            const res                   =   await this.$callApi("post"  ,   "/route-imports/"+client.id_route_import+"/clients/"+client.id+"/update",   formData)
             console.log(res)
 
             if(res.status===200){
@@ -606,10 +606,10 @@ export default {
 
         async getComboData() {
 
-            const res_1     =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/users/frontOffice"    ,   null)
-            const res_2     =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/districts"            ,   null)
-            const res_3     =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/cities"               ,   null)
-            const res_4     =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/salesmen"             ,   null)
+            const res_1     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/users/frontOffice"    ,   null)
+            const res_2     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/districts"            ,   null)
+            const res_3     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/cities"               ,   null)
+            const res_4     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/salesmen"             ,   null)
 
             this.users      =   res_1.data
             this.willayas   =   res_2.data
@@ -647,7 +647,7 @@ export default {
 
             for (let i = 0; i < this.cites.length; i++) {
 
-                if(this.cites[i].CITYNO  ==  CityNo) {
+                if(this.cites[i].CityNo  ==  CityNo) {
 
                     return this.cites[i].CityNameE
                 }                
@@ -685,7 +685,7 @@ export default {
                 if(this.selected_SuperficieMagasins !=  "") formData.append("selected_SuperficieMagasins"   ,   JSON.stringify(this.selected_SuperficieMagasins))
 
                 //
-                this.$callApi("post",   "/route_import/"+this.$route.params.id_route_import+"/clients",   formData)
+                this.$callApi("post",   "/route-imports/"+this.$route.params.id_route_import+"/clients",   formData)
                 .then(async (res)=> {
 
                     console.log(this.$route.params.id_route_import)

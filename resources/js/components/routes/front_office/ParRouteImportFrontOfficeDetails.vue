@@ -159,7 +159,7 @@ export default {
 
             if(this.is_database_clients_map) {
 
-                const res                   =   await this.$callApi("post"  ,   "/route/obs/route_import/"+this.$route.params.id_route_import+"/details/for_front_office",   null)
+                const res                   =   await this.$callApi("post"  ,   "/route/obs/route-imports/"+this.$route.params.id_route_import+"/details/for-front-office",   null)
                 console.log(res)
 
                 this.route_import           =   res.data.route_import
@@ -355,7 +355,7 @@ export default {
 
             if(newValue != null) {
                 
-                this.$router.push('/route_import/'+this.$route.params.id_route_import+'/clients/'+newValue.id+'/details')
+                this.$router.push('/route-imports/'+this.$route.params.id_route_import+'/clients/'+newValue.id+'/details')
             }
         },
     },

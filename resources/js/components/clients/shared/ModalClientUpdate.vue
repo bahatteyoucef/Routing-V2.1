@@ -279,7 +279,7 @@
                                     <div class="col-sm-6">
                                         <label for="CityNo"             class="form-label">Commune</label>
                                         <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo"                                 :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                            <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CityNameE}} ({{cite.CITYNO}})</option>
+                                            <option v-for="city in cities" :key="city.CityNo" :value="city.CityNo">{{city.CityNameE}} ({{city.CityNo}})</option>
                                         </select>
                                     </div>
                                 </div>
@@ -319,8 +319,12 @@
                                         <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude"  :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                     </div>
 
-                                    <div class="col-sm-4 mt-auto">
-                                        <button type="button" class="btn btn-primary w-100" @click="showPositionOnMapMultiMap('show_modal_client_update_map')"     :disabled="((!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice'))))||(check_gps_clicked))">Show Position <i class="mdi mdi-crosshairs-gps"></i></button>
+                                    <div class="col-sm-2 mt-auto">
+                                        <button type="button"           class="btn btn-primary w-100"   @click="getRvrsGeoAddress()"                                            :disabled="((!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice'))))||(check_gps_clicked))">Get RvrsAddress</button>
+                                    </div>
+
+                                    <div class="col-sm-2 mt-auto">
+                                        <button type="button"           class="btn btn-primary w-100"   @click="showPositionOnMapMultiMap('show_modal_client_update_map')"      :disabled="((!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice'))))||(check_gps_clicked))">Show Position <i class="mdi mdi-crosshairs-gps"></i></button>
                                     </div>
                                 </div>
 
@@ -576,7 +580,7 @@ export default {
                 owner_username                              :   ''
             },
 
-            cites                           :   []      ,
+            cities                           :   []      ,
 
             //
 
@@ -627,18 +631,11 @@ export default {
         //
 
         async sendData() {
-            // 1. Validation
-            const validation = this.validationQuestion();
-            if (!validation) {
-                this.$showErrors("Error !", ["Veuillez répondre en respectant les conditions des questions avant de valider !"]);
-                return;
-            }
-
             this.$showLoadingPage();
 
             // 2. Refresh Names
             if (this.willayas.length > 0) this.client.DistrictNameE = this.getDistrictNameE(this.client.DistrictNo);
-            if (this.cites.length > 0) this.client.CityNameE = this.getCityNameE(this.client.CityNo);
+            if (this.cities.length > 0) this.client.CityNameE = this.getCityNameE(this.client.CityNo);
 
             // 3. Prepare Payload based on Status
             let payload = {};
@@ -779,7 +776,7 @@ export default {
 
             // 6. Send Request
             try {
-                const res = await this.$callApi("post", `/route_import/${this.$route.params.id_route_import}/clients/${this.client.id}/update`, formData);
+                const res = await this.$callApi("post", `/route-imports/${this.$route.params.id_route_import}/clients/${this.client.id}/update`, formData);
 
                 if (res.status === 200) {
                     this.$hideLoadingPage();
@@ -802,7 +799,7 @@ export default {
 
             if(this.mode    ==  "permanent") {
 
-                const res                   =   await this.$callApi("post"  ,   "/route_import/"+this.id_route_import+"/clients/"+this.client.id+"/delete",   null)
+                const res                   =   await this.$callApi("post"  ,   "/route-imports/"+this.id_route_import+"/clients/"+this.client.id+"/delete",   null)
 
                 if(res.status===200){
 
@@ -840,7 +837,7 @@ export default {
 
                 if(this.mode    ==  "temporary") {
 
-                    const res                   =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.id_route_import_tempo+"/clients_tempo/"+this.client.id+"/delete",   null)
+                    const res                   =   await this.$callApi("post"  ,   "/route-imports-tempo/"+this.id_route_import_tempo+"/clients-tempo/"+this.client.id+"/delete",   null)
 
                     if(res.status===200){
 
@@ -1037,7 +1034,7 @@ export default {
 
                 this.users                                          =   []  ,
                 this.willayas                                       =   []  ,
-                this.cites                                          =   []  ,
+                this.cities                                          =   []  ,
 
                 this.all_clients                                    =   []  ,
                 this.close_clients                                  =   []
@@ -1049,12 +1046,12 @@ export default {
             //
             if(this.update_type ==  "validation") {
                 if(this.mode ==  "permanent") {
-                    const res           =   await this.$callApi("post", "/route_import/"+this.id_route_import+"/clients", null)
+                    const res           =   await this.$callApi("post", "/route-imports/"+this.id_route_import+"/clients", null)
                     this.all_clients    =   res.data.clients   
                 }
 
                 if(this.mode ==  "temporary") {
-                    const res           =   await this.$callApi("post", "/route_import_tempo/"+this.id_route_import_tempo+"/clients_tempo", null)
+                    const res           =   await this.$callApi("post", "/route-imports-tempo/"+this.id_route_import_tempo+"/clients-tempo", null)
                     this.all_clients    =   res.data   
                 }
             }
@@ -1165,7 +1162,7 @@ export default {
             }
 
             else {
-                const res_2     =   await this.$callApi("post"  ,   "/rtm_willayas"     ,   null)
+                const res_2     =   await this.$callApi("post"  ,   "/rtm-willayas"     ,   null)
                 this.willayas   =   res_2.data
             }
         },
@@ -1187,8 +1184,8 @@ export default {
             // Show Loading Page
             this.$showLoadingPage()
 
-            const res_3     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
-            this.cites      =   res_3.data
+            const res_3     =   await this.$callApi("post"  ,   "/rtm-willayas/"+this.client.DistrictNo+"/rtm-cities"         ,   null)
+            this.cities      =   res_3.data
 
             this.client.CityNo      =   ""
 
@@ -1211,11 +1208,11 @@ export default {
 
         getCityNameE(CityNo) {
 
-            for (let i = 0; i < this.cites.length; i++) {
+            for (let i = 0; i < this.cities.length; i++) {
 
-                if(this.cites[i].CITYNO  ==  CityNo) {
+                if(this.cities[i].CityNo  ==  CityNo) {
 
-                    return this.cites[i].CityNameE
+                    return this.cities[i].CityNameE
                 }                
             }
         },

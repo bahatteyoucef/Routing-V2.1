@@ -154,8 +154,8 @@
               <div>
                 <label for="CityNo" class="form-label fw-bold fst-italic text-decoration-underline">Commune</label>
                 <select class="form-select" id="CityNo" v-model="client.CityNo">
-                  <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">
-                    {{cite.CityNameE}} ({{cite.CITYNO}})
+                  <option v-for="city in cities" :key="city.CityNo" :value="city.CityNo">
+                    {{city.CityNameE}} ({{city.CityNo}})
                   </option>
                 </select>
               </div>
@@ -431,7 +431,7 @@ export default {
 
             // Configuration Options
             willayas: [],
-            cites: [],
+            cities: [],
             liste_type_client_options: [
                 'AG Self', 'AG Tradi', 'Superette', 'Gros Mix', 'Gros Sec', 
                 'Gros Frais', 'Demis Gros Mix', 'Demis Gros Sec', 'Demis Gros Frais', 
@@ -501,7 +501,7 @@ export default {
 
         async getComboData() {
 
-            const res_3                     =   await this.$callApi("post"  ,   "/route_import/"+this.$route.params.id_route_import+"/districts"         ,   null)
+            const res_3                     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/districts"         ,   null)
             this.willayas                   =   res_3.data
         },
 
@@ -935,13 +935,13 @@ export default {
             this.start_adding_date = moment(new Date()).format();
 
             try {
-                const res = await this.$callApi("post", "/route/obs/route_import/"+this.$route.params.id_route_import+"/details/for_front_office", null);
+                const res = await this.$callApi("post", "/route/obs/route-imports/"+this.$route.params.id_route_import+"/details/for-front-office", null);
                 console.log(res)
 
                 this.all_clients = res.data.route_import.data;
                 console.log(this.all_clients)
                 
-                const resCombo = await this.$callApi("post", "/route_import/"+this.$route.params.id_route_import+"/districts", null);
+                const resCombo = await this.$callApi("post", "/route-imports/"+this.$route.params.id_route_import+"/districts", null);
                 this.willayas = resCombo.data;
             } catch (e) {
                 console.error(e);
@@ -953,8 +953,8 @@ export default {
         async getCites() {
             this.$showLoadingPage();
             try {
-                const res = await this.$callApi("post", "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites", null);
-                this.cites = res.data;
+                const res = await this.$callApi("post", "/rtm-willayas/"+this.client.DistrictNo+"/rtm_cities", null);
+                this.cities = res.data;
                 this.client.CityNo = ""; // Reset city when district changes
             } finally {
                 this.$hideLoadingPage();
@@ -968,7 +968,7 @@ export default {
         },
 
         getCityNameE(CityNo) {
-            const item = this.cites.find(c => c.CITYNO == CityNo);
+            const item = this.cities.find(c => c.CityNo == CityNo);
             return item ? item.CityNameE : '';
         },
 
@@ -1096,7 +1096,7 @@ export default {
 
             // 5. Send
             try {
-                const url = `/route_import/${this.$route.params.id_route_import}/clients/store`;
+                const url = `/route-imports/${this.$route.params.id_route_import}/clients/store`;
                 const res = await this.$callApi("post", url, formData);
 
                 if (res.status === 200) {

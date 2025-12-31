@@ -10,9 +10,6 @@ use Throwable;
 
 class ClientTempoController extends Controller
 {
-
-    //
-
     public function clients(int $id_route_import_tempo) {
 
         try {
@@ -22,10 +19,6 @@ class ClientTempoController extends Controller
         }
 
         catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
 
             return response()->json([
                 'errors'    =>  [$erreur->getMessage()],
@@ -66,7 +59,7 @@ class ClientTempoController extends Controller
         }
     }
 
-    public function updateClient(Request $request, int $id_route_import_tempo, int $id) {
+    public function updateClient(Request $request, int $id_route_import_tempo, int $id_client_tempo) {
 
         try {
 
@@ -84,7 +77,7 @@ class ClientTempoController extends Controller
             }
 
             // store 
-            $client     =   ClientTempo::updateClient($request, $id_route_import_tempo, $id);
+            $client     =   ClientTempo::updateClient($request, $id_route_import_tempo, $id_client_tempo);
 
             //
             DB::commit();
@@ -109,7 +102,7 @@ class ClientTempoController extends Controller
         }
     }
 
-    public function deleteClient(int $id_route_import_tempo, int $id) {
+    public function deleteClient(int $id_route_import_tempo, int $id_client_tempo) {
 
         try {
 
@@ -118,7 +111,7 @@ class ClientTempoController extends Controller
             //
 
             // store 
-            ClientTempo::deleteClient($id_route_import_tempo, $id);
+            ClientTempo::deleteClient($id_route_import_tempo, $id_client_tempo);
 
             //
             DB::commit();
@@ -142,7 +135,9 @@ class ClientTempoController extends Controller
         }
     }
 
-    //
+    //  //  //  //  //
+    //  //  //  //  //
+    //  //  //  //  //
 
     public function updateResumeClients(Request $request) {
 
@@ -177,112 +172,37 @@ class ClientTempoController extends Controller
         }
     }
 
-    //
+    //  //  //  //  //
+    //  //  //  //  //
+    //  //  //  //  //
 
-    public function getDoublesClients(int $id_route_import_tempo) {
-
-        try {
-
-            $getDoublant    =   ClientTempo::getDoublesClients($id_route_import_tempo);
-
-            return $getDoublant;
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
+    public function getDoublesClients(Request $request, $id_route_import_tempo)
+    {
+        $data = ClientTempo::getDoublesClients($request, $id_route_import_tempo);        
+        return $data;
     }
 
-    public function getDoublesTelClients(int $id_route_import_tempo) {
-
-        try {
-
-            $getDoublant    =   ClientTempo::getDoublesTelClients($id_route_import_tempo);
-
-            return $getDoublant;
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
+    public function getDoublesTelClients(Request $request, $id_route_import_tempo)
+    {
+        $data = ClientTempo::findDuplicates($request, $id_route_import_tempo, 'Tel');
+        return $data;
     }
 
-    public function getDoublesCustomerCodeClients(int $id_route_import_tempo) {
-
-        try {
-
-            $getDoublant    =   ClientTempo::getDoublesCustomerCodeClients($id_route_import_tempo);
-
-            return $getDoublant;
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
+    public function getDoublesCustomerCodeClients(Request $request, $id_route_import_tempo)
+    {
+        $data = ClientTempo::findDuplicates($request, $id_route_import_tempo, 'CustomerCode');        
+        return $data;
     }
 
-    public function getDoublesCustomerNameEClients(int $id_route_import_tempo) {
-
-        try {
-
-            $getDoublant    =   ClientTempo::getDoublesCustomerNameEClients($id_route_import_tempo);
-
-            return $getDoublant;
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
+    public function getDoublesCustomerNameEClients(Request $request, $id_route_import_tempo)
+    {
+        $data = ClientTempo::findDuplicates($request, $id_route_import_tempo, 'CustomerNameE');        
+        return $data;
     }
 
-    public function getDoublesGPSClients(int $id_route_import_tempo) {
-
-        try {
-
-            $getDoublant    =   ClientTempo::getDoublesGPSClients($id_route_import_tempo);
-
-            return $getDoublant;
-        }
-
-        catch(Throwable $erreur) {
-
-            //
-            DB::rollBack();
-            //
-
-            return response()->json([
-                'errors'    =>  [$erreur->getMessage()],
-            ],422);
-        }
+    public function getDoublesGPSClients(Request $request, $id_route_import_tempo)
+    {
+        $data = ClientTempo::findDuplicates($request, $id_route_import_tempo, 'GPS'); 
+        return $data;
     }
-
-    //
 }

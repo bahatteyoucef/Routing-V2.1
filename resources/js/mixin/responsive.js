@@ -53,48 +53,5 @@ export default {
 
             //
         },
-
-        //
-
-        $showMapOptions() {
-
-            let map_top_buttons_parent_div                     =   document.getElementById("map_top_buttons_parent_div")
-            map_top_buttons_parent_div.classList.remove("animate__slideOutRight")
-            map_top_buttons_parent_div.classList.add("animate__slideInRight")
-
-            map_top_buttons_parent_div.style.display           =   "block" 
-            
-            //
-
-            let show_map_options_div            =   document.getElementById("show_map_options_div")
-            show_map_options_div.style.display  =   "none"
-
-            let hide_map_options_div            =   document.getElementById("hide_map_options_div")
-            hide_map_options_div.style.display  =   "block"
-
-            //
-        },
-
-        $hideMapOptions() {
-
-            let map_top_buttons_parent_div                  =   document.getElementById("map_top_buttons_parent_div")
-            map_top_buttons_parent_div.classList.remove("animate__slideInRight")
-            map_top_buttons_parent_div.classList.add("animate__slideOutRight")
-
-            setTimeout(()   =>  {
-
-                map_top_buttons_parent_div.style.display    =   "none" 
-            }, 555)
-
-            //
-
-            let hide_map_options_div            =   document.getElementById("hide_map_options_div")
-            hide_map_options_div.style.display  =   "none"
-
-            let show_map_options_div            =   document.getElementById("show_map_options_div")
-            show_map_options_div.style.display  =   "block"
-
-            //
-        }
     }
 }

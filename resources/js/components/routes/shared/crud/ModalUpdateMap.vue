@@ -70,7 +70,7 @@ export default {
             formData.append("data"                      ,   JSON.stringify(this.clients))
             formData.append("file"                      ,   this.route_import.file)
 
-            const res   =   await this.$callApi('post'    ,   '/route_import/'+this.id_route_import+'/update' ,   formData)         
+            const res   =   await this.$callApi('post'    ,   '/route-imports/'+this.id_route_import+'/update' ,   formData)         
             console.log(res)
 
             if(res.status===200){

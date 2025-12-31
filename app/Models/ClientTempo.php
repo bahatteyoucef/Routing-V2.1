@@ -23,22 +23,27 @@ class ClientTempo extends Model
     protected $primaryKey   = 'id';
     public    $timestamps   = false;
 
-    // Cast AvailableBrands to array when accessed via Eloquent attribute
+    //  //  //  //  //
+    //  //  //  //  //  Casts
+    //  //  //  //  //
+
     protected $casts = [
         'AvailableBrands' => 'array',
     ];
 
-    /**
-     * Relationship to owner user (for eager loading owner username)
-     */
+    //  //  //  //  //
+    //  //  //  //  //  Relationships
+    //  //  //  //  //
+
     public function ownerUser()
     {
         return $this->belongsTo(User::class, 'owner');
     }
 
-    /**
-     * Index: list clients tempo for given tempo id (with owner username and formatted brands)
-     */
+    //  //  //  //  //
+    //  //  //  //  //  Index
+    //  //  //  //  //
+
     public static function index(int $id_route_import_tempo)
     {
         $clients = self::where('id_route_import_tempo', $id_route_import_tempo)
@@ -54,10 +59,122 @@ class ClientTempo extends Model
         return $clients;
     }
 
-    /**
-     * Store clients (batch insert) for a given tempo id.
-     * Request 'data' can be a JSON string or array of objects.
-     */
+    public static function validateUpdate(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'NewCustomer'           =>  ["required", "max:255"],
+            'OpenCustomer'          =>  ["required", "max:255"],
+            'CustomerIdentifier'    =>  ["required", "max:255"],
+            'CustomerCode'          =>  ["required_if:OpenCustomer,Ouvert", "max:255", function ($attribute, $value, $fail) {
+                if (preg_match('/[\/\\\\:*?"<>|& ]/', $value)) {
+                    $fail("Le champ $attribute contient des caractères interdits.");
+                }
+            }],
+            'CustomerNameE'         =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+            'CustomerNameA'         =>  ["required", "max:255"],
+            'Tel'                   =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+            'Latitude'              =>  ["required", "max:255"],
+            'Longitude'             =>  ["required", "max:255"],
+            'Address'               =>  ["required", "max:255"],
+            'RvrsGeoAddress'        =>  ["required", "max:255"],
+            'DistrictNo'            =>  ["required", "max:255"],
+            'DistrictNameE'         =>  ["required", "max:255"],
+            'CityNo'                =>  ["required", "max:255"],
+            'CityNameE'             =>  ["required", "max:255"],
+            'CustomerType'          =>  ["required", "max:255"],
+            'status'                =>  ["required", "max:255"],
+            'Frequency'             =>  ["required", "max:255"],
+            'SuperficieMagasin'     =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+            'NbrAutomaticCheckouts' =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+        ]);
+
+        $validator->sometimes('nonvalidated_details',  ["required"] , function (Fluent $input) {
+            return $input->status == "nonvalidated";
+        });
+
+        $validator->sometimes(['AvailableBrands'],  ["required_if:OpenCustomer,Ouvert"] , function (Fluent $input) {
+            return $input->BrandAvailability == "";
+        });
+
+        $validator->sometimes(['CustomerBarCode_image'],  ["required_if:OpenCustomer,Ouvert"] , function (Fluent $input) {
+            return (($input->CustomerBarCode_image_original_name != "") && ($input->CustomerBarCode_image_updated == "true"));
+        });
+
+        $validator->sometimes(['facade_image'],  ["file"] , function (Fluent $input) {
+            return (($input->facade_image_original_name != "") && ($input->facade_image_updated == "true"));
+        });
+
+        $validator->sometimes(['in_store_image'],  ["required_if:OpenCustomer,Ouvert"] , function (Fluent $input) {
+            return (($input->in_store_image_original_name != "") && ($input->in_store_image_updated == "true"));
+        });
+
+        return $validator;
+    }
+
+    public static function updateClient(Request $request, int $id_route_import_tempo, int $id_client_tempo)
+    {
+        $client = self::find($id_client_tempo);
+        if (!$client) return null;
+
+        // Build AvailableBrands JSON
+        $brandsArray = $request->input('AvailableBrands');
+        if (!is_array($brandsArray)) {
+            $brandsArray = is_string($brandsArray) ? array_filter(array_map('trim', explode(',', $brandsArray)), fn($v) => $v !== '') : [];
+        }
+
+        $AvailableBrands = [];
+        foreach (array_values($brandsArray) as $index => $value) {
+            $AvailableBrands["brand_$index"] = $value;
+        }
+
+        // Mass assign simple fields (explicit list)
+        $fields = [
+            'NewCustomer', 'OpenCustomer', 'CustomerIdentifier', 'CustomerCode',
+            'Latitude', 'Longitude', 'Address', 'RvrsGeoAddress', 'DistrictNo', 'DistrictNameE',
+            'CityNo', 'CityNameE', 'Tel', 'CustomerType', 'Neighborhood',
+            'Landmark', 'BrandAvailability', 'BrandSourcePurchase', 'Frequency',
+            'SuperficieMagasin', 'NbrAutomaticCheckouts', 'comment', 'Journee',
+            'status', 'nonvalidated_details'
+        ];
+
+        foreach ($fields as $f) {
+            if ($request->has($f)) {
+                $client->{$f} = $request->get($f);
+            }
+        }
+
+        $client->CustomerNameE = mb_strtoupper($request->get('CustomerNameE') ?? '', 'UTF-8');
+        $client->CustomerNameA = mb_strtoupper($request->get('CustomerNameA') ?? '', 'UTF-8');
+        $client->JPlan = mb_strtoupper($request->input('JPlan') ?? '', 'UTF-8');
+
+        $client->AvailableBrands = json_encode($AvailableBrands, JSON_UNESCAPED_UNICODE);
+
+        if (Auth::user()->hasRole('FrontOffice')) {
+            $client->owner = Auth::user()->id;
+        } else {
+            $client->owner = $request->get('owner') ?? $client->owner;
+            $client->tel_status = $request->get('tel_status') ?? $client->tel_status;
+            $client->tel_comment = $request->get('tel_comment') ?? $client->tel_comment;
+        }
+
+        $client->save();
+
+        // Format brands for response
+        \App\Models\Client::appendFormattedBrands($client);
+
+        return $client;
+    }
+
+    public static function deleteClient(int $id_route_import_tempo, int $id_client_tempo)
+    {
+        $client = self::find($id_client_tempo);
+        if ($client) $client->delete();
+    }
+
+    //  //  //  //  //
+    //  //  //  //  //  Store/Delete Clients
+    //  //  //  //  //
+
     public static function storeClients(Request $request, int $id_route_import_tempo)
     {
         // Remove previous tempo clients for this user
@@ -164,130 +281,15 @@ class ClientTempo extends Model
         });
     }
 
-    /**
-     * Validate update rules (unchanged logic, returned as-is)
-     */
-    public static function validateUpdate(Request $request)
+    public static function deleteClients()
     {
-        $validator = Validator::make($request->all(), [
-            'NewCustomer'           =>  ["required", "max:255"],
-            'OpenCustomer'          =>  ["required", "max:255"],
-            'CustomerIdentifier'    =>  ["required", "max:255"],
-            'CustomerCode'          =>  ["required_if:OpenCustomer,Ouvert", "max:255", function ($attribute, $value, $fail) {
-                if (preg_match('/[\/\\\\:*?"<>|& ]/', $value)) {
-                    $fail("Le champ $attribute contient des caractères interdits.");
-                }
-            }],
-            'CustomerNameE'         =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
-            'CustomerNameA'         =>  ["required", "max:255"],
-            'Tel'                   =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
-            'Latitude'              =>  ["required", "max:255"],
-            'Longitude'             =>  ["required", "max:255"],
-            'Address'               =>  ["required", "max:255"],
-            'RvrsGeoAddress'        =>  ["required", "max:255"],
-            'DistrictNo'            =>  ["required", "max:255"],
-            'DistrictNameE'         =>  ["required", "max:255"],
-            'CityNo'                =>  ["required", "max:255"],
-            'CityNameE'             =>  ["required", "max:255"],
-            'CustomerType'          =>  ["required", "max:255"],
-            'status'                =>  ["required", "max:255"],
-            'Frequency'             =>  ["required", "max:255"],
-            'SuperficieMagasin'     =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
-            'NbrAutomaticCheckouts' =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
-        ]);
-
-        $validator->sometimes('nonvalidated_details',  ["required"] , function (Fluent $input) {
-            return $input->status == "nonvalidated";
-        });
-
-        $validator->sometimes(['AvailableBrands'],  ["required_if:OpenCustomer,Ouvert"] , function (Fluent $input) {
-            return $input->BrandAvailability == "";
-        });
-
-        $validator->sometimes(['CustomerBarCode_image'],  ["required_if:OpenCustomer,Ouvert"] , function (Fluent $input) {
-            return (($input->CustomerBarCode_image_original_name != "") && ($input->CustomerBarCode_image_updated == "true"));
-        });
-
-        $validator->sometimes(['facade_image'],  ["file"] , function (Fluent $input) {
-            return (($input->facade_image_original_name != "") && ($input->facade_image_updated == "true"));
-        });
-
-        $validator->sometimes(['in_store_image'],  ["required_if:OpenCustomer,Ouvert"] , function (Fluent $input) {
-            return (($input->in_store_image_original_name != "") && ($input->in_store_image_updated == "true"));
-        });
-
-        return $validator;
+        self::where('created_by', Auth::id())->delete();
     }
 
-    /**
-     * Update a single ClientTempo record
-     */
-    public static function updateClient(Request $request, int $id_route_import_tempo, int $id)
-    {
-        $client = self::find($id);
-        if (!$client) return null;
+    //  //  //  //  //
+    //  //  //  //  //  Update Resume
+    //  //  //  //  //
 
-        // Build AvailableBrands JSON
-        $brandsArray = $request->input('AvailableBrands');
-        if (!is_array($brandsArray)) {
-            $brandsArray = is_string($brandsArray) ? array_filter(array_map('trim', explode(',', $brandsArray)), fn($v) => $v !== '') : [];
-        }
-
-        $AvailableBrands = [];
-        foreach (array_values($brandsArray) as $index => $value) {
-            $AvailableBrands["brand_$index"] = $value;
-        }
-
-        // Mass assign simple fields (explicit list)
-        $fields = [
-            'NewCustomer', 'OpenCustomer', 'CustomerIdentifier', 'CustomerCode',
-            'Latitude', 'Longitude', 'Address', 'RvrsGeoAddress', 'DistrictNo', 'DistrictNameE',
-            'CityNo', 'CityNameE', 'Tel', 'CustomerType', 'Neighborhood',
-            'Landmark', 'BrandAvailability', 'BrandSourcePurchase', 'Frequency',
-            'SuperficieMagasin', 'NbrAutomaticCheckouts', 'comment', 'Journee',
-            'status', 'nonvalidated_details'
-        ];
-
-        foreach ($fields as $f) {
-            if ($request->has($f)) {
-                $client->{$f} = $request->get($f);
-            }
-        }
-
-        $client->CustomerNameE = mb_strtoupper($request->get('CustomerNameE') ?? '', 'UTF-8');
-        $client->CustomerNameA = mb_strtoupper($request->get('CustomerNameA') ?? '', 'UTF-8');
-        $client->JPlan = mb_strtoupper($request->input('JPlan') ?? '', 'UTF-8');
-
-        $client->AvailableBrands = json_encode($AvailableBrands, JSON_UNESCAPED_UNICODE);
-
-        if (Auth::user()->hasRole('FrontOffice')) {
-            $client->owner = Auth::user()->id;
-        } else {
-            $client->owner = $request->get('owner') ?? $client->owner;
-            $client->tel_status = $request->get('tel_status') ?? $client->tel_status;
-            $client->tel_comment = $request->get('tel_comment') ?? $client->tel_comment;
-        }
-
-        $client->save();
-
-        // Format brands for response
-        \App\Models\Client::appendFormattedBrands($client);
-
-        return $client;
-    }
-
-    /**
-     * Delete a single ClientTempo row
-     */
-    public static function deleteClient(int $id_route_import_tempo, int $id)
-    {
-        $client = self::find($id);
-        if ($client) $client->delete();
-    }
-
-    /**
-     * Update resume clients (batch upsert of JPlan/Journee by id)
-     */
     public static function updateResumeClients(Request $request)
     {
         $clients = $request->input('data');
@@ -313,111 +315,64 @@ class ClientTempo extends Model
         }
     }
 
-    /**
-     * Delete tempo clients for the current user
-     */
-    public static function deleteClients()
-    {
-        self::where('created_by', Auth::id())->delete();
+    //  //  //  //  //
+    //  //  //  //  //  Duplicates
+    //  //  //  //  //
+
+    public static function getDoublesClients(Request $request, int $id_route_import_tempo) {
+        return [
+            'getDoublantCustomerCode'  => self::findDuplicates($request, $id_route_import_tempo, 'CustomerCode'),
+            'getDoublantCustomerNameE' => self::findDuplicates($request, $id_route_import_tempo, 'CustomerNameE'),
+            'getDoublantTel'           => self::findDuplicates($request, $id_route_import_tempo, 'Tel'),
+            'getDoublantGPS'           => self::findDuplicates($request, $id_route_import_tempo, 'GPS'),
+        ];
     }
 
-    /**
-     * Get duplicates summary (wrapper)
-     */
-    public static function getDoublesClients(int $id_route_import_tempo)
-    {
-        $getDoublant = new stdClass();
-        $getDoublant->getDoublantCustomerCode = self::getDoublesCustomerCodeClients($id_route_import_tempo);
-        $getDoublant->getDoublantCustomerNameE = self::getDoublesCustomerNameEClients($id_route_import_tempo);
-        $getDoublant->getDoublantTel = self::getDoublesTelClients($id_route_import_tempo);
-        $getDoublant->getDoublantGPS = self::getDoublesGPSClients($id_route_import_tempo);
-        return $getDoublant;
-    }
+    //  //  //  //  //
+    //  //  //  //  //  Helpers
+    //  //  //  //  //
 
-    /**
-     * Helper: format AvailableBrands for a collection/array of stdClass rows
-     */
-    protected static function formatBrandsOnCollection($collection)
-    {
-        foreach ($collection as $row) {
-            \App\Models\Client::appendFormattedBrands($row);
+    public static function findDuplicates(Request $request, int $id_route_import_tempo, string $type) {
+        $startDate = Carbon::parse($request->get('start_date'))->format('Y-m-d');
+        $endDate = Carbon::parse($request->get('end_date'))->format('Y-m-d');
+
+        // 1. Define columns based on type
+        if ($type === 'GPS') {
+            $groupBy = ['Latitude', 'Longitude'];
+        } else {
+            $groupBy = [$type];
         }
-        return $collection;
-    }
 
-    /**
-     * Duplicate finders (optimized to use joinSub and reuse formatting)
-     */
-    public static function getDoublesCustomerCodeClients(int $id_route_import_tempo)
-    {
-        $duplicates = DB::table('clients_tempo')
-            ->select('CustomerCode')
+        // 2. Build the Subquery on the TEMPO table
+        $duplicatesSub = DB::table('clients_tempo')
+            ->select($groupBy)
             ->where('id_route_import_tempo', $id_route_import_tempo)
-            ->groupBy('CustomerCode')
+            // Note: If clients_tempo doesn't use 'status', you can remove the next line
+            // ->whereIn('status', ['validated', 'confirmed']) 
+            ->whereRaw("STR_TO_DATE(created_at, '%d %M %Y') BETWEEN ? AND ?", [$startDate, $endDate])
+            ->groupBy($groupBy)
             ->havingRaw('COUNT(*) > 1');
 
-        $clients = DB::table('clients_tempo as c')
-            ->joinSub($duplicates, 'd', function ($join) {
-                $join->on('c.CustomerCode', '=', 'd.CustomerCode');
+        // 3. Join the subquery on the TEMPO table
+        $query = DB::table('clients_tempo as c')
+            ->joinSub($duplicatesSub, 'd', function ($join) use ($type) {
+                if ($type === 'GPS') {
+                    $join->on('c.Latitude', '=', 'd.Latitude')
+                         ->on('c.Longitude', '=', 'd.Longitude');
+                } else {
+                    $join->on('c.'.$type, '=', 'd.'.$type);
+                }
             })
-            ->where('c.id_route_import_tempo', $id_route_import_tempo)
-            ->get();
+            ->where('c.id_route_import_tempo', $id_route_import_tempo);
 
-        return self::formatBrandsOnCollection($clients);
-    }
+        // Fetch results
+        $rows = $query->get();
 
-    public static function getDoublesCustomerNameEClients(int $id_route_import_tempo)
-    {
-        $duplicates = DB::table('clients_tempo')
-            ->select('CustomerNameE')
-            ->where('id_route_import_tempo', $id_route_import_tempo)
-            ->groupBy('CustomerNameE')
-            ->havingRaw('COUNT(*) > 1');
+        // 4. Format Brands
+        foreach ($rows as $client) {
+            self::appendFormattedBrands($client);
+        }
 
-        $clients = DB::table('clients_tempo as c')
-            ->joinSub($duplicates, 'd', function ($join) {
-                $join->on('c.CustomerNameE', '=', 'd.CustomerNameE');
-            })
-            ->where('c.id_route_import_tempo', $id_route_import_tempo)
-            ->get();
-
-        return self::formatBrandsOnCollection($clients);
-    }
-
-    public static function getDoublesTelClients(int $id_route_import_tempo)
-    {
-        $duplicates = DB::table('clients_tempo')
-            ->select('Tel')
-            ->where('id_route_import_tempo', $id_route_import_tempo)
-            ->groupBy('Tel')
-            ->havingRaw('COUNT(*) > 1');
-
-        $clients = DB::table('clients_tempo as c')
-            ->joinSub($duplicates, 'd', function ($join) {
-                $join->on('c.Tel', '=', 'd.Tel');
-            })
-            ->where('c.id_route_import_tempo', $id_route_import_tempo)
-            ->get();
-
-        return self::formatBrandsOnCollection($clients);
-    }
-
-    public static function getDoublesGPSClients(int $id_route_import_tempo)
-    {
-        $duplicates = DB::table('clients_tempo')
-            ->select('Latitude', 'Longitude')
-            ->where('id_route_import_tempo', $id_route_import_tempo)
-            ->groupBy('Latitude', 'Longitude')
-            ->havingRaw('COUNT(*) > 1');
-
-        $clients = DB::table('clients_tempo as c')
-            ->joinSub($duplicates, 'd', function ($join) {
-                $join->on('c.Latitude', '=', 'd.Latitude')
-                     ->on('c.Longitude', '=', 'd.Longitude');
-            })
-            ->where('c.id_route_import_tempo', $id_route_import_tempo)
-            ->get();
-
-        return self::formatBrandsOnCollection($clients);
+        return $rows;
     }
 }

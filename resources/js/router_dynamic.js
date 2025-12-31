@@ -51,12 +51,6 @@ const routes = [
         component   : () => import('./components/users/UserUpdate.vue')
     },
 
-    // UserUpdate Password
-    {
-        path        : "/users/:id_user/update/password",
-        component   : () => import('./components/users/changePassword.vue')
-    },
-
     // 
 
     // ClientsAdd

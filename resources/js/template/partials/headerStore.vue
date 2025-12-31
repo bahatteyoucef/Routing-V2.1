@@ -126,7 +126,7 @@ export default {
 
             if(this.getIsOnline) {
 
-                this.$router.push('/front_office')
+                this.$router.push('/front-office')
             }
         },
 
@@ -134,7 +134,7 @@ export default {
 
             if(this.getIsOnline) {
 
-                this.$router.push('/route_import/'+this.getUser.id_route_import+'/clients/add')
+                this.$router.push('/route-imports/'+this.getUser.id_route_import+'/clients/add')
             }
         },
 
@@ -142,22 +142,22 @@ export default {
 
             if(this.getIsOnline) {
 
-                this.$router.push('/route/frontoffice/obs/route_import/'+this.getUser.id_route_import+'/details')
+                this.$router.push('/route/frontoffice/obs/route-imports/'+this.getUser.id_route_import+'/details')
             }
         },
 
         showClientsByStatus() {
 
-            this.$router.push('/route_import/'+this.getUser.id_route_import+'/clients/by_status')
+            this.$router.push('/route-imports/'+this.getUser.id_route_import+'/clients/by-status')
         },
     },
 
     watch: {
         '$route.path': {
             handler(newPath) {
-                this.showAddButton = newPath !== "/front_office_role/surveys/add";
+                this.showAddButton = newPath !== "/front-office-role/surveys/add";
                 this.showHomeButton = true;
-                this.showSurveysButton = newPath !== "/front_office_role/surveys";
+                this.showSurveysButton = newPath !== "/front-office-role/surveys";
             },
             immediate: true
         }

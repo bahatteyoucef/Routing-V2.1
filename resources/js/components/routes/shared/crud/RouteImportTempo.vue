@@ -25,16 +25,16 @@
                         <input type="text"                      class="form-control"        id="libelle"        v-model="route_import.libelle"      disabled="disabled">
                     </div>
 
-                    <div class="col-sm-4">
+                    <!-- <div class="col-sm-4">
                         <label for="route_import_tempo_file"    class="form-label">File</label>
                         <input  type="file"                     class="form-control"        
                                                                 id="route_import_tempo_file"
                                                                 disabled="disabled"
                                                                 accept=".csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, 
                                                                         application/vnd.ms-excel">
-                    </div>
+                    </div> -->
 
-                    <div class="col-sm-4">
+                    <div class="col-sm-8">
                         <label for="districts"       class="form-label">districts</label>
                         <ul>
                             <li class="list-item" v-for="district in route_import.districts" :key="district">{{ district.DistrictNameE }} ({{ district.DistrictNo }})</li>
@@ -193,7 +193,7 @@ export default {
             this.$showLoadingPage()
 
             // Set Data
-            const res   = await this.$callApi('post' ,   '/route_import_tempo/last'    ,   null)         
+            const res   = await this.$callApi('post' ,   '/route-imports-tempo/last'    ,   null)         
             console.log(res)
 
             if(res.status===200){
@@ -228,7 +228,7 @@ export default {
             this.$showLoadingPage()
 
             const res_1         =   await this.$callApi("post"  ,   "/users/combo"      ,   null)
-            const res_2         =   await this.$callApi("post"  ,   "/rtm_willayas"     ,   null)
+            const res_2         =   await this.$callApi("post"  ,   "/rtm-willayas"     ,   null)
 
             this.users_all      =   res_1.data
             this.districts_all  =   res_2.data
@@ -243,7 +243,7 @@ export default {
             // Show Loading Page
             this.$showLoadingPage()
 
-            const res                   =   await this.$callApi("post"  ,   "/route_import_tempo/"+this.route_import.id_route_import_tempo+"/clients_tempo/doubles", null)
+            const res                   =   await this.$callApi("post"  ,   "/route-imports-tempo/"+this.route_import.id_route_import_tempo+"/clients-tempo/doubles", null)
             console.log(res)
 
             if(res.status===200){

@@ -21,12 +21,10 @@ class RouteImportTempo extends Model
     protected $primaryKey   = 'id';
     public    $timestamps   = false;
 
-    /**
-     * Return the last tempo for the authenticated user, including clients & districts.
-     *
-     * @return RouteImportTempo|null
-     * @throws Exception
-     */
+    //  //  //  //  //
+    //  //  //  //  //  Last Route Import Imported by Auth user
+    //  //  //  //  //
+
     public static function lastTempo()
     {
         $user = Auth::user();
@@ -52,29 +50,20 @@ class RouteImportTempo extends Model
         return $last;
     }
 
-    /**
-     * Validate incoming request for store.
-     *
-     * @param Request $request
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
+    //  //  //  //  //
+    //  //  //  //  //  Store Route Import Tempo
+    //  //  //  //  //
+
     public static function validateStore(Request $request)
     {
         return Validator::make($request->all(), [
             'libelle'   => ['required', 'max:255'],
             'data'      => ['required', 'json'],
             'districts' => ['required'], // accept JSON/array, validated further below
-            'file'      => ['required', 'file', 'mimetypes:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/octet-stream'],
+            // 'file'      => ['required', 'file', 'mimetypes:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/octet-stream'],
         ]);
     }
 
-    /**
-     * Create a new route import tempo, save the uploaded file, districts and client data.
-     *
-     * @param Request $request
-     * @return self
-     * @throws Exception
-     */
     public static function storeRouteImportTempo(Request $request)
     {
         $user = Auth::user();
@@ -149,17 +138,17 @@ class RouteImportTempo extends Model
             }
 
             // Save uploaded file (ensure destination dir)
-            $uploaded = $request->file('file');
-            $userDir = public_path('uploads/route_import_tempo/' . $user->id);
-            if (! File::isDirectory($userDir)) {
-                File::makeDirectory($userDir, 0755, true);
-            }
+            // $uploaded = $request->file('file');
+            // $userDir = public_path('uploads/route_import_tempo/' . $user->id);
+            // if (! File::isDirectory($userDir)) {
+            //     File::makeDirectory($userDir, 0755, true);
+            // }
 
-            $fileName = uniqid() . '.' . $uploaded->getClientOriginalExtension();
-            $uploaded->move($userDir, $fileName);
+            // $fileName = uniqid() . '.' . $uploaded->getClientOriginalExtension();
+            // $uploaded->move($userDir, $fileName);
 
-            $routeImportTempo->file = $fileName;
-            $routeImportTempo->file_original_name = $uploaded->getClientOriginalName();
+            // $routeImportTempo->file                 = $fileName;
+            // $routeImportTempo->file_original_name   = $uploaded->getClientOriginalName();
             $routeImportTempo->save();
 
             // Ensure clients payload (data) passed properly to ClientTempo::storeClients
@@ -172,9 +161,6 @@ class RouteImportTempo extends Model
         return $routeImportTempo;
     }
 
-    /**
-     * Delete all tempo records for current user and remove uploaded files/directory.
-     */
     public static function deleteRouteImportTempo()
     {
         $user = Auth::user();
@@ -193,16 +179,13 @@ class RouteImportTempo extends Model
         // }
     }
 
-    /**
-     * Store data (delegate to ClientTempo)
-     *
-     * @param Request $request
-     * @param int $id
-     * @return void
-     */
-    public static function storeData(Request $request, int $id)
+    //  //  //  //  //
+    //  //  //  //  //  Store Route Import Tempo Clients
+    //  //  //  //  //
+
+    public static function storeData(Request $request, int $id_route_import_tempo)
     {
         // Delegate to ClientTempo (ClientTempo::storeClients handles data normalization)
-        ClientTempo::storeClients($request, $id);
+        ClientTempo::storeClients($request, $id_route_import_tempo);
     }
 }

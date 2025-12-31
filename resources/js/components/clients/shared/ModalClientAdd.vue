@@ -281,7 +281,7 @@
                                     <div class="col-sm-6">
                                         <label for="CityNo"             class="form-label">Commune</label>
                                         <select                         class="form-select"         id="CityNo"                 v-model="client.CityNo">
-                                            <option v-for="cite in cites" :key="cite.CITYNO" :value="cite.CITYNO">{{cite.CityNameE}} ({{cite.CITYNO}})</option>
+                                            <option v-for="city in cities" :key="city.CityNo" :value="city.CityNo">{{city.CityNameE}} ({{city.CityNo}})</option>
                                         </select>
                                     </div>
                                 </div>
@@ -321,8 +321,12 @@
                                         <input type="text"              class="form-control"        id="Longitude"              v-model="client.Longitude">
                                     </div>
 
-                                    <div class="col-sm-4 mt-auto">
-                                        <button type="button" class="btn btn-primary w-100" @click="showPositionOnMapMultiMap('show_modal_client_add_map')"     :disabled="((!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice'))))||(check_gps_clicked))">Show Position <i class="mdi mdi-crosshairs-gps"></i></button>
+                                    <div class="col-sm-2 mt-auto">
+                                        <button type="button"           class="btn btn-primary w-100"   @click="getRvrsGeoAddress()"                                            :disabled="((!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice'))))||(check_gps_clicked))">Get RvrsAddress</button>
+                                    </div>
+
+                                    <div class="col-sm-2 mt-auto">
+                                        <button type="button"           class="btn btn-primary w-100"   @click="showPositionOnMapMultiMap('show_modal_client_add_map')"         :disabled="((!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice'))))||(check_gps_clicked))">Show Position <i class="mdi mdi-crosshairs-gps"></i></button>
                                     </div>
                                 </div>
 
@@ -578,7 +582,7 @@ export default {
 
             users                           :   []      ,
             willayas                        :   []      ,
-            cites                           :   []      ,
+            cities                           :   []      ,
 
             // 
             liste_journey_plan              :   []      ,
@@ -709,7 +713,7 @@ export default {
             formData.append("finish_adding_date"                    ,   this.client.finish_adding_date)
 
             //
-            const res   =   await this.$callApi("post"  ,   "/route_import/"+this.id_route_import+"/clients/store",   formData)
+            const res   =   await this.$callApi("post"  ,   "/route-imports/"+this.id_route_import+"/clients/store",   formData)
             console.log(res.data)
 
             if(res.status===200){
@@ -900,7 +904,7 @@ export default {
 
                 this.users                                          =   []  
                 this.willayas                                       =   []
-                this.cites                                          =   []
+                this.cities                                          =   []
 
                 this.liste_journey_plan                             =   []  
                 this.liste_journee                                  =   []  
@@ -974,8 +978,8 @@ export default {
             // Show Loading Page
             this.$showLoadingPage()
 
-            const res_1                     =   await this.$callApi("post"  ,   "/rtm_willayas/"+this.client.DistrictNo+"/rtm_cites"         ,   null)
-            this.cites                      =   res_1.data
+            const res_1                     =   await this.$callApi("post"  ,   "/rtm-willayas/"+this.client.DistrictNo+"/rtm-cities"         ,   null)
+            this.cities                      =   res_1.data
 
             this.client.CityNo              =   ""
 
@@ -998,11 +1002,11 @@ export default {
 
         getCityNameE(CityNo) {
 
-            for (let i = 0; i < this.cites.length; i++) {
+            for (let i = 0; i < this.cities.length; i++) {
 
-                if(this.cites[i].CITYNO  ==  CityNo) {
+                if(this.cities[i].CityNo  ==  CityNo) {
 
-                    return this.cites[i].CityNameE
+                    return this.cities[i].CityNameE
                 }                
             }
         },
