@@ -183,8 +183,11 @@ class DataTableHelper {
                     paginate: {
                         first:    'First',
                         previous: 'Previous',
-                        next:     'Next',
-                        last:     'Last'
+                        // next:     'Next',
+                        // last:     'Last',
+
+                        next:     '<i class="fa fa-chevron-right" aria-hidden="true"></i>',
+                        previous: '<i class="fa fa-chevron-left" aria-hidden="true"></i>'
                     }
                 };
     }

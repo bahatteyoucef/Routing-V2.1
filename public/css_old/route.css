@@ -4,16 +4,17 @@
   --toggle-width: 140px;
   --toggle-height: 35px;
   --toggle-knob-width: 70px;
-  --map-top-left: 50%;
+  --map-top-left: 48%;
   --map-top-z: 999;
   --map-options-width: 14%;
   --map-options-panel-width: 15%;
+  --map-button-left-mobile: 31%;
   --map-show-bottom: 3%;
   --map-hide-bottom: 62%;
 }
 
 /* Sidebar fixed for tablet+ */
-@media only screen and (min-width: 992px) {
+@media only screen and (min-device-width: 768px) {
   #sidebar_route {
     position: fixed;
     overflow-x: hidden;
@@ -54,13 +55,31 @@
 }
 
 /* show/hide controls */
-#show_datatable_route_import_obs_clients_div { position: absolute; width:100%; text-align: center; bottom: var(--map-show-bottom); z-index: var(--map-z); }
-#hide_datatable_route_import_obs_clients_div { position: absolute; width:100%; text-align: center; bottom: var(--map-hide-bottom); z-index: var(--map-z); }
+#show_datatable_route_import_obs_clients_div { position: absolute; bottom: var(--map-show-bottom); left: 50%; z-index: var(--map-z); }
+#hide_datatable_route_import_obs_clients_div { position: absolute; bottom: var(--map-hide-bottom); left: 50%; z-index: var(--map-z); }
+
+/* Top-right map controls */
+/* .map_top_buttons_parent_div {
+  position: fixed;
+  top: 75px;
+  right: 1cqh;
+  z-index: var(--map-top-z);
+  width: var(--map-options-width);
+} */
 
 .map_top_infos_div { z-index: var(--map-top-z); }
 .map_top_infos_div td, .map_top_infos_div th { font-size: 13px; color: #fff; }
 
+/* Animated leaflet paths */
+/* path.leaflet-interactive.animate {
+  stroke-dasharray: 1920;
+  stroke-dashoffset: 1920;
+  animation: dash 20s linear 3s forwards;
+}
+@keyframes dash { to { stroke-dashoffset: 0; } } */
+
 /* Routing UI, top spacing */
+/* .leaflet-routing-container { display: none; } */
 .leaflet-top { margin-top: 15px; }
 
 /* Marker interactions */
@@ -91,7 +110,7 @@
 
 /* Toggle / show-hide controls (grouped for #toggle_div & #show_hide_values_toggle_div) */
 :is(#toggle_div, #show_hide_values_toggle_div) { position: relative; }
-#map_top_middle_options_div { position: absolute; left: var(--map-top-left); transform: translateX(-50%); z-index: var(--map-z); margin-top: 15px; }
+#map_top_middle_options_div { position: absolute; left: var(--map-top-left); z-index: var(--map-z); margin-top: 15px; }
 
 /* button container / icons / labels */
 :is(#toggle_div, #show_hide_values_toggle_div) div.btn-container {
@@ -201,13 +220,16 @@
 :is(#toggle_div, #show_hide_values_toggle_div) .dark-preview p.by a { color: #777; }
 :is(#toggle_div, #show_hide_values_toggle_div) .white-preview p.by a { color: #000; }
 
+/* fixed position show-position btn */
+/* #show_position_button { position: fixed; top: 75px; right: 7px; } */
+
 /* tweak when showing map: reduce top margin of leaflet UI */
 #show_map .leaflet-top { margin-top: 5px !important; }
 
 /* small screens: move position button & adjust top-middle options */
-@media only screen and (max-width: 991px) {
+@media only screen and (max-device-width: 650px) {
   /* #show_position_button { top: 10px; right: 7px; } */
-  #map_top_middle_options_div { transform: translateX(-50%); margin-top: 15px; }
+  #map_top_middle_options_div { left: var(--map-button-left-mobile); margin-top: 15px; }
   .leaflet-top { margin-top: 5px; }
 }
 

@@ -48,7 +48,7 @@
         </div>
 
         <RecycleScroller
-            class="row mt-2"
+            class="row mt-2 pb-5"
             style="height: 80vh;"
             :items="clients_filtered"
             :item-size="itemHeight + gap" 
@@ -60,13 +60,13 @@
                 <ul class="list-group" style="margin-bottom: 0;">
                     <li
                         @click="getDetailsPage(item)"
-                        class="list-group-item shadow border-0"
+                        class="list-group-item shadow border-0 py-1"
                         role="button"
                         :style="{ height: itemHeight + 'px' }" 
                     >
-                    <div class="media align-items-lg-center flex-column flex-lg-row p-1" style="height: 100%; overflow: hidden;">
+                    <div class="media align-items-lg-center flex-column flex-lg-row" style="height: 100%; overflow: hidden;">
                             <div class="media-body order-2 order-lg-1 w-100">
-                                <h6 class="mt-0 font-weight-bold mb-2">{{ item.CustomerNameA }} ({{ item.CustomerNameE }})</h6>
+                                <span class="mt-0 font-weight-bold mb-2">{{ item.CustomerNameA }} ({{ item.CustomerNameE }})</span>
                                 <p class="font-italic text-muted mb-0 small">{{ item.Address }} - {{ item.CityNameE }}</p>
 
                                 <div>

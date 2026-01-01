@@ -8,12 +8,30 @@
   --gradient: linear-gradient(90deg, var(--primary), var(--primary));
 }
 
+/* ---------- Color utilities ---------- */
+/* .text_light_green   { color: #1BCFB4 !important; } */
+/* .bg_light_green     { background-color: #1BCFB4 !important; } */
+
+/* .text_light_purple  { color: #B66DFF !important; } */
+/* .bg_light_purple    { background-color: #B66DFF !important; } */
+
+/* .text_light_yellow  { color: #FED713 !important; } */
+/* .bg_light_yellow    { background-color: #FED713 !important; } */
+
+/* .text_light_red     { color: #FE7C96 !important; } */
+/* .bg_light_red       { background-color: #FE7C96 !important; } */
+
+/* .text_light_blue    { color: #198AE3 !important; } */
+/* .bg_light_blue      { background-color: #198AE3 !important; } */
+
 .text_primary, .text_primary * { color: var(--primary) !important; } /* kept previous behavior */
+/* .bg_primary         { background-color: var(--primary) !important; } */
 
 .active_item        { color: var(--primary) !important; }
 
 /* ---------- Small layout / form tweaks ---------- */
 p { line-height: 1rem; }
+.card { padding: 20px; }
 .form-group input { margin-bottom: 20px; }
 
 /* image absolute (unchanged intent) */
@@ -77,6 +95,14 @@ p { line-height: 1rem; }
 .btn-primary span { position: relative; z-index: 1; }
 .btn-primary i { color: inherit; }
 
+/* ---------- Form-check primary border color ---------- */
+/* .form-check-primary.form-check label input[type=checkbox] + .input-helper:before,
+.form-check-primary.form-check label input[type=radio]  + .input-helper:before {
+  border-color: var(--primary) !important;
+} */
+
+/* checkbox/radio checked backgrounds use gradient -- reused via grouped rule above */
+
 /* ---------- Navbar profile image ---------- */
 .navbar .navbar-menu-wrapper .navbar-nav .nav-item.nav-profile .nav-link .nav-profile-img img {
   border-radius: 0% !important;
@@ -114,12 +140,6 @@ html, * {
 
 /*  */
 
-/* @media (min-width: 1200px) { */
 @media (min-width: 992px) {
   .modal-xl { --bs-modal-width: 91% !important; }
-}
-
-/* Force the nav items to stay in a row without wrapping */
-.navbar-nav-right.row {
-    flex-wrap: nowrap !important;
 }

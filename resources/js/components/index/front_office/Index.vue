@@ -3,8 +3,8 @@
         <section class="dashboard mt-4">
             <!-- Header Options -->
             <div class="container">
-                <div class="row justify-content-start h-100 mt-2">
-                    <div class="col-sm-10 d-flex align-items-center">
+                <div class="row justify-content-center h-100 align-items-stretch">
+                    <div class="col-10 p-0">
                         <i
                             class="mdi mdi-dice-1 mr-1 ml-1 fw-bold"
                             style="color: #2c78bd"
@@ -14,9 +14,9 @@
                 </div>
 
                 <!-- Index Options -->
-                <div class="row justify-content-center h-100 mt-4 align-items-stretch">
+                <div class="row justify-content-center h-100 mt-3 align-items-stretch">
                     <div
-                        class="card col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
+                        class="card p-3 col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
                         @click="addClient()"
                     >
                         <div class="text-center" style="height: 50px">
@@ -32,7 +32,7 @@
                     </div>
 
                     <div
-                        class="card col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
+                        class="card p-3 col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
                         @click="showProfile()"
                     >
                         <div class="text-center" style="height: 50px">
@@ -48,7 +48,7 @@
                     </div>
 
                     <div
-                        class="card col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
+                        class="card p-3 col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
                         @click="goToMap()"
                     >
                         <div class="text-center" style="height: 50px">
@@ -64,7 +64,7 @@
                     </div>
 
                     <div
-                        class="card col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
+                        class="card p-3 col-5 m-1 shadow-sm rounded min_card_height text-center h-100"
                         @click="showClientsByStatus()"
                     >
                         <div class="text-center" style="height: 50px">
@@ -80,7 +80,7 @@
                     </div>
 
                     <div
-                        class="card col-10 m-1 shadow-sm rounded min_card_height text-center h-100"
+                        class="card p-3 col-10 m-1 shadow-sm rounded min_card_height text-center h-100"
                         @click="logOut()"
                     >
                         <div class="text-center" style="height: 50px">

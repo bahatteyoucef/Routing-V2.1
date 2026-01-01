@@ -22,6 +22,16 @@
   z-index: -1; /* sits behind the content */
 }
 
+/* simple fade transition classes (Vue-like naming) */
+/* .login_page .fade-enter-active,
+.login_page .fade-leave-active {
+  transition: opacity var(--login-fade-time) ease;
+} */
+/* .login_page .fade-enter,
+.login_page .fade-leave-to {
+  opacity: 0;
+} */
+
 /* headings */
 .login_page h1 {
   margin: 0 0 1.5rem; /* keeps top margin predictable */

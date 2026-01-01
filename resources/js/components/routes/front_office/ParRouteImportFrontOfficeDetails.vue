@@ -131,7 +131,7 @@ export default {
         this.map_instance               =   new Map()
 
         //
-        const pattern                   =   /^\/route\/frontoffice\/obs\/route_import\/\d+\/details$/;
+        const pattern                   =   /^\/route\/frontoffice\/obs\/route-imports\/\d+\/details$/;
         this.is_database_clients_map    =   pattern.test(this.$route.path);
 
         // add Map

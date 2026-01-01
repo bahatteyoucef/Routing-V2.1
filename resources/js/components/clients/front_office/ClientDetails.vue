@@ -5,7 +5,7 @@
                 <img id="facade_image_display" :src="'/uploads/clients/'+client.id+'/'+client.facade_image"     class="card-img-top">
             </div>
 
-            <div class="card-body" style="height: 35%; overflow-y: auto;">
+            <div class="card-body px-1" style="height: 35%; overflow-y: auto;">
                 <h5 class="card-title fw-bold text-center text-decoration-underline">{{ client.CustomerCode }} ({{ client.status }})</h5>
                 <div>
                     <div class="d-flex flex-row justify-content-center gap-2">
@@ -112,43 +112,45 @@ export default {
 
             const res                   =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/clients/"+this.$route.params.id_client+"/show" ,   null)
 
-            this.client.id                              =   res.data.id
+            let client                  =   res.data.client
 
-            this.client.NewCustomer                     =   res.data.NewCustomer   
+            this.client.id                              =   client.id
 
-            this.client.OpenCustomer                    =   res.data.OpenCustomer
+            this.client.NewCustomer                     =   client.NewCustomer   
 
-            this.client.CustomerCode                    =   res.data.CustomerCode
+            this.client.OpenCustomer                    =   client.OpenCustomer
 
-            this.client.CustomerNameE                   =   res.data.CustomerNameE
-            this.client.CustomerNameA                   =   res.data.CustomerNameA                              
+            this.client.CustomerCode                    =   client.CustomerCode
 
-            this.client.RegionNo                        =   res.data.RegionNo
-            this.client.DistrictNo                      =   res.data.DistrictNo
-            this.client.CityNo                          =   res.data.CityNo
-            this.client.Address                         =   res.data.Address
-            this.client.RvrsGeoAddress                  =   res.data.RvrsGeoAddress
+            this.client.CustomerNameE                   =   client.CustomerNameE
+            this.client.CustomerNameA                   =   client.CustomerNameA                              
 
-            this.client.AddressA                        =   res.data.AddressA                 
-            this.client.CityNameE                       =   res.data.CityNameE
-            this.client.DistrictNameE                   =   res.data.DistrictNameE
+            this.client.RegionNo                        =   client.RegionNo
+            this.client.DistrictNo                      =   client.DistrictNo
+            this.client.CityNo                          =   client.CityNo
+            this.client.Address                         =   client.Address
+            this.client.RvrsGeoAddress                  =   client.RvrsGeoAddress
 
-            this.client.Tel                             =   res.data.Tel
+            this.client.AddressA                        =   client.AddressA                 
+            this.client.CityNameE                       =   client.CityNameE
+            this.client.DistrictNameE                   =   client.DistrictNameE
 
-            this.client.CustomerType                    =   res.data.CustomerType
-            this.client.status                          =   res.data.status
+            this.client.Tel                             =   client.Tel
 
-            this.client.Latitude                        =   res.data.Latitude
-            this.client.Longitude                       =   res.data.Longitude
+            this.client.CustomerType                    =   client.CustomerType
+            this.client.status                          =   client.status
 
-            this.client.JPlan                           =   res.data.JPlan
-            this.client.Journee                         =   res.data.Journee
+            this.client.Latitude                        =   client.Latitude
+            this.client.Longitude                       =   client.Longitude
 
-            this.client.facade_image_original_name      =   res.data.facade_image_original_name
-            this.client.in_store_image_original_name    =   res.data.in_store_image_original_name
+            this.client.JPlan                           =   client.JPlan
+            this.client.Journee                         =   client.Journee
 
-            this.client.facade_image                    =   res.data.facade_image
-            this.client.in_store_image                  =   res.data.in_store_image
+            this.client.facade_image_original_name      =   client.facade_image_original_name
+            this.client.in_store_image_original_name    =   client.in_store_image_original_name
+
+            this.client.facade_image                    =   client.facade_image
+            this.client.in_store_image                  =   client.in_store_image
 
             //
             if(this.client.status != 'validated') {

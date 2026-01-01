@@ -76,9 +76,6 @@ Route::middleware(['auth:api', 'isEnabledUser'])->group(function () {
     // Pointings
     Route::post('/users/pointings'                                                                      ,   [UserController::class                  , 'pointings'                               ])->middleware('BUManager');
 
-    // is Auth
-    Route::post('/users'                                                                                ,   function() { return Auth::user();                                                   })->middleware('Viewer');
-
     //  //  //  //  //
     //  //  //  //  //  Route Imports
     //  //  //  //  //

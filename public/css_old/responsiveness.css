@@ -1,32 +1,22 @@
-/* small helpers */
-:root {
-  --mobile-mini-logo-size: 35px;
-  --mobile-padding-left-main: 10px;
-  --map-button-left: 45%;
-  --map-button-bottom: 62%;
-}
-
 @media screen and (max-width:991px) {
+  /* small helpers */
+  :root {
+    --mobile-mini-logo-size: 35px;
+    --mobile-padding-left-main: 10px;
+    --map-button-left: 45%;
+    --map-button-bottom: 53%;
+  }
+
   #main_content {
     min-height: calc(100vh - 60px); /* 60px = header height */
     margin-top: 0;
-    /* transition: margin 0.3s ease-in-out; */
-  }
-
-  #header_menu {
-    display: inline-block;
-    box-sizing: border-box;
-    pointer-events: auto;
+    transition: margin 0.3s ease-in-out;
   }
 
   /* Let the card expand to fill available space */
   #main_content .card.h-100 {
     flex: 1 1 auto;            /* grow and shrink as needed */
     min-height: 0;             /* prevents overflow in some browsers */
-  }
-
-  #main_content.header-open {
-    margin-top: 205px;
   }
 
   /* logo / header */
@@ -48,19 +38,45 @@
 
   /* header menu */
   #header_menu_buttons_div { display: block !important; margin-top: 21px !important; }
-  /* #header_menu { width: 100%; display: none; } */
+  #header_menu { width: 100%; display: none; }
 
   /* modal */
   .modal { height: 90% !important; }
 
   /* Map / floating controls — grouped to avoid repetition */
-  /* #show_datatable_route_import_obs_clients_div {
+  #show_datatable_route_import_obs_clients_div {
+    left: var(--map-button-left);
+    /* bottom commented out in original — leaving omitted */
+  }
+
+  /* #show_route_datatable_icon_div {
     left: var(--map-button-left);
   } */
 
-  /* #hide_datatable_route_import_obs_clients_div {
+  #hide_datatable_route_import_obs_clients_div {
+    bottom: var(--map-button-bottom);
+    /* left commented out in original — leaving omitted */
+  }
+
+  /* #hide_route_datatable_icon_div {
     bottom: var(--map-button-bottom);
   } */
+
+  /* top map buttons layout */
+  /* .map_top_buttons_parent_div {
+    display: block;
+    width: 100%;
+    left: 0;
+    top: 64px;
+    padding: 15px 0;
+  } */
+
+  /* .map_top_buttons_div {
+    width: 95%;
+    margin: 0 auto;
+  } */
+
+  /* #map_options_buttons_div { display: block !important; } */
 
   /* brand / navbar compacting */
   .navbar.default-layout-navbar .navbar-brand-wrapper .navbar-brand { width: 20%; }

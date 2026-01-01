@@ -28,6 +28,17 @@
 
 .primary_color { color: var(--primary) !important; }
 
+/* .border_primary { border: none !important; outline: none !important; } */
+
+/* .display_none { display: none !important; } */
+
+/* .clickable_table tr { cursor: pointer; } */
+
+/* Generic horizontal/axis scroll helpers */
+/* .horizontal_scroll,
+.chart_scroll,
+.table_scroll_x { overflow-x: auto; } */
+
 .table_scroll_y { overflow-y: auto; max-height: 500px; }
 
 /* ---------- Loading / screens ---------- */
@@ -48,11 +59,79 @@
   background: var(--overlay);
 }
 
+/* Centered single-line screens (shared) */
+/* .center-screen {
+  position: fixed;
+  width: 100%;
+  margin: auto;
+  left: 0;
+  right: 0;
+  text-align: center;
+} */
+/* .center_screen_loading_screen  { top: 45%; } */
+/* .center_screen_internet_error_screen { top: 30%; } */
+
+/* ---------- Circular progress ---------- */
+/* .circular-progress {
+  position: relative;
+  height: 250px;
+  width: 250px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+} */
+
+/* .circular-progress::before {
+  content: "";
+  position: absolute;
+  height: 210px;
+  width: 210px;
+  border-radius: 50%;
+  background-color: var(--light);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+} */
+
+/* .progress-value {
+  position: relative;
+  font-size: 40px;
+  font-weight: 600;
+  color: var(--primary);
+} */
+
+/* ---------- Pagination / modal ---------- */
+/* .page-item.active .page-link {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+} */
+
+/* ---------- Icons / misc ---------- */
+/* .mdi_upload_client::before { font-size: 55px !important; color: var(--primary) !important; } */
+
 /* ---------- Generic containers / layout ---------- */
+/* .full_view_height { height: 100vh; } */
 .bar_chart_container { height: 500px; }
 .pie_chart_container { display:flex; justify-content:center; align-items:center; }
 .table thead th { font-weight: bold; }
 .dashboard { min-height: 93%; }
+
+/* Details page */
+/* #details_page { height: 90%; }
+#details_page .card { background-color: var(--muted); border: none; cursor: pointer; }
+#details_page .facade_image_display_update { height:210px; width:210px; border-radius:50%; }
+#details_page .name { font-size:22px; font-weight:bold; }
+#details_page .idd { font-size:14px; font-weight:600; }
+#details_page .idd1 { font-size:12px; }
+#details_page .number { font-size:22px; font-weight:bold; }
+#details_page .follow { font-size:12px; font-weight:500; color:#444; }
+#details_page .btn1 { height:40px; width:150px; border:none; background-color:#000; color:#aeaeae; font-size:15px; }
+#details_page .text span { font-size:13px; color:#545454; font-weight:500; }
+#details_page .icons i { font-size:19px; }
+#details_page hr .new1 { border: 1px solid; }
+#details_page .join { font-size:14px; color:#a0a0a0; font-weight:bold; }
+#details_page .date { background-color:#ccc; } */
 
 /* ---------- Animations ---------- */
 .changing_height_animation {
@@ -70,6 +149,13 @@
   height: 100px;
   display: block;
 }
+
+/* ---------- Color-square option ---------- */
+/* .color-square-option { display:flex; align-items:center; } */
+/* .color-square-box { width:20px; height:20px; margin-right:10px; } */
+
+/* ---------- Generic details ---------- */
+/* #details_page .text span { font-size: 13px; color: #545454; font-weight: 500; } */
 
 /* ---------- Scrollbars (grouped) ---------- */
 /* WebKit-specific */
@@ -121,3 +207,8 @@
 /* ---------- Misc layout helpers ---------- */
 .bar_chart_container { height: 500px; }
 .table_scroll_x { overflow-x: auto; }
+
+/* ---------- small detail fixes ---------- */
+/* #details_page .btn1 { display:inline-flex; align-items:center; justify-content:center; } */
+
+/* ---------- End of optimized CSS ---------- */

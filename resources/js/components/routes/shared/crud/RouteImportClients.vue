@@ -7,7 +7,7 @@
                 <h4 class="fw-bold" v-if="route_import"><u>Clients of route import : <span class="text_primary">{{ route_import.libelle }}</span></u></h4>
 
                 <!-- Export Data    -->
-                <div class="row mt-2">
+                <div class="row mt-2 gy-1">
                     <div class="col-sm-4">
                         <select     class="form-select form-select-sm"      v-model="status">
                             <option value="All">All</option>

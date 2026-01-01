@@ -100,33 +100,4 @@
 
 .dataTables_paginate .pagination {
   float: right;
-  margin-bottom: 25px;
-}
-
-.paginate_button.previous, .paginate_button.next {
- width: 38px;
- text-align: center;
-}
-
-/*  */
-/*  */
-/*  */
-
-@media (max-width: 991px) {
-  /* 1. Reset the wrapper to take full width and center content */
-  .dataTables_paginate {
-    margin-right: 0;       /* Remove the right margin */
-    width: 100%;           /* Ensure container spans the screen */
-    text-align: center;    /* Center text-based elements */
-    display: flex;         /* Use flexbox for alignment */
-    justify-content: center; /* Center the child (.pagination) horizontally */
-  }
-
-  /* 2. Stop the pagination list from floating right */
-  .dataTables_paginate .pagination {
-    float: none;           /* Override your existing 'float: right' */
-    margin-right: 0;       /* Remove extra spacing */
-    display: inline-flex;  /* Ensure it behaves like a flex container */
-    justify-content: center;
-  }
 }

@@ -114,7 +114,7 @@
                     this.setIsAuthentificatedAction(true)
 
                     if(this.$isRole("FrontOffice")) {
-                        this.$router.push('/front_office')
+                        this.$router.push('/front-office')
                     }
 
                     else {
