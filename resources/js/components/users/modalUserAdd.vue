@@ -252,7 +252,7 @@ export default {
         async sendData() {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             let formData = new FormData();
 
@@ -292,7 +292,7 @@ export default {
                 this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
                 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 
                 // Reload DataTable
                 await this.$parent.setDataTable()
@@ -307,7 +307,7 @@ export default {
                 this.$showErrors("Error !", res.data.errors)
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 			}
         },
 
@@ -348,19 +348,19 @@ export default {
         async getData() {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             await this.getComboData()  
 
             // Hide Loading Page
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
         async getComboData() {
 
             const res               =   await this.$callApi("post",       "/route-imports/combo",        null)
 
-            let liste_route_import  =   res.data
+            let liste_route_import  =   res.data.liste_route_import
 
             for (let i = 0; i < liste_route_import.length; i++) {
 
@@ -372,12 +372,12 @@ export default {
 
         async getDistricts() {   
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             if(this.user.selected_route_import) {
 
                 const res_3         =   await this.$callApi("post"  ,   "/route-imports/"+this.user.selected_route_import+"/districts"   ,   null)
-                let districts       =   res_3.data
+                let districts       =   res_3.data.willayas
 
                 this.districts      =   []
 
@@ -401,15 +401,15 @@ export default {
                 this.user.selected_cities   =   []
             }
 
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
         async getCities() {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             const res_3         =   await this.$callApi("post"  ,   "/rtm-willayas/"+this.user.selected_district+"/rtm-cities"       ,   null)
-            let cities          =   res_3.data
+            let cities          =   res_3.data.cities
 
             for (let i = 0; i < cities.length; i++) {
 
@@ -419,7 +419,7 @@ export default {
             this.user.cities            =   []
             this.user.selected_cities   =   []
 
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         }
     }
 };

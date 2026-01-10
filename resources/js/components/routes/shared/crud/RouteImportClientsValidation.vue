@@ -352,7 +352,7 @@ export default {
 
         async sendData(index) {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             // Set Client
             let client              =   this.clients[index]
@@ -813,7 +813,7 @@ export default {
             if(res.status===200){
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 
                 // Send Feedback
                 this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
@@ -831,66 +831,316 @@ export default {
             else{
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 
                 // Send Errors
                 this.$showErrors("Error !", res.data.errors)
 			}
         },
 
-        //
+        //  //  //  //  //
 
-        // -------------------- Initialization helpers --------------------
-        initClients(receivedClients) {
-            if (!Array.isArray(receivedClients)) return;
-            // create a fresh array with our helper fields so all properties are reactive
-            this.clients = receivedClients.map(c => {
-            const copy = Object.assign({}, c);
-            copy.imagesLoadedCount = 0;
-            copy.facade_image_display = copy.facade_image_display || '';
-            copy.CustomerBarCode_image_display = copy.CustomerBarCode_image_display || '';
-            copy.in_store_image_display = copy.in_store_image_display || '';
-            copy.CustomerBarCodeExiste_image_display = copy.CustomerBarCodeExiste_image_display || '';
-            copy._facade_object_url = null;
-            copy._CustomerBarCode_object_url = null;
-            copy._in_store_object_url = null;
-            copy._CustomerBarCodeExiste_object_url = null;
-            copy.sizeKey = this.computeSizeKey(copy);
-            return copy;
-            });
+        async getData() {
+
+            try {
+
+                await this.$showLoadingPage()
+
+                let formData    =   new FormData()
+
+                formData.append("status",   "pending")
+
+                if(this.start_date  !=  "") formData.append("start_date"    ,   this.start_date)
+                if(this.end_date    !=  "") formData.append("end_date"      ,   this.end_date)
+
+                if(this.selected_CustomerTypes      !=  "") formData.append("selected_CustomerTypes"        ,   JSON.stringify(this.selected_CustomerTypes))
+                if(this.selected_NbrVitrines        !=  "") formData.append("selected_NbrVitrines"          ,   JSON.stringify(this.selected_NbrVitrines))
+                if(this.selected_SuperficieMagasins !=  "") formData.append("selected_SuperficieMagasins"   ,   JSON.stringify(this.selected_SuperficieMagasins))
+
+                //
+                this.$callApi("post",   "/route-imports/"+this.$route.params.id_route_import+"/clients",   formData)
+                .then(async (res)=> {
+
+                    console.log(res)
+
+                    this.route_import   =   res.data.route_import
+                    this.initClients(res.data.clients);
+
+                    //
+                    await this.getComboData()
+
+                    //
+                    await this.$hideLoadingPage()
+                })
+            }
+
+            catch(e) {
+
+                console.log(e)
+
+                //
+                await this.$hideLoadingPage()
+            }
         },
 
-        computeSizeKey(client) {
-            return [
-            client.OpenCustomer,
-            client.NewCustomer,
-            client.status,
-            client.tel_status,
-            (client.nonvalidated_details || '').length > 0 ? 'nv' : '',
-            (client.tel_comment || '').length > 0 ? 'telc' : '',
-            (client.comment || '').length > 0 ? 'c' : '',
-            (client.Landmark || '').length > 0 ? 'lm' : '',
-            (client.CustomerNameE || '').length > 0 ? 'name' : '',
-            (client.Address || '').length > 0 ? 'addr' : '',
-            (client.RvrsGeoAddress || '').length > 0 ? 'ra' : '',
-            client.imagesLoadedCount || 0,
-            client.CustomerBarCode_image ? 'bcimg' : '',
-            client.facade_image ? 'facimg' : '',
-            client.in_store_image ? 'instore' : '',
-            client.CustomerBarCodeExiste_image ? 'bcex' : ''
-            ].join('|');
+        async getComboData() {
+
+            const res_1     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/users/frontOffice"    ,   null)
+            const res_2     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/districts"            ,   null)
+            const res_3     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/cities"               ,   null)
+
+            this.users      =   res_1.data.users
+            this.willayas   =   res_2.data.willayas
+            this.cites      =   res_3.data.cities
         },
 
-        updateSizeKey(client) {
-            client.sizeKey = this.computeSizeKey(client);
+        //  //  //  //  //
+
+        getDistrictNameE(DistrictNo) {
+
+            for (let i = 0; i < this.willayas.length; i++) {
+
+                if(this.willayas[i].DistrictNo  ==  DistrictNo) {
+
+                    return this.willayas[i].DistrictNameE
+                }                
+            }
         },
 
-        onImageLoad(client) {
-            client.imagesLoadedCount = (client.imagesLoadedCount || 0) + 1;
+        getCityNameE(CityNo) {
+
+            for (let i = 0; i < this.cites.length; i++) {
+
+                if(this.cites[i].CityNo  ==  CityNo) {
+
+                    return this.cites[i].CityNameE
+                }                
+            }
+        },
+
+        getOwnerUsername(owner) {
+
+            for (let i = 0; i < this.users.length; i++) {
+
+                if(this.users[i].id  ==  owner) {
+
+                    return this.users[i].username
+                }                
+            }
+        },
+
+        //  //  //  //  //
+
+        setStatus(index) {
+
+            if(this.clients[index].OpenCustomer ==  "Ferme") {
+                this.clients[index].status     =   "ferme"
+            }
+
+            else {
+
+                if(this.clients[index].OpenCustomer ==  "refus") {
+                    this.clients[index].status     =   "refus"
+                }
+
+                else {
+
+                    if(this.clients[index].OpenCustomer ==  "Ouvert") {
+                        this.clients[index].status     =   "pending"
+                    }
+
+                    else {
+                        if(this.clients[index].OpenCustomer ==  "Introuvable") {
+                            this.clients[index].status     =   "introuvable"
+                        }
+                    }
+                }
+            }
+
+            // 
+            if(this.clients[index].NewCustomer  ==  "Nouveau Client") {
+                // if he was ferme and then became ouvert i keep all info
+                if(this.clients[index].OpenCustomer ==  "Ouvert") {
+                    this.clients[index].CustomerIdentifier                      =   "Nouveau"
+                }
+
+                // i only keep info that are in ferme questionnary
+                if(this.clients[index].OpenCustomer ==  "Ferme") {
+                    this.clients[index].CustomerIdentifier                      =   "Nouveau"
+
+                    this.clients[index].CustomerCode                            =   ""
+                    this.clients[index].CustomerBarCode_image                   =   ""
+                    this.clients[index].CustomerBarCode_image_original_name     =   ""
+
+                    this.clients[index].CustomerBarCodeExiste                       =   ""
+                    this.clients[index].CustomerBarCodeExiste_image                 =   ""
+                    this.clients[index].CustomerBarCodeExiste_image_original_name   =   ""
+
+                    this.clients[index].CustomerNameE                           =   ""
+
+                    this.clients[index].Tel                                     =   ""
+                    this.clients[index].tel_status                              =   "nonvalidated"
+                    this.clients[index].tel_comment                             =   ""
+
+                    this.clients[index].NbrAutomaticCheckouts                   =   ""
+                    this.clients[index].NbrVitrines                             =   ""
+                    this.clients[index].SuperficieMagasin                       =   ""
+                    this.clients[index].in_store_image                          =   ""
+                    this.clients[index].in_store_image_original_name            =   ""
+
+                    this.clients[index].CustomerBarCodeExiste_image_updated     =   true
+                    this.clients[index].CustomerBarCode_image_updated           =   true
+                    this.clients[index].in_store_image_updated                  =   true
+                }
+
+                //
+                if(this.clients[index].OpenCustomer ==  "refus") {
+                    this.clients[index].CustomerIdentifier                      =   "Nouveau"
+
+                    this.clients[index].CustomerCode                            =   ""
+                    this.clients[index].CustomerBarCode_image                   =   ""
+                    this.clients[index].CustomerBarCode_image_original_name     =   ""
+
+                    this.clients[index].CustomerBarCodeExiste                       =   ""
+                    this.clients[index].CustomerBarCodeExiste_image                 =   ""
+                    this.clients[index].CustomerBarCodeExiste_image_original_name   =   ""
+
+                    this.clients[index].CustomerNameE                           =   ""
+
+                    this.clients[index].Tel                                     =   ""
+                    this.clients[index].tel_status                              =   "nonvalidated"
+                    this.clients[index].tel_comment                             =   ""
+
+                    this.clients[index].NbrAutomaticCheckouts                   =   ""
+                    this.clients[index].NbrVitrines                             =   ""
+                    this.clients[index].SuperficieMagasin                       =   ""
+                    this.clients[index].in_store_image                          =   ""
+                    this.clients[index].in_store_image_original_name            =   ""
+
+                    this.clients[index].CustomerBarCodeExiste_image_updated     =   true
+                    this.clients[index].CustomerBarCode_image_updated           =   true
+                    this.clients[index].in_store_image_updated                  =   true
+                }
+
+                //
+                if(this.clients[index].OpenCustomer ==  "Introuvable") {
+                    this.clients[index].CustomerIdentifier                      =   "Nouveau"
+
+                    this.clients[index].CustomerCode                            =   ""
+                    this.clients[index].CustomerBarCode_image                   =   ""
+                    this.clients[index].CustomerBarCode_image_original_name     =   ""
+
+                    this.clients[index].CustomerBarCodeExiste                       =   ""
+                    this.clients[index].CustomerBarCodeExiste_image                 =   ""
+                    this.clients[index].CustomerBarCodeExiste_image_original_name   =   ""
+
+                    this.clients[index].CustomerNameE                           =   ""
+
+                    this.clients[index].Tel                                     =   ""
+                    this.clients[index].tel_status                              =   "nonvalidated"
+                    this.clients[index].tel_comment                             =   ""
+
+                    this.clients[index].NbrAutomaticCheckouts                   =   ""
+                    this.clients[index].NbrVitrines                             =   ""
+                    this.clients[index].SuperficieMagasin                       =   ""
+                    this.clients[index].in_store_image                          =   ""
+                    this.clients[index].in_store_image_original_name            =   ""
+
+                    this.clients[index].CustomerBarCodeExiste_image_updated     =   true
+                    this.clients[index].CustomerBarCode_image_updated           =   true
+                    this.clients[index].in_store_image_updated                  =   true
+                }
+            }
+
+            if(this.clients[index].NewCustomer  ==  "Client Existant") {
+                if(this.clients[index].OpenCustomer ==  "Ouvert") {
+
+                }
+
+                if(this.clients[index].OpenCustomer ==  "Ferme") {
+
+                    this.clients[index].CustomerCode                            =   ""
+                    this.clients[index].CustomerBarCode_image                   =   ""
+                    this.clients[index].CustomerBarCode_image_original_name     =   ""
+
+                    this.clients[index].CustomerBarCodeExiste                       =   ""
+                    this.clients[index].CustomerBarCodeExiste_image                 =   ""
+                    this.clients[index].CustomerBarCodeExiste_image_original_name   =   ""
+
+                    this.clients[index].CustomerNameE                           =   ""
+
+                    this.clients[index].Tel                                     =   ""
+                    this.clients[index].tel_status                              =   "nonvalidated"
+                    this.clients[index].tel_comment                             =   ""
+
+                    this.clients[index].NbrAutomaticCheckouts                   =   ""
+                    this.clients[index].NbrVitrines                             =   ""
+                    this.clients[index].SuperficieMagasin                       =   ""
+                    this.clients[index].in_store_image                          =   ""
+                    this.clients[index].in_store_image_original_name            =   ""
+
+                    this.clients[index].CustomerBarCodeExiste_image_updated     =   true
+                    this.clients[index].CustomerBarCode_image_updated           =   true
+                    this.clients[index].in_store_image_updated                  =   true
+                }
+
+                if(this.clients[index].OpenCustomer ==  "refus") {
+                    this.clients[index].CustomerCode                            =   ""
+                    this.clients[index].CustomerBarCode_image                   =   ""
+                    this.clients[index].CustomerBarCode_image_original_name     =   ""
+
+                    this.clients[index].CustomerBarCodeExiste                       =   ""
+                    this.clients[index].CustomerBarCodeExiste_image                 =   ""
+                    this.clients[index].CustomerBarCodeExiste_image_original_name   =   ""
+
+                    this.clients[index].CustomerNameE                           =   ""
+
+                    this.clients[index].Tel                                     =   ""
+                    this.clients[index].tel_status                              =   "nonvalidated"
+                    this.clients[index].tel_comment                             =   ""
+
+                    this.clients[index].NbrAutomaticCheckouts                   =   ""
+                    this.clients[index].NbrVitrines                             =   ""
+                    this.clients[index].SuperficieMagasin                       =   ""
+                    this.clients[index].in_store_image                          =   ""
+                    this.clients[index].in_store_image_original_name            =   ""
+
+                    this.clients[index].CustomerBarCodeExiste_image_updated     =   true
+                    this.clients[index].CustomerBarCode_image_updated           =   true
+                    this.clients[index].in_store_image_updated                  =   true
+                }
+
+                if(this.clients[index].OpenCustomer ==  "Introuvable") {
+                    this.clients[index].CustomerCode                            =   ""
+                    this.clients[index].CustomerBarCode_image                   =   ""
+                    this.clients[index].CustomerBarCode_image_original_name     =   ""
+
+                    this.clients[index].CustomerBarCodeExiste                       =   ""
+                    this.clients[index].CustomerBarCodeExiste_image                 =   ""
+                    this.clients[index].CustomerBarCodeExiste_image_original_name   =   ""
+
+                    this.clients[index].CustomerNameE                           =   ""
+
+                    this.clients[index].Tel                                     =   ""
+                    this.clients[index].tel_status                              =   "nonvalidated"
+                    this.clients[index].tel_comment                             =   ""
+
+                    this.clients[index].NbrAutomaticCheckouts                   =   ""
+                    this.clients[index].NbrVitrines                             =   ""
+                    this.clients[index].SuperficieMagasin                       =   ""
+                    this.clients[index].in_store_image                          =   ""
+                    this.clients[index].in_store_image_original_name            =   ""
+
+                    this.clients[index].CustomerBarCodeExiste_image_updated     =   true
+                    this.clients[index].CustomerBarCode_image_updated           =   true
+                    this.clients[index].in_store_image_updated                  =   true
+                }
+            }
+
             this.updateSizeKey(client);
         },
 
-        //
+        //  //  //  //  //
 
         async facadeImage(index) {
             const input = document.getElementById('facade_image_update_' + this.clients[index].id);
@@ -1106,100 +1356,7 @@ export default {
             this.updateSizeKey(client);
         },
 
-        //
-
-        async getComboData() {
-
-            const res_1     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/users/frontOffice"    ,   null)
-            const res_2     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/districts"            ,   null)
-            const res_3     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/cities"               ,   null)
-
-            this.users      =   res_1.data
-            this.willayas   =   res_2.data
-            this.cites      =   res_3.data
-        },
-
-        //
-
-        getDistrictNameE(DistrictNo) {
-
-            for (let i = 0; i < this.willayas.length; i++) {
-
-                if(this.willayas[i].DistrictNo  ==  DistrictNo) {
-
-                    return this.willayas[i].DistrictNameE
-                }                
-            }
-        },
-
-        getCityNameE(CityNo) {
-
-            for (let i = 0; i < this.cites.length; i++) {
-
-                if(this.cites[i].CityNo  ==  CityNo) {
-
-                    return this.cites[i].CityNameE
-                }                
-            }
-        },
-
-        getOwnerUsername(owner) {
-
-            for (let i = 0; i < this.users.length; i++) {
-
-                if(this.users[i].id  ==  owner) {
-
-                    return this.users[i].username
-                }                
-            }
-        },
-
-        //
-
-        async getData() {
-
-            try {
-
-                this.$showLoadingPage()
-
-                let formData    =   new FormData()
-
-                formData.append("status",   "pending")
-
-                if(this.start_date  !=  "") formData.append("start_date"    ,   this.start_date)
-                if(this.end_date    !=  "") formData.append("end_date"      ,   this.end_date)
-
-                if(this.selected_CustomerTypes      !=  "") formData.append("selected_CustomerTypes"        ,   JSON.stringify(this.selected_CustomerTypes))
-                if(this.selected_NbrVitrines        !=  "") formData.append("selected_NbrVitrines"          ,   JSON.stringify(this.selected_NbrVitrines))
-                if(this.selected_SuperficieMagasins !=  "") formData.append("selected_SuperficieMagasins"   ,   JSON.stringify(this.selected_SuperficieMagasins))
-
-                //
-                this.$callApi("post",   "/route-imports/"+this.$route.params.id_route_import+"/clients",   formData)
-                .then(async (res)=> {
-
-                    console.log(res)
-
-                    this.route_import   =   res.data.route_import
-                    this.initClients(res.data.clients);
-
-                    //
-                    await this.getComboData()
-
-                    //
-                    this.$hideLoadingPage()
-                })
-            }
-
-            catch(e) {
-
-                console.log(e)
-
-                //
-                this.$hideLoadingPage()
-            }
-        },
-
-        //
+        //  //  //  //  //
 
         async setBarCodeReader(index) {
 
@@ -1259,214 +1416,54 @@ export default {
             console.error("");
         },
 
-        //
+        //  //  //  //  //
 
-        setStatus(index) {
+        initClients(receivedClients) {
+            if (!Array.isArray(receivedClients)) return;
+            // create a fresh array with our helper fields so all properties are reactive
+            this.clients = receivedClients.map(c => {
+            const copy = Object.assign({}, c);
+            copy.imagesLoadedCount = 0;
+            copy.facade_image_display = copy.facade_image_display || '';
+            copy.CustomerBarCode_image_display = copy.CustomerBarCode_image_display || '';
+            copy.in_store_image_display = copy.in_store_image_display || '';
+            copy.CustomerBarCodeExiste_image_display = copy.CustomerBarCodeExiste_image_display || '';
+            copy._facade_object_url = null;
+            copy._CustomerBarCode_object_url = null;
+            copy._in_store_object_url = null;
+            copy._CustomerBarCodeExiste_object_url = null;
+            copy.sizeKey = this.computeSizeKey(copy);
+            return copy;
+            });
+        },
 
-            if(this.clients[index].OpenCustomer ==  "Ferme") {
-                this.clients[index].status     =   "ferme"
-            }
+        computeSizeKey(client) {
+            return [
+            client.OpenCustomer,
+            client.NewCustomer,
+            client.status,
+            client.tel_status,
+            (client.nonvalidated_details || '').length > 0 ? 'nv' : '',
+            (client.tel_comment || '').length > 0 ? 'telc' : '',
+            (client.comment || '').length > 0 ? 'c' : '',
+            (client.Landmark || '').length > 0 ? 'lm' : '',
+            (client.CustomerNameE || '').length > 0 ? 'name' : '',
+            (client.Address || '').length > 0 ? 'addr' : '',
+            (client.RvrsGeoAddress || '').length > 0 ? 'ra' : '',
+            client.imagesLoadedCount || 0,
+            client.CustomerBarCode_image ? 'bcimg' : '',
+            client.facade_image ? 'facimg' : '',
+            client.in_store_image ? 'instore' : '',
+            client.CustomerBarCodeExiste_image ? 'bcex' : ''
+            ].join('|');
+        },
 
-            else {
+        updateSizeKey(client) {
+            client.sizeKey = this.computeSizeKey(client);
+        },
 
-                if(this.clients[index].OpenCustomer ==  "refus") {
-                    this.clients[index].status     =   "refus"
-                }
-
-                else {
-
-                    if(this.clients[index].OpenCustomer ==  "Ouvert") {
-                        this.clients[index].status     =   "pending"
-                    }
-
-                    else {
-                        if(this.clients[index].OpenCustomer ==  "Introuvable") {
-                            this.clients[index].status     =   "introuvable"
-                        }
-                    }
-                }
-            }
-
-            // 
-            if(this.clients[index].NewCustomer  ==  "Nouveau Client") {
-                // if he was ferme and then became ouvert i keep all info
-                if(this.clients[index].OpenCustomer ==  "Ouvert") {
-                    this.clients[index].CustomerIdentifier                      =   "Nouveau"
-                }
-
-                // i only keep info that are in ferme questionnary
-                if(this.clients[index].OpenCustomer ==  "Ferme") {
-                    this.clients[index].CustomerIdentifier                      =   "Nouveau"
-
-                    this.clients[index].CustomerCode                            =   ""
-                    this.clients[index].CustomerBarCode_image                   =   ""
-                    this.clients[index].CustomerBarCode_image_original_name     =   ""
-
-                    this.clients[index].CustomerBarCodeExiste                       =   ""
-                    this.clients[index].CustomerBarCodeExiste_image                 =   ""
-                    this.clients[index].CustomerBarCodeExiste_image_original_name   =   ""
-
-                    this.clients[index].CustomerNameE                           =   ""
-
-                    this.clients[index].Tel                                     =   ""
-                    this.clients[index].tel_status                              =   "nonvalidated"
-                    this.clients[index].tel_comment                             =   ""
-
-                    this.clients[index].NbrAutomaticCheckouts                   =   ""
-                    this.clients[index].NbrVitrines                             =   ""
-                    this.clients[index].SuperficieMagasin                       =   ""
-                    this.clients[index].in_store_image                          =   ""
-                    this.clients[index].in_store_image_original_name            =   ""
-
-                    this.clients[index].CustomerBarCodeExiste_image_updated     =   true
-                    this.clients[index].CustomerBarCode_image_updated           =   true
-                    this.clients[index].in_store_image_updated                  =   true
-                }
-
-                //
-                if(this.clients[index].OpenCustomer ==  "refus") {
-                    this.clients[index].CustomerIdentifier                      =   "Nouveau"
-
-                    this.clients[index].CustomerCode                            =   ""
-                    this.clients[index].CustomerBarCode_image                   =   ""
-                    this.clients[index].CustomerBarCode_image_original_name     =   ""
-
-                    this.clients[index].CustomerBarCodeExiste                       =   ""
-                    this.clients[index].CustomerBarCodeExiste_image                 =   ""
-                    this.clients[index].CustomerBarCodeExiste_image_original_name   =   ""
-
-                    this.clients[index].CustomerNameE                           =   ""
-
-                    this.clients[index].Tel                                     =   ""
-                    this.clients[index].tel_status                              =   "nonvalidated"
-                    this.clients[index].tel_comment                             =   ""
-
-                    this.clients[index].NbrAutomaticCheckouts                   =   ""
-                    this.clients[index].NbrVitrines                             =   ""
-                    this.clients[index].SuperficieMagasin                       =   ""
-                    this.clients[index].in_store_image                          =   ""
-                    this.clients[index].in_store_image_original_name            =   ""
-
-                    this.clients[index].CustomerBarCodeExiste_image_updated     =   true
-                    this.clients[index].CustomerBarCode_image_updated           =   true
-                    this.clients[index].in_store_image_updated                  =   true
-                }
-
-                //
-                if(this.clients[index].OpenCustomer ==  "Introuvable") {
-                    this.clients[index].CustomerIdentifier                      =   "Nouveau"
-
-                    this.clients[index].CustomerCode                            =   ""
-                    this.clients[index].CustomerBarCode_image                   =   ""
-                    this.clients[index].CustomerBarCode_image_original_name     =   ""
-
-                    this.clients[index].CustomerBarCodeExiste                       =   ""
-                    this.clients[index].CustomerBarCodeExiste_image                 =   ""
-                    this.clients[index].CustomerBarCodeExiste_image_original_name   =   ""
-
-                    this.clients[index].CustomerNameE                           =   ""
-
-                    this.clients[index].Tel                                     =   ""
-                    this.clients[index].tel_status                              =   "nonvalidated"
-                    this.clients[index].tel_comment                             =   ""
-
-                    this.clients[index].NbrAutomaticCheckouts                   =   ""
-                    this.clients[index].NbrVitrines                             =   ""
-                    this.clients[index].SuperficieMagasin                       =   ""
-                    this.clients[index].in_store_image                          =   ""
-                    this.clients[index].in_store_image_original_name            =   ""
-
-                    this.clients[index].CustomerBarCodeExiste_image_updated     =   true
-                    this.clients[index].CustomerBarCode_image_updated           =   true
-                    this.clients[index].in_store_image_updated                  =   true
-                }
-            }
-
-            if(this.clients[index].NewCustomer  ==  "Client Existant") {
-                if(this.clients[index].OpenCustomer ==  "Ouvert") {
-
-                }
-
-                if(this.clients[index].OpenCustomer ==  "Ferme") {
-
-                    this.clients[index].CustomerCode                            =   ""
-                    this.clients[index].CustomerBarCode_image                   =   ""
-                    this.clients[index].CustomerBarCode_image_original_name     =   ""
-
-                    this.clients[index].CustomerBarCodeExiste                       =   ""
-                    this.clients[index].CustomerBarCodeExiste_image                 =   ""
-                    this.clients[index].CustomerBarCodeExiste_image_original_name   =   ""
-
-                    this.clients[index].CustomerNameE                           =   ""
-
-                    this.clients[index].Tel                                     =   ""
-                    this.clients[index].tel_status                              =   "nonvalidated"
-                    this.clients[index].tel_comment                             =   ""
-
-                    this.clients[index].NbrAutomaticCheckouts                   =   ""
-                    this.clients[index].NbrVitrines                             =   ""
-                    this.clients[index].SuperficieMagasin                       =   ""
-                    this.clients[index].in_store_image                          =   ""
-                    this.clients[index].in_store_image_original_name            =   ""
-
-                    this.clients[index].CustomerBarCodeExiste_image_updated     =   true
-                    this.clients[index].CustomerBarCode_image_updated           =   true
-                    this.clients[index].in_store_image_updated                  =   true
-                }
-
-                if(this.clients[index].OpenCustomer ==  "refus") {
-                    this.clients[index].CustomerCode                            =   ""
-                    this.clients[index].CustomerBarCode_image                   =   ""
-                    this.clients[index].CustomerBarCode_image_original_name     =   ""
-
-                    this.clients[index].CustomerBarCodeExiste                       =   ""
-                    this.clients[index].CustomerBarCodeExiste_image                 =   ""
-                    this.clients[index].CustomerBarCodeExiste_image_original_name   =   ""
-
-                    this.clients[index].CustomerNameE                           =   ""
-
-                    this.clients[index].Tel                                     =   ""
-                    this.clients[index].tel_status                              =   "nonvalidated"
-                    this.clients[index].tel_comment                             =   ""
-
-                    this.clients[index].NbrAutomaticCheckouts                   =   ""
-                    this.clients[index].NbrVitrines                             =   ""
-                    this.clients[index].SuperficieMagasin                       =   ""
-                    this.clients[index].in_store_image                          =   ""
-                    this.clients[index].in_store_image_original_name            =   ""
-
-                    this.clients[index].CustomerBarCodeExiste_image_updated     =   true
-                    this.clients[index].CustomerBarCode_image_updated           =   true
-                    this.clients[index].in_store_image_updated                  =   true
-                }
-
-                if(this.clients[index].OpenCustomer ==  "Introuvable") {
-                    this.clients[index].CustomerCode                            =   ""
-                    this.clients[index].CustomerBarCode_image                   =   ""
-                    this.clients[index].CustomerBarCode_image_original_name     =   ""
-
-                    this.clients[index].CustomerBarCodeExiste                       =   ""
-                    this.clients[index].CustomerBarCodeExiste_image                 =   ""
-                    this.clients[index].CustomerBarCodeExiste_image_original_name   =   ""
-
-                    this.clients[index].CustomerNameE                           =   ""
-
-                    this.clients[index].Tel                                     =   ""
-                    this.clients[index].tel_status                              =   "nonvalidated"
-                    this.clients[index].tel_comment                             =   ""
-
-                    this.clients[index].NbrAutomaticCheckouts                   =   ""
-                    this.clients[index].NbrVitrines                             =   ""
-                    this.clients[index].SuperficieMagasin                       =   ""
-                    this.clients[index].in_store_image                          =   ""
-                    this.clients[index].in_store_image_original_name            =   ""
-
-                    this.clients[index].CustomerBarCodeExiste_image_updated     =   true
-                    this.clients[index].CustomerBarCode_image_updated           =   true
-                    this.clients[index].in_store_image_updated                  =   true
-                }
-            }
-
+        onImageLoad(client) {
+            client.imagesLoadedCount = (client.imagesLoadedCount || 0) + 1;
             this.updateSizeKey(client);
         },
     }

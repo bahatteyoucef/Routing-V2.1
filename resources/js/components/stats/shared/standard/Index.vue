@@ -437,7 +437,7 @@ export default {
 
         if((this.start_date  !=  "")&&(this.end_date  !=  "")) {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             //
 
@@ -471,7 +471,7 @@ export default {
                 console.log(res)
 
                 //
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 
                 //
                 this.number_clients_tel_status_validated          =   res.data.stats_details.number_clients_tel_status_validated
@@ -589,7 +589,7 @@ export default {
     async exportData() {
 
         //
-        this.$showLoadingPage()
+        await this.$showLoadingPage()
 
         // Create a workbook
         this.workbook = new ExcelJS.Workbook();
@@ -620,7 +620,7 @@ export default {
         });
 
         //
-        this.$hideLoadingPage()
+        await this.$hideLoadingPage()
     },
 
     //
@@ -1383,7 +1383,7 @@ export default {
       this.$callApi("post",    "/route-imports", null)
       .then((res)=> {
 
-          this.liste_route_import = res.data
+          this.liste_route_import = res.data.liste_route_import
 
           this.prepareRouteLink()
       })

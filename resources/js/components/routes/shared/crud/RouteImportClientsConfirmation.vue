@@ -374,7 +374,7 @@ export default {
 
         async sendData(index) {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             // Set Client
             let client              =   this.clients[index]
@@ -521,7 +521,7 @@ export default {
             if(res.status===200){
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 
                 // Send Feedback
                 this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
@@ -534,14 +534,86 @@ export default {
             else{
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 
                 // Send Errors
                 this.$showErrors("Error !", res.data.errors)
 			}
         },
 
-        //
+        //  //  //  //  //
+
+        async getData() {
+
+            try {
+
+                await this.$showLoadingPage()
+
+                let formData    =   new FormData()
+
+                formData.append("status",   "validated")
+
+                if(this.start_date  !=  "") formData.append("start_date"    ,   this.start_date)
+                if(this.end_date    !=  "") formData.append("end_date"      ,   this.end_date)
+
+                if(this.selected_CustomerTypes      !=  "") formData.append("selected_CustomerTypes"        ,   JSON.stringify(this.selected_CustomerTypes))
+                if(this.selected_NbrVitrines        !=  "") formData.append("selected_NbrVitrines"          ,   JSON.stringify(this.selected_NbrVitrines))
+                if(this.selected_SuperficieMagasins !=  "") formData.append("selected_SuperficieMagasins"   ,   JSON.stringify(this.selected_SuperficieMagasins))
+
+                //
+                this.$callApi("post",   "/route-imports/"+this.$route.params.id_route_import+"/clients",   formData)
+                .then(async (res)=> {
+
+                    console.log(this.$route.params.id_route_import)
+                    console.log(res)
+
+                    this.route_import = res.data.route_import;
+                    this.initClients(res.data.clients);
+
+                    //
+                    await this.getComboData()
+
+                    //
+                    await this.$hideLoadingPage()
+                })
+            }
+
+            catch(e) {
+
+                console.log(e)
+
+                //
+                await this.$hideLoadingPage()
+            }
+        },
+
+        async getComboData() {
+
+            const res_1     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/users/frontOffice"    ,   null)
+            const res_2     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/districts"            ,   null)
+            const res_3     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/cities"               ,   null)
+            const res_4     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/salesmen"             ,   null)
+
+            this.users      =   res_1.data.users
+            this.willayas   =   res_2.data.willayas
+            this.cites      =   res_3.data.cities
+
+            //
+            let salesmen                        =   res_4.data.salesmen
+            this.salesmen_all                   =   salesmen
+
+            //
+
+            this.salesmen                       =   []
+            this.salesmen.push({value : "NA"    , label : "NA"})
+
+            for (let i = 0; i < salesmen.length; i++) {
+
+                this.salesmen.push({ value : salesmen[i].SalesmanNo , label : salesmen[i].SalesmanNo})
+            }
+        },
+
+        //  //  //  //  //
 
         async facadeImage(index) {
             const input = document.getElementById("facade_image_update_" + this.clients[index].id);
@@ -602,35 +674,7 @@ export default {
             this.updateSizeKey(client);
         },
 
-        //
-
-        async getComboData() {
-
-            const res_1     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/users/frontOffice"    ,   null)
-            const res_2     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/districts"            ,   null)
-            const res_3     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/cities"               ,   null)
-            const res_4     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/salesmen"             ,   null)
-
-            this.users      =   res_1.data
-            this.willayas   =   res_2.data
-            this.cites      =   res_3.data
-
-            //
-            let salesmen                        =   res_4.data
-            this.salesmen_all                   =   salesmen
-
-            //
-
-            this.salesmen                       =   []
-            this.salesmen.push({value : "NA"    , label : "NA"})
-
-            for (let i = 0; i < salesmen.length; i++) {
-
-                this.salesmen.push({ value : salesmen[i].SalesmanNo , label : salesmen[i].SalesmanNo})
-            }
-        },
-
-        //
+        //  //  //  //  //
 
         getDistrictNameE(DistrictNo) {
 
@@ -665,53 +709,7 @@ export default {
             }
         },
 
-        //
-
-        async getData() {
-
-            try {
-
-                this.$showLoadingPage()
-
-                let formData    =   new FormData()
-
-                formData.append("status",   "validated")
-
-                if(this.start_date  !=  "") formData.append("start_date"    ,   this.start_date)
-                if(this.end_date    !=  "") formData.append("end_date"      ,   this.end_date)
-
-                if(this.selected_CustomerTypes      !=  "") formData.append("selected_CustomerTypes"        ,   JSON.stringify(this.selected_CustomerTypes))
-                if(this.selected_NbrVitrines        !=  "") formData.append("selected_NbrVitrines"          ,   JSON.stringify(this.selected_NbrVitrines))
-                if(this.selected_SuperficieMagasins !=  "") formData.append("selected_SuperficieMagasins"   ,   JSON.stringify(this.selected_SuperficieMagasins))
-
-                //
-                this.$callApi("post",   "/route-imports/"+this.$route.params.id_route_import+"/clients",   formData)
-                .then(async (res)=> {
-
-                    console.log(this.$route.params.id_route_import)
-                    console.log(res)
-
-                    this.route_import = res.data.route_import;
-                    this.initClients(res.data.clients);
-
-                    //
-                    await this.getComboData()
-
-                    //
-                    this.$hideLoadingPage()
-                })
-            }
-
-            catch(e) {
-
-                console.log(e)
-
-                //
-                this.$hideLoadingPage()
-            }
-        },
-
-        //
+        //  //  //  //  //
 
         async setBarCodeReader(index) {
 
@@ -773,7 +771,6 @@ export default {
 
         //  //  //  //  //
 
-        // initialize sizeKey and image count after clients are fetched
         initClients(receivedClients) {
             if (!Array.isArray(receivedClients)) return;
 

@@ -1,5 +1,5 @@
 <template>
-    <div v-show="getShowLoadingPage" id="loading_screen" role="status" aria-live="polite" aria-busy="true">
+    <div v-if="getShowLoadingPage" id="loading_screen" role="status" aria-live="polite" aria-busy="true">
         <span class="sr-only">Loading…</span>
 
         <div class="loading_container">

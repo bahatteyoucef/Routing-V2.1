@@ -167,7 +167,7 @@ export default {
         // getClients, getDetailsPage, showMap (No changes needed here)
         async getClients() {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             let formData    =   new FormData()
 
@@ -178,16 +178,14 @@ export default {
                 console.log(res)
 
                 //
-                let clients             =   res.data
-
-                this.clients            =   clients
+                this.clients            =   res.data.clients
                 this.clients_filtered   =   this.clients
 
                 //
                 this.setFilterStatusRouteImportClientsByStatusAction(this.filter_status)
 
                 //
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
             })
         },
 

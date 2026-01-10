@@ -9,22 +9,19 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Validation\Rules;
 
-use App\Models\Role;
 use App\Models\RouteImport;
 use App\Models\RouteImportDistrict;
 use App\Models\UserRouteImport;
 use App\Models\UserTerritory;
-use Exception;
+
 use Throwable;
 
 use Illuminate\Support\Facades\Validator;
 
-class UserController extends Controller
-{
+class UserController extends Controller {
+
     public function login(Request $request) {
 
         $validator      =   Validator::make($request->all(), [
@@ -173,12 +170,15 @@ class UserController extends Controller
     //  //  //  //  //
     //  //  //  //  //
 
-    public function index()
-    {
+    public function index() {
         
         try {
 
             $users          =   User::indexUser();
+            return response()->json([
+                "users"   =>  $users
+            ]);
+
             return $users;
         }
 
@@ -190,13 +190,14 @@ class UserController extends Controller
         }
     }
 
-    public function combo()
-    {
+    public function combo() {
         
         try {
 
             $users          =   User::comboUser();
-            return $users;
+            return response()->json([
+                "users"   =>  $users
+            ]);
         }
 
         catch(Throwable $erreur) {
@@ -207,13 +208,14 @@ class UserController extends Controller
         }
     }
 
-    public function comboBackOffice()
-    {
+    public function comboBackOffice() {
         
         try {
 
             $users          =   User::comboBackOffice();
-            return $users;
+            return response()->json([
+                "users"   =>  $users
+            ]);
         }
 
         catch(Throwable $erreur) {
@@ -228,8 +230,7 @@ class UserController extends Controller
     //  //  //  //  //
     //  //  //  //  //
 
-    public function store(Request $request) 
-    {    
+    public function store(Request $request)  {    
 
         try {
 
@@ -271,8 +272,7 @@ class UserController extends Controller
         }
     }
 
-    public function update(Request $request, int $id_user) 
-    {
+    public function update(Request $request, int $id_user)  {
 
         try {
 
@@ -315,13 +315,14 @@ class UserController extends Controller
         }
     }
     
-    public function show(int $id_user)
-    {
+    public function show(int $id_user) {
 
         try {
 
             $user  =   User::showUser($id_user);
-            return $user;
+            return response()->json([
+                "user"   =>  $user
+            ]);
         }
 
         catch(Throwable $erreur) {
@@ -336,13 +337,14 @@ class UserController extends Controller
     //  //  //  //  //
     //  //  //  //  //
 
-    public static function pointings(Request $request)
-    {
+    public function pointings(Request $request) {
 
         try {
 
             $pointings  =   User::pointings($request);
-            return $pointings;
+            return response()->json([
+                "pointings" =>  $pointings
+            ]);
         }
 
         catch(Throwable $erreur) {

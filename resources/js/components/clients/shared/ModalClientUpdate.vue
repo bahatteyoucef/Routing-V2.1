@@ -90,7 +90,8 @@
                                         <label for="tel_status"         class="form-label">Téléphone Status</label>
                                         <select                         class="form-select"         id="tel_status"     v-model="client.tel_status"         :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                             <option value="validated" selected>validated</option>
-                                            <option value="nonvalidated" selected>nonvalidated</option>
+                                            <option value="pending">pending</option>
+                                            <option value="nonvalidated">nonvalidated</option>
                                         </select>
                                     </div>
 
@@ -506,7 +507,7 @@ export default {
 
                 // Slide 6
                 Tel                                     :   '',
-                tel_status                              :   'nonvalidated',
+                tel_status                              :   'pending',
                 tel_comment                             :   '',
 
                 // Slide 7
@@ -609,17 +610,25 @@ export default {
     props : ["id_route_import", "update_type", "id_route_import_tempo", "mode", "validation_type", "districts_all", "users_all"],
 
     mounted() {
+        console.log(this.id_route_import)
+        console.log(this.id_route_import_tempo)
 
         this.clearData("#ModalClientUpdate")
     },
 
-    // 1. Non-reactive storage for heavy binary blobs
     created() {
+        // 1. Initialize non-reactive storage for files
         this._rawFiles = {
-            CustomerBarCode_image: null,
             facade_image: null,
+            CustomerBarCode_image: null,
             in_store_image: null
         };
+    },
+
+    beforeUnmount() {
+        // 2. Cleanup memory when modal closes
+        const fields = ['facade_image', 'CustomerBarCode_image', 'in_store_image'];
+        fields.forEach(field => this.revokeImage(field));
     },
 
     methods : {
@@ -628,20 +637,25 @@ export default {
             "setUpdateClientAction"   ,
         ]),
 
-        //
+        //  //  //  //  //
 
         async sendData() {
-            this.$showLoadingPage();
+            await this.$showLoadingPage();
 
-            // 2. Refresh Names
-            if (this.willayas.length > 0) this.client.DistrictNameE = this.getDistrictNameE(this.client.DistrictNo);
-            if (this.cities.length > 0) this.client.CityNameE = this.getCityNameE(this.client.CityNo);
+            // 1. Refresh Geographic Names (Ensure they match the IDs)
+            if (this.willayas.length > 0) {
+                this.client.DistrictNameE = this.getDistrictNameE(this.client.DistrictNo);
+            }
+            if (this.cities.length > 0) {
+                this.client.CityNameE = this.getCityNameE(this.client.CityNo);
+            }
 
-            // 3. Prepare Payload based on Status
+            // 2. Prepare Payload Object (Metadata Only)
+            // We construct a plain JS object first. We do NOT put binary files here.
             let payload = {};
-            const status = this.client.OpenCustomer; // Ouvert, Ferme, Refus, Introuvable
+            const status = this.client.OpenCustomer; // 'Ouvert', 'Ferme', 'Refus', 'Introuvable'
 
-            // --- A. Base Fields (Common to almost all) ---
+            // --- A. Base Fields (Common to all statuses) ---
             const baseFields = {
                 NewCustomer: this.client.NewCustomer,
                 OpenCustomer: this.client.OpenCustomer,
@@ -658,10 +672,13 @@ export default {
                 CityNo: this.client.CityNo,
                 CityNameE: this.client.CityNameE,
                 CustomerType: this.client.CustomerType,
-                // Default Images Logic
-                facade_image: this.client.facade_image,
+                
+                // For images in JSON, we send the existing filename string (or empty).
+                // The actual binary update happens in step 4 via _rawFiles.
+                facade_image: typeof this.client.facade_image === 'string' ? this.client.facade_image : '',
                 facade_image_original_name: this.client.facade_image_original_name,
                 facade_image_updated: this.client.facade_image_updated,
+                
                 comment: this.client.comment
             };
 
@@ -681,24 +698,29 @@ export default {
                     Frequency: this.client.Frequency,
                     SuperficieMagasin: this.client.SuperficieMagasin,
                     NbrAutomaticCheckouts: this.client.NbrAutomaticCheckouts,
-                    AvailableBrands: JSON.stringify(this.client.AvailableBrands), // Specific serialization
                     
-                    // Images
+                    // Convert arrays to JSON strings
+                    AvailableBrands: JSON.stringify(this.client.AvailableBrands),
+                    
+                    // Image Flags
                     CustomerBarCode_image_updated: this.client.CustomerBarCode_image_updated,
                     in_store_image_updated: this.client.in_store_image_updated,
-                    CustomerBarCode_image: this.client.CustomerBarCode_image,
-                    in_store_image: this.client.in_store_image,
+                    
+                    // Image Filenames (Strings)
+                    CustomerBarCode_image: typeof this.client.CustomerBarCode_image === 'string' ? this.client.CustomerBarCode_image : '',
+                    in_store_image: typeof this.client.in_store_image === 'string' ? this.client.in_store_image : '',
+                    
                     CustomerBarCode_image_original_name: this.client.CustomerBarCode_image_original_name,
                     in_store_image_original_name: this.client.in_store_image_original_name,
                     
                     status: this.client.status,
-                    nonvalidated_details: this.client.nonvalidated_details
+                    nonvalidated_details: this.client.nonvalidated_details,
+                    owner: this.client.owner // Maintain owner if needed
                 };
-            } 
-            else if (status === 'Ferme' || status === 'refus') {
+            } else if (status === 'Ferme' || status === 'refus') {
                 payload = {
                     ...baseFields,
-                    // Empty/Default overrides
+                    // Reset/Clear specific fields for closed/refused
                     CustomerCode: '',
                     CustomerNameE: '',
                     Tel: '',
@@ -712,61 +734,56 @@ export default {
                     SuperficieMagasin: this.client.SuperficieMagasin,
                     NbrAutomaticCheckouts: '',
                     AvailableBrands: JSON.stringify([]),
-
-                    // Images (Clear others, keep facade)
+                    
+                    // Clear images
                     CustomerBarCode_image: '',
                     in_store_image: '',
                     CustomerBarCode_image_original_name: '',
                     in_store_image_original_name: '',
                     
-                    // Specific Updates for Refus/Ferme
-                    CustomerBarCodeExiste_image_updated: true, // Note: You had this in 'refus'
+                    // Force update flags to true so backend clears them
                     CustomerBarCode_image_updated: true,
                     in_store_image_updated: true,
                     
                     status: 'pending',
                     nonvalidated_details: ''
                 };
-            }
-            else if (status === 'Introuvable') {
-                 payload = {
+            } else if (status === 'Introuvable') {
+                payload = {
                     ...baseFields,
-                    CustomerBarCodeExiste: '',
                     CustomerCode: '',
                     CustomerNameE: '',
-                    RvrsGeoAddress: this.client.RvrsGeoAddress, // Specific to Introuvable
                     Tel: this.client.Tel,
                     tel_status: 'nonvalidated',
                     tel_comment: '',
-                    NbrVitrines: '',
                     NbrAutomaticCheckouts: '',
                     SuperficieMagasin: this.client.SuperficieMagasin,
                     BrandAvailability: this.client.BrandAvailability,
                     BrandSourcePurchase: this.client.BrandSourcePurchase,
                     
-                    // Images logic (Clear all except facade)
-                    CustomerBarCodeExiste_image_updated: true,
-                    CustomerBarCode_image_updated: true,
-                    in_store_image_updated: true,
-                    CustomerBarCodeExiste_image: '',
+                    // Clear images
                     CustomerBarCode_image: '',
                     in_store_image: '',
+                    CustomerBarCode_image_original_name: '',
+                    in_store_image_original_name: '',
+                    
+                    CustomerBarCode_image_updated: true,
+                    in_store_image_updated: true,
                     
                     JPlan: this.client.JPlan,
                     Journee: this.client.Journee,
-                    
                     status: 'pending',
                     nonvalidated_details: ''
-                 };
+                };
             }
 
-            // 4. Timer Logic
+            // 3. Timer Logic
             if (this.client.status_original === 'visible') {
-                payload.start_adding_date = this.start_adding_date;
-                payload.finish_adding_date = moment(new Date()).format();
+                payload.start_adding_date = moment().format(); // Or use stored start date
+                payload.finish_adding_date = moment().format();
             }
 
-            // 5. Build FormData
+            // 4. Create FormData and Append Text Fields
             const formData = new FormData();
             for (const key in payload) {
                 let value = payload[key];
@@ -774,385 +791,155 @@ export default {
                 formData.append(key, value);
             }
 
-            // 6. Send Request
+            // 5. Append BINARY Files (from non-reactive storage)
+            // This is the key optimization step
+            if (this._rawFiles) {
+                Object.keys(this._rawFiles).forEach(key => {
+                    if (this._rawFiles[key]) {
+                        formData.append(key, this._rawFiles[key]);
+                    }
+                });
+            }
+
+            // 6. Send to API based on Mode (Permanent vs Temporary)
             try {
-                const res = await this.$callApi("post", `/route-imports/${this.$route.params.id_route_import}/clients/${this.client.id}/update`, formData);
+                let res;
+                if (this.mode == "permanent") {
+                    res = await this.$callApi("post", `/route-imports/${this.id_route_import}/clients/${this.client.id}/update`, formData);
+                } else if (this.mode == "temporary") {
+                    res = await this.$callApi("post", `/route-imports-tempo/${this.id_route_import_tempo}/clients-tempo/${this.client.id}/update`, formData);
+                }
 
                 if (res.status === 200) {
-                    this.$hideLoadingPage();
                     this.$feedbackSuccess(res.data["header"], res.data["message"]);
-                    this.$goBack();
+
+                    // Validation Logic / Event Emission
+                    if (this.update_type == "validation") {
+                        this.emitter.emit("updateDoubles" + this.validation_type, this.client);
+                    } else {
+                        // Generic update event for parent
+                        this.emitter.emit('updateClient', this.client);
+                    }
+
+                    await this.$hideModal("ModalClientUpdate");
                 } else {
-                    this.$hideLoadingPage();
                     this.$showErrors("Error !", res.data.errors);
                 }
             } catch (error) {
-                this.$hideLoadingPage();
-                this.$showErrors("System Error", ["An unexpected error occurred."]);
                 console.error(error);
+                this.$showErrors("System Error", ["An unexpected error occurred."]);
+            } finally {
+                await this.$hideLoadingPage();
             }
         },
 
         async deleteData() {
+            await this.$showLoadingPage();
 
-            this.$showLoadingPage()
-
-            if(this.mode    ==  "permanent") {
-
-                const res                   =   await this.$callApi("post"  ,   "/route-imports/"+this.id_route_import+"/clients/"+this.client.id+"/delete",   null)
-
-                if(res.status===200){
-
-                    // Send Feedback
-                    this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
-
-                    // 5) Now hide the spinner
-                    this.$hideLoadingPage();
-
-                    // Validation
-                    if(this.update_type ==  "validation") {
-                        this.emitter.emit("deleteDoubles"+this.validation_type   , this.client)
-                    }
-
-                    // Update Data
-                    else {
-                        this.emitter.emit('reSetDelete' , this.client)
-                    }
-
-                    // Close Modal
-                    await this.$hideModal("ModalClientUpdate")
-                }
+            try {
+                let res;
                 
-                else{
-
-                    // Send Errors
-                    this.$showErrors("Error !", res.data.errors)
-
-                    // 5) Now hide the spinner
-                    this.$hideLoadingPage();
+                // Branching Logic
+                if (this.mode == "permanent") {
+                    res = await this.$callApi("post", `/route-imports/${this.id_route_import}/clients/${this.client.id}/delete`, null);
+                } else if (this.mode == "temporary") {
+                    res = await this.$callApi("post", `/route-imports-tempo/${this.id_route_import_tempo}/clients-tempo/${this.client.id}/delete`, null);
                 }
-            }
 
-            else {
-
-                if(this.mode    ==  "temporary") {
-
-                    const res                   =   await this.$callApi("post"  ,   "/route-imports-tempo/"+this.id_route_import_tempo+"/clients-tempo/"+this.client.id+"/delete",   null)
-
-                    if(res.status===200){
-
-                        // Send Feedback
-                        this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
-
-                        // 5) Now hide the spinner
-                        this.$hideLoadingPage();
-
-                        // Validation
-                        if(this.update_type ==  "validation") {
-                            this.emitter.emit("deleteDoubles"+this.validation_type   , this.client)
-                        }
-
-                        // Update Data
-                        else {
-                            this.emitter.emit('reSetDelete' , this.client)
-                        }
-
-                        // Close Modal
-                        await this.$hideModal("ModalClientUpdate")
-                    }
+                // Success Handling
+                if (res.status === 200) {
+                    this.$feedbackSuccess(res.data["header"], res.data["message"]);
                     
-                    else{
-
-                        // Send Errors
-                        this.$showErrors("Error !", res.data.errors)
-
-                        // 5) Now hide the spinner
-                        this.$hideLoadingPage();
+                    // Validation Logic
+                    if (this.update_type == "validation") {
+                        this.emitter.emit("deleteDoubles" + this.validation_type, this.client);
+                    } else {
+                        this.emitter.emit('reSetDelete', this.client);
                     }
+
+                    await this.$hideModal("ModalClientUpdate");
+                } else {
+                    this.$showErrors("Error !", res.data.errors);
                 }
+
+            } catch (error) {
+                console.error("Delete Error", error);
+                this.$showErrors("System Error", ["An unexpected error occurred during deletion."]);
+            } finally {
+                await this.$hideLoadingPage();
             }
         },
 
-        //
-
-        clearData(id_modal) {
-
-            $(id_modal).on("hidden.bs.modal",   ()  => {
-
-                //
-
-                if(this.scanner) {
-
-                    this.scanner.clear().then(_ => {
-
-                    }).catch(error => {
-
-                    });
-                }
-
-                //
-
-                let CustomerBarCode_image_update                =   document.getElementById("CustomerBarCode_image_update")
-                if(CustomerBarCode_image_update) {
-                    CustomerBarCode_image_update.value              =   ""
-                }
-
-                let CustomerBarCode_image_display_update        =   document.getElementById("CustomerBarCode_image_display_update")
-                if(CustomerBarCode_image_display_update) {
-                    CustomerBarCode_image_display_update.src        =   ""
-                }
-
-                //
-
-                let facade_image_update                         =   document.getElementById("facade_image_update")
-                if(facade_image_update) {
-                    facade_image_update.value                       =   ""
-                }
-
-                let facade_image_display_update                 =   document.getElementById("facade_image_display_update")
-                if(facade_image_display_update) {
-                    facade_image_display_update.src                 =   ""
-                }
-
-                //
-
-                let in_store_image_update                       =   document.getElementById("in_store_image_update")
-                if(in_store_image_update) {
-                    in_store_image_update.value                     =   ""
-                }
-
-                let in_store_image_display_update               =   document.getElementById("in_store_image_display_update")
-                if(in_store_image_display_update) {
-                    in_store_image_display_update.src               =   ""
-                }
-
-                //
-
-                this.client.CustomerBarCode_image                   =   '',
-                this.client.facade_image                            =   '',
-                this.client.in_store_image                          =   '',
-
-                this.client.CustomerBarCode_image_original_name     =   '',
-                this.client.facade_image_original_name              =   '',
-                this.client.in_store_image_original_name            =   '',
-
-                this.client.CustomerBarCode_image_updated           =   false
-                this.client.facade_image_updated                    =   false,
-                this.client.in_store_image_updated                  =   false
-
-                // 
-                this.setUpdateClientAction(null)
-
-                // Client
-                this.client.id                                      =   '',
-
-                //
-                this.client.NewCustomer                             =   '',
-
-                //
-                this.client.OpenCustomer                            =   '',
-
-                // Slide 1
-                this.client.CustomerCode                            =   '',
-
-                // Slide 2
-                this.client.CustomerBarCode_image                   =   '',
-                this.client.CustomerBarCode_image_original_name     =   '',
-
-                // Slide 3
-                this.client.old_CustomerNameE                       =   '',
-                this.client.CustomerNameE                           =   '',
-
-                // Slide 4
-                this.client.CustomerNameA                           =   '',
-
-                // Slide 5
-                this.client.Tel                                     =   '',
-                this.client.tel_status                              =   'nonvalidated',
-                this.client.tel_comment                             =   '',
-
-                // Slide 6
-                this.client.Latitude                                =   '',
-                this.client.Longitude                               =   '',
-
-                // Slide 7
-                this.client.Address                                 =   '',
-                this.client.RvrsGeoAddress                          =   '',
-
-                // Slide 8
-                this.client.Neighborhood                            =   '',
-
-                // Slide 9
-                this.client.Landmark                                =   '',
-
-                // Slide 10
-                this.client.DistrictNo                              =   '',
-                this.client.DistrictNameE                           =   '',
-
-                // Slide 11
-                this.client.CityNo                                  =   '',
-                this.client.CityNameE                               =   '',
-
-                // Slide 12
-                this.client.CustomerType                            =   '',
-
-                // Slide 13
-                this.client.BrandAvailability                       =   'Non',
-
-                // Slide 14
-                this.client.BrandSourcePurchase                     =   '',
-
-                // Slide 15
-                this.client.JPlan                                   =   '',
-
-                // Slide 16 
-                this.client.Journee                                 =   '',
-
-                //
-                this.client.AvailableBrands                         =   [],
-                this.client.NbrAutomaticCheckouts                   =   '',
-                this.client.SuperficieMagasin                       =   '',
-
-                // Slide 17
-                this.client.status_original                         =   '',
-                this.client.status                                  =   '',
-                this.client.nonvalidated_details                    =   '', 
-
-                // Slide 18
-                this.client.facade_image                            =   '',
-                this.client.facade_image_original_name              =   '',
-
-                // Slide 19   
-                this.client.in_store_image                          =   '',
-                this.client.in_store_image_original_name            =   '',
-
-                this.client.owner                                   =   '',
-                this.client.owner_username                              =   '',
-                this.client.comment                                 =   '',
-
-                //
-
-                this.users                                          =   []  ,
-                this.willayas                                       =   []  ,
-                this.cities                                          =   []  ,
-
-                this.all_clients                                    =   []  ,
-                this.close_clients                                  =   []
-            });
-        },
+        //  //  //  //  //
 
         async getData(client, all_clients) {
-
-            //
-            if(this.update_type ==  "validation") {
-                if(this.mode ==  "permanent") {
-                    const res           =   await this.$callApi("post", "/route-imports/"+this.id_route_import+"/clients", null)
-                    this.all_clients    =   res.data.clients   
+            await this.$showLoadingPage();
+            try {
+                // Handle All Clients List Logic
+                if (this.update_type == "validation") {
+                    const route = this.mode === "permanent" 
+                        ? `/route-imports/${this.id_route_import}/clients`
+                        : `/route-imports-tempo/${this.id_route_import_tempo}/clients-tempo`;
+                    
+                    const res = await this.$callApi("post", route, null);
+                    this.all_clients = res.data.clients;
+                } else if (this.update_type == "normal_update") {
+                    this.all_clients = all_clients;
                 }
 
-                if(this.mode ==  "temporary") {
-                    const res           =   await this.$callApi("post", "/route-imports-tempo/"+this.id_route_import_tempo+"/clients-tempo", null)
-                    this.all_clients    =   res.data   
-                }
+                await this.getComboData();
+                await this.getClientData(client);
+                
+                // Map logic
+                await this.showPositionOnMapMultiMap("show_modal_client_update_map");
+            } finally {
+                await this.$hideLoadingPage();
             }
-
-            else {
-                if(this.update_type ==  "normal_update") {
-                    this.all_clients    =   all_clients
-                }
-            }
-
-            //
-            await this.getComboData()  
-            await this.getClientData(client)  
-
-            await this.showPositionOnMapMultiMap("show_modal_client_update_map");
         },
 
         async getClientData(client) {
+            // Reset Raw Files
+            this._rawFiles = {
+                facade_image: null,
+                CustomerBarCode_image: null,
+                in_store_image: null
+            };
 
-            this.client.id                              =   client.id
+            // Clone data to avoid mutating parent directly until save
+            // Using Object.assign to copy properties
+            Object.assign(this.client, client);
 
-            this.client.id_route_import                 =   client.id_route_import
+            // Handle Specific Fields
+            this.client.old_CustomerNameE = client.CustomerNameE;
+            this.client.AvailableBrands = client.AvailableBrands_array_formatted || [];
+            this.client.status_original = client.status;
 
-            await this.getUsers()
+            // --- IMAGE PREVIEW LOGIC ---
+            // Instead of using $createFile (which is heavy), simply point the URL to the server
+            
+            const imageFields = ['CustomerBarCode_image', 'facade_image', 'in_store_image'];
+            
+            imageFields.forEach(field => {
+                // Set original names
+                this.client[`${field}_original_name`] = client[`${field}_original_name`];
+                
+                // Set Preview URL
+                if (client[field]) {
+                    this.client[`${field}_currentObjectURL`] = `/uploads/clients/${client.id}/${client[field]}`;
+                    
+                    // Show container if it exists (for your magnifier logic)
+                    const container = document.getElementById(`${field}_display_update_container`);
+                    if(container) container.style.display = "block";
+                } else {
+                    this.client[`${field}_currentObjectURL`] = null;
+                     const container = document.getElementById(`${field}_display_update_container`);
+                    if(container) container.style.display = "none";
+                }
+            });
 
-            this.client.NewCustomer                     =   client.NewCustomer
-
-            this.client.OpenCustomer                    =   client.OpenCustomer
-
-            this.client.CustomerIdentifier              =   client.CustomerIdentifier
-
-            this.client.CustomerCode                    =   client.CustomerCode
-
-            this.client.old_CustomerNameE               =   client.CustomerNameE
-
-            this.client.CustomerNameE                   =   client.CustomerNameE
-            this.client.CustomerNameA                   =   client.CustomerNameA
-            this.client.Latitude                        =   client.Latitude
-            this.client.Longitude                       =   client.Longitude
-
-            this.client.Address                         =   client.Address
-            this.client.RvrsGeoAddress                  =   client.RvrsGeoAddress
-            this.client.Neighborhood                    =   client.Neighborhood
-            this.client.Landmark                        =   client.Landmark
-
-            this.client.DistrictNo                      =   client.DistrictNo
-            this.client.DistrictNameE                   =   client.DistrictNameE
-
-            await this.getCites()
-
-            this.client.CityNo                          =   client.CityNo
-            this.client.CityNameE                       =   client.CityNameE
-
-            this.client.Tel                             =   client.Tel
-            this.client.tel_status                      =   client.tel_status
-            this.client.tel_comment                     =   client.tel_comment
-
-            this.client.CustomerType                    =   client.CustomerType
-            this.client.BrandAvailability               =   client.BrandAvailability
-            this.client.BrandSourcePurchase             =   client.BrandSourcePurchase
-
-            this.client.JPlan                           =   client.JPlan
-            this.client.Journee                         =   client.Journee
-
-            this.client.Frequency                       =   client.Frequency
-            this.client.AvailableBrands                 =   client.AvailableBrands_array_formatted // client.AvailableBrands
-            this.client.NbrAutomaticCheckouts           =   client.NbrAutomaticCheckouts
-            this.client.SuperficieMagasin               =   client.SuperficieMagasin
-
-            this.client.status                          =   client.status
-            this.client.status_original                 =   client.status
-            this.client.nonvalidated_details            =   client.nonvalidated_details
-
-            this.client.owner                           =   client.owner
-            this.client.comment                         =   client.comment
-
-            this.client.CustomerBarCode_image                   =   client.CustomerBarCode_image
-            this.client.facade_image                            =   client.facade_image
-            this.client.in_store_image                          =   client.in_store_image
-
-            this.client.CustomerBarCode_image_original_name     =   client.CustomerBarCode_image_original_name
-            this.client.facade_image_original_name              =   client.facade_image_original_name
-            this.client.in_store_image_original_name            =   client.in_store_image_original_name
-
-            if(this.client.CustomerBarCode_image_original_name) {
-                this.$createFile(client.CustomerBarCode_image_original_name     ,   "CustomerBarCode_image_update")
-                let CustomerBarCode_image_display_update                        =   document.getElementById("CustomerBarCode_image_display_update")
-                CustomerBarCode_image_display_update.src                        =   "/uploads/clients/"+client.id+"/"+client.CustomerBarCode_image
-            }
-
-            if(this.client.facade_image_original_name) {
-                this.$createFile(client.facade_image_original_name              ,   "facade_image_update")
-                let facade_image_display_update                                 =   document.getElementById("facade_image_display_update")
-                facade_image_display_update.src                                 =   "/uploads/clients/"+client.id+"/"+client.facade_image
-            }
-
-            if(this.client.in_store_image_original_name) {
-                this.$createFile(client.in_store_image_original_name            ,   "in_store_image_update")
-                let in_store_image_display_update                               =   document.getElementById("in_store_image_display_update")
-                in_store_image_display_update.src                               =   "/uploads/clients/"+client.id+"/"+client.in_store_image
-            }
+            // If you need specific logic like getUsers/Cites, keep them:
+            await this.getUsers();
+            if(this.client.DistrictNo) await this.getCites();
         },
 
         async getComboData() {
@@ -1163,7 +950,7 @@ export default {
 
             else {
                 const res_2     =   await this.$callApi("post"  ,   "/rtm-willayas"     ,   null)
-                this.willayas   =   res_2.data
+                this.willayas   =   res_2.data.willayas
             }
         },
 
@@ -1175,25 +962,27 @@ export default {
 
             else {
                 const res_1         =   await this.$callApi("post"  ,   "/users/combo"  ,   null)
-                this.users          =   res_1.data
+                this.users          =   res_1.data.users
             }
         },
 
         async getCites() {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             const res_3     =   await this.$callApi("post"  ,   "/rtm-willayas/"+this.client.DistrictNo+"/rtm-cities"         ,   null)
-            this.cities      =   res_3.data
+            this.cities      =   res_3.data.cities
+
+            console.log(this.cities)
 
             this.client.CityNo      =   ""
 
             // Hide Loading Page
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
-        //
+        //  //  //  //  //
 
         getDistrictNameE(DistrictNo) {
 
@@ -1228,7 +1017,80 @@ export default {
             }
         },
 
-        //
+        //  //  //  //  //
+
+        async handleImageUpload(event, fieldKey) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            this.revokeImage(fieldKey); // Clear old memory
+
+            try {
+                // Compress
+                const compressedFile = await this.$compressImage(file);
+                const objectUrl = URL.createObjectURL(compressedFile);
+
+                // Store Binary in non-reactive object
+                this._rawFiles[fieldKey] = compressedFile;
+
+                // Update Vue State (Metadata & Preview only)
+                this.client[`${fieldKey}_currentObjectURL`] = objectUrl;
+                this.client[`${fieldKey}_original_name`] = file.name;
+                this.client[`${fieldKey}_updated`] = true;
+
+                // Handle Display Containers (Logic from your original code)
+                const containerId = `${fieldKey}_display_update_container`;
+                const container = document.getElementById(containerId);
+                if (container) container.style.display = "block";
+
+                // Clear input value to allow re-selecting same file
+                event.target.value = '';
+
+            } catch (e) {
+                console.error(`Error uploading ${fieldKey}:`, e);
+            }
+        },
+
+        revokeImage(fieldKey) {
+            if (this.client[`${fieldKey}_currentObjectURL`]?.startsWith('blob:')) {
+                URL.revokeObjectURL(this.client[`${fieldKey}_currentObjectURL`]);
+            }
+        },
+
+        //  //  //  //  //
+
+        brandAvailabilityChanged() {
+
+            if(this.client.BrandAvailability   === 'Non') {
+
+                this.client.AvailableBrands                 =   []
+
+                this.client.in_store_image_original_name    =   ""
+                this.client.in_store_image                  =   ""
+
+                this.client.in_store_image_updated          =   true
+
+                const in_store_image_display_update         =   document.getElementById("in_store_image_display_update")
+
+                if(in_store_image_display_update) {
+
+                    in_store_image_display_update.src           =   ""
+                }
+            }
+        },
+
+        setStatus() {
+
+            if(this.client.OpenCustomer ==  "Ferme") {
+                this.client.status     =   "ferme"
+            }
+
+            else {
+                this.client.status     =   ""
+            }
+        },
+
+        //  //  //  //  //
 
         async showPositionOnMapMultiMap(map_id) {
             
@@ -1320,170 +1182,18 @@ export default {
             return this.$map.$setDistanceStraight(latitude_1, longitude_1, latitude_2, longitude_2)
         },
 
-        //
+        async getRvrsGeoAddress() {
 
-        async customerBarCodeImage() {
-
-            const CustomerBarCode_image  =   document.getElementById("CustomerBarCode_image_update").files[0];
-
-            if(CustomerBarCode_image) {
-
-                this.client.CustomerBarCode_image_updated           =   true
-
-                this.client.CustomerBarCode_image_original_name     =   CustomerBarCode_image.name
-                this.client.CustomerBarCode_image                   =   await this.$compressImage(CustomerBarCode_image)
-
-                //
-
-                let CustomerBarCode_image_base64                    =   await this.$imageToBase64(this.client.CustomerBarCode_image)
-
-                let CustomerBarCode_image_display                   =   document.getElementById("CustomerBarCode_image_display_update")
-                this.base64ToImage(CustomerBarCode_image_base64, CustomerBarCode_image_display)
-            }
-
-            else {
-
-                this.client.CustomerBarCode_image_original_name     =   ""
-                this.client.CustomerBarCode_image                   =   ""
-
-                this.client.CustomerBarCode_image_updated           =   true
-
-                const CustomerBarCode_image_display_update          =   document.getElementById("CustomerBarCode_image_display_update")
-
-                if(CustomerBarCode_image_display_update) {
-
-                    CustomerBarCode_image_display_update.src            =   ""
-                }
-
-                //
-
-                const CustomerBarCode_image_display_update_container   =   document.getElementById("CustomerBarCode_image_display_update_container")
-
-                if(CustomerBarCode_image_display_update_container) {
-
-                    CustomerBarCode_image_display_update_container.style.display   =   "none"
-                }
+            const address   =   await this.$getAddressFromLocationIQ(this.client.Latitude, this.client.Longitude);
+            
+            // Assuming 'this.client.Address' is where you want to store it
+            if(address) {
+                this.client.RvrsGeoAddress  =   address;
+                console.log("Address found:", this.client.RvrsGeoAddress);
             }
         },
 
-        async facadeImage() {
-
-            const facade_image  =   document.getElementById("facade_image_update").files[0];
-
-            if(facade_image) {
-
-                this.client.facade_image_updated            =   true
-
-                this.client.facade_image_original_name      =   facade_image.name
-                this.client.facade_image                    =   await this.$compressImage(facade_image)
-
-                //
-
-                let facade_image_base64                     =   await this.$imageToBase64(this.client.facade_image)
-
-                let facade_image_display                    =   document.getElementById("facade_image_display_update")
-                this.base64ToImage(facade_image_base64, facade_image_display)
-            }
-
-            else {
-
-                this.client.facade_image_original_name      =   ""
-                this.client.facade_image                    =   ""
-
-                this.client.facade_image_updated            =   true
-
-                const facade_image_display_update           =   document.getElementById("facade_image_display_update")
-
-                if(facade_image_display_update) {
-
-                    facade_image_display_update.src            =   ""
-                }
-
-                //
-
-                const facade_image_display_update_container   =   document.getElementById("facade_image_display_update_container")
-
-                if(facade_image_display_update_container) {
-
-                    facade_image_display_update_container.style.display   =   "none"
-                }
-            }
-        },
-
-        async inStoreImage() {
-
-            const in_store_image  =   document.getElementById("in_store_image_update").files[0];
-
-            if(in_store_image) {
-
-                this.client.in_store_image_updated          =   true
-
-                this.client.in_store_image_original_name    =   in_store_image.name
-                this.client.in_store_image                  =   await this.$compressImage(in_store_image)
-                
-                //
-
-                let in_store_image_base64                   =   await this.$imageToBase64(this.client.in_store_image)
-
-                let in_store_image_display                  =   document.getElementById("in_store_image_display_update")
-                this.base64ToImage(in_store_image_base64, in_store_image_display)
-            }
-
-            else {
-
-                this.client.in_store_image_original_name    =   ""
-                this.client.in_store_image                  =   ""
-
-                this.client.in_store_image_updated          =   true
-
-                const in_store_image_display_update         =   document.getElementById("in_store_image_display_update")
-
-                if(in_store_image_display_update) {
-
-                    in_store_image_display_update.src           =   ""
-                }
-
-                //
-
-                const in_store_image_display_update_container   =   document.getElementById("in_store_image_display_update_container")
-
-                if(in_store_image_display_update_container) {
-
-                    in_store_image_display_update_container.style.display   =   "none"
-                }
-            }
-        },
-
-        //    
-
-        brandAvailabilityChanged() {
-
-            if(this.client.BrandAvailability   === 'Non') {
-
-                this.client.AvailableBrands                 =   []
-
-                this.client.in_store_image_original_name    =   ""
-                this.client.in_store_image                  =   ""
-
-                this.client.in_store_image_updated          =   true
-
-                const in_store_image_display_update         =   document.getElementById("in_store_image_display_update")
-
-                if(in_store_image_display_update) {
-
-                    in_store_image_display_update.src           =   ""
-                }
-            }
-        },
-
-        //
-
-        base64ToImage(image_base64, image_display_div) {
-
-            this.$base64ToImage(image_base64, image_display_div)
-        },
-
-        //
+        //  //  //
 
         async setBarCodeReader() {
 
@@ -1543,16 +1253,52 @@ export default {
             console.error("");
         },
 
-        //  //  //
+        //  //  //  //  //
 
-        setStatus() {
+        clearData() {
+            // 1. Revoke Object URLs to free memory
+            const fields = ['facade_image', 'CustomerBarCode_image', 'in_store_image'];
+            fields.forEach(field => {
+                if (this.client[`${field}_currentObjectURL`]?.startsWith('blob:')) {
+                    URL.revokeObjectURL(this.client[`${field}_currentObjectURL`]);
+                }
+                // Reset Vue State for images
+                this.client[field] = '';
+                this.client[`${field}_original_name`] = '';
+                this.client[`${field}_currentObjectURL`] = null;
+                this.client[`${field}_updated`] = false;
 
-            if(this.client.OpenCustomer ==  "Ferme") {
-                this.client.status     =   "ferme"
-            }
+                // Hide Display Containers
+                const container = document.getElementById(`${field}_display_update_container`);
+                if (container) container.style.display = "none";
+            });
 
-            else {
-                this.client.status     =   ""
+            // 2. Clear Raw Files (Binary Data)
+            this._rawFiles = {
+                facade_image: null,
+                CustomerBarCode_image: null,
+                in_store_image: null
+            };
+
+            // 3. Reset Text Fields (Optional - depending on if you want a blank slate or just image cleanup)
+            // Usually, in a modal, you overwrite these in `getData`, but it's good practice to reset keys.
+            this.client.id = '';
+            this.client.CustomerNameE = '';
+            this.client.CustomerNameA = '';
+            this.client.AvailableBrands = [];
+            this.client.status = '';
+            
+            // 4. Reset Inputs in DOM
+            const inputIds = ['facade_image_update', 'CustomerBarCode_image_update', 'in_store_image_update'];
+            inputIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            
+            // 5. Reset Map if initialized
+            if(this.position_marker) {
+                // Logic to remove marker from map if necessary
+                this.position_marker = null;
             }
         }
     }

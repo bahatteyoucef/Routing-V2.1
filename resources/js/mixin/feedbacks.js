@@ -16,7 +16,7 @@ export default {
                 showConfirmButton   : false,
 
                 customClass : {
-                    container: 'position-absolute'
+                    container: 'position-fixed'
                 },
                 toast       : true,
                 position    : 'top-right'
@@ -35,7 +35,7 @@ export default {
                 showConfirmButton   : false,
 
                 customClass : {
-                    container: 'position-absolute'
+                    container: 'position-fixed'
                 },
                 toast       : true,
                 position    : 'top-right'
@@ -70,7 +70,7 @@ export default {
                 showConfirmButton   : false,
 
                 customClass : {
-                    container: 'position-absolute'
+                    container: 'position-fixed'
                 },
                 toast       : true,
                 position    : 'top-right'

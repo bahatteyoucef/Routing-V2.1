@@ -3,13 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
-use Exception;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class ClientController extends Controller
-{
+class ClientController extends Controller {
 
     public function showClient(Request $request, int $id_route_import, int $id_client) {
 
@@ -74,8 +73,7 @@ class ClientController extends Controller
 
     }
 
-    public function updateClient(Request $request, int $id_route_import, int $id_client)
-    {
+    public function updateClient(Request $request, int $id_route_import, int $id_client) {
 
         try {
 
@@ -267,27 +265,37 @@ class ClientController extends Controller
     //  //  //  //  //
 
     public function getDoublesClients(Request $request, $id_route_import) {
-        $data = Client::getDoublesClients($request, $id_route_import);        
-        return $data;
+        $doubles    =   Client::getDoublesClients($request, $id_route_import);        
+        return response()->json([   
+            "doubles"   =>  $doubles
+        ]);
     }
 
     public function getDoublesTelClients(Request $request, $id_route_import) {
-        $data = Client::findDuplicates($request, $id_route_import, 'Tel');
-        return $data;
+        $doubles_tel = Client::findDuplicates($request, $id_route_import, 'Tel');
+        return response()->json([   
+            "doubles_tel"   =>  $doubles_tel
+        ]);
     }
 
     public function getDoublesCustomerCodeClients(Request $request, $id_route_import) {
-        $data = Client::findDuplicates($request, $id_route_import, 'CustomerCode');        
-        return $data;
+        $doubles_customer_code = Client::findDuplicates($request, $id_route_import, 'CustomerCode');        
+        return response()->json([   
+            "doubles_customer_code"   =>  $doubles_customer_code
+        ]);
     }
 
     public function getDoublesCustomerNameEClients(Request $request, $id_route_import) {
-        $data = Client::findDuplicates($request, $id_route_import, 'CustomerNameE');        
-        return $data;
+        $doubles_customer_namee = Client::findDuplicates($request, $id_route_import, 'CustomerNameE');        
+        return response()->json([   
+            "doubles_customer_namee"   =>  $doubles_customer_namee
+        ]);
     }
 
     public function getDoublesGPSClients(Request $request, $id_route_import) {
-        $data = Client::findDuplicates($request, $id_route_import, 'GPS'); 
-        return $data;
+        $doubles_gps = Client::findDuplicates($request, $id_route_import, 'GPS'); 
+        return response()->json([   
+            "doubles_gps"   =>  $doubles_gps
+        ]);
     }
 }

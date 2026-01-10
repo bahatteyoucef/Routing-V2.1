@@ -123,3 +123,10 @@ html, * {
 .navbar-nav-right.row {
     flex-wrap: nowrap !important;
 }
+
+/*  */
+/* .swal2-container.swal2-top-right {
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+} */

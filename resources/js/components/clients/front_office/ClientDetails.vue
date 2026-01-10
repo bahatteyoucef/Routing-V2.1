@@ -200,14 +200,14 @@ export default {
 
             if(res) {
 
-                this.$showLoadingPage()
+                await this.$showLoadingPage()
 
                 const res                   =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/clients/"+this.client.id+"/delete",   null)
 
                 if(res.status===200){
 
                     // Hide Loading Page
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
 
                     // Send Feedback
                     this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
@@ -219,7 +219,7 @@ export default {
                 else{
 
                     // Hide Loading Page
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
 
                     // Send Errors
                     this.$showErrors("Error !", res.data.errors)

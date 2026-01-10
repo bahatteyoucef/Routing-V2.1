@@ -7,10 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class JourneeTerritoryController extends Controller
-{
-    public function storeJourneeTerritory(Request $request, int $id_route_import)
-    {
+class JourneeTerritoryController extends Controller {
+
+    public function storeJourneeTerritory(Request $request, int $id_route_import) {
 
         try {
 
@@ -53,8 +52,7 @@ class JourneeTerritoryController extends Controller
 
     }
 
-    public function updateJourneeTerritory(Request $request, int $id_route_import, int $id_journee_territory)
-    {
+    public function updateJourneeTerritory(Request $request, int $id_route_import, int $id_journee_territory) {
 
         try {
 
@@ -97,8 +95,7 @@ class JourneeTerritoryController extends Controller
 
     }
 
-    public function deleteJourneeTerritory(Request $request, int $id_route_import, int $id_journee_territory)
-    {
+    public function deleteJourneeTerritory(Request $request, int $id_route_import, int $id_journee_territory) {
 
         try {
 

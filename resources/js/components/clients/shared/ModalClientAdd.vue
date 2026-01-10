@@ -92,7 +92,8 @@
                                         <label for="tel_status"         class="form-label">Téléphone Status</label>
                                         <select                         class="form-select"         id="tel_status"     v-model="client.tel_status">
                                             <option value="validated" selected>validated</option>
-                                            <option value="nonvalidated" selected>nonvalidated</option>
+                                            <option value="pending">pending</option>
+                                            <option value="nonvalidated">nonvalidated</option>
                                         </select>
                                     </div>
 
@@ -405,11 +406,12 @@
 
                                     <div v-if="client.OpenCustomer  === 'Ouvert'"   class="col-sm-12">
                                         <label for="CustomerBarCode_image_add"      class="form-label">Image Code-Barre</label>
-                                        <input type="file"                          class="form-control"        id="CustomerBarCode_image_add"              accept="image/*"    capture     @change="customerBarCodeImage()">
+                                        <input type="file"                          class="form-control"        id="CustomerBarCode_image_add"              accept="image/*"    capture     @change="handleImageUpload($event, 'CustomerBarCode_image')">
 
-                                        <div class="img-magnifier-container">
+                                        <div v-if="client.CustomerBarCode_image_currentObjectURL" class="img-magnifier-container">
                                             <img
                                                 id="CustomerBarCode_image_display_add"
+                                                :src="client.CustomerBarCode_image_currentObjectURL"
                                                 class="w-100"
                                                 @load="$magnify('CustomerBarCode_image_display_add', 3)"
                                             />
@@ -420,11 +422,12 @@
                                 <div class="row mt-3 mb-3">
                                     <div class="col-sm-12">
                                         <label for="facade_image_add"       class="form-label">Image Facade</label>
-                                        <input type="file"                  class="form-control"    id="facade_image_add"               accept="image/*"    @change="facadeImage()">
+                                        <input type="file"                  class="form-control"    id="facade_image_add"               accept="image/*"    @change="handleImageUpload($event, 'facade_image')">
 
-                                        <div class="img-magnifier-container">
+                                        <div v-if="client.facade_image_currentObjectURL" class="img-magnifier-container">
                                             <img
                                                 id="facade_image_display_add"
+                                                :src="client.facade_image_currentObjectURL"
                                                 class="w-100"
                                                 @load="$magnify('facade_image_display_add', 3)"
                                             />
@@ -440,6 +443,20 @@
                                         <div class="img-magnifier-container">
                                             <img
                                                 id="in_store_image_display_add"
+                                                class="w-100"
+                                                @load="$magnify('in_store_image_display_add', 3)"
+                                            />
+                                        </div>
+
+                                        <!--  -->
+
+                                        <label for="in_store_image_add"      class="form-label">Image In-Store</label>
+                                        <input type="file"                          class="form-control"        id="in_store_image_add"              accept="image/*"    capture     @change="handleImageUpload($event, 'in_store_image')">
+
+                                        <div v-if="client.in_store_image_currentObjectURL" class="img-magnifier-container">
+                                            <img
+                                                id="in_store_image_display_add"
+                                                :src="client.in_store_image_currentObjectURL"
                                                 class="w-100"
                                                 @load="$magnify('in_store_image_display_add', 3)"
                                             />
@@ -496,6 +513,11 @@ export default {
                 // Slide 2
                 CustomerCode                            :   '',
 
+                // Image display URLs (String)
+                facade_image_currentObjectURL           :   null,
+                in_store_image_currentObjectURL         :   null,
+                CustomerBarCode_image_currentObjectURL  :   null,
+
                 // Slide 3
                 CustomerBarCode_image                   :   '',
                 CustomerBarCode_image_original_name     :   '',
@@ -508,7 +530,7 @@ export default {
 
                 // Slide 6
                 Tel                                     :   '',
-                tel_status                              :   'nonvalidated',
+                tel_status                              :   'pending',
                 tel_comment                             :   '',
 
                 // Slide 7
@@ -614,6 +636,15 @@ export default {
 
     props : ["id_route_import", "districts_all", "users_all"],
 
+    created() {
+        this._rawFiles = {};
+    },
+
+    beforeUnmount() {
+        const imageKeys = ['facade_image', 'CustomerBarCode_image', 'in_store_image'];
+        imageKeys.forEach(key => this.revokeImage(key));
+    },
+
     mounted() {
         this.clearData("#ModalClientAdd")
     },  
@@ -624,308 +655,77 @@ export default {
             "setAddClientAction"   ,
         ]),
 
+        //  //  //  //  //
+
         async sendData() {
-
-            this.$showLoadingPage()
-
-            // Set Client
-            this.client.DistrictNameE   =   this.getDistrictNameE(this.client.DistrictNo)
-            this.client.CityNameE       =   this.getCityNameE(this.client.CityNo)
-            this.client.owner_username      =   this.getOwnerUsername(this.client.owner)
-
-            //
-            this.client.start_adding_date   =   this.start_adding_date
-            this.client.finish_adding_date  =   moment(new Date()).format()
-
-            //
-            if(this.client.OpenCustomer  === 'Ouvert') {
-            }
-
-            else {
-                this.client.CustomerCode                                =   ''
-                this.client.CustomerNameE                               =   ''
-                this.client.Tel                                         =   ''
-                this.client.tel_status                                  =   'nonvalidated'
-                this.client.tel_comment                                 =   ''
-                this.client.BrandAvailability                           =   'Non'
-                this.client.BrandSourcePurchase                         =   ''
-                this.client.NbrAutomaticCheckouts                       =   ''
-                this.client.AvailableBrands                             =   []
-                this.client.CustomerBarCode_image                       =   ''
-                this.client.in_store_image                              =   ''
-                this.client.CustomerBarCode_image_original_name         =   ''
-                this.client.in_store_image_original_name                =   ''
-                this.client.status                                      =   'ferme'
-                this.client.nonvalidated_details                        =   ''
-            }
-
-            //
-            let formData = new FormData();
-
-            formData.append("NewCustomer"                           ,   this.client.NewCustomer)
-            formData.append("OpenCustomer"                          ,   this.client.OpenCustomer)
-
-            formData.append("CustomerIdentifier"                    ,   this.client.CustomerIdentifier)
-            formData.append("CustomerCode"                          ,   this.client.CustomerCode)
-            formData.append("CustomerNameE"                         ,   this.client.CustomerNameE)
-            formData.append("CustomerNameA"                         ,   this.client.CustomerNameA)
-            formData.append("Latitude"                              ,   this.client.Latitude)
-            formData.append("Longitude"                             ,   this.client.Longitude)
-            formData.append("Address"                               ,   this.client.Address)
-            formData.append("RvrsGeoAddress"                        ,   this.client.RvrsGeoAddress)
-            formData.append("Neighborhood"                          ,   this.client.Neighborhood)
-            formData.append("Landmark"                              ,   this.client.Landmark)
-
-            formData.append("DistrictNo"                            ,   this.client.DistrictNo)
-            formData.append("DistrictNameE"                         ,   this.client.DistrictNameE)
-            formData.append("CityNo"                                ,   this.client.CityNo)
-            formData.append("CityNameE"                             ,   this.client.CityNameE)
-            formData.append("Tel"                                   ,   this.client.Tel)
-            formData.append("tel_status"                            ,   this.client.tel_status)
-            formData.append("tel_comment"                           ,   this.client.tel_comment)
-            formData.append("CustomerType"                          ,   this.client.CustomerType)
-            formData.append("BrandAvailability"                     ,   this.client.BrandAvailability)
-            formData.append("BrandSourcePurchase"                   ,   this.client.BrandSourcePurchase)
-
-            formData.append("JPlan"                                 ,   this.client.JPlan)
-            formData.append("Journee"                               ,   this.client.Journee)
-
-            formData.append("Frequency"                             ,   this.client.Frequency)
-            formData.append("SuperficieMagasin"                     ,   this.client.SuperficieMagasin)
-            formData.append("NbrAutomaticCheckouts"                 ,   this.client.NbrAutomaticCheckouts)
-            formData.append("AvailableBrands"                       ,   JSON.stringify(this.client.AvailableBrands))
-
-            formData.append("CustomerBarCode_image"                 ,   this.client.CustomerBarCode_image)
-            formData.append("facade_image"                          ,   this.client.facade_image)
-            formData.append("in_store_image"                        ,   this.client.in_store_image)
-
-            formData.append("CustomerBarCode_image_original_name"   ,   this.client.CustomerBarCode_image_original_name)
-            formData.append("facade_image_original_name"            ,   this.client.facade_image_original_name)
-            formData.append("in_store_image_original_name"          ,   this.client.in_store_image_original_name)
-
-            formData.append("status"                                ,   this.client.status)
-            formData.append("nonvalidated_details"                  ,   this.client.nonvalidated_details)
-
-            formData.append("owner"                                 ,   this.client.owner)
-            formData.append("comment"                               ,   this.client.comment)
-
-            formData.append("start_adding_date"                     ,   this.client.start_adding_date)
-            formData.append("finish_adding_date"                    ,   this.client.finish_adding_date)
-
-            //
-            const res   =   await this.$callApi("post"  ,   "/route-imports/"+this.id_route_import+"/clients/store",   formData)
-            console.log(res.data)
-
-            if(res.status===200){
-
-                // Send Client
-                let client                                  =   res.data.client
-                client.owner_username                           =   this.client.owner_username
-                client.created_at                           =   this.$formatDate(new Date())
-
-                // Send Feedback
-                this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
-
-                // Hide Loading Page
-                this.$hideLoadingPage()
-
-                //
-                this.emitter.emit('reSetAdd' , client)
-
-                // Close Modal
-                await this.$hideModal("ModalClientAdd")
-            }
-
-            else{
-
-                // Send Errors
-                this.$showErrors("Error !", res.data.errors)
-
-                // Hide Loading Page
-                this.$hideLoadingPage()
-			}            
-        },
-
-        //
-
-        clearData(id_modal) {
-
-            $(id_modal).on("hidden.bs.modal",   ()  => {
-
-                //
-
-                if(this.scanner) {
-
-                    this.scanner.clear().then(_ => {
-
-                    }).catch(error => {
-
-                    });
-                }
-
-                //
-
-                let CustomerBarCode_image               =   document.getElementById("CustomerBarCode_image_add")
-                if(CustomerBarCode_image) {
-                    CustomerBarCode_image.value             =   ""
-                }
-
-                let CustomerBarCode_image_display       =   document.getElementById("CustomerBarCode_image_display_add")
-                if(CustomerBarCode_image_display) {
-                    CustomerBarCode_image_display.src       =   ""
-                }
-
-                //
-
-                let facade_image_add                    =   document.getElementById("facade_image_add")
-                if(facade_image_add) {
-                    facade_image_add.value                  =   ""
-                }
-
-                let facade_image_display_add            =   document.getElementById("facade_image_display_add")
-                if(facade_image_display_add) {
-                    facade_image_display_add.src            =   ""
-                }
-
-                //
-
-                let in_store_image_add                  =   document.getElementById("in_store_image_add")
-                if(in_store_image_add) {
-                    in_store_image_add.value                =   ""
-                }
-
-                let in_store_image_display_add          =   document.getElementById("in_store_image_display_add")
-                if(in_store_image_display_add) {
-                    in_store_image_display_add.src          =   ""
-                }
-
-                //
-
-                this.client.CustomerBarCode_image                   =   '',
-                this.client.facade_image                            =   '',
-                this.client.in_store_image                          =   '',
-
-                this.client.CustomerBarCode_image_original_name     =   '',
-                this.client.facade_image_original_name              =   '',
-                this.client.in_store_image_original_name            =   '',
-
-                // 
-                this.setAddClientAction(null)
-
-                // Client
-                this.client.id                                      =   '',
-
-                //
-                this.client.NewCustomer                             =   '',
-
-                //
-                this.client.OpenCustomer                            =   '',
-
-                //
-                this.client.CustomerIdentifier                      =   '',
-
-                // Slide 1
-                this.client.CustomerCode                            =   '',
-
-                // Slide 2
-                this.client.CustomerBarCode_image                   =   '',
-                this.client.CustomerBarCode_image_original_name     =   '',
-
-                // Slide 3
-                this.client.CustomerNameE                           =   '',
-
-                // Slide 4
-                this.client.CustomerNameA                           =   '',
-
-                // Slide 5
-                this.client.Tel                                     =   '',
-                this.client.tel_status                              =   'nonvalidated',
-                this.client.tel_comment                             =   '',
-
-                // Slide 6
-                this.client.Latitude                                =   '',
-                this.client.Longitude                               =   '',
-
-                // Slide 7
-                this.client.Address                                 =   '',
-                this.client.RvrsGeoAddress                          =   '',
-
-                // Slide 8
-                this.client.Neighborhood                            =   '',
-
-                // Slide 9
-                this.client.Landmark                                =   '',
-
-                // Slide 10
-                this.client.DistrictNo                              =   '',
-                this.client.DistrictNameE                           =   '',
-
-                // Slide 11
-                this.client.CityNo                                  =   '',
-                this.client.CityNameE                               =   '',
-
-                // Slide 12
-                this.client.CustomerType                            =   '',
-
-                // Slide 13
-                this.client.BrandAvailability                       =   'Non',
-
-                // Slide 14
-                this.client.BrandSourcePurchase                     =   '',
-
-                // Slide 15
-                this.client.JPlan                                   =   '',
-
-                // Slide 16 
-                this.client.Journee                                 =   '',
-
-                //
-                this.client.AvailableBrands                         =   [],
-                this.client.NbrAutomaticCheckouts                   =   '',
-                this.client.SuperficieMagasin                       =   '',
-
-                // Slide 17
-                this.client.status                                  =   '',
-                this.client.nonvalidated_details                    =   '', 
-
-                // Slide 18
-                this.client.facade_image                            =   '',
-                this.client.facade_image_original_name              =   '',
-
-                // Slide 19   
-                this.client.in_store_image                          =   '',
-                this.client.in_store_image_original_name            =   '',
-
-                this.client.owner                                   =   '',
-                this.client.owner_username                          =   '',
-                this.client.comment                                 =   ''
-
-                //
-
-                this.users                                          =   []  
-                this.willayas                                       =   []
-                this.cities                                          =   []
-
-                this.liste_journey_plan                             =   []  
-                this.liste_journee                                  =   []  
-                this.liste_type_client                              =   []  
-
-                //
-
-                this.all_clients                                    =   []  
-                this.close_clients                                  =   []  
-
-                //
-
-                this.start_adding_date                              =   ""  
-
-                //
-
-                this.scanner                                        =   null
+            await this.$showLoadingPage();
+
+            // Set Derived Data
+            this.client.DistrictNameE = this.getDistrictNameE(this.client.DistrictNo);
+            this.client.CityNameE = this.getCityNameE(this.client.CityNo);
+            this.client.owner_username = this.getOwnerUsername(this.client.owner);
+            this.client.finish_adding_date = moment(new Date()).format();
+
+            // Handle "Ferme" logic inside data preparation or use your setStatus method
+
+            const formData = new FormData();
+            
+            // Define all text fields to send
+            const textFields = [
+                'NewCustomer', 'OpenCustomer', 'CustomerIdentifier', 'CustomerCode',
+                'CustomerNameE', 'CustomerNameA', 'Latitude', 'Longitude', 'Address',
+                'RvrsGeoAddress', 'Neighborhood', 'Landmark', 'DistrictNo', 'DistrictNameE',
+                'CityNo', 'CityNameE', 'Tel', 'tel_status', 'tel_comment', 'CustomerType',
+                'BrandAvailability', 'BrandSourcePurchase', 'JPlan', 'Journee', 
+                'Frequency', 'SuperficieMagasin', 'NbrAutomaticCheckouts',
+                'status', 'nonvalidated_details', 'owner', 'comment', 
+                'start_adding_date', 'finish_adding_date'
+            ];
+
+            // Append Text Fields
+            textFields.forEach(key => {
+                const value = this.client[key];
+                formData.append(key, (value === undefined || value === null) ? '' : value);
             });
+
+            // Append JSON fields
+            formData.append("AvailableBrands", JSON.stringify(this.client.AvailableBrands || []));
+
+            // Append Images from _rawFiles
+            const imageKeys = ['facade_image', 'CustomerBarCode_image', 'in_store_image'];
+            
+            imageKeys.forEach(key => {
+                // If we have a file in _rawFiles, append it
+                if (this._rawFiles[key]) {
+                    formData.append(key, this._rawFiles[key]);
+                    formData.append(`${key}_original_name`, this.client[`${key}_original_name`] || '');
+                } 
+            });
+
+            try {
+                const url = "/route-imports/" + this.id_route_import + "/clients/store";
+                const res = await this.$callApi("post", url, formData);
+
+                if (res.status === 200) {
+                    let client = res.data.client;
+                    client.owner_username = this.client.owner_username;
+                    client.created_at = this.$formatDate(new Date());
+
+                    this.$feedbackSuccess(res.data["header"], res.data["message"]);
+                    this.emitter.emit('reSetAdd', client);
+                    await this.$hideModal("ModalClientAdd");
+                } else {
+                    this.$showErrors("Error !", res.data.errors);
+                }
+            } catch (e) {
+                console.error(e);
+                this.$showErrors("Connection Error", ["Failed to send data."]);
+            } finally {
+                await this.$hideLoadingPage();
+            }
         },
 
-        //
+        //  //  //  //  //
 
         async getData(client, all_clients) {
 
@@ -941,15 +741,6 @@ export default {
             await this.showPositionOnMapMultiMap("show_modal_client_add_map");
         },
 
-        setCoords(client) {
-
-            if(client) {
-
-                this.client.Latitude    =   client.lat
-                this.client.Longitude   =   client.lng
-            }
-        },
-
         async getComboData() {
 
             if(this.users_all) {
@@ -958,7 +749,7 @@ export default {
 
             else {
                 const res_1         =   await this.$callApi("post"  ,   "/users/combo"  ,   null)
-                this.users          =   res_1.data
+                this.users          =   res_1.data.users
             }
 
             //
@@ -969,25 +760,34 @@ export default {
 
             else {
                 const res_2         =   await this.$callApi("post"  ,   "/rtm_willayas"         ,   null)
-                this.willayas       =   res_2.data
+                this.willayas       =   res_2.data.willayas
             }
         },
 
         async getCites() {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             const res_1                     =   await this.$callApi("post"  ,   "/rtm-willayas/"+this.client.DistrictNo+"/rtm-cities"         ,   null)
-            this.cities                      =   res_1.data
+            this.cities                     =   res_1.data.cities
 
             this.client.CityNo              =   ""
 
             // Hide Loading Page
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
-        //
+        setCoords(client) {
+
+            if(client) {
+
+                this.client.Latitude    =   client.lat
+                this.client.Longitude   =   client.lng
+            }
+        },
+
+        //  //  //  //  //
 
         getDistrictNameE(DistrictNo) {
 
@@ -1022,7 +822,96 @@ export default {
             }
         },
 
-        //
+        //  //  //  //  //
+
+        async handleImageUpload(event, fieldKey) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Clear previous memory
+            this.revokeImage(fieldKey);
+
+            try {
+                const compressedFile = await this.$compressImage(file);
+                const objectUrl = URL.createObjectURL(compressedFile);
+
+                // Store heavy file in non-reactive storage
+                this._rawFiles[fieldKey] = compressedFile;
+
+                // Update Vue state with lightweight URL and Name
+                this.client[`${fieldKey}_original_name`] = file.name;
+                this.client[`${fieldKey}_currentObjectURL`] = objectUrl;
+
+                // Clear input value to allow re-selecting same file
+                event.target.value = ''; 
+
+            } catch (error) {
+                console.error(`Image processing failed for ${fieldKey}:`, error);
+            }
+        },
+
+        revokeImage(fieldKey) {
+            // Revoke Browser URL
+            if (this.client[`${fieldKey}_currentObjectURL`]) {
+                URL.revokeObjectURL(this.client[`${fieldKey}_currentObjectURL`]);
+                this.client[`${fieldKey}_currentObjectURL`] = null;
+            }
+            // Remove binary file
+            if (this._rawFiles && this._rawFiles[fieldKey]) {
+                delete this._rawFiles[fieldKey];
+            }
+            // Clear name
+            this.client[`${fieldKey}_original_name`] = '';
+        },
+
+        //  //  //  //  //
+
+        brandAvailabilityChanged() {
+
+            if(this.client.BrandAvailability   === 'Non') {
+
+                this.client.AvailableBrands                 =   []
+
+                this.client.in_store_image_original_name    =   ""
+                this.client.in_store_image                  =   ""
+
+                const in_store_image_display                =   document.getElementById("in_store_image_display")
+
+                if(in_store_image_display) {
+
+                    in_store_image_display.src                  =   ""
+                }
+            }
+        },
+
+        setStatus() {
+
+            if(this.client.OpenCustomer ==  "Ferme") {
+                this.client.status     =   "ferme"
+            }
+
+            else {
+
+                if(this.client.OpenCustomer ==  "refus") {
+                    this.client.status     =   "refus"
+                }
+
+                else {
+
+                    if(this.client.OpenCustomer ==  "Ouvert") {
+                        this.client.status     =   "pending"
+                    }
+
+                    else {
+                        if(this.client.OpenCustomer ==  "Introuvable") {
+                            this.client.status     =   "introuvable"
+                        }
+                    }
+                }
+            }
+        },
+
+        //  //  //  //  //
 
         async showPositionOnMapMultiMap(map_id) {
             
@@ -1114,129 +1003,18 @@ export default {
             return this.$map.$setDistanceStraight(latitude_1, longitude_1, latitude_2, longitude_2)
         },
 
-        //
+        async getRvrsGeoAddress() {
 
-        async customerBarCodeImage() {
-
-            const CustomerBarCode_image  =   document.getElementById("CustomerBarCode_image_add").files[0];
-
-            if(CustomerBarCode_image) {
-
-                this.client.CustomerBarCode_image_original_name      =   CustomerBarCode_image.name
-                this.client.CustomerBarCode_image                    =   await this.$compressImage(CustomerBarCode_image)
-
-                //
-
-                let CustomerBarCode_image_base64                     =   await this.$imageToBase64(this.client.CustomerBarCode_image)
-
-                let CustomerBarCode_image_display                    =   document.getElementById("CustomerBarCode_image_display_add")
-                this.base64ToImage(CustomerBarCode_image_base64, CustomerBarCode_image_display)
-            }
-
-            else {
-
-                    this.client.CustomerBarCode_image_original_name     =   ""
-                    this.client.CustomerBarCode_image                   =   ""
-
-                    const CustomerBarCode_image_display                 =   document.getElementById("CustomerBarCode_image_display_add")
-
-                    if(CustomerBarCode_image_display) {
-
-                        CustomerBarCode_image_display.src                   =   ""
-                    }
+            const address   =   await this.$getAddressFromLocationIQ(this.client.Latitude, this.client.Longitude);
+            
+            // Assuming 'this.client.Address' is where you want to store it
+            if(address) {
+                this.client.RvrsGeoAddress  =   address;
+                console.log("Address found:", this.client.RvrsGeoAddress);
             }
         },
 
-        async facadeImage() {
-
-            const facade_image  =   document.getElementById("facade_image_add").files[0];
-
-            if(facade_image) {
-
-                this.client.facade_image_original_name      =   facade_image.name
-                this.client.facade_image                    =   await this.$compressImage(facade_image)
-
-                //
-
-                let facade_image_base64                     =   await this.$imageToBase64(this.client.facade_image)
-
-                let facade_image_display                    =   document.getElementById("facade_image_display_add")
-                this.base64ToImage(facade_image_base64, facade_image_display)
-            }
-
-            else {
-
-                    this.client.facade_image_original_name      =   ""
-                    this.client.facade_image                    =   ""
-
-                    const facade_image_display                  =   document.getElementById("facade_image_display_add")
-
-                    if(facade_image_display) {
-
-                        facade_image_display.src                    =   ""
-                    }
-            }
-        },
-
-        async inStoreImage() {
-
-            const in_store_image  =   document.getElementById("in_store_image_add").files[0];
-
-            if(in_store_image) {
-
-                this.client.in_store_image_original_name    =   in_store_image.name
-                this.client.in_store_image                  =   await this.$compressImage(in_store_image)
-                
-                //
-
-                let in_store_image_base64                   =   await this.$imageToBase64(this.client.in_store_image)
-
-                let in_store_image_display                  =   document.getElementById("in_store_image_display_add")
-                this.base64ToImage(in_store_image_base64, in_store_image_display)
-            }
-
-            else {
-
-                    this.client.in_store_image_original_name    =   ""
-                    this.client.in_store_image                  =   ""
-
-                    const in_store_image_display                =   document.getElementById("in_store_image_display_add")
-
-                    if(in_store_image_display) {
-
-                        in_store_image_display.src                  =   ""
-                    }
-            }
-        },
-
-        //     
-
-        brandAvailabilityChanged() {
-
-            if(this.client.BrandAvailability   === 'Non') {
-
-                this.client.AvailableBrands                 =   []
-
-                this.client.in_store_image_original_name    =   ""
-                this.client.in_store_image                  =   ""
-
-                const in_store_image_display                =   document.getElementById("in_store_image_display")
-
-                if(in_store_image_display) {
-
-                    in_store_image_display.src                  =   ""
-                }
-            }
-        },
-
-        //
-
-        base64ToImage(image_base64, image_display_div) {
-
-            this.$base64ToImage(image_base64, image_display_div)
-        },
-
-        //
+        //  //  //  //  //
 
         async setBarCodeReader() {
 
@@ -1297,34 +1075,67 @@ export default {
             console.error("");
         },
 
-        //  //  //
+        //  //  //  //  //
 
-        setStatus() {
-
-            if(this.client.OpenCustomer ==  "Ferme") {
-                this.client.status     =   "ferme"
-            }
-
-            else {
-
-                if(this.client.OpenCustomer ==  "refus") {
-                    this.client.status     =   "refus"
-                }
-
-                else {
-
-                    if(this.client.OpenCustomer ==  "Ouvert") {
-                        this.client.status     =   "pending"
+        clearData(id_modal) {
+            $(id_modal).on("hidden.bs.modal", () => {
+                
+                // 1. Revoke Object URLs to free memory
+                const fields = ['facade_image', 'CustomerBarCode_image', 'in_store_image'];
+                fields.forEach(field => {
+                    if (this.client[`${field}_currentObjectURL`]?.startsWith('blob:')) {
+                        URL.revokeObjectURL(this.client[`${field}_currentObjectURL`]);
                     }
+                    // Reset Vue State for images
+                    this.client[field] = '';
+                    this.client[`${field}_original_name`] = '';
+                    this.client[`${field}_currentObjectURL`] = null;
+                    this.client[`${field}_updated`] = false;
 
-                    else {
-                        if(this.client.OpenCustomer ==  "Introuvable") {
-                            this.client.status     =   "introuvable"
-                        }
-                    }
+                    // Hide Display Containers
+                    const container = document.getElementById(`${field}_display_update_container`);
+                    if (container) container.style.display = "none";
+                });
+
+                // 2. Clear Raw Files (Binary Data)
+                this._rawFiles = {
+                    facade_image: null,
+                    CustomerBarCode_image: null,
+                    in_store_image: null
+                };
+
+                // 3. Reset Text Fields (Optional - depending on if you want a blank slate or just image cleanup)
+                // Usually, in a modal, you overwrite these in `getData`, but it's good practice to reset keys.
+                this.client.id = '';
+                this.client.CustomerNameE = '';
+                this.client.CustomerNameA = '';
+                this.client.AvailableBrands = [];
+                this.client.status = '';
+                
+                // 4. Reset Inputs in DOM
+                const inputIds = ['facade_image_update', 'CustomerBarCode_image_update', 'in_store_image_update'];
+                inputIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = '';
+                });
+                
+                // 5. Reset Map if initialized
+                if(this.position_marker) {
+                    // Logic to remove marker from map if necessary
+                    this.position_marker = null;
                 }
-            }
-        }
+            });
+        },
+
+        resetClientState() {
+            // Reset your client fields to empty strings here
+            // This is cleaner than doing it inside the JQuery callback
+            this.client.CustomerCode = '';
+            this.client.CustomerNameE = '';
+            this.client.Address = '';
+            this.client.AvailableBrands = [];
+            // ... reset other fields as necessary
+        },    
     }
 };
 

@@ -53,7 +53,7 @@ class ClientTempo extends Model
         // Format owners and brands
         $clients->each(function ($client) {
             $client->owner_username = $client->ownerUser->username ?? null;
-            \App\Models\Client::appendFormattedBrands($client); // reuse Client helper (public static)
+            self::appendFormattedBrands($client); // reuse Client helper (public static)
         });
 
         return $clients;
@@ -70,22 +70,22 @@ class ClientTempo extends Model
                     $fail("Le champ $attribute contient des caractères interdits.");
                 }
             }],
-            'CustomerNameE'         =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
-            'CustomerNameA'         =>  ["required", "max:255"],
-            'Tel'                   =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+            // 'CustomerNameE'         =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+            // 'CustomerNameA'         =>  ["required", "max:255"],
+            // 'Tel'                   =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
             'Latitude'              =>  ["required", "max:255"],
             'Longitude'             =>  ["required", "max:255"],
-            'Address'               =>  ["required", "max:255"],
-            'RvrsGeoAddress'        =>  ["required", "max:255"],
+            // 'Address'               =>  ["required", "max:255"],
+            // 'RvrsGeoAddress'        =>  ["required", "max:255"],
             'DistrictNo'            =>  ["required", "max:255"],
             'DistrictNameE'         =>  ["required", "max:255"],
             'CityNo'                =>  ["required", "max:255"],
             'CityNameE'             =>  ["required", "max:255"],
-            'CustomerType'          =>  ["required", "max:255"],
+            // 'CustomerType'          =>  ["required", "max:255"],
             'status'                =>  ["required", "max:255"],
-            'Frequency'             =>  ["required", "max:255"],
-            'SuperficieMagasin'     =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
-            'NbrAutomaticCheckouts' =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+            // 'Frequency'             =>  ["required", "max:255"],
+            // 'SuperficieMagasin'     =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+            // 'NbrAutomaticCheckouts' =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
         ]);
 
         $validator->sometimes('nonvalidated_details',  ["required"] , function (Fluent $input) {
@@ -145,22 +145,18 @@ class ClientTempo extends Model
 
         $client->CustomerNameE = mb_strtoupper($request->get('CustomerNameE') ?? '', 'UTF-8');
         $client->CustomerNameA = mb_strtoupper($request->get('CustomerNameA') ?? '', 'UTF-8');
-        $client->JPlan = mb_strtoupper($request->input('JPlan') ?? '', 'UTF-8');
+        $client->JPlan  = mb_strtoupper($request->input('JPlan') ?? '', 'UTF-8');
 
         $client->AvailableBrands = json_encode($AvailableBrands, JSON_UNESCAPED_UNICODE);
 
-        if (Auth::user()->hasRole('FrontOffice')) {
-            $client->owner = Auth::user()->id;
-        } else {
-            $client->owner = $request->get('owner') ?? $client->owner;
-            $client->tel_status = $request->get('tel_status') ?? $client->tel_status;
-            $client->tel_comment = $request->get('tel_comment') ?? $client->tel_comment;
-        }
+        $client->owner          =   $request->get('owner')          ?? $client->owner;
+        $client->tel_status     =   $request->get('tel_status')     ?? $client->tel_status;
+        $client->tel_comment    =   $request->get('tel_comment')    ?? $client->tel_comment;
 
         $client->save();
 
         // Format brands for response
-        \App\Models\Client::appendFormattedBrands($client);
+        self::appendFormattedBrands($client);
 
         return $client;
     }
@@ -333,9 +329,6 @@ class ClientTempo extends Model
     //  //  //  //  //
 
     public static function findDuplicates(Request $request, int $id_route_import_tempo, string $type) {
-        $startDate = Carbon::parse($request->get('start_date'))->format('Y-m-d');
-        $endDate = Carbon::parse($request->get('end_date'))->format('Y-m-d');
-
         // 1. Define columns based on type
         if ($type === 'GPS') {
             $groupBy = ['Latitude', 'Longitude'];
@@ -343,22 +336,33 @@ class ClientTempo extends Model
             $groupBy = [$type];
         }
 
-        // 2. Build the Subquery on the TEMPO table
+        // 2. Initialize the Subquery
         $duplicatesSub = DB::table('clients_tempo')
             ->select($groupBy)
-            ->where('id_route_import_tempo', $id_route_import_tempo)
-            // Note: If clients_tempo doesn't use 'status', you can remove the next line
-            // ->whereIn('status', ['validated', 'confirmed']) 
-            ->whereRaw("STR_TO_DATE(created_at, '%d %M %Y') BETWEEN ? AND ?", [$startDate, $endDate])
-            ->groupBy($groupBy)
-            ->havingRaw('COUNT(*) > 1');
+            ->where('id_route_import_tempo', $id_route_import_tempo);
 
-        // 3. Join the subquery on the TEMPO table
+        // 3. Conditionally apply Date Filter
+        // Only apply if both dates are present and not empty
+        $startInput = $request->input('start_date');
+        $endInput   = $request->input('end_date');
+
+        if (!empty($startInput) && !empty($endInput)) {
+            $startDate = Carbon::parse($startInput)->format('Y-m-d');
+            $endDate   = Carbon::parse($endInput)->format('Y-m-d');
+
+            $duplicatesSub->whereRaw("STR_TO_DATE(created_at, '%d %M %Y') BETWEEN ? AND ?", [$startDate, $endDate]);
+        }
+
+        // 4. Finish the Subquery (Group By and Having)
+        $duplicatesSub->groupBy($groupBy)
+                    ->havingRaw('COUNT(*) > 1');
+
+        // 5. Join the subquery on the TEMPO table
         $query = DB::table('clients_tempo as c')
             ->joinSub($duplicatesSub, 'd', function ($join) use ($type) {
                 if ($type === 'GPS') {
                     $join->on('c.Latitude', '=', 'd.Latitude')
-                         ->on('c.Longitude', '=', 'd.Longitude');
+                        ->on('c.Longitude', '=', 'd.Longitude');
                 } else {
                     $join->on('c.'.$type, '=', 'd.'.$type);
                 }
@@ -368,11 +372,27 @@ class ClientTempo extends Model
         // Fetch results
         $rows = $query->get();
 
-        // 4. Format Brands
+        // 6. Format Brands
         foreach ($rows as $client) {
             self::appendFormattedBrands($client);
         }
 
         return $rows;
+    }
+
+    public static function appendFormattedBrands($client) {
+        $brandsJson =   is_array($client)       ? ($client['AvailableBrands'] ?? '{}')  : ($client->AvailableBrands ?? '{}');
+        $assoc      =   is_array($brandsJson)   ? $brandsJson                           : (json_decode($brandsJson, true) ?? []);
+        $values     =   array_values($assoc);
+
+        if (is_array($client)) {
+            $client['AvailableBrands_array_formatted']  =   $values;
+            $client['AvailableBrands_string_formatted'] =   implode(", ", $values);
+        } else {
+            $client->AvailableBrands_array_formatted    =   $values;
+            $client->AvailableBrands_string_formatted   =   implode(", ", $values);
+        }
+
+        return $client;
     }
 }

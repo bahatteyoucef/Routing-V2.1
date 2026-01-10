@@ -117,15 +117,15 @@ export default {
 
         async getComboData() {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             const res_1         =   await this.$callApi("post"  ,   "/users/combo"      ,   null)
             const res_2         =   await this.$callApi("post"  ,   "/rtm-willayas"     ,   null)
 
-            this.users_all      =   res_1.data
-            this.districts_all  =   res_2.data
+            this.users_all      =   res_1.data.users
+            this.districts_all  =   res_2.data.willayas
 
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
         //
@@ -133,28 +133,28 @@ export default {
         async getDoubles() {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             const res   =   await this.$callApi("post"  ,   "/route-imports/"+this.id_route_import+"/clients/doubles", null)
             console.log(res)
 
             if(res.status===200){
 
-                this.getDoublant.getDoublantTel                 =   res.data.getDoublantTel
-                this.getDoublant.getDoublantGPS                 =   res.data.getDoublantGPS
-                this.getDoublant.getDoublantCustomerNameE       =   res.data.getDoublantCustomerNameE
-                this.getDoublant.getDoublantCustomerCode        =   res.data.getDoublantCustomerCode
+                this.getDoublant.getDoublantTel                 =   res.data.doubles.getDoublantTel
+                this.getDoublant.getDoublantGPS                 =   res.data.doubles.getDoublantGPS
+                this.getDoublant.getDoublantCustomerNameE       =   res.data.doubles.getDoublantCustomerNameE
+                this.getDoublant.getDoublantCustomerCode        =   res.data.doubles.getDoublantCustomerCode
 
                 this.show_card_doublants                        =   true
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
             }
             
             else{
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 
                 // Send Errors
                 this.$showErrors("Error !", res.data.errors)

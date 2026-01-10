@@ -7,17 +7,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class RTMWillayaController extends Controller
-{
-    public static function index(Request $request) {
+class RTMWillayaController extends Controller {
+
+    public function index(Request $request) {
 
         try {
 
             //
             $willayas  =   RTMWillaya::index($request);
-
-            //
-            return $willayas;
+            return response()->json([
+                "willayas"   =>  $willayas
+            ]);
         }
 
         catch(Throwable $erreur) {
@@ -28,15 +28,15 @@ class RTMWillayaController extends Controller
         }
     } 
 
-    public static function willayasCities(Request $request) {
+    public function willayasCities(Request $request) {
 
         try {
 
             //
             $willayas  =   RTMWillaya::willayasCities($request);
-
-            //
-            return $willayas;
+            return response()->json([
+                "willayas"   =>  $willayas
+            ]);
         }
 
         catch(Throwable $erreur) {
@@ -47,15 +47,15 @@ class RTMWillayaController extends Controller
         }
     }
 
-    public static function cities(int $DistrictNo, Request $request) {
+    public function cities(int $DistrictNo, Request $request) {
 
         try {
 
             //
             $cities  =   RTMWillaya::cities($DistrictNo);
-
-            //
-            return $cities;
+            return response()->json([
+                "cities"   =>  $cities
+            ]);
         }
 
         catch(Throwable $erreur) {
@@ -70,7 +70,7 @@ class RTMWillayaController extends Controller
     //  //  //  //  //
     //  //  //  //  //
 
-    public static function updateExpectedClients(int $DistrictNo, Request $request) {
+    public function updateExpectedClients(int $DistrictNo, Request $request) {
 
         try {
 

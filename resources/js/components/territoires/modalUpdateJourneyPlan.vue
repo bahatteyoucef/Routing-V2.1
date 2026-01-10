@@ -116,7 +116,7 @@ export default {
 
         async sendData() {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             let formData = new FormData();
 
@@ -134,7 +134,7 @@ export default {
                 if(res.status===200){
 
                     // Hide Loading Page
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
 
                     // Send Client
                     this.emitter.emit('reSetJPlanBDTerritory')
@@ -149,7 +149,7 @@ export default {
                     this.$showErrors("Error !", res.data.errors)
 
                     // Hide Loading Page
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
                 }            
             }
 
@@ -160,7 +160,7 @@ export default {
                 if(res.status===200){
 
                     // Hide Loading Page
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
 
                     // Send Client
                     this.emitter.emit('reSetJourneeBDTerritory')
@@ -175,7 +175,7 @@ export default {
                     this.$showErrors("Error !", res.data.errors)
 
                     // Hide Loading Page
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
                 }            
             }
 
@@ -186,7 +186,7 @@ export default {
                 if(res.status===200){
 
                     // Hide Loading Page
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
 
                     // Send Client
                     this.emitter.emit('reSetUserBDTerritory')
@@ -201,14 +201,14 @@ export default {
                     this.$showErrors("Error !", res.data.errors)
 
                     // Hide Loading Page
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
                 }            
             }
         },
 
         async deleteData() {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             let formData = new FormData();
 
@@ -226,7 +226,7 @@ export default {
                 if(res.status===200){
 
                     // Hide Loading Page
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
 
                     // Send Client
                     this.emitter.emit('reSetJPlanBDTerritory')
@@ -241,7 +241,7 @@ export default {
                     this.$showErrors("Error !", res.data.errors)
 
                     // Hide Loading Page
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
                 }            
             }
 
@@ -252,7 +252,7 @@ export default {
                 if(res.status===200){
 
                     // Hide Loading Page
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
 
                     // Send Client
                     this.emitter.emit('reSetJourneeBDTerritory')
@@ -267,7 +267,7 @@ export default {
                     this.$showErrors("Error !", res.data.errors)
 
                     // Hide Loading Page
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
                 }            
             }
 
@@ -278,7 +278,7 @@ export default {
                 if(res.status===200){
 
                     // Hide Loading Page
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
 
                     // Send Client
                     this.emitter.emit('reSetUserBDTerritory')
@@ -293,7 +293,7 @@ export default {
                     this.$showErrors("Error !", res.data.errors)
 
                     // Hide Loading Page
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
                 }            
             }
         },
@@ -336,8 +336,7 @@ export default {
         async getComboData() {
 
             const res       =   await this.$callApi("post",     "/route-imports/"+this.$route.params.id_route_import+"/users/frontOffice",     null)
-
-            this.users      =   res.data
+            this.users      =   res.data.users
         },
 
         //

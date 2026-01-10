@@ -78,7 +78,7 @@ export default {
             this.route_import.id_route_import       =   id_route_import
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             const res_3                             =   await this.$callApi("post"  ,   "/route-imports/"+this.route_import.id_route_import+"/show"      ,   null)
 
@@ -87,7 +87,7 @@ export default {
             this.route_import.liste_journee         =   res_3.data.liste_journee
 
             // Hide Loading Page
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
         //
@@ -95,7 +95,7 @@ export default {
         async deleteMap() {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             const res   = await this.$callApi('post'    ,   '/route-imports/'+this.route_import.id_route_import+'/delete'    ,   null)      
 
@@ -105,7 +105,7 @@ export default {
                 this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 
                 // Get Route Import
                 this.emitter.emit("reSetRouteImport")
@@ -120,7 +120,7 @@ export default {
                 this.$showErrors("Error !", res.data.errors)
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
             }
         }
     }

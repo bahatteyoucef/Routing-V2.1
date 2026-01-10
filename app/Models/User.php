@@ -422,7 +422,7 @@ class User extends Authenticatable
             $startDate = Carbon::parse($request->get('start_date'))->startOfDay();
             $endDate   = Carbon::parse($request->get('end_date'))->endOfDay();
         } catch (\Throwable $e) {
-            return response()->json([], 200);
+            return [];
         }
 
         // Build base client query
@@ -442,7 +442,7 @@ class User extends Authenticatable
         }
 
         if (empty($ownerIds)) {
-            return response()->json([], 200);
+            return [];
         }
 
         // per-user totals

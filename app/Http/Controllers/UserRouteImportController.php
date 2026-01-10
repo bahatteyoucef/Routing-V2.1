@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+class UserRouteImportController extends Controller {
 
-class UserRouteImportController extends Controller
-{
-    //
 }

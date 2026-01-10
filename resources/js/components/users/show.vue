@@ -91,7 +91,7 @@ export default {
         async getData(user) {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             await this.getUserData()  
             await this.getComboData()  
@@ -99,7 +99,7 @@ export default {
             this.setListeRouteImport()
 
             // Hide Loading Page
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
         async getUserData() {
@@ -107,28 +107,28 @@ export default {
             const res                   =   await this.$callApi("post"  ,   "/users/"+this.$route.params.id_user+"/show"    ,   null)
             console.log(res)
 
-            this.user.username_original     =   res.data.username
+            this.user.username_original     =   res.data.user.username
 
-            this.user.id                    =   res.data.id                 
-            this.user.username              =   res.data.username                 
-            this.user.first_name            =   res.data.first_name                 
-            this.user.last_name             =   res.data.last_name                 
+            this.user.id                    =   res.data.user.id                 
+            this.user.username              =   res.data.user.username                 
+            this.user.first_name            =   res.data.user.first_name                 
+            this.user.last_name             =   res.data.user.last_name                 
 
-            this.user.email                 =   res.data.email   
-            this.user.tel                   =   res.data.tel                 
-            this.user.company               =   res.data.company    
-            this.user.type_user             =   res.data.type_user        
+            this.user.email                 =   res.data.user.email   
+            this.user.tel                   =   res.data.user.tel                 
+            this.user.company               =   res.data.user.company    
+            this.user.type_user             =   res.data.user.type_user        
 
-            this.user.max_route_import      =   res.data.max_route_import        
+            this.user.max_route_import      =   res.data.user.max_route_import        
 
-            this.user.liste_route_import    =   res.data.liste_route_import   
+            this.user.liste_route_import    =   res.data.user.liste_route_import   
         },
 
         async getComboData() {
 
             const res               =   await this.$callApi("post",       "/route-imports/combo",        null)
 
-            let liste_route_import  =   res.data
+            let liste_route_import  =   res.data.liste_route_import
 
             for (let i = 0; i < liste_route_import.length; i++) {
 

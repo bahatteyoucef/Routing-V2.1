@@ -474,7 +474,6 @@ export default {
         GPSErrorComponent   :   GPSErrorComponent
     },
 
-    // 1. Initialize a non-reactive storage container
     created() {
         this._rawFiles = {}; 
     },
@@ -484,8 +483,7 @@ export default {
         if (this.watchGPS) navigator.geolocation.clearWatch(this.watchGPS);
     },
 
-    // 2. Ensure cleanup if the user leaves the page
-    beforeDestroy() { // Use 'beforeUnmount' if you are on Vue 3
+    beforeDestroy() {
         const fields = ['CustomerBarCode_image', 'facade_image', 'in_store_image'];
         fields.forEach(field => this.revokeImage(field));
     },
@@ -499,439 +497,73 @@ export default {
 
     methods : {
 
-        async getComboData() {
+        async sendData() {
+            if (!this.validationQuestion()) return;
 
-            const res_3                     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/districts"         ,   null)
-            this.willayas                   =   res_3.data
-        },
+            await this.$showLoadingPage();
 
-        //
-
-        async customerBarCodeImage() {
-
-            const input     =   document.getElementById("CustomerBarCode_image");
-            const display   =   document.getElementById("CustomerBarCode_image_display");
-            const file      =   input.files[0];
-
-            // Clear previous resources
-            if (this.client.CustomerBarCode_image_currentObjectURL) {
-
-                URL.revokeObjectURL(this.client.CustomerBarCode_image_currentObjectURL);
-                this.client.CustomerBarCode_image_currentObjectURL  =   null;
-            }
-
-            if (!file) {
-
-                this.client.CustomerBarCode_image_original_name     =   "";
-                this.client.CustomerBarCode_image                   =   "";
-
-                display.src                                         =   "";
-
-                return;
-            }
-
-            try {
-                // 1. Use lighter compression
-                const compressedFile                                =   await this.$compressImage(file);
-                
-                // 2. Use object URL instead of base64
-                const objectUrl                                     =   URL.createObjectURL(compressedFile);
-                this.client.CustomerBarCode_image_currentObjectURL  =   objectUrl;
-                display.src                                         =   objectUrl;
-
-                // 3. Store compressed file instead of base64 string
-                this.client.CustomerBarCode_image_original_name     =   file.name;
-                this.client.CustomerBarCode_image                   =   compressedFile;
-            } 
-
-            catch (error) {
-
-                console.error("Image processing failed:", error);
-
-                this.client.CustomerBarCode_image_original_name     =   "";
-                this.client.CustomerBarCode_image                   =   "";
-
-                display.src = "";
-            }
-        },
-
-        async facadeImage() {
-
-            const input     =   document.getElementById("facade_image");
-            const display   =   document.getElementById("facade_image_display");
-            const file      =   input.files[0];
-
-            // Clear previous resources
-            if (this.client.facade_image_currentObjectURL) {
-
-                URL.revokeObjectURL(this.client.facade_image_currentObjectURL);
-                this.client.facade_image_currentObjectURL   =   null;
-            }
-
-            if (!file) {
-
-                this.client.facade_image_original_name      =   "";
-                this.client.facade_image                    =   "";
-
-                display.src                                 =   "";
-
-                return;
-            }
-
-            try {
-                // 1. Use lighter compression
-                const compressedFile                                =   await this.$compressImage(file);
-                
-                // 2. Use object URL instead of base64
-                const objectUrl                                     =   URL.createObjectURL(compressedFile);
-                this.client.facade_image_currentObjectURL           =   objectUrl;
-                display.src                                         =   objectUrl;
-
-                // 3. Store compressed file instead of base64 string
-                this.client.facade_image_original_name              =   file.name;
-                this.client.facade_image                            =   compressedFile;
-            } 
-
-            catch (error) {
-
-                console.error("Image processing failed:", error);
-
-                this.client.facade_image_original_name      =   "";
-                this.client.facade_image                    =   "";
-
-                display.src = "";
-            }
-        },
-
-        async inStoreImage() {
-
-            const input     =   document.getElementById("in_store_image");
-            const display   =   document.getElementById("in_store_image_display");
-            const file      =   input.files[0];
-
-            // Clear previous resources
-            if (this.client.in_store_image_currentObjectURL) {
-
-                URL.revokeObjectURL(this.client.in_store_image_currentObjectURL);
-                this.client.in_store_image_currentObjectURL =   null;
-            }
-
-            if (!file) {
-
-                this.client.in_store_image_original_name    =   "";
-                this.client.in_store_image                  =   "";
-
-                display.src                                 =   "";
-
-                return;
-            }
-
-            try {
-                // 1. Use lighter compression
-                const compressedFile                                =   await this.$compressImage(file);
-                
-                // 2. Use object URL instead of base64
-                const objectUrl                                     =   URL.createObjectURL(compressedFile);
-                this.client.in_store_image_currentObjectURL         =   objectUrl;
-                display.src                                         =   objectUrl;
-
-                // 3. Store compressed file instead of base64 string
-                this.client.in_store_image_original_name            =   file.name;
-                this.client.in_store_image                          =   compressedFile;
-            } 
-
-            catch (error) {
-
-                console.error("Image processing failed:", error);
-
-                this.client.in_store_image_original_name    =   "";
-                this.client.in_store_image                  =   "";
-
-                display.src = "";
-            }
-        },
-
-        //
-
-        base64ToImage(image_base64, image_display_div) {
-
-            this.$base64ToImage(image_base64, image_display_div)
-        },
-
-        //
-
-        checkClients() {
-
-            this.close_clients  =   []
-
-            let distance        =   0
-
-            console.log(this.all_clients)
-
-            for (let i = 0; i < this.all_clients.length; i++) {
-
-                distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
-
-                if(distance <=  this.min_distance) {
-                
-                    this.close_clients.push(this.all_clients[i])
-                }
-            }
-        },
-
-        getDistance(latitude_1, longitude_1, latitude_2, longitude_2) {
-
-            return this.$map.$setDistanceStraight(latitude_1, longitude_1, latitude_2, longitude_2)
-        },
-
-        //
-
-        success(result) {
-             
-            if(this.$isValidForFileName(result)) {
-
-                // 
-                this.client.CustomerCode    =   result
-            }
-
-            else {
-
-                // 
-                this.client.CustomerCode    =   ""
-                this.$showErrors("Error !"  ,   ["Votre code-barres contient des caractères interdits : / \ : * ? \" < > | &; (espace)"])
-            }
-
-            this.scanner.clear();
-
-            this.show_reader    =   false
-            // document.getElementById('reader').style.display =   "none"
-            // Removes reader element from DOM since no longer needed 
-        },
-
-        error(err) {
-
-            // Prints any errors to the console
-            console.error("");
-        },
-
-        //  //  //
-
-        async checkInsidePolygon() {
-
-            let response                        =   await this.$currentPosition(this.getUser.accuracy)
-
-            if(response.success) {
-
-                //
-                this.show_gps_error                 =   false
-
-                //
-                this.client.Latitude                =   response.position.coords.latitude
-                this.client.Longitude               =   response.position.coords.longitude
-
-                //
-                this.checkClients()
-
-                //
-                // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygonsWithoutMap(this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
-                this.point_is_inside_user_polygons  =   true
-            }
-
-            else {
-
-                //
-                this.show_gps_error                 =   true
-
-                //
-                this.client.Latitude                =   0
-                this.client.Longitude               =   0
-
-                //
-                await this.$nextTick()
-
-                //
-                this.checkClients()
-
-                //
-                this.point_is_inside_user_polygons  =   false
-
-                //
-                this.$customMessages("GPS Error", "Vérifiez si votre GPS est activée", "error", "OK", "", "", "")
-
-                //
-                this.checkGPS()
-            }
-        },
-
-        checkGPS(map_id) {
-
-            if (this.watchGPS) return;
-
-            this.watchGPS   =   navigator.geolocation.watchPosition(
-                async (pos) => {
-                    const accuracy  =   pos.coords.accuracy;
-
-                    //
-                    if (Math.ceil(accuracy) <= this.getUser.accuracy) {
-
-                        this.show_gps_error     =   false
-
-                        //
-                        this.client.Latitude    =   pos.coords.latitude
-                        this.client.Longitude   =   pos.coords.longitude
-
-                        if(map_id) {
-
-                            //
-                            await this.$nextTick()
-
-                            //
-                            let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
-
-                            //
-                            this.checkClients()
-
-                            //
-                            // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
-                            this.point_is_inside_user_polygons  =   true
-
-                            // Send Feedback
-                            this.$feedbackSuccess('Success !'   ,   'Le GPS a été pris avec succès ')
-                        }
-
-                        else {
-
-                            //
-                            await this.$nextTick()
-
-                            //
-                            this.checkClients()
-
-                            //
-                            // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygonsWithoutMap(this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
-                            this.point_is_inside_user_polygons  =   true
-
-                            // Send Feedback
-                            this.$feedbackSuccess('Success !'   ,   'Le GPS a été pris avec succès ')
-                        }
-
-                        //
-                        navigator.geolocation.clearWatch(this.watchGPS); // Stop watching
-                        this.watchGPS = null; // Reset watcher
-
-                        //
-                        this.check_gps_clicked              =   false
-                    }
-                },
-                (err) => {
-                    this.show_gps_error     =   true;
-                },
-                {
-                    enableHighAccuracy: true,   // Use high-accuracy mode
-                    maximumAge: 0,              // No cached data
-                    timeout: 10000,              // Timeout for location retrieval
-                }
-            );
-        },
-
-        //  //  //
-
-        plusSlides(current_slide) {
-
-            // Go Next
-            if(current_slide    ==  1) {
-
-                // Validation de la question
-                let validation          =   this.validationQuestion()
-
-                if(validation   ==  true)  {
-
-                    this.slideIndex     =   this.$plusSlides(this.slideIndex += current_slide, this.slideIndex)
-                }
-
-                else {
-
-                    this.$showErrors("Error !"  ,   ["Veuillez répondre en respectant les conditions des questions avant de passer à la page suivante !"])
-                    return false;
-                }
-                //
-
-                // Verifier Si La Question GPS
-                if(this.slideIndex  ==  this.total_questions) {
-
-                    this.point_is_inside_user_polygons  =   false
-
-                    this.showPositionOnMap("show_map")
-                }
-            }
-
-            else {
-
-                this.slideIndex     =   this.$plusSlides(this.slideIndex += current_slide, this.slideIndex)
-            }
-        },
-
-        currentSlide(current_slide) {
-
-            this.slideIndex     =   this.$currentSlide(this.slideIndex = current_slide, this.slideIndex)
-        },
-
-        //
-
-        setTotalQuestions() {
-
-            this.total_questions    =   document.getElementsByClassName("mySlides").length
-        },
-
-        //
-
-        setStatus() {
-
-            if(this.client.OpenCustomer == "Refus") {
-                this.client.status     =   "refus"
-            }
-
-            if(this.client.OpenCustomer ==  "Ferme") {
-                this.client.status     =   "ferme"
-            }
-
-            else {
-                this.client.status     =   "pending"
-            }
-
-            this.setTotalQuestions()
-        },
-
-        // --- Navigation ---
-        changeSlide(step) {
-            const nextIndex = this.slideIndex + step;
+            // Prepare derived data
+            this.client.DistrictNameE = this.getDistrictNameE(this.client.DistrictNo);
+            this.client.CityNameE = this.getCityNameE(this.client.CityNo);
             
-            // Logic for "Next"
-            if (step > 0) {
-                if (!this.validationQuestion()) {
-                    this.$showErrors("Erreur !", ["Veuillez remplir les champs obligatoires correctement."]);
-                    return;
+            const formData = new FormData();
+            const imageKeys = ['facade_image', 'CustomerBarCode_image', 'in_store_image'];
+
+            // 1. & 2. Define all fields
+            const allFields = [
+                'CustomerIdentifier', 'NewCustomer', 'OpenCustomer', 'CustomerCode', 
+                'CustomerNameE', 'CustomerNameA', 'Latitude', 'Longitude', 'RvrsGeoAddress', 'Address', 
+                'Neighborhood', 'Landmark', 'DistrictNo', 'DistrictNameE', 'CityNo', 
+                'CityNameE', 'Tel', 'CustomerType', 'JPlan', 'Journee', 'comment',
+                'BrandAvailability', 'BrandSourcePurchase', 'Frequency', 
+                'SuperficieMagasin', 'NbrAutomaticCheckouts'
+            ];
+
+            // 3. Append standard fields
+            allFields.forEach(key => {
+                const value = this.client[key];
+                formData.append(key, (value === undefined || value === null) ? '' : value);
+            });
+
+            // 4. Append Images and their Metadata
+            imageKeys.forEach(key => {
+                if (this._rawFiles[key]) {
+                    formData.append(key, this._rawFiles[key]);
+                    // Send the original name
+                    formData.append(`${key}_original_name`, this.client[`${key}_original_name`] || '');
+                    // Set updated flag so backend helper knows to process it
+                    formData.append(`${key}_updated`, 'true'); 
                 }
-                
-                // If moving TO the map slide (last slide)
-                if (nextIndex === this.total_questions) {
-                    this.point_is_inside_user_polygons = false;
-                    setTimeout(() => {
-                        this.showPositionOnMap('show_map'); 
-                    }, 200); // Small delay to ensure DIV is rendered via v-show
+            });
+
+            // Handle JSON and Meta
+            formData.append("AvailableBrands", JSON.stringify(this.client.AvailableBrands || []));
+            formData.append("status", "pending");
+            formData.append("start_adding_date", this.start_adding_date);
+            formData.append("finish_adding_date", moment().format());
+
+            // 5. Send
+            try {
+                const url = `/route-imports/${this.$route.params.id_route_import}/clients/store`;
+                const res = await this.$callApi("post", url, formData);
+
+                if (res.status === 200) {
+                    this.$feedbackSuccess(res.data["header"], res.data["message"]);
+                    this.$goBack();
+                } else {
+                    this.$showErrors("Error !", res.data.errors);
                 }
+            } catch (e) {
+                this.$showErrors("Connection Error", ["Failed to send data."]);
+            } finally {
+                await this.$hideLoadingPage();
             }
-
-            // Logic for "Previous"
-            if (nextIndex < 1) return;
-            if (nextIndex > this.total_questions) return;
-
-            this.slideIndex = nextIndex;
         },
 
-        // --- Data Loading ---
+        //  //  //  //  //
+
         async getData() {
-            this.$showLoadingPage();
+            await this.$showLoadingPage();
             this.start_adding_date = moment(new Date()).format();
 
             try {
@@ -942,26 +574,33 @@ export default {
                 console.log(this.all_clients)
                 
                 const resCombo = await this.$callApi("post", "/route-imports/"+this.$route.params.id_route_import+"/districts", null);
-                this.willayas = resCombo.data;
+                this.willayas = resCombo.data.willayas;
             } catch (e) {
                 console.error(e);
             } finally {
-                this.$hideLoadingPage();
+                await this.$hideLoadingPage();
             }
+        },
+
+        async getComboData() {
+
+            const res_3                     =   await this.$callApi("post"  ,   "/route-imports/"+this.$route.params.id_route_import+"/districts"         ,   null)
+            this.willayas                   =   res_3.data.willayas
         },
 
         async getCites() {
-            this.$showLoadingPage();
+            await this.$showLoadingPage();
             try {
                 const res = await this.$callApi("post", "/rtm-willayas/"+this.client.DistrictNo+"/rtm_cities", null);
-                this.cities = res.data;
+                this.cities = res.data.cities;
                 this.client.CityNo = ""; // Reset city when district changes
             } finally {
-                this.$hideLoadingPage();
+                await this.$hideLoadingPage();
             }
         },
 
-        // --- Helper: Get Names ---
+        //  //  //  //  //
+
         getDistrictNameE(DistrictNo) {
             const item = this.willayas.find(w => w.DistrictNo == DistrictNo);
             return item ? item.DistrictNameE : '';
@@ -972,8 +611,8 @@ export default {
             return item ? item.CityNameE : '';
         },
 
-        // --- Optimized Image Handling ---
-        // Generic function for ALL 3 image inputs
+        //  //  //  //  //
+
         async handleImageUpload(event, fieldKey) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1025,6 +664,8 @@ export default {
             }
         },
 
+        //  //  //  //  //
+
         brandAvailabilityChanged() {
             if (this.client.BrandAvailability === 'Non') {
                 this.client.AvailableBrands = [];
@@ -1035,84 +676,39 @@ export default {
             }
         },
 
-        // --- GPS Logic ---
-        refreshGPS() {
-            this.point_is_inside_user_polygons  =   false;
-            setTimeout(() => {
-                this.showPositionOnMap('show_map'); 
-            }, 200); // Small delay to ensure DIV is rendered via v-show
+        //  //  //  //  //
+
+        setTotalQuestions() {
+
+            this.total_questions    =   document.getElementsByClassName("mySlides").length
         },
 
-        // --- Submission Logic ---
-        async sendData() {
-            if (!this.validationQuestion()) return;
-
-            this.$showLoadingPage();
-
-            // Prepare derived data
-            this.client.DistrictNameE = this.getDistrictNameE(this.client.DistrictNo);
-            this.client.CityNameE = this.getCityNameE(this.client.CityNo);
+        changeSlide(step) {
+            const nextIndex = this.slideIndex + step;
             
-            const formData = new FormData();
-            const imageKeys = ['facade_image', 'CustomerBarCode_image', 'in_store_image'];
-
-            // 1. & 2. Define all fields
-            const allFields = [
-                'CustomerIdentifier', 'NewCustomer', 'OpenCustomer', 'CustomerCode', 
-                'CustomerNameE', 'CustomerNameA', 'Latitude', 'Longitude', 'RvrsGeoAddress', 'Address', 
-                'Neighborhood', 'Landmark', 'DistrictNo', 'DistrictNameE', 'CityNo', 
-                'CityNameE', 'Tel', 'CustomerType', 'JPlan', 'Journee', 'comment',
-                'BrandAvailability', 'BrandSourcePurchase', 'Frequency', 
-                'SuperficieMagasin', 'NbrAutomaticCheckouts'
-            ];
-
-            // 3. Append standard fields
-            allFields.forEach(key => {
-                const value = this.client[key];
-                formData.append(key, (value === undefined || value === null) ? '' : value);
-            });
-
-            // 4. Append Images and their Metadata
-            imageKeys.forEach(key => {
-                if (this._rawFiles[key]) {
-                    formData.append(key, this._rawFiles[key]);
-                    // Send the original name
-                    formData.append(`${key}_original_name`, this.client[`${key}_original_name`] || '');
-                    // Set updated flag so backend helper knows to process it
-                    formData.append(`${key}_updated`, 'true'); 
+            // Logic for "Next"
+            if (step > 0) {
+                if (!this.validationQuestion()) {
+                    this.$showErrors("Erreur !", ["Veuillez remplir les champs obligatoires correctement."]);
+                    return;
                 }
-            });
-
-            // Handle JSON and Meta
-            formData.append("AvailableBrands", JSON.stringify(this.client.AvailableBrands || []));
-            formData.append("status", "pending");
-            formData.append("start_adding_date", this.start_adding_date);
-            formData.append("finish_adding_date", moment().format());
-
-            //
-            console.log(this.client.CustomerBarCode_image_original_name)
-            console.log(this.client.in_store_image_original_name)
-            console.log(this.client.facade_image_original_name)
-
-            // 5. Send
-            try {
-                const url = `/route-imports/${this.$route.params.id_route_import}/clients/store`;
-                const res = await this.$callApi("post", url, formData);
-
-                if (res.status === 200) {
-                    this.$feedbackSuccess(res.data["header"], res.data["message"]);
-                    this.$goBack();
-                } else {
-                    this.$showErrors("Error !", res.data.errors);
+                
+                // If moving TO the map slide (last slide)
+                if (nextIndex === this.total_questions) {
+                    this.point_is_inside_user_polygons = false;
+                    setTimeout(() => {
+                        this.showPositionOnMap('show_map'); 
+                    }, 200); // Small delay to ensure DIV is rendered via v-show
                 }
-            } catch (e) {
-                this.$showErrors("Connection Error", ["Failed to send data."]);
-            } finally {
-                this.$hideLoadingPage();
             }
+
+            // Logic for "Previous"
+            if (nextIndex < 1) return;
+            if (nextIndex > this.total_questions) return;
+
+            this.slideIndex = nextIndex;
         },
 
-        // --- Mock Validations (Add your real logic here) ---
         validationQuestion() {
 
             //Slide 1
@@ -1818,8 +1414,9 @@ export default {
                 }
             }
         },
-        
-        // --- Mock Map Function (Since implementation wasn't provided) ---
+
+        //  //  //  //  //
+
         async showPositionOnMap(map_id) {
             if (!this.check_gps_clicked) {
                 this.check_gps_clicked = true;
@@ -1878,7 +1475,111 @@ export default {
                 }
             }
         },
+
+        checkGPS(map_id) {
+
+            if (this.watchGPS) return;
+
+            this.watchGPS   =   navigator.geolocation.watchPosition(
+                async (pos) => {
+                    const accuracy  =   pos.coords.accuracy;
+
+                    //
+                    if (Math.ceil(accuracy) <= this.getUser.accuracy) {
+
+                        this.show_gps_error     =   false
+
+                        //
+                        this.client.Latitude    =   pos.coords.latitude
+                        this.client.Longitude   =   pos.coords.longitude
+
+                        if(map_id) {
+
+                            //
+                            await this.$nextTick()
+
+                            //
+                            let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
+
+                            //
+                            this.checkClients()
+
+                            //
+                            // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
+                            this.point_is_inside_user_polygons  =   true
+
+                            // Send Feedback
+                            this.$feedbackSuccess('Success !'   ,   'Le GPS a été pris avec succès ')
+                        }
+
+                        else {
+
+                            //
+                            await this.$nextTick()
+
+                            //
+                            this.checkClients()
+
+                            //
+                            // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygonsWithoutMap(this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
+                            this.point_is_inside_user_polygons  =   true
+
+                            // Send Feedback
+                            this.$feedbackSuccess('Success !'   ,   'Le GPS a été pris avec succès ')
+                        }
+
+                        //
+                        navigator.geolocation.clearWatch(this.watchGPS); // Stop watching
+                        this.watchGPS = null; // Reset watcher
+
+                        //
+                        this.check_gps_clicked              =   false
+                    }
+                },
+                (err) => {
+                    this.show_gps_error     =   true;
+                },
+                {
+                    enableHighAccuracy: true,   // Use high-accuracy mode
+                    maximumAge: 0,              // No cached data
+                    timeout: 10000,              // Timeout for location retrieval
+                }
+            );
+        },
+
+        refreshGPS() {
+            this.point_is_inside_user_polygons  =   false;
+            setTimeout(() => {
+                this.showPositionOnMap('show_map'); 
+            }, 200); // Small delay to ensure DIV is rendered via v-show
+        },
+
+        checkClients() {
+
+            this.close_clients  =   []
+
+            let distance        =   0
+
+            console.log(this.all_clients)
+
+            for (let i = 0; i < this.all_clients.length; i++) {
+
+                distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
+
+                if(distance <=  this.min_distance) {
+                
+                    this.close_clients.push(this.all_clients[i])
+                }
+            }
+        },
+
+        getDistance(latitude_1, longitude_1, latitude_2, longitude_2) {
+
+            return this.$map.$setDistanceStraight(latitude_1, longitude_1, latitude_2, longitude_2)
+        },
         
+        //  //  //  //  //
+
         async setBarCodeReader() {
             // const reader    =   document.getElementById('reader')
 
@@ -1922,6 +1623,34 @@ export default {
                     console.error('Error rendering scanner:', error);
                 }
             }
+        },
+
+        success(result) {
+             
+            if(this.$isValidForFileName(result)) {
+
+                // 
+                this.client.CustomerCode    =   result
+            }
+
+            else {
+
+                // 
+                this.client.CustomerCode    =   ""
+                this.$showErrors("Error !"  ,   ["Votre code-barres contient des caractères interdits : / \ : * ? \" < > | &; (espace)"])
+            }
+
+            this.scanner.clear();
+
+            this.show_reader    =   false
+            // document.getElementById('reader').style.display =   "none"
+            // Removes reader element from DOM since no longer needed 
+        },
+
+        error(err) {
+
+            // Prints any errors to the console
+            console.error("");
         },
         
         cleanupScanner() {

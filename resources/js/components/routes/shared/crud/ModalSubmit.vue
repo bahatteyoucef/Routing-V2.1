@@ -142,7 +142,7 @@ export default {
         async sendData() {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             let formData = new FormData();
 
@@ -161,7 +161,7 @@ export default {
                 this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
 
                 // 5) Now hide the spinner
-                this.$hideLoadingPage();
+                await this.$hideLoadingPage();
 
                 // Send Event
                 this.emitter.emit("reSetRouteImport")
@@ -179,7 +179,7 @@ export default {
                 this.$showErrors("Error !", res.data.errors)
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 			}
         },
 

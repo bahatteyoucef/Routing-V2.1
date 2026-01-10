@@ -94,23 +94,22 @@ class Client extends Model
                     $fail("Le champ $attribute contient des caractères interdits.");
                 }
             }],
-            'CustomerNameE'         =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
-            'CustomerNameA'         =>  ["required", "max:255"],
-            'Tel'                   =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+            // 'CustomerNameE'         =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+            // 'CustomerNameA'         =>  ["required", "max:255"],
+            // 'Tel'                   =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
             'Latitude'              =>  ["required", "max:255"],
             'Longitude'             =>  ["required", "max:255"],
-            'Address'               =>  ["required", "max:255"],
-            'RvrsGeoAddress'        =>  ["required", "max:255"],
+            // 'Address'               =>  ["required", "max:255"],
+            // 'RvrsGeoAddress'        =>  ["required", "max:255"],
             'DistrictNo'            =>  ["required", "max:255"],
             'DistrictNameE'         =>  ["required", "max:255"],
             'CityNo'                =>  ["required", "max:255"],
             'CityNameE'             =>  ["required", "max:255"],
-            'CustomerType'          =>  ["required", "max:255"],
+            // 'CustomerType'          =>  ["required", "max:255"],
             'status'                =>  ["required", "max:255"],
-
-            'Frequency'             =>  ["required", "max:255"],
-            'SuperficieMagasin'     =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
-            'NbrAutomaticCheckouts' =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+            // 'Frequency'             =>  ["required", "max:255"],
+            // 'SuperficieMagasin'     =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+            // 'NbrAutomaticCheckouts' =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
         ]);
 
         $validator->sometimes('nonvalidated_details',  ["required"] , function (Fluent $input) {
@@ -189,6 +188,8 @@ class Client extends Model
         // Owner Logic
         if (Auth::user()->hasRole('FrontOffice')) {
             $client->owner = Auth::user()->id;
+            $client->tel_status = 'pending';
+            $client->tel_comment = '';
         } else {
             $client->owner = $request->get("owner");
             $client->tel_status = $request->get("tel_status");
@@ -223,24 +224,23 @@ class Client extends Model
                     $fail("Le champ $attribute contient des caractères interdits.");
                 }
             }],
-            'CustomerNameE'         =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
-            'CustomerNameA'         =>  ["required", "max:255"],
-            'Tel'                   =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
-            'tel_status'            =>  ["sometimes"],
+            // 'CustomerNameE'         =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+            // 'CustomerNameA'         =>  ["required", "max:255"],
+            // 'Tel'                   =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+            // 'tel_status'            =>  ["sometimes"],
             'Latitude'              =>  ["required", "max:255"],
             'Longitude'             =>  ["required", "max:255"],
-            'Address'               =>  ["required", "max:255"],
-            'RvrsGeoAddress'        =>  ["required", "max:255"],
+            // 'Address'               =>  ["required", "max:255"],
+            // 'RvrsGeoAddress'        =>  ["required", "max:255"],
             'DistrictNo'            =>  ["required", "max:255"],
             'DistrictNameE'         =>  ["required", "max:255"],
             'CityNo'                =>  ["required", "max:255"],
             'CityNameE'             =>  ["required", "max:255"],
-            'CustomerType'          =>  ["required", "max:255"],
+            // 'CustomerType'          =>  ["required", "max:255"],
             'status'                =>  ["required", "max:255"],
-
-            'Frequency'             =>  ["required", "max:255"],
-            'SuperficieMagasin'     =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
-            'NbrAutomaticCheckouts' =>  ["required_if:OpenCustomer,Ouvert", "max:255"]
+            // 'Frequency'             =>  ["required", "max:255"],
+            // 'SuperficieMagasin'     =>  ["required_if:OpenCustomer,Ouvert", "max:255"],
+            // 'NbrAutomaticCheckouts' =>  ["required_if:OpenCustomer,Ouvert", "max:255"]
         ]);
 
         $validator->sometimes('nonvalidated_details',  ["required"] , function (Fluent $input) {
@@ -331,8 +331,8 @@ class Client extends Model
             'Journee'                       =>  $request->input("Journee")                                  ?? ''   ,
             'status'                        =>  $request->input("status")                                   ?? ''   ,
             'nonvalidated_details'          =>  $request->input("nonvalidated_details")                     ?? ''   ,
-            'tel_status'                    =>  $request->get("tel_status")                                 ?? ''   , // Assuming these are NOT in the mass assignment $fillable array
-            'tel_comment'                   =>  $request->get("tel_comment")                                ?? ''   ,
+            'tel_status'                    =>  'pending'                                                   ?? ''   , // Assuming these are NOT in the mass assignment $fillable array
+            'tel_comment'                   =>  ''                                                          ?? ''   ,
 
             'facade_image_original_name'           => $request->input("facade_image_original_name")             ?? '',
             'CustomerBarCode_image_original_name'  => $request->input("CustomerBarCode_image_original_name")    ?? '',
@@ -387,6 +387,8 @@ class Client extends Model
     //  //  //  //  //  Store/Update/Delete Clients
     //  //  //  //  //
 
+    /*
+
     public static function storeClients(Request $request, int $id_route_import) {
 
         // Assume clients is a JSON string/array, not an array of objects for simplicity.
@@ -426,8 +428,8 @@ class Client extends Model
                     'CityNo'                    =>  $client_elem['CityNo']                                  ??  ''              ,
                     'CityNameE'                 =>  $client_elem['CityNameE']                               ??  ''              ,
                     'Tel'                       =>  $client_elem['Tel']                                     ??  ''              ,
-                    'tel_comment'               =>  $client_elem['tel_comment']                             ??  ''              ,
                     'tel_status'                =>  $client_elem['tel_status']                              ??  ''              ,
+                    'tel_comment'               =>  $client_elem['tel_comment']                             ??  ''              ,
                     'CustomerType'              =>  $client_elem['CustomerType']                            ??  ''              ,
 
                     'status'                    =>  $client_elem['status']                                  ??  ''              ,
@@ -467,6 +469,8 @@ class Client extends Model
             }
         });
     }
+
+    */
 
     public static function updateClients(Request $request, int $id_route_import) {
         // Ensure clients is decoded as an associative array for consistency
@@ -729,9 +733,6 @@ class Client extends Model
     }
 
     private static function findDuplicates(Request $request, int $id_route_import, string $type) {
-        $startDate = Carbon::parse($request->get('start_date'))->format('Y-m-d');
-        $endDate = Carbon::parse($request->get('end_date'))->format('Y-m-d');
-
         // 1. Define columns based on type
         if ($type === 'GPS') {
             $groupBy = ['Latitude', 'Longitude'];
@@ -739,17 +740,29 @@ class Client extends Model
             $groupBy = [$type];
         }
 
-        // 2. Build the Subquery (Identical to Approach 2, but dynamic)
+        // 2. Initialize the Subquery
         $duplicatesSub = DB::table('clients')
             ->select($groupBy)
             ->where('id_route_import', $id_route_import)
-            ->whereIn('status', ['validated', 'confirmed'])
-            // Keep your date logic (though converting column to real Date type is better)
-            ->whereRaw("STR_TO_DATE(created_at, '%d %M %Y') BETWEEN ? AND ?", [$startDate, $endDate])
-            ->groupBy($groupBy)
-            ->havingRaw('COUNT(*) > 1');
+            ->whereIn('status', ['validated', 'confirmed']);
 
-        // 3. Join the subquery (Fast SQL, no PHP looping)
+        // 3. Conditional Date Logic
+        // Check if dates exist in the request before parsing or applying filters
+        $startInput = $request->input('start_date');
+        $endInput   = $request->input('end_date');
+
+        if (!empty($startInput) && !empty($endInput)) {
+            $startDate = Carbon::parse($startInput)->format('Y-m-d');
+            $endDate   = Carbon::parse($endInput)->format('Y-m-d');
+
+            $duplicatesSub->whereRaw("STR_TO_DATE(created_at, '%d %M %Y') BETWEEN ? AND ?", [$startDate, $endDate]);
+        }
+
+        // 4. Finish the Subquery (Group By and Having)
+        $duplicatesSub->groupBy($groupBy)
+                    ->havingRaw('COUNT(*) > 1');
+
+        // 5. Join the subquery (Fast SQL, no PHP looping)
         $query = DB::table('clients as c')
             ->joinSub($duplicatesSub, 'd', function ($join) use ($type) {
                 if ($type === 'GPS') {
@@ -765,7 +778,7 @@ class Client extends Model
         // Fetch results
         $rows = $query->get();
 
-        // 4. Format Brands
+        // 6. Format Brands
         foreach ($rows as $client) {
             self::appendFormattedBrands($client);
         }

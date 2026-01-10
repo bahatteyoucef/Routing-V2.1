@@ -116,8 +116,8 @@ export default {
     // ==========================================
     // 1. MAIN ENTRY POINT
     // ==========================================
-    setResume() {
-      this.$showLoadingPage();
+    async setResume() {
+      await this.$showLoadingPage();
 
       // Step A: Build the Data Tree (O(N) Complexity)
       this.routingTree = this.buildDataTree(this.clients);
@@ -128,7 +128,7 @@ export default {
       // Step C: Generate the "Par Jour" Table Rows
       this.generatedRowsParJour = this.generateParJourRows(this.routingTree);
 
-      this.$hideLoadingPage();
+      await this.$hideLoadingPage();
     },
 
 
@@ -450,15 +450,15 @@ export default {
 
     async decouperRoutes() {
       if (this.nomber_routes > 0) {
-        this.$showLoadingPage();
+        await this.$showLoadingPage();
         await this.partitionClients({ 
             clientList: this.clients, 
             numGroups: this.nomber_routes, 
             propertyName: 'JPlan', 
             labelPrefix: this.routeLabelPrefix 
         });
-        this.setResume(); // Re-calculate tree
-        this.$hideLoadingPage();
+        await this.setResume(); // Re-calculate tree
+        await this.$hideLoadingPage();
       }
     },
 
@@ -473,15 +473,15 @@ export default {
        const routeNode = this.routingTree.find(r => r.id == routeKey);
        
        if (nombre_journee > 0 && routeNode) {
-          this.$showLoadingPage();
+          await this.$showLoadingPage();
           await this.partitionClients({ 
              clientList: routeNode.clients, 
              numGroups: nombre_journee, 
              propertyName: 'Journee', 
              labelPrefix: this.journeeLabelPrefix 
           });
-          this.setResume(); // Re-calculate tree
-          this.$hideLoadingPage();
+          await this.setResume(); // Re-calculate tree
+          await this.$hideLoadingPage();
        }
     },
 

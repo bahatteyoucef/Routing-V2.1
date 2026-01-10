@@ -155,7 +155,7 @@ export default {
         async getData() {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             if(this.is_database_clients_map) {
 
@@ -183,7 +183,7 @@ export default {
             this.setRouteMarkers()
 
             // Hide Loading Page
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         }, 
 
         //  //  //  //  //  //  //  //  //  //
@@ -198,7 +198,7 @@ export default {
             this.map_instance.$showUserBDTerritoriesFront(this.getUser.user_territories)
         },
 
-        switchMarkerClusterMode() {
+        async switchMarkerClusterMode() {
 
             if(this.marker_cluster_mode ==  "marker") {
 
@@ -206,7 +206,7 @@ export default {
                 this.map_instance.$switchMarkerClusterMode("marker")
 
                 // Show Markers
-                this.reAfficherClientsAndMarkers()
+                await this.reAfficherClientsAndMarkers()
             }
 
             else {
@@ -217,15 +217,15 @@ export default {
                     this.map_instance.$switchMarkerClusterMode("cluster")
 
                     // Show Markers
-                    this.reAfficherClientsAndMarkers()
+                    await this.reAfficherClientsAndMarkers()
                 }
             }
         },
 
-        reAfficherClientsAndMarkers() {
+        async reAfficherClientsAndMarkers() {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             //
             this.clearRouteMarkers()
@@ -234,7 +234,7 @@ export default {
             this.setRouteMarkers(this.clients_markers_affiche)
 
             // Hide Loading Page
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
         clearRouteMarkers() {

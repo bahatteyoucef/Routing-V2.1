@@ -252,7 +252,7 @@ export default {
         async sendData() {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             let formData = new FormData();
 
@@ -294,7 +294,7 @@ export default {
                 this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 
                 // Reload DataTable
                 await this.$parent.setDataTable()
@@ -309,7 +309,7 @@ export default {
                 this.$showErrors("Error !", res.data.errors)
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 			}
         },
 
@@ -349,50 +349,50 @@ export default {
 
         async getData(user) {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             await this.getUserData(user)  
             await this.getComboData()  
 
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
         async getUserData(user) {
 
             const res                   =   await this.$callApi("post"  ,   "/users/"+user.id+"/show"    ,   null)
 
-            this.user.username_original     =   res.data.username
+            this.user.username_original     =   res.data.user.username
 
-            this.user.id                    =   res.data.id                 
-            this.user.username              =   res.data.username                 
-            this.user.first_name            =   res.data.first_name   
-            this.user.last_name             =   res.data.last_name   
+            this.user.id                    =   res.data.user.id                 
+            this.user.username              =   res.data.user.username                 
+            this.user.first_name            =   res.data.user.first_name   
+            this.user.last_name             =   res.data.user.last_name   
 
-            this.user.email                 =   res.data.email   
-            this.user.tel                   =   res.data.tel                 
-            this.user.company               =   res.data.company    
-            this.user.type_user             =   res.data.type_user        
-            this.user.status                =   res.data.status
+            this.user.email                 =   res.data.user.email   
+            this.user.tel                   =   res.data.user.tel                 
+            this.user.company               =   res.data.user.company    
+            this.user.type_user             =   res.data.user.type_user        
+            this.user.status                =   res.data.user.status
 
-            this.user.accuracy              =   res.data.accuracy
-            this.user.max_route_import      =   res.data.max_route_import        
+            this.user.accuracy              =   res.data.user.accuracy
+            this.user.max_route_import      =   res.data.user.max_route_import        
 
             if((this.user.type_user  ==  "Viewer")||(this.user.type_user  ==  "BackOffice")||(this.user.type_user  ==  "BU Manager")) {
 
-                this.user.liste_route_import        =   res.data.liste_route_import
+                this.user.liste_route_import        =   res.data.user.liste_route_import
             }
 
             if(this.user.type_user  ==  "FrontOffice") {
 
-                this.user.selected_route_import     =   res.data.liste_route_import
+                this.user.selected_route_import     =   res.data.user.liste_route_import
 
                 await this.getDistricts()
 
-                this.user.selected_district         =   res.data.DistrictNo
+                this.user.selected_district         =   res.data.user.DistrictNo
 
                 await this.getCities()
 
-                this.user.selected_cities           =   res.data.cities
+                this.user.selected_cities           =   res.data.user.cities
             }
         },
 
@@ -400,7 +400,7 @@ export default {
 
             const res               =   await this.$callApi("post",       "/route-imports/combo",        null)
 
-            let liste_route_import  =   res.data
+            let liste_route_import  =   res.data.liste_route_import
 
             for (let i = 0; i < liste_route_import.length; i++) {
 
@@ -412,7 +412,7 @@ export default {
 
         async getDistricts() {   
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             setTimeout(async () => {
                 
@@ -425,7 +425,7 @@ export default {
                 if(this.user.selected_route_import) {
 
                     const res_3         =   await this.$callApi("post"  ,   "/route-imports/"+this.user.selected_route_import+"/districts"   ,   null)
-                    let districts       =   res_3.data
+                    let districts       =   res_3.data.willayas
 
                     for (let i = 0; i < districts.length; i++) {
 
@@ -435,15 +435,15 @@ export default {
 
             }, 222);
 
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
         async getCities() {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             const res_3         =   await this.$callApi("post"  ,   "/rtm-willayas/"+this.user.selected_district+"/rtm-cities"       ,   null)
-            let cities          =   res_3.data
+            let cities          =   res_3.data.cities
 
             for (let i = 0; i < cities.length; i++) {
 
@@ -453,7 +453,7 @@ export default {
             this.user.cities            =   []
             this.user.selected_cities   =   []
 
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         }
     }
 };

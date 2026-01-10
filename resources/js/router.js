@@ -54,23 +54,23 @@ const routes = [
     { path: "/stats/standard"                                                               , component: StatsStandardShared                        },
     { path: "/stats/self-service"                                                           , component: StatsSelfServiceShared                     },
 
-    { path: "/route-imports/:id_route_import/clients"                                        , component: RouteImportClientsShared                   },
+    { path: "/route-imports/:id_route_import/clients"                                       , component: RouteImportClientsShared                   },
 
-    { path: "/route/obs/route-imports/add"                                                   , component: RouteImportAddShared                       },
-    { path: "/route/obs/route_import_tempo"                                                 , component: RouteImportTempoShared                     },
-    { path: "/route/obs/route-imports/:id_route_import/details"                              , component: ParRouteImportDetailsShared                },
+    { path: "/route-imports/add"                                                  , component: RouteImportAddShared                       },
+    { path: "/route-imports-tempo/last-imported"                                                , component: RouteImportTempoShared                     },
+    { path: "/route/obs/route-imports/:id_route_import/details"                             , component: ParRouteImportDetailsShared                },
 
     //  //  //
-    { path: "/route/frontoffice/obs/route-imports/:id_route_import/details"                  , component: ParRouteImportFrontOfficeDetails           },
-    { path: "/route/frontoffice/obs/route-imports/:id_route_import/clients/selected"         , component: ParRouteImportFrontOfficeDetails           },
+    { path: "/route/frontoffice/obs/route-imports/:id_route_import/details"                 , component: ParRouteImportFrontOfficeDetails           },
+    { path: "/route/frontoffice/obs/route-imports/:id_route_import/clients/selected"        , component: ParRouteImportFrontOfficeDetails           },
 
-    { path: "/route-imports/:id_route_import/clients/:id_client/details"                     , component: ClientDetailsFrontOffice                   },
-    { path: "/route-imports/:id_route_import/clients/add"                                    , component: ClientAddCurrentPositionFrontOffice        },
-    { path: "/route-imports/:id_route_import/clients/:id_client/update"                      , component: ClientUpdateFrontOffice                    },
-    { path: "/route-imports/:id_route_import/clients/confirmation"                           , component: RouteImportClientsConfirmation             },
-    { path: "/route-imports/:id_route_import/clients/validation"                             , component: RouteImportClientsValidation               },
+    { path: "/route-imports/:id_route_import/clients/:id_client/details"                    , component: ClientDetailsFrontOffice                   },
+    { path: "/route-imports/:id_route_import/clients/add"                                   , component: ClientAddCurrentPositionFrontOffice        },
+    { path: "/route-imports/:id_route_import/clients/:id_client/update"                     , component: ClientUpdateFrontOffice                    },
+    { path: "/route-imports/:id_route_import/clients/confirmation"                          , component: RouteImportClientsConfirmation             },
+    { path: "/route-imports/:id_route_import/clients/validation"                            , component: RouteImportClientsValidation               },
 
-    { path: "/route-imports/:id_route_import/clients/by-status"                              , component: RouteImportClientsByStatusFrontOffice      },
+    { path: "/route-imports/:id_route_import/clients/by-status"                             , component: RouteImportClientsByStatusFrontOffice      },
 
     { path: "/front-office"                                                                 , component: IndexFrontOffice                           },
 

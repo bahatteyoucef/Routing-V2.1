@@ -85,7 +85,7 @@
             async login() {
 
                 // Show Loading Page
-                this.$showLoadingPage()
+                await this.$showLoadingPage()
 
                 let formData = new FormData()
 
@@ -96,7 +96,7 @@
                 console.log(response)
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 
                 if(response.status === 200) {
 

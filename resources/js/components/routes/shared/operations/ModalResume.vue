@@ -76,7 +76,7 @@ export default {
 
             if(this.mode    ==  "temporary") {
 
-                this.$showLoadingPage()
+                await this.$showLoadingPage()
 
                 let formData    =   new FormData();
 
@@ -95,7 +95,7 @@ export default {
                     this.$feedbackSuccess(res.data.header     ,   res.data.message)
 
                     // 5) Now hide the spinner
-                    this.$hideLoadingPage();
+                    await this.$hideLoadingPage();
 
                     //
                     const clients_object = this.clients.reduce((acc, { id, JPlan, Journee }) => {
@@ -116,13 +116,13 @@ export default {
                     this.$showErrors("Error !", res.data.errors)
 
                     // Hide Loading Page
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
                 }            
             }
 
             else {
 
-                this.$showLoadingPage()
+                await this.$showLoadingPage()
 
                 let formData    =   new FormData();
 
@@ -140,7 +140,7 @@ export default {
                     this.$feedbackSuccess(res.data.header     ,   res.data.message)
 
                     // 5) Now hide the spinner
-                    this.$hideLoadingPage();
+                    await this.$hideLoadingPage();
 
                     //
                     const clients_object = this.clients.reduce((acc, { id, JPlan, Journee }) => {
@@ -161,7 +161,7 @@ export default {
                     this.$showErrors("Error !", res.data.errors)
 
                     // Hide Loading Page
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
                 }
             }
         },

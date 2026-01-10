@@ -417,12 +417,12 @@ export default {
     // ------------------------------
     async getStatsDetails() {
       try {
-        this.$showLoadingPage();
+        await this.$showLoadingPage();
 
         // validate + sanitize conditions first
         const validatedObj = this.validateAndSanitizeConditions();
         if (!validatedObj.valid) {
-          this.$hideLoadingPage();
+          await this.$hideLoadingPage();
           this.$showErrors("Error !", validatedObj.errors);
           return;
         }
@@ -455,18 +455,18 @@ export default {
         if (res.status == 200) {
           this.stats_details = res.data.stats_details ?? null;
 
-          this.$hideLoadingPage();
+          await this.$hideLoadingPage();
           this.$feedbackSuccess(res.data?.header ?? "Success", res.data?.message ?? "Statistics loaded.");
         }
 
         else {
 
-          this.$hideLoadingPage();
+          await this.$hideLoadingPage();
           this.$showErrors(res.data?.header ?? "Error !", res.data?.errors);
         }
       } catch (e) {
         console.error(e);
-        this.$hideLoadingPage();
+        await this.$hideLoadingPage();
         this.$showErrors("Error !", ["Failed to load statistics", e.message || e]);
       }
     },
@@ -728,7 +728,7 @@ export default {
     async getComboData() {
       try {
         const res = await this.$callApi("post", "/route-imports/combo", null)
-        this.liste_route_import_all = res.data || []
+        this.liste_route_import_all = res.data.liste_route_import || []
         this.liste_route_link = (this.liste_route_import_all || []).map(i => ({ value: i.id, label: i.libelle }))
       } catch (e) {
         console.error(e)

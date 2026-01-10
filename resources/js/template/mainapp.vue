@@ -249,7 +249,7 @@
 
                         BlockInstallButton.addEventListener('click', async () => {
 
-                            this.$showLoadingPage()
+                            await this.$showLoadingPage()
 
                             if (deferredPrompt !== null) {
 
@@ -262,7 +262,7 @@
                                 }
                             }
 
-                            this.$hideLoadingPage()
+                            await this.$hideLoadingPage()
                         });
                     }
 

@@ -63,7 +63,7 @@ export default {
         async sendData() {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             let formData = new FormData();
 
@@ -79,7 +79,7 @@ export default {
                 this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 
                 // Pass Clients to Map
                 this.emitter.emit('reSetClientsUpdateMap'   ,   res.data.clients)
@@ -94,20 +94,20 @@ export default {
                 this.$showErrors("Error !", res.data.errors)
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 			}
         },
 
         //
 
-        getFile(event) {
+        async getFile(event) {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             this.rdy_send   =   false
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 
                 const target    =   event.target
 
@@ -157,21 +157,21 @@ export default {
                             }
 
                             // Hide Loading Page
-                            this.$hideLoadingPage()
+                            await this.$hideLoadingPage()
                         };      
                     }
 
                     else {
 
                         // Hide Loading Page
-                        this.$hideLoadingPage()
+                        await this.$hideLoadingPage()
                     }
                 }
 
                 else {
 
                     // Hide Loading Page
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
                 }
 
             }, 55);
@@ -209,8 +209,8 @@ export default {
                     'CityNo'                    ,
                     'CityNameE'                 ,
                     'Tel'                       ,
-                    'tel_comment'               ,
                     'tel_status'                ,
+                    'tel_comment'               ,
                     'CustomerType'              ,
                     'JPlan'                     ,
                     'Journee'                   ,

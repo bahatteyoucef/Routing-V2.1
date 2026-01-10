@@ -98,14 +98,14 @@ export default {
 
     methods : {
 
-        getFile(event) {
+        async getFile(event) {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             this.rdy_send   =   false
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 
                 const target    =   event.target
 
@@ -155,21 +155,21 @@ export default {
                             }
 
                             // Hide Loading Page
-                            this.$hideLoadingPage()
+                            await this.$hideLoadingPage()
                         };   
                     }  
 
                     else {
 
                         // Hide Loading Page
-                        this.$hideLoadingPage()
+                        await this.$hideLoadingPage()
                     }
                 }
 
                 else {
 
                     // Hide Loading Page
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
                 }
 
             }, 55);
@@ -179,7 +179,7 @@ export default {
 
             const res           =   await this.$callApi("post",     "/rtm-willayas",    null)
 
-            this.districts_full =   res.data
+            this.districts_full =   res.data.willayas
 
             for (let index = 0; index < this.districts_full.length; index++) {
 
@@ -219,8 +219,8 @@ export default {
                     'CityNo'                    ,
                     'CityNameE'                 ,
                     'Tel'                       ,
-                    'tel_comment'               ,
                     'tel_status'                ,
+                    'tel_comment'               ,
                     'CustomerType'              ,
                     'JPlan'                     ,
                     'Journee'                   ,
@@ -385,7 +385,7 @@ export default {
 
             if(this.rdy_send) {
 
-                this.$showLoadingPage()
+                await this.$showLoadingPage()
 
                 let formData = new FormData();
 
@@ -401,11 +401,11 @@ export default {
 
                     //
 
-                    this.$goTo('/route/obs/route-imports-tempo')
+                    this.$goTo('/route-imports-tempo/last-imported')
 
                     //
 
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
 
                     // Send Feedback
                     this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
@@ -413,7 +413,7 @@ export default {
                 
                 else{
 
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
 
                     // Send Errors
                     this.$showWarnings("Error !", res.data.errors)

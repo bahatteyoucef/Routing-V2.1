@@ -17,7 +17,7 @@ class StatisticController extends Controller {
     //  //  //  //  //
     //  //  //  //  //
 
-    public static function standardStatistics(Request $request) {
+    public function standardStatistics(Request $request) {
 
         try {
 
@@ -26,7 +26,6 @@ class StatisticController extends Controller {
 
             //
             return response()->json([
-
                 "stats_details" =>  $stats_details
             ]);
         }

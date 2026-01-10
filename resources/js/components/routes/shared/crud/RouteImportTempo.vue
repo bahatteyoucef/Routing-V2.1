@@ -190,31 +190,31 @@ export default {
 
         async getDataTempo() {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             // Set Data
-            const res   = await this.$callApi('post' ,   '/route-imports-tempo/last'    ,   null)         
+            const res   = await this.$callApi('post' ,   '/route-imports-tempo/last-imported'    ,   null)         
             console.log(res)
 
             if(res.status===200){
 
-                this.total_clients                          =   res.data.clients
+                this.total_clients                          =   res.data.route_import.clients
 
-                this.route_import.id_route_import_tempo     =   res.data.id
-                this.route_import.libelle                   =   res.data.libelle
-                this.route_import.districts                 =   res.data.districts
-                this.route_import.file_route_import_tempo   =   res.data.file
-                this.route_import.file_original_name        =   res.data.file_original_name
+                this.route_import.id_route_import_tempo     =   res.data.route_import.id
+                this.route_import.libelle                   =   res.data.route_import.libelle
+                this.route_import.districts                 =   res.data.route_import.districts
+                this.route_import.file_route_import_tempo   =   res.data.route_import.file
+                this.route_import.file_original_name        =   res.data.route_import.file_original_name
 
                 //
-                this.$createFile(res.data.file_original_name, "route_import_tempo_file")
+                this.$createFile(res.data.route_import.file_original_name, "route_import_tempo_file")
 
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
             }
             
             else{
 
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 
                 // Send Errors
                 this.$showErrors("Error !", res.data.errors)
@@ -225,15 +225,15 @@ export default {
 
         async getComboData() {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             const res_1         =   await this.$callApi("post"  ,   "/users/combo"      ,   null)
             const res_2         =   await this.$callApi("post"  ,   "/rtm-willayas"     ,   null)
 
-            this.users_all      =   res_1.data
-            this.districts_all  =   res_2.data
+            this.users_all      =   res_1.data.users
+            this.districts_all  =   res_2.data.willayas
 
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
         //
@@ -241,28 +241,30 @@ export default {
         async getDoubles() {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             const res                   =   await this.$callApi("post"  ,   "/route-imports-tempo/"+this.route_import.id_route_import_tempo+"/clients-tempo/doubles", null)
             console.log(res)
+            console.log(this.route_import)
+            console.log(this.route_import.id_route_import_tempo)
 
             if(res.status===200){
 
-                this.getDoublant.getDoublantTel                 =   res.data.getDoublantTel
-                this.getDoublant.getDoublantGPS                 =   res.data.getDoublantGPS
-                this.getDoublant.getDoublantCustomerNameE       =   res.data.getDoublantCustomerNameE
-                this.getDoublant.getDoublantCustomerCode        =   res.data.getDoublantCustomerCode
+                this.getDoublant.getDoublantTel                 =   res.data.doubles.getDoublantTel
+                this.getDoublant.getDoublantGPS                 =   res.data.doubles.getDoublantGPS
+                this.getDoublant.getDoublantCustomerNameE       =   res.data.doubles.getDoublantCustomerNameE
+                this.getDoublant.getDoublantCustomerCode        =   res.data.doubles.getDoublantCustomerCode
 
                 this.show_card_doublants                        =   true
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
             }
             
             else{
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 
                 // Send Errors
                 this.$showErrors("Error !", res.data.errors)

@@ -370,7 +370,7 @@ export default {
                 if((this.start_date  !=  "")&&(this.end_date  !=  "")) {
 
                     //
-                    this.$showLoadingPage()
+                    await this.$showLoadingPage()
 
                     // Initialisation 
                     this.users_pointings  =   [];
@@ -395,11 +395,11 @@ export default {
                         console.log(res)
 
                         //
-                        this.users_pointings      =   res.data;
+                        this.users_pointings      =   res.data.pointings;
                         await this.prepareDatatables()
 
                         //
-                        this.$hideLoadingPage()
+                        await this.$hideLoadingPage()
                     })
                 }
             }
@@ -407,7 +407,7 @@ export default {
             catch(e) {
 
                 console.log(e)
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
             }
         },
 
@@ -416,7 +416,7 @@ export default {
         async getComboData() {
 
             //
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             const res_1                     =   await this.$callApi("post",     "/route-imports/combo"       ,   null)
             const res_2                     =   await this.$callApi("post",     "/users/combo/backoffice"   ,   null)
@@ -424,8 +424,8 @@ export default {
             console.log(res_1)
             console.log(res_2)
 
-            this.liste_route_import_all     =   res_1.data
-            this.users_all                  =   res_2.data
+            this.liste_route_import_all     =   res_1.data.liste_route_import
+            this.users_all                  =   res_2.data.users
 
             for (let i = 0; i < this.liste_route_import_all.length; i++) {
 
@@ -438,7 +438,7 @@ export default {
             }
 
             //
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
         //

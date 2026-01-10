@@ -293,7 +293,7 @@ export default {
 
         async multiUpdate() {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             let formData                =   new FormData()
 
@@ -359,7 +359,7 @@ export default {
                 this.$feedbackSuccess(res.data.header, res.data.message);
 
                 // 5) Now hide the spinner
-                this.$hideLoadingPage();
+                await this.$hideLoadingPage();
 
                 // Send Client
                 this.emitter.emit('reSetChangeRoute' , clients_copy)
@@ -374,13 +374,13 @@ export default {
                 this.$showErrors("Error !", res.data.errors)
 
                 // 5) Now hide the spinner
-                this.$hideLoadingPage();
+                await this.$hideLoadingPage();
 			}
         },
 
         async devideClients() {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             let formData    =   new FormData();
 
@@ -403,7 +403,7 @@ export default {
                 this.$feedbackSuccess(res.data.header     ,   res.data.message)
 
                 // 5) Now hide the spinner
-                this.$hideLoadingPage();
+                await this.$hideLoadingPage();
 
                 //
                 const clients_object = clients.reduce((acc, { id, JPlan, Journee }) => {
@@ -424,13 +424,13 @@ export default {
                 this.$showErrors("Error !", res.data.errors)
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
             }
         },
 
         async deleteClients() {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             let formData                =   new FormData()
 
@@ -450,7 +450,7 @@ export default {
                 this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
                 // 5) Now hide the spinner
-                this.$hideLoadingPage();
+                await this.$hideLoadingPage();
 
                 //
                 let clients_copy            =   [...this.clients].map(client => { return { id : client.id }})  
@@ -468,7 +468,7 @@ export default {
                 this.$showErrors("Error !", res.data.errors)
 
                 // 5) Now hide the spinner
-                this.$hideLoadingPage();
+                await this.$hideLoadingPage();
 			}
         },
 
@@ -499,7 +499,7 @@ export default {
         async getData(clients) {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             // Set Value
             this.all_clients    =   [...clients]
@@ -521,7 +521,7 @@ export default {
             this.checkUncheckAllRows()
 
             // Hide Loading Page
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
         async getComboData() {
@@ -532,7 +532,7 @@ export default {
 
             else {
                 const res_1         =   await this.$callApi("post"  ,   "/users/combo"  ,   null)
-                this.users          =   res_1.data
+                this.users          =   res_1.data.users
             }
 
             //
@@ -543,20 +543,20 @@ export default {
 
             else {
                 const res_2         =   await this.$callApi("post"  ,   "/rtm-willayas"         ,   null)
-                this.districts      =   res_2.data
+                this.districts      =   res_2.data.willayas
             }
         },
 
         async getCites() {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             const res_3                     =   await this.$callApi("post"  ,   "/rtm-willayas/"+this.DistrictNo+"/rtm-cities"         ,   null)
-            this.cities                      =   res_3.data
+            this.cities                      =   res_3.data.cities
 
             // Hide Loading Page
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
         //

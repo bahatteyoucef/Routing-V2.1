@@ -2,22 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ClientTempo;
 use App\Models\RouteImportTempo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class RouteImportTempoController extends Controller
-{
-    public function lastTempo()
-    {
+class RouteImportTempoController extends Controller {
+
+    public function lastTempo() {
 
         try {
 
             $last_route_import     =   RouteImportTempo::lastTempo();
-            return $last_route_import;
+            return response()->json([
+                "route_import"   =>  $last_route_import
+            ]);
         }
 
         catch(Throwable $erreur) {
@@ -28,8 +28,7 @@ class RouteImportTempoController extends Controller
         }
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
 
         try {
 
@@ -71,8 +70,7 @@ class RouteImportTempoController extends Controller
         }
     }
 
-    public function getFile()
-    {
+    public function getFile() {
 
         try {
 

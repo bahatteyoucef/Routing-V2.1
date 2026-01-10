@@ -230,7 +230,7 @@ export default {
 
         async getRouteTempo() {
 
-            this.$callApi("post",    "/route-imports-tempo/last", null)
+            this.$callApi("post",    "/route-imports-tempo/last-imported", null)
             .then((res)=> {
 
               if(res.data) {
@@ -247,7 +247,7 @@ export default {
 
                 console.log(res)
 
-                this.liste_route_import = res.data
+                this.liste_route_import = res.data.liste_route_import
 
                 this.prepareRouteLink()
             })
@@ -284,7 +284,7 @@ export default {
         AddRouteImport() {
     
             // Go To Route
-            this.$router.push('/route/obs/route-imports/add')
+            this.$router.push('/route-imports/add')
         },
 
         //
@@ -329,7 +329,7 @@ export default {
 
         goToRouteTempo() {
 
-            this.$goTo('/route/obs/route-imports-tempo')
+            this.$goTo('/route-imports-tempo/last-imported')
         },
 
         //

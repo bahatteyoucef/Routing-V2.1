@@ -8,14 +8,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class ClientTempoController extends Controller
-{
+class ClientTempoController extends Controller {
+
     public function clients(int $id_route_import_tempo) {
 
         try {
 
             $clients     =   ClientTempo::index($id_route_import_tempo);
-            return $clients;
+            return response()->json([
+                'clients'    =>  $clients,
+            ]);
         }
 
         catch(Throwable $erreur) {
@@ -176,33 +178,38 @@ class ClientTempoController extends Controller
     //  //  //  //  //
     //  //  //  //  //
 
-    public function getDoublesClients(Request $request, $id_route_import_tempo)
-    {
-        $data = ClientTempo::getDoublesClients($request, $id_route_import_tempo);        
-        return $data;
+    public function getDoublesClients(Request $request, $id_route_import_tempo) {
+        $doubles = ClientTempo::getDoublesClients($request, $id_route_import_tempo);        
+        return response()->json([   
+            "doubles"   =>  $doubles
+        ]);
     }
 
-    public function getDoublesTelClients(Request $request, $id_route_import_tempo)
-    {
-        $data = ClientTempo::findDuplicates($request, $id_route_import_tempo, 'Tel');
-        return $data;
+    public function getDoublesTelClients(Request $request, $id_route_import_tempo) {
+        $doubles_tel = ClientTempo::findDuplicates($request, $id_route_import_tempo, 'Tel');
+        return response()->json([   
+            "doubles_tel"   =>  $doubles_tel
+        ]);
     }
 
-    public function getDoublesCustomerCodeClients(Request $request, $id_route_import_tempo)
-    {
-        $data = ClientTempo::findDuplicates($request, $id_route_import_tempo, 'CustomerCode');        
-        return $data;
+    public function getDoublesCustomerCodeClients(Request $request, $id_route_import_tempo) {
+        $doubles_customer_code = ClientTempo::findDuplicates($request, $id_route_import_tempo, 'CustomerCode');        
+        return response()->json([   
+            "doubles_customer_code"   =>  $doubles_customer_code
+        ]);
     }
 
-    public function getDoublesCustomerNameEClients(Request $request, $id_route_import_tempo)
-    {
-        $data = ClientTempo::findDuplicates($request, $id_route_import_tempo, 'CustomerNameE');        
-        return $data;
+    public function getDoublesCustomerNameEClients(Request $request, $id_route_import_tempo) {
+        $doubles_customer_namee = ClientTempo::findDuplicates($request, $id_route_import_tempo, 'CustomerNameE');        
+        return response()->json([   
+            "doubles_customer_namee"   =>  $doubles_customer_namee
+        ]);
     }
 
-    public function getDoublesGPSClients(Request $request, $id_route_import_tempo)
-    {
-        $data = ClientTempo::findDuplicates($request, $id_route_import_tempo, 'GPS'); 
-        return $data;
+    public function getDoublesGPSClients(Request $request, $id_route_import_tempo) {
+        $doubles_gps = ClientTempo::findDuplicates($request, $id_route_import_tempo, 'GPS'); 
+        return response()->json([   
+            "doubles_gps"   =>  $doubles_gps
+        ]);
     }
 }

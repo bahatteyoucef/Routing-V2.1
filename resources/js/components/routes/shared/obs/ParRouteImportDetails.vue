@@ -693,7 +693,7 @@ export default {
         async getData() {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
                 
             const res                   =   await this.$callApi("post"  ,   "/route/obs/route-imports/"+this.id_route_import+"/details",   null)
             console.log(res)
@@ -706,17 +706,17 @@ export default {
 
         async getComboData() {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             const res_1         =   await this.$callApi("post"  ,   "/users/combo"      ,   null)
             const res_2         =   await this.$callApi("post"  ,   "/rtm-willayas"     ,   null)
 
-            this.users_all      =   res_1.data
-            this.districts_all  =   res_2.data
+            this.users_all      =   res_1.data.users
+            this.districts_all  =   res_2.data.willayas
 
             this.setKMLWillayas()
 
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
         // Prepare Markers and Table Data
@@ -724,7 +724,7 @@ export default {
         async reAfficherClientsAndMarkers(mode, clients = null) {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             setTimeout(async () => {
 
@@ -846,7 +846,7 @@ export default {
                 }
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
             }, 0)
         },
 
@@ -1496,27 +1496,28 @@ export default {
         async showJPlanBDTerritories() {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             let formData = new FormData();
 
             formData.append("liste_journey_plan", JSON.stringify(this.journey_plan_filter_value)) 
 
             const res   = await this.$callApi('post'    ,   '/route-imports/'+this.route_import.id+'/journey-plan-territories/util'   ,   formData)      
+            console.log(res)
 
             if(res.status===200){
 
                 // Show BD Territories
-                this.map_instance.$showJPlanBDTerritories(res.data)
+                this.map_instance.$showJPlanBDTerritories(res.data.journey_plan_territories)
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
             }
             
             else{
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 
                 // Send Errors
                 this.$showErrors("Error !", res.data.errors)
@@ -1526,7 +1527,7 @@ export default {
         async showJourneeBDTerritories() {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             let formData = new FormData();
 
@@ -1534,20 +1535,21 @@ export default {
             formData.append("journees"              , JSON.stringify(this.journee_filter_value)) 
 
             const res   = await this.$callApi('post'    ,   '/route-imports/'+this.route_import.id+'/journee-territories/util'   ,   formData)      
+            console.log(res)
 
             if(res.status===200){
 
                 // Show BD Territories
-                this.map_instance.$showJourneeBDTerritories(res.data)
+                this.map_instance.$showJourneeBDTerritories(res.data.journee_territories)
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
             }
             
             else{
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 
                 // Send Errors
                 this.$showErrors("Error !", res.data.errors)
@@ -1557,27 +1559,28 @@ export default {
         async showUserBDTerritories() {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             let formData = new FormData();
 
             formData.append("liste_user_territory"  ,   JSON.stringify(this.owner_filter_value)) 
 
             const res   = await this.$callApi('post'    ,   '/route-imports/'+this.route_import.id+'/user-territories/util'   ,   formData)      
+            console.log(res)
 
             if(res.status===200){
 
                 // Show BD Territories
-                this.map_instance.$showUserBDTerritories(res.data)
+                this.map_instance.$showUserBDTerritories(res.data.user_territories)
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
             }
             
             else{
 
                 // Hide Loading Page
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 
                 // Send Errors
                 this.$showErrors("Error !", res.data.errors)

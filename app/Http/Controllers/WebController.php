@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class WebController extends Controller
-{  
+class WebController extends Controller {
+  
     public function loginPage(Request $request) {
         return view('welcome');
     }

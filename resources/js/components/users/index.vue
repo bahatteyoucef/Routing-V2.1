@@ -109,7 +109,7 @@ export default {
 
         async setDataTable() {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             // Initialisation 
             this.index_users_data   =   [];
@@ -119,13 +119,13 @@ export default {
 
                 console.log(res)
 
-                this.index_users_data       =   res.data;
+                this.index_users_data       =   res.data.users;
 
                 // Create DataTable
                 this.datatable_index_users  =   this.datatable_index_users_instance.$DataTableCreate("index_users", this.index_users_data, this.index_users_columns, this.setDataTable, this.addElement, this.updateElement, null, this.selectRow, "Users")      
 
                 //
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
             })
         },
 

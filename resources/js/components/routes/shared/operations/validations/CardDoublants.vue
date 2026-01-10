@@ -205,16 +205,16 @@ export default {
 
         async getDoubleCustomerCode() {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             if(this.mode    ==  "temporary") {
                 const res                                   =   await this.$callApi("post"  ,   "/route-imports-tempo/"+this.id_route_import_tempo+"/clients-tempo/doubles/CustomerCode"     , null)
-                this.getDoublant.getDoublantCustomerCode    =   res.data
+                this.getDoublant.getDoublantCustomerCode    =   res.data.doubles_customer_code
             }
 
             if(this.mode    ==  "permanent") {
                 const res                                   =   await this.$callApi("post"  ,   "/route-imports/"+this.id_route_import+"/clients/doubles/CustomerCode"                       , null)
-                this.getDoublant.getDoublantCustomerCode    =   res.data
+                this.getDoublant.getDoublantCustomerCode    =   res.data.doubles_customer_code
             }
 
             //
@@ -234,21 +234,21 @@ export default {
             await this.$refs.ShowValidationClients.setDatatable()
 
             //
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
         async getDoubleCustomerNameE() {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             if(this.mode    ==  "temporary") {
                 const res                                   =   await this.$callApi("post"  ,   "/route-imports-tempo/"+this.id_route_import_tempo+"/clients-tempo/doubles/CustomerNameE"    , null)
-                this.getDoublant.getDoublantCustomerNameE   =   res.data
+                this.getDoublant.getDoublantCustomerNameE   =   res.data.doubles_customer_namee
             }
 
             if(this.mode    ==  "permanent") {
                 const res                                   =   await this.$callApi("post"  ,   "/route-imports/"+this.id_route_import+"/clients/doubles/CustomerNameE"                      , null)
-                this.getDoublant.getDoublantCustomerNameE   =   res.data
+                this.getDoublant.getDoublantCustomerNameE   =   res.data.doubles_customer_namee
             }
 
             //
@@ -268,21 +268,21 @@ export default {
             await this.$refs.ShowValidationClients.setDatatable()
 
             //
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
         async getDoubleTel() {
   
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             if(this.mode    ==  "temporary") {
                 const res                           =   await this.$callApi("post"  ,   "/route-imports-tempo/"+this.id_route_import_tempo+"/clients-tempo/doubles/Tel"  , null)
-                this.getDoublant.getDoublantTel     =   res.data
+                this.getDoublant.getDoublantTel     =   res.data.doubles_tel
             }
 
             if(this.mode    ==  "permanent") {
                 const res                           =   await this.$callApi("post"  ,   "/route-imports/"+this.id_route_import+"/clients/doubles/Tel"                    , null)
-                this.getDoublant.getDoublantTel     =   res.data
+                this.getDoublant.getDoublantTel     =   res.data.doubles_tel
             }
 
             //
@@ -302,21 +302,21 @@ export default {
             await this.$refs.ShowValidationClients.setDatatable()
 
             //
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
         async getDoubleGPS() {
   
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             if(this.mode    ==  "temporary") {
                 const res                                       =   await this.$callApi("post"  ,   "/route-imports-tempo/"+this.id_route_import_tempo+"/clients-tempo/doubles/GPS"  , null)
-                this.getDoublant.getDoublantGPS   =   res.data
+                this.getDoublant.getDoublantGPS   =   res.data.doubles_gps
             }
 
             if(this.mode    ==  "permanent") {
                 const res                                       =   await this.$callApi("post"  ,   "/route-imports/"+this.id_route_import+"/clients/doubles/GPS"                    , null)
-                this.getDoublant.getDoublantGPS   =   res.data
+                this.getDoublant.getDoublantGPS   =   res.data.doubles_gps
             }
 
             //
@@ -336,7 +336,7 @@ export default {
             await this.$refs.ShowValidationClients.setDatatable()
 
             //
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
         //

@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+class RTMCityController extends Controller {
 
-class RTMCityController extends Controller
-{
-    //
 }

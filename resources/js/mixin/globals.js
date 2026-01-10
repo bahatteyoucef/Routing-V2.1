@@ -164,16 +164,16 @@ export default {
 
         // 
 
-        $showLoadingPage() {
-
+        async $showLoadingPage() {
             store.commit("loading_page/setShowLoadingPage", true)
+            await this.$nextTick()
         },
 
         // 
 
-        $hideLoadingPage() {
-
+        async $hideLoadingPage() {
             store.commit("loading_page/setShowLoadingPage", false)
+            await this.$nextTick()
         },
 
         //

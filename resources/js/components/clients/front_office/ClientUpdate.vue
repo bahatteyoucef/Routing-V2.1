@@ -368,7 +368,7 @@ import {mapGetters, mapActions} from    "vuex"
 //
 
 import GPSErrorComponent        from    "@/template/partials/GPSErrorComponent.vue"
-import moment                   from    "moment"; // Ensure moment is installed
+import moment                   from    "moment";
 
 export default {
 
@@ -473,13 +473,11 @@ export default {
         if (this.watchGPS) navigator.geolocation.clearWatch(this.watchGPS);
     },
 
-    // 2. Ensure cleanup if the user leaves the page
-    beforeDestroy() { // Use 'beforeUnmount' if you are on Vue 3
+    beforeDestroy() {
         const fields = ['CustomerBarCode_image', 'facade_image', 'in_store_image'];
         fields.forEach(field => this.revokeImage(field));
     }, 
 
-    // 1. Non-reactive storage for heavy binary blobs
     created() {
         this._rawFiles = {
             CustomerBarCode_image: null,
@@ -489,12 +487,12 @@ export default {
     },
 
     async mounted() {
-        this.$showLoadingPage();
+        await this.$showLoadingPage();
         try {
             await Promise.all([this.getComboData(), this.getClientData()]);
             this.total_questions = document.getElementsByClassName("mySlides").length || 23;
         } finally {
-            this.$hideLoadingPage();
+            await this.$hideLoadingPage();
         }
     },
 
@@ -504,182 +502,55 @@ export default {
             "setUpdateClientAction"   ,
         ]),
 
-        //
+        //  //  //  //  //
 
         async sendData() {
-            // 1. Validation
-            const validation = this.validationQuestion();
-            if (!validation) {
-                this.$showErrors("Error !", ["Veuillez répondre en respectant les conditions des questions avant de valider !"]);
-                return;
-            }
+            await this.$showLoadingPage();
+            
+            const formData = new FormData();
+            
+            // Logic to determine what to send based on OpenCustomer status
+            const isOuvert = this.client.OpenCustomer === 'Ouvert';
 
-            this.$showLoadingPage();
-
-            // 2. Refresh Names
-            if (this.willayas.length > 0) this.client.DistrictNameE = this.getDistrictNameE(this.client.DistrictNo);
-            if (this.cities.length > 0) this.client.CityNameE = this.getCityNameE(this.client.CityNo);
-
-            // 3. Prepare Payload based on Status
-            let payload = {};
-            const status = this.client.OpenCustomer; // Ouvert, Ferme, Refus, Introuvable
-
-            // --- A. Base Fields (Common to almost all) ---
-            const baseFields = {
-                NewCustomer: this.client.NewCustomer,
-                OpenCustomer: this.client.OpenCustomer,
-                CustomerIdentifier: this.client.CustomerIdentifier,
-                CustomerNameA: this.client.CustomerNameA,
-                Latitude: this.client.Latitude,
-                Longitude: this.client.Longitude,
-                Address: this.client.Address,
-                RvrsGeoAddress: this.client.RvrsGeoAddress,
-                Neighborhood: this.client.Neighborhood,
-                Landmark: this.client.Landmark,
-                DistrictNo: this.client.DistrictNo,
-                DistrictNameE: this.client.DistrictNameE,
-                CityNo: this.client.CityNo,
-                CityNameE: this.client.CityNameE,
-                CustomerType: this.client.CustomerType,
-                // Default Images Logic
-                facade_image: this.client.facade_image,
-                facade_image_original_name: this.client.facade_image_original_name,
-                facade_image_updated: this.client.facade_image_updated,
-                comment: this.client.comment
+            // 1. Build Payload Object
+            const payload = {
+                ...this.client,
+                AvailableBrands: JSON.stringify(this.client.AvailableBrands),
+                finish_adding_date: moment().format(),
+                start_adding_date: this.start_adding_date,
+                // Override status if not open
+                status: isOuvert ? this.client.status : 'pending'
             };
 
-            // --- B. Status Specific Logic ---
-            if (status === 'Ouvert') {
-                payload = {
-                    ...baseFields,
-                    CustomerCode: this.client.CustomerCode,
-                    CustomerNameE: this.client.CustomerNameE,
-                    Tel: this.client.Tel,
-                    tel_status: this.client.tel_status,
-                    tel_comment: this.client.tel_comment,
-                    BrandAvailability: this.client.BrandAvailability,
-                    BrandSourcePurchase: this.client.BrandSourcePurchase,
-                    JPlan: this.client.JPlan,
-                    Journee: this.client.Journee,
-                    Frequency: this.client.Frequency,
-                    SuperficieMagasin: this.client.SuperficieMagasin,
-                    NbrAutomaticCheckouts: this.client.NbrAutomaticCheckouts,
-                    AvailableBrands: JSON.stringify(this.client.AvailableBrands), // Specific serialization
-                    
-                    // Images
-                    CustomerBarCode_image_updated: this.client.CustomerBarCode_image_updated,
-                    in_store_image_updated: this.client.in_store_image_updated,
-                    CustomerBarCode_image: this.client.CustomerBarCode_image,
-                    in_store_image: this.client.in_store_image,
-                    CustomerBarCode_image_original_name: this.client.CustomerBarCode_image_original_name,
-                    in_store_image_original_name: this.client.in_store_image_original_name,
-                    
-                    status: this.client.status,
-                    nonvalidated_details: this.client.nonvalidated_details
-                };
-            } 
-            else if (status === 'Ferme' || status === 'refus') {
-                payload = {
-                    ...baseFields,
-                    // Empty/Default overrides
-                    CustomerCode: '',
-                    CustomerNameE: '',
-                    Tel: '',
-                    tel_status: 'nonvalidated',
-                    tel_comment: '',
-                    BrandAvailability: 'Non',
-                    BrandSourcePurchase: '',
-                    JPlan: this.client.JPlan,
-                    Journee: this.client.Journee,
-                    Frequency: this.client.Frequency,
-                    SuperficieMagasin: this.client.SuperficieMagasin,
-                    NbrAutomaticCheckouts: '',
-                    AvailableBrands: JSON.stringify([]),
+            // 2. Append text fields
+            Object.keys(payload).forEach(key => {
+                if (typeof payload[key] !== 'object' || Array.isArray(payload[key])) {
+                    formData.append(key, payload[key] ?? '');
+                }
+            });
 
-                    // Images (Clear others, keep facade)
-                    CustomerBarCode_image: '',
-                    in_store_image: '',
-                    CustomerBarCode_image_original_name: '',
-                    in_store_image_original_name: '',
-                    
-                    // Specific Updates for Refus/Ferme
-                    CustomerBarCodeExiste_image_updated: true, // Note: You had this in 'refus'
-                    CustomerBarCode_image_updated: true,
-                    in_store_image_updated: true,
-                    
-                    status: 'pending',
-                    nonvalidated_details: ''
-                };
-            }
-            else if (status === 'Introuvable') {
-                 payload = {
-                    ...baseFields,
-                    CustomerBarCodeExiste: '',
-                    CustomerCode: '',
-                    CustomerNameE: '',
-                    RvrsGeoAddress: this.client.RvrsGeoAddress, // Specific to Introuvable
-                    Tel: this.client.Tel,
-                    tel_status: 'nonvalidated',
-                    tel_comment: '',
-                    NbrVitrines: '',
-                    NbrAutomaticCheckouts: '',
-                    SuperficieMagasin: this.client.SuperficieMagasin,
-                    BrandAvailability: this.client.BrandAvailability,
-                    BrandSourcePurchase: this.client.BrandSourcePurchase,
-                    
-                    // Images logic (Clear all except facade)
-                    CustomerBarCodeExiste_image_updated: true,
-                    CustomerBarCode_image_updated: true,
-                    in_store_image_updated: true,
-                    CustomerBarCodeExiste_image: '',
-                    CustomerBarCode_image: '',
-                    in_store_image: '',
-                    
-                    JPlan: this.client.JPlan,
-                    Journee: this.client.Journee,
-                    
-                    status: 'pending',
-                    nonvalidated_details: ''
-                 };
-            }
+            // 3. Append Heavy Files from non-reactive storage
+            Object.keys(this._rawFiles).forEach(key => {
+                if (this._rawFiles[key]) {
+                    formData.append(key, this._rawFiles[key]);
+                }
+            });
 
-            // 4. Timer Logic
-            if (this.client.status_original === 'visible') {
-                payload.start_adding_date = this.start_adding_date;
-                payload.finish_adding_date = moment(new Date()).format();
-            }
-
-            // 5. Build FormData
-            const formData = new FormData();
-            for (const key in payload) {
-                let value = payload[key];
-                if (value === null || value === undefined) value = '';
-                formData.append(key, value);
-            }
-
-            // 6. Send Request
             try {
                 const res = await this.$callApi("post", `/route-imports/${this.$route.params.id_route_import}/clients/${this.client.id}/update`, formData);
-
-                if (res.status === 200) {
-                    this.$hideLoadingPage();
-                    this.$feedbackSuccess(res.data["header"], res.data["message"]);
-                    this.$goBack();
-                } else {
-                    this.$hideLoadingPage();
-                    this.$showErrors("Error !", res.data.errors);
-                }
-            } catch (error) {
-                this.$hideLoadingPage();
-                this.$showErrors("System Error", ["An unexpected error occurred."]);
-                console.error(error);
+                this.$feedbackSuccess(res.data.header, res.data.message);
+                this.$goBack();
+            } catch (err) {
+                this.$showErrors("Error", ["Update failed"]);
+            } finally {
+                await this.$hideLoadingPage();
             }
         },
 
-        //
+        //  //  //  //  //
 
         async getData() {
-            this.$showLoadingPage();
+            await this.$showLoadingPage();
 
             try {
                 // 1. Get Route Details
@@ -698,11 +569,46 @@ export default {
                 console.error("Error fetching data", error);
                 this.$showErrors("Error", ["Failed to load data."]);
             } finally {
-                this.$hideLoadingPage();
+                await this.$hideLoadingPage();
             }
         },
 
-        //
+        async getClientData() {
+            const res = await this.$callApi("post", `/route-imports/${this.$route.params.id_route_import}/clients/${this.$route.params.id_client}/show`);
+            const data = res.data.client;
+
+            // Bulk assign properties
+            Object.assign(this.client, data);
+            
+            // Format specific fields
+            this.client.AvailableBrands = data.AvailableBrands_array_formatted || [];
+            
+            // Set Initial Previews from Server
+            const imgFields = ['CustomerBarCode_image', 'facade_image', 'in_store_image'];
+            imgFields.forEach(field => {
+                if (data[field]) {
+                    this.client[`${field}_currentObjectURL`] = `/uploads/clients/${data.id}/${data[field]}`;
+                }
+            });
+
+            if (this.client.status === "visible") {
+                this.start_adding_date = moment().format();
+            }
+            
+            if (this.client.DistrictNo) this.getCites();
+        },
+
+        async getComboData() {
+            const res = await this.$callApi("post", `/route-imports/${this.$route.params.id_route_import}/districts`);
+            this.willayas = res.data.willayas;
+        },
+
+        async getCites() {
+            const res = await this.$callApi("post", `/rtm-willayas/${this.client.DistrictNo}/rtm_cities`);
+            this.cities = res.data.cities;
+        },
+
+        //  //  //  //  //
 
         getDistrictNameE(DistrictNo) {
 
@@ -726,34 +632,41 @@ export default {
             }
         },
 
-        //
+        //  //  //  //  //
 
-        checkClients() {
+        async handleImageUpload(event, fieldKey) {
+            const file = event.target.files[0];
+            if (!file) return;
 
-            this.close_clients  =   []
+            // Revoke old URL to free memory
+            this.revokeImage(fieldKey);
 
-            let distance        =   0
+            try {
+                const compressedFile = await this.$compressImage(file);
+                const objectUrl = URL.createObjectURL(compressedFile);
 
-            for (let i = 0; i < this.all_clients.length; i++) {
+                // Update non-reactive storage
+                this._rawFiles[fieldKey] = compressedFile;
 
-                if(this.all_clients[i].id   !=  this.client.id) {
+                // Update Vue state with metadata only
+                this.client[`${fieldKey}_currentObjectURL`] = objectUrl;
+                this.client[`${fieldKey}_original_name`] = file.name;
+                this.client[`${fieldKey}_updated`] = true;
 
-                    distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
-
-                    if(distance <=  this.min_distance) {
-                    
-                        this.close_clients.push(this.all_clients[i])
-                    }
-                }
+                // Clear input so same file can be re-selected if needed
+                event.target.value = ''; 
+            } catch (e) {
+                console.error("Upload Error:", e);
             }
         },
 
-        getDistance(latitude_1, longitude_1, latitude_2, longitude_2) {
-
-            return this.$map.$setDistanceStraight(latitude_1, longitude_1, latitude_2, longitude_2)
+        revokeImage(fieldKey) {
+            if (this.client[`${fieldKey}_currentObjectURL`]?.startsWith('blob:')) {
+                URL.revokeObjectURL(this.client[`${fieldKey}_currentObjectURL`]);
+            }
         },
 
-        //
+        //  //  //  //  //
 
         brandAvailabilityChanged() {
 
@@ -775,241 +688,37 @@ export default {
             }
         },
 
-        //     
+        //  //  //  //  //
 
-        async showPositionOnMap(map_id) {
+        setTotalQuestions() {
+            this.total_questions = document.getElementsByClassName("mySlides").length;
+        },
 
-            if(!this.check_gps_clicked) {
-
-                this.check_gps_clicked              =   true
-
-                //
-                this.point_is_inside_user_polygons  =   false
-
-                //
-                let response                        =   await this.$currentPosition(this.getUser.accuracy)
-
-                if(response.success) {
-
-                    //
-                    this.show_gps_error                 =   false
-
-                    //
-                    this.client.Latitude                =   response.position.coords.latitude
-                    this.client.Longitude               =   response.position.coords.longitude
-
-                    // --- NEW: Get Address from LocationIQ ---
-                    // We await this so the address is ready before you save/check clients
-                    const address = await this.$getAddressFromLocationIQ(this.client.Latitude, this.client.Longitude);
-                    
-                    // Assuming 'this.client.Address' is where you want to store it
-                    if(address) {
-                        this.client.RvrsGeoAddress  =   address;
-                        console.log("Address found:", this.client.RvrsGeoAddress);
-                    }
-                    // ----------------------------------------
-
-                    await this.$nextTick()
-
-                    //
-                    let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
-
-                    //
-                    this.checkClients()
-
-                    //
-                    // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
-                    this.point_is_inside_user_polygons  =   true
-
-                    // Send Feedback
-                    this.$feedbackSuccess('Success !'   ,   'Le GPS a été pris avec succès ')
-
-                    //
-                    this.check_gps_clicked              =   false
+        changeSlide(step) {
+            const nextIndex = this.slideIndex + step;
+            
+            // Logic for "Next"
+            if (step > 0) {
+                if (!this.validationQuestion()) {
+                    this.$showErrors("Erreur !", ["Veuillez remplir les champs obligatoires correctement."]);
+                    return;
                 }
-
-                else {
-
-                    //
-                    this.show_gps_error                 =   true
-
-                    //
-                    this.client.Latitude                =   0
-                    this.client.Longitude               =   0
-
-                    //
-                    await this.$nextTick()
-
-                    //
-                    let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
-
-                    //
-                    this.checkClients()
-
-                    //
-                    // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
-                    this.point_is_inside_user_polygons  =   false
-
-                    //
-                    this.$customMessages("GPS Error", "Vérifiez si votre GPS est activée", "error", "OK", "", "", "")
-
-                    //
-                    this.checkGPS(map_id)
-
-                    //
-                    this.check_gps_clicked              =   false
+                
+                // If moving TO the map slide (last slide)
+                if (nextIndex === this.total_questions) {
+                    this.point_is_inside_user_polygons = false;
+                    setTimeout(() => {
+                        this.showPositionOnMap('show_map'); 
+                    }, 200); // Small delay to ensure DIV is rendered via v-show
                 }
             }
+
+            // Logic for "Previous"
+            if (nextIndex < 1) return;
+            if (nextIndex > this.total_questions) return;
+
+            this.slideIndex = nextIndex;
         },
-
-        checkGPS(map_id) {
-
-            if (this.watchGPS) return;
-
-            this.watchGPS   =   navigator.geolocation.watchPosition(
-                async (pos) => {
-                    const accuracy  =   pos.coords.accuracy;
-                    
-                    //
-                    if (Math.ceil(accuracy) <= this.getUser.accuracy) {
-
-                        this.show_gps_error     =   false
-
-                        //
-                        this.client.Latitude    =   pos.coords.latitude
-                        this.client.Longitude   =   pos.coords.longitude
-
-                        if(map_id) {
-
-                            //
-                            await this.$nextTick()
-
-                            //
-                            let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
-
-                            //
-                            this.checkClients()
-
-                            //
-                            // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
-                            this.point_is_inside_user_polygons  =   true
-
-                            // Send Feedback
-                            this.$feedbackSuccess('Success !'   ,   'Le GPS a été pris avec succès ')
-                        }
-
-                        else {
-
-                            //
-                            await this.$nextTick()
-
-                            //
-                            this.checkClients()
-
-                            //
-                            // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygonsWithoutMap(this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
-                            this.point_is_inside_user_polygons  =   true
-
-                            // Send Feedback
-                            this.$feedbackSuccess('Success !'   ,   'Le GPS a été pris avec succès ')
-                        }
-
-                        //
-                        navigator.geolocation.clearWatch(this.watchGPS); // Stop watching
-                        this.watchGPS = null; // Reset watcher
-
-                        //
-                        this.check_gps_clicked              =   false
-                    }
-                },
-                (err) => {
-                    this.show_gps_error     =   true;
-                },
-                {
-                    enableHighAccuracy: true,   // Use high-accuracy mode
-                    maximumAge: 0,              // No cached data
-                    timeout: 10000,              // Timeout for location retrieval
-                }
-            );
-        },
-
-        //
-
-        async setBarCodeReader() {
-
-            const reader    =   document.getElementById('reader')
-
-            // 
-            this.client.CustomerCode    =   ""
-
-            if(reader) {
-
-                reader.style.display        =   "block";
-
-                //
-                const requestCamera = async () => {
-                    const devices       = await navigator.mediaDevices.enumerateDevices();
-                    const videoDevices  = devices.filter(device => device.kind === 'videoinput');
-                    const backCamera    = videoDevices.find(device => device.label.includes('back') || device.label.includes('rear'));
-                    
-                    if (backCamera) {
-
-                        return { exact: backCamera.deviceId };
-                    }
-                    
-                    return undefined;
-                };
-
-                //
-                this.scanner = new Html5QrcodeScanner('reader', {
-
-                    qrbox   : window.innerWidth < 500 ? { width: 200, height: 200 } : { width: 250, height: 250 },
-
-                    fps     : navigator.hardwareConcurrency > 4 ? 20 : 10,
-
-                    // supportedScanTypes  : [
-                    //     Html5QrcodeScanType.SCAN_TYPE_CAMERA
-                    // ],
-                });
-
-                try {
-                    await this.scanner.render(this.success, this.error, requestCamera);
-                } catch (error) {
-                    console.error('Error rendering scanner:', error);
-                }
-            }
-        },
-
-        success(result) {
-             
-            // 
-            if(this.$isValidForFileName(result)) {
-
-                // 
-                this.client.CustomerCode    =   result
-            }
-
-            else {
-
-                // 
-                this.client.CustomerCode    =   ""
-                this.$showErrors("Error !"  ,   ["Votre code-barres contient des caractères interdits : / \ : * ? \" < > | &; (espace)"])
-            }
-
-            //
-            this.scanner.clear();
-
-            document.getElementById('reader').style.display =   "none"
-            // Removes reader element from DOM since no longer needed 
-        },
-
-        error(err) {
-
-            // Prints any errors to the console
-            console.error("");
-        },
-
-        //
 
         validationQuestion() {
 
@@ -1526,166 +1235,162 @@ export default {
             }
         },
 
-        //
+        //  //  //  //  //
 
-        setTotalQuestions() {
-            this.total_questions = document.getElementsByClassName("mySlides").length;
-        },
+        async showPositionOnMap(map_id) {
 
-        setStatus() {
+            if(!this.check_gps_clicked) {
 
-            if(this.client.OpenCustomer ==  "Ferme") {
-                this.client.status     =   "ferme"
-            }
+                this.check_gps_clicked              =   true
 
-            else {
-                this.client.status     =   "pending"
-            }
+                //
+                this.point_is_inside_user_polygons  =   false
 
-            this.setTotalQuestions()
-        },
+                //
+                let response                        =   await this.$currentPosition(this.getUser.accuracy)
 
-        // --- Navigation ---
-        changeSlide(step) {
-            const nextIndex = this.slideIndex + step;
-            
-            // Logic for "Next"
-            if (step > 0) {
-                if (!this.validationQuestion()) {
-                    this.$showErrors("Erreur !", ["Veuillez remplir les champs obligatoires correctement."]);
-                    return;
+                if(response.success) {
+
+                    //
+                    this.show_gps_error                 =   false
+
+                    //
+                    this.client.Latitude                =   response.position.coords.latitude
+                    this.client.Longitude               =   response.position.coords.longitude
+
+                    // --- NEW: Get Address from LocationIQ ---
+                    // We await this so the address is ready before you save/check clients
+                    const address = await this.$getAddressFromLocationIQ(this.client.Latitude, this.client.Longitude);
+                    
+                    // Assuming 'this.client.Address' is where you want to store it
+                    if(address) {
+                        this.client.RvrsGeoAddress  =   address;
+                        console.log("Address found:", this.client.RvrsGeoAddress);
+                    }
+                    // ----------------------------------------
+
+                    await this.$nextTick()
+
+                    //
+                    let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
+
+                    //
+                    this.checkClients()
+
+                    //
+                    // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
+                    this.point_is_inside_user_polygons  =   true
+
+                    // Send Feedback
+                    this.$feedbackSuccess('Success !'   ,   'Le GPS a été pris avec succès ')
+
+                    //
+                    this.check_gps_clicked              =   false
                 }
-                
-                // If moving TO the map slide (last slide)
-                if (nextIndex === this.total_questions) {
-                    this.point_is_inside_user_polygons = false;
-                    setTimeout(() => {
-                        this.showPositionOnMap('show_map'); 
-                    }, 200); // Small delay to ensure DIV is rendered via v-show
+
+                else {
+
+                    //
+                    this.show_gps_error                 =   true
+
+                    //
+                    this.client.Latitude                =   0
+                    this.client.Longitude               =   0
+
+                    //
+                    await this.$nextTick()
+
+                    //
+                    let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
+
+                    //
+                    this.checkClients()
+
+                    //
+                    // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
+                    this.point_is_inside_user_polygons  =   false
+
+                    //
+                    this.$customMessages("GPS Error", "Vérifiez si votre GPS est activée", "error", "OK", "", "", "")
+
+                    //
+                    this.checkGPS(map_id)
+
+                    //
+                    this.check_gps_clicked              =   false
                 }
             }
-
-            // Logic for "Previous"
-            if (nextIndex < 1) return;
-            if (nextIndex > this.total_questions) return;
-
-            this.slideIndex = nextIndex;
         },
 
-        async handleImageUpload(event, fieldKey) {
-            const file = event.target.files[0];
-            if (!file) return;
+        checkGPS(map_id) {
 
-            // Revoke old URL to free memory
-            this.revokeImage(fieldKey);
+            if (this.watchGPS) return;
 
-            try {
-                const compressedFile = await this.$compressImage(file);
-                const objectUrl = URL.createObjectURL(compressedFile);
+            this.watchGPS   =   navigator.geolocation.watchPosition(
+                async (pos) => {
+                    const accuracy  =   pos.coords.accuracy;
+                    
+                    //
+                    if (Math.ceil(accuracy) <= this.getUser.accuracy) {
 
-                // Update non-reactive storage
-                this._rawFiles[fieldKey] = compressedFile;
+                        this.show_gps_error     =   false
 
-                // Update Vue state with metadata only
-                this.client[`${fieldKey}_currentObjectURL`] = objectUrl;
-                this.client[`${fieldKey}_original_name`] = file.name;
-                this.client[`${fieldKey}_updated`] = true;
+                        //
+                        this.client.Latitude    =   pos.coords.latitude
+                        this.client.Longitude   =   pos.coords.longitude
 
-                // Clear input so same file can be re-selected if needed
-                event.target.value = ''; 
-            } catch (e) {
-                console.error("Upload Error:", e);
-            }
-        },
+                        if(map_id) {
 
-        revokeImage(fieldKey) {
-            if (this.client[`${fieldKey}_currentObjectURL`]?.startsWith('blob:')) {
-                URL.revokeObjectURL(this.client[`${fieldKey}_currentObjectURL`]);
-            }
-        },
+                            //
+                            await this.$nextTick()
 
-        async getClientData() {
-            const res = await this.$callApi("post", `/route-imports/${this.$route.params.id_route_import}/clients/${this.$route.params.id_client}/show`);
-            const data = res.data;
+                            //
+                            let position_marker                 =   this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
 
-            // Bulk assign properties
-            Object.assign(this.client, data);
-            
-            // Format specific fields
-            this.client.AvailableBrands = data.AvailableBrands_array_formatted || [];
-            
-            // Set Initial Previews from Server
-            const imgFields = ['CustomerBarCode_image', 'facade_image', 'in_store_image'];
-            imgFields.forEach(field => {
-                if (data[field]) {
-                    this.client[`${field}_currentObjectURL`] = `/uploads/clients/${data.id}/${data[field]}`;
+                            //
+                            this.checkClients()
+
+                            //
+                            // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygons(position_marker)
+                            this.point_is_inside_user_polygons  =   true
+
+                            // Send Feedback
+                            this.$feedbackSuccess('Success !'   ,   'Le GPS a été pris avec succès ')
+                        }
+
+                        else {
+
+                            //
+                            await this.$nextTick()
+
+                            //
+                            this.checkClients()
+
+                            //
+                            // this.point_is_inside_user_polygons  =   this.$checkMarkerInsideUserPolygonsWithoutMap(this.client.Latitude, this.client.Longitude, this.getUser.user_territories)
+                            this.point_is_inside_user_polygons  =   true
+
+                            // Send Feedback
+                            this.$feedbackSuccess('Success !'   ,   'Le GPS a été pris avec succès ')
+                        }
+
+                        //
+                        navigator.geolocation.clearWatch(this.watchGPS); // Stop watching
+                        this.watchGPS = null; // Reset watcher
+
+                        //
+                        this.check_gps_clicked              =   false
+                    }
+                },
+                (err) => {
+                    this.show_gps_error     =   true;
+                },
+                {
+                    enableHighAccuracy: true,   // Use high-accuracy mode
+                    maximumAge: 0,              // No cached data
+                    timeout: 10000,              // Timeout for location retrieval
                 }
-            });
-
-            if (this.client.status === "visible") {
-                this.start_adding_date = moment().format();
-            }
-            
-            if (this.client.DistrictNo) this.getCites();
-        },
-
-        async getComboData() {
-            const res = await this.$callApi("post", `/route-imports/${this.$route.params.id_route_import}/districts`);
-            this.willayas = res.data;
-        },
-
-        async getCites() {
-            const res = await this.$callApi("post", `/rtm-willayas/${this.client.DistrictNo}/rtm_cities`);
-            this.cities = res.data;
-        },
-
-        async sendData() {
-            this.$showLoadingPage();
-            
-            const formData = new FormData();
-            
-            // Logic to determine what to send based on OpenCustomer status
-            const isOuvert = this.client.OpenCustomer === 'Ouvert';
-
-            // 1. Build Payload Object
-            const payload = {
-                ...this.client,
-                AvailableBrands: JSON.stringify(this.client.AvailableBrands),
-                finish_adding_date: moment().format(),
-                start_adding_date: this.start_adding_date,
-                // Override status if not open
-                status: isOuvert ? this.client.status : 'pending'
-            };
-
-            // 2. Append text fields
-            Object.keys(payload).forEach(key => {
-                if (typeof payload[key] !== 'object' || Array.isArray(payload[key])) {
-                    formData.append(key, payload[key] ?? '');
-                }
-            });
-
-            // 3. Append Heavy Files from non-reactive storage
-            Object.keys(this._rawFiles).forEach(key => {
-                if (this._rawFiles[key]) {
-                    formData.append(key, this._rawFiles[key]);
-                }
-            });
-
-            try {
-                const res = await this.$callApi("post", `/route-imports/${this.$route.params.id_route_import}/clients/${this.client.id}/update`, formData);
-                this.$feedbackSuccess(res.data.header, res.data.message);
-                this.$goBack();
-            } catch (err) {
-                this.$showErrors("Error", ["Update failed"]);
-            } finally {
-                this.$hideLoadingPage();
-            }
-        },
-
-        cleanupScanner() {
-             if (this.scanner) {
-                 this.scanner.clear().catch(e => {});
-             }
+            );
         },
 
         refreshGPS() {
@@ -1694,6 +1399,113 @@ export default {
                 this.showPositionOnMap('show_map'); 
             }, 200); // Small delay to ensure DIV is rendered via v-show
         },
+
+        checkClients() {
+
+            this.close_clients  =   []
+
+            let distance        =   0
+
+            for (let i = 0; i < this.all_clients.length; i++) {
+
+                if(this.all_clients[i].id   !=  this.client.id) {
+
+                    distance        =   this.getDistance(this.client.Latitude, this.client.Longitude, this.all_clients[i].Latitude, this.all_clients[i].Longitude)
+
+                    if(distance <=  this.min_distance) {
+                    
+                        this.close_clients.push(this.all_clients[i])
+                    }
+                }
+            }
+        },
+
+        getDistance(latitude_1, longitude_1, latitude_2, longitude_2) {
+
+            return this.$map.$setDistanceStraight(latitude_1, longitude_1, latitude_2, longitude_2)
+        },
+
+        //  //  //  //  //
+
+        async setBarCodeReader() {
+
+            const reader    =   document.getElementById('reader')
+
+            // 
+            this.client.CustomerCode    =   ""
+
+            if(reader) {
+
+                reader.style.display        =   "block";
+
+                //
+                const requestCamera = async () => {
+                    const devices       = await navigator.mediaDevices.enumerateDevices();
+                    const videoDevices  = devices.filter(device => device.kind === 'videoinput');
+                    const backCamera    = videoDevices.find(device => device.label.includes('back') || device.label.includes('rear'));
+                    
+                    if (backCamera) {
+
+                        return { exact: backCamera.deviceId };
+                    }
+                    
+                    return undefined;
+                };
+
+                //
+                this.scanner = new Html5QrcodeScanner('reader', {
+
+                    qrbox   : window.innerWidth < 500 ? { width: 200, height: 200 } : { width: 250, height: 250 },
+
+                    fps     : navigator.hardwareConcurrency > 4 ? 20 : 10,
+
+                    // supportedScanTypes  : [
+                    //     Html5QrcodeScanType.SCAN_TYPE_CAMERA
+                    // ],
+                });
+
+                try {
+                    await this.scanner.render(this.success, this.error, requestCamera);
+                } catch (error) {
+                    console.error('Error rendering scanner:', error);
+                }
+            }
+        },
+
+        success(result) {
+             
+            // 
+            if(this.$isValidForFileName(result)) {
+
+                // 
+                this.client.CustomerCode    =   result
+            }
+
+            else {
+
+                // 
+                this.client.CustomerCode    =   ""
+                this.$showErrors("Error !"  ,   ["Votre code-barres contient des caractères interdits : / \ : * ? \" < > | &; (espace)"])
+            }
+
+            //
+            this.scanner.clear();
+
+            document.getElementById('reader').style.display =   "none"
+            // Removes reader element from DOM since no longer needed 
+        },
+
+        error(err) {
+
+            // Prints any errors to the console
+            console.error("");
+        },
+
+        cleanupScanner() {
+             if (this.scanner) {
+                 this.scanner.clear().catch(e => {});
+             }
+        }
     }
 };
 

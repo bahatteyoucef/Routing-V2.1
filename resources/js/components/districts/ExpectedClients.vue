@@ -86,7 +86,7 @@ export default {
 
         async sendData() {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             let formData    =   new FormData();
             formData.append("district_cities" , JSON.stringify(this.district_cities))
@@ -96,7 +96,7 @@ export default {
 
             if(res.status===200){
 
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 
                 // Send Feedback
                 this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
@@ -104,7 +104,7 @@ export default {
             
             else{
 
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
 
                 // Send Errors
                 this.$showWarnings("Error !", res.data.errors)
@@ -116,12 +116,12 @@ export default {
         async getData() {
 
             // Show Loading Page
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             await this.getComboData()  
 
             // Hide Loading Page
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
         async getComboData() {
@@ -129,7 +129,7 @@ export default {
             const res           =   await this.$callApi("post",     "/rtm-willayas",    null)
             console.log(res)
 
-            this.districts_full =   res.data
+            this.districts_full =   res.data.willayas
 
             for (let index = 0; index < this.districts_full.length; index++) {
 
@@ -144,7 +144,7 @@ export default {
             const res               =   await this.$callApi("post",     "/rtm-willayas/"+this.selected_district.DistrictNo+"/rtm-cities",    null)
             console.log(res)
 
-            this.district_cities    =   res.data
+            this.district_cities    =   res.data.cities
         },
 
         async clearDistrictCities() {

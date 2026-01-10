@@ -212,7 +212,7 @@ export default {
 
         async setDataTable() {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             // Initialisation 
             this.route_import_clients_data  =   [];
@@ -227,7 +227,7 @@ export default {
                 this.datatable_route_import_clients     =   this.datatable_route_import_clients_instance.$DataTableCreate("route_import_clients", this.route_import_clients_data, this.route_import_clients_columns, this.setDataTable, null, null, null, this.selectRow, "Map Clients")      
 
                 //
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
             })
         },
 
@@ -235,15 +235,15 @@ export default {
 
         async getComboData() {
 
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             const res_1         =   await this.$callApi("post"  ,   "/users/combo"      ,   null)
             const res_2         =   await this.$callApi("post"  ,   "/rtm_willayas"     ,   null)
 
-            this.users_all      =   res_1.data
-            this.districts_all  =   res_2.data
+            this.users_all      =   res_1.data.users
+            this.districts_all  =   res_2.data.willayas
 
-            this.$hideLoadingPage()
+            await this.$hideLoadingPage()
         },
 
         //  //  //  //  //
@@ -255,7 +255,7 @@ export default {
         async downloadCustomerCodeImages() {
 
             //
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             let formData                        =   new FormData()
 
@@ -263,7 +263,7 @@ export default {
             formData.append("id_route_import"   ,   this.$route.params.id_route_import)
 
             this.$callApiResponse('post', '/route-imports/all-data/images/customer-code', formData, 'blob')
-            .then(response => {
+            .then(async (response) => {
 
                 if(response.status  ==  200) {
 
@@ -279,7 +279,7 @@ export default {
                     link.click();
 
                     //
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
                 }
 
                 else {
@@ -288,7 +288,7 @@ export default {
                     this.$showErrors("Error !", ["No Images to Download"])
 
                     //
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
                 }
 
             }).catch(error => {
@@ -300,7 +300,7 @@ export default {
         async downloadFacadeImages() {
 
             //
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             let formData                        =   new FormData()
 
@@ -308,7 +308,7 @@ export default {
             formData.append("id_route_import"   ,   this.$route.params.id_route_import)
 
             this.$callApiResponse('post', '/route-imports/all-data/images/facade', formData, 'blob')
-            .then(response => {
+            .then(async (response) => {
 
                 if(response.status  ==  200) {
 
@@ -324,7 +324,7 @@ export default {
                     link.click();
 
                     //
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
                 }
 
                 else {
@@ -333,7 +333,7 @@ export default {
                     this.$showErrors("Error !", ["No Images to Download"])
 
                     //
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
                 }
 
             }).catch(error => {
@@ -345,7 +345,7 @@ export default {
         async downloadInStoreImages() {
 
             //
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             let formData                        =   new FormData()
 
@@ -353,7 +353,7 @@ export default {
             formData.append("id_route_import"   ,   this.$route.params.id_route_import)
 
             this.$callApiResponse('post', '/route-imports/all-data/images/in-store', formData, 'blob')
-            .then(response => {
+            .then(async (response) => {
 
                 if(response.status  ==  200) {
 
@@ -369,7 +369,7 @@ export default {
                     link.click();
 
                     //
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
                 }
 
                 else {
@@ -378,7 +378,7 @@ export default {
                     this.$showErrors("Error !", ["No Images to Download"])
 
                     //
-                    this.$hideLoadingPage()
+                    await this.$hideLoadingPage()
                 }
 
             }).catch(error => {
@@ -392,7 +392,7 @@ export default {
         async downloadData() {
 
             //
-            this.$showLoadingPage()
+            await this.$showLoadingPage()
 
             // Initialisation 
             this.route_import_clients_data_export     =   [];
@@ -410,7 +410,7 @@ export default {
                 await this.exportToExcel()
 
                 //
-                this.$hideLoadingPage()
+                await this.$hideLoadingPage()
             })
         },
 

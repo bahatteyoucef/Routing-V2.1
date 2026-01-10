@@ -115,16 +115,16 @@ Route::middleware(['auth:api', 'isEnabledUser'])->group(function () {
     Route::post('/route-imports/all_data/images/in-store'                                               ,   [RouteImportController::class           , 'downloadInStoreImages'                   ])->middleware('Viewer');
 
     // Journey Plan Territories
-    Route::post('/route-imports/{id_route_import}/journey-plan-territories'                             ,   [RouteImportController::class           , 'journeyPlan'                             ])->middleware('Viewer');
-    Route::post('/route-imports/{id_route_import}/journey-plan-territories/util'                        ,   [RouteImportController::class           , 'journeyPlanUtil'                         ])->middleware('Viewer');
+    Route::post('/route-imports/{id_route_import}/journey-plan-territories'                             ,   [RouteImportController::class           , 'journeyPlanTerritories'                  ])->middleware('Viewer');
+    Route::post('/route-imports/{id_route_import}/journey-plan-territories/util'                        ,   [RouteImportController::class           , 'journeyPlanTerritoriesUtil'              ])->middleware('Viewer');
 
     // Journee Territories
     Route::post('/route-imports/{id_route_import}/journee-territories'                                  ,   [RouteImportController::class           , 'journeeTerritories'                      ])->middleware('Viewer');
     Route::post('/route-imports/{id_route_import}/journee-territories/util'                             ,   [RouteImportController::class           , 'journeeTerritoriesUtil'                  ])->middleware('Viewer');
 
     // User Territories
-    Route::post('/route-imports/{id_route_import}/user-territories'                                     ,   [RouteImportController::class           , 'userTerritory'                           ])->middleware('Viewer');
-    Route::post('/route-imports/{id_route_import}/user-territories/util'                                ,   [RouteImportController::class           , 'userTerritoryUtil'                       ])->middleware('Viewer');
+    Route::post('/route-imports/{id_route_import}/user-territories'                                     ,   [RouteImportController::class           , 'userTerritories'                         ])->middleware('Viewer');
+    Route::post('/route-imports/{id_route_import}/user-territories/util'                                ,   [RouteImportController::class           , 'userTerritoriesUtil'                     ])->middleware('Viewer');
 
     // OBS
     Route::post('/route/obs/route-imports/{id_route_import}/details'                                    ,   [RouteImportController::class           , 'obsDetailsRouteImport'                   ])->middleware('BackOffice');
@@ -135,7 +135,7 @@ Route::middleware(['auth:api', 'isEnabledUser'])->group(function () {
     //  //  //  //  //
 
     // Show/Store
-    Route::post('/route-imports-tempo/last'                                                             ,   [RouteImportTempoController::class      , 'lastTempo'                               ])->middleware('BUManager');
+    Route::post('/route-imports-tempo/last-imported'                                                    ,   [RouteImportTempoController::class      , 'lastTempo'                               ])->middleware('BUManager');
     Route::post('/route-imports-tempo/store'                                                            ,   [RouteImportTempoController::class      , 'store'                                   ])->middleware('BUManager');
 
     // Route::post('/route-imports-tempo/file'                                                              ,   [RouteImportTempoController::class      , 'getFile'                                 ])->middleware('BUManager');
