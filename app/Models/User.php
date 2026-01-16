@@ -30,7 +30,6 @@ class User extends Authenticatable
     protected $guarded      = [];
     protected $table        = 'users';
     protected $primaryKey   = 'id';
-    public    $timestamps   = false;
 
     //  //  //  //  //
     //  //  //  //  //  Hidden/Casts
@@ -49,13 +48,11 @@ class User extends Authenticatable
     //  //  //  //  //  Relationships
     //  //  //  //  //
 
-    public function routeImports()
-    {
+    public function routeImports() {
         return $this->belongsToMany(RouteImport::class, 'users_route_import', 'id_user', 'id_route_import');
     }
 
-    public function userRouteImports()
-    {
+    public function userRouteImports() {
         return $this->hasMany(UserRouteImport::class, 'id_user', 'id');
     }
 
@@ -63,8 +60,7 @@ class User extends Authenticatable
     //  //  //  //  //  Listings
     //  //  //  //  //
 
-    public static function indexUser()
-    {
+    public static function indexUser() {
         $me = Auth::user();
         if (! $me || (! $me->hasRole('Super Admin') && ! $me->hasRole('BU Manager'))) {
             throw new Exception('Unauthorized', 403);
@@ -95,8 +91,7 @@ class User extends Authenticatable
         return $query->get();
     }
 
-    public static function comboUser()
-    {
+    public static function comboUser() {
         $me = Auth::user();
 
         $select = [
@@ -133,8 +128,7 @@ class User extends Authenticatable
         return $query->get();
     }
 
-    public static function comboBackOffice()
-    {
+    public static function comboBackOffice() {
         $me = Auth::user();
 
         // Start from users with BackOffice role via role table join (keeps original intent)
@@ -175,8 +169,7 @@ class User extends Authenticatable
         return $query->get();
     }
 
-    public static function showUser(int $id_user)
-    {
+    public static function showUser(int $id_user) {
         $user = self::findOrFail($id_user);
         // use the belongsToMany relation to retrieve route imports
         $user->liste_route_import = $user->routeImports()->get();
@@ -187,17 +180,20 @@ class User extends Authenticatable
     //  //  //  //  //  Store/Update
     //  //  //  //  //
 
-    public static function validateStore(Request $request)
-    {
+    public static function validateStore(Request $request) {
         $validator = Validator::make($request->all(), [
-            'username' => ['required', 'alpha_num', Rule::unique('users', 'username')],
-            'first_name' => ['required', 'max:255'],
-            'last_name' => ['required', 'max:255'],
-            'email' => ['required', Rule::unique('users')->whereNotNull('email'), 'email', 'max:255'],
-            'tel' => ['required', 'max:255'],
-            'company' => ['required', 'max:255'],
-            'type_user' => ['required', 'max:255'],
-            'password' => ['required', 'confirmed', 'min:6', 'max:255'],
+            'username'      => ['required', 'alpha_num', Rule::unique('users', 'username')],
+
+            'first_name'    => ['required', 'max:255'],
+            'last_name'     => ['required', 'max:255'],
+            'email'         => ['required', Rule::unique('users')->whereNotNull('email'), 'email', 'max:255'],
+            'tel'           => ['required', 'max:255'],
+            'company'       => ['required', 'max:255'],
+
+            'type_user'     => ['required', 'max:255'],
+            'status'        => ['required'],
+
+            'password'      => ['required', 'confirmed', 'min:6', 'max:255'],
         ]);
 
         $validator->sometimes('max_route_import', ['required', 'integer'], function (Fluent $input) {
@@ -211,110 +207,113 @@ class User extends Authenticatable
         return $validator;
     }
 
-    public static function storeUser(Request $request)
-    {
+    public static function storeUser(Request $request) {
         $me = Auth::user();
         if (! $me) throw new Exception('Unauthorized', 403);
 
-        DB::transaction(function () use ($request, $me) {
-            $userData = [
-                'username' => $request->input('username'),
-                'first_name' => $request->input('first_name'),
-                'last_name' => $request->input('last_name'),
-                'email' => $request->input('email'),
-                'tel' => $request->input('tel'),
-                'company' => $request->input('company'),
-                'type_user' => $request->input('type_user'),
-                'password_non_hashed' => $request->input('password'),
-                'password' => Hash::make($request->input('password')),
-                'owner' => $me->id,
-            ];
+        $userData = [
+            'username'      => $request->input('username'),
 
-            $user = self::create($userData);
+            'first_name'    => $request->input('first_name'),
+            'last_name'     => $request->input('last_name'),
+            'email'         => $request->input('email'),
+            'tel'           => $request->input('tel'),
+            'company'       => $request->input('company'),
 
-            // Handle assignment of route imports in bulk (if provided)
-            $liste_route_import = $request->input('liste_route_import');
-            $routeIds = [];
-            if ($liste_route_import) {
-                // Accept JSON string or array
-                $routeIds = is_string($liste_route_import) ? json_decode($liste_route_import, true) : (array)$liste_route_import;
-                $routeIds = array_filter($routeIds);
-            }
+            'type_user'     => $request->input('type_user'),
+            'status'        => $request->input('status'),
 
-            // Role assignment and specific attributes per type_user
-            $type = $request->input('type_user');
+            'password_non_hashed'   => $request->input('password'),
+            'password'              => Hash::make($request->input('password')),
+            'owner'                 => $me->id,
+        ];
 
-            switch ($type) {
-                case 'BU Manager':
-                    $user->syncRoles(['BU Manager']);
-                    // set max_route_import if provided
-                    if ($request->has('max_route_import')) {
-                        $user->max_route_import = (int) $request->input('max_route_import');
-                        $user->save();
+        $user = self::create($userData);
+
+        // Handle assignment of route imports in bulk (if provided)
+        $liste_route_import =   $request->input('liste_route_import');
+        $routeIds           =   [];
+        if ($liste_route_import) {
+            // Accept JSON string or array
+            $routeIds           = is_string($liste_route_import) ? json_decode($liste_route_import, true) : (array)$liste_route_import;
+            $routeIds           = array_filter($routeIds);
+        }
+
+        // Role assignment and specific attributes per type_user
+        $type               = $request->input('type_user');
+
+        switch ($type) {
+            case 'BU Manager':
+                $user->syncRoles(['BU Manager']);
+                // set max_route_import if provided
+                if ($request->has('max_route_import')) {
+                    $user->max_route_import = (int) $request->input('max_route_import');
+                    $user->save();
+                }
+                // assign route imports pivot in bulk
+                if (! empty($routeIds)) {
+                    $insert = [];
+                    foreach ($routeIds as $rid) {
+                        $insert[] = ['id_user' => $user->id, 'id_route_import' => $rid];
                     }
-                    // assign route imports pivot in bulk
-                    if (! empty($routeIds)) {
-                        $insert = [];
-                        foreach ($routeIds as $rid) {
-                            $insert[] = ['id_user' => $user->id, 'id_route_import' => $rid];
-                        }
-                        UserRouteImport::insert($insert);
-                    }
-                    break;
+                    UserRouteImport::insert($insert);
+                }
+                break;
 
-                case 'BackOffice':
-                    $user->syncRoles(['BackOffice']);
-                    if (! empty($routeIds)) {
-                        $insert = [];
-                        foreach ($routeIds as $rid) {
-                            $insert[] = ['id_user' => $user->id, 'id_route_import' => $rid];
-                        }
-                        UserRouteImport::insert($insert);
+            case 'BackOffice':
+                $user->syncRoles(['BackOffice']);
+                if (! empty($routeIds)) {
+                    $insert = [];
+                    foreach ($routeIds as $rid) {
+                        $insert[] = ['id_user' => $user->id, 'id_route_import' => $rid];
                     }
-                    break;
+                    UserRouteImport::insert($insert);
+                }
+                break;
 
-                case 'Viewer':
-                    $user->syncRoles(['Viewer']);
-                    if (! empty($routeIds)) {
-                        $insert = [];
-                        foreach ($routeIds as $rid) {
-                            $insert[] = ['id_user' => $user->id, 'id_route_import' => $rid];
-                        }
-                        UserRouteImport::insert($insert);
+            case 'Viewer':
+                $user->syncRoles(['Viewer']);
+                if (! empty($routeIds)) {
+                    $insert = [];
+                    foreach ($routeIds as $rid) {
+                        $insert[] = ['id_user' => $user->id, 'id_route_import' => $rid];
                     }
-                    break;
+                    UserRouteImport::insert($insert);
+                }
+                break;
 
-                case 'FrontOffice':
-                    $user->syncRoles(['FrontOffice']);
-                    if ($request->filled('selected_route_import') && $request->input('selected_route_import') !== 'null') {
-                        UserRouteImport::create([
-                            'id_user' => $user->id,
-                            'id_route_import' => $request->input('selected_route_import'),
-                        ]);
-                    }
-                    if ($request->has('accuracy')) {
-                        $user->accuracy = $request->input('accuracy');
-                        $user->save();
-                    }
-                    break;
+            case 'FrontOffice':
+                $user->syncRoles(['FrontOffice']);
+                if ($request->filled('selected_route_import') && $request->input('selected_route_import') !== 'null') {
+                    UserRouteImport::create([
+                        'id_user' => $user->id,
+                        'id_route_import' => $request->input('selected_route_import'),
+                    ]);
+                }
+                if ($request->has('accuracy')) {
+                    $user->accuracy = $request->input('accuracy');
+                    $user->save();
+                }
+                break;
 
-                default:
-                    // If an unknown type is passed, leave role assignment empty (or handle accordingly)
-                    break;
-            }
-        });
+            default:
+                // If an unknown type is passed, leave role assignment empty (or handle accordingly)
+                break;
+        }
     }
 
-    public static function validateUpdate(Request $request, int $id_user)
-    {
+    public static function validateUpdate(Request $request, int $id_user) {
         $validator = Validator::make($request->all(), [
-            'username' => ['required', 'alpha_num', Rule::unique('users', 'username')->ignore($id_user)],
-            'first_name' => ['required', 'max:255'],
-            'last_name' => ['required', 'max:255'],
-            'email' => ['required', Rule::unique('users')->ignore($id_user), 'email', 'max:255'],
-            'tel' => ['required', 'max:255'],
-            'company' => ['required', 'max:255'],
-            'type_user' => ['required', 'max:255'],
+            'username'      => ['required', 'alpha_num', Rule::unique('users', 'username')->ignore($id_user)],
+
+            'first_name'    => ['required', 'max:255'],
+            'last_name'     => ['required', 'max:255'],
+            'email'         => ['required', Rule::unique('users')->ignore($id_user), 'email', 'max:255'],
+            'tel'           => ['required', 'max:255'],
+            'company'       => ['required', 'max:255'],
+
+            'type_user'     => ['required', 'max:255'],
+            'status'        => ['required'],
         ]);
 
         $validator->sometimes('max_route_import', ['required', 'integer'], function (Fluent $input) {
@@ -328,9 +327,8 @@ class User extends Authenticatable
         return $validator;
     }
 
-    public static function updateUser(Request $request, int $id_user)
-    {
-        $user = self::findOrFail($id_user);
+    public static function updateUser(Request $request, int $id_user) {
+        $user   = self::findOrFail($id_user);
 
         // mass assign safe properties explicitly
         $fields = ['username', 'first_name', 'last_name', 'email', 'tel', 'company', 'type_user', 'status'];
@@ -343,14 +341,14 @@ class User extends Authenticatable
         UserRouteImport::where('id_user', $user->id)->delete();
 
         // Re-attach according to type_user
-        $type = $request->input('type_user');
+        $type   = $request->input('type_user');
 
         $liste_route_import = $request->input('liste_route_import');
 
-        $routeIds = [];
+        $routeIds   = [];
         if ($liste_route_import) {
-            $routeIds = is_string($liste_route_import) ? json_decode($liste_route_import, true) : (array)$liste_route_import;
-            $routeIds = array_filter($routeIds);
+            $routeIds   = is_string($liste_route_import) ? json_decode($liste_route_import, true) : (array)$liste_route_import;
+            $routeIds   = array_filter($routeIds);
         }
 
         switch ($type) {
@@ -406,8 +404,7 @@ class User extends Authenticatable
     //  //  //  //  //  Pointings
     //  //  //  //  //
 
-    public static function pointings(Request $request)
-    {
+    public static function pointings(Request $request) {
         // parse filters
         $route_links_raw = $request->get('route_links');
         $selected_users_raw = $request->get('selected_users');

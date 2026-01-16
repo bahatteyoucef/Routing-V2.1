@@ -25,8 +25,8 @@ class RouteImportTempo extends Model
     //  //  //  //  //  Last Route Import Imported by Auth user
     //  //  //  //  //
 
-    public static function lastTempo()
-    {
+    public static function lastTempo() {
+
         $user = Auth::user();
         if (! $user) {
             throw new Exception('Unauthorized', 403);
@@ -54,8 +54,7 @@ class RouteImportTempo extends Model
     //  //  //  //  //  Store Route Import Tempo
     //  //  //  //  //
 
-    public static function validateStore(Request $request)
-    {
+    public static function validateStore(Request $request) {
         return Validator::make($request->all(), [
             'libelle'   => ['required', 'max:255'],
             'data'      => ['required', 'json'],
@@ -64,8 +63,7 @@ class RouteImportTempo extends Model
         ]);
     }
 
-    public static function storeRouteImportTempo(Request $request)
-    {
+    public static function storeRouteImportTempo(Request $request) {
         $user = Auth::user();
         if (! $user) {
             throw new Exception('Unauthorized', 403);
@@ -103,66 +101,62 @@ class RouteImportTempo extends Model
         // Transaction: create tempo, file move, district inserts, and store client data.
         $routeImportTempo = null;
 
-        DB::transaction(function () use ($request, $user, $districts, &$routeImportTempo) {
+        // Create tempo header
+        $routeImportTempo = self::create([
+            'libelle' => $request->get('libelle'),
+            'owner' => $user->id,
+        ]);
 
-            // Create tempo header
-            $routeImportTempo = self::create([
-                'libelle' => $request->get('libelle'),
-                'owner' => $user->id,
-            ]);
-
-            // Bulk insert districts (prepare rows)
-            $districtRows = [];
-            foreach ($districts as $d) {
-                // accept object or array
-                $districtNo = is_array($d) ? ($d['DistrictNo'] ?? $d['DistrictNo'] ?? null) : ($d->DistrictNo ?? $d->DistrictNo ?? null);
-                // if the payload is just the DistrictNo value (not object), handle it
-                if ($districtNo === null) {
-                    $districtNo = is_scalar($d) ? $d : null;
-                }
-                if ($districtNo === null) continue;
-
-                $districtRows[] = [
-                    'DistrictNo'           => $districtNo,
-                    'id_route_import_tempo'=> $routeImportTempo->id,
-                    'owner'                => $user->id,
-                ];
+        // Bulk insert districts (prepare rows)
+        $districtRows = [];
+        foreach ($districts as $d) {
+            // accept object or array
+            $districtNo = is_array($d) ? ($d['DistrictNo'] ?? $d['DistrictNo'] ?? null) : ($d->DistrictNo ?? $d->DistrictNo ?? null);
+            // if the payload is just the DistrictNo value (not object), handle it
+            if ($districtNo === null) {
+                $districtNo = is_scalar($d) ? $d : null;
             }
+            if ($districtNo === null) continue;
 
-            if (!empty($districtRows)) {
-                // Use chunk insert to avoid very large single inserts
-                $chunks = array_chunk($districtRows, 500);
-                foreach ($chunks as $chunk) {
-                    RouteImportTempoDistrict::insert($chunk);
-                }
+            $districtRows[] = [
+                'DistrictNo'           => $districtNo,
+                'id_route_import_tempo'=> $routeImportTempo->id,
+                'owner'                => $user->id,
+            ];
+        }
+
+        if (!empty($districtRows)) {
+            // Use chunk insert to avoid very large single inserts
+            $chunks = array_chunk($districtRows, 500);
+            foreach ($chunks as $chunk) {
+                RouteImportTempoDistrict::insert($chunk);
             }
+        }
 
-            // Save uploaded file (ensure destination dir)
-            // $uploaded = $request->file('file');
-            // $userDir = public_path('uploads/route_import_tempo/' . $user->id);
-            // if (! File::isDirectory($userDir)) {
-            //     File::makeDirectory($userDir, 0755, true);
-            // }
+        // Save uploaded file (ensure destination dir)
+        // $uploaded = $request->file('file');
+        // $userDir = public_path('uploads/route_import_tempo/' . $user->id);
+        // if (! File::isDirectory($userDir)) {
+        //     File::makeDirectory($userDir, 0755, true);
+        // }
 
-            // $fileName = uniqid() . '.' . $uploaded->getClientOriginalExtension();
-            // $uploaded->move($userDir, $fileName);
+        // $fileName = uniqid() . '.' . $uploaded->getClientOriginalExtension();
+        // $uploaded->move($userDir, $fileName);
 
-            // $routeImportTempo->file                 = $fileName;
-            // $routeImportTempo->file_original_name   = $uploaded->getClientOriginalName();
-            $routeImportTempo->save();
+        // $routeImportTempo->file                 = $fileName;
+        // $routeImportTempo->file_original_name   = $uploaded->getClientOriginalName();
+        $routeImportTempo->save();
 
-            // Ensure clients payload (data) passed properly to ClientTempo::storeClients
-            // ClientTempo::storeClients expects request->get('data') to be JSON text or array depending on its implementation.
-            // If the controller already provided 'data' as JSON string, keep it. Otherwise, if there's 'data' field as array/object, pass it through.
-            // We don't modify request param here; we call storeData which delegates to ClientTempo::storeClients
-            self::storeData($request, $routeImportTempo->id);
-        });
-
+        // Ensure clients payload (data) passed properly to ClientTempo::storeClients
+        // ClientTempo::storeClients expects request->get('data') to be JSON text or array depending on its implementation.
+        // If the controller already provided 'data' as JSON string, keep it. Otherwise, if there's 'data' field as array/object, pass it through.
+        // We don't modify request param here; we call storeData which delegates to ClientTempo::storeClients
+        self::storeData($request, $routeImportTempo->id);
+        
         return $routeImportTempo;
     }
 
-    public static function deleteRouteImportTempo()
-    {
+    public static function deleteRouteImportTempo() {
         $user = Auth::user();
         if (! $user) return;
 
@@ -183,8 +177,7 @@ class RouteImportTempo extends Model
     //  //  //  //  //  Store Route Import Tempo Clients
     //  //  //  //  //
 
-    public static function storeData(Request $request, int $id_route_import_tempo)
-    {
+    public static function storeData(Request $request, int $id_route_import_tempo) {
         // Delegate to ClientTempo (ClientTempo::storeClients handles data normalization)
         ClientTempo::storeClients($request, $id_route_import_tempo);
     }

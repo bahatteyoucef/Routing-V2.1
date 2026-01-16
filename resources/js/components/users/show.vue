@@ -77,8 +77,6 @@ export default {
                 liste_route_import          :   [],
                 liste_route_import_string   :   ""
             },
-
-            liste_route_import          :   []
         }
     },
 
@@ -94,7 +92,6 @@ export default {
             await this.$showLoadingPage()
 
             await this.getUserData()  
-            await this.getComboData()  
 
             this.setListeRouteImport()
 
@@ -122,18 +119,6 @@ export default {
             this.user.max_route_import      =   res.data.user.max_route_import        
 
             this.user.liste_route_import    =   res.data.user.liste_route_import   
-        },
-
-        async getComboData() {
-
-            const res               =   await this.$callApi("post",       "/route-imports/combo",        null)
-
-            let liste_route_import  =   res.data.liste_route_import
-
-            for (let i = 0; i < liste_route_import.length; i++) {
-
-                this.liste_route_import.push({ value : liste_route_import[i].id , label : liste_route_import[i].libelle})
-            }
         },
 
         //

@@ -101,3 +101,7 @@
 .dataTables_paginate .pagination {
   float: right;
 }
+
+.dataTables_paginate .active .page-link {
+ background-color: var(--dt-primary) !important;
+}

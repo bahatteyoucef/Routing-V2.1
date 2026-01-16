@@ -7,8 +7,8 @@ import feedbacks        from    './mixin/feedbacks'
 import globals          from    './mixin/globals'
 import responsive       from    './mixin/responsive'
 
-import Map              from    './services/map'
-import IndexedDB        from    './services/indexedDB'
+import Map              from    './services/Map'
+import IndexedDB        from    './services/IndexedDB'
 
 // 
 

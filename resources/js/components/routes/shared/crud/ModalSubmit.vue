@@ -154,14 +154,15 @@ export default {
             
             //
             const res   = await this.$callApi('post'    ,   '/route-imports/store'   ,   formData)         
+            console.log(res)
 
-            if(res.status===200){
-
-                // Send Feedback
-                this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
+            if(res.status===201){
 
                 // 5) Now hide the spinner
                 await this.$hideLoadingPage();
+
+                // Send Feedback
+                this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
 
                 // Send Event
                 this.emitter.emit("reSetRouteImport")
@@ -175,11 +176,11 @@ export default {
             
             else{
 
-                // Send Errors
-                this.$showErrors("Error !", res.data.errors)
-
                 // Hide Loading Page
                 await this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
 			}
         },
 

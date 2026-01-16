@@ -1,7 +1,7 @@
 <template>
 
     <!-- Modal -->
-    <div class="modal fade" id="ModalClientsChangeRoute" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="ModalClientsMultiUpdate" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl expanded_modal modal-dialog-scrollable">
             <div class="modal-content">
 
@@ -274,7 +274,7 @@ export default {
         this.datatable_change_route_clients_instance    =   new DatatableHelper()
 
         //
-        this.clearData("#ModalClientsChangeRoute")
+        this.clearData("#ModalClientsMultiUpdate")
     },  
 
     methods : {
@@ -355,26 +355,26 @@ export default {
 
             if(res.status===200){
 
-                // 3) Show success toast (awaits timer/dismiss)
-                this.$feedbackSuccess(res.data.header, res.data.message);
-
                 // 5) Now hide the spinner
                 await this.$hideLoadingPage();
+
+                // 3) Show success toast (awaits timer/dismiss)
+                this.$feedbackSuccess(res.data.header, res.data.message);
 
                 // Send Client
                 this.emitter.emit('reSetChangeRoute' , clients_copy)
 
                 // Close Modal
-                await this.$hideModal("ModalClientsChangeRoute")
+                await this.$hideModal("ModalClientsMultiUpdate")
             }
             
             else{
 
-                // Send Errors
-                this.$showErrors("Error !", res.data.errors)
-
                 // 5) Now hide the spinner
                 await this.$hideLoadingPage();
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
 			}
         },
 
@@ -399,11 +399,11 @@ export default {
 
             if(res.status===200){
 
-                // Send Feedback
-                this.$feedbackSuccess(res.data.header     ,   res.data.message)
-
                 // 5) Now hide the spinner
                 await this.$hideLoadingPage();
+
+                // Send Feedback
+                this.$feedbackSuccess(res.data.header     ,   res.data.message)
 
                 //
                 const clients_object = clients.reduce((acc, { id, JPlan, Journee }) => {
@@ -415,16 +415,16 @@ export default {
                 this.emitter.emit('reSetClientsDecoupeByJourneeMap' , clients_object)
 
                 // Close Modal
-                await this.$hideModal("ModalClientsChangeRoute")
+                await this.$hideModal("ModalClientsMultiUpdate")
             }
             
             else{
 
+                // 5) Now hide the spinner
+                await this.$hideLoadingPage();
+
                 // Send Errors
                 this.$showErrors("Error !", res.data.errors)
-
-                // Hide Loading Page
-                await this.$hideLoadingPage()
             }
         },
 
@@ -446,11 +446,11 @@ export default {
 
             if(res.status===200){
 
-                // Send Feedback
-                this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
-
                 // 5) Now hide the spinner
                 await this.$hideLoadingPage();
+
+                // Send Feedback
+                this.$feedbackSuccess(res.data["header"]    ,   res.data["message"])
 
                 //
                 let clients_copy            =   [...this.clients].map(client => { return { id : client.id }})  
@@ -459,16 +459,16 @@ export default {
                 this.emitter.emit('reSetChangeRouteDelete' , clients_copy)
 
                 // Close Modal
-                await this.$hideModal("ModalClientsChangeRoute")
+                await this.$hideModal("ModalClientsMultiUpdate")
             }
             
             else{
 
-                // Send Errors
-                this.$showErrors("Error !", res.data.errors)
-
                 // 5) Now hide the spinner
                 await this.$hideLoadingPage();
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
 			}
         },
 

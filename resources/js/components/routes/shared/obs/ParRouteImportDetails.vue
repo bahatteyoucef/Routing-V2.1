@@ -726,128 +726,127 @@ export default {
             // Show Loading Page
             await this.$showLoadingPage()
 
-            setTimeout(async () => {
+            await this.$nextTick()
 
-                // data_ready                   => wher filters 
-                // switch_marker_cluster_mode   => switch cluster/marker
-                // initial                      => wher getData()
-                // add                          => wher add clients         (clients passed)
-                // update                       => when update clients      (clients passed)
-                // delete                       => when delete clients      (clients passed)
-                // standard                     => when resume
+            // data_ready                   => wher filters 
+            // switch_marker_cluster_mode   => switch cluster/marker
+            // initial                      => wher getData()
+            // add                          => wher add clients         (clients passed)
+            // update                       => when update clients      (clients passed)
+            // delete                       => when delete clients      (clients passed)
+            // standard                     => when resume
 
-                // reAffiche Markers
-                if(mode == "switch_marker_cluster_mode") {
+            // reAffiche Markers
+            if(mode == "switch_marker_cluster_mode") {
 
-                    console.log(1)
+                console.log(1)
+
+                // Show Markers
+                this.setRouteMarkers(mode, this.clients_markers_affiche)
+            }
+
+            else {
+
+                if((mode == "data_ready")||(mode == "initial")||(mode == "standard")) {
+
+                    // Extract JPlan, Cites, District
+                    if(mode != "data_ready") this.extractMetaData(clients)
+
+                    //
+                    this.reAfficheClientsMarkers(this.route_import.clients)
+
+                    // Datatable
+                    await this.setDataTable()
 
                     // Show Markers
                     this.setRouteMarkers(mode, this.clients_markers_affiche)
                 }
 
+                //
                 else {
 
-                    if((mode == "data_ready")||(mode == "initial")||(mode == "standard")) {
+                    if((mode == "add")||(mode == "update")||(mode == "delete")||(mode == "change_route_update")||(mode == "change_route_delete")) {
 
-                        // Extract JPlan, Cites, District
-                        if(mode != "data_ready") this.extractMetaData(clients)
+                        if(mode == "add")       {
 
-                        //
-                        this.reAfficheClientsMarkers(this.route_import.clients)
+                            // Extract JPlan, Cites, District
+                            this.extractMetaData(clients)
 
-                        // Datatable
-                        await this.setDataTable()
+                            // reAffiche Clients
+                            this.reAfficheClientsMarkers(this.route_import.clients)
+                            let clients_markers_affiche_partial     =   this.reAfficheClientsMarkersPartly(clients)
 
-                        // Show Markers
-                        this.setRouteMarkers(mode, this.clients_markers_affiche)
-                    }
-
-                    //
-                    else {
-
-                        if((mode == "add")||(mode == "update")||(mode == "delete")||(mode == "change_route_update")||(mode == "change_route_delete")) {
-
-                            if(mode == "add")       {
-
-                                // Extract JPlan, Cites, District
-                                this.extractMetaData(clients)
-
-                                // reAffiche Clients
-                                this.reAfficheClientsMarkers(this.route_import.clients)
-                                let clients_markers_affiche_partial     =   this.reAfficheClientsMarkersPartly(clients)
-
-                                // Datatable
-                                await this.setDataTable()
-
-                                //
-                                this.addMarkers(clients_markers_affiche_partial)
-                            }
-
-                            if(mode == "update")       {
-
-                                //
-                                this.extractMetaData(clients)
-
-                                // reAffiche Clients
-                                this.reAfficheClientsMarkers(this.route_import.clients)
-                                let clients_markers_affiche_partial     =   this.reAfficheClientsMarkersPartly(clients)
-
-                                // Datatable
-                                await this.setDataTable()
-
-                                //
-                                await this.updateMarkers(clients_markers_affiche_partial, clients)
-                            }
-
-                            if(mode == "delete")       {
-
-                                // reAffiche Clients
-                                this.reAfficheClientsMarkers(this.route_import.clients)
-
-                                // Datatable
-                                await this.setDataTable()
-
-                                // reAffiche Clients
-                                await this.deleteMarkers(clients)
-                            }
-
-                            if(mode == "change_route_update")   {
-
-                                //
-                                this.extractMetaData(clients)
-
-                                // reAffiche Clients
-                                this.reAfficheClientsMarkers(this.route_import.clients)
-                                let clients_markers_affiche_partial     =   this.reAfficheClientsMarkersPartly(clients)
-
-                                // Datatable
-                                await this.setDataTable()
-
-                                //
-                                await this.updateMarkers(clients_markers_affiche_partial, clients)
-                            }
-
-                            if(mode == "change_route_delete")   {
-
-                                // reAffiche Clients
-                                this.reAfficheClientsMarkers(this.route_import.clients)
-
-                                // Datatable
-                                await this.setDataTable()
-
-                                // reAffiche Clients
-                                await this.deleteMarkers(clients)
-                            }
+                            // Datatable
+                            await this.setDataTable()
 
                             //
-                            this.focuseMarkers()
+                            this.addMarkers(clients_markers_affiche_partial)
                         }
+
+                        if(mode == "update")       {
+
+                            //
+                            this.extractMetaData(clients)
+
+                            // reAffiche Clients
+                            this.reAfficheClientsMarkers(this.route_import.clients)
+                            let clients_markers_affiche_partial     =   this.reAfficheClientsMarkersPartly(clients)
+
+                            // Datatable
+                            await this.setDataTable()
+
+                            //
+                            await this.updateMarkers(clients_markers_affiche_partial, clients)
+                        }
+
+                        if(mode == "delete")       {
+
+                            // reAffiche Clients
+                            this.reAfficheClientsMarkers(this.route_import.clients)
+
+                            // Datatable
+                            await this.setDataTable()
+
+                            // reAffiche Clients
+                            await this.deleteMarkers(clients)
+                        }
+
+                        if(mode == "change_route_update")   {
+
+                            //
+                            this.extractMetaData(clients)
+
+                            // reAffiche Clients
+                            this.reAfficheClientsMarkers(this.route_import.clients)
+                            let clients_markers_affiche_partial     =   this.reAfficheClientsMarkersPartly(clients)
+
+                            // Datatable
+                            await this.setDataTable()
+
+                            //
+                            await this.updateMarkers(clients_markers_affiche_partial, clients)
+                        }
+
+                        if(mode == "change_route_delete")   {
+
+                            // reAffiche Clients
+                            this.reAfficheClientsMarkers(this.route_import.clients)
+
+                            // Datatable
+                            await this.setDataTable()
+
+                            // reAffiche Clients
+                            await this.deleteMarkers(clients)
+                        }
+
+                        //
+                        this.focuseMarkers()
                     }
                 }
+            }
 
-                // Hide Loading Page
-                await this.$hideLoadingPage()
-            }, 0)
+            // Hide Loading Page
+            await this.$hideLoadingPage()
         },
 
         // Extract Filters Data
@@ -1463,12 +1462,10 @@ export default {
 
             await this.$nextTick()
 
-            setTimeout(() => {                
-                // Set Markers
-                for (let index = 0; index < clients_markers_affiche.length; index++) {
-                    this.map_instance.$setRouteMarkers(clients_markers_affiche[index].clients, clients_markers_affiche[index].column_name, clients_markers_affiche[index].color)
-                }
-            }, 0);
+            // Set Markers
+            for (let index = 0; index < clients_markers_affiche.length; index++) {
+                this.map_instance.$setRouteMarkers(clients_markers_affiche[index].clients, clients_markers_affiche[index].column_name, clients_markers_affiche[index].color)
+            }
         },
 
         async deleteMarkers(param_clients) {

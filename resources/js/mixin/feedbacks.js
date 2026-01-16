@@ -12,8 +12,10 @@ export default {
                 html                : html,
                 timer               : 3000,
 
-                showCancelButton    : false,
-                showConfirmButton   : false,
+                showCancelButton        : false,
+                showConfirmButton       : false,
+                showCloseButton         : true,
+                timerProgressBar        : true,
 
                 customClass : {
                     container: 'position-fixed'
@@ -29,10 +31,12 @@ export default {
                 icon                : 'warning',
                 title               : header,
                 html                : html,
-                timer               : 3000,
+                timer               : 10000,
 
-                showCancelButton    : false,
-                showConfirmButton   : false,
+                showCancelButton        : false,
+                showConfirmButton       : false,
+                showCloseButton         : true,
+                timerProgressBar        : true,
 
                 customClass : {
                     container: 'position-fixed'
@@ -64,10 +68,12 @@ export default {
                 icon                : 'error',
                 title               : header,
                 html                : html,
-                timer               : 3000,
+                timer               : 10000,
 
-                showCancelButton    : false,
-                showConfirmButton   : false,
+                showCancelButton        : false,
+                showConfirmButton       : false,
+                showCloseButton         : true,
+                timerProgressBar        : true,
 
                 customClass : {
                     container: 'position-fixed'

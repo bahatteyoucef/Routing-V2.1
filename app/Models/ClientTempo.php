@@ -32,11 +32,25 @@ class ClientTempo extends Model
     ];
 
     //  //  //  //  //
+    //  //  //  //  //  Boot
+    //  //  //  //  //
+
+    protected static function boot() {
+        parent::boot();
+
+        //
+        static::creating(function ($model) {
+            if (empty($model->created_at)) {
+                $model->created_at = Carbon::now()->format('d F Y'); 
+            }
+        });
+    }
+
+    //  //  //  //  //
     //  //  //  //  //  Relationships
     //  //  //  //  //
 
-    public function ownerUser()
-    {
+    public function ownerUser() {
         return $this->belongsTo(User::class, 'owner');
     }
 
@@ -44,8 +58,7 @@ class ClientTempo extends Model
     //  //  //  //  //  Index
     //  //  //  //  //
 
-    public static function index(int $id_route_import_tempo)
-    {
+    public static function index(int $id_route_import_tempo) {
         $clients = self::where('id_route_import_tempo', $id_route_import_tempo)
             ->with('ownerUser')
             ->get();
@@ -59,8 +72,7 @@ class ClientTempo extends Model
         return $clients;
     }
 
-    public static function validateUpdate(Request $request)
-    {
+    public static function validateUpdate(Request $request) {
         $validator = Validator::make($request->all(), [
             'NewCustomer'           =>  ["required", "max:255"],
             'OpenCustomer'          =>  ["required", "max:255"],
@@ -96,38 +108,37 @@ class ClientTempo extends Model
             return $input->BrandAvailability == "";
         });
 
-        $validator->sometimes(['CustomerBarCode_image'],  ["required_if:OpenCustomer,Ouvert"] , function (Fluent $input) {
-            return (($input->CustomerBarCode_image_original_name != "") && ($input->CustomerBarCode_image_updated == "true"));
-        });
-
-        $validator->sometimes(['facade_image'],  ["file"] , function (Fluent $input) {
-            return (($input->facade_image_original_name != "") && ($input->facade_image_updated == "true"));
-        });
-
-        $validator->sometimes(['in_store_image'],  ["required_if:OpenCustomer,Ouvert"] , function (Fluent $input) {
-            return (($input->in_store_image_original_name != "") && ($input->in_store_image_updated == "true"));
-        });
-
         return $validator;
     }
 
-    public static function updateClient(Request $request, int $id_route_import_tempo, int $id_client_tempo)
-    {
+    public static function updateClient(Request $request, int $id_route_import_tempo, int $id_client_tempo) {
         $client = self::find($id_client_tempo);
         if (!$client) return null;
 
-        // Build AvailableBrands JSON
-        $brandsArray = $request->input('AvailableBrands');
-        if (!is_array($brandsArray)) {
-            $brandsArray = is_string($brandsArray) ? array_filter(array_map('trim', explode(',', $brandsArray)), fn($v) => $v !== '') : [];
+        // --- FIX START: Handle JSON string from Vue correctly ---
+        $rawBrands = $request->input('AvailableBrands');
+        $brandsArray = [];
+
+        // 1. Try to decode if it's a JSON string (This handles your Vue JSON.stringify data)
+        if (is_string($rawBrands)) {
+            $decoded = json_decode($rawBrands, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $brandsArray = $decoded;
+            } else {
+                // Fallback: It's a simple comma-separated string
+                $brandsArray = array_filter(array_map('trim', explode(',', $rawBrands)), fn($v) => $v !== '');
+            }
+        } elseif (is_array($rawBrands)) {
+            $brandsArray = $rawBrands;
         }
+        // --- FIX END ---
 
         $AvailableBrands = [];
         foreach (array_values($brandsArray) as $index => $value) {
             $AvailableBrands["brand_$index"] = $value;
         }
 
-        // Mass assign simple fields (explicit list)
+        // Mass assign simple fields
         $fields = [
             'NewCustomer', 'OpenCustomer', 'CustomerIdentifier', 'CustomerCode',
             'Latitude', 'Longitude', 'Address', 'RvrsGeoAddress', 'DistrictNo', 'DistrictNameE',
@@ -139,7 +150,7 @@ class ClientTempo extends Model
 
         foreach ($fields as $f) {
             if ($request->has($f)) {
-                $client->{$f} = $request->get($f);
+                $client->{$f} = $request->get($f) ?? '';
             }
         }
 
@@ -147,7 +158,11 @@ class ClientTempo extends Model
         $client->CustomerNameA = mb_strtoupper($request->get('CustomerNameA') ?? '', 'UTF-8');
         $client->JPlan  = mb_strtoupper($request->input('JPlan') ?? '', 'UTF-8');
 
-        $client->AvailableBrands = json_encode($AvailableBrands, JSON_UNESCAPED_UNICODE);
+        // --- FIX START: Assign the ARRAY directly ---
+        // Laravel's $casts will handle the json_encoding automatically.
+        // Assigning json_encode() output here would cause "Double Encoding".
+        $client->AvailableBrands = $AvailableBrands; 
+        // --- FIX END ---
 
         $client->owner          =   $request->get('owner')          ?? $client->owner;
         $client->tel_status     =   $request->get('tel_status')     ?? $client->tel_status;
@@ -155,14 +170,12 @@ class ClientTempo extends Model
 
         $client->save();
 
-        // Format brands for response
         self::appendFormattedBrands($client);
 
         return $client;
     }
 
-    public static function deleteClient(int $id_route_import_tempo, int $id_client_tempo)
-    {
+    public static function deleteClient(int $id_route_import_tempo, int $id_client_tempo) {
         $client = self::find($id_client_tempo);
         if ($client) $client->delete();
     }
@@ -171,8 +184,7 @@ class ClientTempo extends Model
     //  //  //  //  //  Store/Delete Clients
     //  //  //  //  //
 
-    public static function storeClients(Request $request, int $id_route_import_tempo)
-    {
+    public static function storeClients(Request $request, int $id_route_import_tempo) {
         // Remove previous tempo clients for this user
         self::deleteClients();
 
@@ -187,7 +199,7 @@ class ClientTempo extends Model
         }
 
         $now = Carbon::now();
-        $createdAt = $now->toDateTimeString();
+        $defaultCreatedAt = $now->toDateTimeString();
         $createdBy = Auth::id();
 
         // Precompute user map for 'owner' usernames to user IDs
@@ -212,26 +224,16 @@ class ClientTempo extends Model
             // Resolve owner id
             $ownerId = $userMap[$ownerUsername] ?? $createdBy; // fallback to current user
 
-            // Validate CustomerCode
-            $customerCode = $clientElem['CustomerCode'] ?? '';
-            if (!empty($customerCode) && preg_match('/[\/\\\\:*?"<>|& ]/', $customerCode)) {
-                throw new Exception("Le champ CustomerCode contient des caractères interdits : " . $customerCode);
-            }
-
-            // Format AvailableBrands: 'val1, val2' => {"brand_0":"val1","brand_1":"val2"}
-            $brandsRaw = $clientElem['AvailableBrands'] ?? '';
-            $brandsArray = is_array($brandsRaw) ? $brandsRaw : array_filter(array_map('trim', explode(',', (string)$brandsRaw)), fn($v) => $v !== '');
-            $brandAssoc = [];
-            foreach (array_values($brandsArray) as $idx => $val) {
-                $brandAssoc["brand_$idx"] = $val;
-            }
-            $availableBrandsJson = json_encode($brandAssoc, JSON_UNESCAPED_UNICODE);
+            // Validations
+            $customerCode           = ClientTempo::normalizeCustomerCode($clientElem['CustomerCode'] ?? '');
+            $createdAtValue         = ClientTempo::normalizeCreatedAt($clientElem['created_at'] ?? null, $defaultCreatedAt);
+            $availableBrandsJson    = ClientTempo::normalizeAvailableBrands($clientElem['AvailableBrands'] ?? '[]');
 
             // Prepare row for bulk insert (use created_at consistent format)
             $rows[] = [
                 'NewCustomer'               => $clientElem['NewCustomer']            ?? '',
                 'CustomerIdentifier'        => $clientElem['CustomerIdentifier']     ?? '',
-                'CustomerCode'              => $customerCode                           ,
+                'CustomerCode'              => $customerCode                            ,
                 'OpenCustomer'              => $clientElem['OpenCustomer']           ?? '',
                 'CustomerNameE'             => isset($clientElem['CustomerNameE']) ? mb_strtoupper($clientElem['CustomerNameE'], 'UTF-8') : '',
                 'CustomerNameA'             => isset($clientElem['CustomerNameA']) ? mb_strtoupper($clientElem['CustomerNameA'], 'UTF-8') : '',
@@ -255,13 +257,14 @@ class ClientTempo extends Model
                 'Frequency'                 => $clientElem['Frequency']              ?? '',
                 'SuperficieMagasin'         => $clientElem['SuperficieMagasin']      ?? '',
                 'NbrAutomaticCheckouts'     => $clientElem['NbrAutomaticCheckouts']  ?? '',
-                'AvailableBrands'           => $availableBrandsJson,
                 'start_adding_time'         => $clientElem['start_adding_time']      ?? '',
                 'adding_duration'           => $clientElem['adding_duration']        ?? '',
                 'JPlan'                     => $clientElem['JPlan']                  ?? '',
                 'Journee'                   => $clientElem['Journee']                ?? '',
                 'comment'                   => $clientElem['comment']                ?? '',
-                'created_at'                => $clientElem['created_at'] ?? $createdAt,
+
+                'AvailableBrands'           => $availableBrandsJson                       ,
+                'created_at'                => $createdAtValue,
                 'id_route_import_tempo'     => $id_route_import_tempo,
                 'owner'                     => $ownerId,
                 'created_by'                => $createdBy,
@@ -269,16 +272,13 @@ class ClientTempo extends Model
         }
 
         // Insert in chunks
-        DB::transaction(function () use ($rows) {
-            $chunks = array_chunk($rows, 500);
-            foreach ($chunks as $chunk) {
-                self::insert($chunk);
-            }
-        });
+        $chunks = array_chunk($rows, 500);
+        foreach ($chunks as $chunk) {
+            self::insert($chunk);
+        }
     }
 
-    public static function deleteClients()
-    {
+    public static function deleteClients() {
         self::where('created_by', Auth::id())->delete();
     }
 
@@ -286,8 +286,7 @@ class ClientTempo extends Model
     //  //  //  //  //  Update Resume
     //  //  //  //  //
 
-    public static function updateResumeClients(Request $request)
-    {
+    public static function updateResumeClients(Request $request) {
         $clients = $request->input('data');
         if (is_string($clients)) $clients = json_decode($clients, true);
         if (empty($clients) || !is_array($clients)) return;
@@ -302,12 +301,12 @@ class ClientTempo extends Model
                     'id' => $c['id'],
                     'JPlan' => !empty($c['JPlan']) ? mb_strtoupper($c['JPlan'], 'UTF-8') : '',
                     'Journee' => !empty($c['Journee']) ? $c['Journee'] : '',
-                    'owner_bo' => Auth::id(),
-                    'created_at' => $now,
+                    // 'owner_bo' => Auth::id(),
+                    // 'created_at' => $now,
                 ];
             }
 
-            self::upsert($upsertData, ['id'], ['JPlan', 'Journee', 'owner_bo', 'created_at']);
+            self::upsert($upsertData, ['id'], ['JPlan', 'Journee'/*, 'owner_bo', 'created_at' */]);
         }
     }
 
@@ -381,18 +380,149 @@ class ClientTempo extends Model
     }
 
     public static function appendFormattedBrands($client) {
-        $brandsJson =   is_array($client)       ? ($client['AvailableBrands'] ?? '{}')  : ($client->AvailableBrands ?? '{}');
-        $assoc      =   is_array($brandsJson)   ? $brandsJson                           : (json_decode($brandsJson, true) ?? []);
-        $values     =   array_values($assoc);
+        // 1. Retrieve the raw value based on whether client is Array or Object
+        $rawBrands = is_array($client) 
+            ? ($client['AvailableBrands'] ?? []) 
+            : ($client->AvailableBrands ?? []);
 
-        if (is_array($client)) {
-            $client['AvailableBrands_array_formatted']  =   $values;
-            $client['AvailableBrands_string_formatted'] =   implode(", ", $values);
+        // 2. Normalize: If it's a string (JSON), decode it. 
+        //    If it's already an array (due to Model $casts), this skips.
+        if (is_string($rawBrands)) {
+            $assoc = json_decode($rawBrands, true);
         } else {
-            $client->AvailableBrands_array_formatted    =   $values;
-            $client->AvailableBrands_string_formatted   =   implode(", ", $values);
+            $assoc = $rawBrands;
+        }
+
+        // 3. Safety Check: Ensure $assoc is actually an array before using array_values
+        //    This handles cases where json_decode returns null, or the DB had bad data.
+        if (!is_array($assoc)) {
+            $assoc = [];
+        }
+
+        // 4. Process the values
+        $values = array_values($assoc);
+        $stringFormatted = implode(", ", $values);
+
+        // 5. Assign back to client
+        if (is_array($client)) {
+            $client['AvailableBrands']  = $values;
+            $client['AvailableBrands_array_formatted']  = $values;
+            $client['AvailableBrands_string_formatted'] = $stringFormatted;
+        } else {
+            $client->AvailableBrands                    = $values;
+            $client->AvailableBrands_array_formatted    = $values;
+            $client->AvailableBrands_string_formatted   = $stringFormatted;
         }
 
         return $client;
+    }
+
+    //  //  //  //  //
+    //  //  //  //  //  Validators
+    //  //  //  //  //
+
+    public static function normalizeCustomerCode($code) {
+        $code = (string) ($code ?? '');
+        $code = trim($code);
+
+        // If empty, return empty string (no validation needed)
+        if ($code === '') {
+            return $code;
+        }
+
+        // Forbidden characters: / \ : * ? " < > | & and space
+        if (preg_match('/[\/\\\\:*?"<>|& ]/', $code)) {
+            throw new \Exception("Le champ CustomerCode contient des caractères interdits : " . $code);
+        }
+
+        return $code;
+    }
+
+    protected static function normalizeCreatedAt($value, ?string $fallback = null) {
+        // If nothing provided, use fallback (already expected in the target format)
+        if (empty($value)) {
+            if ($fallback === null) {
+                throw new \Exception('No created_at provided and no fallback supplied.');
+            }
+            return $fallback;
+        }
+
+        $str = (string)$value;
+
+        // 1) Try strict datetime first (common exact DB format)
+        $dt = \DateTime::createFromFormat('Y-m-d H:i:s', $str);
+        $errors = \DateTime::getLastErrors();
+        if ($dt !== false && empty($errors['warning_count']) && empty($errors['error_count'])) {
+            return Carbon::instance($dt)->format('d F Y');
+        }
+
+        // 2) Try Carbon::parse (lenient)
+        try {
+            $c = Carbon::parse($str);
+            return $c->format('d F Y');
+        } catch (\Exception $e) {
+            // continue to explicit formats
+        }
+
+        // 3) Try a list of common formats
+        $commonFormats = [
+            'd F Y',        // 18 August 2025
+            'd M Y',        // 18 Aug 2025
+            'd/m/Y',        // 18/08/2025
+            'd-m-Y',        // 18-08-2025
+            'Y-m-d',        // 2025-08-18
+            'Y/m/d',        // 2025/08/18
+            'm/d/Y',        // 08/18/2025
+            'm-d-Y',        // 08-18-2025
+            'd F Y H:i',    // 18 August 2025 14:30
+            'Y-m-d\TH:i:sP' // ISO 8601 with timezone
+        ];
+
+        foreach ($commonFormats as $fmt) {
+            $dt = \DateTime::createFromFormat($fmt, $str);
+            $errors = \DateTime::getLastErrors();
+            if ($dt !== false && empty($errors['warning_count']) && empty($errors['error_count'])) {
+                return Carbon::instance($dt)->format('d F Y');
+            }
+        }
+
+        // nothing worked
+        throw new \Exception(
+            "Invalid created_at value. Expected a parseable date (e.g. '2025-08-18 14:30:00', '2025-08-18', or '18 August 2025'). Provided: {$str}"
+        );
+    }
+
+    public static function normalizeAvailableBrands($raw) {
+        if (is_string($raw)) {
+            $decoded = json_decode($raw, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception('AvailableBrands contains invalid JSON: ' . json_last_error_msg());
+            }
+        } elseif (is_array($raw)) {
+            $decoded = $raw;
+        } else {
+            throw new \Exception('AvailableBrands must be an array or a JSON string.');
+        }
+
+        if (empty($decoded)) {
+            return '[]';
+        }
+
+        foreach ($decoded as $key => $value) {
+            if (!is_string($key) || !preg_match('/^brand_\d+$/', $key)) {
+                throw new \Exception("AvailableBrands keys must be 'brand_N' (e.g. 'brand_0'). Invalid key: " . var_export($key, true));
+            }
+
+            if (!is_string($value) || trim($value) === '') {
+                throw new \Exception("AvailableBrands values must be non-empty strings. Invalid value for '{$key}': " . var_export($value, true));
+            }
+        }
+
+        $json = json_encode($decoded, JSON_UNESCAPED_UNICODE);
+        if ($json === false) {
+            throw new \Exception('Failed to encode AvailableBrands to JSON.');
+        }
+
+        return $json;
     }
 }

@@ -47,6 +47,7 @@ export default {
     },
 
     mounted() {
+        console.log("header store")
         this.fetchImages();
     },
 

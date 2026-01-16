@@ -91,11 +91,11 @@ export default {
 
                 if(res.status===200){
 
-                    // Send Feedback
-                    this.$feedbackSuccess(res.data.header     ,   res.data.message)
-
                     // 5) Now hide the spinner
                     await this.$hideLoadingPage();
+
+                    // Send Feedback
+                    this.$feedbackSuccess(res.data.header     ,   res.data.message)
 
                     //
                     const clients_object = this.clients.reduce((acc, { id, JPlan, Journee }) => {
@@ -112,11 +112,11 @@ export default {
                 
                 else{
 
-                    // Send Errors
-                    this.$showErrors("Error !", res.data.errors)
-
                     // Hide Loading Page
                     await this.$hideLoadingPage()
+
+                    // Send Errors
+                    this.$showErrors("Error !", res.data.errors)
                 }            
             }
 
@@ -136,11 +136,11 @@ export default {
 
                 if(res.status===200){
 
-                    // Send Feedback
-                    this.$feedbackSuccess(res.data.header     ,   res.data.message)
-
                     // 5) Now hide the spinner
                     await this.$hideLoadingPage();
+
+                    // Send Feedback
+                    this.$feedbackSuccess(res.data.header     ,   res.data.message)
 
                     //
                     const clients_object = this.clients.reduce((acc, { id, JPlan, Journee }) => {
@@ -157,11 +157,11 @@ export default {
                 
                 else{
 
-                    // Send Errors
-                    this.$showErrors("Error !", res.data.errors)
-
                     // Hide Loading Page
                     await this.$hideLoadingPage()
+
+                    // Send Errors
+                    this.$showErrors("Error !", res.data.errors)
                 }
             }
         },

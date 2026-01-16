@@ -288,7 +288,7 @@
                                 <div class="row mt-3 mb-3">
                                     <div class="col-sm-3">
                                         <label for="RvrsGeoAddress"     class="form-label">RvrsGeoAddress</label>
-                                        <textarea                       class="form-control"        :id="'RvrsGeoAddress_'+client.id"   rows="3"    v-model="client.RvrsGeoAddress"     :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
+                                        <textarea                       class="form-control"        :id="'RvrsGeoAddress_'+client.id"   rows="3"    v-model="client.RvrsGeoAddress"     :disabled="(true)||!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))"></textarea>
                                     </div>
 
                                     <div class="col-sm-3">
@@ -470,6 +470,9 @@
 
 import {mapGetters, mapActions} from    "vuex"
 
+import moment                   from    "moment"
+import "moment-timezone"
+
 export default {
 
     data() {
@@ -551,7 +554,11 @@ export default {
 
                 // Slide 19
                 BrandAvailability                       :   'Non',
+
                 AvailableBrands                         :   [],
+                AvailableBrands_array_formatted         :   [],
+                AvailableBrands_string_formatted        :   "",
+
                 in_store_image                          :   '',
                 in_store_image_original_name            :   '',
 
@@ -811,7 +818,11 @@ export default {
                 }
 
                 if (res.status === 200) {
+                    await this.$hideLoadingPage();
                     this.$feedbackSuccess(res.data["header"], res.data["message"]);
+
+                    this.client.AvailableBrands_array_formatted     =   this.client.AvailableBrands
+                    this.client.AvailableBrands_string_formatted    =   this.client.AvailableBrands.join(', ')
 
                     // Validation Logic / Event Emission
                     if (this.update_type == "validation") {
@@ -823,13 +834,14 @@ export default {
 
                     await this.$hideModal("ModalClientUpdate");
                 } else {
+                    await this.$hideLoadingPage();
                     this.$showErrors("Error !", res.data.errors);
                 }
             } catch (error) {
                 console.error(error);
+                await this.$hideLoadingPage();
                 this.$showErrors("System Error", ["An unexpected error occurred."]);
             } finally {
-                await this.$hideLoadingPage();
             }
         },
 
@@ -848,6 +860,7 @@ export default {
 
                 // Success Handling
                 if (res.status === 200) {
+                    await this.$hideLoadingPage();
                     this.$feedbackSuccess(res.data["header"], res.data["message"]);
                     
                     // Validation Logic
@@ -859,14 +872,15 @@ export default {
 
                     await this.$hideModal("ModalClientUpdate");
                 } else {
+                    await this.$hideLoadingPage();
                     this.$showErrors("Error !", res.data.errors);
                 }
 
             } catch (error) {
                 console.error("Delete Error", error);
+                await this.$hideLoadingPage();
                 this.$showErrors("System Error", ["An unexpected error occurred during deletion."]);
             } finally {
-                await this.$hideLoadingPage();
             }
         },
 
@@ -888,21 +902,26 @@ export default {
                 }
 
                 await this.getComboData();
+
+                console.log(client)
+
                 await this.getClientData(client);
-                
+
                 // Map logic
                 await this.showPositionOnMapMultiMap("show_modal_client_update_map");
-            } finally {
+
+                //
                 await this.$hideLoadingPage();
+            } finally {
             }
         },
 
         async getClientData(client) {
             // Reset Raw Files
             this._rawFiles = {
-                facade_image: null,
-                CustomerBarCode_image: null,
-                in_store_image: null
+                facade_image            : null,
+                CustomerBarCode_image   : null,
+                in_store_image          : null
             };
 
             // Clone data to avoid mutating parent directly until save
@@ -911,7 +930,6 @@ export default {
 
             // Handle Specific Fields
             this.client.old_CustomerNameE = client.CustomerNameE;
-            this.client.AvailableBrands = client.AvailableBrands_array_formatted || [];
             this.client.status_original = client.status;
 
             // --- IMAGE PREVIEW LOGIC ---
@@ -940,6 +958,9 @@ export default {
             // If you need specific logic like getUsers/Cites, keep them:
             await this.getUsers();
             if(this.client.DistrictNo) await this.getCites();
+
+            // Re-Assign Cities 
+            this.client.CityNo  =   client.CityNo
         },
 
         async getComboData() {
@@ -1193,7 +1214,7 @@ export default {
             }
         },
 
-        //  //  //
+        //  //  //  //  //
 
         async setBarCodeReader() {
 

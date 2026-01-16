@@ -711,17 +711,19 @@ export default {
                     client.owner_username = this.client.owner_username;
                     client.created_at = this.$formatDate(new Date());
 
+                    await this.$hideLoadingPage();
                     this.$feedbackSuccess(res.data["header"], res.data["message"]);
                     this.emitter.emit('reSetAdd', client);
                     await this.$hideModal("ModalClientAdd");
                 } else {
+                    await this.$hideLoadingPage();
                     this.$showErrors("Error !", res.data.errors);
                 }
             } catch (e) {
                 console.error(e);
+                await this.$hideLoadingPage();
                 this.$showErrors("Connection Error", ["Failed to send data."]);
             } finally {
-                await this.$hideLoadingPage();
             }
         },
 

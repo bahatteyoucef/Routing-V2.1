@@ -492,8 +492,8 @@ export default {
             await Promise.all([this.getComboData(), this.getClientData()]);
             this.total_questions = document.getElementsByClassName("mySlides").length || 23;
         } finally {
-            await this.$hideLoadingPage();
         }
+        await this.$hideLoadingPage();
     },
 
     methods : {
@@ -538,12 +538,13 @@ export default {
 
             try {
                 const res = await this.$callApi("post", `/route-imports/${this.$route.params.id_route_import}/clients/${this.client.id}/update`, formData);
+                await this.$hideLoadingPage();
                 this.$feedbackSuccess(res.data.header, res.data.message);
                 this.$goBack();
             } catch (err) {
+                await this.$hideLoadingPage();
                 this.$showErrors("Error", ["Update failed"]);
             } finally {
-                await this.$hideLoadingPage();
             }
         },
 
@@ -565,11 +566,13 @@ export default {
                     this.getComboData()
                 ]);
 
+                await this.$hideLoadingPage();
+
             } catch (error) {
+                await this.$hideLoadingPage();
                 console.error("Error fetching data", error);
                 this.$showErrors("Error", ["Failed to load data."]);
             } finally {
-                await this.$hideLoadingPage();
             }
         },
 

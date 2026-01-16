@@ -1192,7 +1192,30 @@ export default class Map {
 
     $isMarkerInsidePolygon(marker, event) {
 
-        return event.layer.contains(marker.getLatLng()) // event.layer.getBounds().contains(marker.getLatLng())
+        const poly = event.layer;
+        const point = marker.getLatLng();
+        
+        // Retrieve the polygon's vertices (the outer ring)
+        // Leaflet polygons are an array of arrays (to support holes), so we select [0]
+        const polyPoints = poly.getLatLngs()[0]; 
+        
+        const x = point.lat;
+        const y = point.lng;
+
+        let inside = false;
+        
+        // Ray Casting Algorithm to check if point is inside polygon
+        for (let i = 0, j = polyPoints.length - 1; i < polyPoints.length; j = i++) {
+            const xi = polyPoints[i].lat, yi = polyPoints[i].lng;
+            const xj = polyPoints[j].lat, yj = polyPoints[j].lng;
+
+            const intersect = ((yi > y) != (yj > y))
+                && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+                
+            if (intersect) inside = !inside;
+        }
+
+        return inside;
     }
 
     //  //  //  //  //  //  //  //  //  //  //  //  //  //

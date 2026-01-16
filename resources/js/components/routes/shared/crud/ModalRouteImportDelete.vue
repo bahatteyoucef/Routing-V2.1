@@ -101,11 +101,11 @@ export default {
 
             if(res.status===200){
 
-                // Send Feedback
-                this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
-
                 // Hide Loading Page
                 await this.$hideLoadingPage()
+
+                // Send Feedback
+                this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
 
                 // Get Route Import
                 this.emitter.emit("reSetRouteImport")
@@ -116,11 +116,11 @@ export default {
 
             else{
 
-                // Send Errors
-                this.$showErrors("Error !", res.data.errors)
-
                 // Hide Loading Page
                 await this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
             }
         }
     }

@@ -149,7 +149,6 @@ class RouteImport extends Model
     //  //  //  //  //  Store/Update/Delete
     //  //  //  //  //
 
-
     public static function validateStore(Request $request)
     {
         return Validator::make($request->all(), [
@@ -250,15 +249,19 @@ class RouteImport extends Model
     {
         $routeImport = self::findOrFail($id_route_import);
 
-        DB::transaction(function () use ($routeImport, $id_route_import) {
-            $routeImport->delete();
-            self::deleteData($id_route_import);
-        });
+        $routeImport->delete();
+        self::deleteData($id_route_import);
     }
 
     //  //  //  //  //
     //  //  //  //  //  Delete Clients
     //  //  //  //  //
+
+    public static function storeData(Request $request, int $id_route_import)
+    {
+        // Delegate to ClientTempo (ClientTempo::storeClients handles data normalization)
+        Client::storeClients($request, $id_route_import);
+    }
 
     public static function deleteData(int $id_route_import)
     {

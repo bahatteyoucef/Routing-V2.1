@@ -290,11 +290,11 @@ export default {
 
             if(res.status===200){
 
-                // Send Feedback
-                this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
-
                 // Hide Loading Page
                 await this.$hideLoadingPage()
+
+                // Send Feedback
+                this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
 
                 // Reload DataTable
                 await this.$parent.setDataTable()
@@ -305,11 +305,11 @@ export default {
             
             else{
 
-                // Send Errors
-                this.$showErrors("Error !", res.data.errors)
-
                 // Hide Loading Page
                 await this.$hideLoadingPage()
+
+                // Send Errors
+                this.$showErrors("Error !", res.data.errors)
 			}
         },
 
@@ -414,26 +414,24 @@ export default {
 
             await this.$showLoadingPage()
 
-            setTimeout(async () => {
+            await this.$nextTick()
                 
-                this.districts              =   []
-                this.user.selected_district =   null
+            this.districts              =   []
+            this.user.selected_district =   null
 
-                this.user.cities            =   []
-                this.user.selected_cities   =   []
+            this.user.cities            =   []
+            this.user.selected_cities   =   []
 
-                if(this.user.selected_route_import) {
+            if(this.user.selected_route_import) {
 
-                    const res_3         =   await this.$callApi("post"  ,   "/route-imports/"+this.user.selected_route_import+"/districts"   ,   null)
-                    let districts       =   res_3.data.willayas
+                const res_3         =   await this.$callApi("post"  ,   "/route-imports/"+this.user.selected_route_import+"/districts"   ,   null)
+                let districts       =   res_3.data.willayas
 
-                    for (let i = 0; i < districts.length; i++) {
+                for (let i = 0; i < districts.length; i++) {
 
-                        this.districts.push({ value : districts[i].DistrictNo , label : districts[i].DistrictNameE  +   " (" + districts[i].DistrictNo + ")"})
-                    }
+                    this.districts.push({ value : districts[i].DistrictNo , label : districts[i].DistrictNameE  +   " (" + districts[i].DistrictNo + ")"})
                 }
-
-            }, 222);
+            }
 
             await this.$hideLoadingPage()
         },

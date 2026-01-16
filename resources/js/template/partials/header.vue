@@ -1,75 +1,58 @@
 <template>
     <nav v-if="user.username" class="navbar default-layout-navbar col-sm-lg-12 col-sm-12 p-0 fixed-top d-flex flex-row navbar-light navbar-expand-lg" id="template-header">
         
-        <!-- Logo -->
         <div class="text-center navbar-brand-wrapper d-flex align-items-top justify-content-center" id="logo_div_parent">
+            <router-link to="/" class="navbar-brand brand-logo p-0">
+              <img :src="'/images/custom/header.png'" alt="logo" class="mt-2"/>
+            </router-link>
 
-            <!-- <div> -->
-              <router-link to="/" aria-current="page" class="navbar-brand brand-logo active router-link-active p-0">
-                <img  :src="'/images/custom/header.png'"     alt="logo" class="mt-2"/>
-              </router-link>
+            <router-link to="/" class="navbar-brand brand-logo-mini p-0" id="mini_logo_custom" style="margin-top: 5px;">
+              <img :src="'/images/custom/logo.png'" alt="logo" id="mini_logo_custom_image" class="mt-2"/>
+            </router-link>
 
-              <router-link to="/" aria-current="page"   class="navbar-brand brand-logo-mini active router-link-active p-0" id="mini_logo_custom" style="margin-top: 5px;">
-                <img  :src="'/images/custom/logo.png'"     alt="logo" id="mini_logo_custom_image" class="mt-2"/>
-              </router-link>
-            <!-- </div> -->
-
-            <!--  -->
-
-            <div id="header_menu_buttons_div" style="display:none">
-              <div id="show_header_menu_div" v-show="!headerOpen" class="toggle-control">
-                <span class="page-title-icon bg-gradient-primary text-white mr-2" id="show_header_menu_button" @click="showHeaderMenu()">
+            <div id="header_menu_buttons_div">
+              <div v-show="!headerOpen" class="toggle-control">
+                <span class="page-title-icon bg-gradient-primary text-white mr-2" @click="showHeaderMenu()">
                   <i class="mdi mdi-menu-left"></i>
                 </span> 
               </div>
 
-              <div id="hide_header_menu_div" v-show="headerOpen" class="toggle-control">
-                <span class="page-title-icon bg-gradient-primary text-white mr-2" id="hide_header_menu_button" @click="hideHeaderMenu()">
+              <div v-show="headerOpen" class="toggle-control">
+                <span class="page-title-icon bg-gradient-primary text-white mr-2" @click="hideHeaderMenu()">
                   <i class="mdi mdi-menu-right"></i>
                 </span> 
               </div>
             </div>
-
         </div>
 
-        <!-- Options -->
-        <div class="navbar-menu-wrapper d-flex align-items-center row h-100 w-100 pr-0 pl-4">
-            <transition name="slide-right" @before-leave="beforeLeave" @before-enter="beforeEnter">
-                <ul class="navbar-nav navbar-nav-right container m-0 mt-1 animate__animated pr-0" id="header_menu"  v-show="headerOpen" aria-hidden="false">
-
-                  <!-- Route -->
-                  <li class="col-sm-5 nav-item" >
+        <div class="navbar-menu-wrapper d-flex align-items-center row h-100 w-100 pr-0 pl-4" :class="{ 'menu-closed': !headerOpen }">
+            <transition 
+                name="slide-right" 
+                @before-leave="beforeLeave" 
+                @after-leave="afterLeave"
+                @before-enter="beforeEnter"
+            >
+                <ul v-if="headerOpen" class="navbar-nav navbar-nav-right container m-0 mt-1 pr-0" id="header_menu">
+                  <li class="col-sm-5 nav-item">
                     <Multiselect
-                        v-model             =   "route_link"
-                        :options            =   "liste_route_link"
-                        mode                =   "single" 
-                        placeholder         =   "Select Map"
-                        class               =   "mt-1"
-
-                        :close-on-select    =   "true"
-                        :searchable         =   "true"
-                        :create-option      =   "true"
-
-                        :canDeselect        =   "false"
-                        :canClear           =   "false"
-                        :allowAbsent        =   "false"
+                        v-model="route_link"
+                        :options="liste_route_link"
+                        placeholder="Select Map"
+                        class="mt-1"
+                        :searchable="true"
+                        :canDeselect="false"
                     />
                   </li>
-                  <!--                -->
 
-                  <!-- Buttons        -->
                   <li class="col-sm-5 nav-item">
-
                     <div class="row justify-content-end">
-                      <div class="col mt-1"  v-if="$isRole('Super Admin')||$isRole('BU Manager')">
+                      <div class="col mt-1" v-if="$isRole('Super Admin')||$isRole('BU Manager')">
                         <button class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="AddRouteImport()">New Import</button>
                       </div>
-
                       <div class="col mt-1">
-                        <button v-if="(route_import_existe)" class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToRouteTempo()">Suspended Import</button>
+                        <button v-if="route_import_existe" class="float-right btn bg-gradient-primary btn-block text-white h-100" @click="goToRouteTempo()">Suspended Import</button>
                       </div>
                     </div>
-
                   </li>
 
                   <!-- Profile        -->
@@ -141,8 +124,7 @@
                     </ul>
 
                   </li>
-
-                </ul>
+                  </ul>
             </transition>
         </div>
     </nav>
@@ -232,11 +214,7 @@ export default {
 
             this.$callApi("post",    "/route-imports-tempo/last-imported", null)
             .then((res)=> {
-
-              if(res.data) {
-
-                this.route_import_existe  = true
-              }
+              if(res.status ==  200) this.route_import_existe  = true
             })
         }, 
 
@@ -422,19 +400,27 @@ export default {
         //  //  //  //  //  //  //  
 
         showHeaderMenu() {
-          this.headerOpen = true;
+            this.headerOpen = true;
         },
 
         hideHeaderMenu() {
-          this.headerOpen = false;
-        },
-
-        beforeLeave() {
-          document.getElementById("main_content").classList.remove('header-open');
+            this.headerOpen = false;
         },
 
         beforeEnter() {
-          document.getElementById("main_content").classList.add('header-open');
+            // Add class immediately when opening
+            const el = document.getElementById("main_content");
+            if(el) el.classList.add('header-open');
+        },
+
+        beforeLeave() {
+            // Don't remove the class yet, wait for the animation
+        },
+
+        afterLeave() {
+            // ONLY remove the class and clear the space AFTER the slide finishes
+            const el = document.getElementById("main_content");
+            if(el) el.classList.remove('header-open');
         }
     },
 
@@ -460,33 +446,33 @@ export default {
 
 <style scoped>
 
-.slide-right-enter-from {
-  transform: translateX(100%);
-  opacity: 0;
-}
-.slide-right-enter-active {
-  transition: transform .55s ease, opacity .45s ease;
-}
-.slide-right-enter-to {
-  transform: translateX(0);
-  opacity: 1;
+/* Ensure the wrapper background vanishes when closed */
+.navbar-menu-wrapper {
+    transition: background 0.3s ease, width 0.4s ease;
+    background: white; /* Or your default header color */
 }
 
-.slide-right-leave-from {
-  transform: translateX(0);
-  opacity: 1;
+.navbar-menu-wrapper.menu-closed {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    pointer-events: none; /* Prevents clicking hidden items */
 }
+
+.slide-right-enter-active,
 .slide-right-leave-active {
-  transition: transform .55s ease, opacity .45s ease;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 0.3s ease;
 }
+
+.slide-right-enter-from,
 .slide-right-leave-to {
-  transform: translateX(100%);
+  transform: translateX(50px); /* Smaller movement for mobile feel */
   opacity: 0;
 }
 
-.toggle-control {
-  display: inline-block;
-  margin-right: 0.5rem ;
+#header_menu_buttons_div {
+  display: none;
 }
 
 </style>

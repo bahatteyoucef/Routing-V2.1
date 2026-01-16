@@ -166,18 +166,20 @@ export default {
                     if(validation_type   ==  "GPS")              this.validation_clients         =   this.getDoublant.getDoublantGPS
 
                     //
+                    await this.$nextTick()
+
+                    const validation_clients_parent_div             =   document.getElementById("validation_clients_parent")
+                    validation_clients_parent_div.style.height      =   "750px"
+                    validation_clients_parent_div.classList.add("mt-5")
+
+                    //
+                    await this.$nextTick()
                     setTimeout(async () => {
-
-                        const validation_clients_parent_div             =   document.getElementById("validation_clients_parent")
-                        validation_clients_parent_div.style.height      =   "750px"
-                        validation_clients_parent_div.classList.add("mt-5")
-
-                        //
                         await this.$refs.ShowValidationClients.setDatatable()
+                    }, 555);
 
-                        //
-                        this.validation_clients_child_clicked  =   false
-                    }, 0);
+                    //
+                    this.validation_clients_child_clicked  =   false
                 }
 
                 else {
@@ -229,9 +231,9 @@ export default {
 
             //
             await this.$nextTick()
-
-            //
-            await this.$refs.ShowValidationClients.setDatatable()
+            setTimeout(async () => {
+                await this.$refs.ShowValidationClients.setDatatable()
+            }, 555);
 
             //
             await this.$hideLoadingPage()
@@ -263,9 +265,9 @@ export default {
 
             //
             await this.$nextTick()
-
-            //
-            await this.$refs.ShowValidationClients.setDatatable()
+            setTimeout(async () => {
+                await this.$refs.ShowValidationClients.setDatatable()
+            }, 555);
 
             //
             await this.$hideLoadingPage()
@@ -297,9 +299,9 @@ export default {
 
             //
             await this.$nextTick()
-
-            //
-            await this.$refs.ShowValidationClients.setDatatable()
+            setTimeout(async () => {
+                await this.$refs.ShowValidationClients.setDatatable()
+            }, 555);
 
             //
             await this.$hideLoadingPage()
@@ -331,9 +333,9 @@ export default {
 
             //
             await this.$nextTick()
-
-            //
-            await this.$refs.ShowValidationClients.setDatatable()
+            setTimeout(async () => {
+                await this.$refs.ShowValidationClients.setDatatable()
+            }, 555);
 
             //
             await this.$hideLoadingPage()
@@ -428,7 +430,12 @@ export default {
             }
 
             //
-            await this.$refs.ShowValidationClients.setDatatable()
+            console.log(client)
+
+            await this.$nextTick()
+            setTimeout(async () => {
+                await this.$refs.ShowValidationClients.setDatatable()
+            }, 555);
         },
 
         async deleteClientJSON(client) {
@@ -457,7 +464,10 @@ export default {
             if (idx !== -1) this.getDoublant.getDoublantGPS.splice(idx, 1);
 
             //
-            await this.$refs.ShowValidationClients.setDatatable()
+            await this.$nextTick()
+            setTimeout(async () => {
+                await this.$refs.ShowValidationClients.setDatatable()
+            }, 555);
         }
     },
 

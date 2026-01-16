@@ -1,315 +1,175 @@
 <template>
+    <div>
+        <loading-page></loading-page>
 
-    <!-- Loading -->
-    <loading-page></loading-page>
+        <InternetErrorPage v-if="!show_internet_error_page"></InternetErrorPage>
 
-    <!-- No Internet -->
-    <InternetErrorPage v-if="!show_internet_error_page"></InternetErrorPage>
-
-    <!-- Login      -->
-    <section v-if="component_login">
-        <login-page></login-page>
-    </section>
-
-    <!-- Dashboard  -->
-    <div v-if="isAuthentificated">
-        <!-- Dashboard + Route -->
-        <section v-if="component_dashboard">
-
-            <div class="container-scroller" id="page_route">
-
-                <!-- BackOffice + Super Admin -->
-                <div v-if="(($isRole('Super Admin'))||($isRole('BU Manager'))||($isRole('BackOffice')||($isRole('Viewer'))))">
-
-                    <header-part></header-part>
-
-                    <div class="container-fluid page-body-wrapper">
-                        <div class="main-panel w-100 animate__animated" id="main_content">
-                            <router-view    :key="$route.path"></router-view>
-                        </div>
-                    </div>
-
+        <div v-if="mobile_device && $isRole('FrontOffice')" v-show="show_install_button" id="BlockInstall" class="w-100 p-3">
+            <div class="row">
+                <div @click="closeInstallBanner()" class="col-2 p-0 d-flex justify-content-center align-items-center">
+                    <i class="mdi mdi-close font-weight-bold text-light" style="font-size: 30px;"></i>
                 </div>
-
-                <!-- FrontOffice -->
-                <div v-if="$isRole('FrontOffice')" class="vh-100">
-                    <header-store-part v-if="!isObsRoute"></header-store-part>
-
-                    <!-- <div class="container-fluid pt-2"> -->
-                    <!-- <div class="main-panel" id="main_content"> -->
-                    <div id="main_content_fo" class="h-100">
-                        <router-view :key="$route.path"></router-view>
-                    </div>
-                    <!-- </div> -->
+                <div class="col-7 text-light p-0">
+                    <div><h5>Routing V2.1 App</h5></div>
+                    <div><span>Get our app for better experience.</span></div>
                 </div>
-
-            </div>
-        </section>
-    </div>
-
-    <!-- Install Banner -->
-    <div v-if="(mobile_device)&&($isRole('FrontOffice'))" v-show="show_install_button"   id="BlockInstall" class="w-100 p-3">
-        <div class="row">
-            <div @click="closeInstallBanner()"  class="col-2 p-0 d-flex justify-content-center align-items-center">
-                <i class="mdi mdi-close font-weight-bold text-light" style="font-size: 30px;"></i>
-            </div>
-
-            <div class="col-7 text-light p-0">
-                <div><h5>Routing V2.1 App</h5></div>
-                <div><span>Get our app for better experience.</span></div>
-            </div>
-
-            <div class="col-3 p-0 d-flex justify-content-center align-items-center">
-                <button id="BlockInstallButton" class="btn btn-light"><b>Install</b></button>
+                <div class="col-3 p-0 d-flex justify-content-center align-items-center">
+                    <button id="BlockInstallButton" class="btn btn-light"><b>Install</b></button>
+                </div>
             </div>
         </div>
-    </div>
 
+        <router-view v-if="appReady"></router-view>
+    </div>
 </template>
 
 <script>
+import { mapGetters, mapActions } from "vuex"
+import InternetErrorPage from "./partials/InternetErrorPage.vue"
 
-    import {mapGetters, mapActions}     from    "vuex"
+export default {
+    components: {
+        InternetErrorPage
+    },
 
-    import InternetErrorPage            from    "./partials/InternetErrorPage.vue"
+    data() {
+        return {
+            appReady: false, // Controls when to mount the router
+            
+            // UI State
+            show_install_button: false,
+            mobile_device: false,
+            show_internet_error_page: true // Default to true (online)
+        }
+    },
 
-    export default {
+    computed: {
+        ...mapGetters({
+            getUser: 'authentification/getUser',
+            getIsOnline: 'internet/getIsOnline'
+        })
+    },
 
-        data() {
+    watch: {
+        getIsOnline(newValue) {
+            this.show_internet_error_page = newValue
+        }
+    },
 
-            return {
+    async mounted() {
+        console.log("App Mounting...")
 
-                user                        :   {}      ,
+        // --- 1. Internet Connection Listeners ---
+        const updateOnlineStatus = (status) => {
+            this.setIsOnlineAction(status)
+            this.show_internet_error_page = status
+        }
+        
+        updateOnlineStatus(window.navigator.onLine)
+        window.addEventListener('online', () => updateOnlineStatus(true))
+        window.addEventListener('offline', () => updateOnlineStatus(false))
 
-                isAuthentificated           :   false   ,
 
-                component_login             :   false   ,
-                component_dashboard         :   false   ,
+        // --- 2. Authentification Check ---
+        const isAuthenticated = await this.checkIfUserIsAuthentificated()
+        
+        if (isAuthenticated) {
+            // Store is valid, user is logged in
+            // The Router Guard will handle sending them to /dashboard
+        } else {
+            // Invalid token
+            this.setUserAction({})
+            this.setAccessTokenAction("")
+            this.setIsAuthentificatedAction(false)
+            // The Router Guard will handle sending them to /login
+        }
 
-                //
+        // --- 3. Device Check ---
+        await this.$nextTick()
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            this.mobile_device = true
+        }
 
-                show_install_button         :   false   ,
+        // --- 4. PWA Setup ---
+        await this.$nextTick()
+        this.pwaFunction()
 
-                //
+        // --- 5. Application Ready ---
+        // Now we let the router take over.
+        this.appReady = true
+    },
 
-                mobile_device               :   false   ,
+    methods: {
+        ...mapActions("authentification", [
+            "setUserAction",
+            "setAccessTokenAction",
+            "setIsAuthentificatedAction"
+        ]),
+        ...mapActions("internet", [
+            "setIsOnlineAction"
+        ]),
 
-                //
-
-                show_internet_error_page    :   false
-            }
-        },
-
-        computed : {
-
-            ...mapGetters({
-                getUser                     :   'authentification/getUser'              ,
-                getAccessToken              :   'authentification/getAccessToken'       ,
-                getIsAuthentificated        :   'authentification/getIsAuthentificated' ,
-
-                getIsOnline                 :   'internet/getIsOnline'                   
-            }),
-
-            isObsRoute () {
-                const p = this.$route && this.$route.path ? this.$route.path : ''
-                return p.startsWith('/route/frontoffice/obs')
-            }
-        },
-
-        beforeMount() {
-
-            this.isAuthentificated              =   false
-        },
-
-        components : {
-
-            InternetErrorPage : InternetErrorPage
-        },
-
-        async mounted() {
-
-            //
-            if(window.navigator.onLine) {
-
-                this.setIsOnlineAction(true)
-            }
-
-            else {
-
-                this.setIsOnlineAction(false)
-            }
-
-            //
-            window.addEventListener('online'    , ()    =>  {this.setIsOnlineAction(true)     });
-            window.addEventListener('offline'   , ()    =>  {this.setIsOnlineAction(false)    });
-
-            // 
-            this.isAuthentificated      =   await this.checkIfUserIsAuthentificated()
-
-            if(this.isAuthentificated) {
-
-                this.user   =   this.getUser
-
-                if(this.user.username) {
-
-                    this.component_login        =   false
-                    this.component_dashboard    =   true
-
-                    this.isAuthentificated      =   true
-                }
-
-                else {
-
-                    this.component_login        =   true
-                    this.component_dashboard    =   false
-
-                    this.isAuthentificated      =   false
-                }
-            }
-
-            else {
-
-                // Update State
-                this.setUserAction({})
-                this.setAccessTokenAction("")
-                this.setIsAuthentificatedAction(false)
-
-                // Router
-                this.$goTo("/login")
-            }
-
-            //
-            await this.$nextTick()
-
-            //
-            if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-
-                this.mobile_device  =   true
-            }
-
-            else {
-
-                this.mobile_device  =   false
-            }
-
-            //
-            await this.$nextTick()
-
-            //
-            this.pwaFunction()
-        },
-
-        methods : {
-
-            ...mapActions("authentification" ,  [
-                "setUserAction"                 ,
-                "setAccessTokenAction"          ,
-                "setIsAuthentificatedAction"    
-            ]),
-
-            ...mapActions("internet" ,  [
-                "setIsOnlineAction"
-            ]),
-
-            //
-
-            async checkIfUserIsAuthentificated() {
-
-                const res                   =   await this.$callApi("post"  ,   "/users/is-authentificated",   null)
+        async checkIfUserIsAuthentificated() {
+            try {
+                // Assuming $callApi handles headers automatically
+                const res = await this.$callApi("post", "/users/is-authentificated", null)
                 
-                if(res.data    ==  "") {
-
+                // If API returns empty string or error, invalid
+                if (!res || res.data === "") {
                     localStorage.removeItem("vuex")
                     return false
                 }
-
+                
+                this.setIsAuthentificatedAction(true)
                 return true
-            },
-
-            pwaFunction() {
-
-                // setTimeout(() => {
-
-                    let deferredPrompt;
-
-                    window.addEventListener('beforeinstallprompt', async (e) => {
-
-                        // Prevent the browser's default prompt from showing
-                        e.preventDefault();
-
-                        // 
-                        deferredPrompt = e;
-
-                        this.show_install_button  = true                
-                    });
-
-                    const BlockInstallButton = document.getElementById('BlockInstallButton');
-
-                    if(BlockInstallButton) {
-
-                        BlockInstallButton.addEventListener('click', async () => {
-
-                            await this.$showLoadingPage()
-
-                            if (deferredPrompt !== null) {
-
-                                deferredPrompt.prompt();
-
-                                const { outcome } = await deferredPrompt.userChoice;
-
-                                if (outcome === 'accepted') {
-                                    deferredPrompt = null;
-                                }
-                            }
-
-                            await this.$hideLoadingPage()
-                        });
-                    }
-
-                // }, 1111)
-            },
-
-            closeInstallBanner() {
-
-                const BlockInstall  =   document.getElementById("BlockInstall")
-
-                BlockInstall.remove()
+            } catch (e) {
+                console.error("Auth check failed", e)
+                return false
             }
         },
 
-        watch : {
+        // --- PWA Logic ---
+        pwaFunction() {
+            let deferredPrompt;
 
-            getUser(newUser, oldUser) {
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                this.show_install_button = true;
+            });
 
-                if(newUser.username) {
-
-                    this.component_login        =   false
-                    this.component_dashboard    =   true
-
-                    this.isAuthentificated      =   true
-
+            // We use a global click listener delegate or ensure the button exists in DOM
+            // Since the banner is in the template now, we can use @click on the button directly ideally,
+            // but keeping your logic similar to before:
+            
+            this.$nextTick(() => {
+                const btn = document.getElementById('BlockInstallButton')
+                if(btn) {
+                    btn.addEventListener('click', async () => {
+                        await this.$showLoadingPage()
+                        if (deferredPrompt) {
+                            deferredPrompt.prompt();
+                            const { outcome } = await deferredPrompt.userChoice;
+                            if (outcome === 'accepted') {
+                                deferredPrompt = null;
+                                this.show_install_button = false;
+                            }
+                        }
+                        await this.$hideLoadingPage()
+                    })
                 }
+            })
+        },
 
-                else {
-
-                    this.component_login        =   true
-                    this.component_dashboard    =   false
-
-                    this.isAuthentificated      =   false
-                }
-            },
-
-            getIsOnline(newValue, oldValue) {
-
-                this.show_internet_error_page   =   newValue
-            }
+        closeInstallBanner() {
+            this.show_install_button = false
         }
     }
-
+}
 </script>
 
 <style>
-
+/* Your Root Styles */
 :root {
     --popper-theme-background-color: #333333;
     --popper-theme-background-color-hover: #333333;
@@ -320,7 +180,5 @@
     --popper-theme-padding: 7px;
     --popper-theme-box-shadow: 0 6px 30px -6px rgba(0, 0, 0, 0.25);
 }
-
 </style>
-
-<style src="@vueform/multiselect/themes/default.css"></style> 
+<style src="@vueform/multiselect/themes/default.css"></style>

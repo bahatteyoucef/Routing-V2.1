@@ -95,10 +95,10 @@
                 let response = await this.$callApi('post',  '/login',   formData)
                 console.log(response)
 
-                // Hide Loading Page
-                await this.$hideLoadingPage()
-
                 if(response.status === 200) {
+
+                    // Hide Loading Page
+                    await this.$hideLoadingPage()
 
                     this.$feedbackSuccess("Logged in !","You have been logged in successfully !")
 
@@ -123,6 +123,9 @@
                 }
 
                 else {
+                    // Hide Loading Page
+                    await this.$hideLoadingPage()
+
                     this.$showErrors("Error !", response.data.errors)
                 }
             }

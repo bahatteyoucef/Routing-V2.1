@@ -548,15 +548,15 @@ export default {
                 const res = await this.$callApi("post", url, formData);
 
                 if (res.status === 200) {
+                    await this.$hideLoadingPage();
                     this.$feedbackSuccess(res.data["header"], res.data["message"]);
                     this.$goBack();
                 } else {
                     this.$showErrors("Error !", res.data.errors);
                 }
             } catch (e) {
-                this.$showErrors("Connection Error", ["Failed to send data."]);
-            } finally {
                 await this.$hideLoadingPage();
+                this.$showErrors("Connection Error", ["Failed to send data."]);
             }
         },
 
@@ -564,6 +564,7 @@ export default {
 
         async getData() {
             await this.$showLoadingPage();
+
             this.start_adding_date = moment(new Date()).format();
 
             try {
@@ -577,9 +578,9 @@ export default {
                 this.willayas = resCombo.data.willayas;
             } catch (e) {
                 console.error(e);
-            } finally {
-                await this.$hideLoadingPage();
             }
+
+            await this.$hideLoadingPage();
         },
 
         async getComboData() {
@@ -595,8 +596,8 @@ export default {
                 this.cities = res.data.cities;
                 this.client.CityNo = ""; // Reset city when district changes
             } finally {
-                await this.$hideLoadingPage();
             }
+            await this.$hideLoadingPage();
         },
 
         //  //  //  //  //
@@ -698,7 +699,7 @@ export default {
                     this.point_is_inside_user_polygons = false;
                     setTimeout(() => {
                         this.showPositionOnMap('show_map'); 
-                    }, 200); // Small delay to ensure DIV is rendered via v-show
+                    }, 200);
                 }
             }
 

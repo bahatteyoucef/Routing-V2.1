@@ -223,16 +223,15 @@ export default {
         },
 
         // BarCode Methods (No changes needed here)
-        showHideCodeBar() {
+        async showHideCodeBar() {
 
             if(this.show_barcode_div    ==  false) {
 
                 this.show_barcode_div   =   true
 
-                setTimeout(() => {
+                await this.$nextTick()
 
-                    this.setBarCodeReader()
-                }, 555);
+                this.setBarCodeReader()
             }
 
             else {

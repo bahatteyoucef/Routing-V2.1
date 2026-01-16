@@ -156,11 +156,11 @@ export default {
                 
                 else{
 
-                    // Send Errors
-                    this.$showErrors("Error !", res.data.errors)
-
                     // Hide Loading Page
                     await this.$hideLoadingPage()
+
+                    // Send Errors
+                    this.$showErrors("Error !", res.data.errors)
                 }            
             }
 
@@ -182,11 +182,11 @@ export default {
                 
                 else{
 
-                    // Send Errors
-                    this.$showErrors("Error !", res.data.errors)
-
                     // Hide Loading Page
                     await this.$hideLoadingPage()
+
+                    // Send Errors
+                    this.$showErrors("Error !", res.data.errors)
                 }            
             }
 
@@ -208,11 +208,11 @@ export default {
                 
                 else{
 
-                    // Send Errors
-                    this.$showErrors("Error !", res.data.errors)
-
                     // Hide Loading Page
                     await this.$hideLoadingPage()
+
+                    // Send Errors
+                    this.$showErrors("Error !", res.data.errors)
                 }            
             }
         },

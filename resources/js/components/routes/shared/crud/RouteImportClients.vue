@@ -284,11 +284,11 @@ export default {
 
                 else {
 
-                    // Send Errors
-                    this.$showErrors("Error !", ["No Images to Download"])
-
                     //
                     await this.$hideLoadingPage()
+
+                    // Send Errors
+                    this.$showErrors("Error !", ["No Images to Download"])
                 }
 
             }).catch(error => {
@@ -329,11 +329,11 @@ export default {
 
                 else {
 
-                    // Send Errors
-                    this.$showErrors("Error !", ["No Images to Download"])
-
                     //
                     await this.$hideLoadingPage()
+
+                    // Send Errors
+                    this.$showErrors("Error !", ["No Images to Download"])
                 }
 
             }).catch(error => {
@@ -374,11 +374,11 @@ export default {
 
                 else {
 
-                    // Send Errors
-                    this.$showErrors("Error !", ["No Images to Download"])
-
                     //
                     await this.$hideLoadingPage()
+
+                    // Send Errors
+                    this.$showErrors("Error !", ["No Images to Download"])
                 }
 
             }).catch(error => {
@@ -422,10 +422,10 @@ export default {
             XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
             const excelBuffer   =   XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-            this.saveExcelFile(excelBuffer, this.route_import.libelle+' Clients.xlsx');
+            await this.saveExcelFile(excelBuffer, this.route_import.libelle+' Clients.xlsx');
         },
 
-        saveExcelFile(buffer, filename) {
+        async saveExcelFile(buffer, filename) {
 
             const data = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
@@ -448,11 +448,10 @@ export default {
 
                 a.click();
 
-                setTimeout(() => {
+                await this.$nextTick()
 
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
-                }, 0);
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
             }
         },
 

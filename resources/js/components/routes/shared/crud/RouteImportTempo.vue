@@ -244,9 +244,11 @@ export default {
             await this.$showLoadingPage()
 
             const res                   =   await this.$callApi("post"  ,   "/route-imports-tempo/"+this.route_import.id_route_import_tempo+"/clients-tempo/doubles", null)
-            console.log(res)
-            console.log(this.route_import)
-            console.log(this.route_import.id_route_import_tempo)
+            // console.log(res)
+            // console.log(this.route_import)
+            // console.log(this.route_import.id_route_import_tempo)
+
+            console.log(res.data.doubles.getDoublantGPS)
 
             if(res.status===200){
 
@@ -274,6 +276,9 @@ export default {
         //
 
         async updateDoublantsJSON(validation_clients, validation_type) {
+
+            console.log(validation_clients)
+            console.log(validation_type)
 
             const updatableFields   =   [
                 "NewCustomer"               ,

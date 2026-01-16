@@ -35,6 +35,11 @@ class RouteImportController extends Controller {
 
     public function store(Request $request) {
         try {
+
+            //
+            DB::beginTransaction();
+            //
+
             // Validation
             $validator = RouteImport::validateStore($request);
             if ($validator->fails()) {
@@ -44,12 +49,21 @@ class RouteImportController extends Controller {
             // NOTE: RouteImport::storeRouteImport() performs its own transaction internally.
             $route_import = RouteImport::storeRouteImport($request);
 
+            //
+            DB::commit();
+            //
+
             return response()->json([
                 "header"       => "Route Added !",
                 "message"      => "a new route has been added successfuly!",
                 "route_import" => $route_import
             ], 201);
         } catch (Throwable $erreur) {
+
+            //
+            DB::rollBack();
+            //
+
             // If the model already handled transaction rollback, this just returns error.
             return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
@@ -57,7 +71,10 @@ class RouteImportController extends Controller {
 
     public function update(Request $request, int $id_route_import) {
         try {
+
+            //
             DB::beginTransaction();
+            //
 
             $validator = RouteImport::validateUpdate($request);
             if ($validator->fails()) {
@@ -102,14 +119,27 @@ class RouteImportController extends Controller {
 
     public function delete(int $id_route_import) {
         try {
+
+            //
+            DB::beginTransaction();
+            //
+
             // NOTE: RouteImport::deleteRouteImport() runs its own DB transaction internally.
             RouteImport::deleteRouteImport($id_route_import);
+
+            //
+            DB::commit();
+            //
 
             return response()->json([
                 "header"  => "Route Deleted !",
                 "message" => "a route has been deleted successfuly!"
             ]);
         } catch (Throwable $erreur) {
+            //
+            DB::rollBack();
+            //
+
             return response()->json(['errors' => [$erreur->getMessage()]], 422);
         }
     }

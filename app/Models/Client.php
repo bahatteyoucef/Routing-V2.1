@@ -119,9 +119,44 @@ class Client extends Model
 
         //
 
-        $validator->sometimes(['AvailableBrands'],  ["required_if:OpenCustomer,Ouvert"] , function (Fluent $input) {
-    
-            return $input->BrandAvailability    ==  "";
+        $validator->sometimes('AvailableBrands', ['required_if:OpenCustomer,Ouvert', function ($attribute, $value, $fail) {
+            if ($value === null || $value === '') {
+                return;
+            }
+
+            // decode if string
+            if (is_string($value)) {
+                $decoded = json_decode($value, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    $fail("Le champ $attribute doit être un JSON valide ou un tableau associatif.");
+                    return;
+                }
+            } elseif (is_array($value)) {
+                $decoded = $value;
+            } else {
+                $fail("Le champ $attribute doit être un JSON ou un tableau.");
+                return;
+            }
+
+            // empty array is acceptable (represents [])
+            if (empty($decoded)) {
+                return;
+            }
+
+            // validate keys and values: keys must be brand_N and values non-empty strings
+            foreach ($decoded as $key => $val) {
+                if (!is_string($key) || !preg_match('/^brand_\d+$/', $key)) {
+                    $fail("Les clés de $attribute doivent être 'brand_N' (ex: 'brand_0'). Clé invalide: " . (string)$key);
+                    return;
+                }
+                if (!is_string($val) || trim($val) === '') {
+                    $fail("Les valeurs de $attribute doivent être des chaînes non vides. Valeur invalide pour '{$key}'.");
+                    return;
+                }
+            }
+        }], function (Fluent $input) {
+            // your condition: only run the above rules when BrandAvailability is empty
+            return $input->BrandAvailability == "";
         });
 
         //
@@ -387,14 +422,12 @@ class Client extends Model
     //  //  //  //  //  Store/Update/Delete Clients
     //  //  //  //  //
 
-    /*
-
     public static function storeClients(Request $request, int $id_route_import) {
 
         // Assume clients is a JSON string/array, not an array of objects for simplicity.
         // If it's an array of objects, convert it using array_map or json_decode(true).
-        $clientsData    =   json_decode($request->get('clients'), true);
-        if (empty($clientsData)) return;
+        $clientsData    =   ClientTempo::where('created_by', Auth::user()->id)
+                                ->get();
 
         $now            =   Carbon::now();
         $createdAt      =   $now->format('d F Y'); // Custom format from boot()
@@ -403,74 +436,96 @@ class Client extends Model
         
         $dataToInsert   =   [];
 
-        DB::transaction(function () use ($clientsData, $id_route_import, $createdAt, $updatedAt, $ownerBo, &$dataToInsert) {
-            foreach ($clientsData as $client_elem) {
-                // 1. Validation and Error Check (Moved to top for efficiency)
-                if (isset($client_elem['CustomerCode']) && preg_match('/[\/\\\\:*?"<>|& ]/', $client_elem['CustomerCode'])) {
-                    // Must throw here as per original logic, stops the batch insert.
-                    throw new \Exception("Le champ CustomerCode contient des caractères interdits : ".$client_elem['CustomerCode']);
-                }
+        foreach ($clientsData as $client_elem) {
+            // 1. Validation and Error Check (Moved to top for efficiency)
+            if (isset($client_elem['CustomerCode']) && preg_match('/[\/\\\\:*?"<>|& ]/', $client_elem['CustomerCode'])) {
+                // Must throw here as per original logic, stops the batch insert.
+                throw new \Exception("Le champ CustomerCode contient des caractères interdits : ".$client_elem['CustomerCode']);
+            }
+            
+            // 2. Data Transformation (using null coalescing ?? and strtoupper)
+            $dataToInsert[] = [
+                'NewCustomer'               =>  $client_elem['NewCustomer']                             ??  ''              ,
+                'CustomerIdentifier'        =>  $client_elem['CustomerIdentifier']                      ??  ''              ,
+                'CustomerCode'              =>  $client_elem['CustomerCode']                            ??  ''              ,
+                'OpenCustomer'              =>  $client_elem['OpenCustomer']                            ??  ''              ,
+                'CustomerNameE'             =>  mb_strtoupper($client_elem['CustomerNameE'], 'UTF-8')   ??  ''              ,
+                'CustomerNameA'             =>  mb_strtoupper($client_elem['CustomerNameA'], 'UTF-8')   ??  ''              ,
+                'Latitude'                  =>  $client_elem['Latitude']                                ??  0               ,
+                'Longitude'                 =>  $client_elem['Longitude']                               ??  0               ,
+                'Address'                   =>  $client_elem['Address']                                 ??  ''              ,
+                'RvrsGeoAddress'            =>  $client_elem['RvrsGeoAddress']                          ??  ''              ,
+                'DistrictNo'                =>  $client_elem['DistrictNo']                              ??  ''              ,
+                'DistrictNameE'             =>  $client_elem['DistrictNameE']                           ??  ''              ,
+                'CityNo'                    =>  $client_elem['CityNo']                                  ??  ''              ,
+                'CityNameE'                 =>  $client_elem['CityNameE']                               ??  ''              ,
+                'Tel'                       =>  $client_elem['Tel']                                     ??  ''              ,
+                'tel_status'                =>  $client_elem['tel_status']                              ??  ''              ,
+                'tel_comment'               =>  $client_elem['tel_comment']                             ??  ''              ,
+                'CustomerType'              =>  $client_elem['CustomerType']                            ??  ''              ,
+
+                'status'                    =>  $client_elem['status']                                  ??  ''              ,
+                'nonvalidated_details'      =>  $client_elem['nonvalidated_details']                    ??  ''              ,
+
+                'Neighborhood'              =>  $client_elem['Neighborhood']                            ??  ''              ,
+                'Landmark'                  =>  $client_elem['Landmark']                                ??  ''              ,
+                'BrandAvailability'         =>  $client_elem['BrandAvailability']                       ??  ''              ,
+                'BrandSourcePurchase'       =>  $client_elem['BrandSourcePurchase']                     ??  ''              ,
+
+                'Frequency'                 =>  $client_elem['Frequency']                               ??  ''              ,
+                'SuperficieMagasin'         =>  $client_elem['SuperficieMagasin']                       ??  ''              ,
+                'NbrAutomaticCheckouts'     =>  $client_elem['NbrAutomaticCheckouts']                   ??  ''              ,
+
+                'AvailableBrands'           =>  $client_elem['AvailableBrands']                         ??  ''              ,
+                'FromageAvailability'       =>  $client_elem['FromageAvailability']                     ??  ''              ,
+                'EmplacementFromage'        =>  $client_elem['EmplacementFromage']                      ??  ''              ,
+
+                'Classification'            =>  $client_elem['Classification']                          ??  ''              , 
+
+                'start_adding_time'         =>  $client_elem['start_adding_time']                       ??  ''              ,
+                'adding_duration'           =>  $client_elem['adding_duration']                         ??  ''              ,
+
+                'JPlan'                     =>  $client_elem['JPlan']                                   ??  ''              ,
+                'Journee'                   =>  $client_elem['Journee']                                 ??  ''              ,
+
+                'comment'                   =>  $client_elem['comment']                                 ??  ''              ,
+
+                'facade_image'                              => $client_elem['facade_image']                         ?? ''   ,
+                'facade_image_original_name'                => $client_elem['facade_image_original_name']           ?? ''   ,
+
+                'in_store_image'                            => $client_elem['in_store_image']                       ?? ''   ,
+                'in_store_image_original_name'              => $client_elem['in_store_image_original_name']         ?? ''   ,
+
+                'CustomerBarCode_image'                     => $client_elem['CustomerBarCode_image']                ?? ''   ,
+                'CustomerBarCode_image_original_name'       => $client_elem['CustomerBarCode_image_original_name']  ?? ''   ,
                 
-                // 2. Data Transformation (using null coalescing ?? and strtoupper)
-                $dataToInsert[] = [
-                    'NewCustomer'               =>  $client_elem['NewCustomer']                             ??  ''              ,
-                    'CustomerIdentifier'        =>  $client_elem['CustomerIdentifier']                      ??  ''              ,
-                    'CustomerCode'              =>  $client_elem['CustomerCode']                            ??  ''              ,
-                    'OpenCustomer'              =>  $client_elem['OpenCustomer']                            ??  ''              ,
-                    'CustomerNameE'             =>  mb_strtoupper($client_elem['CustomerNameE'], 'UTF-8')   ??  ''              ,
-                    'CustomerNameA'             =>  mb_strtoupper($client_elem['CustomerNameA'], 'UTF-8')   ??  ''              ,
-                    'Latitude'                  =>  $client_elem['Latitude']                                ??  0               ,
-                    'Longitude'                 =>  $client_elem['Longitude']                               ??  0               ,
-                    'Address'                   =>  $client_elem['Address']                                 ??  ''              ,
-                    'RvrsGeoAddress'            =>  $client_elem['RvrsGeoAddress']                          ??  ''              ,
-                    'DistrictNo'                =>  $client_elem['DistrictNo']                              ??  ''              ,
-                    'DistrictNameE'             =>  $client_elem['DistrictNameE']                           ??  ''              ,
-                    'CityNo'                    =>  $client_elem['CityNo']                                  ??  ''              ,
-                    'CityNameE'                 =>  $client_elem['CityNameE']                               ??  ''              ,
-                    'Tel'                       =>  $client_elem['Tel']                                     ??  ''              ,
-                    'tel_status'                =>  $client_elem['tel_status']                              ??  ''              ,
-                    'tel_comment'               =>  $client_elem['tel_comment']                             ??  ''              ,
-                    'CustomerType'              =>  $client_elem['CustomerType']                            ??  ''              ,
+                'BrandAvailability_image'                   => $client_elem['BrandAvailability_image']                  ?? ''   ,
+                'BrandAvailability_image_original_name'     => $client_elem['BrandAvailability_image_original_name']    ?? ''   ,
+                
+                'emplacement_fromage_image'                 => $client_elem['emplacement_fromage_image']                ?? ''   ,
+                'emplacement_fromage_image_original_name'   => $client_elem['emplacement_fromage_image_original_name']  ?? ''   ,
 
-                    'status'                    =>  $client_elem['status']                                  ??  ''              ,
+                // Manually include the event/auth data
+                'created_at'                =>  $client_elem['created_at']                              ??  $createdAt      ,
+                'updated_at'                =>  $updatedAt                                                                  , // set on insert
+                'owner_bo'                  =>  $ownerBo                                                                    ,
+                'id_route_import'           =>  $id_route_import                                                            ,
+                'owner'                     =>  $client_elem['owner']                                   ??  (Auth::check() ? Auth::user()->id : null) // Assuming 'owner' is the request owner field
+            ];
+        }
 
-                    'Neighborhood'              =>  $client_elem['Neighborhood']                            ??  ''              ,
-                    'Landmark'                  =>  $client_elem['Landmark']                                ??  ''              ,
-                    'BrandAvailability'         =>  $client_elem['BrandAvailability']                       ??  ''              ,
-                    'BrandSourcePurchase'       =>  $client_elem['BrandSourcePurchase']                     ??  ''              ,
+        // 3. Batch Insert (Use chunking for large datasets, e.g., 500 records per query)
+        $chunks     =   array_chunk($dataToInsert, 500);
 
-                    'Frequency'                 =>  $client_elem['Frequency']                               ??  ''              ,
-                    'SuperficieMagasin'         =>  $client_elem['SuperficieMagasin']                       ??  ''              ,
-                    'NbrAutomaticCheckouts'     =>  $client_elem['NbrAutomaticCheckouts']                   ??  ''              ,
+        foreach ($chunks as $chunk) {
+            $chunk = array_map(function($row) {
+                $row['AvailableBrands'] = json_encode($row['AvailableBrands'], JSON_UNESCAPED_UNICODE);
+                return $row;
+            }, $chunk);
 
-                    'AvailableBrands'           =>  $client_elem['AvailableBrands']                         ??  ''              ,
-
-                    'start_adding_time'         =>  $client_elem['start_adding_time']                       ??  ''              ,
-                    'adding_duration'           =>  $client_elem['adding_duration']                         ??  ''              ,
-
-                    'JPlan'                     =>  $client_elem['JPlan']                                   ??  ''              ,
-                    'Journee'                   =>  $client_elem['Journee']                                 ??  ''              ,
-
-                    'comment'                   =>  $client_elem['comment']                                 ??  ''              ,
-                    
-                    // Manually include the event/auth data
-                    'created_at'                =>  $client_elem['created_at']                              ??  $createdAt      ,
-                    'updated_at'                =>  $updatedAt                                                                  , // set on insert
-                    'owner_bo'                  =>  $ownerBo                                                                    ,
-                    'id_route_import'           =>  $id_route_import                                                            ,
-                    'owner'                     =>  $client_elem['owner']                                   ??  (Auth::check() ? Auth::user()->id : null) // Assuming 'owner' is the request owner field
-                ];
-            }
-
-            // 3. Batch Insert (Use chunking for large datasets, e.g., 500 records per query)
-            $chunks     =   array_chunk($dataToInsert, 500);
-            foreach ($chunks as $chunk) {
-                Client::insert($chunk); // Use insert() which is much faster than save()
-            }
-        });
+            Client::insert($chunk); // Use insert() which is much faster than save()
+        }
     }
-
-    */
 
     public static function updateClients(Request $request, int $id_route_import) {
         // Ensure clients is decoded as an associative array for consistency
@@ -792,12 +847,87 @@ class Client extends Model
         $values = array_values($assoc);
 
         if (is_array($client)) {
+            $client['AvailableBrands'] = $values;
             $client['AvailableBrands_array_formatted'] = $values;
             $client['AvailableBrands_string_formatted'] = implode(", ", $values);
         } else {
+            $client->AvailableBrands = $values;
             $client->AvailableBrands_array_formatted = $values;
             $client->AvailableBrands_string_formatted = implode(", ", $values);
         }
         return $client;
+    }
+
+    //  //  //  //  //
+    //  //  //  //  //  Validators
+    //  //  //  //  //
+
+    public static function normalizeCustomerCode($code) {
+        $code = (string) ($code ?? '');
+        $code = trim($code);
+
+        // If empty, return empty string (no validation needed)
+        if ($code === '') {
+            return $code;
+        }
+
+        // Forbidden characters: / \ : * ? " < > | & and space
+        if (preg_match('/[\/\\\\:*?"<>|& ]/', $code)) {
+            throw new \Exception("Le champ CustomerCode contient des caractères interdits : " . $code);
+        }
+
+        return $code;
+    }
+
+    public static function normalizeCreatedAt($value, ?string $fallback = null) {
+        if (empty($value)) {
+            if ($fallback === null) {
+                throw new \Exception('No created_at provided and no fallback supplied.');
+            }
+            return $fallback;
+        }
+
+        // Strict format Y-m-d H:i:s
+        $dt = \DateTime::createFromFormat('Y-m-d H:i:s', (string)$value);
+        $errors = \DateTime::getLastErrors();
+        if ($dt === false || ($errors && ($errors['warning_count'] > 0 || $errors['error_count'] > 0))) {
+            throw new \Exception("Invalid created_at format. Required format: Y-m-d H:i:s. Provided: " . (string)$value);
+        }
+
+        return Carbon::instance($dt)->toDateTimeString();
+    }
+
+    public static function normalizeAvailableBrands($raw) {
+        if (is_string($raw)) {
+            $decoded = json_decode($raw, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception('AvailableBrands contains invalid JSON: ' . json_last_error_msg());
+            }
+        } elseif (is_array($raw)) {
+            $decoded = $raw;
+        } else {
+            throw new \Exception('AvailableBrands must be an array or a JSON string.');
+        }
+
+        if (empty($decoded)) {
+            return '[]';
+        }
+
+        foreach ($decoded as $key => $value) {
+            if (!is_string($key) || !preg_match('/^brand_\d+$/', $key)) {
+                throw new \Exception("AvailableBrands keys must be 'brand_N' (e.g. 'brand_0'). Invalid key: " . var_export($key, true));
+            }
+
+            if (!is_string($value) || trim($value) === '') {
+                throw new \Exception("AvailableBrands values must be non-empty strings. Invalid value for '{$key}': " . var_export($value, true));
+            }
+        }
+
+        $json = json_encode($decoded, JSON_UNESCAPED_UNICODE);
+        if ($json === false) {
+            throw new \Exception('Failed to encode AvailableBrands to JSON.');
+        }
+
+        return $json;
     }
 }
