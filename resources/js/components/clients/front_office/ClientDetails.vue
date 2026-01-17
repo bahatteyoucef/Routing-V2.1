@@ -168,7 +168,6 @@ export default {
         async openDirectionsInGoogleMaps() {
 
             const response      =   await this.$currentPosition(this.getUser.accuracy)
-            console.log(response)
 
             if(response.success) {
 

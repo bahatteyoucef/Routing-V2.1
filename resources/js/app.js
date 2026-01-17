@@ -19,11 +19,6 @@ const app           =   createApp(App)
 
 // Event Bus
 
-import mitt from 'mitt'
-
-const emitter                                   =   mitt()
-app.config.globalProperties.emitter             =   emitter
-
 app.config.globalProperties.$colors             =   [   '#A52714'       , '#F9A825'     , '#3949AB'     , '#817717'     , '#558B2F'     , 
                                                         '#097138'       , '#006064'     , '#01579B'     , '#1A237E'     , '#673AB7'     ,
                                                         '#4E342E'       , '#C2185B'     , '#F70000'     , '#F57C00'     , '#000000'     ,

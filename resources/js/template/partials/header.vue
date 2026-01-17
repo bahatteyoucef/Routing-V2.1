@@ -136,6 +136,8 @@ import Multiselect              from '@vueform/multiselect'
 
 import {mapGetters, mapActions} from    "vuex"
 
+import emitter                  from    "@/utils/emitter"
+
 export default {
 
     data() {
@@ -160,12 +162,7 @@ export default {
     computed : {
 
         ...mapGetters({
-            getUser                     :   'authentification/getUser'              ,
-            getAccessToken              :   'authentification/getAccessToken'       ,
-            getIsAuthentificated        :   'authentification/getIsAuthentificated' ,
-
-            getAddClient                :   'client/getAddClient'                   ,
-            getUpdateClient             :   'client/getUpdateClient'                
+            getUser                     :   'authentification/getUser'
         }),
     },
 
@@ -180,7 +177,7 @@ export default {
         await this.getRouteTempo()
         await this.fetchMaps()
 
-        this.emitter.on('reSetRouteImport'          , async ()    =>  {
+        emitter.on('reSetRouteImport'          , async ()    =>  {
 
           this.route_import_existe  = false
           await this.fetchMaps()
@@ -197,7 +194,7 @@ export default {
 
     unmounted() {
 
-        this.emitter.off('reSetRouteImport')
+        emitter.off('reSetRouteImport')
     },
 
     methods: {
@@ -222,11 +219,7 @@ export default {
 
             this.$callApi("post",    "/route-imports", null)
             .then((res)=> {
-
-                console.log(res)
-
                 this.liste_route_import = res.data.liste_route_import
-
                 this.prepareRouteLink()
             })
         },
@@ -312,13 +305,6 @@ export default {
 
         //
 
-        async showProfile() {
-
-          this.$router.push('/users/'+this.getUser.id+'/show')
-        },
-
-        //
-
         async logOut() {
 
           const res = await this.$callApi("post", "/logout" , null)
@@ -344,37 +330,6 @@ export default {
         },
 
         // 
-
-        async addClient() {
-
-          let response     =   await this.$currentPosition(this.getUser.accuracy)
-
-          if(response.success) {
-
-            this.$router.push('/route-imports/'+this.getUser.id_route_import+'/clients/add/'+response.position.coords.latitude+'/'+response.position.coords.longitude)
-          }
-
-          else {
-
-            //
-            this.$customMessages("GPS Error", "Vérifiez si votre GPS est activée", "error", "OK", "", "", "")
-          }
-        },
-
-        async updateClient() {
-
-          if(this.getUpdateClient) {
-
-            this.$router.push('/route-imports/'+this.getUser.id_route_import+'/clients/'+this.getUpdateClient.id+'/update')
-          }
-        },
-
-        getClients() {
-
-          this.$router.push('/route-imports/'+this.getUser.id_route_import+'/clients')
-        },
-
-        //
 
         hideProfileHeaderList() {
 

@@ -37,6 +37,8 @@
 import ModalClientUpdate    from    "@/components/clients/shared/ModalClientUpdate.vue"
 import CardDoublants        from    "@/components/routes/shared/operations/validations/CardDoublants.vue"
 
+import emitter                  from    "@/utils/emitter"
+
 export default {
 
     data() {
@@ -69,38 +71,38 @@ export default {
 
         await this.getComboData()
 
-        this.emitter.on("reSetValidationClientUpdate"       , (validation_type) => {
+        emitter.on("reSetValidationClientUpdate"       , (validation_type) => {
             this.validation_type    =   validation_type
         })
 
-        this.emitter.on("refreshDoublantCustomerCode"       , async (validation_clients)    =>  {
+        emitter.on("refreshDoublantCustomerCode"       , async (validation_clients)    =>  {
             await this.updateDoublantsJSON(validation_clients, "CustomerCode")
         })
 
-        this.emitter.on("refreshDoublantCustomerNameE"      , async (validation_clients)    =>  {
+        emitter.on("refreshDoublantCustomerNameE"      , async (validation_clients)    =>  {
             await this.updateDoublantsJSON(validation_clients, "CustomerNameE")
         })
 
-        this.emitter.on("refreshDoublantTel"                , async (validation_clients)    =>  {
+        emitter.on("refreshDoublantTel"                , async (validation_clients)    =>  {
             await this.updateDoublantsJSON(validation_clients, "Tel")
         })
 
-        this.emitter.on("refreshDoublantGPS"                , async (validation_clients)    =>  {
+        emitter.on("refreshDoublantGPS"                , async (validation_clients)    =>  {
             await this.updateDoublantsJSON(validation_clients, "GPS")
         })
     },
 
     unmounted() {
 
-        this.emitter.off('reSetUpdate')
-        this.emitter.off('reSetDelete')
+        emitter.off('reSetUpdate')
+        emitter.off('reSetDelete')
 
-        this.emitter.off('reSetValidationClientUpdate')
-        this.emitter.off('reSetClientsDecoupeByJourneeAdd')
-        this.emitter.off('refreshDoublantCustomerCode')
-        this.emitter.off('refreshDoublantCustomerNameE')
-        this.emitter.off('refreshDoublantTel')
-        this.emitter.off('refreshDoublantGPS')
+        emitter.off('reSetValidationClientUpdate')
+        emitter.off('reSetClientsDecoupeByJourneeAdd')
+        emitter.off('refreshDoublantCustomerCode')
+        emitter.off('refreshDoublantCustomerNameE')
+        emitter.off('refreshDoublantTel')
+        emitter.off('refreshDoublantGPS')
     },
 
     methods : {
@@ -136,7 +138,6 @@ export default {
             await this.$showLoadingPage()
 
             const res   =   await this.$callApi("post"  ,   "/route-imports/"+this.id_route_import+"/clients/doubles", null)
-            console.log(res)
 
             if(res.status===200){
 

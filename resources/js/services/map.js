@@ -2,6 +2,8 @@
 
 import store    from    "../store/store"
 
+import emitter  from    "@/utils/emitter"
+
 export default class Map {
     
     constructor() {
@@ -396,6 +398,7 @@ export default class Map {
 
         // Add click event for modal update
         marker.on('click', (event) => {
+            console.log(event)
             this.$updateModalClient(event.target.client);
         });
     }
@@ -630,7 +633,7 @@ export default class Map {
             this.editable_layers_journey_plan_territory.addLayer(poly);
 
     // wire edit & click exactly as before
-    poly.on('edit',  () => console.log('territory edited!'));
+    poly.on('edit',  () => {});
     poly.on('click', e => this.$addTerritory(e));
   }
     }
@@ -1138,18 +1141,15 @@ export default class Map {
     //  //  //  //  Left Tools Events   //  //  //  //
 
     $updateModalClientsRoute(clients_change_route) {
-
-        store.commit("client/setClientsChangeRoute" , clients_change_route)
+        emitter.emit('mapUpdateMultiClients', clients_change_route)
     }
 
     $addModalClient(event) {
-
-        store.commit("client/setAddClient"          ,  event.layer.getLatLng())
+        emitter.emit('mapAddClient', event.layer.getLatLng())
     }
 
     $updateModalClient(client) {
-
-        store.commit("client/setUpdateClient"       , client)
+        emitter.emit('mapUpdateClient', client)
     }
 
     //  //  //  //  //  //  //  //  //  //  //  //  //
@@ -1244,7 +1244,7 @@ export default class Map {
         //
 
         // Add Journey Plan
-        store.commit("journey_plan/setAddJourneyPlan" ,  {"latlngs" : latlngs , "journey_plan" : journey_plan})
+        emitter.emit('mapAddTerritory', {"latlngs" : latlngs , "journey_plan" : journey_plan})
     }
 
     $addJourneeTerritory(event) {
@@ -1268,7 +1268,7 @@ export default class Map {
         //
 
         // Add Journey Plan
-        store.commit("journey_plan/setAddJourneyPlan" ,  {"journee" : journee})
+        emitter.emit('mapAddTerritory', {"journee" : journee})
     }
 
     $addUserTerritory(event) {
@@ -1292,7 +1292,7 @@ export default class Map {
         //
 
         // Add User Territory
-        store.commit("journey_plan/setAddJourneyPlan" ,  {"user" : user})
+        emitter.emit('mapAddTerritory', {"user" : user})
     }
 
     $addTerritory(event) {
@@ -1307,7 +1307,7 @@ export default class Map {
         //
 
         // Add Journey Plan
-        store.commit("journey_plan/setAddJourneyPlan" ,  {"latlngs" : latlngs})
+        emitter.emit('mapAddTerritory', {"latlngs" : latlngs})
     }
 
     //  //  //  //  //  //  //  //  //  //  //  //  //  //
@@ -1381,23 +1381,12 @@ export default class Map {
 
         // Delete all kml layers
         this.kml_layers.forEach(kml_layer => {
-
-            console.log(kml_layer)
-
             this.map.removeLayer(kml_layer);            
         })
 
         // Add all kml layers
         kml_layers.forEach(kml_layer => {
-            
-            console.log(kml_layer)
-
-            // Add new layers
             this.kml_layers[kml_layer]   =   omnivore.kml('/kml/'+kml_layer+'.kml').addTo(this.map);
         });
-
-        console.log(this.kml_layers)
     }
-
-    //  //  //  //  //  //  //  //  //  //  //  //  //  //
 }

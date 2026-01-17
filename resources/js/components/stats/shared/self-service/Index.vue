@@ -449,7 +449,6 @@ export default {
 
         // request backend to also return matching clients (no pagination)
         const res = await this.$callApi("post", "/statistics/self-service", formData);
-        console.log(res)
 
         // expecting: { stats_details: {...}, clients: [...] }
         if (res.status == 200) {

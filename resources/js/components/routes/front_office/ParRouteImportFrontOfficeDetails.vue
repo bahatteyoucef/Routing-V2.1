@@ -34,6 +34,8 @@ import {mapGetters, mapActions} from "vuex"
 
 import Map                      from '@/services/map'
 
+import emitter                  from    "@/utils/emitter"
+
 export default {
     
     data() {
@@ -117,7 +119,6 @@ export default {
 
     computed: {
         ...mapGetters({
-            getUpdateClient         :   'client/getUpdateClient'                ,
             getSelectedClients      :   'client/getSelectedClients'             ,
 
             //
@@ -142,15 +143,14 @@ export default {
 
         // 
         await this.getData()
+
+        //
+        emitter.on('mapUpdateClient'   , async (client)    =>  {
+            this.$router.push('/route-imports/'+this.$route.params.id_route_import+'/clients/'+client.id+'/details')
+        })
     },
 
     methods : {
-
-        ...mapActions("client" ,  [
-            "setAllClientsAction"     ,
-        ]),
-
-        //
 
         async getData() {
 
@@ -160,8 +160,6 @@ export default {
             if(this.is_database_clients_map) {
 
                 const res                   =   await this.$callApi("post"  ,   "/route/obs/route-imports/"+this.$route.params.id_route_import+"/details/for-front-office",   null)
-                console.log(res)
-
                 this.route_import           =   res.data.route_import
 
                 // Set Clients
@@ -175,9 +173,6 @@ export default {
                 // Set Clients
                 this.route_import.clients   =   this.getSelectedClients
             }
-
-            // Set Data in Vuex
-            this.setAllClientsAction(this.route_import.clients)
 
             // Set Markers
             this.setRouteMarkers()
@@ -346,17 +341,6 @@ export default {
 
             // Clear Route Data
             this.map_instance.$showCurrentPosition()
-        },
-    },
-
-    watch: {
-
-        async getUpdateClient(newValue, oldValue) {
-
-            if(newValue != null) {
-                
-                this.$router.push('/route-imports/'+this.$route.params.id_route_import+'/clients/'+newValue.id+'/details')
-            }
         },
     },
 }

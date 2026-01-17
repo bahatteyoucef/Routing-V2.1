@@ -161,7 +161,6 @@ export default {
         ...mapActions("client", [
             "setSelectedClientsAction",
             "setFilterStatusRouteImportClientsByStatusAction",
-            "setUpdateClientAction"
         ]),
 
         // getClients, getDetailsPage, showMap (No changes needed here)
@@ -175,8 +174,6 @@ export default {
 
             this.$callApi("post",   "/route-imports/"+this.getUser.id_route_import+"/clients/by-status",     formData).then(async (res)=> { 
                 
-                console.log(res)
-
                 //
                 this.clients            =   res.data.clients
                 this.clients_filtered   =   this.clients
@@ -190,9 +187,6 @@ export default {
         },
 
         getDetailsPage(client) {
-
-            this.setUpdateClientAction(client)      
-
             this.$router.push('/route-imports/'+client.id_route_import+'/clients/'+client.id+'/details')
         },
 

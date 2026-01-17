@@ -81,6 +81,8 @@
 
 import ShowValidationClients    from    "./ShowValidationClients.vue"
 
+import emitter                  from    "@/utils/emitter"
+
 export default {
 
     data() {
@@ -103,46 +105,46 @@ export default {
 
     mounted() {
 
-        this.emitter.on("updateDoublesCustomerCode"         , async (client)    =>  {
+        emitter.on("updateDoublesCustomerCode"         , async (client)    =>  {
             await this.updateClientJSON(client)
-            this.emitter.emit("reSetUpdate", client)
+            emitter.emit("reSetUpdate", client)
         })
 
-        this.emitter.on("updateDoublesCustomerNameE"        , async (client)    =>  {
+        emitter.on("updateDoublesCustomerNameE"        , async (client)    =>  {
             await this.updateClientJSON(client)
-            this.emitter.emit("reSetUpdate", client)
+            emitter.emit("reSetUpdate", client)
         })
 
-        this.emitter.on("updateDoublesTel"                  , async (client)    =>  {
+        emitter.on("updateDoublesTel"                  , async (client)    =>  {
             await this.updateClientJSON(client)
-            this.emitter.emit("reSetUpdate", client)
+            emitter.emit("reSetUpdate", client)
         })
 
-        this.emitter.on("updateDoublesGPS"                  , async (client)    =>  {
+        emitter.on("updateDoublesGPS"                  , async (client)    =>  {
             await this.updateClientJSON(client)
-            this.emitter.emit("reSetUpdate", client)
+            emitter.emit("reSetUpdate", client)
         })
 
         //
 
-        this.emitter.on("deleteDoublesCustomerCode"         , async (client)    =>  {
+        emitter.on("deleteDoublesCustomerCode"         , async (client)    =>  {
             await this.deleteClientJSON(client)
-            this.emitter.emit("reSetDelete", client)
+            emitter.emit("reSetDelete", client)
         })
 
-        this.emitter.on("deleteDoublesCustomerNameE"        , async (client)    =>  {
+        emitter.on("deleteDoublesCustomerNameE"        , async (client)    =>  {
             await this.deleteClientJSON(client)
-            this.emitter.emit("reSetDelete", client)
+            emitter.emit("reSetDelete", client)
         })
 
-        this.emitter.on("deleteDoublesTel"                  , async (client)    =>  {
+        emitter.on("deleteDoublesTel"                  , async (client)    =>  {
             await this.deleteClientJSON(client)
-            this.emitter.emit("reSetDelete", client)
+            emitter.emit("reSetDelete", client)
         })
 
-        this.emitter.on("deleteDoublesGPS"                  , async (client)    =>  {
+        emitter.on("deleteDoublesGPS"                  , async (client)    =>  {
             await this.deleteClientJSON(client)
-            this.emitter.emit("reSetDelete", client)
+            emitter.emit("reSetDelete", client)
         })
     },
 
@@ -220,7 +222,7 @@ export default {
             }
 
             //
-            this.emitter.emit("refreshDoublantCustomerCode"     ,   this.getDoublant.getDoublantCustomerCode)
+            emitter.emit("refreshDoublantCustomerCode"     ,   this.getDoublant.getDoublantCustomerCode)
 
             //
             await this.$nextTick()
@@ -254,7 +256,7 @@ export default {
             }
 
             //
-            this.emitter.emit("refreshDoublantCustomerNameE"     ,  this.getDoublant.getDoublantCustomerNameE)
+            emitter.emit("refreshDoublantCustomerNameE"     ,  this.getDoublant.getDoublantCustomerNameE)
 
             //
             await this.$nextTick()
@@ -288,7 +290,7 @@ export default {
             }
 
             //
-            this.emitter.emit("refreshDoublantTel"     ,    this.getDoublant.getDoublantTel)
+            emitter.emit("refreshDoublantTel"     ,    this.getDoublant.getDoublantTel)
 
             //
             await this.$nextTick()
@@ -322,7 +324,7 @@ export default {
             }
 
             //
-            this.emitter.emit("refreshDoublantGPS"    ,   this.getDoublant.getDoublantGPS)
+            emitter.emit("refreshDoublantGPS"    ,   this.getDoublant.getDoublantGPS)
 
             //
             await this.$nextTick()
@@ -430,7 +432,6 @@ export default {
             }
 
             //
-            console.log(client)
 
             await this.$nextTick()
             setTimeout(async () => {
@@ -473,7 +474,7 @@ export default {
 
     watch   :   {
         validation_type(new_value, old_value) {
-            this.emitter.emit("reSetValidationClientUpdate", new_value)
+            emitter.emit("reSetValidationClientUpdate", new_value)
         }
     }
 }

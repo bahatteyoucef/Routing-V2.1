@@ -92,7 +92,6 @@ export default {
             formData.append("district_cities" , JSON.stringify(this.district_cities))
 
             const res   = await this.$callApi('post' ,  '/rtm-willayas/'+this.selected_district.DistrictNo+'/rtm-cities/expected-clients/update' ,   formData)         
-            console.log(res)
 
             if(res.status===200){
 
@@ -127,7 +126,6 @@ export default {
         async getComboData() {
 
             const res           =   await this.$callApi("post",     "/rtm-willayas",    null)
-            console.log(res)
 
             this.districts_full =   res.data.willayas
 
@@ -142,8 +140,6 @@ export default {
         async getDistrictCities() {
 
             const res               =   await this.$callApi("post",     "/rtm-willayas/"+this.selected_district.DistrictNo+"/rtm-cities",    null)
-            console.log(res)
-
             this.district_cities    =   res.data.cities
         },
 

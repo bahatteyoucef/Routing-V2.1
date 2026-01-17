@@ -392,8 +392,6 @@ export default {
                     this.$callApi("post",    "/users/pointings",  formData)
                     .then(async (res)=> {
 
-                        console.log(res)
-
                         //
                         this.users_pointings      =   res.data.pointings;
                         await this.prepareDatatables()
@@ -420,9 +418,6 @@ export default {
 
             const res_1                     =   await this.$callApi("post",     "/route-imports/combo"       ,   null)
             const res_2                     =   await this.$callApi("post",     "/users/combo/backoffice"   ,   null)
-
-            console.log(res_1)
-            console.log(res_2)
 
             this.liste_route_import_all     =   res_1.data.liste_route_import
             this.users_all                  =   res_2.data.users

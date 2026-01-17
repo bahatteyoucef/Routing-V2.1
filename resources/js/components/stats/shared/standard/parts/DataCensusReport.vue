@@ -57,6 +57,8 @@
 
 import DatatableHelper              from    "@/services/DatatableHelper"
 
+import emitter                  from    "@/utils/emitter"
+
 export default {
 
     data() {
@@ -113,7 +115,7 @@ export default {
         await this.$nextTick()
 
         //
-        this.emitter.emit('show_data_census_report_table_content_ready')
+        emitter.emit('show_data_census_report_table_content_ready')
     },
 
     methods : {
@@ -135,7 +137,7 @@ export default {
             //
             if(this.$isRole("Super Admin")||this.$isRole('BU Manager')||this.$isRole("BackOffice")||this.$isRole('Viewer')) {
 
-                this.emitter.emit("reSetNormalClientUpdate")
+                emitter.emit("reSetNormalClientUpdate")
 
                 //
                 this.selected_row       =   selected_row

@@ -200,19 +200,27 @@ class Client extends Model
             $formattedBrands["brand_$index"] = $value;
         }
 
-        // 2. Mass Assignment (Fill simple fields)
-        $client->fill($request->only([
-            'NewCustomer', 'OpenCustomer', 'CustomerIdentifier', 'CustomerCode',
-            'Latitude', 'Longitude', 'Address', 'RvrsGeoAddress', 'DistrictNo', 'DistrictNameE',
-            'CityNo', 'CityNameE', 'Tel', 'CustomerType', 'Neighborhood', 
-            'Landmark', 'BrandAvailability', 'BrandSourcePurchase', 'Frequency', 
-            'SuperficieMagasin', 'NbrAutomaticCheckouts', 'comment', 'status', 
+        // safe normalized fill
+        $fields = [
+            'NewCustomer','OpenCustomer','CustomerIdentifier','CustomerCode',
+            'Latitude','Longitude','Address','RvrsGeoAddress','DistrictNo','DistrictNameE',
+            'CityNo','CityNameE','Tel','CustomerType','Neighborhood',
+            'Landmark','BrandAvailability','BrandSourcePurchase','Frequency',
+            'SuperficieMagasin','NbrAutomaticCheckouts','comment','status',
             'nonvalidated_details'
-        ]));
+        ];
+
+        $payload = [];
+        foreach ($fields as $f) {
+            $payload[$f] = $request->has($f) ? $request->input($f) : ($client->{$f} ?? '');
+            if ($payload[$f] === null) $payload[$f] = '';
+        }
+
+        $client->fill($payload);
 
         // 3. Set Complex Fields
-        $client->CustomerNameE = mb_strtoupper($request->get("CustomerNameE") ?? '', 'UTF-8');
-        $client->CustomerNameA = mb_strtoupper($request->get("CustomerNameA") ?? '', 'UTF-8');
+        $client->CustomerNameE = mb_strtoupper($request->get("CustomerNameE") ?? "", 'UTF-8');
+        $client->CustomerNameA = mb_strtoupper($request->get("CustomerNameA") ?? "", 'UTF-8');
         $client->AvailableBrands = json_encode($formattedBrands, JSON_UNESCAPED_UNICODE);
         $client->id_route_import = $id_route_import;
         
@@ -226,9 +234,9 @@ class Client extends Model
             $client->tel_status = 'pending';
             $client->tel_comment = '';
         } else {
-            $client->owner = $request->get("owner");
-            $client->tel_status = $request->get("tel_status");
-            $client->tel_comment = $request->get("tel_comment");
+            $client->owner = $request->get("owner") ?? "";
+            $client->tel_status = $request->get("tel_status") ?? "";
+            $client->tel_comment = $request->get("tel_comment") ?? "";
         }
 
         // 4. IMAGE HANDLING (Reuse the helper!)
@@ -528,80 +536,51 @@ class Client extends Model
     }
 
     public static function updateClients(Request $request, int $id_route_import) {
-        // Ensure clients is decoded as an associative array for consistency
-        $clientsToUpdate    =   json_decode($request->get("clients"), true); 
+        $clientsToUpdate = json_decode($request->get("clients"), true);
         if (empty($clientsToUpdate)) return;
 
-        $createdAt          =   Carbon::now()->format('d F Y');
-        $updatedAt          =   Carbon::now()->format('Y-m-d H:i:s');
-        $ownerBo            =   Auth::check() && !Auth::user()->hasRole('FrontOffice') ? Auth::user()->id : null;
+        $chunks = array_chunk($clientsToUpdate, 500);
+        $now = Carbon::now()->format('Y-m-d H:i:s');
+        $ownerBo = Auth::check() && !Auth::user()->hasRole('FrontOffice') ? Auth::user()->id : null;
 
-        $dataToUpsert       =   [];
-        $updateColumns      =   ['created_at', 'updated_at', 'owner_bo'];
-        
-        foreach ($clientsToUpdate as $client_elem) {
-            $row    =   [
-                'id'            =>  $client_elem['id']  ,
-                'created_at'    =>  $createdAt          ,
-                'updated_at'    =>  $updatedAt          ,
-                'owner_bo'      =>  $ownerBo            , // Update owner_bo on modification
-            ];
-            
-            // Add optional fields and track which ones need to be updated
-            if (isset($client_elem['owner'])) {
-                $row['owner']   =   $client_elem['owner'];
-
-                if (!in_array('owner', $updateColumns))         $updateColumns[]    =   'owner';
-            }
-
-            if (isset($client_elem['JPlan'])) {
-                $row['JPlan']   =   mb_strtoupper($client_elem['JPlan'], 'UTF-8');
-                if (!in_array('JPlan', $updateColumns))         $updateColumns[]    =   'JPlan';
-            }
-
-            if (isset($client_elem['DistrictNo']) && isset($client_elem['DistrictNameE'])) {
-                $row['DistrictNo']      =   $client_elem['DistrictNo'];
-                $row['DistrictNameE']   =   $client_elem['DistrictNameE'];
-
-                if (!in_array('DistrictNo'      , $updateColumns)) $updateColumns[] =   'DistrictNo';
-                if (!in_array('DistrictNameE'   , $updateColumns)) $updateColumns[] =   'DistrictNameE';
-            }
-
-            if (isset($client_elem['CityNo']) && isset($client_elem['CityNameE'])) {
-                $row['CityNo']      =   $client_elem['CityNo'];
-                $row['CityNameE']   =   $client_elem['CityNameE'];
-
-                if (!in_array('CityNo'      , $updateColumns))  $updateColumns[]    =   'CityNo';
-                if (!in_array('CityNameE'   , $updateColumns))  $updateColumns[]    =   'CityNameE';
-            }
-
-            if (isset($client_elem['CustomerType'])) {
-                $row['CustomerType']    =   $client_elem['CustomerType'];
-                if (!in_array('CustomerType', $updateColumns))  $updateColumns[]    =   'CustomerType';
-            }
-
-            if (isset($client_elem['status'])) {
-                $row['status']          =   $client_elem['status'];
-                if (!in_array('status', $updateColumns))        $updateColumns[]    =   'status';
-            }
-
-            if (isset($client_elem['Journee'])) {
-                $row['Journee']         =   $client_elem['Journee'];
-                if (!in_array('Journee', $updateColumns))       $updateColumns[]    =   'Journee';
-            }
-
-            $dataToUpsert[]     =   $row;
-        }
-
-        // --- Batch Update ---
-        $chunks = array_chunk($dataToUpsert, 500);
         foreach ($chunks as $chunk) {
-            Client::upsert(
-                $chunk,
-                ['id'], // Unique by ID (Primary Key)
-                // Use the dynamically built list of columns to update
-                array_unique($updateColumns) 
-            );
+            // collect ids
+            $ids = array_column($chunk, 'id');
+            if (empty($ids)) continue;
+
+            // columns we may update (build dynamically)
+            $updatableCols = ['owner', 'JPlan', 'DistrictNo', 'DistrictNameE', 'CityNo', 'CityNameE', 'CustomerType', 'status', 'Journee'];
+
+            $sets = [];
+            $pdo = DB::getPdo();
+
+            foreach ($updatableCols as $col) {
+                $caseParts = [];
+                foreach ($chunk as $r) {
+                    if (array_key_exists($col, $r)) {
+                        // cast/format where needed (example JPlan uppercase)
+                        $val = $r[$col];
+                        if ($col === 'JPlan' || $col === 'Journee') {
+                            $val = mb_strtoupper($val ?? '', 'UTF-8');
+                        }
+                        $caseParts[] = "WHEN {$r['id']} THEN " . $pdo->quote($val);
+                    }
+                }
+                if (!empty($caseParts)) {
+                    $sets[] = "`$col` = CASE `id` " . implode(' ', $caseParts) . " ELSE `$col` END";
+                }
+            }
+
+            // always update updated_at & owner_bo uniformly
+            $sets[] = "`updated_at` = " . $pdo->quote($now);
+            if ($ownerBo !== null) {
+                $sets[] = "`owner_bo` = " . $pdo->quote($ownerBo);
+            }
+
+            $idsList = implode(',', array_map('intval', $ids));
+            $sql = "UPDATE `clients` SET " . implode(', ', $sets) . " WHERE `id` IN ($idsList)";
+
+            DB::statement($sql);
         }
     }
 
@@ -636,54 +615,69 @@ class Client extends Model
 
     public static function updateResumeClients(Request $request) {
 
-        $clientsData    =   json_decode($request->get("data"), true);
+        $clientsData = json_decode($request->get('data'), true);
         if (empty($clientsData)) return;
 
-        $chunkSize      =   1000;
-        
-        // Pre-format dates exactly as you had them in your boot() method
-        $createdAt      =   Carbon::now()->format('d F Y'); 
-        $updatedAt      =   Carbon::now()->format('Y-m-d H:i:s');
+        $chunkSize = 1000;
+        $now = Carbon::now()->format('Y-m-d H:i:s');
+        $ownerBo = Auth::check() ? Auth::user()->id : null;
+
+        $tableName = (new Client)->getTable(); // safer than hardcoding table name
 
         $chunks = array_chunk($clientsData, $chunkSize);
 
         foreach ($chunks as $chunk) {
-            $upsertData     =   [];
+            // collect ids and skip if none
+            $ids = array_column($chunk, 'id');
+            if (empty($ids)) continue;
 
-            foreach ($chunk as $clientData) {
-                // Logic for JPlan
-                $jPlan      =   !empty($clientData['JPlan']) 
-                                ? mb_strtoupper($clientData['JPlan'], 'UTF-8') 
-                                : "";
+            $pdo = DB::getPdo();
 
-                // Logic for Journee
-                $journee    =   !empty($clientData['Journee']) 
-                                ? mb_strtoupper($clientData['Journee'], 'UTF-8') 
-                                : "";
-
-                // Build the row
-                $row = [
-                    'id'            =>  $clientData['id'],
-                    'JPlan'         =>  $jPlan,
-                    'Journee'       =>  $journee,
-
-                    // Manually add the timestamps and owner
-                    'owner_bo'      =>  Auth::user()->id,
-                    'created_at'    =>  $createdAt, 
-                    'updated_at'    =>  $updatedAt,
-                ];
-
-                //
-                $upsertData[] = $row;
+            // Build CASE for JPlan
+            $caseJPlanParts = [];
+            foreach ($chunk as $c) {
+                if (!isset($c['id'])) continue;
+                $id = intval($c['id']);
+                $j = !empty($c['JPlan']) ? mb_strtoupper($c['JPlan'], 'UTF-8') : "";
+                $caseJPlanParts[] = "WHEN {$id} THEN " . $pdo->quote($j);
             }
 
-            // 2. Perform Upsert
-            Client::upsert(
-                $upsertData ,
-                ['id']      , // Unique column
-                
-                ['JPlan', 'Journee', 'updated_at', 'owner_bo']
-            );
+            // Build CASE for Journee
+            $caseJourneeParts = [];
+            foreach ($chunk as $c) {
+                if (!isset($c['id'])) continue;
+                $id = intval($c['id']);
+                $j2 = !empty($c['Journee']) ? mb_strtoupper($c['Journee'], 'UTF-8') : "";
+                $caseJourneeParts[] = "WHEN {$id} THEN " . $pdo->quote($j2);
+            }
+
+            $sets = [];
+
+            if (!empty($caseJPlanParts)) {
+                $sets[] = "`JPlan` = CASE `id` " . implode(' ', $caseJPlanParts) . " ELSE `JPlan` END";
+            }
+
+            if (!empty($caseJourneeParts)) {
+                $sets[] = "`Journee` = CASE `id` " . implode(' ', $caseJourneeParts) . " ELSE `Journee` END";
+            }
+
+            // Always update updated_at
+            $sets[] = "`updated_at` = " . $pdo->quote($now);
+
+            // Update owner_bo if available
+            if ($ownerBo !== null) {
+                $sets[] = "`owner_bo` = " . $pdo->quote($ownerBo);
+            }
+
+            if (empty($sets)) {
+                // nothing to update in this chunk
+                continue;
+            }
+
+            $idsList = implode(',', array_map('intval', $ids));
+            $sql = "UPDATE `{$tableName}` SET " . implode(', ', $sets) . " WHERE `id` IN ({$idsList})";
+
+            DB::statement($sql);
         }
     }
 

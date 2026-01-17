@@ -252,6 +252,8 @@ import ModalSelfServiceChartClients  from  "./ModalSelfServiceChartClients.vue"
 
 import DatatableHelper    from  "@/services/DatatableHelper"
 
+import emitter                  from    "@/utils/emitter"
+
 export default {
 
   name: "ByDynamicProperty",
@@ -403,7 +405,7 @@ export default {
     this.prepareClientsTable()
 
     this.$nextTick(() => {
-      if (this.emitter) this.emitter?.emit?.("show_by_customer_type_report_content_ready");
+      if (emitter) emitter?.emit?.("show_by_customer_type_report_content_ready");
     });
   },
 
@@ -429,7 +431,6 @@ export default {
     /* */
 
     async buildChart_new() {
-        console.log(this.showValuesToggle);
 
         this.chartBuilding = true;
 
@@ -633,8 +634,8 @@ export default {
                 this.chartInstance = null;
             }
 
-            this.emitter.on('reportChart_rendered', () => {
-                this.emitter.off('reportChart_rendered');
+            emitter.on('reportChart_rendered', () => {
+                emitter.off('reportChart_rendered');
                 this.chartBuilding = false;
             });
         } catch (e) {
@@ -644,7 +645,6 @@ export default {
     },
 
     async buildChart() {
-        console.log(this.showValuesToggle);
 
         this.chartBuilding = true;
 
@@ -980,8 +980,8 @@ export default {
                 this.chartInstance = null;
             }
 
-            this.emitter.on('reportChart_rendered', () => {
-                this.emitter.off('reportChart_rendered');
+            emitter.on('reportChart_rendered', () => {
+                emitter.off('reportChart_rendered');
                 this.chartBuilding = false;
             });
         } catch (e) {
@@ -996,7 +996,7 @@ export default {
         if (!canvas_to_blob) return;
 
         //
-        this.emitter.emit('reportChart_rendered')
+        emitter.emit('reportChart_rendered')
     },
 
     // ---------- Helpers for percentages ----------
@@ -1468,8 +1468,6 @@ export default {
             const dataset = this.chartInstance.data.datasets[datasetIndex];
             key = dataset.clientKey || dataset.key || dataset.label;
         }
-
-        console.log(`Filtering (${isTransposed ? 'Transposed' : 'Standard'}) by:`, { rawLabel, key });
 
         this.selectedClients = this.getClientsByLabelAndDatasetKey(rawLabel, key);
         

@@ -74,6 +74,8 @@
 
 import DatatableHelper  from    "@/services/DatatableHelper"
 
+import emitter                  from    "@/utils/emitter"
+
 export default {
 
     data() {
@@ -154,7 +156,6 @@ export default {
             
             //
             const res   = await this.$callApi('post'    ,   '/route-imports/store'   ,   formData)         
-            console.log(res)
 
             if(res.status===201){
 
@@ -165,7 +166,7 @@ export default {
                 this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
 
                 // Send Event
-                this.emitter.emit("reSetRouteImport")
+                emitter.emit("reSetRouteImport")
 
                 // Close Modal
                 await this.$hideModal("ModalSubmit")

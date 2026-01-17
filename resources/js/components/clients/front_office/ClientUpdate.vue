@@ -498,12 +498,6 @@ export default {
 
     methods : {
 
-        ...mapActions("client" ,  [
-            "setUpdateClientAction"   ,
-        ]),
-
-        //  //  //  //  //
-
         async sendData() {
             await this.$showLoadingPage();
             
@@ -1268,7 +1262,6 @@ export default {
                     // Assuming 'this.client.Address' is where you want to store it
                     if(address) {
                         this.client.RvrsGeoAddress  =   address;
-                        console.log("Address found:", this.client.RvrsGeoAddress);
                     }
                     // ----------------------------------------
 

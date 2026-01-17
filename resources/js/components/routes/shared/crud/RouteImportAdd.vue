@@ -70,14 +70,12 @@ export default {
             try {
                 // 1. Parse File
                 let rawData = await processExcelFile(file);
-                console.log("111")
 
                 if (rawData.length === 0) {
                     this.rdy_send = true;
                     this.$feedbackWarning("Warning", "File is empty");
                     return;
                 }
-                console.log("222")
 
                 // 2. Validate Headers
                 const warnings = validateHeaders(rawData[0]);
@@ -87,21 +85,15 @@ export default {
                     // Decide if you want to block upload or allow it with warnings. 
                     // Your original code allowed it.
                 }
-                console.log("333")
 
                 // 3. Normalize Data (GPS & Defaults)
                 this.clients = normalizeClientsData(rawData);
-                console.log("444")
 
                 // 4. Validate Content (Customer Codes)
                 if (this.validateContent(this.clients)) {
-                    console.log("555")
-
                     this.rdy_send = true;
                     this.route_import.file = file; // Store file if needed for upload
                 }
-
-                console.log("666")
 
             } catch (error) {
                 console.error(error);
@@ -118,8 +110,6 @@ export default {
                     return false;
                 }
             }
-
-            console.log("trrrrrr")
 
             return true;
         },

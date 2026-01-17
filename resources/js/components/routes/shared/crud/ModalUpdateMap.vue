@@ -26,6 +26,8 @@
 <script>
 import { processExcelFile, normalizeClientsData, validateHeaders } from "@/services/ExcelService";
 
+import emitter                  from    "@/utils/emitter"
+
 export default {
     props: ["id_route_import"],
     data() {
@@ -76,7 +78,7 @@ export default {
 
             if (res.status === 200) {
                 this.$feedbackSuccess(res.data["header"], res.data["message"]);
-                this.emitter.emit('reSetClientsUpdateMap', res.data.clients);
+                emitter.emit('reSetClientsUpdateMap', res.data.clients);
                 await this.$hideModal("ModalUpdateMap");
             } else {
                 this.$showErrors("Error !", res.data.errors);

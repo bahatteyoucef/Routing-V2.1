@@ -82,6 +82,8 @@
 
 import {mapGetters, mapActions} from    "vuex"
 
+import emitter                  from    "@/utils/emitter"
+
 export default {
 
     data() {
@@ -115,12 +117,6 @@ export default {
 
     methods : {
 
-        ...mapActions("journey_plan" ,  [
-            "setAddJourneyPlanAction"   ,
-        ]),
-
-        //
-
         async sendData() {
 
             await this.$showLoadingPage()
@@ -148,7 +144,7 @@ export default {
                     await this.$hideLoadingPage()
 
                     // Send Client
-                    this.emitter.emit('reSetJPlanBDTerritory')
+                    emitter.emit('reSetJPlanBDTerritory')
 
                     // Close Modal
                     await this.$hideModal("addJourneyPlanModal")
@@ -174,7 +170,7 @@ export default {
                     await this.$hideLoadingPage()
 
                     // Send Client
-                    this.emitter.emit('reSetJourneeBDTerritory')
+                    emitter.emit('reSetJourneeBDTerritory')
 
                     // Close Modal
                     await this.$hideModal("addJourneyPlanModal")
@@ -200,7 +196,7 @@ export default {
                     await this.$hideLoadingPage()
 
                     // Send Client
-                    this.emitter.emit('reSetUserBDTerritory')
+                    emitter.emit('reSetUserBDTerritory')
 
                     // Close Modal
                     await this.$hideModal("addJourneyPlanModal")
@@ -222,9 +218,6 @@ export default {
         clearData(id_modal) {
 
             $(id_modal).on("hidden.bs.modal",   ()  => {
-
-                // 
-                this.setAddJourneyPlanAction(null)
 
                 // Client
                 this.territoire.type_territoire     =   '1',

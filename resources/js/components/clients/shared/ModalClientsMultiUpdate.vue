@@ -178,9 +178,13 @@
 
 <script>
 
-import DatatableHelper      from "@/services/DatatableHelper"
+import {mapGetters, mapActions} from    "vuex"
 
-import ResumeComponent      from "@/components/routes/shared/parts/ResumeComponent.vue"
+import DatatableHelper          from    "@/services/DatatableHelper"
+
+import ResumeComponent          from    "@/components/routes/shared/parts/ResumeComponent.vue"
+
+import emitter                  from    "@/utils/emitter"
 
 export default {
 
@@ -362,7 +366,7 @@ export default {
                 this.$feedbackSuccess(res.data.header, res.data.message);
 
                 // Send Client
-                this.emitter.emit('reSetChangeRoute' , clients_copy)
+                emitter.emit('reSetChangeRoute' , clients_copy)
 
                 // Close Modal
                 await this.$hideModal("ModalClientsMultiUpdate")
@@ -388,14 +392,9 @@ export default {
 
             //
 
-            console.log(clients)
-
-            //
-
             formData.append("data"      ,   JSON.stringify(clients))
 
             const res                   =   await this.$callApi("post"  ,   "/clients/resume/update",  formData)
-            console.log(res)
 
             if(res.status===200){
 
@@ -412,7 +411,7 @@ export default {
                 }, {});
 
                 //
-                this.emitter.emit('reSetClientsDecoupeByJourneeMap' , clients_object)
+                emitter.emit('reSetClientsDecoupeByJourneeMap' , clients_object)
 
                 // Close Modal
                 await this.$hideModal("ModalClientsMultiUpdate")
@@ -456,7 +455,7 @@ export default {
                 let clients_copy            =   [...this.clients].map(client => { return { id : client.id }})  
 
                 // Send Client
-                this.emitter.emit('reSetChangeRouteDelete' , clients_copy)
+                emitter.emit('reSetChangeRouteDelete' , clients_copy)
 
                 // Close Modal
                 await this.$hideModal("ModalClientsMultiUpdate")
@@ -489,7 +488,7 @@ export default {
                 //
 
                 this.districts                      =   []  
-                this.cities                          =   []  
+                this.cities                         =   []  
                 this.users                          =   []  
             });
         },

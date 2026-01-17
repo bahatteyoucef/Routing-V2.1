@@ -183,18 +183,7 @@
 
                                     <div class="col-sm-4">
                                         <label for="Journee"            class="form-label">Journee</label>
-                                        <select                         class="form-select"         id="Journee"                v-model="client.Journee">
-                                            <option     :value="'Dimanche 1'">Dimanche 1</option>
-                                            <option     :value="'Lundi 1'">Lundi 1</option>
-                                            <option     :value="'Mardi 1'">Mardi 1</option>
-                                            <option     :value="'Mercredi 1'">Mercredi 1</option>
-                                            <option     :value="'Jeudi 1'">Jeudi 1</option>
-                                            <option     :value="'Dimanche 2'">Dimanche 2</option>
-                                            <option     :value="'Lundi 2'">Lundi 2</option>
-                                            <option     :value="'Mardi 2'">Mardi 2</option>
-                                            <option     :value="'Mercredi 2'">Mercredi 2</option>
-                                            <option     :value="'Jeudi 2'">Jeudi 2</option>
-                                        </select>
+                                        <input type="text"              class="form-control"        id="Journee"                  v-model="client.Journee">
                                     </div>
                                 </div>
 
@@ -489,6 +478,8 @@ import {mapGetters, mapActions} from    "vuex"
 import moment                   from    "moment"
 import "moment-timezone"
 
+import emitter                  from    "@/utils/emitter"
+
 export default {
 
     data() {
@@ -651,12 +642,6 @@ export default {
 
     methods : {
 
-        ...mapActions("client" ,  [
-            "setAddClientAction"   ,
-        ]),
-
-        //  //  //  //  //
-
         async sendData() {
             await this.$showLoadingPage();
 
@@ -713,7 +698,7 @@ export default {
 
                     await this.$hideLoadingPage();
                     this.$feedbackSuccess(res.data["header"], res.data["message"]);
-                    this.emitter.emit('reSetAdd', client);
+                    emitter.emit('reSetAdd', client);
                     await this.$hideModal("ModalClientAdd");
                 } else {
                     await this.$hideLoadingPage();
@@ -1012,7 +997,6 @@ export default {
             // Assuming 'this.client.Address' is where you want to store it
             if(address) {
                 this.client.RvrsGeoAddress  =   address;
-                console.log("Address found:", this.client.RvrsGeoAddress);
             }
         },
 

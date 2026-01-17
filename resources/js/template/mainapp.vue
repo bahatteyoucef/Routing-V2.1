@@ -57,8 +57,6 @@ export default {
     },
 
     async mounted() {
-        console.log("App Mounting...")
-
         // --- 1. Internet Connection Listeners ---
         const updateOnlineStatus = (status) => {
             this.setIsOnlineAction(status)

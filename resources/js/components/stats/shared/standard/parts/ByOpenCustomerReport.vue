@@ -62,6 +62,8 @@
 
 <script>
 
+import emitter                  from    "@/utils/emitter"
+
 export default {
 
     data() {
@@ -87,7 +89,7 @@ export default {
         await this.$nextTick()
 
         //
-        this.emitter.emit('show_by_open_customer_report_content_ready')
+        emitter.emit('show_by_open_customer_report_content_ready')
     },
 
     methods : {

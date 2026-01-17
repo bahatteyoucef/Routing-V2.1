@@ -117,8 +117,6 @@ export default {
             this.$callApi("post",    "/users", null)
             .then(async (res)=> {
 
-                console.log(res)
-
                 this.index_users_data       =   res.data.users;
 
                 // Create DataTable

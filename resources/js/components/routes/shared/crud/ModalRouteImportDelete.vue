@@ -55,6 +55,8 @@
 
 <script>
 
+import emitter                  from    "@/utils/emitter"
+
 export default {
 
     data() {
@@ -108,7 +110,7 @@ export default {
                 this.$feedbackSuccess(res.data["header"]     ,   res.data["message"])
 
                 // Get Route Import
-                this.emitter.emit("reSetRouteImport")
+                emitter.emit("reSetRouteImport")
 
                 // Close Modal
                 await this.$hideModal("ModalRouteImportDelete")

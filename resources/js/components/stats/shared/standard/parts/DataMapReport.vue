@@ -20,6 +20,8 @@
 
 <script>
 
+import emitter                  from    "@/utils/emitter"
+
 export default {
 
     data() {
@@ -60,7 +62,7 @@ export default {
         await this.prepareMap()
 
         //
-        this.emitter.emit('show_data_map_report_content_ready')
+        emitter.emit('show_data_map_report_content_ready')
     },
 
     methods : {

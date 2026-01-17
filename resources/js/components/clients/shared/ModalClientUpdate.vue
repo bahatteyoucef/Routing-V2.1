@@ -181,18 +181,7 @@
 
                                     <div class="col-sm-4">
                                         <label for="Journee"            class="form-label">Journee</label>
-                                        <select                         class="form-select"         id="Journee"                v-model="client.Journee"                    :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
-                                            <option     :value="'Dimanche 1'">Dimanche 1</option>
-                                            <option     :value="'Lundi 1'">Lundi 1</option>
-                                            <option     :value="'Mardi 1'">Mardi 1</option>
-                                            <option     :value="'Mercredi 1'">Mercredi 1</option>
-                                            <option     :value="'Jeudi 1'">Jeudi 1</option>
-                                            <option     :value="'Dimanche 2'">Dimanche 2</option>
-                                            <option     :value="'Lundi 2'">Lundi 2</option>
-                                            <option     :value="'Mardi 2'">Mardi 2</option>
-                                            <option     :value="'Mercredi 2'">Mercredi 2</option>
-                                            <option     :value="'Jeudi 2'">Jeudi 2</option>
-                                        </select>
+                                        <input type="text"              class="form-control"        id="Journee"                  v-model="client.Journee"                  :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
                                     </div>
                                 </div>
 
@@ -470,6 +459,8 @@
 
 import {mapGetters, mapActions} from    "vuex"
 
+import emitter                  from    "@/utils/emitter"
+
 import moment                   from    "moment"
 import "moment-timezone"
 
@@ -617,9 +608,6 @@ export default {
     props : ["id_route_import", "update_type", "id_route_import_tempo", "mode", "validation_type", "districts_all", "users_all"],
 
     mounted() {
-        console.log(this.id_route_import)
-        console.log(this.id_route_import_tempo)
-
         this.clearData("#ModalClientUpdate")
     },
 
@@ -639,12 +627,6 @@ export default {
     },
 
     methods : {
-
-        ...mapActions("client" ,  [
-            "setUpdateClientAction"   ,
-        ]),
-
-        //  //  //  //  //
 
         async sendData() {
             await this.$showLoadingPage();
@@ -826,10 +808,10 @@ export default {
 
                     // Validation Logic / Event Emission
                     if (this.update_type == "validation") {
-                        this.emitter.emit("updateDoubles" + this.validation_type, this.client);
+                        emitter.emit("updateDoubles" + this.validation_type, this.client);
                     } else {
                         // Generic update event for parent
-                        this.emitter.emit('updateClient', this.client);
+                        emitter.emit('updateClient', this.client);
                     }
 
                     await this.$hideModal("ModalClientUpdate");
@@ -865,9 +847,9 @@ export default {
                     
                     // Validation Logic
                     if (this.update_type == "validation") {
-                        this.emitter.emit("deleteDoubles" + this.validation_type, this.client);
+                        emitter.emit("deleteDoubles" + this.validation_type, this.client);
                     } else {
-                        this.emitter.emit('reSetDelete', this.client);
+                        emitter.emit('reSetDelete', this.client);
                     }
 
                     await this.$hideModal("ModalClientUpdate");
@@ -902,8 +884,6 @@ export default {
                 }
 
                 await this.getComboData();
-
-                console.log(client)
 
                 await this.getClientData(client);
 
@@ -993,9 +973,7 @@ export default {
             await this.$showLoadingPage()
 
             const res_3     =   await this.$callApi("post"  ,   "/rtm-willayas/"+this.client.DistrictNo+"/rtm-cities"         ,   null)
-            this.cities      =   res_3.data.cities
-
-            console.log(this.cities)
+            this.cities     =   res_3.data.cities
 
             this.client.CityNo      =   ""
 
@@ -1210,7 +1188,6 @@ export default {
             // Assuming 'this.client.Address' is where you want to store it
             if(address) {
                 this.client.RvrsGeoAddress  =   address;
-                console.log("Address found:", this.client.RvrsGeoAddress);
             }
         },
 

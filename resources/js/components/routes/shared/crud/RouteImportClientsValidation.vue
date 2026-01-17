@@ -573,8 +573,6 @@ export default {
                     formData.append("NbrVitrines"                           ,   client.NbrVitrines)
                     formData.append("NbrAutomaticCheckouts"                 ,   client.NbrAutomaticCheckouts)
 
-                    console.log(client.NbrAutomaticCheckouts)
-
                     formData.append("SuperficieMagasin"                     ,   client.SuperficieMagasin)
 
                     formData.append("CustomerBarCodeExiste_image"           ,   client.CustomerBarCodeExiste_image)
@@ -808,7 +806,6 @@ export default {
             }
 
             const res                   =   await this.$callApi("post"  ,   "/route-imports/"+client.id_route_import+"/clients/"+client.id+"/update",   formData)
-            console.log(res)
 
             if(res.status===200){
 
@@ -860,8 +857,6 @@ export default {
                 //
                 this.$callApi("post",   "/route-imports/"+this.$route.params.id_route_import+"/clients",   formData)
                 .then(async (res)=> {
-
-                    console.log(res)
 
                     this.route_import   =   res.data.route_import
                     this.initClients(res.data.clients);

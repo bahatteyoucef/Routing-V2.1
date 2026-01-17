@@ -102,7 +102,6 @@ export default {
         async getUserData() {
 
             const res                   =   await this.$callApi("post"  ,   "/users/"+this.$route.params.id_user+"/show"    ,   null)
-            console.log(res)
 
             this.user.username_original     =   res.data.user.username
 

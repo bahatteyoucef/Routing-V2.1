@@ -94,6 +94,8 @@ import {mapGetters, mapActions}     from    "vuex"
 
 import DatatableHelper              from    "@/services/DatatableHelper"
 
+import emitter                  from    "@/utils/emitter"
+
 export default {
 
     data() {
@@ -179,15 +181,15 @@ export default {
         this.datatable_route_import_clients_instance    =   new DatatableHelper()
 
         //
-        this.emitter.on('reSetAdd'          , async (client)    =>  {
+        emitter.on('reSetAdd'          , async (client)    =>  {
             await this.addClientToDatatable(client)
         })
 
-        this.emitter.on('reSetUpdate'       , async (client)    =>  {
+        emitter.on('reSetUpdate'       , async (client)    =>  {
             await this.updateClientToDatatable(client)
         })
 
-        this.emitter.on('reSetDelete'       , async (client)    =>  {
+        emitter.on('reSetDelete'       , async (client)    =>  {
             await this.deleteClientToDatatable(client)
         })
 
@@ -197,18 +199,12 @@ export default {
 
     unmounted() {
 
-        this.emitter.off('reSetAdd')
-        this.emitter.off('reSetUpdate')
-        this.emitter.off('reSetDelete')
+        emitter.off('reSetAdd')
+        emitter.off('reSetUpdate')
+        emitter.off('reSetDelete')
     },
 
     methods : {
-
-        ...mapActions("client" ,  [
-            "setUpdateClientAction"   ,
-        ]),
-
-        //
 
         async setDataTable() {
 

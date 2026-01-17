@@ -569,10 +569,7 @@ export default {
 
             try {
                 const res = await this.$callApi("post", "/route/obs/route-imports/"+this.$route.params.id_route_import+"/details/for-front-office", null);
-                console.log(res)
-
                 this.all_clients = res.data.route_import.data;
-                console.log(this.all_clients)
                 
                 const resCombo = await this.$callApi("post", "/route-imports/"+this.$route.params.id_route_import+"/districts", null);
                 this.willayas = resCombo.data.willayas;
@@ -638,9 +635,6 @@ export default {
                 this.client[`${fieldKey}_original_name`]    =   file.name;
                 this.client[`${fieldKey}_currentObjectURL`] =   objectUrl;
                 
-                console.log(file.name)
-                console.log(this.client.CustomerBarCode_image_original_name)
-
                 // --- CRITICAL CHANGE END ---
 
                 // Help the Garbage Collector: clear the input value
@@ -1178,9 +1172,6 @@ export default {
                     // Slide 7
                     if(this.slideIndex  ==  7) {
 
-                        console.log(this.client.Tel)
-                        console.log(this.client)
-
                         if((this.client.Tel !== "")&&((this.client.Tel.startsWith('05'))||(this.client.Tel.startsWith('06'))||(this.client.Tel.startsWith('07')))&&(!isNaN(parseInt(this.client.Tel)))&&(this.client.Tel.length == 10)){
                             return true;
                         }
@@ -1439,14 +1430,12 @@ export default {
                     // Assuming 'this.client.Address' is where you want to store it
                     if(address) {
                         this.client.RvrsGeoAddress  =   address;
-                        console.log("Address found:", this.client.RvrsGeoAddress);
                     }
                     // ----------------------------------------
 
                     await this.$nextTick();
 
                     let position_marker = this.$showPositionOnMap(map_id, this.client.Latitude, this.client.Longitude, this.getUser.user_territories);
-                    console.log(position_marker)
 
                     this.checkClients();
 
@@ -1560,8 +1549,6 @@ export default {
             this.close_clients  =   []
 
             let distance        =   0
-
-            console.log(this.all_clients)
 
             for (let i = 0; i < this.all_clients.length; i++) {
 

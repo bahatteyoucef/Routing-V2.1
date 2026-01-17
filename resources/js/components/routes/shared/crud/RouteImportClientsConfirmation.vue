@@ -349,7 +349,6 @@ export default {
     },
 
     async mounted() {
-        console.log(11111)
     },
 
     beforeUnmount() {
@@ -516,7 +515,6 @@ export default {
             }
 
             const res                   =   await this.$callApi("post"  ,   "/route-imports/"+client.id_route_import+"/clients/"+client.id+"/update",   formData)
-            console.log(res)
 
             if(res.status===200){
 
@@ -563,9 +561,6 @@ export default {
                 //
                 this.$callApi("post",   "/route-imports/"+this.$route.params.id_route_import+"/clients",   formData)
                 .then(async (res)=> {
-
-                    console.log(this.$route.params.id_route_import)
-                    console.log(res)
 
                     this.route_import = res.data.route_import;
                     this.initClients(res.data.clients);

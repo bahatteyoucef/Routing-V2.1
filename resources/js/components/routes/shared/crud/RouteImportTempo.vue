@@ -72,6 +72,8 @@ import ModalSubmit          from    "./ModalSubmit.vue"
 
 import CardDoublants        from    "@/components/routes/shared/operations/validations/CardDoublants.vue"
 
+import emitter                  from    "@/utils/emitter"
+
 export default {
 
     data() {
@@ -124,7 +126,7 @@ export default {
         await this.getDoubles()
         await this.getComboData()
 
-        this.emitter.on('reSetClientsDevide' , async (clients)  =>  {
+        emitter.on('reSetClientsDevide' , async (clients)  =>  {
 
             for (let i = 0; i < this.total_clients.length; i++) {
                 const client    =   this.total_clients[i]
@@ -141,39 +143,39 @@ export default {
 
         //
 
-        this.emitter.on("reSetValidationClientUpdate"     , (validation_type) => {
+        emitter.on("reSetValidationClientUpdate"     , (validation_type) => {
             this.validation_type    =   validation_type
         })
 
-        this.emitter.on("refreshDoublantCustomerCode"       , async (validation_clients)    =>  {
+        emitter.on("refreshDoublantCustomerCode"       , async (validation_clients)    =>  {
             await this.updateDoublantsJSON(validation_clients, "CustomerCode")
         })
 
-        this.emitter.on("refreshDoublantCustomerNameE"      , async (validation_clients)    =>  {
+        emitter.on("refreshDoublantCustomerNameE"      , async (validation_clients)    =>  {
             await this.updateDoublantsJSON(validation_clients, "CustomerNameE")
         })
 
-        this.emitter.on("refreshDoublantTel"                , async (validation_clients)    =>  {
+        emitter.on("refreshDoublantTel"                , async (validation_clients)    =>  {
             await this.updateDoublantsJSON(validation_clients, "Tel")
         })
 
-        this.emitter.on("refreshDoublantGPS"                , async (validation_clients)    =>  {
+        emitter.on("refreshDoublantGPS"                , async (validation_clients)    =>  {
             await this.updateDoublantsJSON(validation_clients, "GPS")
         })
     },
 
     unmounted() {
 
-        this.emitter.off('reSetClientsDecoupeByJourneeAdd')
-        this.emitter.off('reSetUpdate')
-        this.emitter.off('reSetDelete')
+        emitter.off('reSetClientsDecoupeByJourneeAdd')
+        emitter.off('reSetUpdate')
+        emitter.off('reSetDelete')
 
-        this.emitter.off('reSetClientsDevide')
-        this.emitter.off('reSetValidationClientUpdate')
-        this.emitter.off('refreshDoublantCustomerCode')
-        this.emitter.off('refreshDoublantCustomerNameE')
-        this.emitter.off('refreshDoublantTel')
-        this.emitter.off('refreshDoublantGPS')
+        emitter.off('reSetClientsDevide')
+        emitter.off('reSetValidationClientUpdate')
+        emitter.off('refreshDoublantCustomerCode')
+        emitter.off('refreshDoublantCustomerNameE')
+        emitter.off('refreshDoublantTel')
+        emitter.off('refreshDoublantGPS')
     },
 
     methods : {
@@ -194,7 +196,6 @@ export default {
 
             // Set Data
             const res   = await this.$callApi('post' ,   '/route-imports-tempo/last-imported'    ,   null)         
-            console.log(res)
 
             if(res.status===200){
 
@@ -244,11 +245,6 @@ export default {
             await this.$showLoadingPage()
 
             const res                   =   await this.$callApi("post"  ,   "/route-imports-tempo/"+this.route_import.id_route_import_tempo+"/clients-tempo/doubles", null)
-            // console.log(res)
-            // console.log(this.route_import)
-            // console.log(this.route_import.id_route_import_tempo)
-
-            console.log(res.data.doubles.getDoublantGPS)
 
             if(res.status===200){
 
@@ -276,9 +272,6 @@ export default {
         //
 
         async updateDoublantsJSON(validation_clients, validation_type) {
-
-            console.log(validation_clients)
-            console.log(validation_type)
 
             const updatableFields   =   [
                 "NewCustomer"               ,

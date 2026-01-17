@@ -291,22 +291,51 @@ class ClientTempo extends Model
         if (is_string($clients)) $clients = json_decode($clients, true);
         if (empty($clients) || !is_array($clients)) return;
 
-        $now = Carbon::now()->toDateTimeString();
+        $now = Carbon::now()->toDateTimeString(); // Y-m-d H:i:s
         $chunks = array_chunk($clients, 500);
 
+        $tableName = (new self)->getTable();
+        $pdo = DB::getPdo();
+
         foreach ($chunks as $chunk) {
-            $upsertData = [];
+            // collect ids
+            $ids = [];
+            $caseJPlanParts = [];
+            $caseJourneeParts = [];
+
             foreach ($chunk as $c) {
-                $upsertData[] = [
-                    'id' => $c['id'],
-                    'JPlan' => !empty($c['JPlan']) ? mb_strtoupper($c['JPlan'], 'UTF-8') : '',
-                    'Journee' => !empty($c['Journee']) ? $c['Journee'] : '',
-                    // 'owner_bo' => Auth::id(),
-                    // 'created_at' => $now,
-                ];
+                if (!isset($c['id'])) continue;
+                $id = intval($c['id']);
+                $ids[] = $id;
+
+                // JPlan -> uppercase fallback to empty string
+                $jPlan = !empty($c['JPlan']) ? mb_strtoupper($c['JPlan'], 'UTF-8') : '';
+                $caseJPlanParts[] = "WHEN {$id} THEN " . $pdo->quote($jPlan);
+
+                // Journee -> keep as provided (fallback to empty string)
+                $journee = !empty($c['Journee']) ? $c['Journee'] : '';
+                $caseJourneeParts[] = "WHEN {$id} THEN " . $pdo->quote($journee);
             }
 
-            self::upsert($upsertData, ['id'], ['JPlan', 'Journee'/*, 'owner_bo', 'created_at' */]);
+            if (empty($ids)) continue;
+
+            $sets = [];
+
+            if (!empty($caseJPlanParts)) {
+                $sets[] = "`JPlan` = CASE `id` " . implode(' ', $caseJPlanParts) . " ELSE `JPlan` END";
+            }
+
+            if (!empty($caseJourneeParts)) {
+                $sets[] = "`Journee` = CASE `id` " . implode(' ', $caseJourneeParts) . " ELSE `Journee` END";
+            }
+
+            // always update updated_at
+            $sets[] = "`updated_at` = " . $pdo->quote($now);
+
+            $idsList = implode(',', array_map('intval', array_unique($ids)));
+            $sql = "UPDATE `{$tableName}` SET " . implode(', ', $sets) . " WHERE `id` IN ({$idsList})";
+
+            DB::statement($sql);
         }
     }
 

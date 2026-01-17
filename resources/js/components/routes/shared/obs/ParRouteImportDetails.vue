@@ -350,7 +350,9 @@ import ColorRowsComponent           from    "../parts/ColorRowsComponent.vue"
 import {mapGetters, mapActions}     from    "vuex"
 
 import DatatableHelper              from    "@/services/DatatableHelper"
-import Map                          from    '@/services/map'
+import Map                          from    "@/services/map"
+
+import emitter                  from    "@/utils/emitter"
 
 export default {
     
@@ -532,17 +534,7 @@ export default {
     },
 
     computed: {
-
         ...mapGetters({
-
-            getAddClient            : 'client/getAddClient'                     ,
-            getUpdateClient         : 'client/getUpdateClient'                  ,
-            getClientsChangeRoute   : 'client/getClientsChangeRoute'            ,
-
-            getAddJourneyPlan       : 'journey_plan/getAddJourneyPlan'          ,
-
-            //
-
             getUser                 :   'authentification/getUser'              
         }),
     },
@@ -570,7 +562,23 @@ export default {
 
         // CRUD Events
 
-        this.emitter.on('reSetAdd'                          , async (client)    =>  {
+        emitter.on('mapAddClient'   , async (client)    =>  {
+            this.addClient(client)
+        })
+
+        emitter.on('mapUpdateClient'   , async (client)    =>  {
+            this.updateClient(client)
+        })
+
+        emitter.on('mapUpdateMultiClients'   , async (clients)    =>  {
+            this.updateMultiClients(clients)
+        })
+
+        emitter.on('mapAddTerritory' , async (territory)  =>  {
+            this.updateJourneyPlan(territory)
+        })
+
+        emitter.on('reSetAdd'                          , async (client)    =>  {
             
             await this.addClientJSON(client)
 
@@ -581,7 +589,7 @@ export default {
             this.removeDrawings()
         })
 
-        this.emitter.on('reSetUpdate'                       , async (client)    =>  {
+        emitter.on('reSetUpdate'                       , async (client)    =>  {
 
             this.updateClientJSON(client)
 
@@ -592,7 +600,7 @@ export default {
             this.removeDrawings()
         })
 
-        this.emitter.on('reSetDelete'                       , async (client)    =>  {
+        emitter.on('reSetDelete'                       , async (client)    =>  {
 
             this.deleteClientJSON(client)
 
@@ -603,7 +611,7 @@ export default {
             this.removeDrawings()
         })
 
-        this.emitter.on('reSetChangeRoute'                  , async (clients)   =>  {
+        emitter.on('reSetChangeRoute'                  , async (clients)   =>  {
 
             this.changeRouteClientsJSON(clients)
 
@@ -614,7 +622,7 @@ export default {
             this.removeDrawings()
         })
 
-        this.emitter.on('reSetChangeRouteDelete'            , async (clients)   =>  {
+        emitter.on('reSetChangeRouteDelete'            , async (clients)   =>  {
 
             //
             this.changeRouteClientsJSONDelete(clients)
@@ -626,7 +634,7 @@ export default {
             this.removeDrawings()
         })
 
-        this.emitter.on('reSetClientsDecoupeByJourneeMap'   , async (clients)   =>  {
+        emitter.on('reSetClientsDecoupeByJourneeMap'   , async (clients)   =>  {
 
             for (let i = 0; i < this.route_import.clients.length; i++) {
                 const client    =   this.route_import.clients[i]
@@ -642,35 +650,35 @@ export default {
             await this.reAfficherClientsAndMarkers("standard");
         })
 
-        this.emitter.on('reSetClientsUpdateMap'             , async ()          =>  {
+        emitter.on('reSetClientsUpdateMap'             , async ()          =>  {
             await this.getData()
         })
 
-        this.emitter.on('reSetJPlanBDTerritory'             , ()                =>  {
+        emitter.on('reSetJPlanBDTerritory'             , ()                =>  {
             this.showJPlanBDTerritories()
         })
 
-        this.emitter.on('reSetJourneeBDTerritory'           , ()                =>  {
+        emitter.on('reSetJourneeBDTerritory'           , ()                =>  {
             this.showJourneeBDTerritories()
         })
 
-        this.emitter.on('reSetUserBDTerritory'              , ()                =>  {
+        emitter.on('reSetUserBDTerritory'              , ()                =>  {
             this.showUserBDTerritories()
         })
     },
 
     unmounted() {
 
-        this.emitter.off('reSetAdd')
-        this.emitter.off('reSetUpdate')
-        this.emitter.off('reSetDelete')
-        this.emitter.off('reSetChangeRoute')
-        this.emitter.off('reSetChangeRouteDelete')
-        this.emitter.off('reSetClientsDecoupeByJourneeMap')
-        this.emitter.off('reSetClientsUpdateMap')
-        this.emitter.off('reSetJPlanBDTerritory')
-        this.emitter.off('reSetJourneeBDTerritory')
-        this.emitter.off('reSetUserBDTerritory')
+        emitter.off('reSetAdd')
+        emitter.off('reSetUpdate')
+        emitter.off('reSetDelete')
+        emitter.off('reSetChangeRoute')
+        emitter.off('reSetChangeRouteDelete')
+        emitter.off('reSetClientsDecoupeByJourneeMap')
+        emitter.off('reSetClientsUpdateMap')
+        emitter.off('reSetJPlanBDTerritory')
+        emitter.off('reSetJourneeBDTerritory')
+        emitter.off('reSetUserBDTerritory')
     },
 
     methods : {
@@ -696,7 +704,6 @@ export default {
             await this.$showLoadingPage()
                 
             const res                   =   await this.$callApi("post"  ,   "/route/obs/route-imports/"+this.id_route_import+"/details",   null)
-            console.log(res)
 
             this.route_import           =   res.data.route_import
 
@@ -738,8 +745,6 @@ export default {
 
             // reAffiche Markers
             if(mode == "switch_marker_cluster_mode") {
-
-                console.log(1)
 
                 // Show Markers
                 this.setRouteMarkers(mode, this.clients_markers_affiche)
@@ -1410,10 +1415,6 @@ export default {
         },
 
         selectRow(selected_row, selected_row_id) {
-
-            console.log(selected_row)
-            console.log(selected_row_id)
-
             this.selected_row       =   selected_row
             this.selected_row_id    =   selected_row_id
         },
@@ -1425,12 +1426,8 @@ export default {
             //
             this.clearRouteMarkers()
 
-            console.log(2)
-
             // Set Markers
             this.addMarkers(clients_markers_affiche)
-
-            console.log(4)
 
             // Focus
             this.focuseMarkers()
@@ -1445,8 +1442,6 @@ export default {
         },
 
         addMarkers(clients_markers_affiche) {
-
-            console.log(clients_markers_affiche)
 
             // Set Markers
             for (let index = 0; index < clients_markers_affiche.length; index++) {
@@ -1500,7 +1495,6 @@ export default {
             formData.append("liste_journey_plan", JSON.stringify(this.journey_plan_filter_value)) 
 
             const res   = await this.$callApi('post'    ,   '/route-imports/'+this.route_import.id+'/journey-plan-territories/util'   ,   formData)      
-            console.log(res)
 
             if(res.status===200){
 
@@ -1532,7 +1526,6 @@ export default {
             formData.append("journees"              , JSON.stringify(this.journee_filter_value)) 
 
             const res   = await this.$callApi('post'    ,   '/route-imports/'+this.route_import.id+'/journee-territories/util'   ,   formData)      
-            console.log(res)
 
             if(res.status===200){
 
@@ -1563,7 +1556,6 @@ export default {
             formData.append("liste_user_territory"  ,   JSON.stringify(this.owner_filter_value)) 
 
             const res   = await this.$callApi('post'    ,   '/route-imports/'+this.route_import.id+'/user-territories/util'   ,   formData)      
-            console.log(res)
 
             if(res.status===200){
 
@@ -1786,7 +1778,10 @@ export default {
             this.$refs.ModalClientUpdate.getData(client, this.clients_table_affiche)
         },
 
-        async updateClientsRoute(clients) {
+        async updateMultiClients(clients) {
+
+            var ModalClientsMultiUpdate     =   new Modal(document.getElementById("ModalClientsMultiUpdate"));
+            ModalClientsMultiUpdate.show();
 
             await this.$refs.ModalClientsMultiUpdate.getData(clients)
         },
@@ -1795,8 +1790,46 @@ export default {
             this.$refs.ModalAddJourneyPlan.getData(LatLngs)
         },
 
-        updateJourneyPlan(journey_plan) {
-            this.$refs.ModalUpdateJourneyPlan.getData(journey_plan)
+        updateJourneyPlan(territory) {
+            if((typeof territory.journey_plan    ==  "undefined")&&(typeof territory.journee  ==  "undefined")&&(typeof territory.user     ==  "undefined")) {
+
+                // ShowModal
+                var addJourneyPlanModal        =   new Modal(document.getElementById("addJourneyPlanModal"));
+                addJourneyPlanModal.show();
+
+                // Send DATA To Modal
+                this.$refs.ModalUpdateJourneyPlan.getData(territory.latlngs)
+            }
+
+            if(typeof territory.journey_plan     !=  "undefined") {
+
+                // ShowModal
+                var updateJourneyPlanModal      =   new Modal(document.getElementById("updateJourneyPlanModal"));
+                updateJourneyPlanModal.show();
+
+                // Send DATA To Modal
+                this.$refs.ModalUpdateJourneyPlan.getData(territory.journey_plan)
+            }
+
+            if(typeof territory.journee          !=  "undefined") {
+
+                // ShowModal
+                var updateJourneyPlanModal      =   new Modal(document.getElementById("updateJourneyPlanModal"));
+                updateJourneyPlanModal.show();
+
+                // Send DATA To Modal
+                this.$refs.ModalUpdateJourneyPlan.getData(territory.journee)
+            }
+
+            if(typeof territory.user             !=  "undefined") {
+
+                // ShowModal
+                var updateJourneyPlanModal      =   new Modal(document.getElementById("updateJourneyPlanModal"));
+                updateJourneyPlanModal.show();
+
+                // Send DATA To Modal
+                this.$refs.ModalUpdateJourneyPlan.getData(territory.user)
+            }
         },
 
         // Handle Events
@@ -1867,88 +1900,6 @@ export default {
 
             this.updateMarkers([clients_markers_affiche], this.clients_markers_affiche[index].clients)
         },
-    },
-
-    watch: {
-
-        getAddClient(newValue, oldValue) {
-
-            if(newValue != null) {
-                
-                // Send DATA To Modal
-                this.addClient(newValue)
-            }
-        },
-
-        getUpdateClient(newValue, oldValue) {
-
-            if(newValue != null) {
-                
-                // Send DATA To Modal
-                this.updateClient(newValue)
-            }
-        },
-
-        async getClientsChangeRoute(newValue, oldValue) {
-
-            if((newValue != null)&&(newValue != {})) {
-                
-                // ShowModal
-                var ModalClientsMultiUpdate     =   new Modal(document.getElementById("ModalClientsMultiUpdate"));
-                ModalClientsMultiUpdate.show();
-
-                // Send DATA To Modal
-                await this.updateClientsRoute(newValue)
-            }
-        },
-
-        //
-
-        getAddJourneyPlan(newValue, oldValue) {
-
-            if(newValue != null) {
-                
-                if((typeof newValue.journey_plan    ==  "undefined")&&(typeof newValue.journee  ==  "undefined")&&(typeof newValue.user     ==  "undefined")) {
-
-                    // ShowModal
-                    var addJourneyPlanModal        =   new Modal(document.getElementById("addJourneyPlanModal"));
-                    addJourneyPlanModal.show();
-
-                    // Send DATA To Modal
-                    this.addJourneyPlan(newValue.latlngs)
-                }
-
-                if(typeof newValue.journey_plan     !=  "undefined") {
-
-                    // ShowModal
-                    var updateJourneyPlanModal      =   new Modal(document.getElementById("updateJourneyPlanModal"));
-                    updateJourneyPlanModal.show();
-
-                    // Send DATA To Modal
-                    this.updateJourneyPlan(newValue.journey_plan)
-                }
-
-                if(typeof newValue.journee          !=  "undefined") {
-
-                    // ShowModal
-                    var updateJourneyPlanModal      =   new Modal(document.getElementById("updateJourneyPlanModal"));
-                    updateJourneyPlanModal.show();
-
-                    // Send DATA To Modal
-                    this.updateJourneyPlan(newValue.journee)
-                }
-
-                if(typeof newValue.user             !=  "undefined") {
-
-                    // ShowModal
-                    var updateJourneyPlanModal      =   new Modal(document.getElementById("updateJourneyPlanModal"));
-                    updateJourneyPlanModal.show();
-
-                    // Send DATA To Modal
-                    this.updateJourneyPlan(newValue.user)
-                }
-            }
-        }
     },
 }
 </script>

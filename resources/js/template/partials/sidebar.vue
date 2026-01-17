@@ -51,8 +51,6 @@ export default {
 
         ...mapGetters({
             getUser                     :   'authentification/getUser'              ,
-            getAccessToken              :   'authentification/getAccessToken'       ,
-            getIsAuthentificated        :   'authentification/getIsAuthentificated'
         }),
 
         // Dashboard

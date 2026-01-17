@@ -325,7 +325,6 @@ class DataTableHelper {
 
         //
         const dataTables_length =   document.querySelector('#' + this.$tableId + '_wrapper').querySelector('.dataTables_length');
-        console.log(dataTables_length)
 
         if (dataTables_length   !=  null) {
             const paginate_numbers  =   document.querySelector('#' + this.$tableId + '_wrapper').querySelector('#' + this.$tableId + '_paginate');

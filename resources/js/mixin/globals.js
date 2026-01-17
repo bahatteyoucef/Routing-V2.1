@@ -593,10 +593,6 @@ export default {
                     navigator.geolocation.getCurrentPosition(
                         (position) => {
                             const accuracy = position.coords.accuracy;
-                            console.log(accuracy);
-                            console.log(accuracy_max);
-                            console.log(Math.ceil(accuracy) <= accuracy_max);
-                            console.log(attempts);
 
                             if (Math.ceil(accuracy) <= accuracy_max) {
                                 resolve({ success: true, position });

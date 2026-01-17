@@ -66,6 +66,8 @@
 
 import ModalRouteImportDelete   from    "@/components/routes/shared/crud/ModalRouteImportDelete.vue"
 
+import emitter                  from    "@/utils/emitter"
+
 export default {
 
     data() {
@@ -82,14 +84,14 @@ export default {
 
         await this.getRouteImport()
 
-        this.emitter.on("reSetRouteImport" , async () =>  {
+        emitter.on("reSetRouteImport" , async () =>  {
             await this.getRouteImport()
         })
     },
 
     unounted() {
 
-        this.emitter.off("reSetRouteImport")
+        emitter.off("reSetRouteImport")
     },
 
     methods : {
@@ -100,9 +102,6 @@ export default {
 
                 this.$callApi("post",    "/route-imports",     null)
                 .then((res)=> {
-
-                    console.log(res)
-
                     this.liste_route_import     =   res.data.liste_route_import
                 })
             }

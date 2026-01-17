@@ -242,6 +242,10 @@ import ModalClientUpdate                  from  "../../../clients/shared/ModalCl
 
 import Multiselect                        from  "@vueform/multiselect"
 
+//
+
+import emitter                  from    "@/utils/emitter"
+
 export default {
 
   data() {
@@ -342,13 +346,13 @@ export default {
 
   async mounted() {
 
-    this.emitter.on("reSetValidationClientUpdate" , (validation_type) =>  {
+    emitter.on("reSetValidationClientUpdate" , (validation_type) =>  {
       this.update_type        =   'validation'
       this.mode               =   'permanent'
       this.validation_type    =   validation_type
     })
 
-    this.emitter.on("reSetNormalClientUpdate"     , ()                =>  {
+    emitter.on("reSetNormalClientUpdate"     , ()                =>  {
       this.update_type        =   'normal_update'
       this.mode               =   'permanent'
       this.validation_type    =   null
@@ -356,51 +360,51 @@ export default {
 
     //
 
-    this.emitter.on("reSetUpdate"                 , async (client)    =>  {
+    emitter.on("reSetUpdate"                 , async (client)    =>  {
       await this.updateClientJSON(client)
     })
 
-    this.emitter.on("updateDoublesCustomerCode"   , async (client)    =>  {
+    emitter.on("updateDoublesCustomerCode"   , async (client)    =>  {
       await this.updateClientJSONDoublant(client)
     })
 
-    this.emitter.on("updateDoublesCustomerNameE"  , async (client)    =>  {
+    emitter.on("updateDoublesCustomerNameE"  , async (client)    =>  {
       await this.updateClientJSONDoublant(client)
     })
 
-    this.emitter.on("updateDoublesTel"            , async (client)    =>  {
+    emitter.on("updateDoublesTel"            , async (client)    =>  {
       await this.updateClientJSONDoublant(client)
     })
 
-    this.emitter.on("updateDoublesGPS"            , async (client)    =>  {
+    emitter.on("updateDoublesGPS"            , async (client)    =>  {
       await this.updateClientJSONDoublant(client)
     })
 
     //
 
-    this.emitter.on("reSetDelete"                 , async (client)    =>  {
+    emitter.on("reSetDelete"                 , async (client)    =>  {
       await this.deleteClientJSON(client)
     })
 
-    this.emitter.on("deleteDoublesCustomerCode"   , async (client)    =>  {
+    emitter.on("deleteDoublesCustomerCode"   , async (client)    =>  {
         await this.deleteClientJSONDoublant(client)
     })
 
-    this.emitter.on("deleteDoublesCustomerNameE"  , async (client)    =>  {
+    emitter.on("deleteDoublesCustomerNameE"  , async (client)    =>  {
         await this.deleteClientJSONDoublant(client)
     })
 
-    this.emitter.on("deleteDoublesTel"            , async (client)    =>  {
+    emitter.on("deleteDoublesTel"            , async (client)    =>  {
         await this.deleteClientJSONDoublant(client)
     })
 
-    this.emitter.on("deleteDoublesGPS"            , async (client)    =>  {
+    emitter.on("deleteDoublesGPS"            , async (client)    =>  {
         await this.deleteClientJSONDoublant(client)
     })
 
     //
 
-    this.emitter.on('reSetClientsDecoupeByJourneeMap'   , async (clients)   =>  {
+    emitter.on('reSetClientsDecoupeByJourneeMap'   , async (clients)   =>  {
         await this.getData();
     })
 
@@ -468,8 +472,6 @@ export default {
             await this.$callApi("post",   "/statistics/standard",    formData)
             .then(async (res)=> {
 
-                console.log(res)
-
                 //
                 await this.$hideLoadingPage()
 
@@ -507,21 +509,21 @@ export default {
 
                 this.show_by_customer_type_report_content         =   true
 
-                this.emitter.on('show_by_customer_type_report_content_ready' , () =>  {
+                emitter.on('show_by_customer_type_report_content_ready' , () =>  {
 
                     this.by_new_customer_report_chart_data   =   res.data.stats_details.by_new_customer_report_chart_data
                     this.by_new_customer_report_table_data   =   res.data.stats_details.by_new_customer_report_table_data
 
                     this.show_by_new_customer_report_content =   true
 
-                    this.emitter.on('show_by_new_customer_report_content_ready' , () =>  {
+                    emitter.on('show_by_new_customer_report_content_ready' , () =>  {
                             
                         this.by_open_customer_report_chart_data           =   res.data.stats_details.by_open_customer_report_chart_data
                         this.by_open_customer_report_table_data           =   res.data.stats_details.by_open_customer_report_table_data
 
                         this.show_by_open_customer_report_content         =   true
 
-                        this.emitter.on('show_by_open_customer_report_content_ready' , () =>  {
+                        emitter.on('show_by_open_customer_report_content_ready' , () =>  {
                                 
                             //
                             this.daily_report_chart_data                      =   res.data.stats_details.daily_report_chart_data
@@ -529,7 +531,7 @@ export default {
 
                             this.show_daily_report_content                    =   true
 
-                            this.emitter.on('show_daily_report_content_ready' , () =>  {
+                            emitter.on('show_daily_report_content_ready' , () =>  {
 
                                 //
                                 // this.by_city_report_chart_data                    =   res.data.stats_details.by_city_report_chart_data
@@ -537,21 +539,21 @@ export default {
 
                                 this.show_by_city_report_content                  =   true
 
-                                this.emitter.on('show_by_city_report_content_ready' , () =>  {
+                                emitter.on('show_by_city_report_content_ready' , () =>  {
 
                                     //
                                     this.map_report_data                              =   res.data.stats_details.data_census_report_table_data
 
                                     this.show_data_map_report_content                 =   true
 
-                                    this.emitter.on('show_data_map_report_content_ready', () => {
+                                    emitter.on('show_data_map_report_content_ready', () => {
 
                                         //
                                         this.data_census_report_table_data                =   res.data.stats_details.data_census_report_table_data
 
                                         this.show_data_census_report_content              =   true
 
-                                        this.emitter.on('show_data_census_report_content_ready' , () =>  {
+                                        emitter.on('show_data_census_report_content_ready' , () =>  {
 
                                             this.show_get_data_button       =   true
                                             this.show_export_data_button    =   true
@@ -598,20 +600,13 @@ export default {
         let filename = "Reports ("+this.start_date+" __ "+this.end_date+").xlsx";
 
         //
-        console.log(1)
         this.exportByCustomerTypeReport()
-        console.log(2)
         this.exportByNewCustomerReport()
-        console.log(3)
         this.exportByOpenCustomerReport()
-        console.log(4)
         this.exportDailyReport()
         this.exportDailyReportTotal()
-        console.log(5)
         this.exportByCityReport()
-        console.log(6)
         this.exportDataCensusReport()
-        console.log(7)
 
         // Write workbook to buffer then convert to Excel file and download
         this.workbook.xlsx.writeBuffer().then(data => {

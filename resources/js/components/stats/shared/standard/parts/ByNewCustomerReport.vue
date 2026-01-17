@@ -62,6 +62,8 @@
 
 <script>
 
+import emitter                  from    "@/utils/emitter"
+
 export default {
 
     data() {
@@ -80,8 +82,6 @@ export default {
 
     async mounted() {
 
-        console.log("new_customer")
-
         //
         this.setChart();
 
@@ -89,14 +89,12 @@ export default {
         await this.$nextTick()
 
         //
-        this.emitter.emit('show_by_new_customer_report_content_ready')
+        emitter.emit('show_by_new_customer_report_content_ready')
     },
 
     methods : {
 
         setChart() {
-
-            console.log("new_customer")
 
             if (this.by_new_customer_report_chart) {
                 this.by_new_customer_report_chart.destroy();   // Destroy existing chart for proper updates

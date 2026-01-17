@@ -47,6 +47,8 @@
 
 import DatatableHelper              from    "@/services/DatatableHelper"
 
+import emitter                  from    "@/utils/emitter"
+
 export default {
 
     data() {
@@ -113,8 +115,8 @@ export default {
 
     unmounted() {
 
-        this.emitter.off("reSetUpdate")
-        this.emitter.off("reSetDelete")
+        emitter.off("reSetUpdate")
+        emitter.off("reSetDelete")
     },
 
     methods : {

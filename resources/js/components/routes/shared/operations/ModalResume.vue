@@ -38,6 +38,8 @@
 
 import ResumeComponent from "../parts/ResumeComponent.vue"
 
+import emitter                  from    "@/utils/emitter"
+
 export default {
 
     data() {
@@ -87,7 +89,6 @@ export default {
                 formData.append("data"  ,   JSON.stringify(clients))
 
                 const res                   =   await this.$callApi("post"  ,   "/clients-tempo/resume/update", formData)
-                console.log(res)
 
                 if(res.status===200){
 
@@ -104,7 +105,7 @@ export default {
                     }, {});
 
                     //
-                    this.emitter.emit('reSetClientsDevide' , clients_object)
+                    emitter.emit('reSetClientsDevide' , clients_object)
 
                     // Close Modal
                     await this.$hideModal("ModalResume")
@@ -149,7 +150,7 @@ export default {
                     }, {});
 
                     //
-                    this.emitter.emit('reSetClientsDecoupeByJourneeMap' , clients_object)
+                    emitter.emit('reSetClientsDecoupeByJourneeMap' , clients_object)
 
                     // Close Modal
                     await this.$hideModal("ModalResume")

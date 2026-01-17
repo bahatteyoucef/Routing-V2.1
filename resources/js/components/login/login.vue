@@ -93,7 +93,6 @@
                 formData.append("password"  ,   this.password)
 
                 let response = await this.$callApi('post',  '/login',   formData)
-                console.log(response)
 
                 if(response.status === 200) {
 
