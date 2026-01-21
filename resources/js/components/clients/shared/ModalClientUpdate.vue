@@ -395,40 +395,40 @@
                                 <div v-if="mode === 'permanent'" class="row mt-3 mb-3">
                                     <div v-if="client.OpenCustomer  === 'Ouvert'" class="col-sm-12">
                                         <label for="CustomerBarCode_image_update"   class="form-label">Image Code-Barre</label>
-                                        <input type="file"                          class="form-control"        id="CustomerBarCode_image_update"       accept="image/*"    capture     @change="customerBarCodeImage()"     :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                        <input type="file"                          class="form-control"        id="CustomerBarCode_image_update"       accept="image/*"    capture     @change="handleImageUpload($event, 'CustomerBarCode_image')"     :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
 
-                                        <div class="img-magnifier-container" id="CustomerBarCode_image_display_update_container" style="display: none">
-                                            <img
-                                                id="CustomerBarCode_image_display_update"
-                                                class="w-100"
-                                                @load="$magnify('CustomerBarCode_image_display_update', 3, 'CustomerBarCode_image_display_update_container')"
-                                            />
+                                        <div class="img-magnifier-container" id="CustomerBarCode_image_display_update_container">
+                                            <img id="CustomerBarCode_image_display_update"
+                                                :src="client.CustomerBarCode_image_currentObjectURL" 
+                                                v-show="client.CustomerBarCode_image_currentObjectURL"
+                                                style="width: 100%; height: auto; display: block; margin: auto; border-radius: 8px;"
+                                                @load="$magnify('CustomerBarCode_image_display_update', 3, 'CustomerBarCode_image_display_update_container')">
                                         </div>
                                     </div>
 
                                     <div class="col-sm-12">
                                         <label for="facade_image_update"    class="form-label">Image Facade</label>
-                                        <input type="file"                  class="form-control"    id="facade_image_update"                            accept="image/*"    @change="facadeImage()"                                              :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                        <input type="file"                  class="form-control"    id="facade_image_update"                            accept="image/*"        @change="handleImageUpload($event, 'facade_image')"         :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
 
                                         <div class="img-magnifier-container" id="facade_image_display_update_container" style="display: none">
-                                            <img
-                                                id="facade_image_display_update"
-                                                class="w-100"
-                                                @load="$magnify('facade_image_display_update', 3, 'facade_image_display_update_container')"
-                                            />
+                                            <img id="facade_image_display_update"
+                                                :src="client.facade_image_currentObjectURL" 
+                                                v-show="client.facade_image_currentObjectURL"
+                                                style="width: 100%; height: auto; display: block; margin: auto; border-radius: 8px;"
+                                                @load="$magnify('facade_image_display_update', 3, 'facade_image_display_update_container')">
                                         </div>
                                     </div>
 
                                     <div v-if="client.OpenCustomer  === 'Ouvert'" class="col-sm-12">
                                         <label for="in_store_image_update"  class="form-label">Image In-Store</label>
-                                        <input type="file"                  class="form-control"    id="in_store_image_update"             accept="image/*"    @change="inStoreImage()"                                             :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
+                                        <input type="file"                  class="form-control"    id="in_store_image_update"             accept="image/*"    @change="handleImageUpload($event, 'in_store_image')"                                             :disabled="!((this.$isRole('Super Admin'))||(this.$isRole('BU Manager'))||(this.$isRole('BackOffice')))">
 
                                         <div class="img-magnifier-container" id="in_store_image_display_update_container" style="display: none">
-                                            <img
-                                                id="in_store_image_display_update"
-                                                class="w-100"
-                                                @load="$magnify('in_store_image_display_update', 3, 'in_store_image_display_update_container')"
-                                            />
+                                            <img id="in_store_image_display_update" 
+                                                :src="client.in_store_image_currentObjectURL" 
+                                                v-show="client.in_store_image_currentObjectURL"
+                                                style="width: 100%; height: auto; display: block; margin: auto; border-radius: 8px;"
+                                                @load="$magnify('in_store_image_display_update', 3, 'in_store_image_display_update_container')">
                                         </div>
                                     </div>
                                 </div>
@@ -488,10 +488,6 @@ export default {
                 // Slide 2
                 CustomerCode                            :   '',
 
-                // Slide 3
-                CustomerBarCode_image                   :   '',
-                CustomerBarCode_image_original_name     :   '',
-
                 // Slide 4
                 old_CustomerNameE                       :   '',
                 CustomerNameE                           :   '',
@@ -550,14 +546,17 @@ export default {
                 AvailableBrands_array_formatted         :   [],
                 AvailableBrands_string_formatted        :   "",
 
-                in_store_image                          :   '',
-                in_store_image_original_name            :   '',
-
                 // Slide 20
                 comment                                 :   '',
 
                 // Slide 21
-                facade_image                            :   '',
+                CustomerBarCode_image_currentObjectURL  :   null,
+                CustomerBarCode_image_original_name     :   '',
+
+                in_store_image_currentObjectURL         :   null,
+                in_store_image_original_name            :   '',
+
+                facade_image_currentObjectURL           :   null,
                 facade_image_original_name              :   '',
 
                 // Slide 22
@@ -620,9 +619,8 @@ export default {
         };
     },
 
-    beforeUnmount() {
-        // 2. Cleanup memory when modal closes
-        const fields = ['facade_image', 'CustomerBarCode_image', 'in_store_image'];
+    beforeDestroy() {
+        const fields = ['CustomerBarCode_image', 'facade_image', 'in_store_image'];
         fields.forEach(field => this.revokeImage(field));
     },
 
@@ -662,14 +660,23 @@ export default {
                 CityNameE: this.client.CityNameE,
                 CustomerType: this.client.CustomerType,
                 
+                tel_status: this.client.tel_status,
+                tel_comment: this.client.tel_comment,
+
                 // For images in JSON, we send the existing filename string (or empty).
                 // The actual binary update happens in step 4 via _rawFiles.
                 facade_image: typeof this.client.facade_image === 'string' ? this.client.facade_image : '',
                 facade_image_original_name: this.client.facade_image_original_name,
                 facade_image_updated: this.client.facade_image_updated,
                 
-                comment: this.client.comment
+                comment: this.client.comment,
+                owner: this.client.owner,
+
+                status: this.client.status,
+                nonvalidated_details: this.client.nonvalidated_details,
             };
+
+            console.log(this.client.nonvalidated_details)
 
             // --- B. Status Specific Logic ---
             if (status === 'Ouvert') {
@@ -678,8 +685,6 @@ export default {
                     CustomerCode: this.client.CustomerCode,
                     CustomerNameE: this.client.CustomerNameE,
                     Tel: this.client.Tel,
-                    tel_status: this.client.tel_status,
-                    tel_comment: this.client.tel_comment,
                     BrandAvailability: this.client.BrandAvailability,
                     BrandSourcePurchase: this.client.BrandSourcePurchase,
                     JPlan: this.client.JPlan,
@@ -701,10 +706,6 @@ export default {
                     
                     CustomerBarCode_image_original_name: this.client.CustomerBarCode_image_original_name,
                     in_store_image_original_name: this.client.in_store_image_original_name,
-                    
-                    status: this.client.status,
-                    nonvalidated_details: this.client.nonvalidated_details,
-                    owner: this.client.owner // Maintain owner if needed
                 };
             } else if (status === 'Ferme' || status === 'refus') {
                 payload = {
@@ -713,8 +714,6 @@ export default {
                     CustomerCode: '',
                     CustomerNameE: '',
                     Tel: '',
-                    tel_status: 'nonvalidated',
-                    tel_comment: '',
                     BrandAvailability: 'Non',
                     BrandSourcePurchase: '',
                     JPlan: this.client.JPlan,
@@ -733,9 +732,6 @@ export default {
                     // Force update flags to true so backend clears them
                     CustomerBarCode_image_updated: true,
                     in_store_image_updated: true,
-                    
-                    status: 'pending',
-                    nonvalidated_details: ''
                 };
             } else if (status === 'Introuvable') {
                 payload = {
@@ -743,8 +739,6 @@ export default {
                     CustomerCode: '',
                     CustomerNameE: '',
                     Tel: this.client.Tel,
-                    tel_status: 'nonvalidated',
-                    tel_comment: '',
                     NbrAutomaticCheckouts: '',
                     SuperficieMagasin: this.client.SuperficieMagasin,
                     BrandAvailability: this.client.BrandAvailability,
@@ -761,8 +755,6 @@ export default {
                     
                     JPlan: this.client.JPlan,
                     Journee: this.client.Journee,
-                    status: 'pending',
-                    nonvalidated_details: ''
                 };
             }
 
@@ -811,7 +803,7 @@ export default {
                         emitter.emit("updateDoubles" + this.validation_type, this.client);
                     } else {
                         // Generic update event for parent
-                        emitter.emit('updateClient', this.client);
+                        emitter.emit('reSetUpdate', this.client);
                     }
 
                     await this.$hideModal("ModalClientUpdate");
@@ -883,9 +875,11 @@ export default {
                     this.all_clients = all_clients;
                 }
 
-                await this.getComboData();
-
-                await this.getClientData(client);
+                // 2. Get Client & Combo Data
+                await Promise.all([
+                    this.getComboData(),
+                    this.getClientData(client)
+                ]);
 
                 // Map logic
                 await this.showPositionOnMapMultiMap("show_modal_client_update_map");
@@ -920,7 +914,12 @@ export default {
             imageFields.forEach(field => {
                 // Set original names
                 this.client[`${field}_original_name`] = client[`${field}_original_name`];
-                
+
+                console.log(client)
+                console.log(field)
+                console.log(client[field])
+                console.log(`/uploads/clients/${client.id}/${client[field]}`)
+
                 // Set Preview URL
                 if (client[field]) {
                     this.client[`${field}_currentObjectURL`] = `/uploads/clients/${client.id}/${client[field]}`;
@@ -1022,31 +1021,25 @@ export default {
             const file = event.target.files[0];
             if (!file) return;
 
-            this.revokeImage(fieldKey); // Clear old memory
+            // Revoke old URL to free memory
+            this.revokeImage(fieldKey);
 
             try {
-                // Compress
                 const compressedFile = await this.$compressImage(file);
                 const objectUrl = URL.createObjectURL(compressedFile);
 
-                // Store Binary in non-reactive object
+                // Update non-reactive storage
                 this._rawFiles[fieldKey] = compressedFile;
 
-                // Update Vue State (Metadata & Preview only)
+                // Update Vue state with metadata only
                 this.client[`${fieldKey}_currentObjectURL`] = objectUrl;
                 this.client[`${fieldKey}_original_name`] = file.name;
                 this.client[`${fieldKey}_updated`] = true;
 
-                // Handle Display Containers (Logic from your original code)
-                const containerId = `${fieldKey}_display_update_container`;
-                const container = document.getElementById(containerId);
-                if (container) container.style.display = "block";
-
-                // Clear input value to allow re-selecting same file
-                event.target.value = '';
-
+                // Clear input so same file can be re-selected if needed
+                event.target.value = ''; 
             } catch (e) {
-                console.error(`Error uploading ${fieldKey}:`, e);
+                console.error("Upload Error:", e);
             }
         },
 

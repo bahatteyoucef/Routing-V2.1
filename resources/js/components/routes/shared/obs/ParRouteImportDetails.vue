@@ -1762,32 +1762,33 @@ export default {
 
             // ShowModal
             var addModal    =   new Modal(document.getElementById("ModalClientAdd"));
-            addModal.show();
+            if(addModal) addModal.show();
 
             //
-            this.$refs.ModalClientAdd.getData(client, this.clients_table_affiche)
+            if(this.$refs.ModalClientAdd) this.$refs.ModalClientAdd.getData(client, this.clients_table_affiche)
         },
 
         updateClient(client) {
 
             // ShowModal
             var updateModal     =   new Modal(document.getElementById("ModalClientUpdate"));
-            updateModal.show();
+            if(updateModal) updateModal.show();
 
             //
-            this.$refs.ModalClientUpdate.getData(client, this.clients_table_affiche)
+            if(this.$refs.ModalClientUpdate) this.$refs.ModalClientUpdate.getData(client, this.clients_table_affiche)
         },
 
         async updateMultiClients(clients) {
 
             var ModalClientsMultiUpdate     =   new Modal(document.getElementById("ModalClientsMultiUpdate"));
-            ModalClientsMultiUpdate.show();
+            if(ModalClientsMultiUpdate) ModalClientsMultiUpdate.show();
 
-            await this.$refs.ModalClientsMultiUpdate.getData(clients)
+            //
+            if(this.$refs.ModalClientsMultiUpdate) await this.$refs.ModalClientsMultiUpdate.getData(clients)
         },
 
         addJourneyPlan(LatLngs) {
-            this.$refs.ModalAddJourneyPlan.getData(LatLngs)
+            if(this.$refs.ModalAddJourneyPlan) this.$refs.ModalAddJourneyPlan.getData(LatLngs)
         },
 
         updateJourneyPlan(territory) {
@@ -1795,40 +1796,40 @@ export default {
 
                 // ShowModal
                 var addJourneyPlanModal        =   new Modal(document.getElementById("addJourneyPlanModal"));
-                addJourneyPlanModal.show();
+                if(addJourneyPlanModal) addJourneyPlanModal.show();
 
                 // Send DATA To Modal
-                this.$refs.ModalUpdateJourneyPlan.getData(territory.latlngs)
+                if(this.$refs.ModalUpdateJourneyPlan) this.$refs.ModalUpdateJourneyPlan.getData(territory.latlngs)
             }
 
             if(typeof territory.journey_plan     !=  "undefined") {
 
                 // ShowModal
                 var updateJourneyPlanModal      =   new Modal(document.getElementById("updateJourneyPlanModal"));
-                updateJourneyPlanModal.show();
+                if(updateJourneyPlanModal) updateJourneyPlanModal.show();
 
                 // Send DATA To Modal
-                this.$refs.ModalUpdateJourneyPlan.getData(territory.journey_plan)
+                if(this.$refs.ModalUpdateJourneyPlan) this.$refs.ModalUpdateJourneyPlan.getData(territory.journey_plan)
             }
 
             if(typeof territory.journee          !=  "undefined") {
 
                 // ShowModal
                 var updateJourneyPlanModal      =   new Modal(document.getElementById("updateJourneyPlanModal"));
-                updateJourneyPlanModal.show();
+                if(updateJourneyPlanModal) updateJourneyPlanModal.show();
 
                 // Send DATA To Modal
-                this.$refs.ModalUpdateJourneyPlan.getData(territory.journee)
+                if(this.$refs.ModalUpdateJourneyPlan) this.$refs.ModalUpdateJourneyPlan.getData(territory.journee)
             }
 
             if(typeof territory.user             !=  "undefined") {
 
                 // ShowModal
                 var updateJourneyPlanModal      =   new Modal(document.getElementById("updateJourneyPlanModal"));
-                updateJourneyPlanModal.show();
+                if(updateJourneyPlanModal) updateJourneyPlanModal.show();
 
                 // Send DATA To Modal
-                this.$refs.ModalUpdateJourneyPlan.getData(territory.user)
+                if(this.$refs.ModalUpdateJourneyPlan) this.$refs.ModalUpdateJourneyPlan.getData(territory.user)
             }
         },
 

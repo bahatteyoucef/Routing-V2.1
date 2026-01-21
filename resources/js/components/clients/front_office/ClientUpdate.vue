@@ -406,7 +406,6 @@ export default {
                 comment: '',
 
                 // Images (Data & Preview)
-                // CustomerBarCode_image: '',
                 CustomerBarCode_image_currentObjectURL: null,
                 CustomerBarCode_image_original_name: '',
 
@@ -556,8 +555,8 @@ export default {
 
                 // 2. Get Client & Combo Data
                 await Promise.all([
-                    this.getClientData(),
-                    this.getComboData()
+                    this.getComboData(),
+                    this.getClientData()
                 ]);
 
                 await this.$hideLoadingPage();

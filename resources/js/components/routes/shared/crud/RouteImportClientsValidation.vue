@@ -1142,7 +1142,6 @@ export default {
             const file = input?.files?.[0];
             const client = this.clients[index];
 
-
             // revoke previous object URL if exists
             if (client._facade_object_url) {
             try { URL.revokeObjectURL(client._facade_object_url); } catch(e) {}
